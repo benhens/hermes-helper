@@ -141,17 +141,21 @@ test('every class comes from the Hermes class table: page code writes no class s
   }
 })
 
-test('two tabs use the SDK SegmentedControl, labelled Setup and Your setup', () => {
-  assert.match(src('page.js'), /jsx\(SegmentedControl,/)
+test('two text tabs, Setup and Your setup, in Capabilities\' TextTab look (not the SegmentedControl pill)', () => {
+  assert.doesNotMatch(src('page.js'), /SegmentedControl/)
   assert.match(src('page.js'), /\{ id: 'setup', label: 'Setup' \}/)
   assert.match(src('page.js'), /\{ id: 'yours', label: 'Your setup' \}/)
+  assert.match(src('page.js'), /role: 'tablist'/)
+  assert.match(src('page.js'), /role: 'tab',/)
 })
 
-test('buttons are Hermes Button components; no bare <button> except the choice cards (Hermes Chip markup)', () => {
-  const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button'/g)]
-  assert.equal(bare.length, 1)
+test('buttons are Hermes Button components; bare <button>s only where Hermes uses them too', () => {
+  // The choice cards (Hermes Chip markup), the text tabs (TextTab is a plain <button>) and the
+  // hidden helper's strip (PaneTab vertical / kanban rail are plain buttons).
+  const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button',\s*\{\s*type: 'button',\s*(['\w-]+)/g)].map(m => m[1])
+  assert.deepEqual(bare.sort(), ["'aria-pressed'", 'className', 'role'])
+  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 3)
   assert.doesNotMatch(src('setup-tab.js'), /jsxs?\(\s*'button'/)
-  assert.match(src('page.js'), /'button',\s*\{\s*type: 'button',\s*'aria-pressed'/)
 })
 
 test('every codicon named in the code is in the ICONS list (which hermes-checks.sh checks against Hermes)', () => {
@@ -166,9 +170,9 @@ test('the step count matches the step list (a mismatch would crash the open step
 })
 
 test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s own patterns', () => {
-  // Allowed: tone on a ghost icon button (RoomHeader), the composer's own send class, the round
-  // floating disc (fan-menu.tsx). Anything else would restyle Hermes's button.
-  const allowed = new Set([K.iconTone, K.peekButton])
+  // Allowed: tone on a ghost icon button (RoomHeader) and the composer's own send class.
+  // Anything else would restyle Hermes's button.
+  const allowed = new Set([K.iconTone])
   const buttons = [...propsOf(src('page.js'), 'Button'), ...propsOf(src('setup-tab.js'), 'Button')]
   assert.ok(buttons.length >= 12, `found ${buttons.length} Button calls`)
   for (const props of buttons) {
@@ -179,7 +183,7 @@ test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s o
     const key = expr.match(/^K\.(\w+)$/)
     assert.ok(key && allowed.has(K[key[1]]), `Button className ${expr}`)
   }
-  for (const key of ['iconTone', 'peekButton']) assert.doesNotMatch(K[key], /(^|\s)(h|w|size|p[xytrbl]?|text-\[)/, key)
+  for (const key of ['iconTone', 'composerSend']) assert.doesNotMatch(K[key], /(^|\s)(h|w|size|p[xytrbl]?|text-\[)/, key)
 })
 
 test('the character is one swappable component, used only through <Character>', () => {

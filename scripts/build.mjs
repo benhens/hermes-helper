@@ -12,7 +12,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const ORDER = ['state.js', 'model-status.js', 'model-call.js', 'key-check.js', 'setup-cards.js', 'placeholder-steps.js', 'look.js', 'character.js', 'setup-tab.js', 'page.js', 'main.js']
+const ORDER = ['state.js', 'model-name.js', 'model-status.js', 'model-call.js', 'key-check.js', 'setup-cards.js', 'placeholder-steps.js', 'look.js', 'layout.js', 'character.js', 'setup-tab.js', 'page.js', 'main.js']
 const ALLOWED = ['@hermes/plugin-sdk', 'react', 'react/jsx-runtime']
 const OUT = path.join(ROOT, 'desktop', 'plugin.js')
 

@@ -73,7 +73,8 @@ test('a working mock home: Works, Works, Not checked yet, Not set up yet (defaul
     ['gateway', 'model', 'answers', 'soul', 'skills', 'memory', 'remember'].map(id => status(view, id)),
     ['works', 'works', 'unchecked', 'notset', 'count', 'works', 'unchecked']
   )
-  assert.match(text(card(view, 'model')), /mock-small/)
+  assert.match(text(card(view, 'model')), /Mock Small/)
+  assert.doesNotMatch(text(card(view, 'model')), /mock-small/)
   assert.match(text(card(view, 'skills')), /2 switched on/)
   // Read-only calls only, each once; the model check from page open is reused, no model call.
   assert.deepEqual(methods().sort(), ['profiles.describe', 'setup.runtime_check'])
@@ -108,7 +109,7 @@ test('Check on "The model answers": one llm.oneshot, task helping_hand, no sessi
   await new Promise(r => setTimeout(r, 60))
   await settle()
   assert.equal(status(view, 'answers'), 'works')
-  assert.match(text(card(view, 'answers')), /mock-small answered a short test in \d+\.\d seconds\./)
+  assert.match(text(card(view, 'answers')), /Mock Small answered a short test in \d+\.\d seconds\./)
   const call = calls.filter(c => c.method === 'llm.oneshot')
   assert.equal(call.length, 1)
   assert.deepEqual(call[0].params, { task: 'helping_hand', instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 300 })
@@ -216,7 +217,7 @@ test('card 7: It didn\'t = Needs a fix with three reasons; It said 7Q4 = Works; 
   assert.deepEqual(texts, ['Use the memory tool to save this exact note: Helping Hand test 7Q4.', 'What is the Helping Hand test note?'])
 })
 
-test('two bots: a picker; the other bot\'s cards read with its name and say "for work"', async () => {
+test('two bots: a picker names the bot once; the other bot\'s cards read with its name; titles carry no bot name', async () => {
   const { view } = await openYours({
     profiles: { profiles: [{ name: 'default', is_default: true }, { name: 'work' }] },
     soul: p => ({ soul: p.name === 'work' ? 'You are Work Bot.' : DEFAULT_SOULS[0] }),
@@ -225,11 +226,13 @@ test('two bots: a picker; the other bot\'s cards read with its name and say "for
   const picker = byData(view.tree, 'bot-picker')
   assert.ok(picker)
   assert.match(text(picker), /2 bots on this Hermes/)
-  assert.match(text(card(view, 'soul')), /Personality file \(SOUL\.md\) for default/)
+  assert.equal(all(view.tree, n => n.type === 'h4').map(h => text(h)).filter(t => /default|work/.test(t)).length, 0)
+  assert.equal(all(picker, n => n.type === 'sdk:Select')[0].props.value, 'default')
   const select = all(picker, n => n.type === 'sdk:Select')[0]
   select.props.onValueChange('work')
   await settle(10)
-  assert.match(text(card(view, 'soul')), /for work/)
+  assert.equal(all(byData(view.tree, 'bot-picker'), n => n.type === 'sdk:Select')[0].props.value, 'work')
+  assert.equal(all(view.tree, n => n.type === 'h4').map(h => text(h)).filter(t => /default|work/.test(t)).length, 0)
   assert.equal(status(view, 'soul'), 'works')
   assert.equal(status(view, 'model'), 'fix')
   assert.deepEqual(calls.filter(c => c.method === 'setup.runtime_check').at(-1).params, { profile: 'work' })
@@ -276,7 +279,7 @@ test('opening the tab later reuses the page\'s fresh model check: runtime_check 
   const { Page } = await registerPlugin(fakeStorage({ tab: 'setup' }))
   const view = mount(Page)
   await settle(10)
-  all(view.tree, n => n.type === 'sdk:SegmentedControl')[0].props.onChange('yours')
+  click(all(view.tree, n => n.props.role === 'tab')[1])
   await settle(10)
   assert.equal(methods().filter(m => m === 'setup.runtime_check').length, 1)
   assert.equal(status(view, 'model'), 'works')
@@ -312,7 +315,7 @@ test('Check again while another bot is shown and the bot list fails: that bot st
   listFails = true
   click(all(view.tree, n => n.type === 'sdk:Button' && text(n).trim() === 'Check again').at(-1))
   await settle(10)
-  assert.match(text(card(view, 'soul')), /for work/)
+  assert.equal(all(byData(view.tree, 'bot-picker'), n => n.type === 'sdk:Select')[0].props.value, 'work')
   assert.equal(status(view, 'soul'), 'works')
 })
 

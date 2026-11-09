@@ -29,13 +29,10 @@ export const CARD_TITLES = {
   remember: 'Does it really remember?'
 }
 
-// Cards that belong to one bot get "for {profile}" when the person has more than one bot.
-// Card 7 is per bot too, but its title is a question, so the picker above says which bot it is.
-export const PER_BOT = new Set(['model', 'answers', 'soul', 'skills', 'memory'])
-
-export function cardTitle(id, bot, botCount) {
-  const t = CARD_TITLES[id]
-  return PER_BOT.has(id) && botCount > 1 && bot ? `${t} for ${bot}` : t
+// Card titles never carry a bot name (B3a, Lead: "A model is connected for default" read badly).
+// With several bots, the picker line above the cards names the bot once.
+export function cardTitle(id) {
+  return CARD_TITLES[id]
 }
 
 export const PASSES = {
