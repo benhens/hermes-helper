@@ -65,9 +65,10 @@ export async function checkModel(request, { params = {}, sleep = () => Promise.r
   }
 
   let name = textOrEmpty(rc.model)
+  // free_tier.status is a pure read scoped to the same bot (tui_gateway/methods_free_tier.py, profile_scoped).
   if (!name && rc.free_tier_route === true) {
     try {
-      const ft = await request('free_tier.status', {}, CHECK_TIMEOUT_MS)
+      const ft = await request('free_tier.status', { ...params }, CHECK_TIMEOUT_MS)
       name = textOrEmpty(ft && ft.label)
     } catch {
       name = ''

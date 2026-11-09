@@ -18,7 +18,7 @@ import { STATUS, PASSES, REMEMBER, ANSWER_CALL, cardTitle, gatewayCard, modelCar
 export const READ_TIMEOUT_MS = 30000
 
 // The bot (profile) Hermes is running now; '' from Hermes means the default one.
-export function launchBot(profile) {
+export function runningBotName(profile) {
   return typeof profile === 'string' && profile.trim() ? profile.trim() : 'default'
 }
 
@@ -52,13 +52,13 @@ export function makeSetupCards(ctx) {
         }
       )
     })
-  const settle = p => p.then(value => ({ ok: true, value }), () => ({ ok: false }))
+  const outcome = p => p.then(value => ({ ok: true, value }), () => ({ ok: false }))
 
   // State and actions for the tab. Lives in the page (always mounted), so switching tabs keeps the
   // answers. launch = { model, recheck }: the page's own model check for the bot Hermes runs, so the
   // helper and card 2 never disagree.
   function useSetupCards({ active, launchModel, recheckLaunch }) {
-    const runningBot = launchBot(useValue(host.state.profile))
+    const runningBot = runningBotName(useValue(host.state.profile))
     const gateway = useValue(host.state.gateway)
     const [bots, setBots] = useState(null)
     const [picked, setPicked] = useState(null)
@@ -66,13 +66,21 @@ export function makeSetupCards(ctx) {
     const [runs, setRuns] = useState({})
     const [remember, setRemember] = useState(() => readRemember(ctx.storage.get('remember', {})))
     const alive = useRef(true)
+    // Per bot: a number that goes up with every new read, so an answer from an older read (or from
+    // before the running bot changed) is dropped instead of landing on the card.
     const generation = useRef({})
     const started = useRef(false)
+    const loadedFor = useRef(null)
+    // Card 3: the bots with a model call in flight, and the stop functions of running counters.
+    const asking = useRef(new Set())
+    const counters = useRef(new Set())
 
     const bot = picked && bots && bots.includes(picked) ? picked : runningBot
     const isRunning = b => b === runningBot
     const params = b => (isRunning(b) ? {} : { profile: b })
     const scope = b => (isRunning(b) ? undefined : b)
+    // A host call that throws instead of rejecting must not stop the reads after it.
+    const attempt = fn => Promise.resolve().then(fn)
 
     function patchRead(b, gen, key, value) {
       if (!alive.current || generation.current[b] !== gen) return
@@ -86,21 +94,26 @@ export function makeSetupCards(ctx) {
       generation.current[b] = gen
       setReads(r => ({ ...r, [b]: { model: isRunning(b) ? null : { state: 'checking' }, soul: null, skills: null, memory: null } }))
       if (!isRunning(b)) {
-        checkModel(request, { params: params(b), sleep }).then(m => patchRead(b, gen, 'model', m), () => patchRead(b, gen, 'model', { state: 'error' }))
+        attempt(() => checkModel(request, { params: params(b), sleep })).then(
+          m => patchRead(b, gen, 'model', m),
+          () => patchRead(b, gen, 'model', { state: 'error' })
+        )
       } else if (!(reuseLaunch && launchModel && (launchModel.state === 'ok' || launchModel.state === 'none'))) {
         recheckLaunch()
       }
-      settle(request('profiles.describe', { name: b }, READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'soul', v))
-      settle(limit(host.skills.list(scope(b)), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'skills', v))
-      settle(limit(host.toolsets.list(scope(b)), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'memory', v))
+      outcome(attempt(() => request('profiles.describe', { name: b }, READ_TIMEOUT_MS))).then(v => patchRead(b, gen, 'soul', v))
+      outcome(limit(attempt(() => host.skills.list(scope(b))), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'skills', v))
+      outcome(limit(attempt(() => host.toolsets.list(scope(b))), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'memory', v))
     }
 
+    // A failed list keeps the bots we already know, so the picked bot stays on screen.
     function loadBots() {
-      settle(limit(host.profiles.list(), READ_TIMEOUT_MS)).then(r => {
+      outcome(limit(attempt(() => host.profiles.list()), READ_TIMEOUT_MS)).then(r => {
         if (!alive.current) return
-        const list = r.ok && r.value && Array.isArray(r.value.profiles) ? r.value.profiles : []
+        const list = r.ok && r.value && Array.isArray(r.value.profiles) ? r.value.profiles : null
+        if (!list) return
         const names = list.map(p => p && typeof p.name === 'string' && p.name.trim()).filter(Boolean)
-        setBots(names.length ? names : null)
+        if (names.length) setBots(names)
       })
     }
 
@@ -108,72 +121,93 @@ export function makeSetupCards(ctx) {
       alive.current = true
       return () => {
         alive.current = false
+        for (const stop of counters.current) stop()
+        counters.current.clear()
       }
     }, [])
 
+    // First open of the tab, and again whenever Hermes switches to another bot: the old answers
+    // belonged to the old running bot, so they are dropped and read again.
     useEffect(() => {
-      if (!active || started.current) return
+      if (!active && !started.current) return
+      if (loadedFor.current === runningBot) return
+      const first = !started.current
       started.current = true
+      loadedFor.current = runningBot
+      if (!first) {
+        generation.current = Object.fromEntries(Object.entries(generation.current).map(([k, v]) => [k, v + 1]))
+        setReads({})
+        setRuns(r => Object.fromEntries(Object.entries(r).filter(([k]) => asking.current.has(k))))
+      }
       loadBots()
-      load(bot, { reuseLaunch: true })
-    }, [active])
+      load(bot, { reuseLaunch: first })
+    }, [active, runningBot])
 
     function pick(b) {
       setPicked(b)
       if (!reads[b]) load(b)
     }
 
+    // "Check again" under the cards: every read again for the shown bot. Card 3's last answer is
+    // dropped too (it may no longer be true); a call still running is left alone.
     function checkAgain() {
       loadBots()
       load(bot)
+      if (!asking.current.has(bot)) setRuns(r => ({ ...r, [bot]: undefined }))
     }
 
     // Card 3: one model call, only on a press, only when card 2 says ok for this bot.
     function ask(b) {
       const model = isRunning(b) ? launchModel : reads[b] && reads[b].model
       if (!model || model.state !== 'ok') return
-      const current = runs[b]
-      if (current && (current.phase === 'calling' || current.phase === 'countdown')) return
+      if (asking.current.has(b)) return
+      asking.current.add(b)
       const setRun = run => alive.current && setRuns(r => ({ ...r, [b]: run }))
       let startedAt = 0
       let stopTick = null
       const stopTicking = () => {
-        if (stopTick) stopTick()
+        if (stopTick) {
+          stopTick()
+          counters.current.delete(stopTick)
+        }
         stopTick = null
       }
+      let lastCheck = null
       askModel({
         request,
         sleep,
         call: { ...ANSWER_CALL, profile: params(b).profile },
-        recheck: () => checkModel(request, { params: params(b), sleep }),
+        recheck: async () => (lastCheck = await checkModel(request, { params: params(b), sleep })),
         cancelled: () => !alive.current,
         onState: s => {
+          stopTicking()
           if (s.phase === 'calling') {
             startedAt = Date.now()
             setRun({ phase: 'calling', waited: 0 })
-            stopTicking()
             stopTick = ctx.setInterval(() => setRun({ phase: 'calling', waited: Math.round((Date.now() - startedAt) / 1000) }), 1000)
+            counters.current.add(stopTick)
           } else {
-            stopTicking()
             setRun({ phase: 'countdown', left: s.left })
           }
         }
-      }).then(
-        result => {
+      })
+        .then(
+          result => {
+            if (!result) return
+            setRun({ phase: 'done', result })
+            // The call found the model gone: card 2 takes the answer of that same re-check, so
+            // both cards agree without asking Hermes a third time.
+            if (!result.ok && lastCheck && (result.kind === 'no_model' || result.kind === 'model_broken')) {
+              if (isRunning(b)) recheckLaunch()
+              else patchRead(b, generation.current[b], 'model', lastCheck)
+            }
+          },
+          () => setRun({ phase: 'done', result: { ok: false, kind: 'other' } })
+        )
+        .finally(() => {
           stopTicking()
-          if (!result) return
-          setRun({ phase: 'done', result })
-          // The call found the model gone: card 2 reads again so both cards agree.
-          if (!result.ok && (result.kind === 'no_model' || result.kind === 'model_broken')) {
-            if (isRunning(b)) recheckLaunch()
-            else checkModel(request, { params: params(b), sleep }).then(m => alive.current && setReads(r => ({ ...r, [b]: { ...(r[b] || {}), model: m } })))
-          }
-        },
-        () => {
-          stopTicking()
-          setRun({ phase: 'done', result: { ok: false, kind: 'other' } })
-        }
-      )
+          asking.current.delete(b)
+        })
     }
 
     function answerRemember(b, answer) {
@@ -182,8 +216,8 @@ export function makeSetupCards(ctx) {
       ctx.storage.set('remember', next)
     }
 
-    const r = reads[bot] || {}
-    const model = isRunning(bot) ? launchModel : r.model
+    const shown = reads[bot] || {}
+    const model = isRunning(bot) ? launchModel : shown.model
     return {
       bot,
       bots: bots || [runningBot],
@@ -191,9 +225,9 @@ export function makeSetupCards(ctx) {
         gateway: gatewayCard(gateway),
         model: modelCard(model),
         answers: answersCard(runs[bot], model),
-        soul: soulCard(r.soul),
-        skills: skillsCard(r.skills),
-        memory: memoryCard(r.memory),
+        soul: soulCard(shown.soul),
+        skills: skillsCard(shown.skills),
+        memory: memoryCard(shown.memory),
         remember: rememberCard(remember[bot])
       },
       pick,

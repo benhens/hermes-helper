@@ -103,25 +103,29 @@ function seconds(ms) {
 //     | { phase: 'done', result }   (result = askModel()'s answer)
 // model = card 2's check for the same bot: the button only works when that says ok.
 export function answersCard(run, model) {
-  const button = (label, disabled = false) => ({ kind: 'ask', label, disabled })
+  const ready = !!model && model.state === 'ok'
+  // A button that asks the model works only while card 2 says ok for this bot.
+  const button = (label, disabled = !ready) => ({ kind: 'ask', label, disabled })
   const phase = run ? run.phase : 'idle'
   if (phase === 'calling') return { status: 'checking', lines: [`Waiting for your model, ${run.waited || 0} s`] }
   if (phase === 'countdown') return { status: 'checking', lines: failLines('not_ready', 'card', run.left) }
   if (phase === 'done' && run.result) {
     const r = run.result
-    const name = modelLabel(model && model.state === 'ok' ? model.name : '')
+    const name = modelLabel(ready ? model.name : '')
     if (r.ok && answerPasses(r.text)) {
-      return { status: 'works', lines: [`${name} answered a short test in ${seconds(r.ms)} seconds.`], action: button('Check again') }
+      // A model id keeps its own spelling; only the fallback "your model" starts the sentence capitalised.
+      const lead = ready && model.name ? name : 'Your model'
+      return { status: 'works', lines: [`${lead} answered a short test in ${seconds(r.ms)} seconds.`], action: button('Check again') }
     }
     if (r.ok) return { status: 'fix', lines: ['Your model answered, but not with OK. Press Try again.'], action: button('Try again') } // (builder)
-    if (r.kind === 'no_model') return { status: 'notset', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
+    // The call found no usable model (runtime_check asked again): card 2's own line and Open step 2.
+    // Status stays "Needs a fix": build-v1.md section 8 gives card 3 only Works / Needs a fix / Not checked yet.
+    if (r.kind === 'no_model') return { status: 'fix', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
     if (r.kind === 'model_broken') return { status: 'fix', lines: [MODEL_LINES.fix], action: OPEN_STEP_2 }
     return { status: 'fix', lines: failLines(r.kind, 'card'), action: button('Try again') }
   }
-  if (!model || model.state === 'checking') return { status: 'unchecked', lines: [], action: button('Check', true) }
-  if (model.state !== 'ok') {
-    return { status: 'unchecked', lines: ['This check needs a connected model first.'], action: button('Check', true) } // (builder)
-  }
+  if (!model || model.state === 'checking') return { status: 'unchecked', lines: [], action: button('Check') }
+  if (!ready) return { status: 'unchecked', lines: ['This check needs a connected model first.'], action: button('Check') } // (builder)
   return { status: 'unchecked', lines: [], action: button('Check') }
 }
 

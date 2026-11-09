@@ -32,20 +32,38 @@ export function fakeStorage(initial = {}) {
   return { data, get: (k, d) => (data.has(k) ? data.get(k) : d), set: (k, v) => data.set(k, v) }
 }
 
-// The host's timers (ctx.setTimeout / ctx.setInterval), faked. setTimeout runs on the next turn of
-// the event loop whatever the delay (the delay is recorded), so waits of 5 s or 60 s pass at once.
-// setInterval never fires by itself: a test calls timers.tick() to fire every live interval once.
+// The host's timers (ctx.setTimeout / ctx.setInterval), faked. A short wait (under 30 s: the 1 s
+// countdown steps, the 5 s "still checking" wait) runs on the next turn of the event loop, so it
+// passes at once. A long one (the 30 s read limits) waits until the test calls timers.fireLong().
+// setInterval never fires by itself: timers.tick() fires every live interval once.
+// Every delay is recorded in timers.delays.
 export function fakeTimers() {
   const delays = []
   const intervals = new Set()
+  const long = new Set()
   return {
     delays,
     intervals,
+    long,
     setTimeout(fn, ms) {
       delays.push(ms)
       let live = true
+      if (ms >= 30000) {
+        const entry = () => live && fn()
+        long.add(entry)
+        return () => {
+          live = false
+          long.delete(entry)
+        }
+      }
       setImmediate(() => live && fn())
       return () => (live = false)
+    },
+    fireLong() {
+      for (const e of [...long]) {
+        long.delete(e)
+        e()
+      }
     },
     setInterval(fn, ms) {
       const entry = { fn, ms }

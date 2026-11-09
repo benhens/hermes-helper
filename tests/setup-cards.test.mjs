@@ -65,7 +65,15 @@ test('card 3, The model answers: Not checked yet before the press, then Works / 
   const works = answersCard({ phase: 'done', result: { ok: true, text: 'OK', ms: 1234 } }, ok)
   assert.equal(works.status, 'works')
   assert.deepEqual(works.lines, ['mock-small answered a short test in 1.2 seconds.'])
-  assert.equal(answersCard({ phase: 'done', result: { ok: true, text: 'OK', ms: 300 } }, { state: 'ok', name: '' }).lines[0], 'your model answered a short test in 0.3 seconds.')
+  assert.equal(answersCard({ phase: 'done', result: { ok: true, text: 'OK', ms: 300 } }, { state: 'ok', name: '' }).lines[0], 'Your model answered a short test in 0.3 seconds.')
+  // After a result, the button works only while card 2 still says ok.
+  for (const kind of ['other', 'key']) {
+    assert.equal(answersCard({ phase: 'done', result: { ok: false, kind } }, ok).action.disabled, false)
+    assert.equal(answersCard({ phase: 'done', result: { ok: false, kind } }, { state: 'none', configured: true }).action.disabled, true)
+  }
+  assert.equal(answersCard({ phase: 'done', result: { ok: true, text: 'OK', ms: 1 } }, { state: 'error' }).action.disabled, true)
+  // Never a lowercase start: "Your model answered ...".
+  assert.match(answersCard({ phase: 'done', result: { ok: true, text: 'OK', ms: 1 } }, { state: 'ok', name: '' }).lines[0], /^Your model answered/)
   const wrong = answersCard({ phase: 'done', result: { ok: true, text: 'Hello there', ms: 10 } }, ok)
   assert.equal(wrong.status, 'fix')
   assert.equal(wrong.action.label, 'Try again')
@@ -80,7 +88,8 @@ test('card 3, The model answers: Not checked yet before the press, then Works / 
     assert.equal(c.action.label, 'Try again')
   }
   const gone = answersCard({ phase: 'done', result: { ok: false, kind: 'no_model' } }, ok)
-  assert.equal(gone.status, 'notset')
+  assert.equal(gone.status, 'fix') // card 3 has only Works / Needs a fix / Not checked yet
+  assert.deepEqual(gone.lines, [MODEL_LINES.notset])
   assert.equal(gone.action.step, 2)
   const broken = answersCard({ phase: 'done', result: { ok: false, kind: 'model_broken' } }, ok)
   assert.equal(broken.status, 'fix')
