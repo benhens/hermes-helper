@@ -49,7 +49,7 @@ test('card 2, A model is connected: Works (with and without a name), Not set up 
   assert.equal(modelCard({ state: 'checking' }).status, 'checking')
 })
 
-test('card 3, The model answers: Not checked yet before the press, then Works / Needs a fix / Not set up yet', () => {
+test('card 3, The model answers: Not checked yet before the press, then Works or Needs a fix (a model gone since is Needs a fix too)', () => {
   const ok = { state: 'ok', name: 'mock-small' }
   const idle = answersCard(undefined, ok)
   assert.equal(idle.status, 'unchecked')
