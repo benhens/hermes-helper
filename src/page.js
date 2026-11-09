@@ -5,14 +5,15 @@
 // Look: Hermes's own UI kit components (Button, SegmentedControl, Switch, Textarea, Tip, EmptyState,
 // GlyphSpinner, Codicon, RowButton) and, where Hermes has no kit component, the class strings its own
 // screens use (src/look.js). No CSS of our own.
-import { host, useValue, Button, Codicon, EmptyState, GlyphSpinner, RowButton, SegmentedControl, Switch, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
+import { host, Button, Codicon, EmptyState, GlyphSpinner, RowButton, SegmentedControl, Switch, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, cx } from './look.js'
 import { Character } from './character.js'
 import { readState, otherSide, STEP_COUNT } from './state.js'
-import { checkModel, NO_MODEL_LINE, CANT_CHECK_LINE, RECHECK_AFTER_MS } from './model-status.js'
+import { checkModel, modelLabel, NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS, NO_MODEL_BOX, CANT_CHECK_LINE, RECHECK_AFTER_MS } from './model-status.js'
 import { PLACEHOLDER_STEPS, LATER_STEPS, VERSION_LINE } from './placeholder-steps.js'
+import { makeSetupCards, renderYourSetup } from './setup-tab.js'
 
 // Column widths (layout only; every colour, font and line comes from Hermes's classes).
 const RAIL_WIDTH = '16rem'
@@ -37,6 +38,8 @@ function HelperIconButton({ icon, label, onClick, tip = true }) {
 }
 
 export function makePage(ctx) {
+  const useSetupCards = makeSetupCards(ctx)
+  const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
   let lastCheck = null
@@ -53,10 +56,7 @@ export function makePage(ctx) {
       setStatus({ state: 'checking' })
       let result = { state: 'error' }
       try {
-        result = await checkModel(
-          (method, params, timeout) => host.request(method, params, timeout),
-          () => host.state.model.get()
-        )
+        result = await checkModel((method, params, timeout) => host.request(method, params, timeout), { sleep })
       } catch {
         result = { state: 'error' }
       } finally {
@@ -88,7 +88,7 @@ export function makePage(ctx) {
     const [draft, setDraft] = useState('')
     const [focusAsk, setFocusAsk] = useState(false)
     const [modelStatus, recheck] = useModelStatus()
-    const liveModel = useValue(host.state.model)
+    const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
 
     const keep = (key, setter) => value => {
@@ -111,7 +111,9 @@ export function makePage(ctx) {
 
     const currentStep = PLACEHOLDER_STEPS[step - 1]
     const noModel = modelStatus.state === 'none'
-    const modelName = modelStatus.state === 'ok' ? (typeof liveModel === 'string' && liveModel.trim()) || modelStatus.name : ''
+    // The model's name: runtime_check's, else the free tier's label, else "your model"
+    // (hhtech-default-model.md point 4). Never host.state.model.
+    const modelName = modelStatus.state === 'ok' ? modelLabel(modelStatus.name) : ''
 
     function askAboutStep() {
       if (helper !== 'open') saveHelper('open')
@@ -272,22 +274,19 @@ export function makePage(ctx) {
         ]
       : [stepHeader(currentStep.title, jsx('p', { className: K.caption, children: 'The text for this step is still being written.' })), stepActions]
 
-    const yoursView = [
-      jsxs('header', {
-        children: [
-          jsx('h3', { className: K.stepTitle, children: 'Your setup' }),
-          jsx('p', { className: K.caption, children: 'Read from your Hermes. Nothing is changed.' })
-        ]
-      }),
-      jsx(EmptyState, { title: 'The setup checks come next', description: 'This tab will show what works in your Hermes and what needs a fix.' })
-    ]
+    const yoursView = renderYourSetup(setup, {
+      openStep: n => {
+        saveStep(n)
+        saveTab('setup')
+      }
+    })
 
     const main = jsx(
       'main',
       {
         className: K.detail,
         'data-hh': 'detail',
-        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: K.detailInner, children: tab === 'setup' ? stepView : yoursView }) })
+        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
       },
       'main'
     )
@@ -296,11 +295,15 @@ export function makePage(ctx) {
     const checkAgain = (variant = 'default') =>
       jsx(Button, { variant, size: 'sm', disabled: modelStatus.state === 'checking', onClick: () => recheck(), children: 'Check again' })
 
-    const say = (text, actions) =>
+    const say = (text, actions, small) =>
       jsxs('div', {
         className: K.bubble,
         'data-hh': 'bubble',
-        children: [jsx('p', { className: K.bubbleText, children: text }), actions ? jsx('div', { className: K.bubbleActions, children: actions }) : null]
+        children: [
+          jsx('p', { className: K.bubbleText, children: text }),
+          small ? jsx('p', { className: K.caption, children: small }) : null,
+          actions ? jsx('div', { className: K.bubbleActions, children: actions }) : null
+        ]
       })
 
     const withCharacter = (bubble, mood) =>
@@ -315,10 +318,11 @@ export function makePage(ctx) {
 
     let helperBody
     if (noModel) {
-      // build-v1.md P7: the one fixed line and "Check again", nothing more. No model call anywhere.
-      helperBody = withCharacter(say(NO_MODEL_LINE, checkAgain('default')), 'straight')
+      // content/v1-strings.md part 1: the progress line, the fixed bubble with its small line and
+      // "Check again". No model call anywhere.
+      helperBody = [contextLine('info', NO_MODEL_PROGRESS, false), ...withCharacter(say(NO_MODEL_LINE, checkAgain('default'), NO_MODEL_SMALL), 'straight')]
     } else {
-      const where = tab === 'setup' ? `On step ${step}: ${currentStep.title}` : 'On Your setup'
+      const where = tab === 'setup' ? `On step ${step}: ${currentStep.title}` : setup.bots.length > 1 ? `On Your setup, bot ${setup.bot}` : 'On Your setup'
       helperBody = [
         modelStatus.state === 'checking'
           ? contextLine('', 'Checking your model', true)
@@ -334,11 +338,11 @@ export function makePage(ctx) {
       ].flat()
     }
 
-    const composer = noModel
-      ? null
-      : jsxs('form', {
+    // With no model the box stays, empty and greyed, with hhdesign's words (v1-strings part 1).
+    const composer = jsxs('form', {
           className: K.composerForm,
           onSubmit: e => e.preventDefault(),
+          'data-hh': 'composer',
           children: [
             jsxs('div', {
               className: cx(K.composerSurface, composerSurfaceRing),
@@ -353,9 +357,12 @@ export function makePage(ctx) {
                         ref: askBox,
                         rows: 2,
                         className: K.composerInput,
-                        value: draft,
-                        onChange: e => setDraft(e.target.value.slice(0, 500)),
-                        placeholder: tab === 'setup' ? 'Ask about this step' : 'Ask about your setup',
+                        disabled: noModel,
+                        value: noModel ? '' : draft,
+                        // The whole text is kept: the pasted-key check reads all of it before the
+                        // 500-character cut (src/key-check.js).
+                        onChange: e => setDraft(e.target.value),
+                        placeholder: noModel ? NO_MODEL_BOX : tab === 'setup' ? 'Ask about this step' : 'Ask about your setup',
                         'aria-label': 'Ask the helper'
                       })
                     }),

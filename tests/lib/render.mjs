@@ -32,13 +32,63 @@ export function fakeStorage(initial = {}) {
   return { data, get: (k, d) => (data.has(k) ? data.get(k) : d), set: (k, v) => data.set(k, v) }
 }
 
+// The host's timers (ctx.setTimeout / ctx.setInterval), faked. A short wait (under 30 s: the 1 s
+// countdown steps, the 5 s "still checking" wait) runs on the next turn of the event loop, so it
+// passes at once. A long one (the 30 s read limits) waits until the test calls timers.fireLong().
+// setInterval never fires by itself: timers.tick() fires every live interval once.
+// Every delay is recorded in timers.delays.
+export function fakeTimers() {
+  const delays = []
+  const intervals = new Set()
+  const long = new Set()
+  return {
+    delays,
+    intervals,
+    long,
+    setTimeout(fn, ms) {
+      delays.push(ms)
+      let live = true
+      if (ms >= 30000) {
+        const entry = () => live && fn()
+        long.add(entry)
+        return () => {
+          live = false
+          long.delete(entry)
+        }
+      }
+      setImmediate(() => live && fn())
+      return () => (live = false)
+    },
+    fireLong() {
+      for (const e of [...long]) {
+        long.delete(e)
+        e()
+      }
+    },
+    setInterval(fn, ms) {
+      const entry = { fn, ms }
+      intervals.add(entry)
+      return () => intervals.delete(entry)
+    },
+    tick() {
+      for (const e of [...intervals]) e.fn()
+    }
+  }
+}
+
 // Registers the plugin with a fake ctx; returns its contributions and the page component.
-export async function registerPlugin(storage = fakeStorage()) {
+export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers()) {
   const plugin = await loadPlugin()
   const contributions = []
-  plugin.register({ storage, registerMany: list => contributions.push(...list), register: c => contributions.push(c) })
+  plugin.register({
+    storage,
+    setTimeout: timers.setTimeout,
+    setInterval: timers.setInterval,
+    registerMany: list => contributions.push(...list),
+    register: c => contributions.push(c)
+  })
   const page = contributions.find(c => c.area === 'routes')
-  return { plugin, contributions, storage, Page: page.render().type }
+  return { plugin, contributions, storage, timers, Page: page.render().type }
 }
 
 const throwaway = {
@@ -120,8 +170,8 @@ export function mount(Component) {
   return view
 }
 
-export const settle = async () => {
-  for (let k = 0; k < 5; k++) await new Promise(r => setImmediate(r))
+export const settle = async (turns = 5) => {
+  for (let k = 0; k < turns; k++) await new Promise(r => setImmediate(r))
 }
 
 export function all(node, pred, out = []) {
