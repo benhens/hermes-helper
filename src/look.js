@@ -44,8 +44,8 @@ export const K = {
   truncate: 'truncate',
   // Step number: a plain numeral, no key-cap box (hhdesign nice-to-have 8; Settings nav rows have
   // no boxed numbers). The open step's numeral is in the main text colour.
-  rowNumber: 'w-4 shrink-0 text-center text-[0.75rem] tabular-nums text-(--ui-text-tertiary)',
-  rowNumberOn: 'w-4 shrink-0 text-center text-[0.75rem] tabular-nums text-foreground',
+  rowNumber: 'w-3 shrink-0 text-center text-[0.75rem] tabular-nums text-(--ui-text-tertiary)',
+  rowNumberOn: 'w-3 shrink-0 text-center text-[0.75rem] tabular-nums text-foreground',
   // DetailColumn footer caption (app/master-detail.tsx)
   railFoot: 'shrink-0 px-2 pb-1 pt-3 text-[0.65rem] text-muted-foreground/50',
 
