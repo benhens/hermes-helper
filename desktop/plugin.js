@@ -953,38 +953,39 @@ const CARD_COLUMNS_PX = 600
 
 // width: our page's measured width in px (0 or missing = not measured yet: lay out as wide).
 // tab: 'setup' | 'yours'. helper: the person's choice, 'open' | 'hidden' | 'closed'.
-// peek: the person opened the helper from a strip the page folded by itself (shown over the page).
+// peek: the person opened the helper from its strip while the window is too narrow for the
+// column (shown over the page; nothing saved).
 // Returns:
 //   helper: 'open' | 'strip' | 'over' | 'none'   what the helper column shows
 //   folded: true when the page folded the helper by itself
+//   narrow: true when an open helper would not fit as a column on this tab
 //   rail:   'full' | 'numbers' | 'none'          the step list (none on Your setup)
 //   main:   the open step's (or Your setup's) width in px, Infinity when not measured
-//   columns: 1 | 2   facts and choices;   cardColumns: 1 | 2   Your setup cards
+//   columns: 1 | 2   facts (two) and choices (three) side by side;   cardColumns: 1 | 2
 function layoutFor({ width, tab, helper, peek = false }) {
   const w = typeof width === 'number' && width > 0 ? width : Infinity
   const railFull = tab === 'setup' ? RAIL_PX : 0
-  const helperSpace = helper === 'open' ? HELPER_PX : helper === 'hidden' ? STRIP_PX : 0
+  const narrow = w - railFull - HELPER_PX < MIN_MAIN_PX
 
   let shown = helper === 'open' ? 'open' : helper === 'hidden' ? 'strip' : 'none'
-  let folded = false
-  let side = helperSpace
-  if (helper === 'open' && w - railFull - HELPER_PX < MIN_MAIN_PX) {
-    folded = true
-    side = STRIP_PX
-    shown = peek ? 'over' : 'strip'
-  }
+  const folded = helper === 'open' && narrow
+  if (folded) shown = 'strip'
+  if (narrow && peek && shown === 'strip') shown = 'over'
+  // The width the helper takes beside the page: the column, the strip, or nothing.
+  const edgePx = shown === 'open' ? HELPER_PX : shown === 'none' ? 0 : STRIP_PX
 
   let rail = tab === 'setup' ? 'full' : 'none'
   let railSpace = railFull
-  if (rail === 'full' && w - RAIL_PX - side < MIN_MAIN_PX) {
+  if (rail === 'full' && w - RAIL_PX - edgePx < MIN_MAIN_PX) {
     rail = 'numbers'
     railSpace = RAIL_NUMBERS_PX
   }
 
-  const main = w - railSpace - side
+  const main = w - railSpace - edgePx
   return {
     helper: shown,
     folded,
+    narrow,
     rail,
     main,
     columns: main >= TWO_COLUMNS_PX ? 2 : 1,
@@ -1393,16 +1394,8 @@ function renderYourSetup(s, { openStep, cardColumns = 2 }) {
       : null
 
   return [
-    jsxs(
-      'header',
-      {
-        children: [
-          jsx('h3', { className: K.stepTitle, children: 'Your setup' }),
-          jsx('p', { className: K.caption, children: 'Read from your Hermes. Nothing is changed.' })
-        ]
-      },
-      'head'
-    ),
+    // No heading: the open tab already says "Your setup", as Capabilities' tabs name their page.
+    jsx('p', { className: K.caption, 'data-hh': 'yours-lead', children: 'Read from your Hermes. Nothing is changed.' }, 'head'),
     picker,
     jsx(
       'div',
@@ -1532,14 +1525,21 @@ function makePage(ctx) {
     const [chosen, setChosen] = useState({})
     const [draft, setDraft] = useState('')
     const [focusAsk, setFocusAsk] = useState(false)
-    // The person opened the helper from a strip the page folded by itself (narrow window): it then
-    // lies over the page. Not saved: it ends when the window is wide enough again.
+    const [focusStrip, setFocusStrip] = useState(false)
+    // The person opened the helper from its strip while the window is too narrow for the column:
+    // it then lies over the page. Not saved: it ends when the window is wide enough again.
     const [peek, setPeek] = useState(false)
     const [width, measureRef] = useOwnWidth()
     const [modelStatus, recheck] = useModelStatus()
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
-    const tabButtons = useRef({})
+    const stripButton = useRef(null)
+    // One ref function per tab, made once (like useOwnWidth's), kept with the tab buttons.
+    const tabRefs = useRef(null)
+    if (!tabRefs.current) {
+      const els = {}
+      tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
+    }
 
     const fit = layoutFor({ width, tab, helper, peek })
 
@@ -1561,10 +1561,18 @@ function makePage(ctx) {
       setFocusAsk(false)
     }, [focusAsk])
 
-    // Wide enough again: the helper is back in its column, so an open "over the page" ends.
+    // Closing the helper that lay over the page hands the keyboard back to the strip.
     useEffect(() => {
-      if (!fit.folded && peek) setPeek(false)
-    }, [fit.folded, peek])
+      if (!focusStrip) return
+      if (stripButton.current) stripButton.current.focus()
+      setFocusStrip(false)
+    }, [focusStrip])
+
+    // The window got wide enough for the column: an open "over the page" ends. Only a change of
+    // width ends it, so switching tabs in a narrow window keeps the helper the person opened.
+    useEffect(() => {
+      if (peek && !fit.narrow) setPeek(false)
+    }, [width])
 
     const currentStep = PLACEHOLDER_STEPS[step - 1]
     const noModel = modelStatus.state === 'none'
@@ -1572,10 +1580,16 @@ function makePage(ctx) {
     // (src/model-status.js, docs/answers/hhtech-model-display-name.md). Never host.state.model.
     const modelName = modelStatus.state === 'ok' ? modelLabel(modelStatus.name) : ''
 
-    // Show the helper. In a window too narrow for its column, it opens over the page.
+    // Show the helper (strip, "Show helper", "Ask about this step"). In a window too narrow for
+    // its column it opens over the page, with the keyboard in its message box. A helper the
+    // person hid stays saved as hidden then, so it doesn't come back as a column by itself later.
     function openHelper() {
-      if (helper !== 'open') saveHelper('open')
-      if (layoutFor({ width, tab, helper: 'open' }).folded) setPeek(true)
+      const narrow = layoutFor({ width, tab, helper: 'open' }).narrow
+      if (helper === 'closed' || (helper === 'hidden' && !narrow)) saveHelper('open')
+      if (narrow) {
+        setPeek(true)
+        setFocusAsk(true)
+      }
     }
 
     function askAboutStep() {
@@ -1583,22 +1597,26 @@ function makePage(ctx) {
       setFocusAsk(true)
     }
 
-    // Hide from the panel. When the page had folded it by itself, only the "over the page" view
-    // ends: the person's choice stays open, so it comes back as a column when the window widens.
+    // Hide from the panel. Over the page, only that view ends (Hide, or Escape): the saved
+    // choice stays as it was, and the keyboard goes back to the strip.
     function hideHelper() {
-      if (fit.helper === 'over') setPeek(false)
-      else saveHelper('hidden')
+      if (fit.helper === 'over') {
+        setPeek(false)
+        setFocusStrip(true)
+      } else saveHelper('hidden')
     }
 
     /* ---------- header: the two text tabs, "Show helper" when the helper is closed ---------- */
-    // Arrow keys move between the tabs (DESIGN.md, Keyboard: one entry point at the selected tab).
+    // Arrow keys move between the tabs, Home and End go to the first and last (DESIGN.md,
+    // Keyboard: one entry point at the selected tab; WAI-ARIA tabs pattern).
     function onTabKey(e, index) {
-      const delta = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
-      if (!delta) return
+      const last = TABS.length - 1
+      const to = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index === 0 ? last : index - 1, Home: 0, End: last }[e.key]
+      if (to === undefined) return
       e.preventDefault()
-      const next = TABS[(index + delta + TABS.length) % TABS.length].id
+      const next = TABS[to].id
       saveTab(next)
-      const el = tabButtons.current[next]
+      const el = tabRefs.current.els[next]
       if (el) el.focus()
     }
 
@@ -1614,13 +1632,13 @@ function makePage(ctx) {
           {
             type: 'button',
             role: 'tab',
+            id: `hh-tab-${t.id}`,
             'aria-selected': on,
+            'aria-controls': 'hh-tabpanel',
             tabIndex: on ? 0 : -1,
             'data-active': on,
             className: cx(K.textTab, on ? K.textTabOn : K.textTabIdle),
-            ref: el => {
-              tabButtons.current[t.id] = el
-            },
+            ref: tabRefs.current.set[t.id],
             onClick: () => saveTab(t.id),
             onKeyDown: e => onTabKey(e, i),
             children: jsx('span', { className: on ? K.textTabLabelOn : K.textTabLabel, children: t.label })
@@ -1639,7 +1657,7 @@ function makePage(ctx) {
           className: K.headEnd,
           children:
             helper === 'closed'
-              ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: () => saveHelper('open'), children: 'Show helper' })
+              ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: openHelper, children: 'Show helper' })
               : null
         })
       ]
@@ -1682,23 +1700,28 @@ function makePage(ctx) {
       )
     }
 
-    const laterRow = s =>
-      jsx(
+    // Steps that come later: not buttons. With numbers only, the number carries its title for
+    // screen readers (role img + label) and as a tip on hover.
+    const laterRow = s => {
+      const inner = jsxs('div', {
+        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
+        role: numbersOnly ? 'img' : undefined,
+        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}, comes later` : undefined,
+        children: [
+          jsx('span', { className: K.rowNumber, children: s.number }, 'n'),
+          numbersOnly ? null : jsx('span', { className: K.rowText, children: jsx('span', { className: K.rowTitleOff, children: s.title }) }, 't')
+        ]
+      })
+      return jsx(
         'div',
         {
           className: cx(K.row, K.rowIdle),
           'aria-disabled': true,
-          children: jsxs('div', {
-            className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
-            'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}, comes later` : undefined,
-            children: [
-              jsx('span', { className: K.rowNumber, children: s.number }, 'n'),
-              numbersOnly ? null : jsx('span', { className: K.rowText, children: jsx('span', { className: K.rowTitleOff, children: s.title }) }, 't')
-            ]
-          })
+          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}, comes later`, children: inner }) : inner
         },
         s.number
       )
+    }
 
     const rail = jsxs(
       'nav',
@@ -1747,12 +1770,13 @@ function makePage(ctx) {
         ]
       })
 
-    const twoColumns = fit.columns === 2
+    // The open step is wide enough for the facts side by side (and the three choices in a row).
+    const wideStep = fit.columns === 2
     const stepView = currentStep.heading
       ? [
           stepHeader(currentStep.heading, jsx('p', { className: K.prose, children: currentStep.intro })),
           jsx('dl', {
-            className: cx(K.pairGrid, twoColumns && K.twoColumns),
+            className: cx(K.pairGrid, wideStep && K.twoColumns),
             'data-hh': 'facts',
             'data-columns': fit.columns,
             children: currentStep.compare.map(c =>
@@ -1770,7 +1794,7 @@ function makePage(ctx) {
             children: [
               jsx('div', { className: K.question, children: currentStep.question }),
               jsx('div', {
-                className: cx(K.choices, twoColumns && K.threeColumns),
+                className: cx(K.choices, wideStep && K.threeColumns),
                 role: 'group',
                 'aria-label': currentStep.question,
                 'data-hh': 'choices',
@@ -1814,6 +1838,10 @@ function makePage(ctx) {
       {
         className: K.detail,
         'data-hh': 'detail',
+        // The tabs' panel (the tabs point here with aria-controls).
+        role: 'tabpanel',
+        id: 'hh-tabpanel',
+        'aria-labelledby': `hh-tab-${tab}`,
         children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
       },
       'main'
@@ -1932,6 +1960,14 @@ function makePage(ctx) {
           'aria-label': 'Helper',
           'data-hh': 'helper',
           'data-over': over,
+          // Escape closes the helper that lies over the page (as Hermes's own overlays do).
+          onKeyDown: over
+            ? e => {
+                if (e.key !== 'Escape') return
+                e.preventDefault()
+                hideHelper()
+              }
+            : undefined,
           children: [
             jsxs('div', {
               className: K.helperTop,
@@ -1980,6 +2016,7 @@ function makePage(ctx) {
               className: K.strip,
               'aria-label': 'Show the helper',
               'data-hh': 'helper-hidden',
+              ref: stripButton,
               'data-folded': fit.folded,
               onClick: openHelper,
               children: [jsx(Codicon, { name: side === 'right' ? 'chevron-left' : 'chevron-right', size: '0.875rem' }), jsx('span', { className: K.stripLabel, children: 'Helper' })]
@@ -1993,6 +2030,7 @@ function makePage(ctx) {
     return jsxs('div', {
       className: K.root,
       'data-hh': 'page',
+      // The measured width, for the screenshot checks (dev/checks/b3a-shots).
       'data-width': width,
       children: [
         header,

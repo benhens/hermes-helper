@@ -206,7 +206,7 @@ test('tabs: Your setup hides the step list and is remembered; arrow keys move be
 })
 
 // Hermes's look: one primary (blue) button per screen; Send is the composer's own icon button.
-const primaries = tree => all(tree, n => n.type === 'sdk:Button' && !n.props.variant && n.props['aria-label'] !== 'Send').map(n => text(n).trim())
+const primaries = tree => all(tree, n => n.type === 'sdk:Button' && (!n.props.variant || n.props.variant === 'default') && n.props['aria-label'] !== 'Send').map(n => text(n).trim())
 
 test('one primary button per screen: setup with and without a model, the failed check, Your setup', async () => {
   for (const runtime of [{ ok: true, model: 'm' }, { ok: false }, new Error('down')]) {
@@ -357,4 +357,116 @@ test('unmount: React calls the ref with null, which stops the observer', async t
   const { view } = await openMeasured()
   byData(view.tree, 'body').props.ref(null)
   assert.equal(observers.filter(o => o.watching).length, 0)
+})
+
+test('the page\'s ref functions stay the same between renders (React would detach and re-attach new ones)', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  const { view } = await openMeasured()
+  const before = [byData(view.tree, 'body').props.ref, ...tabButtons(view).map(b => b.props.ref)]
+  resize(view, 900)
+  click(tabButtons(view)[1])
+  const after = [byData(view.tree, 'body').props.ref, ...tabButtons(view).map(b => b.props.ref)]
+  before.forEach((r, i) => assert.equal(after[i], r, `ref ${i}`))
+})
+
+test('tabs: Home and End; each tab points at the one tab panel, which names its tab', async () => {
+  const { view, storage } = await open()
+  tabButtons(view)[0].props.onKeyDown({ key: 'End', preventDefault() {} })
+  assert.equal(storage.data.get('tab'), 'yours')
+  tabButtons(view)[1].props.onKeyDown({ key: 'Home', preventDefault() {} })
+  assert.equal(storage.data.get('tab'), 'setup')
+  const panel = byData(view.tree, 'detail')
+  assert.equal(panel.props.role, 'tabpanel')
+  for (const t of tabButtons(view)) assert.equal(t.props['aria-controls'], panel.props.id)
+  assert.equal(panel.props['aria-labelledby'], tabButtons(view)[0].props.id)
+})
+
+test('wide step: the three answer choices sit in a row; narrow: one column', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  const { view } = await openMeasured(fakeStorage({ step: 2 }))
+  resize(view, 1180)
+  assert.ok(byData(view.tree, 'choices').props.className.split(' ').includes(K.threeColumns))
+  resize(view, 540)
+  assert.ok(!byData(view.tree, 'choices').props.className.split(' ').includes(K.threeColumns))
+})
+
+test('narrow: "Show helper" after Close opens the helper over the page in one press', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  const { view, storage } = await openMeasured(fakeStorage({ helper: 'closed' }))
+  resize(view, 540)
+  assert.equal(byData(view.tree, 'helper-hidden'), null)
+  click(byLabel(view.tree, 'Show helper'))
+  assert.equal(helper(view).props['data-over'], true)
+  assert.equal(storage.data.get('helper'), 'open')
+})
+
+test('narrow: a helper the person hid opens over the page from its strip and stays saved as hidden', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  const { view, storage } = await openMeasured(fakeStorage({ helper: 'hidden' }))
+  resize(view, 540)
+  click(byData(view.tree, 'helper-hidden'))
+  assert.equal(helper(view).props['data-over'], true)
+  assert.equal(storage.data.get('helper'), 'hidden')
+  click(byLabel(helper(view), 'Hide the helper'))
+  resize(view, 1180)
+  assert.equal(helper(view), null)
+  assert.ok(byData(view.tree, 'helper-hidden'))
+})
+
+test('narrow: over the page, Escape hides it and the keyboard goes back to the strip; the message box gets it on open', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  const { view } = await openMeasured()
+  resize(view, 1180)
+  let focused = null
+  all(view.tree, n => n.type === 'sdk:Textarea')[0].props.ref.current = { focus: () => (focused = 'box') }
+  resize(view, 540)
+  byData(view.tree, 'helper-hidden').props.ref.current = { focus: () => (focused = 'strip') }
+  click(byData(view.tree, 'helper-hidden'))
+  assert.equal(focused, 'box')
+  const h = helper(view)
+  assert.equal(h.props['data-over'], true)
+  h.props.onKeyDown({ key: 'a', preventDefault() {} })
+  assert.ok(helper(view))
+  helper(view).props.onKeyDown({ key: 'Escape', preventDefault() {} })
+  assert.equal(helper(view), null)
+  assert.equal(focused, 'strip')
+})
+
+test('narrow: switching tabs keeps the helper the person opened over the page', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  // 700 px page: Setup is too narrow for the column (700 - 256 - 320 < 320), Your setup is not.
+  const { view } = await openMeasured()
+  resize(view, 700)
+  click(byData(view.tree, 'helper-hidden'))
+  assert.equal(helper(view).props['data-over'], true)
+  click(tabButtons(view)[1])
+  assert.equal(helper(view).props['data-over'], false)
+  click(tabButtons(view)[0])
+  assert.equal(helper(view).props['data-over'], true)
+})
+
+test('narrow, helper on the left: it lies over the page from the left edge, the strip comes first', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  const { view } = await openMeasured(fakeStorage({ side: 'left' }))
+  resize(view, 540)
+  assert.equal(columns(view)[0].props['data-hh'], 'helper-hidden')
+  click(byData(view.tree, 'helper-hidden'))
+  const cls = helper(view).props.className.split(' ')
+  assert.ok(cls.includes(K.helperOverLeft))
+  assert.ok(!cls.includes(K.helperOverRight))
+})
+
+test('numbers-only step list: the later steps carry their title too', async t => {
+  t.after(() => delete globalThis.ResizeObserver)
+  const { view } = await openMeasured()
+  resize(view, 540)
+  const later = all(byData(view.tree, 'steps'), n => n.props.role === 'img')
+  assert.ok(later.length >= 1)
+  for (const l of later) assert.match(l.props['aria-label'], /^Step \d+: \S.*, comes later$/)
+})
+
+test('Your setup: no heading repeating the tab name, just its one line', async () => {
+  const { view } = await open(fakeStorage({ tab: 'yours' }))
+  assert.equal(all(byData(view.tree, 'detail'), n => /^h[1-3]$/.test(n.type)).length, 0)
+  assert.ok(byData(view.tree, 'yours-lead'))
 })

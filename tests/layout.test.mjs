@@ -86,6 +86,13 @@ test('opened from the folded strip: it lies over the page, and the open step kee
   assert.equal(setup(1440, 'open', { peek: true }).helper, 'open')
 })
 
+test('a helper the person hid, opened from its strip in a narrow window: over the page; wide: still a strip', () => {
+  assert.deepEqual([setup(800, 'hidden', { peek: true }).helper, setup(800, 'hidden', { peek: true }).narrow], ['over', true])
+  assert.equal(setup(1440, 'hidden', { peek: true }).helper, 'strip')
+  assert.equal(setup(800, 'closed', { peek: true }).helper, 'none')
+  assert.equal(setup(1440).narrow, false)
+})
+
 test('Your setup: the cards go to one column when narrow; the helper folds only under 320 px', () => {
   assert.deepEqual([yours(1440).helper, yours(1440).cardColumns], ['open', 2])
   assert.deepEqual([yours(1100).helper, yours(1100).main, yours(1100).cardColumns], ['open', 520, 1])

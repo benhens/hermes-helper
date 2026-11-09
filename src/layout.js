@@ -21,38 +21,39 @@ export const CARD_COLUMNS_PX = 600
 
 // width: our page's measured width in px (0 or missing = not measured yet: lay out as wide).
 // tab: 'setup' | 'yours'. helper: the person's choice, 'open' | 'hidden' | 'closed'.
-// peek: the person opened the helper from a strip the page folded by itself (shown over the page).
+// peek: the person opened the helper from its strip while the window is too narrow for the
+// column (shown over the page; nothing saved).
 // Returns:
 //   helper: 'open' | 'strip' | 'over' | 'none'   what the helper column shows
 //   folded: true when the page folded the helper by itself
+//   narrow: true when an open helper would not fit as a column on this tab
 //   rail:   'full' | 'numbers' | 'none'          the step list (none on Your setup)
 //   main:   the open step's (or Your setup's) width in px, Infinity when not measured
-//   columns: 1 | 2   facts and choices;   cardColumns: 1 | 2   Your setup cards
+//   columns: 1 | 2   facts (two) and choices (three) side by side;   cardColumns: 1 | 2
 export function layoutFor({ width, tab, helper, peek = false }) {
   const w = typeof width === 'number' && width > 0 ? width : Infinity
   const railFull = tab === 'setup' ? RAIL_PX : 0
-  const helperSpace = helper === 'open' ? HELPER_PX : helper === 'hidden' ? STRIP_PX : 0
+  const narrow = w - railFull - HELPER_PX < MIN_MAIN_PX
 
   let shown = helper === 'open' ? 'open' : helper === 'hidden' ? 'strip' : 'none'
-  let folded = false
-  let side = helperSpace
-  if (helper === 'open' && w - railFull - HELPER_PX < MIN_MAIN_PX) {
-    folded = true
-    side = STRIP_PX
-    shown = peek ? 'over' : 'strip'
-  }
+  const folded = helper === 'open' && narrow
+  if (folded) shown = 'strip'
+  if (narrow && peek && shown === 'strip') shown = 'over'
+  // The width the helper takes beside the page: the column, the strip, or nothing.
+  const edgePx = shown === 'open' ? HELPER_PX : shown === 'none' ? 0 : STRIP_PX
 
   let rail = tab === 'setup' ? 'full' : 'none'
   let railSpace = railFull
-  if (rail === 'full' && w - RAIL_PX - side < MIN_MAIN_PX) {
+  if (rail === 'full' && w - RAIL_PX - edgePx < MIN_MAIN_PX) {
     rail = 'numbers'
     railSpace = RAIL_NUMBERS_PX
   }
 
-  const main = w - railSpace - side
+  const main = w - railSpace - edgePx
   return {
     helper: shown,
     folded,
+    narrow,
     rail,
     main,
     columns: main >= TWO_COLUMNS_PX ? 2 : 1,

@@ -349,16 +349,8 @@ export function renderYourSetup(s, { openStep, cardColumns = 2 }) {
       : null
 
   return [
-    jsxs(
-      'header',
-      {
-        children: [
-          jsx('h3', { className: K.stepTitle, children: 'Your setup' }),
-          jsx('p', { className: K.caption, children: 'Read from your Hermes. Nothing is changed.' })
-        ]
-      },
-      'head'
-    ),
+    // No heading: the open tab already says "Your setup", as Capabilities' tabs name their page.
+    jsx('p', { className: K.caption, 'data-hh': 'yours-lead', children: 'Read from your Hermes. Nothing is changed.' }, 'head'),
     picker,
     jsx(
       'div',

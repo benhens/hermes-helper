@@ -107,6 +107,15 @@ test('helper states: Move, Hide, Close and Show helper all exist', () => {
   }
 })
 
+test('model names, counts and source tags in normal letters: mono is only for text to paste', () => {
+  // Hermes keeps mono for code, paths and commands (hhdesign fixes 2 and 9, B3a item 4).
+  for (const key of ['composerModel', 'cardValue', 'chip', 'chipsLabel', 'cardTitle', 'cardState', 'rowNumber', 'rowNumberOn']) {
+    assert.doesNotMatch(K[key], /font-mono/, key)
+  }
+  const mono = Object.entries(K).filter(([, v]) => /font-mono/.test(v)).map(([k]) => k)
+  assert.deepEqual(mono, ['cardPasteText'])
+})
+
 test('header clears Hermes\'s title-bar band, where its window buttons float (top-right corner stays empty)', () => {
   // Same top padding as Hermes's own Capabilities page header (app/page-search-shell.tsx).
   assert.match(K.head, /(^|\s)pt-\[calc\(var\(--titlebar-height\)\+1\.5rem\)\](\s|$)/)

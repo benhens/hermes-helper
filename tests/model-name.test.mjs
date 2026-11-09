@@ -36,29 +36,28 @@ test('the parts: provider prefix dropped, date pin dropped, variant and quant as
   assert.deepEqual(modelDisplayParts('claude-sonnet-5[1m]'), { name: 'Sonnet 5', tag: '1M' })
 })
 
-// The copy keeps Hermes's rules word for word: every rule line of Hermes's file (types and
-// comments aside) is in ours. Runs only where the Hermes source is checked out (the team's test
-// machine); the ship container has none, so there it says so and passes.
+// The copy gives what Hermes's own file gives: Hermes's TypeScript file is loaded as it is (Node
+// strips the types) and both are run on the same ids and options. Runs only where the Hermes source
+// is checked out (the team's test machine); the ship container has none, so there it is skipped.
 const HERMES_FILE = path.resolve(import.meta.dirname, '..', '..', 'dev', 'hermes-src', 'apps', 'desktop', 'src', 'lib', 'model-status-label.ts')
-test('the copied rules match Hermes v0.23.0 line by line (where the Hermes source is present)', t => {
+const IDS = [
+  ...HHTECH.map(([id]) => id),
+  '  mock-small  ', 'claude-opus-4-8-fast', 'claude-haiku-4-5-thinking', 'claude-sonnet-5[1m]', 'anthropic/claude-sonnet-4-5-20250929-preview',
+  'gpt-4o-mini', 'gpt-5.4-latest', 'gemini-2.5-flash', 'gemini-3-pro-preview', 'openai/gpt-oss-120b', 'deepseek-flash', 'deepseek/deepseek-r1',
+  'minimax-m2', 'moonshotai/kimi-k2-instruct', 'qwen3-30b-a3b-instruct-2507-Q4_K_XL', 'Qwen3-8B-UD-Q8_0-flash', 'llama-3.3-70b-instruct-BF16',
+  'ernie-4.5-vl-28b-a3b', 'mimo-7b-rl', 'bge-m3', 'gemma-3-27b-it', 'mistral-small-fp8', 'ai21/jamba', 'glm-4.5-air', 'x-ai/grok-4-fast',
+  'hermes-4-70b', 'nousresearch/hermes-4-405b', 'local-model', 'a', '/', 'model-20250101', 'm-IQ4_XS', 'phi-4-F16'
+]
+test('the copy gives exactly what Hermes v0.23.0\'s own file gives (where the Hermes source is present)', async t => {
   if (!fs.existsSync(HERMES_FILE)) return t.skip('no Hermes source checkout next to the plugin')
-  const ours = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', 'model-name.js'), 'utf8')
-  const theirs = fs.readFileSync(HERMES_FILE, 'utf8')
-  const start = theirs.indexOf('const VARIANT_TAGS')
-  const end = theirs.indexOf('const FAST_TIERS')
-  // displayModelName (menus and session rows) is the one function in that range not copied.
-  const skipFrom = theirs.indexOf('export function displayModelName')
-  const skipTo = theirs.indexOf('export function modelVariantTag')
-  assert.ok(start > 0 && skipFrom > start && skipTo > skipFrom && end > skipTo, 'Hermes file layout changed: re-check the copy')
-  const plain = line => line.trim()
-  const ourLines = new Set(ours.split('\n').map(plain))
-  const ruleLines = (theirs.slice(start, skipFrom) + theirs.slice(skipTo, end))
-    .split('\n')
-    .map(plain)
-    .filter(l => l && !l.startsWith('//') && !l.startsWith('/**') && !l.startsWith('*') && !l.startsWith('export function') && !l.startsWith('function') && !/^const \w+ = \(|^const \w+: /.test(l) && !/^let \{/.test(l))
-  // Lines that carry TypeScript types read differently by design; the rest must be identical.
-  const typed = l => /: (string|boolean|ReadonlyArray|\{)|as const|<.*>/.test(l)
-  const missing = ruleLines.filter(l => !typed(l) && !ourLines.has(l))
-  assert.deepEqual(missing, [])
-  assert.ok(ruleLines.length > 60, `only ${ruleLines.length} rule lines found`)
+  const hermes = await import(HERMES_FILE)
+  const ours = await import('../src/model-name.js')
+  for (const id of IDS) {
+    for (const options of [undefined, { fastMode: true }, { serviceTier: 'ultrafast' }]) {
+      assert.equal(ours.formatModelPillLabel(id, options), hermes.formatModelPillLabel(id, options), `${JSON.stringify(id)} ${JSON.stringify(options)}`)
+    }
+    assert.deepEqual(ours.modelDisplayParts(id), hermes.modelDisplayParts(id), id)
+    assert.equal(ours.modelVariantTag(id), hermes.modelVariantTag(id), id)
+    assert.equal(ours.modelBaseId(id), hermes.modelBaseId(id), id)
+  }
 })
