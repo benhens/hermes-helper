@@ -318,9 +318,7 @@ test('Check again while another bot is shown and the bot list fails: that bot st
 
 test('a host call that throws instead of rejecting: that card says Can\'t check, the others still load', async () => {
   useHost()
-  globalThis.__hhHost.skills = () => {
-    throw new Error('sync boom')
-  }
+  globalThis.__hhHost.throwNow = 'skills'
   const reg = await registerPlugin(fakeStorage({ tab: 'yours' }))
   const view = mount(reg.Page)
   await settle(10)

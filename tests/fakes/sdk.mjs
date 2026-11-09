@@ -23,6 +23,7 @@ export const host = {
 function call(name, arg) {
   const h = live()
   ;(h.sdkCalls ||= []).push({ name, arg })
+  if (h.throwNow === name) throw new Error(`host.${name} threw`) // a host door that throws instead of rejecting
   if (typeof h[name] !== 'function') return Promise.reject(new Error(`no fake for host.${name}`))
   return Promise.resolve().then(() => h[name](arg))
 }
