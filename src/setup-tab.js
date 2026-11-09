@@ -1,0 +1,347 @@
+// The "Your setup" tab: reads the person's Hermes through read-only calls, hands each answer to the
+// fixed rules in src/setup-cards.js, and draws the cards (build-v1.md section 8).
+// Reads (all read-only; never .env, auth.json or config.get):
+//   card 1  host.state.gateway                      card 4  profiles.describe { name } -> soul
+//   card 2  setup.runtime_check (+ setup.status)    card 5  host.skills.list(profile)
+//   card 3  llm.oneshot, only when Check is pressed card 6  host.toolsets.list(profile) -> memory
+//   card 7  nothing: the person runs the test in their own chat and presses a button
+// Reads start the first time the tab is opened, and again on "Check again". Nothing polls.
+import { host, useValue, Button, CopyButton, GlyphSpinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@hermes/plugin-sdk'
+import { useEffect, useRef, useState } from 'react'
+import { jsx, jsxs } from 'react/jsx-runtime'
+import { K, cx } from './look.js'
+import { checkModel } from './model-status.js'
+import { askModel } from './model-call.js'
+import { STATUS, PASSES, REMEMBER, ANSWER_CALL, cardTitle, gatewayCard, modelCard, answersCard, soulCard, skillsCard, memoryCard, rememberCard } from './setup-cards.js'
+
+// profiles.describe's own limit is Hermes's 30 s default; host.skills/toolsets get the same limit here.
+export const READ_TIMEOUT_MS = 30000
+
+// The bot (profile) Hermes is running now; '' from Hermes means the default one.
+export function launchBot(profile) {
+  return typeof profile === 'string' && profile.trim() ? profile.trim() : 'default'
+}
+
+// What ctx.storage keeps for card 7: { [bot]: 'yes' | 'no' }. Anything else is dropped.
+export function readRemember(value) {
+  const out = {}
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    for (const [k, v] of Object.entries(value)) if (v === 'yes' || v === 'no') out[k] = v
+  }
+  return out
+}
+
+const DOT = { works: K.dotWorks, fix: K.dotFix, cant: K.dotCant }
+
+export function makeSetupCards(ctx) {
+  const request = (method, params, timeout) => host.request(method, params, timeout)
+  const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
+  // A read that rejects after `ms` if Hermes hasn't answered; the timer is the host's, so it is
+  // cleaned up with the plugin.
+  const limit = (promise, ms) =>
+    new Promise((resolve, reject) => {
+      const stop = ctx.setTimeout(() => reject(new Error(`no answer within ${ms / 1000} s`)), ms)
+      Promise.resolve(promise).then(
+        v => {
+          stop()
+          resolve(v)
+        },
+        e => {
+          stop()
+          reject(e)
+        }
+      )
+    })
+  const settle = p => p.then(value => ({ ok: true, value }), () => ({ ok: false }))
+
+  // State and actions for the tab. Lives in the page (always mounted), so switching tabs keeps the
+  // answers. launch = { model, recheck }: the page's own model check for the bot Hermes runs, so the
+  // helper and card 2 never disagree.
+  function useSetupCards({ active, launchModel, recheckLaunch }) {
+    const runningBot = launchBot(useValue(host.state.profile))
+    const gateway = useValue(host.state.gateway)
+    const [bots, setBots] = useState(null)
+    const [picked, setPicked] = useState(null)
+    const [reads, setReads] = useState({})
+    const [runs, setRuns] = useState({})
+    const [remember, setRemember] = useState(() => readRemember(ctx.storage.get('remember', {})))
+    const alive = useRef(true)
+    const generation = useRef({})
+    const started = useRef(false)
+
+    const bot = picked && bots && bots.includes(picked) ? picked : runningBot
+    const isRunning = b => b === runningBot
+    const params = b => (isRunning(b) ? {} : { profile: b })
+    const scope = b => (isRunning(b) ? undefined : b)
+
+    function patchRead(b, gen, key, value) {
+      if (!alive.current || generation.current[b] !== gen) return
+      setReads(r => ({ ...r, [b]: { ...(r[b] || {}), [key]: value } }))
+    }
+
+    // reuseLaunch: on the first open, the page's own model check (run when the page opened) is
+    // still fresh, so card 2 uses it instead of asking Hermes again.
+    function load(b, { reuseLaunch = false } = {}) {
+      const gen = (generation.current[b] || 0) + 1
+      generation.current[b] = gen
+      setReads(r => ({ ...r, [b]: { model: isRunning(b) ? null : { state: 'checking' }, soul: null, skills: null, memory: null } }))
+      if (!isRunning(b)) {
+        checkModel(request, { params: params(b), sleep }).then(m => patchRead(b, gen, 'model', m), () => patchRead(b, gen, 'model', { state: 'error' }))
+      } else if (!(reuseLaunch && launchModel && (launchModel.state === 'ok' || launchModel.state === 'none'))) {
+        recheckLaunch()
+      }
+      settle(request('profiles.describe', { name: b }, READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'soul', v))
+      settle(limit(host.skills.list(scope(b)), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'skills', v))
+      settle(limit(host.toolsets.list(scope(b)), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'memory', v))
+    }
+
+    function loadBots() {
+      settle(limit(host.profiles.list(), READ_TIMEOUT_MS)).then(r => {
+        if (!alive.current) return
+        const list = r.ok && r.value && Array.isArray(r.value.profiles) ? r.value.profiles : []
+        const names = list.map(p => p && typeof p.name === 'string' && p.name.trim()).filter(Boolean)
+        setBots(names.length ? names : null)
+      })
+    }
+
+    useEffect(() => {
+      alive.current = true
+      return () => {
+        alive.current = false
+      }
+    }, [])
+
+    useEffect(() => {
+      if (!active || started.current) return
+      started.current = true
+      loadBots()
+      load(bot, { reuseLaunch: true })
+    }, [active])
+
+    function pick(b) {
+      setPicked(b)
+      if (!reads[b]) load(b)
+    }
+
+    function checkAgain() {
+      loadBots()
+      load(bot)
+    }
+
+    // Card 3: one model call, only on a press, only when card 2 says ok for this bot.
+    function ask(b) {
+      const model = isRunning(b) ? launchModel : reads[b] && reads[b].model
+      if (!model || model.state !== 'ok') return
+      const current = runs[b]
+      if (current && (current.phase === 'calling' || current.phase === 'countdown')) return
+      const setRun = run => alive.current && setRuns(r => ({ ...r, [b]: run }))
+      let startedAt = 0
+      let stopTick = null
+      const stopTicking = () => {
+        if (stopTick) stopTick()
+        stopTick = null
+      }
+      askModel({
+        request,
+        sleep,
+        call: { ...ANSWER_CALL, profile: params(b).profile },
+        recheck: () => checkModel(request, { params: params(b), sleep }),
+        cancelled: () => !alive.current,
+        onState: s => {
+          if (s.phase === 'calling') {
+            startedAt = Date.now()
+            setRun({ phase: 'calling', waited: 0 })
+            stopTicking()
+            stopTick = ctx.setInterval(() => setRun({ phase: 'calling', waited: Math.round((Date.now() - startedAt) / 1000) }), 1000)
+          } else {
+            stopTicking()
+            setRun({ phase: 'countdown', left: s.left })
+          }
+        }
+      }).then(
+        result => {
+          stopTicking()
+          if (!result) return
+          setRun({ phase: 'done', result })
+          // The call found the model gone: card 2 reads again so both cards agree.
+          if (!result.ok && (result.kind === 'no_model' || result.kind === 'model_broken')) {
+            if (isRunning(b)) recheckLaunch()
+            else checkModel(request, { params: params(b), sleep }).then(m => alive.current && setReads(r => ({ ...r, [b]: { ...(r[b] || {}), model: m } })))
+          }
+        },
+        () => {
+          stopTicking()
+          setRun({ phase: 'done', result: { ok: false, kind: 'other' } })
+        }
+      )
+    }
+
+    function answerRemember(b, answer) {
+      const next = { ...remember, [b]: answer }
+      setRemember(next)
+      ctx.storage.set('remember', next)
+    }
+
+    const r = reads[bot] || {}
+    const model = isRunning(bot) ? launchModel : r.model
+    return {
+      bot,
+      bots: bots || [runningBot],
+      cards: {
+        gateway: gatewayCard(gateway),
+        model: modelCard(model),
+        answers: answersCard(runs[bot], model),
+        soul: soulCard(r.soul),
+        skills: skillsCard(r.skills),
+        memory: memoryCard(r.memory),
+        remember: rememberCard(remember[bot])
+      },
+      pick,
+      checkAgain,
+      ask: () => ask(bot),
+      reload: () => load(bot),
+      answerRemember: answer => answerRemember(bot, answer)
+    }
+  }
+
+  return useSetupCards
+}
+
+/* ---------- the view (no hooks: plain functions of the state above) ---------- */
+
+function StatusLane({ status }) {
+  return jsxs('span', {
+    className: K.cardState,
+    'data-hh': 'status',
+    children: [
+      status === 'checking' ? jsx(GlyphSpinner, {}) : jsx('span', { 'aria-hidden': true, className: cx(K.dot, DOT[status] || K.dotNeutral) }),
+      jsx('span', { children: STATUS[status] })
+    ]
+  })
+}
+
+function PasteBox({ text, label }) {
+  return jsxs('div', {
+    className: K.cardPaste,
+    children: [
+      jsx('span', { className: K.cardPasteText, children: text }),
+      jsx(CopyButton, { text, label, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' })
+    ]
+  })
+}
+
+export function renderYourSetup(s, { openStep }) {
+  const botCount = s.bots.length
+  const actionButton = (action, id) => {
+    if (!action) return null
+    if (action.kind === 'step') return jsx(Button, { size: 'xs', variant: 'secondary', onClick: () => openStep(action.step), children: action.label }, id + '-step')
+    if (action.kind === 'recheck') return jsx(Button, { size: 'xs', variant: 'secondary', onClick: () => s.reload(), children: action.label }, id + '-recheck')
+    if (action.kind === 'ask') return jsx(Button, { size: 'xs', variant: 'secondary', disabled: action.disabled, onClick: () => s.ask(), children: action.label }, id + '-ask')
+    return null
+  }
+
+  const card = (id, { extra = [], more = [], wide = false } = {}) => {
+    const c = s.cards[id]
+    const passes = PASSES[id]
+    const buttons = [actionButton(c.action, id), ...more].filter(Boolean)
+    return jsxs(
+      'section',
+      {
+        className: cx(K.card, wide && K.cardWide),
+        'data-hh': `card-${id}`,
+        'data-status': c.status,
+        'aria-label': cardTitle(id, s.bot, botCount),
+        children: [
+          jsxs('div', {
+            className: K.cardHead,
+            children: [jsx('h4', { className: K.cardTitle, children: cardTitle(id, s.bot, botCount) }), jsx(StatusLane, { status: c.status })]
+          }),
+          c.value ? jsx('div', { className: K.cardValue, children: c.value }) : null,
+          ...c.lines.map((line, i) => jsx('p', { className: K.cardText, children: line }, `l${i}`)),
+          c.reasons ? jsx('ol', { className: K.cardList, children: c.reasons.map((t, i) => jsx('li', { children: t }, i)) }) : null,
+          c.handoff
+            ? jsxs('div', { className: K.cardHead, children: [jsx('p', { className: K.cardText, children: c.handoff.lead }), jsx(PasteBox, { text: c.handoff.text, label: 'Copy' })] })
+            : null,
+          ...extra,
+          passes ? jsx('p', { className: K.cardPasses, children: passes }) : null,
+          buttons.length ? jsx('div', { className: K.cardActions, children: buttons }) : null
+        ]
+      },
+      id
+    )
+  }
+
+  // Card 7: the person's own two-part test, then their answer.
+  const rememberSteps = [
+    jsx('p', { className: K.cardText, children: REMEMBER.intro }, 'intro'),
+    jsxs(
+      'ol',
+      {
+        className: K.cardList,
+        children: [
+          jsxs('li', { children: [REMEMBER.steps[0], jsx(PasteBox, { text: REMEMBER.part1, label: 'Copy test text' })] }, 1),
+          jsxs('li', { children: [REMEMBER.steps[1], jsx(PasteBox, { text: REMEMBER.part2, label: 'Copy question' })] }, 2),
+          jsx('li', { children: REMEMBER.steps[2] }, 3)
+        ]
+      },
+      'steps'
+    )
+  ]
+  const answered = s.cards.remember.status
+  const rememberButtons = [
+    jsx(Button, { size: 'xs', variant: 'secondary', 'aria-pressed': answered === 'works', onClick: () => s.answerRemember('yes'), children: REMEMBER.yes }, 'yes'),
+    jsx(Button, { size: 'xs', variant: 'secondary', 'aria-pressed': answered === 'fix', onClick: () => s.answerRemember('no'), children: REMEMBER.no }, 'no')
+  ]
+
+  const picker =
+    botCount > 1
+      ? jsxs('div', {
+          className: K.botPicker,
+          'data-hh': 'bot-picker',
+          children: [
+            jsx('span', { className: K.botPickerLabel, children: 'Showing bot' }),
+            jsxs(Select, {
+              value: s.bot,
+              onValueChange: s.pick,
+              children: [
+                jsx(SelectTrigger, { className: K.botPickerTrigger, 'aria-label': 'Showing bot', children: jsx(SelectValue, {}) }),
+                jsx(SelectContent, { children: s.bots.map(b => jsx(SelectItem, { value: b, children: b }, b)) })
+              ]
+            }),
+            jsx('span', { className: K.botPickerLabel, children: `${botCount} bots on this Hermes` })
+          ]
+        })
+      : null
+
+  return [
+    jsxs(
+      'header',
+      {
+        children: [
+          jsx('h3', { className: K.stepTitle, children: 'Your setup' }),
+          jsx('p', { className: K.caption, children: 'Read from your Hermes. Nothing is changed.' })
+        ]
+      },
+      'head'
+    ),
+    picker,
+    jsx(
+      'div',
+      {
+        className: K.cardGrid,
+        'data-hh': 'cards',
+        children: [
+          card('gateway'),
+          card('model'),
+          card('answers'),
+          card('soul'),
+          card('skills'),
+          card('memory'),
+          card('remember', { extra: rememberSteps, more: rememberButtons, wide: true })
+        ]
+      },
+      'cards'
+    ),
+    jsx('div', { className: K.pageActions, children: jsx(Button, { size: 'sm', onClick: () => s.checkAgain(), children: 'Check again' }) }, 'again')
+  ]
+}

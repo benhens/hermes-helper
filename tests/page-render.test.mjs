@@ -5,19 +5,20 @@
 import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, mount, settle, all, text, byData, byLabel, click } from './lib/render.mjs'
-import { NO_MODEL_LINE, CANT_CHECK_LINE } from '../src/model-status.js'
+import { NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS, NO_MODEL_BOX, CANT_CHECK_LINE } from '../src/model-status.js'
 
 let calls
-function useHost({ runtime = { ok: true, model: 'mock-small' }, model = '' } = {}) {
+function useHost({ runtime = { ok: true, model: 'mock-small' }, status = { provider_configured: false }, model = '' } = {}) {
   calls = []
   globalThis.__hhHost = {
     request: async (method, params, timeout) => {
       calls.push({ method, timeout })
-      if (method !== 'setup.runtime_check') throw new Error('unexpected ' + method)
-      if (runtime instanceof Error) throw runtime
-      return runtime
+      const answer = { 'setup.runtime_check': runtime, 'setup.status': status }[method]
+      if (!answer) throw new Error('unexpected ' + method)
+      if (answer instanceof Error) throw answer
+      return answer
     },
-    model: () => model
+    model
   }
 }
 
@@ -54,21 +55,39 @@ test('model connected: the model name shows in the message box, Ask about this s
   assert.deepEqual(calls.map(c => c.method), ['setup.runtime_check'])
 })
 
-test('Hermes\'s live model name wins over the checked one', async () => {
+test('the name comes from runtime_check, never from host.state.model (it can be one chat\'s pick)', async () => {
   const { view } = await open(fakeStorage(), { runtime: { ok: true, model: 'mock-small' }, model: 'claude-x' })
-  assert.equal(text(byData(view.tree, 'model-name')).trim(), 'claude-x')
+  assert.equal(text(byData(view.tree, 'model-name')).trim(), 'mock-small')
+  assert.equal(globalThis.__hhHost.modelRead, undefined)
 })
 
-test('no model: only the fixed line and Check again; no message box, no Ask button', async () => {
+test('no name from Hermes: the message box says "your model"', async () => {
+  const { view } = await open(fakeStorage(), { runtime: { ok: true, model: null } })
+  assert.equal(text(byData(view.tree, 'model-name')).trim(), 'your model')
+})
+
+test('no model: hhcontent\'s lines, Check again, and an empty greyed message box; no Ask button', async () => {
   const { view } = await open(fakeStorage(), { runtime: { ok: false } })
   const h = text(helper(view))
-  assert.ok(h.includes(NO_MODEL_LINE))
+  for (const line of [NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS]) assert.ok(h.includes(line), line)
   assert.ok(byLabel(helper(view), 'Check again'))
-  assert.equal(all(view.tree, n => n.type === 'sdk:Textarea').length, 0)
+  const boxes = all(view.tree, n => n.type === 'sdk:Textarea')
+  assert.equal(boxes.length, 1)
+  assert.equal(boxes[0].props.disabled, true)
+  assert.equal(boxes[0].props.value, '')
+  assert.equal(boxes[0].props.placeholder, NO_MODEL_BOX)
+  assert.equal(text(byData(view.tree, 'model-name')).trim(), '')
   assert.equal(byLabel(view.tree, 'Ask about this step'), null)
   click(byLabel(view.tree, 'Check again'))
   await settle()
-  assert.deepEqual(calls.map(c => c.method), ['setup.runtime_check', 'setup.runtime_check'])
+  assert.deepEqual(calls.map(c => c.method), ['setup.runtime_check', 'setup.status', 'setup.runtime_check', 'setup.status'])
+})
+
+test('the message box keeps the whole text (no 500 cut while typing: the key check needs all of it)', async () => {
+  const { view } = await open()
+  const box = () => all(view.tree, n => n.type === 'sdk:Textarea')[0]
+  box().props.onChange({ target: { value: 'x'.repeat(700) } })
+  assert.equal(box().props.value.length, 700)
 })
 
 test('the check fails: "Can\'t check right now", never the no-model line', async () => {

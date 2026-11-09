@@ -35,7 +35,8 @@ test('every SDK name used is imported (a missing one is a ReferenceError at rend
   const imported = new Set(
     [...code.matchAll(/^import\s*\{([^}]*)\}\s*from/gm)].flatMap(m => m[1].split(',').map(s => s.trim().split(/\s+as\s+/).pop()))
   )
-  for (const name of ['ROUTES_AREA', 'SIDEBAR_NAV_AREA', 'host', 'useValue', 'Codicon', 'Switch', 'Button', 'SegmentedControl',
+  for (const name of ['ROUTES_AREA', 'SIDEBAR_NAV_AREA', 'host', 'useValue', 'Codicon', 'Switch', 'Button', 'SegmentedControl', 'CopyButton',
+    'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue',
     'Textarea', 'Tip', 'EmptyState', 'GlyphSpinner', 'RowButton', 'PRIMARY_ICON_BTN', 'composerInputBacking',
     'composerSurfaceRing', 'jsx', 'jsxs', 'useState', 'useEffect', 'useRef', 'useId']) {
     if (new RegExp(`\\b${name}\\b`).test(code.replace(/^import.*$/gm, ''))) assert.ok(imported.has(name), `${name} used but not imported`)
@@ -55,9 +56,35 @@ test('helper panel is a div with role complementary, never an <aside>', () => {
   assert.match(code, /role:\s*'complementary'/)
 })
 
-test('"no model" comes from setup.runtime_check, never setup.status', () => {
+test('"no model" comes from setup.runtime_check; setup.status is read only after it says ok false', () => {
   assert.match(code, /'setup\.runtime_check'/)
-  assert.doesNotMatch(code, /setup\.status/)
+  const ms = src('model-status.js')
+  assert.equal((code.match(/setup\.status/g) || []).length, 1)
+  const block = ms.slice(ms.indexOf('if (!rc.ok) {'), ms.indexOf("return { state: 'none', configured }"))
+  assert.match(block, /request\('setup\.status'/)
+})
+
+test('the one model call: only in model-call.js, task helping_hand, 90000 ms, never a session id', () => {
+  const files = fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js'))
+  for (const f of files) {
+    if (f !== 'model-call.js') assert.doesNotMatch(src(f), /'llm\.oneshot'/, f)
+  }
+  assert.equal((code.match(/'llm\.oneshot'/g) || []).length, 1)
+  assert.match(src('model-call.js'), /request\('llm\.oneshot', oneshotParams\(call\), ONESHOT_TIMEOUT_MS\)/)
+  assert.match(src('model-call.js'), /export const ONESHOT_TASK = 'helping_hand'/)
+  assert.match(src('model-call.js'), /export const ONESHOT_TIMEOUT_MS = 90000/)
+  assert.doesNotMatch(code, /session_id|sessionId/)
+})
+
+test('the model name never comes from host.state.model or config.get', () => {
+  assert.doesNotMatch(code, /state\.model\b/)
+  assert.doesNotMatch(code, /config\.get/)
+})
+
+test('Your setup reads only through read-only calls (no set, configure, write, newChat or send)', () => {
+  const methods = [...code.matchAll(/request\('([a-z_.]+)'/g)].map(m => m[1])
+  assert.deepEqual([...new Set(methods)].sort(), ['free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
+  assert.doesNotMatch(code, /setEnabled|profiles\.configure|set_asset|config\.set|newChat|composer\.setDraft|\.write\(/)
 })
 
 test('no raw globals the host cannot clean up, no reach into Hermes markup, no network', () => {
@@ -104,7 +131,7 @@ function propsOf(text, name) {
 }
 
 test('every class comes from the Hermes class table: page code writes no class string of its own', () => {
-  for (const f of ['page.js', 'character.js', 'main.js']) {
+  for (const f of ['page.js', 'setup-tab.js', 'character.js', 'main.js']) {
     assert.doesNotMatch(src(f), /className:\s*['"`]/, `${f} has a literal className`)
     // cx(...) may hold K values and conditions (side === 'right'), never a class string.
     for (const m of src(f).matchAll(/cx\(([^)]*)\)/g)) {
@@ -123,11 +150,12 @@ test('two tabs use the SDK SegmentedControl, labelled Setup and Your setup', () 
 test('buttons are Hermes Button components; no bare <button> except the choice cards (Hermes Chip markup)', () => {
   const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button'/g)]
   assert.equal(bare.length, 1)
+  assert.doesNotMatch(src('setup-tab.js'), /jsxs?\(\s*'button'/)
   assert.match(src('page.js'), /'button',\s*\{\s*type: 'button',\s*'aria-pressed'/)
 })
 
 test('every codicon named in the code is in the ICONS list (which hermes-checks.sh checks against Hermes)', () => {
-  const named = ['page.js', 'main.js'].flatMap(f => [...src(f).matchAll(/(?:name|icon|codicon):\s*'([a-z-]+)'/g)].map(m => m[1]))
+  const named = ['page.js', 'setup-tab.js', 'main.js'].flatMap(f => [...src(f).matchAll(/(?:name|icon|codicon):\s*'([a-z-]+)'/g)].map(m => m[1]))
   assert.ok(named.length >= 5, named.join(' '))
   for (const n of named) assert.ok(ICONS.includes(n), `${n} not in ICONS`)
 })
@@ -141,8 +169,8 @@ test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s o
   // Allowed: tone on a ghost icon button (RoomHeader), the composer's own send class, the round
   // floating disc (fan-menu.tsx). Anything else would restyle Hermes's button.
   const allowed = new Set([K.iconTone, K.peekButton])
-  const buttons = propsOf(src('page.js'), 'Button')
-  assert.ok(buttons.length >= 6, `found ${buttons.length} Button calls`)
+  const buttons = [...propsOf(src('page.js'), 'Button'), ...propsOf(src('setup-tab.js'), 'Button')]
+  assert.ok(buttons.length >= 12, `found ${buttons.length} Button calls`)
   for (const props of buttons) {
     const cls = props.match(/className:\s*(cx\([^)]*\)|[^,\n]+)/)
     if (!cls) continue

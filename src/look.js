@@ -94,7 +94,39 @@ export const K = {
 
   // ---- hidden helper: one round button at the page edge (components/ui/fan-menu.tsx discs) ----
   peekColumn: 'flex shrink-0 flex-col items-center px-2 pt-2',
-  peekButton: 'rounded-full'
+  peekButton: 'rounded-full',
+
+  // ---- Your setup ----
+  // Bot picker: Capabilities' own profile scope selector (app/capabilities/scope-selector.tsx)
+  botPicker: 'flex min-w-0 items-center gap-2',
+  botPickerLabel: 'text-[0.7rem] font-medium text-(--ui-text-tertiary)',
+  botPickerTrigger: 'text-xs h-7 w-56',
+  // Card grid: Connectors' directory grid (app/capabilities/connectors/connectors-directory.tsx Group)
+  cardGrid: 'grid gap-3 sm:grid-cols-2',
+  cardWide: 'col-span-full',
+  // One card: Connectors' row card (app/capabilities/connectors/connector-row-card.tsx), stacked
+  card: 'flex min-w-0 flex-col gap-1.5 rounded-lg border border-(--ui-stroke-quaternary) bg-(--ui-bg-elevated) p-3',
+  cardHead: 'flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5',
+  cardTitle: 'min-w-0 text-[0.8125rem] font-semibold text-(--ui-text-primary)',
+  // The card's state lane: a 5 px dot and the word (CardLane in the same file)
+  cardState: 'ml-auto flex items-center gap-1.5 text-[0.6875rem] text-(--ui-text-secondary)',
+  dot: 'size-[5px] shrink-0 rounded-full',
+  dotWorks: 'bg-(--ui-green)',
+  dotFix: 'bg-(--ui-red)',
+  dotCant: 'bg-(--ui-yellow)',
+  dotNeutral: 'bg-(--ui-text-quaternary)',
+  // The card's lines: SecondLine in the same file, without the two-line clamp
+  cardText: 'text-[0.72rem] leading-snug text-(--ui-text-secondary)',
+  // Model name: the composer's model label tone (plugins/hermes-bots/group-room-ui.tsx)
+  cardValue: 'min-w-0 truncate font-mono text-[0.6875rem] text-(--ui-text-secondary)',
+  // "Passes when": Connectors' fact line (CardLane)
+  cardPasses: 'text-[0.6875rem] text-(--ui-text-tertiary)',
+  cardActions: 'mt-1 flex flex-wrap items-center gap-1.5',
+  // Text to paste: the source-tag chip's surface (app/master-detail.tsx ToolChip), as a block
+  cardPaste: 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5',
+  cardPasteText: 'min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
+  cardList: 'list-decimal space-y-1 pl-4 text-[0.72rem] leading-snug text-(--ui-text-secondary)',
+  pageActions: 'flex flex-wrap items-center gap-2 pt-1'
 }
 
 // Joins class names, skipping empty ones. Only K values go in.
@@ -104,4 +136,4 @@ export function cx(...names) {
 
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
-export const ICONS = ['compass', 'arrow-swap', 'chevron-left', 'chevron-right', 'close', 'arrow-up', 'play-circle', 'location']
+export const ICONS = ['compass', 'arrow-swap', 'chevron-left', 'chevron-right', 'close', 'arrow-up', 'play-circle', 'location', 'info']
