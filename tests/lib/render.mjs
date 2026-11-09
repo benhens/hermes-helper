@@ -77,18 +77,39 @@ export function fakeTimers() {
 }
 
 // Registers the plugin with a fake ctx; returns its contributions and the page component.
-export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers()) {
+// extra: more ctx doors (e.g. os) for a test.
+export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers(), extra = {}) {
   const plugin = await loadPlugin()
   const contributions = []
-  plugin.register({
+  const ctx = {
     storage,
     setTimeout: timers.setTimeout,
     setInterval: timers.setInterval,
     registerMany: list => contributions.push(...list),
-    register: c => contributions.push(c)
-  })
+    register: c => contributions.push(c),
+    ...extra
+  }
+  plugin.register(ctx)
   const page = contributions.find(c => c.area === 'routes')
-  return { plugin, contributions, storage, timers, Page: page.render().type }
+  return { plugin, contributions, storage, timers, ctx, Page: page.render().type }
+}
+
+// One src file that imports React, loaded with the stand-ins (its own ./ imports stay real files).
+export async function loadSrc(name) {
+  const reactUrl = pathToFileURL(path.join(FAKES, 'react.mjs')).href
+  const srcDir = path.join(ROOT, 'src')
+  const src = fs
+    .readFileSync(path.join(srcDir, name), 'utf8')
+    .replace("from 'react/jsx-runtime'", `from '${reactUrl}'`)
+    .replace("from 'react'", `from '${reactUrl}'`)
+    .replace(/from '\.\/([\w-]+\.js)'/g, (m, f) => `from '${pathToFileURL(path.join(srcDir, f)).href}'`)
+  const file = path.join(os.tmpdir(), `hh-src-test-${process.pid}-${loads++}-${name}`.replace(/\.js$/, '.mjs'))
+  fs.writeFileSync(file, src)
+  try {
+    return await import(pathToFileURL(file).href)
+  } finally {
+    fs.unlinkSync(file)
+  }
 }
 
 const throwaway = {
