@@ -292,9 +292,10 @@ export function renderYourSetup(s, { openStep }) {
           }),
           c.value ? jsx('div', { className: K.cardValue, children: c.value }) : null,
           ...c.lines.map((line, i) => jsx('p', { className: K.cardText, children: line }, `l${i}`)),
+          c.reasons ? jsx('p', { className: K.cardText, children: c.reasonsLead }) : null,
           c.reasons ? jsx('ol', { className: K.cardList, children: c.reasons.map((t, i) => jsx('li', { children: t }, i)) }) : null,
           c.handoff
-            ? jsxs('div', { className: K.cardHead, children: [jsx('p', { className: K.cardText, children: c.handoff.lead }), jsx(PasteBox, { text: c.handoff.text, label: 'Copy' })] })
+            ? jsxs('div', { className: K.cardStack, children: [jsx('p', { className: K.cardText, children: c.handoff.lead }), jsx(PasteBox, { text: c.handoff.text, label: 'Copy' })] })
             : null,
           ...extra,
           passes ? jsx('p', { className: K.cardPasses, children: passes }) : null,

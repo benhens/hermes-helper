@@ -286,7 +286,7 @@ export function makePage(ctx) {
       {
         className: K.detail,
         'data-hh': 'detail',
-        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: K.detailInner, children: tab === 'setup' ? stepView : yoursView }) })
+        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
       },
       'main'
     )

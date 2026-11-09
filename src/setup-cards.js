@@ -30,7 +30,8 @@ export const CARD_TITLES = {
 }
 
 // Cards that belong to one bot get "for {profile}" when the person has more than one bot.
-export const PER_BOT = new Set(['model', 'answers', 'soul', 'skills', 'memory', 'remember'])
+// Card 7 is per bot too, but its title is a question, so the picker above says which bot it is.
+export const PER_BOT = new Set(['model', 'answers', 'soul', 'skills', 'memory'])
 
 export function cardTitle(id, bot, botCount) {
   const t = CARD_TITLES[id]
@@ -40,7 +41,8 @@ export function cardTitle(id, bot, botCount) {
 export const PASSES = {
   gateway: 'Passes when: this app is connected to your Hermes',
   model: "Passes when: your provider's sign-in is found. This doesn't ask the model anything.",
-  answers: 'Passes when: asked to reply "OK", it does within 90 s. Uses a little of your credit.',
+  // A no-break space keeps "90 s" on one line.
+  answers: 'Passes when: asked to reply "OK", it does within 90\u00a0s. Uses a little of your credit.',
   soul: "Passes when: SOUL.md has your own text, not Hermes's default", // (builder)
   skills: null, // a count only, no pass rule
   memory: 'Passes when: the memory tool is on',
@@ -234,6 +236,7 @@ export const REMEMBER = {
   yes: 'It said 7Q4',
   no: "It didn't",
   worked: 'It found the note in a new chat, so memory works for this bot.', // (builder)
+  reasonsLead: 'Three likely reasons, most likely first:', // (builder)
   reasons: [
     "It said it saved but didn't. Small models do this often. A stronger model for setup fixes it.",
     'The note is waiting for your OK. Type /memory pending, then /memory approve all.',
@@ -244,6 +247,6 @@ export const REMEMBER = {
 // answer = 'yes' | 'no' | undefined (kept per bot in ctx.storage)
 export function rememberCard(answer) {
   if (answer === 'yes') return { status: 'works', lines: [REMEMBER.worked] }
-  if (answer === 'no') return { status: 'fix', lines: [], reasons: REMEMBER.reasons }
+  if (answer === 'no') return { status: 'fix', lines: [], reasonsLead: REMEMBER.reasonsLead, reasons: REMEMBER.reasons }
   return { status: 'unchecked', lines: [] }
 }

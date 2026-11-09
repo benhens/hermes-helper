@@ -184,5 +184,5 @@ test('titles: "for {bot}" only on per-bot cards and only with more than one bot'
 
 test('Passes when: one fixed rule per card (skills has none, it is a count)', () => {
   for (const id of ['gateway', 'model', 'answers', 'soul', 'memory', 'remember']) assert.match(PASSES[id], /^Passes when: /, id)
-  assert.match(PASSES.answers, /90 s\. Uses a little of your credit\.$/)
+  assert.match(PASSES.answers, /90\u00a0s\. Uses a little of your credit\.$/)
 })

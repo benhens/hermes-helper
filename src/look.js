@@ -40,6 +40,8 @@ export const K = {
   detail: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
   detailScroll: 'min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]',
   detailInner: 'mx-auto max-w-2xl space-y-5 px-5 py-4',
+  // Your setup is a card grid, so it takes the wider of Hermes's reading widths
+  detailInnerWide: 'mx-auto max-w-3xl space-y-5 px-5 py-4',
   stepTitle: 'min-w-0 text-[0.9375rem] font-semibold tracking-tight',
   // Chat text (plugins/hermes-bots/group-room-ui.tsx RoomMessage body)
   prose: 'mt-1 text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
@@ -106,10 +108,11 @@ export const K = {
   cardWide: 'col-span-full',
   // One card: Connectors' row card (app/capabilities/connectors/connector-row-card.tsx), stacked
   card: 'flex min-w-0 flex-col gap-1.5 rounded-lg border border-(--ui-stroke-quaternary) bg-(--ui-bg-elevated) p-3',
-  cardHead: 'flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5',
-  cardTitle: 'min-w-0 text-[0.8125rem] font-semibold text-(--ui-text-primary)',
+  // Title on the left (it wraps), state on the right, so the state sits in the same place on every card
+  cardHead: 'flex min-w-0 items-start gap-2',
+  cardTitle: 'min-w-0 flex-1 text-[0.8125rem] font-semibold text-(--ui-text-primary)',
   // The card's state lane: a 5 px dot and the word (CardLane in the same file)
-  cardState: 'ml-auto flex items-center gap-1.5 text-[0.6875rem] text-(--ui-text-secondary)',
+  cardState: 'flex shrink-0 items-center gap-1.5 text-[0.6875rem] text-(--ui-text-secondary)',
   dot: 'size-[5px] shrink-0 rounded-full',
   dotWorks: 'bg-(--ui-green)',
   dotFix: 'bg-(--ui-red)',
@@ -122,6 +125,7 @@ export const K = {
   // "Passes when": Connectors' fact line (CardLane)
   cardPasses: 'text-[0.6875rem] text-(--ui-text-tertiary)',
   cardActions: 'mt-1 flex flex-wrap items-center gap-1.5',
+  cardStack: 'flex min-w-0 flex-col gap-1',
   // Text to paste: the source-tag chip's surface (app/master-detail.tsx ToolChip), as a block
   cardPaste: 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5',
   cardPasteText: 'min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',

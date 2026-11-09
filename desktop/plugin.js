@@ -323,7 +323,8 @@ const CARD_TITLES = {
 }
 
 // Cards that belong to one bot get "for {profile}" when the person has more than one bot.
-const PER_BOT = new Set(['model', 'answers', 'soul', 'skills', 'memory', 'remember'])
+// Card 7 is per bot too, but its title is a question, so the picker above says which bot it is.
+const PER_BOT = new Set(['model', 'answers', 'soul', 'skills', 'memory'])
 
 function cardTitle(id, bot, botCount) {
   const t = CARD_TITLES[id]
@@ -333,7 +334,8 @@ function cardTitle(id, bot, botCount) {
 const PASSES = {
   gateway: 'Passes when: this app is connected to your Hermes',
   model: "Passes when: your provider's sign-in is found. This doesn't ask the model anything.",
-  answers: 'Passes when: asked to reply "OK", it does within 90 s. Uses a little of your credit.',
+  // A no-break space keeps "90 s" on one line.
+  answers: 'Passes when: asked to reply "OK", it does within 90\u00a0s. Uses a little of your credit.',
   soul: "Passes when: SOUL.md has your own text, not Hermes's default", // (builder)
   skills: null, // a count only, no pass rule
   memory: 'Passes when: the memory tool is on',
@@ -527,6 +529,7 @@ const REMEMBER = {
   yes: 'It said 7Q4',
   no: "It didn't",
   worked: 'It found the note in a new chat, so memory works for this bot.', // (builder)
+  reasonsLead: 'Three likely reasons, most likely first:', // (builder)
   reasons: [
     "It said it saved but didn't. Small models do this often. A stronger model for setup fixes it.",
     'The note is waiting for your OK. Type /memory pending, then /memory approve all.',
@@ -537,7 +540,7 @@ const REMEMBER = {
 // answer = 'yes' | 'no' | undefined (kept per bot in ctx.storage)
 function rememberCard(answer) {
   if (answer === 'yes') return { status: 'works', lines: [REMEMBER.worked] }
-  if (answer === 'no') return { status: 'fix', lines: [], reasons: REMEMBER.reasons }
+  if (answer === 'no') return { status: 'fix', lines: [], reasonsLead: REMEMBER.reasonsLead, reasons: REMEMBER.reasons }
   return { status: 'unchecked', lines: [] }
 }
 
@@ -624,6 +627,8 @@ const K = {
   detail: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
   detailScroll: 'min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]',
   detailInner: 'mx-auto max-w-2xl space-y-5 px-5 py-4',
+  // Your setup is a card grid, so it takes the wider of Hermes's reading widths
+  detailInnerWide: 'mx-auto max-w-3xl space-y-5 px-5 py-4',
   stepTitle: 'min-w-0 text-[0.9375rem] font-semibold tracking-tight',
   // Chat text (plugins/hermes-bots/group-room-ui.tsx RoomMessage body)
   prose: 'mt-1 text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
@@ -690,10 +695,11 @@ const K = {
   cardWide: 'col-span-full',
   // One card: Connectors' row card (app/capabilities/connectors/connector-row-card.tsx), stacked
   card: 'flex min-w-0 flex-col gap-1.5 rounded-lg border border-(--ui-stroke-quaternary) bg-(--ui-bg-elevated) p-3',
-  cardHead: 'flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5',
-  cardTitle: 'min-w-0 text-[0.8125rem] font-semibold text-(--ui-text-primary)',
+  // Title on the left (it wraps), state on the right, so the state sits in the same place on every card
+  cardHead: 'flex min-w-0 items-start gap-2',
+  cardTitle: 'min-w-0 flex-1 text-[0.8125rem] font-semibold text-(--ui-text-primary)',
   // The card's state lane: a 5 px dot and the word (CardLane in the same file)
-  cardState: 'ml-auto flex items-center gap-1.5 text-[0.6875rem] text-(--ui-text-secondary)',
+  cardState: 'flex shrink-0 items-center gap-1.5 text-[0.6875rem] text-(--ui-text-secondary)',
   dot: 'size-[5px] shrink-0 rounded-full',
   dotWorks: 'bg-(--ui-green)',
   dotFix: 'bg-(--ui-red)',
@@ -706,6 +712,7 @@ const K = {
   // "Passes when": Connectors' fact line (CardLane)
   cardPasses: 'text-[0.6875rem] text-(--ui-text-tertiary)',
   cardActions: 'mt-1 flex flex-wrap items-center gap-1.5',
+  cardStack: 'flex min-w-0 flex-col gap-1',
   // Text to paste: the source-tag chip's surface (app/master-detail.tsx ToolChip), as a block
   cardPaste: 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5',
   cardPasteText: 'min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
@@ -1066,9 +1073,10 @@ function renderYourSetup(s, { openStep }) {
           }),
           c.value ? jsx('div', { className: K.cardValue, children: c.value }) : null,
           ...c.lines.map((line, i) => jsx('p', { className: K.cardText, children: line }, `l${i}`)),
+          c.reasons ? jsx('p', { className: K.cardText, children: c.reasonsLead }) : null,
           c.reasons ? jsx('ol', { className: K.cardList, children: c.reasons.map((t, i) => jsx('li', { children: t }, i)) }) : null,
           c.handoff
-            ? jsxs('div', { className: K.cardHead, children: [jsx('p', { className: K.cardText, children: c.handoff.lead }), jsx(PasteBox, { text: c.handoff.text, label: 'Copy' })] })
+            ? jsxs('div', { className: K.cardStack, children: [jsx('p', { className: K.cardText, children: c.handoff.lead }), jsx(PasteBox, { text: c.handoff.text, label: 'Copy' })] })
             : null,
           ...extra,
           passes ? jsx('p', { className: K.cardPasses, children: passes }) : null,
@@ -1434,7 +1442,7 @@ function makePage(ctx) {
       {
         className: K.detail,
         'data-hh': 'detail',
-        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: K.detailInner, children: tab === 'setup' ? stepView : yoursView }) })
+        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
       },
       'main'
     )
