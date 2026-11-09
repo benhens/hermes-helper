@@ -47,24 +47,20 @@ test('registers exactly one sidebar row (Helping Hand, compass) and one page at 
   assert.deepEqual(contributions.find(c => c.area === 'routes').data, { path: '/helping-hand' })
 })
 
-test('model connected: the model name shows in the message box, Ask about this step is offered', async () => {
+test('model connected: no model name in the message box (the sketch drops it), Ask about this step is offered', async () => {
   const { view } = await open(fakeStorage(), { runtime: { ok: true, provider: 'custom', model: 'mock-small' } })
-  assert.equal(text(byData(view.tree, 'model-name')).trim(), 'Mock Small')
+  assert.equal(byData(view.tree, 'model-name'), null)
+  assert.doesNotMatch(text(helper(view)), /Mock Small|mock-small/)
   assert.ok(all(view.tree, n => n.type === 'sdk:Textarea').length === 1)
   assert.ok(byLabel(view.tree, 'Ask about this step'))
   assert.doesNotMatch(text(view.tree), /no model connected/)
   assert.deepEqual(calls.map(c => c.method), ['setup.runtime_check'])
 })
 
-test('the name comes from runtime_check, never from host.state.model (it can be one chat\'s pick)', async () => {
+test('the page never reads host.state.model (it can be one chat\'s pick)', async () => {
   const { view } = await open(fakeStorage(), { runtime: { ok: true, model: 'mock-small' }, model: 'claude-x' })
-  assert.equal(text(byData(view.tree, 'model-name')).trim(), 'Mock Small')
+  assert.doesNotMatch(text(view.tree), /claude-x/)
   assert.equal(globalThis.__hhHost.modelRead, undefined)
-})
-
-test('no name from Hermes: the message box says "your model"', async () => {
-  const { view } = await open(fakeStorage(), { runtime: { ok: true, model: null } })
-  assert.equal(text(byData(view.tree, 'model-name')).trim(), 'your model')
 })
 
 test('no model: hhcontent\'s lines, Check again, and an empty greyed message box; no Ask button', async () => {
@@ -114,7 +110,8 @@ test('a failed check is asked again on the next open; a good one within 30 s is 
   const again = mount(second.Page)
   await settle()
   assert.equal(calls.length, 1)
-  assert.equal(text(byData(again.tree, 'model-name')).trim(), 'M')
+  // The reused answer is "ok": the "On step" line shows, not "Checking your model".
+  assert.match(text(byData(again.tree, 'helper')), /On step 1:/)
 })
 
 test('Close: the helper goes, Show helper brings it back; remembered as closed', async () => {
@@ -221,30 +218,55 @@ test('one primary button per screen: setup with and without a model, the failed 
   assert.equal(byLabel(byData(view.tree, 'detail'), 'Check again').props.variant, 'secondary')
 })
 
-test('message box: one line that grows, no resize grip; model name in normal letters just before send', async () => {
+test('message box: one line that grows, no resize grip; only the box and a round send button (no model name, no microphone)', async () => {
   const { view } = await open(fakeStorage(), { runtime: { ok: true, model: 'claude-opus-4-8' } })
   const box = all(view.tree, n => n.type === 'sdk:Textarea')[0]
   assert.equal(box.props.rows, 1)
   for (const c of ['field-sizing-content', 'max-h-40', 'min-h-0', 'resize-none']) assert.ok(box.props.className.split(' ').includes(c), c)
   const row = all(byData(view.tree, 'composer'), n => n.props.className === K.composerRow)[0]
   const kids = row.props.children.filter(Boolean)
-  assert.equal(kids.length, 3)
+  assert.equal(kids.length, 2)
   assert.equal(kids[0].props.className, K.composerInputCell)
-  assert.equal(kids[1].props['data-hh'], 'model-name')
-  assert.equal(kids[2].props['aria-label'], 'Send')
-  assert.equal(text(kids[1]).trim(), 'Opus 4.8')
-  assert.doesNotMatch(K.composerModel, /font-mono/)
-  assert.match(K.composerModel, /(^|\s)text-xs(\s|$)/)
+  assert.equal(kids[1].props['aria-label'], 'Send')
+  assert.ok(kids[1].props.className.split(' ').includes('sdk-primary-icon-btn'), 'Hermes\'s round send button')
+  assert.match(K.composerSurface, /(^|\s)rounded-2xl(\s|$)/)
+  assert.doesNotMatch(text(helper(view)), /Opus 4\.8/)
+  assert.equal(all(helper(view), n => /mic/i.test(String(n.props['aria-label'] || '')) || n.props.name === 'mic').length, 0)
 })
 
-test('bubble and character sit together just above the message box (mt-auto), the "On step" line on top', async () => {
+test('the sketch: "On step" line on top, the words low as plain text (no bubble), character small at the bottom right with three thought dots, just above the box', async () => {
   const { view } = await open()
-  const body = all(helper(view), n => n.props.className === K.helperBody)[0]
-  const parts = body.props.children.filter(Boolean)
+  const h = helper(view)
+  const kids = h.props.children.filter(Boolean)
+  // top bar, body, character row, message box: in that order
+  assert.equal(kids[1].props.className, K.helperBody)
+  assert.equal(kids[2].props['data-hh'], 'character')
+  assert.equal(kids[3].props['data-hh'], 'composer')
+  const parts = kids[1].props.children.filter(Boolean)
   assert.equal(parts[0].props.role, 'status')
+  assert.match(text(parts[0]), /^\s*On step 1: What you want Hermes to do\s*$/)
   assert.equal(parts.at(-1).props['data-hh'], 'helper-newest')
   assert.match(K.helperNewest, /(^|\s)mt-auto(\s|$)/)
-  assert.ok(byData(parts.at(-1), 'bubble'))
+  const say = byData(parts.at(-1), 'say')
+  assert.ok(say, 'the newest words')
+  assert.equal(all(say, n => n.type === 'p')[0].props.className, K.say)
+  // plain text: no bubble, card or fill anywhere around the words
+  assert.equal(byData(h, 'bubble'), null)
+  for (const key of ['say', 'sayStack', 'helperNewest']) assert.doesNotMatch(K[key], /(^|\s)(bg-|rounded|border|shadow|p-|px-|py-)/, key)
+  assert.equal(K.bubble, undefined)
+  // the character row: dots first, then the character, pushed to the right
+  const row = kids[2]
+  assert.match(K.characterRow, /(^|\s)justify-end(\s|$)/)
+  const [dots, who] = row.props.children.filter(Boolean)
+  assert.equal(dots.props['data-hh'], 'thought-dots')
+  assert.equal(dots.props['aria-hidden'], true)
+  assert.equal(dots.props.children.length, 3)
+  const sizes = dots.props.children.map(d => d.props.className.match(/(?:^|\s)size-([\d.]+)/)[1]).map(Number)
+  assert.deepEqual(sizes, [...sizes].sort((a, b) => a - b), 'the dots grow toward the character')
+  const lifts = dots.props.children.map(d => Number((d.props.className.match(/(?:^|\s)mb-([\d.]+)/) || [0, 0])[1]))
+  assert.deepEqual(lifts, [...lifts].sort((a, b) => b - a), 'the dots rise toward the words')
+  assert.ok(all(who, n => n.props['data-hh-character']).length === 1)
+  assert.ok(Number(all(who, n => n.props['data-hh-character'])[0].props.height) <= 52, 'small')
 })
 
 test('no line on the helper\'s edge', () => {
@@ -284,13 +306,13 @@ async function openMeasured(storage = fakeStorage(), host) {
   return opened
 }
 
-test('narrow (800 px window, Hermes sidebar shown = 540 px page): helper folds, numbers-only steps, one-column facts', async t => {
+test('narrow (800 px window, Hermes sidebar shown = 540 px page): helper folds, numbers-only steps, one-column comparison', async t => {
   t.after(() => delete globalThis.ResizeObserver)
-  const { view, storage } = await openMeasured(fakeStorage({ step: 2 })) // step 2 has the two facts
+  const { view, storage } = await openMeasured(fakeStorage({ step: 2 })) // step 2 has the two-column comparison
   resize(view, 1180)
   assert.ok(helper(view))
-  assert.equal(byData(view.tree, 'facts').props['data-columns'], 2)
-  assert.ok(byData(view.tree, 'facts').props.className.split(' ').includes(K.twoColumns))
+  assert.equal(byData(view.tree, 'compare').props['data-columns'], 2)
+  assert.ok(byData(view.tree, 'compare').props.className.split(' ').includes(K.twoColumns))
   resize(view, 540)
   assert.equal(helper(view), null)
   const strip = byData(view.tree, 'helper-hidden')
@@ -301,8 +323,8 @@ test('narrow (800 px window, Hermes sidebar shown = 540 px page): helper folds, 
   const rows = all(byData(view.tree, 'steps'), n => n.type === 'sdk:RowButton')
   assert.ok(rows.length >= 2)
   rows.forEach((r, i) => assert.match(r.props['aria-label'], new RegExp(`^Step ${i + 1}: \\S`)))
-  assert.equal(byData(view.tree, 'facts').props['data-columns'], 1)
-  assert.ok(!byData(view.tree, 'facts').props.className.split(' ').includes(K.twoColumns))
+  assert.equal(byData(view.tree, 'compare').props['data-columns'], 1)
+  assert.ok(!byData(view.tree, 'compare').props.className.split(' ').includes(K.twoColumns))
   // Nothing saved: the person's choice is still "open", and it comes back when wider.
   assert.equal(storage.data.get('helper'), undefined)
   resize(view, 1180)
@@ -381,13 +403,13 @@ test('tabs: Home and End; each tab points at the one tab panel, which names its 
   assert.equal(panel.props['aria-labelledby'], tabButtons(view)[0].props.id)
 })
 
-test('wide step: the three answer choices sit in a row; narrow: one column', async t => {
+test('wide step: the answer cards sit two to a row (4 or 5 of them); narrow: one column', async t => {
   t.after(() => delete globalThis.ResizeObserver)
   const { view } = await openMeasured(fakeStorage({ step: 2 }))
   resize(view, 1180)
-  assert.ok(byData(view.tree, 'choices').props.className.split(' ').includes(K.threeColumns))
+  assert.ok(byData(view.tree, 'choices').props.className.split(' ').includes(K.twoColumns))
   resize(view, 540)
-  assert.ok(!byData(view.tree, 'choices').props.className.split(' ').includes(K.threeColumns))
+  assert.ok(!byData(view.tree, 'choices').props.className.split(' ').includes(K.twoColumns))
 })
 
 test('narrow: "Show helper" after Close opens the helper over the page in one press', async t => {

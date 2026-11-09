@@ -1,19 +1,21 @@
 // The Helping Hand page: header with two text tabs, step list, open step, helper panel.
-// B1 = the page shell. Step texts are placeholders until hhcontent's data arrives (B3); the
-// "Your setup" cards are B2; the helper's model call is B4. B3a = the native pass (hhdesign's
-// b1-design-review.md fixes 1-6, 7 and 8) and narrow windows (src/layout.js).
-// Look: Hermes's own UI kit components (Button, Switch, Textarea, Tip, EmptyState, GlyphSpinner,
-// Codicon, RowButton) and, where Hermes has no kit component (its text tabs and vertical strips
+// B1 = the page shell; B2 = the "Your setup" cards; B3a = the native pass (hhdesign's
+// b1-design-review.md fixes) and narrow windows (src/layout.js); B3 = Setup steps 1-4 from
+// hhcontent's data (src/steps.js) and the helper panel from Pēteris's sketch. The helper's model
+// call is B4: until then everything the helper says is fixed text chosen by code (src/helper-chat.js).
+// Look: Hermes's own UI kit components (Button, Switch, Textarea, Tip, GlyphSpinner, Codicon,
+// RowButton, CopyButton) and, where Hermes has no kit component (its text tabs and vertical strips
 // aren't in the SDK), the class strings its own screens use (src/look.js). No CSS of our own.
-import { host, Button, Codicon, EmptyState, GlyphSpinner, RowButton, Switch, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
+import { host, Button, Codicon, GlyphSpinner, RowButton, Switch, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, cx } from './look.js'
-import { Character } from './character.js'
-import { readState, otherSide, STEP_COUNT } from './state.js'
-import { checkModel, modelLabel, NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS, NO_MODEL_BOX, CANT_CHECK_LINE, RECHECK_AFTER_MS } from './model-status.js'
-import { PLACEHOLDER_STEPS, LATER_STEPS, VERSION_LINE } from './placeholder-steps.js'
-import { makeSetupCards, renderYourSetup } from './setup-tab.js'
+import { Character, poseFor, FLASH_MS } from './character.js'
+import { readState, otherSide } from './state.js'
+import { checkModel, NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS, NO_MODEL_BOX, CANT_CHECK_LINE, RECHECK_AFTER_MS } from './model-status.js'
+import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
+import { greetingEntry, answerEntry, doneEntry, typedEntries } from './helper-chat.js'
+import { makeSetupCards, renderYourSetup, PasteBox } from './setup-tab.js'
 import { layoutFor, RAIL_PX, RAIL_NUMBERS_PX, HELPER_PX } from './layout.js'
 
 // Column widths (layout only; every colour, font and line comes from Hermes's classes).
@@ -68,6 +70,25 @@ export function makePage(ctx) {
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
   let lastCheck = null
+  // The chat log, kept while the plugin is loaded (leaving the page and coming back keeps it;
+  // nothing is written to disk). Each entry gets an id for React's list keys.
+  let chatMemory = null
+  let nextEntryId = 1
+  let nextTurn = 1
+  // Entries added by one action share a turn (an answer and its note, a question and its reply).
+  const withIds = entries => {
+    const turn = nextTurn++
+    return entries.filter(Boolean).map(e => ({ ...e, id: nextEntryId++, turn }))
+  }
+  const LOG_MAX = 200
+  // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
+  const openDocs = url => {
+    if (!isDocsUrl(url)) return
+    try {
+      const done = ctx.os && typeof ctx.os.openExternal === 'function' ? ctx.os.openExternal(url) : null
+      if (done && typeof done.catch === 'function') done.catch(() => {})
+    } catch {}
+  }
 
   function useModelStatus() {
     const fresh = lastCheck && Date.now() - lastCheck.at < RECHECK_AFTER_MS
@@ -109,7 +130,13 @@ export function makePage(ctx) {
     const [tab, setTab] = useState(initial.tab)
     const [step, setStep] = useState(initial.step)
     const [chatlog, setChatlog] = useState(initial.chatlog)
-    const [chosen, setChosen] = useState({})
+    const [answers, setAnswers] = useState(initial.answers)
+    const [log, setLog] = useState(() => chatMemory || (chatMemory = withIds([greetingEntry()])))
+    // A one-off pose of the character (waving, jumping), played for FLASH_MS.
+    const [flash, setFlash] = useState(null)
+    const cancelFlash = useRef(null)
+    // When the model-check line (no model / can't check) appeared: the last log entry then.
+    const statusSeen = useRef({ kind: null, after: 0 })
     const [draft, setDraft] = useState('')
     const [focusAsk, setFocusAsk] = useState(false)
     const [focusStrip, setFocusStrip] = useState(false)
@@ -120,6 +147,8 @@ export function makePage(ctx) {
     const [modelStatus, recheck] = useModelStatus()
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
+    // The helper's scrolling area: kept at the bottom, where the newest words are.
+    const helperScroll = useRef(null)
     const stripButton = useRef(null)
     // One ref function per tab, made once (like useOwnWidth's), kept with the tab buttons.
     const tabRefs = useRef(null)
@@ -161,11 +190,76 @@ export function makePage(ctx) {
       if (peek && !fit.narrow) setPeek(false)
     }, [width])
 
-    const currentStep = PLACEHOLDER_STEPS[step - 1]
+    const currentStep = stepByNumber(step) || STEPS[0]
     const noModel = modelStatus.state === 'none'
-    // The model's name as Hermes's model button shows it, the free tier's label, or "your model"
-    // (src/model-status.js, docs/answers/hhtech-model-display-name.md). Never host.state.model.
-    const modelName = modelStatus.state === 'ok' ? modelLabel(modelStatus.name) : ''
+    const helperShown = fit.helper === 'open' || fit.helper === 'over'
+
+    function addToLog(entries) {
+      const fresh = withIds(entries)
+      if (!fresh.length) return
+      setLog(old => (chatMemory = [...old, ...fresh].slice(-LOG_MAX)))
+    }
+
+    function playFlash(pose) {
+      if (cancelFlash.current) cancelFlash.current()
+      setFlash(pose)
+      cancelFlash.current = ctx.setTimeout(() => {
+        cancelFlash.current = null
+        setFlash(null)
+      }, FLASH_MS)
+    }
+    useEffect(
+      () => () => {
+        if (cancelFlash.current) cancelFlash.current()
+      },
+      []
+    )
+
+    // The character waves when the helper comes on screen (the page opens with it, or the person
+    // opens it from the strip or "Show helper").
+    const wasShown = useRef(false)
+    useEffect(() => {
+      if (helperShown && !wasShown.current) playFlash('waving')
+      wasShown.current = helperShown
+    }, [helperShown])
+
+    // Something new was said, the log was switched on, or the helper came back: show the newest
+    // words, at the bottom of the helper's scrolling area.
+    useEffect(() => {
+      const el = helperScroll.current
+      if (el) el.scrollTop = el.scrollHeight
+    }, [log.length, chatlog, helperShown, modelStatus.state])
+
+    // B3 never asks the model, so nothing sets answering yet; B4's call will (review pose).
+    const pose = poseFor({ model: modelStatus.state, answering: false, flash })
+
+    // Picking an answer: saved, and the helper says "Your answer: …" with the fact it points to.
+    function choose(option) {
+      if (answers[currentStep.id] === option.id) return
+      const next = { ...answers, [currentStep.id]: option.id }
+      setAnswers(next)
+      ctx.storage.set('answers', next)
+      addToLog([answerEntry(currentStep, option.id)])
+    }
+
+    // "I understand, next step": the step's next_rule picks the next step (code, not the model).
+    // After the last step the helper says so once; the character jumps either way.
+    function finishStep() {
+      playFlash('jumping')
+      const to = nextAfter(currentStep, answers[currentStep.id])
+      if (to !== 'done') return saveStep(to)
+      if (!(chatMemory || log).some(e => e.kind === 'done')) addToLog([doneEntry()])
+    }
+
+    // The message box: Send or Enter (Shift+Enter makes a new line). Code checks the words in
+    // build-v1.md section 7's order (src/helper-chat.js); nothing goes to a model in B3.
+    function send() {
+      if (noModel) return
+      const entries = typedEntries(draft, { step: currentStep, answers })
+      if (!entries.length) return
+      setDraft('')
+      addToLog(entries)
+    }
 
     // Show the helper (strip, "Show helper", "Ask about this step"). In a window too narrow for
     // its column it opens over the page, with the keyboard in its message box. A helper the
@@ -254,6 +348,7 @@ export function makePage(ctx) {
     const numbersOnly = fit.rail === 'numbers'
     const stepRow = s => {
       const on = s.number === step
+      const rail = railLines(s)
       const number = jsx('span', { className: on ? K.rowNumberOn : K.rowNumber, children: s.number }, 'n')
       const button = jsxs(RowButton, {
         className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
@@ -269,8 +364,8 @@ export function makePage(ctx) {
                 {
                   className: K.rowText,
                   children: [
-                    jsx('span', { className: K.rowTitle, children: s.title }),
-                    jsx('span', { className: K.rowSub, children: jsx('span', { className: K.truncate, children: s.short }) })
+                    jsx('span', { className: K.rowTitle, children: rail.title }),
+                    rail.sub ? jsx('span', { className: K.rowSub, children: jsx('span', { className: K.truncate, children: rail.sub }) }) : null
                   ]
                 },
                 't'
@@ -323,7 +418,7 @@ export function makePage(ctx) {
             className: K.railScroll,
             children: [
               numbersOnly ? null : jsx('div', { className: cx(K.sectionLabel, K.sectionLabelPad), children: 'Steps' }),
-              jsx('div', { className: K.rowList, children: PLACEHOLDER_STEPS.map(stepRow) }),
+              jsx('div', { className: K.rowList, children: STEPS.map(stepRow) }),
               jsx('div', { className: cx(K.sectionLabel, numbersOnly ? K.sectionLabelPad : K.sectionLabelGap), children: numbersOnly ? null : 'After these' }),
               jsx('div', { className: K.rowList, children: LATER_STEPS.map(laterRow) })
             ]
@@ -336,81 +431,162 @@ export function makePage(ctx) {
 
     /* ---------- open step ---------- */
     // One primary button per screen (hhdesign fix 6): "I understand, next step"; the rest are secondary.
-    const stepActions = jsxs('div', {
-      className: K.actions,
-      children: [
-        step < STEP_COUNT
-          ? jsx(Button, { size: 'sm', onClick: () => saveStep(step + 1), children: 'I understand, next step' })
-          : null,
-        !noModel && helper !== 'closed'
-          ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: askAboutStep, children: 'Ask about this step' })
-          : null
-      ]
-    })
-
-    const stepHeader = (title, intro) =>
-      jsxs('header', {
+    const stepActions = jsxs(
+      'div',
+      {
+        className: K.actions,
         children: [
-          jsx('div', { className: K.sectionLabel, children: `Step ${step} of ${STEP_COUNT}` }),
-          jsx('h3', { className: K.stepTitle, children: title }),
-          intro
+          jsx(Button, { size: 'sm', onClick: finishStep, children: 'I understand, next step' }),
+          !noModel && helper !== 'closed'
+            ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: askAboutStep, children: 'Ask about this step' })
+            : null
         ]
-      })
+      },
+      'actions'
+    )
 
-    // The open step is wide enough for the facts side by side (and the three choices in a row).
+    // A source tag that opens its docs page: "Hermes docs › {section}" (v1-strings part 5).
+    const sourceLink = (url, label, key) =>
+      jsx(
+        'a',
+        {
+          className: K.chipLink,
+          href: url,
+          target: '_blank',
+          rel: 'noreferrer',
+          title: url,
+          'data-hh': 'source',
+          onClick: e => {
+            e.preventDefault()
+            openDocs(url)
+          },
+          onAuxClick: e => {
+            e.preventDefault()
+            openDocs(url)
+          },
+          children: label
+        },
+        key
+      )
+    const factSource = f => sourceLink(f.url || docsUrl(f.source), chipLabel(f.section), f.id || f.source + f.section)
+
+    // The open step is wide enough for two columns (the comparison, and the answer cards).
     const wideStep = fit.columns === 2
-    const stepView = currentStep.heading
-      ? [
-          stepHeader(currentStep.heading, jsx('p', { className: K.prose, children: currentStep.intro })),
-          jsx('dl', {
-            className: cx(K.pairGrid, wideStep && K.twoColumns),
-            'data-hh': 'facts',
-            'data-columns': fit.columns,
-            children: currentStep.compare.map(c =>
-              jsxs('div', { children: [jsx('dt', { className: K.pairTitle, children: c.title }), jsx('dd', { className: K.caption, children: c.text })] }, c.title)
-            )
-          }),
-          jsxs('div', {
-            className: K.scaffold,
-            children: [
-              jsx('span', { className: K.scaffoldGlyph, children: jsx(Codicon, { name: 'play-circle', size: '0.875rem' }) }),
-              jsx('span', { children: 'A short video for this step comes later. It will need the internet when you press Play.' })
-            ]
-          }),
-          jsxs('section', {
-            children: [
-              jsx('div', { className: K.question, children: currentStep.question }),
-              jsx('div', {
-                className: cx(K.choices, wideStep && K.threeColumns),
-                role: 'group',
-                'aria-label': currentStep.question,
-                'data-hh': 'choices',
-                children: currentStep.options.map(o =>
-                  jsx(
-                    'button',
-                    {
-                      type: 'button',
-                      'aria-pressed': chosen[step] === o.id,
-                      className: cx(K.choice, chosen[step] === o.id ? K.choiceOn : K.choiceOff),
-                      onClick: () => setChosen(c => ({ ...c, [step]: o.id })),
-                      children: jsxs('span', {
-                        className: K.choiceText,
-                        children: [jsx('span', { className: K.choiceLabel, children: o.label }), jsx('span', { className: K.choiceSub, children: o.text })]
-                      })
-                    },
-                    o.id
-                  )
+    const here = currentStep
+    const picked = answers[here.id]
+    const fits = fitsGoal(answers, here.id)
+    const introSources = []
+    for (const src of here.intro_sources || []) {
+      const key = `${src.source}#${src.section}`
+      if (!introSources.some(x => x.key === key)) introSources.push({ key, url: docsUrl(src.source), label: chipLabel(src.section) })
+    }
+
+    const stepView = [
+      jsxs(
+        'header',
+        {
+          children: [
+            jsx('div', { className: K.sectionLabel, children: `Step ${here.number} of ${STEPS.length}` }),
+            jsx('h3', { className: K.stepTitle, children: here.title }),
+            jsx('p', { className: K.prose, 'data-hh': 'intro', children: here.intro })
+          ]
+        },
+        'head'
+      ),
+      introSources.length
+        ? jsxs(
+            'div',
+            {
+              className: K.chips,
+              'data-hh': 'intro-sources',
+              children: [jsx('span', { className: K.chipsLabel, children: 'Source' }, 'l'), ...introSources.map(x => sourceLink(x.url, x.label, x.key))]
+            },
+            'intro-sources'
+          )
+        : null,
+      here.compare
+        ? jsx(
+            'dl',
+            {
+              className: cx(K.pairGrid, wideStep && K.twoColumns),
+              'data-hh': 'compare',
+              'data-columns': fit.columns,
+              children: ['left', 'right'].map(side => {
+                const c = here.compare[side]
+                return jsxs(
+                  'div',
+                  {
+                    className: K.pairSide,
+                    children: [jsx('dt', { className: K.pairTitle, children: c.title }), jsx('dd', { className: K.caption, children: c.text }), factSource(c)]
+                  },
+                  side
                 )
               })
-            ]
-          }),
-          jsxs('div', {
-            className: K.chips,
-            children: [jsx('span', { className: K.chipsLabel, children: 'Source' }), ...currentStep.sources.map(s => jsx('span', { className: K.chip, children: s }, s))]
-          }),
-          stepActions
-        ]
-      : [stepHeader(currentStep.title, jsx('p', { className: K.caption, children: 'The text for this step is still being written.' })), stepActions]
+            },
+            'compare'
+          )
+        : null,
+      jsx(
+        'ul',
+        {
+          className: K.factList,
+          'data-hh': 'facts',
+          children: here.facts.map(f =>
+            jsxs('li', { className: K.fact, 'data-fact': f.id, children: [jsx('p', { className: K.factText, children: f.text }), factSource(f)] }, f.id)
+          )
+        },
+        'facts'
+      ),
+      jsxs(
+        'div',
+        {
+          className: K.scaffold,
+          'data-hh': 'video',
+          children: [
+            jsx('span', { className: K.scaffoldGlyph, children: jsx(Codicon, { name: 'play-circle', size: '0.875rem' }) }),
+            jsx('span', { children: LINES.videoLater })
+          ]
+        },
+        'video'
+      ),
+      jsxs(
+        'section',
+        {
+          children: [
+            jsx('div', { className: K.question, children: here.question }),
+            jsx('div', {
+              className: cx(K.choices, wideStep && K.twoColumns),
+              role: 'group',
+              'aria-label': here.question,
+              'data-hh': 'choices',
+              'data-columns': fit.columns,
+              children: here.options.map(o =>
+                jsxs(
+                  'button',
+                  {
+                    type: 'button',
+                    'aria-pressed': picked === o.id,
+                    className: cx(K.choice, picked === o.id ? K.choiceOn : K.choiceOff),
+                    'data-option': o.id,
+                    onClick: () => choose(o),
+                    children: [
+                      jsxs('span', {
+                        className: K.choiceText,
+                        children: [jsx('span', { className: K.choiceLabel, children: o.label }), o.hint ? jsx('span', { className: K.choiceSub, children: o.hint }) : null]
+                      }, 't'),
+                      fits === o.id ? jsx('span', { className: K.fitTag, 'data-hh': 'fits-goal', children: LINES.fitsGoal }, 'fit') : null
+                    ]
+                  },
+                  o.id
+                )
+              )
+            })
+          ]
+        },
+        'question'
+      ),
+      stepActions
+    ]
 
     const yoursView = renderYourSetup(setup, {
       openStep: n => {
@@ -434,30 +610,37 @@ export function makePage(ctx) {
       'main'
     )
 
-    /* ---------- helper panel ---------- */
+    /* ---------- helper panel (Pēteris's sketch, inputs/pb-sketch-9nov-helper-chat.png) ---------- */
     // "Check again" is always secondary: the step's own button is the screen's one primary button.
     const checkAgain = () =>
-      jsx(Button, { variant: 'secondary', size: 'sm', disabled: modelStatus.state === 'checking', onClick: () => recheck(), children: 'Check again' })
+      jsx(Button, { variant: 'secondary', size: 'sm', disabled: modelStatus.state === 'checking', onClick: () => recheck(), children: 'Check again' }, 'again')
 
-    const say = (text, actions, small) =>
-      jsxs(
-        'div',
-        {
-          className: K.bubble,
-          'data-hh': 'bubble',
-          children: [
-            jsx('p', { className: K.bubbleText, children: text }),
-            small ? jsx('p', { className: K.caption, children: small }) : null,
-            actions ? jsx('div', { className: K.bubbleActions, children: actions }) : null
-          ]
-        },
-        'say'
-      )
+    // What the page itself has to say about the model check: no model (content/v1-strings.md part 1)
+    // or the check failed (its "Can't check right now"). It counts as said when it appeared, so
+    // anything the person does afterwards (an answer, a pasted key) still shows as the newest.
+    const statusEntry = noModel
+      ? { id: 'status', who: 'helper', kind: 'no-model', lines: [NO_MODEL_LINE], small: NO_MODEL_SMALL, action: 'recheck' }
+      : modelStatus.state === 'error'
+        ? { id: 'status', who: 'helper', kind: 'error', lines: [CANT_CHECK_LINE], action: 'recheck' }
+        : null
+    const statusKind = statusEntry ? statusEntry.kind : null
+    if (statusSeen.current.kind !== statusKind) statusSeen.current = { kind: statusKind, after: log.length ? log[log.length - 1].id : 0 }
+    const statusAfter = statusSeen.current.after
 
-    // The character: one swappable component (src/character.js), unchanged.
-    const character = mood => jsx('div', { className: K.characterRow, children: jsx(Character, { size: 72, mood }) }, 'who')
-    // The newest things the helper says sit just above the message box (hhdesign fix 3).
-    const newest = children => jsx('div', { className: K.helperNewest, 'data-hh': 'helper-newest', children }, 'newest')
+    // One thing the helper (or the person) said, as plain text: no bubble, no card.
+    const entryParts = e => {
+      const you = e.who === 'you'
+      const parts = e.lines.map((line, i) => jsx('p', { className: you ? K.logYou : K.say, children: line }, 'l' + i))
+      if (e.small) parts.push(jsx('p', { className: K.caption, children: e.small }, 'small'))
+      if (e.fact) parts.push(jsx('p', { className: K.caption, children: e.fact.text }, 'fact'), jsx('div', { children: factSource(e.fact) }, 'fact-src'))
+      if (e.paste) parts.push(jsx(PasteBox, { text: e.paste, label: 'Copy' }, 'paste'))
+      if (e.after) parts.push(jsx('p', { className: K.say, children: e.after }, 'after'))
+      if (e.link) parts.push(jsx('div', { children: sourceLink(e.link, e.link, 'link') }, 'link'))
+      if (e.action === 'recheck') parts.push(jsx('div', { className: K.sayActions, children: checkAgain() }, 'act'))
+      if (e.action === 'yours')
+        parts.push(jsx('div', { className: K.sayActions, children: jsx(Button, { variant: 'secondary', size: 'sm', onClick: () => saveTab('yours'), children: 'Your setup' }) }, 'act'))
+      return parts
+    }
 
     const contextLine = (icon, text, spinning) =>
       jsxs(
@@ -470,32 +653,93 @@ export function makePage(ctx) {
         'where'
       )
 
-    let helperBody
-    if (noModel) {
-      // content/v1-strings.md part 1: the progress line, the fixed bubble with its small line and
-      // "Check again". No model call anywhere.
-      helperBody = [contextLine('info', NO_MODEL_PROGRESS, false), newest([say(NO_MODEL_LINE, checkAgain(), NO_MODEL_SMALL), character('straight')])]
-    } else {
-      const where = tab === 'setup' ? `On step ${step}: ${currentStep.title}` : setup.bots.length > 1 ? `On Your setup, bot ${setup.bot}` : 'On Your setup'
-      helperBody = [
-        modelStatus.state === 'checking'
-          ? contextLine('', 'Checking your model', true)
-          : modelStatus.state === 'error'
-            ? null
-            : contextLine('location', where, false),
-        chatlog
-          ? jsx('div', { 'data-hh': 'chatlog', children: jsx(EmptyState, { className: K.logEmpty, title: 'No messages yet', description: 'What you and the helper say shows here.' }) }, 'log')
-          : modelStatus.state === 'error'
-            ? newest([say(CANT_CHECK_LINE, checkAgain()), character('straight')])
-            : newest([say('Open a step and ask me about it here. I explain things; I don’t change your settings.'), character('smile')])
-      ]
-    }
+    // The step list's short title, as in the sketch ("On step 2: The brain"); the full title is the
+    // open step's heading.
+    const where = tab === 'setup' ? `On step ${currentStep.number}: ${railLines(currentStep).title}` : setup.bots.length > 1 ? `On Your setup, bot ${setup.bot}` : 'On Your setup'
+    const topLine = noModel
+      ? contextLine('info', NO_MODEL_PROGRESS, false)
+      : modelStatus.state === 'checking'
+        ? contextLine('', 'Checking your model', true)
+        : modelStatus.state === 'error'
+          ? null
+          : contextLine('location', where, false)
 
-    // One line that grows as you type, then the model's name and send on the same row (hhdesign
-    // fix 2). With no model the box stays, empty and greyed, with hhdesign's words.
+    // Chat log off: only the newest thing the helper said. On: the whole back-and-forth, newest at
+    // the bottom. Either way it sits low in the panel with empty space above it.
+    let wordsView
+    if (chatlog) {
+      const entries = statusEntry ? [...log.filter(e => e.id <= statusAfter), statusEntry, ...log.filter(e => e.id > statusAfter)] : log
+      wordsView = jsx(
+        'ol',
+        {
+          className: K.log,
+          'data-hh': 'chatlog',
+          'aria-label': 'Chat log',
+          'aria-live': 'polite',
+          children: entries.map(e =>
+            jsxs(
+              'li',
+              {
+                className: K.logEntry,
+                'data-who': e.who,
+                'data-kind': e.kind,
+                children: [jsx('span', { className: K.logWho, children: e.who === 'you' ? 'You' : 'Helper' }, 'who'), jsx('div', { className: K.sayStack, children: entryParts(e) }, 'what')]
+              },
+              e.id
+            )
+          )
+        },
+        'log'
+      )
+    } else {
+      // The newest turn's helper lines (an answer with its note, a reply after a long message); the
+      // model-check line when nothing was said since it appeared.
+      const lastTurn = log.length ? log[log.length - 1].turn : null
+      const fromHelper = log.filter(e => e.turn === lastTurn && e.who === 'helper')
+      const shown = statusEntry && !log.some(e => e.id > statusAfter) ? [statusEntry] : fromHelper.length ? fromHelper : [log[log.length - 1]]
+      wordsView = jsx(
+        'div',
+        {
+          className: K.sayStack,
+          'data-hh': 'say',
+          'data-kind': shown[shown.length - 1].kind,
+          'aria-live': 'polite',
+          children: shown.map(e => jsx('div', { className: K.sayStack, children: entryParts(e) }, e.id))
+        },
+        'say'
+      )
+    }
+    const helperBody = [topLine, jsx('div', { className: K.helperNewest, 'data-hh': 'helper-newest', children: wordsView }, 'newest')]
+
+    // The character stands small at the bottom right, just above the message box, with three
+    // thought dots trailing from it toward the words.
+    const characterRow = jsxs(
+      'div',
+      {
+        className: K.characterRow,
+        'data-hh': 'character',
+        children: [
+          jsxs('span', {
+            className: K.thoughtDots,
+            'aria-hidden': true,
+            'data-hh': 'thought-dots',
+            children: [jsx('span', { className: K.thoughtDot1 }, 1), jsx('span', { className: K.thoughtDot2 }, 2), jsx('span', { className: K.thoughtDot3 }, 3)]
+          }, 'dots'),
+          jsx(Character, { size: 48, pose }, 'who')
+        ]
+      },
+      'character'
+    )
+
+    // A rounded box that grows as you type, and a round send button on its right, like Hermes's
+    // own composer. No model name and no microphone (no documented voice door for plugin pages).
+    // With no model the box stays, empty and greyed, with hhdesign's words.
     const composer = jsx('form', {
       className: K.composerForm,
-      onSubmit: e => e.preventDefault(),
+      onSubmit: e => {
+        e.preventDefault()
+        send()
+      },
       'data-hh': 'composer',
       children: jsxs('div', {
         className: cx(K.composerSurface, composerSurfaceRing),
@@ -515,17 +759,19 @@ export function makePage(ctx) {
                   // The whole text is kept: the pasted-key check reads all of it before the
                   // 500-character cut (src/key-check.js).
                   onChange: e => setDraft(e.target.value),
+                  onKeyDown: e => {
+                    if (e.key !== 'Enter' || e.shiftKey || (e.nativeEvent && e.nativeEvent.isComposing)) return
+                    e.preventDefault()
+                    send()
+                  },
                   placeholder: noModel ? NO_MODEL_BOX : tab === 'setup' ? 'Ask about this step' : 'Ask about your setup',
                   'aria-label': 'Ask the helper'
                 })
               }),
-              modelName
-                ? jsx('span', { className: K.composerModel, 'data-hh': 'model-name', children: jsx('span', { className: K.truncate, children: modelName }) })
-                : null,
               jsx(Button, {
                 'aria-label': 'Send',
                 className: cx(PRIMARY_ICON_BTN, K.composerSend),
-                disabled: true,
+                disabled: noModel || !draft.trim(),
                 type: 'submit',
                 children: jsx(Codicon, { name: 'arrow-up', size: '0.875rem' })
               })
@@ -583,9 +829,9 @@ export function makePage(ctx) {
                 })
               ]
             }),
-            jsx('div', { className: K.helperBody, children: helperBody }),
-            composer,
-            noModel ? null : jsx('p', { className: K.composerNote, children: 'It explains; it doesn’t change your settings.' })
+            jsx('div', { className: K.helperBody, ref: helperScroll, 'data-hh': 'helper-body', children: helperBody }),
+            characterRow,
+            composer
           ]
         },
         'helper'

@@ -75,14 +75,25 @@ export const K = {
   choice: 'flex min-w-0 items-center gap-2.5 rounded-[6px] px-3 py-2.5 text-left text-[13px] border text-foreground transition-colors',
   choiceOn: 'border-primary bg-primary/15',
   choiceOff: 'border-transparent bg-muted hover:bg-accent/60',
-  choiceText: 'min-w-0',
+  choiceText: 'min-w-0 flex-1',
   choiceLabel: 'block',
   choiceSub: 'block text-xs text-muted-foreground',
+  // "Fits your goal" on an answer card: Hermes's member badge (plugins/hermes-bots/group-room-ui.tsx)
+  fitTag: 'shrink-0 rounded-sm bg-(--ui-accent)/15 px-1 text-[0.625rem] font-medium text-(--ui-accent)',
+  // The step's facts: a plain list, each fact in the chat's text size with its source tag below
+  factList: 'space-y-4',
+  fact: 'flex min-w-0 flex-col items-start gap-1.5',
+  factText: 'text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
+  // The two-column comparison (steps 2 and 3): each side with its own source tag
+  pairSide: 'flex min-w-0 flex-col items-start gap-1.5',
   // Source tags: app/master-detail.tsx ToolChip, in the normal sans like Capabilities' metadata
   // chips ("Built In", "v1.0.1"); mono in Hermes means code, paths and commands.
   chips: 'flex flex-wrap items-center gap-1.5',
   chipsLabel: 'text-xs text-muted-foreground',
   chip: 'rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5 text-[0.65rem] text-(--ui-text-tertiary)',
+  // The same tag as a link to its docs page (opened in the person's browser through ctx.os)
+  chipLink:
+    'wrap-anywhere rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5 text-left text-[0.65rem] text-(--ui-text-tertiary) transition-colors hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
   // Video slot: a quiet scaffold line (components/chat/scaffold-row.tsx)
   scaffold: 'flex min-w-0 items-center gap-1.5 text-[length:var(--conversation-tool-font-size)] leading-(--conversation-line-height) text-(--conversation-scaffold-text)',
   scaffoldGlyph: 'grid size-3.5 shrink-0 place-items-center',
@@ -101,20 +112,33 @@ export const K = {
   helperTopLabel: 'min-w-0 truncate text-xs font-medium text-foreground',
   // RoomHeader's ghost icon buttons (plugins/hermes-bots/group-room-ui.tsx)
   iconTone: 'text-(--ui-text-tertiary)',
-  helperBody: 'flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pb-3 pt-1',
-  // Bubble and character sit just above the message box, as the newest chat content does in
-  // Hermes; the space opens above them (hhdesign fix 3). mt-auto, not justify-end, so a tall
-  // bubble can still be scrolled to its top.
+  helperBody: 'flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pb-1 pt-1',
+  // Pēteris's sketch (inputs/pb-sketch-9nov-helper-chat.png): the helper's words sit low, as plain
+  // text with no bubble or card, and the space opens above them. mt-auto, not justify-end, so a
+  // long chat log can still be scrolled to its top.
   helperNewest: 'mt-auto flex flex-col gap-3',
-  // Widget bubble in a chat (components/chat/widget-shell.ts WIDGET_SHELL_CLASS)
-  bubble: 'rounded-3xl bg-(--ui-widget-surface-background) px-3.5 py-3',
-  bubbleText: 'text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
-  bubbleActions: 'mt-2.5 flex flex-wrap items-center gap-2',
-  characterRow: 'flex items-end gap-2 pl-2',
-  // Chat log: the user's bubble and an empty log (RoomMessage; components/ui/empty-state.tsx)
-  logEmpty: 'min-h-24',
-  // Composer: plugins/hermes-bots/group-room-ui.tsx RoomComposer, on one row like Hermes's chat
-  // composer: the box, then the model name, then send (hhdesign fix 2).
+  // The helper's words: the chat's own message text (plugins/hermes-bots/group-room-ui.tsx RoomMessage body)
+  say: 'text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
+  sayStack: 'flex min-w-0 flex-col gap-1.5',
+  sayActions: 'mt-1 flex flex-wrap items-center gap-2',
+  // Chat log on: the whole back-and-forth as a plain list, newest at the bottom. Each entry has
+  // its speaker in RoomMessage's small time-stamp tone, then the words.
+  log: 'flex min-w-0 flex-col gap-3',
+  logEntry: 'flex min-w-0 flex-col gap-0.5',
+  logWho: 'text-[0.6875rem] font-medium text-(--ui-text-tertiary)',
+  // The person's own words in the log: the same text, one tone quieter than the helper's
+  logYou: 'wrap-anywhere text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-(--ui-text-secondary)',
+  // The character stands small at the bottom right, just above the message box, with three
+  // thought dots trailing from it up toward the words (the sketch). The dots are the room's typing
+  // dots (RoomTyping: size-1.5 rounded-full, secondary text colour), in three sizes, fainter.
+  characterRow: 'flex shrink-0 items-end justify-end gap-1 px-4',
+  thoughtDots: 'mb-6 flex items-end gap-1',
+  thoughtDot1: 'mb-4 size-1 rounded-full bg-(--ui-text-quaternary)',
+  thoughtDot2: 'mb-2 size-1.5 rounded-full bg-(--ui-text-quaternary)',
+  thoughtDot3: 'size-2 rounded-full bg-(--ui-text-quaternary)',
+  // Composer: plugins/hermes-bots/group-room-ui.tsx RoomComposer (rounded surface, round send
+  // button), on one row like Hermes's chat composer. No model name (the sketch drops it; it stays
+  // on the Your setup card).
   composerForm: 'px-3 pb-3 pt-1',
   composerSurface: 'relative isolate rounded-2xl',
   composerRow: 'flex items-end gap-x-(--composer-control-gap) px-(--composer-surface-pad-x) py-(--composer-surface-pad-y)',
@@ -123,11 +147,7 @@ export const K = {
   // (components/assistant-ui/clarify/core/shell.tsx) on the room composer's input.
   composerInput:
     'field-sizing-content max-h-40 min-h-0 resize-none !border-transparent !bg-transparent !shadow-none px-1 py-1 text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) placeholder:text-(--ui-text-tertiary)',
-  // The model name as Hermes's composer model button shows it: normal letters, text-xs, tertiary
-  // (app/chat/composer/model-pill.tsx PILL), without the button, chevron or picker.
-  composerModel: 'flex h-(--composer-control-size) min-w-0 shrink items-center px-1 text-xs font-normal text-(--ui-text-tertiary)',
   composerSend: 'shrink-0',
-  composerNote: 'px-3 pb-3 text-center text-[0.65rem] text-muted-foreground/50',
 
   // ---- hidden helper: a thin full-height strip at the page edge, its label written vertically
   // (hhdesign fix 4): components/ui/pane-tab.tsx TAB_VERTICAL and the collapsed kanban column
@@ -168,7 +188,7 @@ export const K = {
   cardStack: 'flex min-w-0 flex-col gap-1',
   // Text to paste: the source-tag chip's surface (app/master-detail.tsx ToolChip), as a block
   cardPaste: 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5',
-  cardPasteText: 'min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
+  cardPasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
   cardList: 'list-decimal space-y-1 pl-4 text-[0.72rem] leading-snug text-(--ui-text-secondary)',
   pageActions: 'flex flex-wrap items-center gap-2 pt-1'
 }

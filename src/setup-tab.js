@@ -254,7 +254,7 @@ function StatusLane({ status }) {
   })
 }
 
-function PasteBox({ text, label }) {
+export function PasteBox({ text, label }) {
   return jsxs('div', {
     className: K.cardPaste,
     children: [

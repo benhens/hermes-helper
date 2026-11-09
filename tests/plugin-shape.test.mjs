@@ -7,7 +7,8 @@ import { execFileSync } from 'node:child_process'
 import { buildSource } from '../scripts/build.mjs'
 import { K, ICONS } from '../src/look.js'
 import { STEP_COUNT } from '../src/state.js'
-import { PLACEHOLDER_STEPS } from '../src/placeholder-steps.js'
+import { STEPS } from '../src/steps.js'
+import { looksLikeKey } from '../src/key-check.js'
 import { selectorFor, missingClasses } from '../scripts/check-hermes-classes.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
@@ -96,9 +97,18 @@ test('no raw globals the host cannot clean up, no reach into Hermes markup, no n
   assert.doesNotMatch(code, /createElement\(\s*['"]script/)
 })
 
+// The program without hhcontent's step text: that text is prose for the person ("Keep it secret:
+// it goes in Settings …"), so the code rules below read the code only, and the text gets the
+// pasted-key check instead.
+const STEPS_BLOCK = /\nconst STEPS_DATA = \{[\s\S]*?\n\}\n/
+const codeOnly = code.replace(STEPS_BLOCK, '\n')
+
 test('no keys or credentials, never reads the full config', () => {
-  assert.doesNotMatch(code, /(api[_-]?key|secret|password|bearer)\s*[:=]/i)
+  assert.ok(STEPS_BLOCK.test(code), 'the step data block is where the build puts it')
+  assert.ok(codeOnly.length < code.length - 20000, 'only the step data was set aside')
+  assert.doesNotMatch(codeOnly, /(api[_-]?key|secret|password|bearer)\s*[:=]/i)
   assert.doesNotMatch(code, /config\.get/)
+  for (const s of STEPS) assert.equal(looksLikeKey(JSON.stringify(s)), false, s.id)
 })
 
 test('helper states: Move, Hide, Close and Show helper all exist', () => {
@@ -109,7 +119,7 @@ test('helper states: Move, Hide, Close and Show helper all exist', () => {
 
 test('model names, counts and source tags in normal letters: mono is only for text to paste', () => {
   // Hermes keeps mono for code, paths and commands (hhdesign fixes 2 and 9, B3a item 4).
-  for (const key of ['composerModel', 'cardValue', 'chip', 'chipsLabel', 'cardTitle', 'cardState', 'rowNumber', 'rowNumberOn']) {
+  for (const key of ['cardValue', 'chip', 'chipsLabel', 'cardTitle', 'cardState', 'rowNumber', 'rowNumberOn']) {
     assert.doesNotMatch(K[key], /font-mono/, key)
   }
   const mono = Object.entries(K).filter(([, v]) => /font-mono/.test(v)).map(([k]) => k)
@@ -174,8 +184,8 @@ test('every codicon named in the code is in the ICONS list (which hermes-checks.
 })
 
 test('the step count matches the step list (a mismatch would crash the open step)', () => {
-  assert.equal(PLACEHOLDER_STEPS.length, STEP_COUNT)
-  PLACEHOLDER_STEPS.forEach((s, i) => assert.equal(s.number, i + 1))
+  assert.equal(STEPS.length, STEP_COUNT)
+  STEPS.forEach((s, i) => assert.equal(s.number, i + 1))
 })
 
 test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s own patterns', () => {

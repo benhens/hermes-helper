@@ -77,18 +77,39 @@ export function fakeTimers() {
 }
 
 // Registers the plugin with a fake ctx; returns its contributions and the page component.
-export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers()) {
+// extra: more ctx doors (e.g. os) for a test.
+export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers(), extra = {}) {
   const plugin = await loadPlugin()
   const contributions = []
-  plugin.register({
+  const ctx = {
     storage,
     setTimeout: timers.setTimeout,
     setInterval: timers.setInterval,
     registerMany: list => contributions.push(...list),
-    register: c => contributions.push(c)
-  })
+    register: c => contributions.push(c),
+    ...extra
+  }
+  plugin.register(ctx)
   const page = contributions.find(c => c.area === 'routes')
-  return { plugin, contributions, storage, timers, Page: page.render().type }
+  return { plugin, contributions, storage, timers, ctx, Page: page.render().type }
+}
+
+// One src file that imports React, loaded with the stand-ins (its own ./ imports stay real files).
+export async function loadSrc(name) {
+  const reactUrl = pathToFileURL(path.join(FAKES, 'react.mjs')).href
+  const srcDir = path.join(ROOT, 'src')
+  const src = fs
+    .readFileSync(path.join(srcDir, name), 'utf8')
+    .replace("from 'react/jsx-runtime'", `from '${reactUrl}'`)
+    .replace("from 'react'", `from '${reactUrl}'`)
+    .replace(/from '\.\/([\w-]+\.js)'/g, (m, f) => `from '${pathToFileURL(path.join(srcDir, f)).href}'`)
+  const file = path.join(os.tmpdir(), `hh-src-test-${process.pid}-${loads++}-${name}`.replace(/\.js$/, '.mjs'))
+  fs.writeFileSync(file, src)
+  try {
+    return await import(pathToFileURL(file).href)
+  } finally {
+    fs.unlinkSync(file)
+  }
 }
 
 const throwaway = {
@@ -127,8 +148,8 @@ export function mount(Component) {
     useEffect(fn, deps) {
       const k = i++
       const prev = slots[k]
-      if (!prev || !deps || !same(prev.deps, deps)) pending.push(fn)
-      slots[k] = { deps }
+      if (!prev || !deps || !same(prev.deps, deps)) pending.push({ k, fn })
+      slots[k] = { deps, cleanup: prev ? prev.cleanup : undefined }
     },
     useId: () => ':r0:'
   }
@@ -162,11 +183,21 @@ export function mount(Component) {
       rendering = false
       const run = pending
       pending = []
-      for (const fn of run) fn()
+      // As React does: an effect whose inputs changed first runs the cleanup its last run returned.
+      for (const { k, fn } of run) {
+        const slot = slots[k]
+        if (typeof slot.cleanup === 'function') slot.cleanup()
+        const cleanup = fn()
+        slot.cleanup = typeof cleanup === 'function' ? cleanup : undefined
+      }
     } while (dirty)
   }
 
   render()
+  // Leaving the page: every effect's cleanup runs.
+  view.unmount = () => {
+    for (const slot of slots) if (slot && typeof slot.cleanup === 'function') slot.cleanup()
+  }
   return view
 }
 
