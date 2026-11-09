@@ -1,6 +1,6 @@
 // Helping Hand: a Hermes Desktop plugin. Built by scripts/build.mjs from src/; edit src/, not this file.
 // Licence: MIT (see LICENSE).
-import { Button, Codicon, CopyButton, EmptyState, GlyphSpinner, PRIMARY_ICON_BTN, ROUTES_AREA, RowButton, SIDEBAR_NAV_AREA, SegmentedControl, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Textarea, Tip, composerInputBacking, composerSurfaceRing, host, useValue } from '@hermes/plugin-sdk'
+import { Button, Codicon, CopyButton, EmptyState, GlyphSpinner, PRIMARY_ICON_BTN, ROUTES_AREA, RowButton, SIDEBAR_NAV_AREA, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Textarea, Tip, composerInputBacking, composerSurfaceRing, host, useValue } from '@hermes/plugin-sdk'
 import { useEffect, useId, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 
@@ -30,6 +30,157 @@ function otherSide(side) {
   return side === 'left' ? 'right' : 'left'
 }
 
+// ---- src/model-name.js ----
+// The model's name the way Hermes's own model button shows it ("mock-small" -> "Mock Small",
+// "claude-opus-4-8" -> "Opus 4.8"). Hermes keeps no display name anywhere: its button works the
+// name out from the id with the text rules below, and those rules are not in the plugin SDK, so
+// this file carries a copy. Do not edit the rules: matching Hermes's button is the point
+// (docs/answers/hhtech-model-display-name.md).
+//
+// Adapted from Hermes Agent, MIT License, Copyright (c) 2025 Nous Research:
+// apps/desktop/src/lib/model-status-label.ts (Hermes v0.23.0, commit 2bd378ed). Copied:
+// modelBaseId, VARIANT_TAGS, titleCase, VENDOR_CASING, PARAMETER_COUNT, applyVendorCasing,
+// prettifyBase, splitTrailingTags, modelDisplayParts, modelVariantTag, formatModelPillLabel.
+// Changes: TypeScript types removed; nothing else.
+
+/** Strip provider prefix and normalize for display. */
+function modelBaseId(model) {
+  const trimmed = model.trim()
+  const slash = trimmed.lastIndexOf('/')
+
+  return slash >= 0 ? trimmed.slice(slash + 1) : trimmed
+}
+
+const VARIANT_TAGS = [
+  [/-fast$/i, 'Fast'],
+  [/-flash$/i, 'Flash'],
+  [/-thinking$/i, 'Thinking'],
+  [/-preview$/i, 'Preview'],
+  [/-latest$/i, 'Latest']
+]
+
+const titleCase = text => text.replace(/\b\w/g, char => char.toUpperCase()).trim()
+
+const VENDOR_CASING = [
+  [/\bDeepseek\b/g, 'DeepSeek'],
+  [/\bGlm\b/g, 'GLM'],
+  [/\bMinimax\b/g, 'MiniMax'],
+  [/\bOpenai\b/g, 'OpenAI'],
+  [/\bErnie\b/g, 'ERNIE'],
+  [/\bMimo\b/g, 'MiMo'],
+  [/\bBge\b/g, 'BGE'],
+  [/\bVl\b/g, 'VL'],
+  [/\bIt\b/g, 'IT'],
+  [/\bFp8\b/g, 'FP8'],
+  [/\bAi\b/g, 'AI']
+]
+
+const PARAMETER_COUNT = /\b(a?)(\d+(?:\.\d+)?)b\b/gi
+
+const applyVendorCasing = text => {
+  let cased = text.replace(PARAMETER_COUNT, (_match, prefix, size) => `${prefix.toUpperCase()}${size}B`)
+
+  for (const [pattern, replacement] of VENDOR_CASING) {
+    cased = cased.replace(pattern, replacement)
+  }
+
+  return cased
+}
+
+function prettifyBase(base) {
+  if (/^claude-/i.test(base)) {
+    return applyVendorCasing(
+      titleCase(
+        base
+          .replace(/^claude-/i, '')
+          .replace(/(\d)-(?=\d)/g, '$1.')
+          .replace(/-/g, ' ')
+      )
+    )
+  }
+
+  if (/^gpt-/i.test(base)) {
+    return base.replace(/^gpt-/i, 'GPT-')
+  }
+
+  if (/^gemini-/i.test(base)) {
+    return applyVendorCasing(titleCase(base.replace(/^gemini-/i, 'Gemini ').replace(/-/g, ' ')))
+  }
+
+  return applyVendorCasing(titleCase(base.replace(/-/g, ' ')))
+}
+
+function splitTrailingTags(base) {
+  let variant = ''
+  let quant = ''
+
+  for (let progress = true; progress;) {
+    progress = false
+
+    if (!variant) {
+      for (const [pattern, label] of VARIANT_TAGS) {
+        if (pattern.test(base)) {
+          variant = label
+          base = base.replace(pattern, '')
+          progress = true
+
+          break
+        }
+      }
+    }
+
+    if (!quant) {
+      const quantMatch = base.match(/-(?:UD-)?(Q\d(?:_[A-Z0-9]+)*|IQ\d(?:_[A-Z0-9]+)*|F16|BF16)$/i)
+
+      if (quantMatch) {
+        quant = quantMatch[1].split('_')[0].toUpperCase()
+        base = base.slice(0, -quantMatch[0].length)
+        base = base.replace(/-(?:Instruct|Chat)(?:-\d{4})?$/i, '')
+        progress = true
+      }
+    }
+  }
+
+  return { base, variant, quant }
+}
+
+/** Split a model id into a clean display name plus an optional grayed variant tag. */
+function modelDisplayParts(model) {
+  let { base, variant, quant } = splitTrailingTags(modelBaseId(model))
+
+  const tags = [variant, quant].filter(Boolean)
+
+  const contextWindow = base.match(/\[(\d+[mk])\]$/i)
+
+  if (contextWindow) {
+    tags.push(contextWindow[1].toUpperCase())
+    base = base.slice(0, -contextWindow[0].length)
+  }
+
+  base = base.replace(/-\d{8}$/, '')
+
+  return { name: prettifyBase(base) || model.trim() || 'No model', tag: tags.join(' ') }
+}
+
+function modelVariantTag(model) {
+  return splitTrailingTags(modelBaseId(model)).variant
+}
+
+/** Composer model-pill label: model name plus its variant tag, "name · variant". */
+function formatModelPillLabel(model, options) {
+  const name = modelDisplayParts(model).name
+
+  const tag = model.trim()
+    ? options?.serviceTier === 'ultrafast'
+      ? 'Ultrafast'
+      : options?.fastMode
+        ? 'Fast'
+        : modelVariantTag(model)
+    : ''
+
+  return tag ? `${name} · ${tag}` : name
+}
+
 // ---- src/model-status.js ----
 // "Is a model connected?" without calling a model (build-v1.md section 5, corrected by
 // docs/answers/hhtech-default-model.md point 4).
@@ -42,8 +193,9 @@ function otherSide(side) {
 //                                       (null = setup.status couldn't be read).
 //   { state: 'error' }                  the check itself failed, timed out or answered nonsense.
 //                                       Never shown as "no model".
-// The name: runtime_check.model, else the free tier's label when runtime_check.free_tier_route,
-// else ''. Never host.state.model (it can be one chat's own pick) or config.get.
+// The name: the free tier's label when runtime_check.free_tier_route, else runtime_check.model as
+// Hermes's model button shows it (src/model-name.js), else ''. Never host.state.model (it can be
+// one chat's own pick) or config.get.
 
 // content/v1-strings.md part 1 (hhcontent, final 9 Nov).
 const NO_MODEL_LINE =
@@ -97,17 +249,26 @@ async function checkModel(request, { params = {}, sleep = () => Promise.resolve(
     return { state: 'none', configured }
   }
 
-  let name = textOrEmpty(rc.model)
-  // free_tier.status is a pure read scoped to the same bot (tui_gateway/methods_free_tier.py, profile_scoped).
-  if (!name && rc.free_tier_route === true) {
+  return { state: 'ok', name: await displayName(request, rc, params) }
+}
+
+// The name the page shows (docs/answers/hhtech-model-display-name.md section 4):
+//   1. free_tier_route true: free_tier.status's own label ("Nous · free tier"), never the id run
+//      through the button's rules ("nous/welcome" would read "Welcome");
+//   2. else runtime_check.model, shown the way Hermes's model button shows it ("Mock Small");
+//   3. else '' (the page then says "your model").
+async function displayName(request, rc, params) {
+  if (rc.free_tier_route === true) {
+    // free_tier.status is a pure read scoped to the same bot (tui_gateway/methods_free_tier.py, profile_scoped).
     try {
       const ft = await request('free_tier.status', { ...params }, CHECK_TIMEOUT_MS)
-      name = textOrEmpty(ft && ft.label)
+      return textOrEmpty(ft && ft.label)
     } catch {
-      name = ''
+      return ''
     }
   }
-  return { state: 'ok', name }
+  const id = textOrEmpty(rc.model)
+  return id ? formatModelPillLabel(id) : ''
 }
 
 function textOrEmpty(v) {
@@ -322,13 +483,10 @@ const CARD_TITLES = {
   remember: 'Does it really remember?'
 }
 
-// Cards that belong to one bot get "for {profile}" when the person has more than one bot.
-// Card 7 is per bot too, but its title is a question, so the picker above says which bot it is.
-const PER_BOT = new Set(['model', 'answers', 'soul', 'skills', 'memory'])
-
-function cardTitle(id, bot, botCount) {
-  const t = CARD_TITLES[id]
-  return PER_BOT.has(id) && botCount > 1 && bot ? `${t} for ${bot}` : t
+// Card titles never carry a bot name (B3a, Lead: "A model is connected for default" read badly).
+// With several bots, the picker line above the cards names the bot once.
+function cardTitle(id) {
+  return CARD_TITLES[id]
 }
 
 const PASSES = {
@@ -596,11 +754,20 @@ const K = {
   // ---- page frame (app/page-search-shell.tsx: Capabilities' page shell, header with tabs) ----
   root: 'flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden',
   // The header clears Hermes's title-bar band (its window buttons float there), as Capabilities does.
+  // No page title: like Capabilities, the sidebar row names the page and the header holds the tabs.
   head: 'flex shrink-0 items-center gap-3 px-6 pb-2 pt-[calc(var(--titlebar-height)+1.5rem)]',
-  // Title: plugins/hermes-bots/group-room-ui.tsx RoomHeader <h2>
-  title: 'min-w-0 truncate px-1 text-[0.9375rem] font-semibold text-foreground',
+  // Page tabs: Capabilities' text tabs (components/ui/tab-dropdown.tsx ResponsiveTabs row,
+  // components/ui/text-tab.tsx TextTab). The colour is split off so the open tab doesn't carry two.
+  tabs: 'flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1',
+  textTab:
+    'group/text-tab inline-flex h-7 items-center gap-1 bg-transparent px-1 text-[length:var(--conversation-caption-font-size)] font-medium transition-colors hover:bg-transparent hover:text-foreground focus-visible:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+  textTabIdle: 'text-(--ui-text-tertiary)',
+  textTabOn: 'text-foreground',
+  textTabLabel: 'underline-offset-4 decoration-current/25 group-hover/text-tab:underline',
+  textTabLabelOn: 'underline-offset-4 decoration-current/25 underline',
   headEnd: 'ml-auto flex shrink-0 items-center gap-0.5',
-  body: 'flex min-h-0 flex-1',
+  // relative: the helper opened over a narrow page (layout.js 'over') is placed inside it.
+  body: 'relative flex min-h-0 flex-1',
 
   // ---- step list (app/master-detail.tsx ListColumn + CapRow; app/overlays/panel.tsx) ----
   rail: 'flex min-h-0 shrink-0 flex-col p-2',
@@ -613,57 +780,77 @@ const K = {
   rowActive: 'bg-(--ui-row-active-background) text-foreground',
   rowIdle: 'text-(--ui-text-secondary)',
   rowButton: 'flex h-full min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-md pl-2 pr-1.5 text-left',
+  // Narrow window: the step list shows its numbers only, centred in the row
+  rowButtonNumbers: 'flex h-full min-w-0 flex-1 cursor-pointer items-center justify-center rounded-md',
   rowText: 'min-w-0 flex-1',
   rowTitle: 'block truncate text-[0.78rem] font-medium text-foreground/85',
   rowTitleOff: 'block truncate text-[0.78rem] font-normal text-muted-foreground/60',
   rowSub: 'flex min-w-0 items-center gap-1 text-[0.62rem] text-muted-foreground/50',
   truncate: 'truncate',
-  // CapRow's meta chip, used as the step number
-  rowNumber: 'shrink-0 rounded bg-(--ui-bg-quinary) px-1 py-px text-[0.6rem] tabular-nums leading-3.5 text-(--ui-text-tertiary)',
+  // Step number: a plain numeral, no key-cap box (hhdesign nice-to-have 8; Settings nav rows have
+  // no boxed numbers). The open step's numeral is in the main text colour.
+  rowNumber: 'w-3 shrink-0 text-center text-[0.75rem] tabular-nums text-(--ui-text-tertiary)',
+  rowNumberOn: 'w-3 shrink-0 text-center text-[0.75rem] tabular-nums text-foreground',
   // DetailColumn footer caption (app/master-detail.tsx)
   railFoot: 'shrink-0 px-2 pb-1 pt-3 text-[0.65rem] text-muted-foreground/50',
 
   // ---- open step (app/master-detail.tsx DetailColumn; app/capabilities/primitives.tsx DetailHeader) ----
   detail: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
   detailScroll: 'min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]',
-  detailInner: 'mx-auto max-w-2xl space-y-5 px-5 py-4',
+  // One fixed left text edge (hhdesign nice-to-have 7): left-aligned with fixed padding, never
+  // re-centred when the helper opens, hides or closes; the same 24 px edge as the header's tabs.
+  detailInner: 'max-w-2xl space-y-5 px-6 py-4',
   // Your setup is a card grid, so it takes the wider of Hermes's reading widths
-  detailInnerWide: 'mx-auto max-w-3xl space-y-5 px-5 py-4',
+  detailInnerWide: 'max-w-3xl space-y-5 px-6 py-4',
   stepTitle: 'min-w-0 text-[0.9375rem] font-semibold tracking-tight',
   // Chat text (plugins/hermes-bots/group-room-ui.tsx RoomMessage body)
   prose: 'mt-1 text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
-  // Settings row title + caption (app/settings/primitives.tsx ListRow)
-  pairGrid: 'grid gap-5 sm:grid-cols-2',
+  // Settings row title + caption (app/settings/primitives.tsx ListRow). One column; layout.js adds
+  // the two columns when the open step is wide enough (the window's sm: breakpoint can't see the
+  // step list and helper beside it).
+  pairGrid: 'grid gap-5',
+  twoColumns: 'grid-cols-2',
+  threeColumns: 'grid-cols-3',
   pairTitle: 'text-[length:var(--conversation-text-font-size)] font-medium text-foreground',
   caption: 'mt-1 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)',
   // Settings SectionHeading (app/settings/primitives.tsx)
   question: 'mb-2.5 flex items-center gap-2 pt-2 text-[length:var(--conversation-text-font-size)] font-medium',
   // Choice cards: Hermes's first-run setup chooser (components/ui/chip.tsx, card variant)
-  choices: 'grid gap-2 sm:grid-cols-3',
+  choices: 'grid gap-2',
   choice: 'flex min-w-0 items-center gap-2.5 rounded-[6px] px-3 py-2.5 text-left text-[13px] border text-foreground transition-colors',
   choiceOn: 'border-primary bg-primary/15',
   choiceOff: 'border-transparent bg-muted hover:bg-accent/60',
   choiceText: 'min-w-0',
   choiceLabel: 'block',
   choiceSub: 'block text-xs text-muted-foreground',
-  // Source tags: app/master-detail.tsx ToolChip
+  // Source tags: app/master-detail.tsx ToolChip, in the normal sans like Capabilities' metadata
+  // chips ("Built In", "v1.0.1"); mono in Hermes means code, paths and commands.
   chips: 'flex flex-wrap items-center gap-1.5',
   chipsLabel: 'text-xs text-muted-foreground',
-  chip: 'rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
+  chip: 'rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5 text-[0.65rem] text-(--ui-text-tertiary)',
   // Video slot: a quiet scaffold line (components/chat/scaffold-row.tsx)
   scaffold: 'flex min-w-0 items-center gap-1.5 text-[length:var(--conversation-tool-font-size)] leading-(--conversation-line-height) text-(--conversation-scaffold-text)',
   scaffoldGlyph: 'grid size-3.5 shrink-0 place-items-center',
   actions: 'flex flex-wrap items-center gap-2',
 
   // ---- helper panel (a page column, like Hermes's right sidebar; master-detail.tsx DetailPane header) ----
+  // No line on its edge: Hermes's own sidebar has none, only the step from its fill to the page's
+  // (hhdesign fix 5; the Nous theme tints --ui-stroke-tertiary with its accent, so a line read as one).
   helper: 'flex min-h-0 shrink-0 flex-col bg-(--ui-sidebar-surface-background)',
-  helperRight: 'border-l border-(--ui-stroke-tertiary)',
-  helperLeft: 'border-r border-(--ui-stroke-tertiary)',
+  // Opened from the strip while the window is too narrow for a column: it lies over the page, on
+  // its side, at full height (layout.js 'over').
+  helperOver: 'absolute inset-y-0 z-20 shadow-lg',
+  helperOverRight: 'right-0',
+  helperOverLeft: 'left-0',
   helperTop: 'flex h-9 shrink-0 items-center gap-2 px-3',
   helperTopLabel: 'min-w-0 truncate text-xs font-medium text-foreground',
   // RoomHeader's ghost icon buttons (plugins/hermes-bots/group-room-ui.tsx)
   iconTone: 'text-(--ui-text-tertiary)',
   helperBody: 'flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pb-3 pt-1',
+  // Bubble and character sit just above the message box, as the newest chat content does in
+  // Hermes; the space opens above them (hhdesign fix 3). mt-auto, not justify-end, so a tall
+  // bubble can still be scrolled to its top.
+  helperNewest: 'mt-auto flex flex-col gap-3',
   // Widget bubble in a chat (components/chat/widget-shell.ts WIDGET_SHELL_CLASS)
   bubble: 'rounded-3xl bg-(--ui-widget-surface-background) px-3.5 py-3',
   bubbleText: 'text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
@@ -671,27 +858,37 @@ const K = {
   characterRow: 'flex items-end gap-2 pl-2',
   // Chat log: the user's bubble and an empty log (RoomMessage; components/ui/empty-state.tsx)
   logEmpty: 'min-h-24',
-  // Composer: plugins/hermes-bots/group-room-ui.tsx RoomComposer + ROOM_COMPOSER_INPUT_CLASS
+  // Composer: plugins/hermes-bots/group-room-ui.tsx RoomComposer, on one row like Hermes's chat
+  // composer: the box, then the model name, then send (hhdesign fix 2).
   composerForm: 'px-3 pb-3 pt-1',
   composerSurface: 'relative isolate rounded-2xl',
-  composerGrid: "grid grid-cols-[auto_minmax(0,1fr)_auto] items-end gap-x-(--composer-control-gap) gap-y-1 px-(--composer-surface-pad-x) py-(--composer-surface-pad-y) [grid-template-areas:'reply_reply_reply''files_files_files''attach_input_send']",
-  composerInputCell: 'min-w-0 [grid-area:reply]',
-  composerInput: '!border-transparent !bg-transparent !shadow-none min-h-(--composer-input-min-height) px-1 py-1 text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) placeholder:text-(--ui-text-tertiary)',
-  composerModel: 'mb-1 min-w-0 truncate px-1 font-mono text-[0.6875rem] text-(--ui-text-tertiary) [grid-area:input]',
-  composerSend: 'mb-1 [grid-area:send]',
+  composerRow: 'flex items-end gap-x-(--composer-control-gap) px-(--composer-surface-pad-x) py-(--composer-surface-pad-y)',
+  composerInputCell: 'min-w-0 flex-1',
+  // One line that grows as you type, no resize grip: CLARIFY_TEXTAREA_CLASS
+  // (components/assistant-ui/clarify/core/shell.tsx) on the room composer's input.
+  composerInput:
+    'field-sizing-content max-h-40 min-h-0 resize-none !border-transparent !bg-transparent !shadow-none px-1 py-1 text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) placeholder:text-(--ui-text-tertiary)',
+  // The model name as Hermes's composer model button shows it: normal letters, text-xs, tertiary
+  // (app/chat/composer/model-pill.tsx PILL), without the button, chevron or picker.
+  composerModel: 'flex h-(--composer-control-size) min-w-0 shrink items-center px-1 text-xs font-normal text-(--ui-text-tertiary)',
+  composerSend: 'shrink-0',
   composerNote: 'px-3 pb-3 text-center text-[0.65rem] text-muted-foreground/50',
 
-  // ---- hidden helper: one round button at the page edge (components/ui/fan-menu.tsx discs) ----
-  peekColumn: 'flex shrink-0 flex-col items-center px-2 pt-2',
-  peekButton: 'rounded-full',
+  // ---- hidden helper: a thin full-height strip at the page edge, its label written vertically
+  // (hhdesign fix 4): components/ui/pane-tab.tsx TAB_VERTICAL and the collapsed kanban column
+  // (plugins/kanban/board.tsx), on the open helper's fill ----
+  strip:
+    'flex h-full w-7 shrink-0 cursor-pointer flex-col items-center gap-2 bg-(--ui-sidebar-surface-background) py-3 text-(--ui-text-tertiary) transition-colors hover:bg-(--chrome-action-hover) hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+  stripLabel: 'text-[0.6875rem] font-medium uppercase tracking-wide text-(--ui-text-tertiary) [writing-mode:vertical-rl]',
 
   // ---- Your setup ----
   // Bot picker: Capabilities' own profile scope selector (app/capabilities/scope-selector.tsx)
   botPicker: 'flex min-w-0 items-center gap-2',
   botPickerLabel: 'text-[0.7rem] font-medium text-(--ui-text-tertiary)',
   botPickerTrigger: 'text-xs h-7 w-56',
-  // Card grid: Connectors' directory grid (app/capabilities/connectors/connectors-directory.tsx Group)
-  cardGrid: 'grid gap-3 sm:grid-cols-2',
+  // Card grid: Connectors' directory grid (app/capabilities/connectors/connectors-directory.tsx Group).
+  // One column; layout.js adds the second when the column is wide enough (not the window's sm:).
+  cardGrid: 'grid gap-3',
   cardWide: 'col-span-full',
   // One card: Connectors' row card (app/capabilities/connectors/connector-row-card.tsx), stacked
   card: 'flex min-w-0 flex-col gap-1.5 rounded-lg border border-(--ui-stroke-quaternary) bg-(--ui-bg-elevated) p-3',
@@ -707,8 +904,9 @@ const K = {
   dotNeutral: 'bg-(--ui-text-quaternary)',
   // The card's lines: SecondLine in the same file, without the two-line clamp
   cardText: 'text-[0.72rem] leading-snug text-(--ui-text-secondary)',
-  // Model name: the composer's model label tone (plugins/hermes-bots/group-room-ui.tsx)
-  cardValue: 'min-w-0 truncate font-mono text-[0.6875rem] text-(--ui-text-secondary)',
+  // Model name or count: the composer model label's tone, in normal letters (not mono: Hermes keeps
+  // mono for code, paths and commands)
+  cardValue: 'min-w-0 truncate text-[0.6875rem] text-(--ui-text-secondary)',
   // "Passes when": Connectors' fact line (CardLane)
   cardPasses: 'text-[0.6875rem] text-(--ui-text-tertiary)',
   cardActions: 'mt-1 flex flex-wrap items-center gap-1.5',
@@ -728,6 +926,72 @@ function cx(...names) {
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
 const ICONS = ['compass', 'arrow-swap', 'chevron-left', 'chevron-right', 'close', 'arrow-up', 'play-circle', 'location', 'info']
+// Hermes's look has one primary button per screen (hhdesign fix 6); every other button of
+// ours is secondary or ghost. tests/page-render.test.mjs counts them per screen.
+
+// ---- src/layout.js ----
+// How the page fits a narrow window (Lead's decision for B3a; hhtech's b1-verify.md section 2C).
+// Pure rules, no React: page.js measures our own page element (a ResizeObserver on our own
+// markup, nothing of Hermes's) and asks layoutFor() what to show. In order:
+//   1. the open step (or the Your setup column) must stay at least MIN_MAIN_PX wide. If an open
+//      helper would push it under that, the helper folds into its edge strip by itself. Nothing is
+//      saved: the helper comes back when the window is wider again.
+//   2. if the open step is still under MIN_MAIN_PX, the step list shrinks to its numbers.
+//   3. the two-column facts (and the three answer choices) stack into one column under
+//      TWO_COLUMNS_PX; the Your setup cards do the same under CARD_COLUMNS_PX.
+// The widths match the inline column widths page.js sets (16rem, 3rem, 20rem) and the strip's w-7.
+
+const RAIL_PX = 256
+const RAIL_NUMBERS_PX = 48
+const HELPER_PX = 320
+const STRIP_PX = 28
+const MIN_MAIN_PX = 320
+// The open step's own padding is 24 px a side, so 520 leaves two facts of about 226 px each.
+const TWO_COLUMNS_PX = 520
+// Two cards of about 270 px each, after the padding and the 12 px gap.
+const CARD_COLUMNS_PX = 600
+
+// width: our page's measured width in px (0 or missing = not measured yet: lay out as wide).
+// tab: 'setup' | 'yours'. helper: the person's choice, 'open' | 'hidden' | 'closed'.
+// peek: the person opened the helper from its strip while the window is too narrow for the
+// column (shown over the page; nothing saved).
+// Returns:
+//   helper: 'open' | 'strip' | 'over' | 'none'   what the helper column shows
+//   folded: true when the page folded the helper by itself
+//   narrow: true when an open helper would not fit as a column on this tab
+//   rail:   'full' | 'numbers' | 'none'          the step list (none on Your setup)
+//   main:   the open step's (or Your setup's) width in px, Infinity when not measured
+//   columns: 1 | 2   facts (two) and choices (three) side by side;   cardColumns: 1 | 2
+function layoutFor({ width, tab, helper, peek = false }) {
+  const w = typeof width === 'number' && width > 0 ? width : Infinity
+  const railFull = tab === 'setup' ? RAIL_PX : 0
+  const narrow = w - railFull - HELPER_PX < MIN_MAIN_PX
+
+  let shown = helper === 'open' ? 'open' : helper === 'hidden' ? 'strip' : 'none'
+  const folded = helper === 'open' && narrow
+  if (folded) shown = 'strip'
+  if (narrow && peek && shown === 'strip') shown = 'over'
+  // The width the helper takes beside the page: the column, the strip, or nothing.
+  const edgePx = shown === 'open' ? HELPER_PX : shown === 'none' ? 0 : STRIP_PX
+
+  let rail = tab === 'setup' ? 'full' : 'none'
+  let railSpace = railFull
+  if (rail === 'full' && w - RAIL_PX - edgePx < MIN_MAIN_PX) {
+    rail = 'numbers'
+    railSpace = RAIL_NUMBERS_PX
+  }
+
+  const main = w - railSpace - edgePx
+  return {
+    helper: shown,
+    folded,
+    narrow,
+    rail,
+    main,
+    columns: main >= TWO_COLUMNS_PX ? 2 : 1,
+    cardColumns: main >= CARD_COLUMNS_PX ? 2 : 1
+  }
+}
 
 // ---- src/character.js ----
 // The helper's character: hhdesign's drawn hand (design/hermes-look-r3), inline SVG.
@@ -1045,7 +1309,7 @@ function PasteBox({ text, label }) {
   })
 }
 
-function renderYourSetup(s, { openStep }) {
+function renderYourSetup(s, { openStep, cardColumns = 2 }) {
   const botCount = s.bots.length
   const actionButton = (action, id) => {
     if (!action) return null
@@ -1065,11 +1329,11 @@ function renderYourSetup(s, { openStep }) {
         className: cx(K.card, wide && K.cardWide),
         'data-hh': `card-${id}`,
         'data-status': c.status,
-        'aria-label': cardTitle(id, s.bot, botCount),
+        'aria-label': cardTitle(id),
         children: [
           jsxs('div', {
             className: K.cardHead,
-            children: [jsx('h4', { className: K.cardTitle, children: cardTitle(id, s.bot, botCount) }), jsx(StatusLane, { status: c.status })]
+            children: [jsx('h4', { className: K.cardTitle, children: cardTitle(id) }), jsx(StatusLane, { status: c.status })]
           }),
           c.value ? jsx('div', { className: K.cardValue, children: c.value }) : null,
           ...c.lines.map((line, i) => jsx('p', { className: K.cardText, children: line }, `l${i}`)),
@@ -1130,22 +1394,16 @@ function renderYourSetup(s, { openStep }) {
       : null
 
   return [
-    jsxs(
-      'header',
-      {
-        children: [
-          jsx('h3', { className: K.stepTitle, children: 'Your setup' }),
-          jsx('p', { className: K.caption, children: 'Read from your Hermes. Nothing is changed.' })
-        ]
-      },
-      'head'
-    ),
+    // No heading: the open tab already says "Your setup", as Capabilities' tabs name their page.
+    jsx('p', { className: K.caption, 'data-hh': 'yours-lead', children: 'Read from your Hermes. Nothing is changed.' }, 'head'),
     picker,
     jsx(
       'div',
       {
-        className: K.cardGrid,
+        // Two columns only when the column is wide enough (src/layout.js), else one.
+        className: cx(K.cardGrid, cardColumns === 2 && K.twoColumns),
         'data-hh': 'cards',
+        'data-columns': cardColumns,
         children: [
           card('gateway'),
           card('model'),
@@ -1158,22 +1416,23 @@ function renderYourSetup(s, { openStep }) {
       },
       'cards'
     ),
-    jsx('div', { className: K.pageActions, children: jsx(Button, { size: 'sm', onClick: () => s.checkAgain(), children: 'Check again' }) }, 'again')
+    jsx('div', { className: K.pageActions, children: jsx(Button, { size: 'sm', variant: 'secondary', onClick: () => s.checkAgain(), children: 'Check again' }) }, 'again')
   ]
 }
 
 // ---- src/page.js ----
-// The Helping Hand page: header with two tabs, step list, open step, helper panel.
+// The Helping Hand page: header with two text tabs, step list, open step, helper panel.
 // B1 = the page shell. Step texts are placeholders until hhcontent's data arrives (B3); the
-// "Your setup" cards are B2; the helper's model call is B4. What is real in B1: the layout, the
-// Hermes-native look, the helper's Move / Hide / Close states (remembered), and the model check.
-// Look: Hermes's own UI kit components (Button, SegmentedControl, Switch, Textarea, Tip, EmptyState,
-// GlyphSpinner, Codicon, RowButton) and, where Hermes has no kit component, the class strings its own
-// screens use (src/look.js). No CSS of our own.
+// "Your setup" cards are B2; the helper's model call is B4. B3a = the native pass (hhdesign's
+// b1-design-review.md fixes 1-6, 7 and 8) and narrow windows (src/layout.js).
+// Look: Hermes's own UI kit components (Button, Switch, Textarea, Tip, EmptyState, GlyphSpinner,
+// Codicon, RowButton) and, where Hermes has no kit component (its text tabs and vertical strips
+// aren't in the SDK), the class strings its own screens use (src/look.js). No CSS of our own.
 
 // Column widths (layout only; every colour, font and line comes from Hermes's classes).
-const RAIL_WIDTH = '16rem'
-const HELPER_WIDTH = '20rem'
+const RAIL_WIDTH = `${RAIL_PX}px`
+const RAIL_NUMBERS_WIDTH = `${RAIL_NUMBERS_PX}px`
+const HELPER_WIDTH = `${HELPER_PX}px`
 
 const TABS = [
   { id: 'setup', label: 'Setup' },
@@ -1191,6 +1450,29 @@ function HelperIconButton({ icon, label, onClick, tip = true }) {
   })
   // Hermes tips icon buttons whose job isn't on screen, but never a close X (DESIGN.md "Buttons").
   return tip ? jsx(Tip, { label, children: button }) : button
+}
+
+// Our own page's width, from a ResizeObserver on our own element (never Hermes's markup). The ref
+// function is made once, so React doesn't detach and re-attach it on every render; React calls it
+// with null on unmount, which stops the observer. 0 until measured, which layoutFor() reads as wide.
+function useOwnWidth() {
+  const [width, setWidth] = useState(0)
+  const holder = useRef(null)
+  if (!holder.current) {
+    const box = { observer: null }
+    box.ref = node => {
+      if (box.observer) box.observer.disconnect()
+      box.observer = null
+      if (!node || typeof ResizeObserver !== 'function') return
+      box.observer = new ResizeObserver(entries => {
+        const entry = entries[entries.length - 1]
+        if (entry) setWidth(Math.round(entry.contentRect.width))
+      })
+      box.observer.observe(node)
+    }
+    holder.current = box
+  }
+  return [width, holder.current.ref]
 }
 
 function makePage(ctx) {
@@ -1243,9 +1525,23 @@ function makePage(ctx) {
     const [chosen, setChosen] = useState({})
     const [draft, setDraft] = useState('')
     const [focusAsk, setFocusAsk] = useState(false)
+    const [focusStrip, setFocusStrip] = useState(false)
+    // The person opened the helper from its strip while the window is too narrow for the column:
+    // it then lies over the page. Not saved: it ends when the window is wide enough again.
+    const [peek, setPeek] = useState(false)
+    const [width, measureRef] = useOwnWidth()
     const [modelStatus, recheck] = useModelStatus()
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
+    const stripButton = useRef(null)
+    // One ref function per tab, made once (like useOwnWidth's), kept with the tab buttons.
+    const tabRefs = useRef(null)
+    if (!tabRefs.current) {
+      const els = {}
+      tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
+    }
+
+    const fit = layoutFor({ width, tab, helper, peek })
 
     const keep = (key, setter) => value => {
       setter(value)
@@ -1265,100 +1561,194 @@ function makePage(ctx) {
       setFocusAsk(false)
     }, [focusAsk])
 
+    // Closing the helper that lay over the page hands the keyboard back to the strip.
+    useEffect(() => {
+      if (!focusStrip) return
+      if (stripButton.current) stripButton.current.focus()
+      setFocusStrip(false)
+    }, [focusStrip])
+
+    // The window got wide enough for the column: an open "over the page" ends. Only a change of
+    // width ends it, so switching tabs in a narrow window keeps the helper the person opened.
+    useEffect(() => {
+      if (peek && !fit.narrow) setPeek(false)
+    }, [width])
+
     const currentStep = PLACEHOLDER_STEPS[step - 1]
     const noModel = modelStatus.state === 'none'
-    // The model's name: runtime_check's, else the free tier's label, else "your model"
-    // (hhtech-default-model.md point 4). Never host.state.model.
+    // The model's name as Hermes's model button shows it, the free tier's label, or "your model"
+    // (src/model-status.js, docs/answers/hhtech-model-display-name.md). Never host.state.model.
     const modelName = modelStatus.state === 'ok' ? modelLabel(modelStatus.name) : ''
 
+    // Show the helper (strip, "Show helper", "Ask about this step"). In a window too narrow for
+    // its column it opens over the page, with the keyboard in its message box. A helper the
+    // person hid stays saved as hidden then, so it doesn't come back as a column by itself later.
+    function openHelper() {
+      const narrow = layoutFor({ width, tab, helper: 'open' }).narrow
+      if (helper === 'closed' || (helper === 'hidden' && !narrow)) saveHelper('open')
+      if (narrow) {
+        setPeek(true)
+        setFocusAsk(true)
+      }
+    }
+
     function askAboutStep() {
-      if (helper !== 'open') saveHelper('open')
+      openHelper()
       setFocusAsk(true)
     }
 
-    /* ---------- header: name, the two tabs, "Show helper" when the helper is closed ---------- */
+    // Hide from the panel. Over the page, only that view ends (Hide, or Escape): the saved
+    // choice stays as it was, and the keyboard goes back to the strip.
+    function hideHelper() {
+      if (fit.helper === 'over') {
+        setPeek(false)
+        setFocusStrip(true)
+      } else saveHelper('hidden')
+    }
+
+    /* ---------- header: the two text tabs, "Show helper" when the helper is closed ---------- */
+    // Arrow keys move between the tabs, Home and End go to the first and last (DESIGN.md,
+    // Keyboard: one entry point at the selected tab; WAI-ARIA tabs pattern).
+    function onTabKey(e, index) {
+      const last = TABS.length - 1
+      const to = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index === 0 ? last : index - 1, Home: 0, End: last }[e.key]
+      if (to === undefined) return
+      e.preventDefault()
+      const next = TABS[to].id
+      saveTab(next)
+      const el = tabRefs.current.els[next]
+      if (el) el.focus()
+    }
+
+    const tabRow = jsx('div', {
+      className: K.tabs,
+      role: 'tablist',
+      'aria-label': 'Helping Hand',
+      'data-hh': 'tabs',
+      children: TABS.map((t, i) => {
+        const on = tab === t.id
+        return jsx(
+          'button',
+          {
+            type: 'button',
+            role: 'tab',
+            id: `hh-tab-${t.id}`,
+            'aria-selected': on,
+            'aria-controls': 'hh-tabpanel',
+            tabIndex: on ? 0 : -1,
+            'data-active': on,
+            className: cx(K.textTab, on ? K.textTabOn : K.textTabIdle),
+            ref: tabRefs.current.set[t.id],
+            onClick: () => saveTab(t.id),
+            onKeyDown: e => onTabKey(e, i),
+            children: jsx('span', { className: on ? K.textTabLabelOn : K.textTabLabel, children: t.label })
+          },
+          t.id
+        )
+      })
+    })
+
     const header = jsxs('div', {
       className: K.head,
       'data-hh': 'header',
       children: [
-        jsx('h2', { className: K.title, children: 'Helping Hand' }),
-        jsx(SegmentedControl, { options: TABS, value: tab, onChange: saveTab }),
+        tabRow,
         jsx('div', {
           className: K.headEnd,
           children:
             helper === 'closed'
-              ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: () => saveHelper('open'), children: 'Show helper' })
+              ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: openHelper, children: 'Show helper' })
               : null
         })
       ]
     })
 
-    /* ---------- step list ---------- */
-    const stepRow = s =>
-      jsx(
+    /* ---------- step list (numbers only when the window is narrow) ---------- */
+    const numbersOnly = fit.rail === 'numbers'
+    const stepRow = s => {
+      const on = s.number === step
+      const number = jsx('span', { className: on ? K.rowNumberOn : K.rowNumber, children: s.number }, 'n')
+      const button = jsxs(RowButton, {
+        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
+        'aria-current': on ? 'step' : undefined,
+        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}` : undefined,
+        onClick: () => saveStep(s.number),
+        children: numbersOnly
+          ? [number]
+          : [
+              number,
+              jsxs(
+                'span',
+                {
+                  className: K.rowText,
+                  children: [
+                    jsx('span', { className: K.rowTitle, children: s.title }),
+                    jsx('span', { className: K.rowSub, children: jsx('span', { className: K.truncate, children: s.short }) })
+                  ]
+                },
+                't'
+              )
+            ]
+      })
+      return jsx(
         'div',
         {
-          className: cx(K.row, s.number === step ? K.rowActive : K.rowIdle),
-          children: jsxs(RowButton, {
-            className: K.rowButton,
-            'aria-current': s.number === step ? 'step' : undefined,
-            onClick: () => saveStep(s.number),
-            children: [
-              jsx('span', { className: K.rowNumber, children: s.number }),
-              jsxs('span', {
-                className: K.rowText,
-                children: [
-                  jsx('span', { className: K.rowTitle, children: s.title }),
-                  jsx('span', { className: K.rowSub, children: jsx('span', { className: K.truncate, children: s.short }) })
-                ]
-              })
-            ]
-          })
+          className: cx(K.row, on ? K.rowActive : K.rowIdle),
+          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}`, children: button }) : button
         },
         s.number
       )
+    }
 
-    const laterRow = s =>
-      jsx(
+    // Steps that come later: not buttons. With numbers only, the number carries its title for
+    // screen readers (role img + label) and as a tip on hover.
+    const laterRow = s => {
+      const inner = jsxs('div', {
+        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
+        role: numbersOnly ? 'img' : undefined,
+        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}, comes later` : undefined,
+        children: [
+          jsx('span', { className: K.rowNumber, children: s.number }, 'n'),
+          numbersOnly ? null : jsx('span', { className: K.rowText, children: jsx('span', { className: K.rowTitleOff, children: s.title }) }, 't')
+        ]
+      })
+      return jsx(
         'div',
         {
           className: cx(K.row, K.rowIdle),
           'aria-disabled': true,
-          children: jsxs('div', {
-            className: K.rowButton,
-            children: [
-              jsx('span', { className: K.rowNumber, children: s.number }),
-              jsx('span', { className: K.rowText, children: jsx('span', { className: K.rowTitleOff, children: s.title }) })
-            ]
-          })
+          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}, comes later`, children: inner }) : inner
         },
         s.number
       )
+    }
 
     const rail = jsxs(
       'nav',
       {
         className: K.rail,
-        style: { width: RAIL_WIDTH },
+        style: { width: numbersOnly ? RAIL_NUMBERS_WIDTH : RAIL_WIDTH },
         'aria-label': 'Steps',
         'data-hh': 'steps',
+        'data-numbers-only': numbersOnly,
         children: [
           jsxs('div', {
             className: K.railScroll,
             children: [
-              jsx('div', { className: cx(K.sectionLabel, K.sectionLabelPad), children: 'Steps' }),
+              numbersOnly ? null : jsx('div', { className: cx(K.sectionLabel, K.sectionLabelPad), children: 'Steps' }),
               jsx('div', { className: K.rowList, children: PLACEHOLDER_STEPS.map(stepRow) }),
-              jsx('div', { className: cx(K.sectionLabel, K.sectionLabelGap), children: 'After these' }),
+              jsx('div', { className: cx(K.sectionLabel, numbersOnly ? K.sectionLabelPad : K.sectionLabelGap), children: numbersOnly ? null : 'After these' }),
               jsx('div', { className: K.rowList, children: LATER_STEPS.map(laterRow) })
             ]
           }),
-          jsx('div', { className: K.railFoot, children: VERSION_LINE })
+          numbersOnly ? null : jsx('div', { className: K.railFoot, children: VERSION_LINE })
         ]
       },
       'rail'
     )
 
     /* ---------- open step ---------- */
+    // One primary button per screen (hhdesign fix 6): "I understand, next step"; the rest are secondary.
     const stepActions = jsxs('div', {
       className: K.actions,
       children: [
@@ -1380,11 +1770,15 @@ function makePage(ctx) {
         ]
       })
 
+    // The open step is wide enough for the facts side by side (and the three choices in a row).
+    const wideStep = fit.columns === 2
     const stepView = currentStep.heading
       ? [
           stepHeader(currentStep.heading, jsx('p', { className: K.prose, children: currentStep.intro })),
           jsx('dl', {
-            className: K.pairGrid,
+            className: cx(K.pairGrid, wideStep && K.twoColumns),
+            'data-hh': 'facts',
+            'data-columns': fit.columns,
             children: currentStep.compare.map(c =>
               jsxs('div', { children: [jsx('dt', { className: K.pairTitle, children: c.title }), jsx('dd', { className: K.caption, children: c.text })] }, c.title)
             )
@@ -1400,9 +1794,10 @@ function makePage(ctx) {
             children: [
               jsx('div', { className: K.question, children: currentStep.question }),
               jsx('div', {
-                className: K.choices,
+                className: cx(K.choices, wideStep && K.threeColumns),
                 role: 'group',
                 'aria-label': currentStep.question,
+                'data-hh': 'choices',
                 children: currentStep.options.map(o =>
                   jsx(
                     'button',
@@ -1434,7 +1829,8 @@ function makePage(ctx) {
       openStep: n => {
         saveStep(n)
         saveTab('setup')
-      }
+      },
+      cardColumns: fit.cardColumns
     })
 
     const main = jsx(
@@ -1442,41 +1838,56 @@ function makePage(ctx) {
       {
         className: K.detail,
         'data-hh': 'detail',
+        // The tabs' panel (the tabs point here with aria-controls).
+        role: 'tabpanel',
+        id: 'hh-tabpanel',
+        'aria-labelledby': `hh-tab-${tab}`,
         children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
       },
       'main'
     )
 
     /* ---------- helper panel ---------- */
-    const checkAgain = (variant = 'default') =>
-      jsx(Button, { variant, size: 'sm', disabled: modelStatus.state === 'checking', onClick: () => recheck(), children: 'Check again' })
+    // "Check again" is always secondary: the step's own button is the screen's one primary button.
+    const checkAgain = () =>
+      jsx(Button, { variant: 'secondary', size: 'sm', disabled: modelStatus.state === 'checking', onClick: () => recheck(), children: 'Check again' })
 
     const say = (text, actions, small) =>
-      jsxs('div', {
-        className: K.bubble,
-        'data-hh': 'bubble',
-        children: [
-          jsx('p', { className: K.bubbleText, children: text }),
-          small ? jsx('p', { className: K.caption, children: small }) : null,
-          actions ? jsx('div', { className: K.bubbleActions, children: actions }) : null
-        ]
-      })
+      jsxs(
+        'div',
+        {
+          className: K.bubble,
+          'data-hh': 'bubble',
+          children: [
+            jsx('p', { className: K.bubbleText, children: text }),
+            small ? jsx('p', { className: K.caption, children: small }) : null,
+            actions ? jsx('div', { className: K.bubbleActions, children: actions }) : null
+          ]
+        },
+        'say'
+      )
 
-    const withCharacter = (bubble, mood) =>
-      [bubble, jsx('div', { className: K.characterRow, children: jsx(Character, { size: 72, mood }) }, 'who')]
+    // The character: one swappable component (src/character.js), unchanged.
+    const character = mood => jsx('div', { className: K.characterRow, children: jsx(Character, { size: 72, mood }) }, 'who')
+    // The newest things the helper says sit just above the message box (hhdesign fix 3).
+    const newest = children => jsx('div', { className: K.helperNewest, 'data-hh': 'helper-newest', children }, 'newest')
 
     const contextLine = (icon, text, spinning) =>
-      jsxs('div', {
-        className: K.scaffold,
-        role: 'status',
-        children: [jsx('span', { className: K.scaffoldGlyph, children: spinning ? jsx(GlyphSpinner, {}) : jsx(Codicon, { name: icon, size: '0.875rem' }) }), jsx('span', { className: K.truncate, children: text })]
-      })
+      jsxs(
+        'div',
+        {
+          className: K.scaffold,
+          role: 'status',
+          children: [jsx('span', { className: K.scaffoldGlyph, children: spinning ? jsx(GlyphSpinner, {}) : jsx(Codicon, { name: icon, size: '0.875rem' }) }), jsx('span', { className: K.truncate, children: text })]
+        },
+        'where'
+      )
 
     let helperBody
     if (noModel) {
       // content/v1-strings.md part 1: the progress line, the fixed bubble with its small line and
       // "Check again". No model call anywhere.
-      helperBody = [contextLine('info', NO_MODEL_PROGRESS, false), ...withCharacter(say(NO_MODEL_LINE, checkAgain('default'), NO_MODEL_SMALL), 'straight')]
+      helperBody = [contextLine('info', NO_MODEL_PROGRESS, false), newest([say(NO_MODEL_LINE, checkAgain(), NO_MODEL_SMALL), character('straight')])]
     } else {
       const where = tab === 'setup' ? `On step ${step}: ${currentStep.title}` : setup.bots.length > 1 ? `On Your setup, bot ${setup.bot}` : 'On Your setup'
       helperBody = [
@@ -1485,68 +1896,78 @@ function makePage(ctx) {
           : modelStatus.state === 'error'
             ? null
             : contextLine('location', where, false),
-        modelStatus.state === 'error' ? say(CANT_CHECK_LINE, checkAgain('secondary')) : null,
         chatlog
-          ? jsx('div', { 'data-hh': 'chatlog', children: jsx(EmptyState, { className: K.logEmpty, title: 'No messages yet', description: 'What you and the helper say shows here.' }) })
+          ? jsx('div', { 'data-hh': 'chatlog', children: jsx(EmptyState, { className: K.logEmpty, title: 'No messages yet', description: 'What you and the helper say shows here.' }) }, 'log')
           : modelStatus.state === 'error'
-            ? jsx('div', { className: K.characterRow, children: jsx(Character, { size: 72, mood: 'straight' }) })
-            : withCharacter(say('Open a step and ask me about it here. I explain things; I don’t change your settings.'), 'smile')
-      ].flat()
+            ? newest([say(CANT_CHECK_LINE, checkAgain()), character('straight')])
+            : newest([say('Open a step and ask me about it here. I explain things; I don’t change your settings.'), character('smile')])
+      ]
     }
 
-    // With no model the box stays, empty and greyed, with hhdesign's words (v1-strings part 1).
-    const composer = jsxs('form', {
-          className: K.composerForm,
-          onSubmit: e => e.preventDefault(),
-          'data-hh': 'composer',
-          children: [
-            jsxs('div', {
-              className: cx(K.composerSurface, composerSurfaceRing),
-              children: [
-                jsx('div', { 'aria-hidden': true, className: composerInputBacking }),
-                jsxs('div', {
-                  className: K.composerGrid,
-                  children: [
-                    jsx('div', {
-                      className: K.composerInputCell,
-                      children: jsx(Textarea, {
-                        ref: askBox,
-                        rows: 2,
-                        className: K.composerInput,
-                        disabled: noModel,
-                        value: noModel ? '' : draft,
-                        // The whole text is kept: the pasted-key check reads all of it before the
-                        // 500-character cut (src/key-check.js).
-                        onChange: e => setDraft(e.target.value),
-                        placeholder: noModel ? NO_MODEL_BOX : tab === 'setup' ? 'Ask about this step' : 'Ask about your setup',
-                        'aria-label': 'Ask the helper'
-                      })
-                    }),
-                    jsx('span', { className: K.composerModel, 'data-hh': 'model-name', children: modelStatus.state === 'checking' ? '' : modelName }),
-                    jsx(Button, {
-                      'aria-label': 'Send',
-                      className: cx(PRIMARY_ICON_BTN, K.composerSend),
-                      disabled: true,
-                      type: 'submit',
-                      children: jsx(Codicon, { name: 'arrow-up', size: '0.875rem' })
-                    })
-                  ]
+    // One line that grows as you type, then the model's name and send on the same row (hhdesign
+    // fix 2). With no model the box stays, empty and greyed, with hhdesign's words.
+    const composer = jsx('form', {
+      className: K.composerForm,
+      onSubmit: e => e.preventDefault(),
+      'data-hh': 'composer',
+      children: jsxs('div', {
+        className: cx(K.composerSurface, composerSurfaceRing),
+        children: [
+          jsx('div', { 'aria-hidden': true, className: composerInputBacking }),
+          jsxs('div', {
+            className: K.composerRow,
+            children: [
+              jsx('div', {
+                className: K.composerInputCell,
+                children: jsx(Textarea, {
+                  ref: askBox,
+                  rows: 1,
+                  className: K.composerInput,
+                  disabled: noModel,
+                  value: noModel ? '' : draft,
+                  // The whole text is kept: the pasted-key check reads all of it before the
+                  // 500-character cut (src/key-check.js).
+                  onChange: e => setDraft(e.target.value),
+                  placeholder: noModel ? NO_MODEL_BOX : tab === 'setup' ? 'Ask about this step' : 'Ask about your setup',
+                  'aria-label': 'Ask the helper'
                 })
-              ]
-            })
-          ]
-        })
+              }),
+              modelName
+                ? jsx('span', { className: K.composerModel, 'data-hh': 'model-name', children: jsx('span', { className: K.truncate, children: modelName }) })
+                : null,
+              jsx(Button, {
+                'aria-label': 'Send',
+                className: cx(PRIMARY_ICON_BTN, K.composerSend),
+                disabled: true,
+                type: 'submit',
+                children: jsx(Codicon, { name: 'arrow-up', size: '0.875rem' })
+              })
+            ]
+          })
+        ]
+      })
+    })
 
     let helperArea = null
-    if (helper === 'open') {
+    if (fit.helper === 'open' || fit.helper === 'over') {
+      const over = fit.helper === 'over'
       helperArea = jsxs(
         'div',
         {
-          className: cx(K.helper, side === 'right' ? K.helperRight : K.helperLeft),
-          style: { width: HELPER_WIDTH },
+          className: cx(K.helper, over && K.helperOver, over && (side === 'right' ? K.helperOverRight : K.helperOverLeft)),
+          style: { width: over && width ? `${Math.min(HELPER_PX, width)}px` : HELPER_WIDTH },
           role: 'complementary',
           'aria-label': 'Helper',
           'data-hh': 'helper',
+          'data-over': over,
+          // Escape closes the helper that lies over the page (as Hermes's own overlays do).
+          onKeyDown: over
+            ? e => {
+                if (e.key !== 'Escape') return
+                e.preventDefault()
+                hideHelper()
+              }
+            : undefined,
           children: [
             jsxs('div', {
               className: K.helperTop,
@@ -1561,46 +1982,65 @@ function makePage(ctx) {
                       label: side === 'right' ? 'Move to the left' : 'Move to the right',
                       onClick: () => saveSide(otherSide(side))
                     }),
-                    jsx(HelperIconButton, { icon: side === 'right' ? 'chevron-right' : 'chevron-left', label: 'Hide the helper', onClick: () => saveHelper('hidden') }),
-                    jsx(HelperIconButton, { icon: 'close', label: 'Close the helper', tip: false, onClick: () => saveHelper('closed') })
+                    jsx(HelperIconButton, { icon: side === 'right' ? 'chevron-right' : 'chevron-left', label: 'Hide the helper', onClick: hideHelper }),
+                    jsx(HelperIconButton, {
+                      icon: 'close',
+                      label: 'Close the helper',
+                      tip: false,
+                      onClick: () => {
+                        setPeek(false)
+                        saveHelper('closed')
+                      }
+                    })
                   ]
                 })
               ]
             }),
-            jsxs('div', { className: K.helperBody, children: helperBody }),
+            jsx('div', { className: K.helperBody, children: helperBody }),
             composer,
             noModel ? null : jsx('p', { className: K.composerNote, children: 'It explains; it doesn’t change your settings.' })
           ]
         },
         'helper'
       )
-    } else if (helper === 'hidden') {
-      helperArea = jsx(
-        'div',
-        {
-          className: K.peekColumn,
-          'data-hh': 'helper-hidden',
-          children: jsx(Tip, {
-            label: 'Show the helper',
-            children: jsx(Button, {
-              'aria-label': 'Show the helper',
-              className: K.peekButton,
-              size: 'icon',
-              variant: 'floating',
-              onClick: () => saveHelper('open'),
-              children: jsx(Character, { size: 24, shadow: false, label: '' })
-            })
-          })
-        },
-        'helper'
-      )
     }
 
+    // Hidden (by the person, or folded by the page in a narrow window): a thin full-height strip at
+    // the helper's edge with HELPER written down it; the whole strip opens the helper (fix 4).
+    const strip =
+      fit.helper === 'strip' || fit.helper === 'over'
+        ? jsxs(
+            'button',
+            {
+              type: 'button',
+              className: K.strip,
+              'aria-label': 'Show the helper',
+              'data-hh': 'helper-hidden',
+              ref: stripButton,
+              'data-folded': fit.folded,
+              onClick: openHelper,
+              children: [jsx(Codicon, { name: side === 'right' ? 'chevron-left' : 'chevron-right', size: '0.875rem' }), jsx('span', { className: K.stripLabel, children: 'Helper' })]
+            },
+            'strip'
+          )
+        : null
+
     const columns = tab === 'setup' ? [rail, main] : [main]
+    const edge = fit.helper === 'over' ? [strip] : [strip || helperArea]
     return jsxs('div', {
       className: K.root,
       'data-hh': 'page',
-      children: [header, jsx('div', { className: K.body, children: side === 'left' ? [helperArea, ...columns] : [...columns, helperArea] })]
+      // The measured width, for the screenshot checks (dev/checks/b3a-shots).
+      'data-width': width,
+      children: [
+        header,
+        jsx('div', {
+          className: K.body,
+          ref: measureRef,
+          'data-hh': 'body',
+          children: [...(side === 'left' ? [...edge, ...columns] : [...columns, ...edge]), fit.helper === 'over' ? helperArea : null]
+        })
+      ]
     })
   }
 }

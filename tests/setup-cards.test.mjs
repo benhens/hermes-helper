@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import {
-  STATUS, PASSES, cardTitle, gatewayCard, modelCard, answersCard, soulCard, skillsCard, memoryCard, rememberCard,
+  STATUS, PASSES, CARD_TITLES, cardTitle, gatewayCard, modelCard, answersCard, soulCard, skillsCard, memoryCard, rememberCard,
   DEFAULT_SOULS, isDefaultSoul, answerPasses, ANSWER_CALL, MODEL_LINES, SOUL_LINES
 } from '../src/setup-cards.js'
 import { CANT_CHECK_LINE } from '../src/model-status.js'
@@ -175,11 +175,10 @@ test('every status in the job is reachable somewhere', () => {
   for (const s of ['works', 'fix', 'notset', 'unchecked', 'cant']) assert.ok(all.has(s), s)
 })
 
-test('titles: "for {bot}" only on per-bot cards and only with more than one bot', () => {
-  assert.equal(cardTitle('model', 'work', 1), 'A model is connected')
-  assert.equal(cardTitle('model', 'work', 2), 'A model is connected for work')
-  assert.equal(cardTitle('soul', 'work', 2), 'Personality file (SOUL.md) for work')
-  assert.equal(cardTitle('gateway', 'work', 2), 'Hermes is connected')
+test('titles never carry a bot name (the picker line names the bot once)', () => {
+  for (const id of Object.keys(CARD_TITLES)) assert.equal(cardTitle(id, 'work', 2), CARD_TITLES[id])
+  assert.equal(cardTitle('model'), 'A model is connected')
+  assert.equal(cardTitle('soul'), 'Personality file (SOUL.md)')
 })
 
 test('Passes when: one fixed rule per card (skills has none, it is a count)', () => {

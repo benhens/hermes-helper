@@ -264,7 +264,7 @@ function PasteBox({ text, label }) {
   })
 }
 
-export function renderYourSetup(s, { openStep }) {
+export function renderYourSetup(s, { openStep, cardColumns = 2 }) {
   const botCount = s.bots.length
   const actionButton = (action, id) => {
     if (!action) return null
@@ -284,11 +284,11 @@ export function renderYourSetup(s, { openStep }) {
         className: cx(K.card, wide && K.cardWide),
         'data-hh': `card-${id}`,
         'data-status': c.status,
-        'aria-label': cardTitle(id, s.bot, botCount),
+        'aria-label': cardTitle(id),
         children: [
           jsxs('div', {
             className: K.cardHead,
-            children: [jsx('h4', { className: K.cardTitle, children: cardTitle(id, s.bot, botCount) }), jsx(StatusLane, { status: c.status })]
+            children: [jsx('h4', { className: K.cardTitle, children: cardTitle(id) }), jsx(StatusLane, { status: c.status })]
           }),
           c.value ? jsx('div', { className: K.cardValue, children: c.value }) : null,
           ...c.lines.map((line, i) => jsx('p', { className: K.cardText, children: line }, `l${i}`)),
@@ -349,22 +349,16 @@ export function renderYourSetup(s, { openStep }) {
       : null
 
   return [
-    jsxs(
-      'header',
-      {
-        children: [
-          jsx('h3', { className: K.stepTitle, children: 'Your setup' }),
-          jsx('p', { className: K.caption, children: 'Read from your Hermes. Nothing is changed.' })
-        ]
-      },
-      'head'
-    ),
+    // No heading: the open tab already says "Your setup", as Capabilities' tabs name their page.
+    jsx('p', { className: K.caption, 'data-hh': 'yours-lead', children: 'Read from your Hermes. Nothing is changed.' }, 'head'),
     picker,
     jsx(
       'div',
       {
-        className: K.cardGrid,
+        // Two columns only when the column is wide enough (src/layout.js), else one.
+        className: cx(K.cardGrid, cardColumns === 2 && K.twoColumns),
         'data-hh': 'cards',
+        'data-columns': cardColumns,
         children: [
           card('gateway'),
           card('model'),
@@ -377,6 +371,6 @@ export function renderYourSetup(s, { openStep }) {
       },
       'cards'
     ),
-    jsx('div', { className: K.pageActions, children: jsx(Button, { size: 'sm', onClick: () => s.checkAgain(), children: 'Check again' }) }, 'again')
+    jsx('div', { className: K.pageActions, children: jsx(Button, { size: 'sm', variant: 'secondary', onClick: () => s.checkAgain(), children: 'Check again' }) }, 'again')
   ]
 }

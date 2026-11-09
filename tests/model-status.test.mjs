@@ -1,15 +1,15 @@
 // build-v1.md section 5 with hhtech's corrections (docs/answers/hhtech-default-model.md point 4):
 // "model connected?" is decided by setup.runtime_check alone; setup.status is read only after
-// ok false (card 2); the name is runtime_check.model, else the free tier's label, else none.
+// ok false (card 2); the name is the free tier's label on the free tier, else runtime_check.model as Hermes's button shows it, else none.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { checkModel, modelLabel, NO_MODEL_LINE, CANT_CHECK_LINE, STILL_CHECKING_WAIT_MS } from '../src/model-status.js'
 
 import { fakeRequest, rpcError } from './lib/fake-request.mjs'
 
-test('ok true: connected, name from runtime_check.model', async () => {
+test('ok true: connected, name from runtime_check.model as Hermes\'s model button shows it', async () => {
   const f = fakeRequest({ 'setup.runtime_check': { ok: true, provider: 'custom', model: 'mock-small' } })
-  assert.deepEqual(await checkModel(f.request), { state: 'ok', name: 'mock-small' })
+  assert.deepEqual(await checkModel(f.request), { state: 'ok', name: 'Mock Small' })
 })
 
 test('ok true on the free tier with no model name: name from free_tier.status label', async () => {
@@ -20,10 +20,17 @@ test('ok true on the free tier with no model name: name from free_tier.status la
   assert.deepEqual(await checkModel(f.request), { state: 'ok', name: 'Nous · free tier' })
 })
 
-test('runtime_check.model wins over the free tier label', async () => {
-  const f = fakeRequest({ 'setup.runtime_check': { ok: true, model: 'nous/welcome', free_tier_route: true } })
-  assert.deepEqual(await checkModel(f.request), { state: 'ok', name: 'nous/welcome' })
-  assert.deepEqual(f.calls.map(c => c.method), ['setup.runtime_check'])
+// hhtech-model-display-name.md section 4 rule 2 (replaces B2's "model wins"): on the free tier the
+// label wins, so "nous/welcome" never reads "Welcome".
+test('free tier with a model id: the free tier label wins, the id is not run through the name rules', async () => {
+  const f = fakeRequest({ 'setup.runtime_check': { ok: true, model: 'nous/welcome', free_tier_route: true }, 'free_tier.status': { label: 'Nous · free tier' } })
+  assert.deepEqual(await checkModel(f.request), { state: 'ok', name: 'Nous · free tier' })
+  assert.deepEqual(f.calls.map(c => c.method), ['setup.runtime_check', 'free_tier.status'])
+})
+
+test('free tier with a model id and the label read fails: "your model", never "Welcome"', async () => {
+  const f = fakeRequest({ 'setup.runtime_check': { ok: true, model: 'nous/welcome', free_tier_route: true }, 'free_tier.status': new Error('boom') })
+  assert.deepEqual(await checkModel(f.request), { state: 'ok', name: '' })
 })
 
 test('ok true, no name anywhere: still connected, name empty; the page then says "your model"', async () => {
@@ -80,7 +87,7 @@ test('5097 "still checking": asks again after 5 s, and gets the answer', async (
   const waits = []
   const f = fakeRequest({ 'setup.runtime_check': [rpcError(5097, 'readiness check still in progress; retrying next tick'), rpcError(5097, 'x'), { ok: true, model: 'm' }] })
   const r = await checkModel(f.request, { sleep: async ms => waits.push(ms) })
-  assert.deepEqual(r, { state: 'ok', name: 'm' })
+  assert.deepEqual(r, { state: 'ok', name: 'M' })
   assert.deepEqual(waits, [STILL_CHECKING_WAIT_MS, STILL_CHECKING_WAIT_MS])
   assert.equal(STILL_CHECKING_WAIT_MS, 5000)
 })

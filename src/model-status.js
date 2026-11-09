@@ -9,8 +9,10 @@
 //                                       (null = setup.status couldn't be read).
 //   { state: 'error' }                  the check itself failed, timed out or answered nonsense.
 //                                       Never shown as "no model".
-// The name: runtime_check.model, else the free tier's label when runtime_check.free_tier_route,
-// else ''. Never host.state.model (it can be one chat's own pick) or config.get.
+// The name: the free tier's label when runtime_check.free_tier_route, else runtime_check.model as
+// Hermes's model button shows it (src/model-name.js), else ''. Never host.state.model (it can be
+// one chat's own pick) or config.get.
+import { formatModelPillLabel } from './model-name.js'
 
 // content/v1-strings.md part 1 (hhcontent, final 9 Nov).
 export const NO_MODEL_LINE =
@@ -64,17 +66,26 @@ export async function checkModel(request, { params = {}, sleep = () => Promise.r
     return { state: 'none', configured }
   }
 
-  let name = textOrEmpty(rc.model)
-  // free_tier.status is a pure read scoped to the same bot (tui_gateway/methods_free_tier.py, profile_scoped).
-  if (!name && rc.free_tier_route === true) {
+  return { state: 'ok', name: await displayName(request, rc, params) }
+}
+
+// The name the page shows (docs/answers/hhtech-model-display-name.md section 4):
+//   1. free_tier_route true: free_tier.status's own label ("Nous · free tier"), never the id run
+//      through the button's rules ("nous/welcome" would read "Welcome");
+//   2. else runtime_check.model, shown the way Hermes's model button shows it ("Mock Small");
+//   3. else '' (the page then says "your model").
+async function displayName(request, rc, params) {
+  if (rc.free_tier_route === true) {
+    // free_tier.status is a pure read scoped to the same bot (tui_gateway/methods_free_tier.py, profile_scoped).
     try {
       const ft = await request('free_tier.status', { ...params }, CHECK_TIMEOUT_MS)
-      name = textOrEmpty(ft && ft.label)
+      return textOrEmpty(ft && ft.label)
     } catch {
-      name = ''
+      return ''
     }
   }
-  return { state: 'ok', name }
+  const id = textOrEmpty(rc.model)
+  return id ? formatModelPillLabel(id) : ''
 }
 
 function textOrEmpty(v) {
