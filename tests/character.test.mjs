@@ -101,11 +101,19 @@ test('animation: steps through the row\'s frames, 6 by default or the sheet\'s o
     return Character({ size: 52, sheet, pose })
   })
   const [fill, ink] = layers(view.tree)
-  ink.props.ref.current = { animate: (k, o) => (started.push(['ink', k, o]), { cancel() {} }) }
-  fill.props.ref.current = { animate: (k, o) => (started.push(['fill', k, o]), { cancel() {} }) }
+  let cancelled = 0
+  ink.props.ref.current = { animate: (k, o) => (started.push(['ink', k, o]), { cancel: () => cancelled++ }) }
+  fill.props.ref.current = { animate: (k, o) => (started.push(['fill', k, o]), { cancel: () => cancelled++ }) }
   setPose('waving')
   assert.deepEqual(started.map(s => s[0]).sort(), ['fill', 'ink'])
-  for (const [, keys, options] of started) {
+  assert.equal(cancelled, 0)
+  // a new pose stops the old row's animations first; leaving the page stops the rest
+  setPose('jumping')
+  assert.equal(cancelled, 2)
+  assert.equal(started.length, 4)
+  view.unmount()
+  assert.equal(cancelled, 4)
+  for (const [, keys, options] of started.slice(0, 2)) {
     assert.deepEqual(keys, spriteAnimation(sheet, 3, 0.25).keys)
     assert.equal(options.easing, 'steps(6, end)')
   }

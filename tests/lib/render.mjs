@@ -148,8 +148,8 @@ export function mount(Component) {
     useEffect(fn, deps) {
       const k = i++
       const prev = slots[k]
-      if (!prev || !deps || !same(prev.deps, deps)) pending.push(fn)
-      slots[k] = { deps }
+      if (!prev || !deps || !same(prev.deps, deps)) pending.push({ k, fn })
+      slots[k] = { deps, cleanup: prev ? prev.cleanup : undefined }
     },
     useId: () => ':r0:'
   }
@@ -183,11 +183,21 @@ export function mount(Component) {
       rendering = false
       const run = pending
       pending = []
-      for (const fn of run) fn()
+      // As React does: an effect whose inputs changed first runs the cleanup its last run returned.
+      for (const { k, fn } of run) {
+        const slot = slots[k]
+        if (typeof slot.cleanup === 'function') slot.cleanup()
+        const cleanup = fn()
+        slot.cleanup = typeof cleanup === 'function' ? cleanup : undefined
+      }
     } while (dirty)
   }
 
   render()
+  // Leaving the page: every effect's cleanup runs.
+  view.unmount = () => {
+    for (const slot of slots) if (slot && typeof slot.cleanup === 'function') slot.cleanup()
+  }
   return view
 }
 

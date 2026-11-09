@@ -209,11 +209,59 @@ test('build words: the hand-over text, filled by code, in a box with Copy', asyn
   const said = newest(view)
   assert.match(text(said), /I don't do that here\. I help you understand and decide; your own Hermes does the doing\./)
   assert.match(text(said), /When it's done, come back and check it under Your setup\./)
-  const paste = all(said, n => n.type === 'PasteBox' || (n.props && n.props.text && /setting up Hermes/.test(n.props.text)))
   const copy = all(said, n => n.type === 'sdk:CopyButton')[0]
   assert.ok(copy, 'a Copy button')
   assert.match(copy.props.text, /^I'm setting up Hermes\. My goal: do jobs on its own on a schedule\. I'd like you to: "please install a skill for writing emails"\./)
-  assert.ok(paste.length >= 1)
+  // the same text is on screen, in the paste box (its mono text line), not only inside the button
+  const shownText = all(said, n => n.type === 'span' && n.props.className === K.cardPasteText)
+  assert.equal(shownText.length, 1)
+  assert.equal(text(shownText[0]), copy.props.text)
+})
+
+test('the check failed, then the person acts: the newest thing said shows (a pasted key\'s warning is not hidden)', async () => {
+  const { view } = await open(fakeStorage({ step: 2 }), { runtime: new Error('timed out') })
+  assert.equal(newest(view).props['data-kind'], 'error')
+  type(view, 'my key is sk-' + 'Ab12'.repeat(8))
+  enter(view)
+  assert.equal(newest(view).props['data-kind'], 'key')
+  assert.ok(text(newest(view)).includes(KEY_LINE))
+  // in the log, the check's line sits where it appeared, before the key warning
+  all(helper(view), n => n.type === 'sdk:Switch')[0].props.onCheckedChange(true)
+  const kinds = all(byData(helper(view), 'chatlog'), n => n.type === 'li').map(i => i.props['data-kind'])
+  assert.deepEqual(kinds, ['greeting', 'error', 'key'])
+  assert.equal(byData(helper(view), 'chatlog').props['aria-live'], 'polite')
+})
+
+test('over 500 characters with Chat log off: the cut note and the reply both show', async () => {
+  const { view } = await open(fakeStorage({ step: 2 }))
+  type(view, 'why '.repeat(140))
+  enter(view)
+  const said = text(newest(view))
+  assert.match(said, /Your message was long, so I read only the first 500 characters\./)
+  assert.match(said, /I don't have a checked answer for that yet/)
+  assert.doesNotMatch(said, /why why/, 'the person\'s own words are not in the helper\'s view')
+})
+
+test('the done line comes once, even after other messages', async () => {
+  const { view } = await open(fakeStorage({ step: 4, chatlog: true }))
+  const next = () => all(detail(view), n => n.type === 'sdk:Button' && text(n).trim() === 'I understand, next step')[0]
+  click(next())
+  type(view, 'what is MCP')
+  enter(view)
+  click(next())
+  assert.equal(all(byData(helper(view), 'chatlog'), n => n.props['data-kind'] === 'done').length, 1)
+})
+
+test('links: the no-answer link and the intro sources open in the browser too; middle-click as well; nothing outside the docs opens', async () => {
+  const { view } = await open(fakeStorage({ step: 3 }))
+  type(view, 'What is a VPS?')
+  enter(view)
+  const link = all(newest(view), n => n.type === 'a')[0]
+  assert.equal(link.props.href, stepById('s3').handoff.docs_url)
+  link.props.onClick({ preventDefault() {} })
+  const intro = all(byData(detail(view), 'intro-sources'), n => n.type === 'a')[0]
+  intro.props.onAuxClick({ preventDefault() {} })
+  assert.deepEqual(opened, [stepById('s3').handoff.docs_url, 'https://hermes-agent.nousresearch.com/docs/user-guide/desktop'])
 })
 
 test('no model: the box is greyed and sends nothing; the fixed no-model line is the newest thing said', async () => {
@@ -242,4 +290,23 @@ test('poses: waving when the helper opens, then idle; jumping when a step is fin
   assert.equal(pose(failed.view), 'failed')
   assert.ok(text(newest(failed.view)).includes(CANT_CHECK_LINE))
   assert.equal(newest(failed.view).props['data-kind'], 'error')
+})
+
+test('the helper\'s words stay scrolled to the newest at the bottom (new words, Chat log switched on)', async () => {
+  const { view } = await open(fakeStorage({ step: 2 }))
+  const body = byData(helper(view), 'helper-body')
+  const el = { scrollTop: 0, scrollHeight: 900 }
+  body.props.ref.current = el
+  type(view, 'What is a provider?')
+  enter(view)
+  assert.equal(el.scrollTop, 900)
+  el.scrollTop = 0
+  el.scrollHeight = 1400
+  all(helper(view), n => n.type === 'sdk:Switch')[0].props.onCheckedChange(true)
+  assert.equal(el.scrollTop, 1400)
+})
+
+test('"On step N" names the step by its short title, as in the sketch ("On step 2: The brain")', async () => {
+  const { view } = await open(fakeStorage({ step: 2 }))
+  assert.match(text(all(helper(view), n => n.props.role === 'status')[0]), /^\s*On step 2: The brain\s*$/)
 })

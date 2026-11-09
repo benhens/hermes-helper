@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { STEPS_DATA } from '../src/steps-data.js'
-import { STEPS, LINES, stepByNumber, stepById, railLines, docsUrl, chipLabel, nextAfter, fitsGoal, isBuildRequest, handoffText, cleanAnswers, REQUEST_MAX_CHARS } from '../src/steps.js'
+import { STEPS, LINES, isDocsUrl, stepByNumber, stepById, railLines, docsUrl, chipLabel, nextAfter, fitsGoal, isBuildRequest, handoffText, cleanAnswers, REQUEST_MAX_CHARS } from '../src/steps.js'
 import { stepFindings, stepWords, words } from './lib/step-checks.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
@@ -122,6 +122,15 @@ test('build words: hhcontent\'s 16 sentences give hhcontent\'s answers', () => {
   for (const [id, words, want] of BUILD_CASES) assert.equal(isBuildRequest(stepById(id), words), want, `${id} "${words}"`)
 })
 
+test('build words: a question start skips the check, even with a build phrase inside ("what does install a plugin mean")', () => {
+  assert.equal(isBuildRequest(stepById('s4'), 'What does install a plugin mean?'), false)
+  assert.equal(isBuildRequest(stepById('s2'), 'Should I add my API key here?'), false)
+  assert.equal(isBuildRequest(stepById('s1'), 'why would I build a bot'), false)
+  // the same phrases without the question start are build requests
+  assert.equal(isBuildRequest(stepById('s4'), 'install a plugin please'), true)
+  assert.equal(isBuildRequest(stepById('s1'), 'I would like you to build a bot'), true)
+})
+
 test('build words: curly quotes, capitals and extra spaces don\'t hide a phrase; a word inside another word doesn\'t count', () => {
   assert.equal(isBuildRequest(stepById('s2'), 'Here’s   MY KEY'), true)
   assert.equal(isBuildRequest(stepById('s1'), 'Please  build it'), true)
@@ -151,6 +160,17 @@ test('the fixed lines are hhcontent\'s words (content/v1-strings.md part 4)', t 
   // hhcontent names one slot "{step docs_url}"; the code fills it as {docs_url}.
   const text = fs.readFileSync(strings, 'utf8').replace('{step docs_url}', '{docs_url}')
   for (const line of want) assert.ok(text.includes(line), line)
+})
+
+test('only the official docs open: every link in the data is one, and nothing else passes', () => {
+  const urls = [STEPS_DATA.live_base]
+  for (const s of STEPS) {
+    urls.push(s.handoff.docs_url, ...s.facts.map(f => f.url), ...(s.intro_sources || []).map(x => docsUrl(x.source)))
+    if (s.compare) urls.push(docsUrl(s.compare.left.source), docsUrl(s.compare.right.source))
+  }
+  for (const u of urls) assert.equal(isDocsUrl(u), true, u)
+  for (const u of ['javascript:alert(1)', 'file:///etc/passwd', 'https://evil.example/docs/', 'https://hermes-agent.nousresearch.com.evil.example/', 'http://hermes-agent.nousresearch.com/docs/', 'https://hermes-agent.nousresearch.com/docs/x" onclick="y', null])
+    assert.equal(isDocsUrl(u), false, String(u))
 })
 
 test('answers from storage: only real options of real steps', () => {

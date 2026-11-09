@@ -13,7 +13,7 @@ import { K, cx } from './look.js'
 import { Character, poseFor, FLASH_MS } from './character.js'
 import { readState, otherSide } from './state.js'
 import { checkModel, NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS, NO_MODEL_BOX, CANT_CHECK_LINE, RECHECK_AFTER_MS } from './model-status.js'
-import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
+import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
 import { greetingEntry, answerEntry, doneEntry, typedEntries } from './helper-chat.js'
 import { makeSetupCards, renderYourSetup, PasteBox } from './setup-tab.js'
 import { layoutFor, RAIL_PX, RAIL_NUMBERS_PX, HELPER_PX } from './layout.js'
@@ -74,10 +74,16 @@ export function makePage(ctx) {
   // nothing is written to disk). Each entry gets an id for React's list keys.
   let chatMemory = null
   let nextEntryId = 1
-  const withIds = entries => entries.filter(Boolean).map(e => ({ ...e, id: nextEntryId++ }))
+  let nextTurn = 1
+  // Entries added by one action share a turn (an answer and its note, a question and its reply).
+  const withIds = entries => {
+    const turn = nextTurn++
+    return entries.filter(Boolean).map(e => ({ ...e, id: nextEntryId++, turn }))
+  }
   const LOG_MAX = 200
   // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
   const openDocs = url => {
+    if (!isDocsUrl(url)) return
     try {
       const done = ctx.os && typeof ctx.os.openExternal === 'function' ? ctx.os.openExternal(url) : null
       if (done && typeof done.catch === 'function') done.catch(() => {})
@@ -128,7 +134,9 @@ export function makePage(ctx) {
     const [log, setLog] = useState(() => chatMemory || (chatMemory = withIds([greetingEntry()])))
     // A one-off pose of the character (waving, jumping), played for FLASH_MS.
     const [flash, setFlash] = useState(null)
-    const flashStop = useRef(null)
+    const cancelFlash = useRef(null)
+    // When the model-check line (no model / can't check) appeared: the last log entry then.
+    const statusSeen = useRef({ kind: null, after: 0 })
     const [draft, setDraft] = useState('')
     const [focusAsk, setFocusAsk] = useState(false)
     const [focusStrip, setFocusStrip] = useState(false)
@@ -139,6 +147,8 @@ export function makePage(ctx) {
     const [modelStatus, recheck] = useModelStatus()
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
+    // The helper's scrolling area: kept at the bottom, where the newest words are.
+    const helperScroll = useRef(null)
     const stripButton = useRef(null)
     // One ref function per tab, made once (like useOwnWidth's), kept with the tab buttons.
     const tabRefs = useRef(null)
@@ -191,16 +201,16 @@ export function makePage(ctx) {
     }
 
     function playFlash(pose) {
-      if (flashStop.current) flashStop.current()
+      if (cancelFlash.current) cancelFlash.current()
       setFlash(pose)
-      flashStop.current = ctx.setTimeout(() => {
-        flashStop.current = null
+      cancelFlash.current = ctx.setTimeout(() => {
+        cancelFlash.current = null
         setFlash(null)
       }, FLASH_MS)
     }
     useEffect(
       () => () => {
-        if (flashStop.current) flashStop.current()
+        if (cancelFlash.current) cancelFlash.current()
       },
       []
     )
@@ -212,6 +222,13 @@ export function makePage(ctx) {
       if (helperShown && !wasShown.current) playFlash('waving')
       wasShown.current = helperShown
     }, [helperShown])
+
+    // Something new was said, the log was switched on, or the helper came back: show the newest
+    // words, at the bottom of the helper's scrolling area.
+    useEffect(() => {
+      const el = helperScroll.current
+      if (el) el.scrollTop = el.scrollHeight
+    }, [log.length, chatlog, helperShown, modelStatus.state])
 
     // B3 never asks the model, so nothing sets answering yet; B4's call will (review pose).
     const pose = poseFor({ model: modelStatus.state, answering: false, flash })
@@ -231,8 +248,7 @@ export function makePage(ctx) {
       playFlash('jumping')
       const to = nextAfter(currentStep, answers[currentStep.id])
       if (to !== 'done') return saveStep(to)
-      const last = log[log.length - 1]
-      if (!last || last.kind !== 'done') addToLog([doneEntry()])
+      if (!(chatMemory || log).some(e => e.kind === 'done')) addToLog([doneEntry()])
     }
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code checks the words in
@@ -444,6 +460,10 @@ export function makePage(ctx) {
             e.preventDefault()
             openDocs(url)
           },
+          onAuxClick: e => {
+            e.preventDefault()
+            openDocs(url)
+          },
           children: label
         },
         key
@@ -452,11 +472,11 @@ export function makePage(ctx) {
 
     // The open step is wide enough for two columns (the comparison, and the answer cards).
     const wideStep = fit.columns === 2
-    const s = currentStep
-    const picked = answers[s.id]
-    const fits = fitsGoal(answers, s.id)
+    const here = currentStep
+    const picked = answers[here.id]
+    const fits = fitsGoal(answers, here.id)
     const introSources = []
-    for (const src of s.intro_sources || []) {
+    for (const src of here.intro_sources || []) {
       const key = `${src.source}#${src.section}`
       if (!introSources.some(x => x.key === key)) introSources.push({ key, url: docsUrl(src.source), label: chipLabel(src.section) })
     }
@@ -466,9 +486,9 @@ export function makePage(ctx) {
         'header',
         {
           children: [
-            jsx('div', { className: K.sectionLabel, children: `Step ${s.number} of ${STEPS.length}` }),
-            jsx('h3', { className: K.stepTitle, children: s.title }),
-            jsx('p', { className: K.prose, 'data-hh': 'intro', children: s.intro })
+            jsx('div', { className: K.sectionLabel, children: `Step ${here.number} of ${STEPS.length}` }),
+            jsx('h3', { className: K.stepTitle, children: here.title }),
+            jsx('p', { className: K.prose, 'data-hh': 'intro', children: here.intro })
           ]
         },
         'head'
@@ -484,7 +504,7 @@ export function makePage(ctx) {
             'intro-sources'
           )
         : null,
-      s.compare
+      here.compare
         ? jsx(
             'dl',
             {
@@ -492,7 +512,7 @@ export function makePage(ctx) {
               'data-hh': 'compare',
               'data-columns': fit.columns,
               children: ['left', 'right'].map(side => {
-                const c = s.compare[side]
+                const c = here.compare[side]
                 return jsxs(
                   'div',
                   {
@@ -511,7 +531,7 @@ export function makePage(ctx) {
         {
           className: K.factList,
           'data-hh': 'facts',
-          children: s.facts.map(f =>
+          children: here.facts.map(f =>
             jsxs('li', { className: K.fact, 'data-fact': f.id, children: [jsx('p', { className: K.factText, children: f.text }), factSource(f)] }, f.id)
           )
         },
@@ -533,14 +553,14 @@ export function makePage(ctx) {
         'section',
         {
           children: [
-            jsx('div', { className: K.question, children: s.question }),
+            jsx('div', { className: K.question, children: here.question }),
             jsx('div', {
               className: cx(K.choices, wideStep && K.twoColumns),
               role: 'group',
-              'aria-label': s.question,
+              'aria-label': here.question,
               'data-hh': 'choices',
               'data-columns': fit.columns,
-              children: s.options.map(o =>
+              children: here.options.map(o =>
                 jsxs(
                   'button',
                   {
@@ -595,16 +615,20 @@ export function makePage(ctx) {
     const checkAgain = () =>
       jsx(Button, { variant: 'secondary', size: 'sm', disabled: modelStatus.state === 'checking', onClick: () => recheck(), children: 'Check again' }, 'again')
 
-    // What the page itself has to say about the model check, shown after everything else: no
-    // model (content/v1-strings.md part 1) or the check failed (its "Can't check right now").
+    // What the page itself has to say about the model check: no model (content/v1-strings.md part 1)
+    // or the check failed (its "Can't check right now"). It counts as said when it appeared, so
+    // anything the person does afterwards (an answer, a pasted key) still shows as the newest.
     const statusEntry = noModel
       ? { id: 'status', who: 'helper', kind: 'no-model', lines: [NO_MODEL_LINE], small: NO_MODEL_SMALL, action: 'recheck' }
       : modelStatus.state === 'error'
         ? { id: 'status', who: 'helper', kind: 'error', lines: [CANT_CHECK_LINE], action: 'recheck' }
         : null
+    const statusKind = statusEntry ? statusEntry.kind : null
+    if (statusSeen.current.kind !== statusKind) statusSeen.current = { kind: statusKind, after: log.length ? log[log.length - 1].id : 0 }
+    const statusAfter = statusSeen.current.after
 
     // One thing the helper (or the person) said, as plain text: no bubble, no card.
-    const saying = e => {
+    const entryParts = e => {
       const you = e.who === 'you'
       const parts = e.lines.map((line, i) => jsx('p', { className: you ? K.logYou : K.say, children: line }, 'l' + i))
       if (e.small) parts.push(jsx('p', { className: K.caption, children: e.small }, 'small'))
@@ -629,7 +653,9 @@ export function makePage(ctx) {
         'where'
       )
 
-    const where = tab === 'setup' ? `On step ${currentStep.number}: ${currentStep.title}` : setup.bots.length > 1 ? `On Your setup, bot ${setup.bot}` : 'On Your setup'
+    // The step list's short title, as in the sketch ("On step 2: The brain"); the full title is the
+    // open step's heading.
+    const where = tab === 'setup' ? `On step ${currentStep.number}: ${railLines(currentStep).title}` : setup.bots.length > 1 ? `On Your setup, bot ${setup.bot}` : 'On Your setup'
     const topLine = noModel
       ? contextLine('info', NO_MODEL_PROGRESS, false)
       : modelStatus.state === 'checking'
@@ -640,15 +666,16 @@ export function makePage(ctx) {
 
     // Chat log off: only the newest thing the helper said. On: the whole back-and-forth, newest at
     // the bottom. Either way it sits low in the panel with empty space above it.
-    let words
+    let wordsView
     if (chatlog) {
-      const entries = statusEntry ? [...log, statusEntry] : log
-      words = jsx(
+      const entries = statusEntry ? [...log.filter(e => e.id <= statusAfter), statusEntry, ...log.filter(e => e.id > statusAfter)] : log
+      wordsView = jsx(
         'ol',
         {
           className: K.log,
           'data-hh': 'chatlog',
           'aria-label': 'Chat log',
+          'aria-live': 'polite',
           children: entries.map(e =>
             jsxs(
               'li',
@@ -656,7 +683,7 @@ export function makePage(ctx) {
                 className: K.logEntry,
                 'data-who': e.who,
                 'data-kind': e.kind,
-                children: [jsx('span', { className: K.logWho, children: e.who === 'you' ? 'You' : 'Helper' }, 'who'), jsx('div', { className: K.sayStack, children: saying(e) }, 'what')]
+                children: [jsx('span', { className: K.logWho, children: e.who === 'you' ? 'You' : 'Helper' }, 'who'), jsx('div', { className: K.sayStack, children: entryParts(e) }, 'what')]
               },
               e.id
             )
@@ -665,10 +692,24 @@ export function makePage(ctx) {
         'log'
       )
     } else {
-      const newest = statusEntry || [...log].reverse().find(e => e.who === 'helper') || log[log.length - 1]
-      words = jsx('div', { className: K.sayStack, 'data-hh': 'say', 'data-kind': newest.kind, 'aria-live': 'polite', children: saying(newest) }, 'say')
+      // The newest turn's helper lines (an answer with its note, a reply after a long message); the
+      // model-check line when nothing was said since it appeared.
+      const lastTurn = log.length ? log[log.length - 1].turn : null
+      const fromHelper = log.filter(e => e.turn === lastTurn && e.who === 'helper')
+      const shown = statusEntry && !log.some(e => e.id > statusAfter) ? [statusEntry] : fromHelper.length ? fromHelper : [log[log.length - 1]]
+      wordsView = jsx(
+        'div',
+        {
+          className: K.sayStack,
+          'data-hh': 'say',
+          'data-kind': shown[shown.length - 1].kind,
+          'aria-live': 'polite',
+          children: shown.map(e => jsx('div', { className: K.sayStack, children: entryParts(e) }, e.id))
+        },
+        'say'
+      )
     }
-    const helperBody = [topLine, jsx('div', { className: K.helperNewest, 'data-hh': 'helper-newest', children: words }, 'newest')]
+    const helperBody = [topLine, jsx('div', { className: K.helperNewest, 'data-hh': 'helper-newest', children: wordsView }, 'newest')]
 
     // The character stands small at the bottom right, just above the message box, with three
     // thought dots trailing from it toward the words.
@@ -788,7 +829,7 @@ export function makePage(ctx) {
                 })
               ]
             }),
-            jsx('div', { className: K.helperBody, children: helperBody }),
+            jsx('div', { className: K.helperBody, ref: helperScroll, 'data-hh': 'helper-body', children: helperBody }),
             characterRow,
             composer
           ]

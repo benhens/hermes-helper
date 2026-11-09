@@ -57,6 +57,9 @@ export function docsUrl(source) {
 // The label on a source chip (v1-strings part 5: "Hermes docs › {section}").
 export const chipLabel = section => `Hermes docs › ${section}`
 
+// Only the official Hermes docs open from the page (a content slip can't open anything else).
+export const isDocsUrl = url => typeof url === 'string' && url.startsWith(STEPS_DATA.live_base) && !/[\s"'<>]/.test(url)
+
 // The step after this one, by the step's next_rule (code, not the model). No answer picked yet:
 // the next step in order (every rule in v1 leads there too). Returns a step number, or 'done'.
 export function nextAfter(step, optionId) {

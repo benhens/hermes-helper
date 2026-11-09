@@ -188,7 +188,7 @@ export const K = {
   cardStack: 'flex min-w-0 flex-col gap-1',
   // Text to paste: the source-tag chip's surface (app/master-detail.tsx ToolChip), as a block
   cardPaste: 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5',
-  cardPasteText: 'min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
+  cardPasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
   cardList: 'list-decimal space-y-1 pl-4 text-[0.72rem] leading-snug text-(--ui-text-secondary)',
   pageActions: 'flex flex-wrap items-center gap-2 pt-1'
 }
