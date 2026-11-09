@@ -1,0 +1,5 @@
+name: helping-hand
+version: "0.1.0"
+description: "Helps a person understand Hermes and set it up their way, one step at a time, with checks decided by fixed rules."
+author: "Pēteris Benhens"
+requires_hermes: ">=0.23.0"

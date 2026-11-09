@@ -1,0 +1,12 @@
+{
+  "name": "helping-hand",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Hermes Desktop plugin: helps a person understand Hermes and set it up their way.",
+  "license": "MIT",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs --check && node --check desktop/plugin.js && node --test tests/"
+  }
+}

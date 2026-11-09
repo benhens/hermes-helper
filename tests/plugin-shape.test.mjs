@@ -1,0 +1,170 @@
+// The built desktop/plugin.js: what Hermes and the catalog require (build-v1.md sections 3, 4, 9).
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
+import { execFileSync } from 'node:child_process'
+import { buildSource } from '../scripts/build.mjs'
+import { K, ICONS } from '../src/look.js'
+import { STEP_COUNT } from '../src/state.js'
+import { PLACEHOLDER_STEPS } from '../src/placeholder-steps.js'
+import { selectorFor, missingClasses } from '../scripts/check-hermes-classes.mjs'
+
+const ROOT = path.resolve(import.meta.dirname, '..')
+const plugin = fs.readFileSync(path.join(ROOT, 'desktop/plugin.js'), 'utf8')
+// Code without comments, so a rule can't pass or fail because of a comment.
+const code = plugin.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"\w])\/\/[^\n]*/g, '$1')
+
+test('desktop/plugin.js is the current build of src/ (nobody edited it by hand or forgot to build)', () => {
+  assert.equal(plugin, buildSource())
+})
+
+test('node --check passes', () => {
+  execFileSync(process.execPath, ['--check', path.join(ROOT, 'desktop/plugin.js')])
+})
+
+test('imports only @hermes/plugin-sdk, react and react/jsx-runtime', () => {
+  const specs = [...code.matchAll(/^\s*import\s[^'"]*['"]([^'"]+)['"]/gm)].map(m => m[1])
+  assert.ok(specs.length >= 3)
+  for (const s of specs) assert.ok(['@hermes/plugin-sdk', 'react', 'react/jsx-runtime'].includes(s), s)
+  assert.doesNotMatch(code, /\bimport\s*\(/)
+  assert.doesNotMatch(code, /\brequire\s*\(/)
+})
+
+test('every SDK name used is imported (a missing one is a ReferenceError at render)', () => {
+  const imported = new Set(
+    [...code.matchAll(/^import\s*\{([^}]*)\}\s*from/gm)].flatMap(m => m[1].split(',').map(s => s.trim().split(/\s+as\s+/).pop()))
+  )
+  for (const name of ['ROUTES_AREA', 'SIDEBAR_NAV_AREA', 'host', 'useValue', 'Codicon', 'Switch', 'Button', 'SegmentedControl',
+    'Textarea', 'Tip', 'EmptyState', 'GlyphSpinner', 'RowButton', 'PRIMARY_ICON_BTN', 'composerInputBacking',
+    'composerSurfaceRing', 'jsx', 'jsxs', 'useState', 'useEffect', 'useRef', 'useId']) {
+    if (new RegExp(`\\b${name}\\b`).test(code.replace(/^import.*$/gm, ''))) assert.ok(imported.has(name), `${name} used but not imported`)
+  }
+})
+
+test('sidebar row: "Helping Hand", compass icon, no tier; page at the same path', () => {
+  assert.match(code, /area:\s*SIDEBAR_NAV_AREA,\s*data:\s*\{\s*path:\s*PATH,\s*label:\s*'Helping Hand',\s*codicon:\s*'compass'\s*\}/)
+  assert.match(code, /area:\s*ROUTES_AREA,\s*data:\s*\{\s*path:\s*PATH\s*\}/)
+  assert.match(code, /const PATH = '\/helping-hand'/)
+  assert.doesNotMatch(code, /\btier\s*:/)
+})
+
+test('helper panel is a div with role complementary, never an <aside>', () => {
+  assert.doesNotMatch(code, /['"]aside['"]/)
+  assert.doesNotMatch(code, /<aside/)
+  assert.match(code, /role:\s*'complementary'/)
+})
+
+test('"no model" comes from setup.runtime_check, never setup.status', () => {
+  assert.match(code, /'setup\.runtime_check'/)
+  assert.doesNotMatch(code, /setup\.status/)
+})
+
+test('no raw globals the host cannot clean up, no reach into Hermes markup, no network', () => {
+  assert.doesNotMatch(code, /\bwindow\.(setTimeout|setInterval|addEventListener)\b/)
+  assert.doesNotMatch(code, /(?<![\w.])(setInterval|setTimeout)\(/)
+  assert.doesNotMatch(code, /\bdocument\.(querySelector|getElementBy|getElementsBy|head|body)/)
+  assert.doesNotMatch(code, /hermesDesktop/)
+  assert.doesNotMatch(code, /\b(fetch|XMLHttpRequest|WebSocket|eval)\s*\(/)
+  assert.doesNotMatch(code, /createElement\(\s*['"]script/)
+})
+
+test('no keys or credentials, never reads the full config', () => {
+  assert.doesNotMatch(code, /(api[_-]?key|secret|password|bearer)\s*[:=]/i)
+  assert.doesNotMatch(code, /config\.get/)
+})
+
+test('helper states: Move, Hide, Close and Show helper all exist', () => {
+  for (const label of ['Move to the left', 'Move to the right', 'Hide the helper', 'Close the helper', 'Show helper']) {
+    assert.ok(code.includes(label), label)
+  }
+})
+
+test('header clears Hermes\'s title-bar band, where its window buttons float (top-right corner stays empty)', () => {
+  // Same top padding as Hermes's own Capabilities page header (app/page-search-shell.tsx).
+  assert.match(K.head, /(^|\s)pt-\[calc\(var\(--titlebar-height\)\+1\.5rem\)\](\s|$)/)
+})
+
+const src = f => fs.readFileSync(path.join(ROOT, 'src', f), 'utf8')
+
+// The props object of every jsx(<name>, {...}) call in a source file (balanced braces).
+function propsOf(text, name) {
+  const out = []
+  const start = `jsx(${name}, {`
+  for (let i = text.indexOf(start); i !== -1; i = text.indexOf(start, i + 1)) {
+    let depth = 0
+    let j = i + start.length - 1
+    for (; j < text.length; j++) {
+      if (text[j] === '{') depth++
+      else if (text[j] === '}' && --depth === 0) break
+    }
+    out.push(text.slice(i + start.length, j))
+  }
+  return out
+}
+
+test('every class comes from the Hermes class table: page code writes no class string of its own', () => {
+  for (const f of ['page.js', 'character.js', 'main.js']) {
+    assert.doesNotMatch(src(f), /className:\s*['"`]/, `${f} has a literal className`)
+    // cx(...) may hold K values and conditions (side === 'right'), never a class string.
+    for (const m of src(f).matchAll(/cx\(([^)]*)\)/g)) {
+      const args = m[1].replace(/[!=]==\s*'[^']*'/g, '')
+      assert.doesNotMatch(args, /['"`]/, `${f}: cx(${m[1]})`)
+    }
+  }
+})
+
+test('two tabs use the SDK SegmentedControl, labelled Setup and Your setup', () => {
+  assert.match(src('page.js'), /jsx\(SegmentedControl,/)
+  assert.match(src('page.js'), /\{ id: 'setup', label: 'Setup' \}/)
+  assert.match(src('page.js'), /\{ id: 'yours', label: 'Your setup' \}/)
+})
+
+test('buttons are Hermes Button components; no bare <button> except the choice cards (Hermes Chip markup)', () => {
+  const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button'/g)]
+  assert.equal(bare.length, 1)
+  assert.match(src('page.js'), /'button',\s*\{\s*type: 'button',\s*'aria-pressed'/)
+})
+
+test('every codicon named in the code is in the ICONS list (which hermes-checks.sh checks against Hermes)', () => {
+  const named = ['page.js', 'main.js'].flatMap(f => [...src(f).matchAll(/(?:name|icon|codicon):\s*'([a-z-]+)'/g)].map(m => m[1]))
+  assert.ok(named.length >= 5, named.join(' '))
+  for (const n of named) assert.ok(ICONS.includes(n), `${n} not in ICONS`)
+})
+
+test('the step count matches the step list (a mismatch would crash the open step)', () => {
+  assert.equal(PLACEHOLDER_STEPS.length, STEP_COUNT)
+  PLACEHOLDER_STEPS.forEach((s, i) => assert.equal(s.number, i + 1))
+})
+
+test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s own patterns', () => {
+  // Allowed: tone on a ghost icon button (RoomHeader), the composer's own send class, the round
+  // floating disc (fan-menu.tsx). Anything else would restyle Hermes's button.
+  const allowed = new Set([K.iconTone, K.peekButton])
+  const buttons = propsOf(src('page.js'), 'Button')
+  assert.ok(buttons.length >= 6, `found ${buttons.length} Button calls`)
+  for (const props of buttons) {
+    const cls = props.match(/className:\s*(cx\([^)]*\)|[^,\n]+)/)
+    if (!cls) continue
+    const expr = cls[1].trim()
+    if (expr === 'cx(PRIMARY_ICON_BTN, K.composerSend)') continue
+    const key = expr.match(/^K\.(\w+)$/)
+    assert.ok(key && allowed.has(K[key[1]]), `Button className ${expr}`)
+  }
+  for (const key of ['iconTone', 'peekButton']) assert.doesNotMatch(K[key], /(^|\s)(h|w|size|p[xytrbl]?|text-\[)/, key)
+})
+
+test('the character is one swappable component, used only through <Character>', () => {
+  assert.match(src('character.js'), /export function Character\(/)
+  assert.equal((src('page.js').match(/jsx\(Character,/g) || []).length >= 1, true)
+  assert.doesNotMatch(src('page.js'), /<svg|'svg'/)
+  assert.match(src('character.js'), /var\(--ui-accent\)/)
+})
+
+test('Hermes-class checker: escapes like Tailwind and finds a missing class (it bites)', () => {
+  assert.equal(selectorFor('pt-[calc(var(--titlebar-height)+1.5rem)]'), '.pt-\\[calc\\(var\\(--titlebar-height\\)\\+1\\.5rem\\)\\]')
+  assert.equal(selectorFor('hover:bg-accent/60'), '.hover\\:bg-accent\\/60')
+  const css = '.flex{display:flex}.hover\\:bg-accent\\/60:hover{x:y}.px-6{x:y}'
+  assert.deepEqual(missingClasses(css, { a: 'flex hover:bg-accent/60 px-6' }).missing, [])
+  assert.deepEqual(missingClasses(css, { a: 'flex px-60 made-up' }).missing, ['made-up', 'px-60'])
+})
