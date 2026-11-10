@@ -14,7 +14,7 @@
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
 import { Codicon } from '@hermes/plugin-sdk'
 import { jsx, jsxs } from 'react/jsx-runtime'
-import { T, cx } from './look.js'
+import { K, T, cx } from './look.js'
 import { Said } from './reveal.js'
 import { BubbleLink } from './bubble-link.js'
 import { PasteBox } from './setup-tab.js'
@@ -33,6 +33,7 @@ function OldLine({ entry, onNext }) {
     'data-hh': 'old',
     'data-line': entry.line,
     children: [
+      jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
       entry.text,
       next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: next.text }, 'where') : null,
       next && next.kind !== 'where'
@@ -54,7 +55,9 @@ function OldLine({ entry, onNext }) {
   })
 }
 
-// The conversation so far: everything said before Helper's newest sentence. It scrolls when full.
+// The conversation so far: everything said before Helper's newest sentence. It scrolls when it is
+// full and stays at its newest when its room changes (the style sheet does that: the outer box
+// stacks from its bottom). A screen reader hears who said each line; the eye sees it by the side.
 export function Conversation({ entries, onNext, scrollRef }) {
   return jsx('div', {
     className: T.conv,
@@ -62,9 +65,15 @@ export function Conversation({ entries, onNext, scrollRef }) {
     role: 'group',
     'aria-label': 'Conversation so far',
     'data-hh': 'conversation',
-    children: entries.map(e =>
-      e.who === 'you' ? jsx('div', { className: T.me, 'data-hh': 'me', children: e.text }, e.id) : jsx(OldLine, { entry: e, onNext }, e.id)
-    )
+    children: jsx('div', {
+      className: T.convIn,
+      'data-hh': 'conversation-lines',
+      children: entries.map(e =>
+        e.who === 'you'
+          ? jsxs('div', { className: T.me, 'data-hh': 'me', children: [jsx('span', { className: K.srOnly, children: 'You said: ' }, 'who'), e.text] }, e.id)
+          : jsx(OldLine, { entry: e, onNext }, e.id)
+      )
+    })
   })
 }
 
@@ -156,8 +165,9 @@ export function Under({ character, answers, said, onPick }) {
 }
 
 // The edge to drag, on the window's left side. The page keeps the drag itself (where it began)
-// and hands the four handlers in; the keyboard moves it with the arrow keys.
-export function Grip({ width, min, max, onDown, onMove, onUp, onKey }) {
+// and hands the handlers in; the keyboard moves it with the arrow keys. A drag the system cancels,
+// or whose pointer is lost, ends without a new width.
+export function Grip({ width, min, max, onDown, onMove, onUp, onCancel, onKey }) {
   return jsx('div', {
     className: T.grip,
     role: 'separator',
@@ -171,7 +181,8 @@ export function Grip({ width, min, max, onDown, onMove, onUp, onKey }) {
     onPointerDown: onDown,
     onPointerMove: onMove,
     onPointerUp: onUp,
-    onPointerCancel: onUp,
+    onPointerCancel: onCancel,
+    onLostPointerCapture: onCancel,
     onKeyDown: onKey,
     children: jsx('span', { className: T.gripPill })
   })

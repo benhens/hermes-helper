@@ -178,6 +178,7 @@ export const T = {
   winOver: 'hh-over',
   // the conversation so far: Helper's older lines as small bubbles, the person's messages
   conv: 'hh-conv',
+  convIn: 'hh-conv-in',
   old: 'hh-old',
   oldLink: 'hh-old-link',
   me: 'hh-me',

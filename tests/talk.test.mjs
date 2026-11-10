@@ -389,3 +389,11 @@ test('asking whether a message needs the model changes nothing in the visit', ()
   turnNeedsModel('Peter', st)
   assert.equal(JSON.stringify(st), before)
 })
+
+test('the reference scripts the test files were made from are still the team\'s (when the team\'s folder is there): a changed route2.py or check.py needs a recopy and a new dump', t => {
+  const team = path.resolve(ROOT, '..', 'dev', 'checks', 'hhcontent-talk-v2')
+  if (!fs.existsSync(path.join(team, 'route2.py'))) return t.skip('no team folder beside the plugin')
+  assert.equal(OFF.route2_sha256, sha(path.join(team, 'route2.py')), 'route2.py changed since the copy: bash dev/checks/talk-v1/recopy.sh')
+  const lines = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/check-py-lines.json'), 'utf8'))
+  assert.equal(lines.check_py_sha256, sha(path.join(team, 'check.py')), 'check.py changed since the copy')
+})

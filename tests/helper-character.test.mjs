@@ -224,12 +224,13 @@ test('the person\'s own words appear at once; Helper\'s reply appears word by wo
   const { view, timers } = await open()
   for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
   send(view, 'Peter')
-  const conv = byData(helper(view), 'conversation').props.children
+  const conv = byData(helper(view), 'conversation-lines').props.children
   assert.deepEqual(conv.map(c => c.props['data-hh']), ['old', 'me'])
   // the older line and the person's message: plain text, whole, not word by word
   assert.equal(all(conv, n => n.props['data-hh'] === 'said').length, 0)
-  assert.equal(text(conv[0]).trim(), OPENING)
-  assert.equal(text(conv[1]).trim(), 'Peter')
+  // (each starts with the words only a screen reader hears: who said it)
+  assert.equal(text(conv[0]).replace(/^Helper said: /, '').trim(), OPENING)
+  assert.equal(text(conv[1]).replace(/^You said: /, '').trim(), 'Peter')
   // Helper's reply: one word at once (nothing to wait for), the rest to come
   const reply = 'Nice to meet you, Peter. What do you do?'
   assert.equal(spoken(bubble(view)).trim(), reply)

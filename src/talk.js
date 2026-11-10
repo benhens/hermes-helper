@@ -37,7 +37,7 @@ const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const wordRes = new Map()
 // A key word matches with no letter a to z and no digit directly before or after it.
 function wordRe(p, flags = '') {
-  const key = flags + p
+  const key = flags + '\u0000' + p
   if (!wordRes.has(key)) wordRes.set(key, new RegExp('(^|[^a-z0-9])' + escapeRe(p) + '($|[^a-z0-9])', flags))
   return wordRes.get(key)
 }

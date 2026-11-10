@@ -82,7 +82,7 @@ export function makePage(ctx) {
   // The conversation, kept while the plugin is loaded (leaving the page and coming back keeps
   // it). Nothing of it is written anywhere: it is gone when Hermes restarts. visit = what Helper
   // knows in this visit (src/talk.js); log = what was said, each entry with an id; typed = the
-  // message that led to "Which one do you mean?".
+  // message that led to "Which one do you mean?", kept only while that line is the newest.
   let memory = null
   const remembered = () => {
     if (!memory) {
@@ -231,8 +231,9 @@ export function makePage(ctx) {
     const currentStep = stepByNumber(step) || STEPS[0]
     const helperShown = fit.helper !== 'strip'
 
-    // The one place that puts Helper away or brings it back. Today only the strip calls it, in a
-    // window too narrow for both sides (src/layout.js).
+    // Puts Helper away or brings it back, with the keyboard following (to the strip, or to the
+    // message box). The strip, Escape and "Ask about this step" all go through it; only the
+    // unfolding by a wider window (the effect above) sets the state itself, and moves no focus.
     function foldHelper(away) {
       setFolded(away)
       if (away) setFocusStrip(true)
@@ -275,10 +276,13 @@ export function makePage(ctx) {
     const busyNow = calls > 0
 
     // Something new was said, or Helper came back: show the newest of the conversation so far.
+    // (By the newest entry's id, not the count: the count stops changing once the log is full.
+    // The style sheet keeps it at its newest when the window or the message box changes size.)
+    const newestId = log.length ? log[log.length - 1].id : 0
     useEffect(() => {
       const el = helperScroll.current
       if (el) el.scrollTop = el.scrollHeight
-    }, [log.length, helperShown])
+    }, [newestId, helperShown])
 
     /* ---------- the conversation: what the person does, what Helper says back ---------- */
     const visit = remembered().visit
@@ -299,7 +303,9 @@ export function makePage(ctx) {
       if (!typed.trim()) return
       setDraft('')
       const result = turn(typed, visit)
-      memory.typed = typed
+      // Kept only while "Which one do you mean?" is open, for the pick that answers it. A message
+      // with a key in it never gets that line, so a key is never kept here.
+      memory.typed = result.kind === 'W1' ? typed : ''
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       answer(result, result.kind === 'K1' ? null : shown, typed)
@@ -349,34 +355,52 @@ export function makePage(ctx) {
 
     // "Ask about this step": the keyboard goes to the message box; a folded Helper opens first.
     function askAboutStep() {
-      if (folded) setFolded(false)
-      setFocusAsk(true)
+      foldHelper(false)
     }
 
     /* ---------- Helper's edge to drag: between 360 and 600 px, remembered ---------- */
+    // The drag starts from the width on screen (in a squeezed window that is less than the
+    // remembered one). Only a drag that moved the edge is saved; a press without a move, a drag
+    // the system cancelled and a lost pointer leave the remembered width as it was.
     function gripDown(e) {
       if (e.button !== undefined && e.button !== 0) return
       e.preventDefault()
-      drag.current = { x: e.clientX, width: fit.helperPx }
+      drag.current = { x: e.clientX, width: fit.helperPx, before: helperWidth, moved: false }
       if (e.currentTarget && e.currentTarget.setPointerCapture && e.pointerId !== undefined) e.currentTarget.setPointerCapture(e.pointerId)
     }
+    const dragged = e => clampHelperWidth(drag.current.width + (drag.current.x - e.clientX))
     function gripMove(e) {
-      if (!drag.current) return
+      if (!drag.current || typeof e.clientX !== 'number') return
       // The edge is on the left: moving it left makes Helper wider.
-      setHelperWidth(clampHelperWidth(drag.current.width + (drag.current.x - e.clientX)))
+      if (e.clientX !== drag.current.x) drag.current.moved = true
+      if (drag.current.moved) setHelperWidth(dragged(e))
     }
     function gripUp(e) {
       if (!drag.current) return
-      const final = clampHelperWidth(drag.current.width + (drag.current.x - e.clientX))
+      const d = drag.current
       drag.current = null
+      if (typeof e.clientX !== 'number' || (!d.moved && e.clientX === d.x)) return setHelperWidth(d.before)
+      const final = clampHelperWidth(d.width + (d.x - e.clientX))
       setHelperWidth(final)
       ctx.storage.set('helperWidth', final)
     }
+    function gripCancel() {
+      if (!drag.current) return
+      const d = drag.current
+      drag.current = null
+      setHelperWidth(d.before)
+    }
+    // Arrow keys move the edge 16 px; Home is the narrowest and End the widest (the least and the
+    // most of the value the edge reports). A key that would change nothing on screen (wider, in a
+    // window that already squeezes Helper) is left alone, so it cannot change the remembered width
+    // unseen.
     function gripKey(e) {
-      const to = { ArrowLeft: fit.helperPx + GRIP_KEY_PX, ArrowRight: fit.helperPx - GRIP_KEY_PX, Home: HELPER_MAX_PX, End: HELPER_MIN_PX }[e.key]
+      const to = { ArrowLeft: fit.helperPx + GRIP_KEY_PX, ArrowRight: fit.helperPx - GRIP_KEY_PX, Home: HELPER_MIN_PX, End: HELPER_MAX_PX }[e.key]
       if (to === undefined) return
       e.preventDefault()
       const final = clampHelperWidth(to)
+      const squeezed = fit.helperPx < clampHelperWidth(helperWidth)
+      if (final === fit.helperPx || (squeezed && final > fit.helperPx)) return
       setHelperWidth(final)
       ctx.storage.set('helperWidth', final)
     }
@@ -710,8 +734,9 @@ export function makePage(ctx) {
     const question = !!inBubble && said && asksQuestion(inBubble.text)
     const expression = expressionFor({ revealing, busy: busyNow, question })
     const toPick = inBubble && inBubble.answers && inBubble.answers.items.length ? inBubble.answers : null
-    // "Skip" shows only while one of the opening's two questions is the open one.
-    const openingOpen = !!inBubble && (inBubble.line === 'OPEN' || inBubble.line === 'F1')
+    // "Skip" shows while one of the opening's two questions is still open (the visit's stage, not
+    // the newest line: a pasted key at "What's your name?" gets its own line and Skip stays).
+    const openingOpen = visit.stage === 'name' || visit.stage === 'work'
 
     // The character sits on the message box's top edge (placed by src/talk.css). It rises when
     // Helper comes on screen.
@@ -804,7 +829,7 @@ export function makePage(ctx) {
               }
             : undefined,
           children: [
-            fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onKey: gripKey }, 'grip') : null,
+            fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
             jsx(Conversation, { entries: older, onNext: pressNext, scrollRef: helperScroll }, 'conversation'),
             inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { lit: 0 }, 'bubble'),
             jsx(Under, { character, answers: toPick, said, onPick: pickAnswer }, 'under'),

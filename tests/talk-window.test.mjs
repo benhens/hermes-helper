@@ -38,7 +38,9 @@ const root = view => byData(view.tree, 'page')
 const bubble = view => byData(helper(view), 'bubble')
 const line = view => bubble(view).props['data-line']
 const said = view => spoken(byData(bubble(view), 'said')).trim()
-const conversation = view => byData(helper(view), 'conversation').props.children
+const conversation = view => byData(helper(view), 'conversation-lines').props.children
+// What is on screen in an older line or a message, without the words only a screen reader hears.
+const words = node => text(node).replace(/^(?:You|Helper) said: /, '').trim()
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
 const group = view => byData(helper(view), 'answers')
 const answers = view => all(helper(view), n => n.props['data-hh'] === 'answer')
@@ -110,7 +112,7 @@ test('the opening, played: the name, what the person does, then the line that of
   assert.ok(labels(view).length <= 5)
   assert.equal(box(view).props.placeholder, 'Or type your question')
   // what was said before has moved up: Helper's lines small on its side, the person's on theirs
-  assert.deepEqual(conversation(view).map(c => [c.props['data-hh'], c.props.className, text(c).trim()]), [
+  assert.deepEqual(conversation(view).map(c => [c.props['data-hh'], c.props.className, words(c)]), [
     ['old', T.old, OPEN],
     ['me', T.me, 'Peter'],
     ['old', T.old, 'Nice to meet you, Peter. What do you do?'],
@@ -124,7 +126,7 @@ test('"Skip" at the name question: it becomes the person\'s message, Helper says
   assert.equal(line(view), 'F3')
   assert.equal(said(view), "That's fine. Ask me anything about Hermes, or pick one of these.")
   assert.equal(skipLink(view), null)
-  assert.deepEqual(conversation(view).map(c => text(c).trim()), [OPEN, 'Skip'])
+  assert.deepEqual(conversation(view).map(c => words(c)), [OPEN, 'Skip'])
   finish(view)
   assert.deepEqual(labels(view), TOPIC_LABELS)
   // and at the second question
@@ -185,7 +187,7 @@ test('a pick becomes the person\'s message and Helper answers at once; the keybo
   assert.equal(focused, 1)
   assert.equal(line(view), 'msg-q')
   assert.equal(said(view), 'Which chat app do you use most?')
-  assert.deepEqual(conversation(view).slice(-2).map(c => [c.props['data-hh'], text(c).trim()]), [
+  assert.deepEqual(conversation(view).slice(-2).map(c => [c.props['data-hh'], words(c)]), [
     ['old', 'Thanks, Peter. Ask me anything about Hermes, or pick one of these.'],
     ['me', 'Phone and chat apps']
   ])
@@ -199,7 +201,7 @@ test('a pick becomes the person\'s message and Helper answers at once; the keybo
   assert.equal(group(view), null, 'an answer line has nothing to pick')
   assert.equal(box(view).props.placeholder, 'Reply to Helper')
   assert.equal(conversation(view).at(-1).props['data-hh'], 'me')
-  assert.equal(text(conversation(view).at(-1)).trim(), 'WhatsApp')
+  assert.equal(words(conversation(view).at(-1)), 'WhatsApp')
 })
 
 test('a pick goes by its own id, never through the key words: every answer of every question gives exactly its row', async () => {
@@ -332,7 +334,7 @@ test('a button that makes Helper say one more line: "How to add one" becomes the
   click(button(view))
   assert.equal(line(view), 'bot1-next')
   assert.match(said(view), /^Open "Bots", press "\+", then "New bot"\./)
-  assert.deepEqual(conversation(view).slice(-2).map(c => [c.props['data-hh'], c.props['data-line'] || text(c).trim()]), [['old', 'bot1'], ['me', 'How to add one']])
+  assert.deepEqual(conversation(view).slice(-2).map(c => [c.props['data-hh'], c.props['data-line'] || words(c)]), [['old', 'bot1'], ['me', 'How to add one']])
 })
 
 test('an older line keeps its button as a small link, and it still works: text to paste opens under the older line', async () => {
@@ -419,7 +421,7 @@ test('"Which one do you mean?": the matches to pick, at most five; the pick answ
   assert.equal(box(view).props.placeholder, 'Or type your own answer')
   click(answer(view, 'Which AI to use'))
   assert.equal(line(view), 'mod2', 'Claude was in the message: the Claude line, not the question')
-  assert.equal(text(conversation(view).at(-1)).trim(), 'Which AI to use')
+  assert.equal(words(conversation(view).at(-1)), 'Which AI to use')
   // more than five matches: the first five in the list's order
   send(view, 'memory model telegram schedule gmail second bot')
   finish(view)
@@ -439,7 +441,7 @@ test('a long message is shown back cut to 500 characters; Helper still reads all
   send(view, 'why '.repeat(140) + 'does memory forget')
   const mine = conversation(view).at(-1)
   assert.equal(mine.props['data-hh'], 'me')
-  assert.equal(Array.from(text(mine)).length, 501)
+  assert.equal(Array.from(words(mine)).length, 501)
   assert.ok(text(mine).endsWith('…'))
   assert.equal(line(view), 'mem-q', 'the word after character 500 was read')
 })
@@ -473,13 +475,13 @@ test('the conversation lives while the plugin is loaded (leaving the page and co
   const back = mount(first.Page)
   await settle()
   assert.equal(spoken(byData(byData(back.tree, 'bubble'), 'said')).trim(), 'Nice to meet you, Peter. What do you do?')
-  assert.equal(byData(back.tree, 'conversation').props.children.length, 2)
+  assert.equal(byData(back.tree, 'conversation-lines').props.children.length, 2)
   // Hermes starts again: the plugin is loaded anew, with the same storage
   const second = await registerPlugin(storage, fakeTimers())
   const fresh = mount(second.Page)
   await settle()
   assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'OPEN')
-  assert.deepEqual(byData(fresh.tree, 'conversation').props.children, [])
+  assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children, [])
   assert.doesNotMatch(text(fresh.tree), /Peter/)
 })
 
@@ -507,4 +509,52 @@ test('Helper\'s lines hold no link out of the page and no model\'s words: every 
     assert.ok(lines.has(now), `${words} → ${now}`)
     assert.equal(all(helper(view), n => n.type === 'a').length, 0)
   }
+})
+
+test('a screen reader hears who said each line of the conversation so far: "Helper said:" or "You said:" before the words, unseen on screen', async () => {
+  const { view } = await pastOpening()
+  const [first, mine] = conversation(view)
+  const who = n => n.props.children[0]
+  assert.equal(who(first).type, 'span')
+  assert.equal(who(first).props.className, K.srOnly)
+  assert.equal(text(who(first)), 'Helper said: ')
+  assert.equal(words(first), OPEN)
+  assert.equal(who(mine).type, 'span')
+  assert.equal(who(mine).props.className, K.srOnly)
+  assert.equal(text(who(mine)), 'You said: ')
+  assert.equal(words(mine), 'Peter')
+  // the newest sentence, in the bubble, is Helper's by its place: no such words there
+  assert.doesNotMatch(text(bubble(view)), /said: /)
+})
+
+test('a pasted key at "What\'s your name?": Helper\'s line about keys, and "Skip" is still there, because the question is still open', async () => {
+  const key = 'sk-or-v1-' + 'f3a9'.repeat(12)
+  const { view } = await open()
+  finish(view)
+  send(view, key)
+  assert.equal(line(view), 'K1')
+  assert.ok(skipLink(view), 'Skip stays: the name question is still the open one')
+  click(skipLink(view))
+  assert.equal(line(view), 'F3')
+  assert.equal(skipLink(view), null)
+  // and a name typed after the key line still answers the question
+  const second = await open()
+  send(second.view, key)
+  send(second.view, 'Peter')
+  assert.equal(line(second.view), 'F1')
+  assert.ok(skipLink(second.view), 'the second question is open now')
+})
+
+test('a long conversation: it holds the newest 200 entries, and each new line still brings the newest into view', async () => {
+  const { view } = await pastOpening()
+  const el = { scrollTop: 0, scrollHeight: 900 }
+  byData(helper(view), 'conversation').props.ref.current = el
+  for (let i = 0; i < 104; i++) send(view, 'what is a skill')
+  const full = conversation(view).length
+  assert.equal(full, 199, 'the newest 200: 199 above the bubble')
+  el.scrollTop = 0
+  el.scrollHeight = 5000
+  send(view, 'what is a plugin')
+  assert.equal(conversation(view).length, full, 'full: the two oldest went')
+  assert.equal(el.scrollTop, 5000)
 })

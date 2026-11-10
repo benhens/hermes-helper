@@ -314,7 +314,7 @@ test('dragging the edge left makes Helper wider, right narrower, between 360 and
   assert.deepEqual([...storage.data.keys()], ['helperWidth'], 'the width is the only thing the drag stored')
 })
 
-test('the edge with the keyboard: the arrow keys move it 16 px, Home and End go to the widest and narrowest; saved each time', async () => {
+test('the edge with the keyboard: the arrow keys move it 16 px; Home is the narrowest and End the widest (the least and the most of the value it reports); saved each time', async () => {
   const { view, storage } = await openMeasured()
   resize(view, 1440)
   const key = name => grip(view).props.onKeyDown({ key: name, preventDefault() {} })
@@ -324,10 +324,12 @@ test('the edge with the keyboard: the arrow keys move it 16 px, Home and End go 
   key('ArrowRight')
   key('ArrowRight')
   assert.equal(helper(view).props.style.width, '444px')
-  key('Home')
-  assert.equal(helper(view).props.style.width, '600px')
   key('End')
+  assert.equal(helper(view).props.style.width, '600px')
+  assert.equal(grip(view).props['aria-valuenow'], grip(view).props['aria-valuemax'])
+  key('Home')
   assert.equal(helper(view).props.style.width, '360px')
+  assert.equal(grip(view).props['aria-valuenow'], grip(view).props['aria-valuemin'])
   key('ArrowRight')
   assert.equal(helper(view).props.style.width, '360px')
   key('a')
@@ -545,4 +547,65 @@ test('Your setup: no heading repeating the tab name, just its one line', async (
   const { view } = await open(fakeStorage({ tab: 'yours' }))
   assert.equal(all(byData(view.tree, 'detail'), n => /^h[1-3]$/.test(n.type)).length, 0)
   assert.ok(byData(view.tree, 'yours-lead'))
+})
+
+/* ---------- the edge: what is not a drag ---------- */
+test('a press on the edge that does not move it saves nothing; in a window that squeezes Helper, neither it nor a "wider" arrow key touches the remembered width', async () => {
+  const { view, storage } = await openMeasured()
+  resize(view, 1180)
+  grip(view).props.onPointerDown(pointer(720))
+  grip(view).props.onPointerUp(pointer(720))
+  assert.equal(helper(view).props.style.width, '460px')
+  assert.equal(storage.data.has('helperWidth'), false)
+  // 740 px of page: Helper is drawn narrower than the remembered 460
+  resize(view, 740)
+  const squeezed = helper(view).props.style.width
+  assert.notEqual(squeezed, '460px')
+  assert.ok(grip(view), 'the edge is still there')
+  grip(view).props.onPointerDown(pointer(368))
+  grip(view).props.onPointerUp(pointer(368))
+  assert.equal(storage.data.has('helperWidth'), false)
+  // an arrow key that would make it wider changes nothing on screen, so it saves nothing
+  grip(view).props.onKeyDown({ key: 'ArrowLeft', preventDefault() {} })
+  assert.equal(storage.data.has('helperWidth'), false)
+  assert.equal(helper(view).props.style.width, squeezed)
+  resize(view, 1180)
+  assert.equal(helper(view).props.style.width, '460px', 'the wide window gets the remembered width back')
+})
+
+test('a drag the system cancels, or whose pointer is lost, puts the width back and saves nothing; the "lost pointer" that follows a normal end undoes nothing', async () => {
+  const { view, storage } = await openMeasured()
+  resize(view, 1180)
+  const width = () => helper(view).props.style.width
+  for (const end of ['onPointerCancel', 'onLostPointerCapture']) {
+    grip(view).props.onPointerDown(pointer(720))
+    grip(view).props.onPointerMove(pointer(660))
+    assert.equal(width(), '520px')
+    // the event carries a place, as a real one does; it is not where the drag ended
+    grip(view).props[end](pointer(0))
+    assert.equal(width(), '460px', end)
+    assert.equal(storage.data.has('helperWidth'), false, end)
+    grip(view).props.onPointerMove(pointer(600))
+    assert.equal(width(), '460px', 'the drag is over')
+  }
+  // a normal end is saved; the browser's "lost pointer" event after it changes nothing
+  grip(view).props.onPointerDown(pointer(720))
+  grip(view).props.onPointerMove(pointer(660))
+  grip(view).props.onPointerUp(pointer(660))
+  grip(view).props.onLostPointerCapture(pointer(0))
+  assert.equal(width(), '520px')
+  assert.equal(storage.data.get('helperWidth'), 520)
+  // an end that names no place is not a width either
+  grip(view).props.onPointerDown(pointer(660))
+  grip(view).props.onPointerMove(pointer(700))
+  grip(view).props.onPointerUp({})
+  assert.equal(width(), '520px')
+  assert.equal(storage.data.get('helperWidth'), 520)
+})
+
+test('a narrow window opens with Helper shown, lying over the page: it is not folded away until the person folds it', async () => {
+  const { view } = await openMeasured()
+  resize(view, 540)
+  assert.ok(helper(view), 'Helper is on screen')
+  assert.ok(helper(view).props.className.split(' ').includes(T.winOver))
 })

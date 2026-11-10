@@ -51,10 +51,13 @@
    it has no shadow and may lie on a fill close to its own. */
 .hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}
 /* The conversation so far scrolls when it is full (the drawings cut it at the top; plain
-   scrolling is stage 1's way). Stacked from the bottom with an auto margin, not justify-content,
-   so the top of a long conversation can still be reached. */
-.hh-conv{justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain}
-.hh-conv>:first-child{margin-top:auto}
+   scrolling is stage 1's way). The outer box stacks from its bottom (column-reverse), so it
+   starts at its newest, the top of a long conversation can still be reached, and it stays at
+   its newest when the bubble or the message box grows and its room shrinks. The lines
+   themselves are one inner column in reading order. */
+.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain}
+.hh-conv-in{display:flex;flex-direction:column;gap:9px}
+.hh-conv-in>*{flex:none}
 .hh-me{overflow-wrap:anywhere}
 /* The bubble sits under the scrolling part, not in it, so the piece below always hangs from it:
    the 5 px of the drawing plus the 9 px gap; and never narrower than where that piece hangs. */
@@ -66,7 +69,7 @@
 .hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:8px}
 /* In place of a button, for a screen no button can open: one line that says where it is. Under
    an older line it is as small as that line's link would be. */
-.hh-where{font-size:13px;line-height:19px;color:var(--ui-text-secondary)}
+.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}
 .hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}
 /* The cell between bubble and character (src/bubble-link.js draws inside it): hhdesign's .hh-tail
    placement, as a cell. It hangs 1 px into the bubble, in front of it, and ends where the
