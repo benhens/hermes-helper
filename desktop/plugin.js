@@ -7625,7 +7625,8 @@ function nameLater(text, st, out) {
   return { kind: 'NAME_NEW', name: strong }
 }
 // "what is ..." (JSON what_is): the topic whose plain line explains the one word asked about, or null.
-const WHAT_IS = TALK_DATA.what_is ? new RegExp(TALK_DATA.what_is.pattern) : null
+// Anchored at the start as Python's re.match is, whatever the data's pattern begins with.
+const WHAT_IS = TALK_DATA.what_is ? new RegExp('^(?:' + TALK_DATA.what_is.pattern + ')') : null
 function whatIs(t) {
   const m = WHAT_IS && WHAT_IS.exec(t)
   if (!m) return null
@@ -7635,10 +7636,12 @@ function whatIs(t) {
 }
 // COST (a question with a cost word) or WHERE (a where word), when no topic and no term matched.
 // Builder (not in route2.py, which has no rows; please check): a row of the wants counts as a topic
-// here, so "can it keep an eye on airline ticket prices" is the prices row, not the cost line.
+// here, so "can it keep an eye on airline ticket prices" is the prices row, not the cost line. Only
+// where byCode would look at the rows: not while Helper's own question is open and the message is
+// no question (there route2.py's order stands).
 function fixedByWords(t, st) {
   if (strongTopics(t).length || anyTerm(t)) return null
-  if (st.wants !== false && wantsOf(t).length) return null
+  if (st.wants !== false && wantsOf(t).length && !(st.pending && !questionForm(t))) return null
   if (questionForm(t) && whichOf(t, TALK_DATA.cost.words).length) return 'COST'
   if (whichOf(t, TALK_DATA.where.words).length) return 'WHERE'
   return null
@@ -8049,14 +8052,18 @@ function keptNote(result, st) {
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
   return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null, items }
 }
-// Is one thing a faint line named still kept, as it was then? ("asked": in any capitals, as the
-// remember step and the settings page count the same thing.)
+// Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
+// as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
+// step and on the settings page).
 function stillKept(kept, [key, value]) {
-  if (key === 'asked') return (kept.asked || []).some(a => String(a).toLowerCase() === String(value).toLowerCase())
-  return kept[key] === value
+  const same = a => String(a).toLowerCase() === String(value).toLowerCase()
+  if (key === 'asked') return (kept.asked || []).some(same)
+  return kept[key] != null && same(kept[key])
 }
 // A faint line (note: "Kept: ...", or used: "From what I keep: ...") that is no longer true: none
-// of what it named is kept any more.
+// of what it named is kept any more. (A line names one thing in all but one rare case, a name and
+// a typed change in one message; such a line is struck once both are gone.) A thing kept again
+// later makes its old line true again, and it is no longer struck.
 function noteForgotten(note, kept) {
   if (!note || !kept) return false
   const items = note.items || (note.topic ? [[note.topic, note.value]] : [])
@@ -10587,7 +10594,8 @@ function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       const result = turn(typed, visit)
-      // Kept only while "Which one do you mean?" is open, for the pick that answers it. A message
+      // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
+      // pick that answers it. A message
       // with a key in it never gets that line, so a key is never kept here.
       memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())

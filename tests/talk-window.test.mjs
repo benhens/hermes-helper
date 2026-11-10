@@ -1055,3 +1055,12 @@ test('hhtech\'s ten typed messages and "my chat app is WhatsApp" in the window, 
   send(view, 'what do you know about me')
   assert.ok(all(byData(bubble(view), 'kept-rows'), n => n.type === 'li').map(n => text(n)).includes('Your chat app: WhatsApp'))
 })
+
+test('W2 (skill and plugin compared): a pick in the message box becomes the person\'s message and gives that term\'s line', async () => {
+  const { view } = await pastOpening()
+  send(view, 'whats the difference between a skill and a plugin')
+  assert.equal(line(view), 'W2')
+  pickNow(view, 'Plugins')
+  assert.equal(line(view), 'term-plugin')
+  assert.equal(words(lines(view).at(-1)), 'Plugins')
+})

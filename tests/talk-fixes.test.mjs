@@ -11,9 +11,9 @@
 // this file checks the lines a person sees, with the wants on.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { freshVisit, laterVisit, turn, press, lineFor, forgetAnswer } from '../src/talk.js'
+import { freshVisit, laterVisit, turn, press, lineFor, forgetAnswer, noteForgotten, stillKept, whatIs, PARTS } from '../src/talk.js'
 import { TALK_DATA } from '../src/talk-data.js'
-import { talkProblems } from '../scripts/talk-data.mjs'
+import { talkProblems, FIXED_PARTS } from '../scripts/talk-data.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -30,7 +30,7 @@ const TEN = [
   ['how do I connect telegram', s => [s.line, s.next.label], ['msg1', 'Open Messaging']],
   ['what is a model', s => [s.line, s.text, s.next.label, s.used], ['mod0', 'A model is the AI that does the thinking. Hermes needs one to answer.', 'Open Model', null]],
   ['can hermes check my email every morning', s => [s.line, s.text, s.next.label, s.next.text], ['sch5', 'Yes. Connect your email to Hermes first. Then ask it once, in plain words.', 'Show me what to ask', 'Every morning at 8, check my email and send me a short summary.']],
-  ['which AI should I use', s => [s.line, s.used && s.used.text], [need('mod', 'mod1').id, 'From what I keep: you pay for ChatGPT.']],
+  ['which AI should I use', s => [s.line, s.used && s.used.text], ['mod1', 'From what I keep: you pay for ChatGPT.']],
   ['how much does it cost', s => [s.line, s.text, s.next.label, s.used], ['COST', 'Hermes itself is free. The AI it uses can cost money, depending on which one you choose.', 'Open Model', null]],
   ['whats the difference between a skill and a plugin', s => [s.line, s.text, s.answers.items.map(a => a.label)], ['W2', 'A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.', ['Skills', 'Plugins']]],
   ['can you install the github plugin for me', s => [s.line, s.text], ['H1', "I can't do that, but your own Hermes can. Paste this into a new chat with it."]],
@@ -177,15 +177,91 @@ test('a later visit (the name question skipped), then a name typed: the kept nam
   assert.notEqual(say(asking, 'my name is Bea').line, 'NAME_NEW')
 })
 
-test('the faint "Kept:" line carries what it kept, so the page can tell when that is forgotten', () => {
+test('the faint "Kept:" line carries what it kept, and is forgotten exactly when none of that is kept any more', () => {
   const st = freshVisit('name')
   say(st, 'Anna')
   const f2 = say(st, 'I run a bakery')
   assert.deepEqual(f2.note.items, [['name', 'Anna']])
   const rm = say(st, 'remember that my club has six courts')
   assert.deepEqual(rm.note.items, [['asked', 'my club has six courts']])
+  assert.equal(noteForgotten(f2.note, st.kept), false)
+  assert.equal(noteForgotten(rm.note, st.kept), false)
+  // the same thing in other capitals is still kept (as the settings page and "remember" count it)
+  assert.equal(noteForgotten(f2.note, { name: 'anna' }), false)
+  assert.equal(noteForgotten(rm.note, { asked: ['My club has SIX courts'] }), false)
+  // forgotten one by one
+  forgetAnswer('name', true, st)
+  assert.equal(noteForgotten(f2.note, st.kept), true)
+  assert.equal(noteForgotten(rm.note, st.kept), false)
   forgetAnswer('all', true, st)
   assert.deepEqual(st.kept, {})
+  assert.equal(noteForgotten(rm.note, st.kept), true)
+  // a line naming two things: struck once both are gone
+  const two = { items: [['name', 'Anna'], ['msg', 'WhatsApp']] }
+  assert.equal(noteForgotten(two, { msg: 'WhatsApp' }), false)
+  assert.equal(noteForgotten(two, {}), true)
+  // "From what I keep: ..." for a service: its topic and value
+  const svc = laterVisit({ svc: 'Notion', told: true })
+  const used = lineFor(turn('how do I connect a service', svc), svc).used
+  assert.deepEqual([used.topic, used.value], ['svc', 'Notion'])
+  assert.equal(noteForgotten(used, { svc: 'Notion' }), false)
+  assert.equal(noteForgotten(used, { svc: 'Gmail' }), true)
+  // nothing to judge by: never struck
+  assert.equal(noteForgotten({ text: 'Kept: x.' }, {}), false)
+  assert.equal(noteForgotten(null, {}), false)
+  assert.equal(stillKept({}, ['name', 'Anna']), false)
+})
+
+test('a typed service replaces the kept one too: "I use gmail" with Notion kept gives the Connectors line, "Kept: you use Gmail.", and Gmail in the record', () => {
+  const st = laterVisit({ svc: 'Notion', told: true })
+  const s = say(st, 'I use gmail')
+  assert.equal(s.line, 'CN1')
+  assert.equal(s.note.text, 'Kept: you use Gmail.')
+  assert.deepEqual(st.kept, { svc: 'Gmail', told: true })
+})
+
+test('Builder rule, the edge: while Helper\'s own question is open and the message is no question, the rows are not looked at, so the where line stands as in route2.py', () => {
+  const st = freshVisit()
+  say(st, 'how does memory work')
+  assert.equal(st.pending, 'mem')
+  const typed = 'it should watch flight prices always on'
+  const route2 = Object.assign(freshVisit(), { wants: false })
+  turn('how does memory work', route2)
+  assert.equal(turn(typed, route2).kind, 'WHERE')
+  assert.equal(turn(typed, st).kind, 'WHERE')
+})
+
+test('"what is ..." is looked for at the start only, as Python\'s re.match does', () => {
+  assert.equal(whatIs('what is a model'), 'mod')
+  assert.equal(whatIs('so what is a model'), 'mod')
+  assert.equal(whatIs('tell me what is a model'), null, 'not at the start: no explanation step')
+  assert.equal(whatIs('i wonder what is a model'), null)
+  assert.equal(whatIs('what is a model and a bot'), null, 'more than the one word: no')
+})
+
+test('the new build checks stop the build on broken data (each broken on purpose)', () => {
+  const problemsWith = change => {
+    const d = JSON.parse(JSON.stringify(DATA))
+    change(d)
+    return talkProblems(d)
+  }
+  const has = (ps, start) => assert.ok(ps.some(p => p.startsWith(start)), `${start}: ${JSON.stringify(ps)}`)
+  has(problemsWith(d => (d.what_is.pattern = '^(?:what is)\\s+.+$')), 'what_is.pattern has no part to catch')
+  has(problemsWith(d => (d.what_is.pattern = '^(?<=x)(')), 'what_is.pattern is not a JavaScript pattern')
+  has(problemsWith(d => delete d.what_is.pattern), 'what_is.pattern has no part to catch')
+  has(problemsWith(d => (d.what_is.words = {})), 'what_is.words is empty')
+  has(problemsWith(d => (d.what_is.words.llm = ['llm'])), 'what_is.words names llm, which is not a topic')
+  has(problemsWith(d => (d.cost.words = [])), 'cost.words is empty')
+  has(problemsWith(d => delete d.where), 'where.words is empty')
+  has(problemsWith(d => (d.w1_pairs = [{ terms: ['skill', 'gadget'] }])), 'w1_pairs:')
+  has(problemsWith(d => (d.w1_pairs = [{ terms: ['skill'] }])), 'w1_pairs:')
+  for (const k of ['self_words', 'question_words', 'not_words']) has(problemsWith(d => (d.keeps.typed_change[k] = [])), `keeps.typed_change.${k} is empty`)
+  has(problemsWith(d => (d.fixed_lines.find(f => f.id === 'COST').next.part = 'billing')), 'COST: a button to a part the plugin cannot open')
+  has(problemsWith(d => (d.fixed_lines.find(f => f.id === 'WHERE').next = { kind: 'door', label: 'Go' })), 'WHERE: button of an unknown kind')
+  has(problemsWith(d => delete d.fixed_lines.find(f => f.id === 'WHERE').next.label), 'WHERE: button with no label')
+  has(problemsWith(d => (d.fixed_lines.find(f => f.id === 'COST').next = { kind: 'paste', label: 'Show me' })), 'COST: text to paste is empty')
+  // the parts a fixed line may open are the ones the plugin has
+  assert.deepEqual([...FIXED_PARTS].sort(), Object.keys(PARTS).sort())
 })
 
 test('the build: the new lines are in the plugin\'s data, and W2 alone may hold two Hermes terms (each still explained); a W2 that breaks another rule still stops the build', () => {

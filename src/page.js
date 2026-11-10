@@ -357,7 +357,8 @@ export function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       const result = turn(typed, visit)
-      // Kept only while "Which one do you mean?" is open, for the pick that answers it. A message
+      // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
+      // pick that answers it. A message
       // with a key in it never gets that line, so a key is never kept here.
       memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())

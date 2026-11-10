@@ -47,10 +47,10 @@ const isWants = o => ['want', 'skillS', 'N2'].includes(o.kind) || (o.kind === 'W
 // oracle's turn is older than route2.py's in its other steps: no "what can I ask", no N1a or N1b).
 // changes-11: route2.py checks a name on a later visit and "what is ..." before the topics, so where it
 // gives one of those, that is the result even when the reference (older than changes-11) has a row.
-// The cost and where lines come after the rows in the plugin (the Builder's rule, tests/talk-fixes):
+// The cost and where lines give way to a row in the plugin (the Builder's rule, tests/talk-fixes):
 // there the reference's row stays the result.
-const before11 = r => ['NAME_AGAIN', 'NAME_NEW'].includes(r.kind) || (r.kind === 'plain' && r.why === 'what is')
-const expected = m => (before11(m.route2) ? m.route2.shown : isWants(m.oracle) ? m.oracle.shown : m.route2.shown)
+const route2FirstSteps = r => ['NAME_AGAIN', 'NAME_NEW'].includes(r.kind) || (r.kind === 'plain' && r.why === 'what is')
+const expected = m => (route2FirstSteps(m.route2) ? m.route2.shown : isWants(m.oracle) ? m.oracle.shown : m.route2.shown)
 function ours(m) {
   const st = freshVisit({ '': 'open', name: 'name', work: 'work' }[m.after || ''])
   if (m.after === 'work') st.name = 'Sam'

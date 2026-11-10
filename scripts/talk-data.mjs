@@ -71,8 +71,9 @@ export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT
 // changes-11 (check_json.py): W2 compares the two terms the person typed, so for W2 alone the
 // two-terms rule is lifted; each term must still be explained in the line.
 const LIFTED = { W2: ['2 Hermes terms in one line'] }
-// The parts a fixed line's "Open ..." button may name (src/talk.js PARTS has these).
-const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots']
+// The parts a fixed line's "Open ..." button may name (src/talk.js PARTS has these; a test keeps
+// the two lists equal).
+export const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots']
 // Row 5 of docs/build/talk-v2-plan.md (the wants: "Web, files, pictures and voice" under C1) is in
 // this build (job talk-v2-wants): C1 says its full text and holds the wants pick first. With
 // WANTS_BUILT false, held_picks.note: the held picks that are not topics are dropped, and C1 says
@@ -211,6 +212,7 @@ export function talkProblems(d) {
     if (!FIXED_USED.includes(f.id) || !f.next) continue
     if (!NEXT_KINDS.includes(f.next.kind)) problems.push(`${f.id}: button of an unknown kind ${f.next.kind}`)
     else if (f.next.kind !== 'none' && !f.next.label) problems.push(`${f.id}: button with no label`)
+    else if (f.next.kind === 'paste' && !f.next.paste_text) problems.push(`${f.id}: text to paste is empty`)
     else if (f.next.kind === 'part' && !FIXED_PARTS.includes(f.next.part)) problems.push(`${f.id}: a button to a part the plugin cannot open: ${f.next.part}`)
   }
   // changes-11: the rules the code reads as data. A pattern JavaScript cannot read would stop the
@@ -218,8 +220,8 @@ export function talkProblems(d) {
   const topicIdsAll = (d.topics || []).map(t => t.id)
   const wi = d.what_is || {}
   try {
-    new RegExp(wi.pattern)
-    if (!/\(/.test(wi.pattern || '')) problems.push('what_is.pattern has no part to catch')
+    // the part it catches must exist: a pattern with only (?:...) would leave nothing to look up
+    if (new RegExp(wi.pattern + '|').exec('').length < 2) problems.push('what_is.pattern has no part to catch')
   } catch (e) {
     problems.push(`what_is.pattern is not a JavaScript pattern (${e.message})`)
   }
