@@ -116,14 +116,16 @@ export function makePage(ctx, opts = {}) {
     m.stored = JSON.stringify(keptToStore(kept))
   }
   // After everything the person does: the record is written when it changed, and removed whole
-  // when nothing is left in it (told with it).
+  // when nothing is left in it (told with it). A storage that fails is not kept from answering.
   const writeKept = () => {
     const next = keptToStore(memory.visit.kept)
     const text = JSON.stringify(next)
     if (text === memory.stored) return
-    if (next) ctx.storage.set('kept', next)
-    else ctx.storage.remove('kept')
-    memory.stored = text
+    try {
+      if (next) ctx.storage.set('kept', next)
+      else ctx.storage.remove('kept')
+      memory.stored = text
+    } catch {}
   }
   const helperEntry = said => {
     const id = memory.nextId++
@@ -337,7 +339,7 @@ export function makePage(ctx, opts = {}) {
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
     // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
-    // Nothing is sent anywhere: there is no AI step (tests/no-ai-step.test.mjs).
+    // Nothing is sent anywhere: there is no AI step (tests/talk-window.test.mjs, "no AI step").
     function send() {
       const typed = draft
       if (!typed.trim()) return

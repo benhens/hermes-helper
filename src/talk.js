@@ -18,6 +18,7 @@
 // settings_step and hhcontent's changes-8 rule, and come straight after the remember step.
 import { TALK_DATA } from './talk-data.js'
 import { looksLikeKey } from './key-check.js'
+import { hasKept } from './kept.js'
 
 const TOPICS = Object.fromEntries(TALK_DATA.topics.map(t => [t.id, t]))
 const TOPIC_IDS = TALK_DATA.topics.map(t => t.id)
@@ -223,7 +224,10 @@ function remember(text, st, out) {
     if (n < lim.min_words) out.kind = 'RM3'
     else if (whichOf(talkNorm(thing), KEEP_REMEMBER.refuse.words).length || new RegExp(KEEP_REMEMBER.refuse.digits_pattern).test(thing)) out.kind = 'RM6'
     else if (n > lim.max_words || charCount(thing) > lim.max_chars) out.kind = 'RM5'
-    else if (asked.includes(thing)) out.kind = 'RM1'
+    // Builder, after review (route2.py compares exactly): the same thing in other capitals counts
+    // as kept already, as the settings page reads it (settings_read.py), which would otherwise
+    // refuse every Save with "This line is there twice".
+    else if (asked.some(a => a.toLowerCase() === thing.toLowerCase())) out.kind = 'RM1'
     else if (asked.length >= lim.max_things) out.kind = 'RM4'
     else {
       keep(st, out, 'asked', thing)
@@ -265,7 +269,7 @@ export function typedAboutKept(text) {
   }
   return s
 }
-export const hasKeptValues = kept => ['name', 'mod', 'msg', 'svc'].some(k => kept[k]) || (kept.asked || []).length > 0
+const hasKeptValues = kept => hasKept(kept)
 // What A1, A2 and A4 do to the visit: A1 answers at once, A2 and A4 ask for a Yes first, and
 // there is nothing to ask about when nothing like that is kept.
 function aboutKept(s, st) {
@@ -316,6 +320,13 @@ export function dontKnow(text) {
 }
 
 function codeName(text, strongOnly = false) {
+  const name = codeNameAsRoute2(text, strongOnly)
+  // Builder, after review (not in route2.py): a "name" holding one of the words Helper never keeps
+  // (keeps.remember.refuse.words: password, PIN, ...) is no name, as a name with digits is none,
+  // because it would be kept and shown in "Kept: ...", and the settings page then refuses the box.
+  return name && !whichOf(talkNorm(name), KEEP_REMEMBER.refuse.words).length ? name : null
+}
+function codeNameAsRoute2(text, strongOnly) {
   let m = NAME_STRONG.exec(text)
   if (m) return capFirst(m[1])
   if (strongOnly) return null

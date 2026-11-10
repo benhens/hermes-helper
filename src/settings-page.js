@@ -34,6 +34,8 @@ export function makeSettingsPage(ctx) {
     const [said, setSaid] = useState(null)
     // "Forget all of this": null, 'ask' (the question shows) or 'done'
     const [forget, setForget] = useState(null)
+    // the box differs from what is stored
+    const changed = box !== renderKept(stored)
 
     // After a write: read it back and draw the box again from storage, with Helper's reasons.
     function showStored() {
@@ -56,6 +58,7 @@ export function makeSettingsPage(ctx) {
     function undo() {
       showStored()
       setSaid(null)
+      setForget(null)
     }
     function forgetAll() {
       ctx.storage.remove('kept')
@@ -70,9 +73,10 @@ export function makeSettingsPage(ctx) {
             className: K.settingsAsk,
             'data-hh': 'settings-ask',
             children: [
-              jsx('p', { className: K.settingsText, children: said.question }, 'q'),
+              // read out when it comes; the keyboard goes to No, the answer that changes nothing
+              jsx('p', { className: K.settingsText, role: 'status', children: said.question }, 'q'),
               jsx(Button, { size: 'sm', onClick: () => save('yes'), 'data-hh': 'settings-yes', children: SETTINGS_WORDS.would_delete.answers[0].label }, 'yes'),
-              jsx(Button, { size: 'sm', variant: 'text', onClick: () => save('no'), 'data-hh': 'settings-no', children: SETTINGS_WORDS.would_delete.answers[1].label }, 'no')
+              jsx(Button, { size: 'sm', variant: 'text', autoFocus: true, onClick: () => save('no'), 'data-hh': 'settings-no', children: SETTINGS_WORDS.would_delete.answers[1].label }, 'no')
             ]
           })
         : jsx('div', { className: K.settingsMessage, role: 'status', 'data-hh': `settings-${said.kind}`, children: said.lines.map((l, i) => jsx('p', { children: l }, i)) })
@@ -110,8 +114,9 @@ export function makeSettingsPage(ctx) {
             : jsxs('div', {
                 className: K.settingsButtons,
                 children: [
-                  jsx(Button, { size: 'sm', onClick: () => save(undefined), 'data-hh': 'settings-save', children: SETTINGS_WORDS.buttons[0] }, 'save'),
-                  jsx(Button, { size: 'sm', variant: 'text', onClick: undo, 'data-hh': 'settings-undo', children: SETTINGS_WORDS.buttons[1] }, 'undo')
+                  // as Hermes's own plugin settings form: Save and Undo wait for a change
+                  jsx(Button, { size: 'sm', disabled: !changed, onClick: () => save(undefined), 'data-hh': 'settings-save', children: SETTINGS_WORDS.buttons[0] }, 'save'),
+                  jsx(Button, { size: 'sm', variant: 'text', disabled: !changed, onClick: undo, 'data-hh': 'settings-undo', children: SETTINGS_WORDS.buttons[1] }, 'undo')
                 ]
               }, 'buttons')
         ]
@@ -128,14 +133,14 @@ export function makeSettingsPage(ctx) {
           children:
             forget === 'ask'
               ? [
-                  jsx('p', { className: K.settingsText, children: FA.question }, 'q'),
+                  jsx('p', { className: K.settingsText, role: 'status', children: FA.question }, 'q'),
                   // (FA.with_question, "What was already sent to your AI cannot be taken back.", is
                   // left out: in this build nothing is ever sent to an AI)
                   jsxs('div', {
                     className: K.settingsButtons,
                     children: [
                       jsx(Button, { size: 'sm', variant: 'secondary', onClick: forgetAll, 'data-hh': 'settings-forget-yes', children: FA.answers[0].label }, 'yes'),
-                      jsx(Button, { size: 'sm', variant: 'text', onClick: () => setForget(null), 'data-hh': 'settings-forget-no', children: FA.answers[1].label }, 'no')
+                      jsx(Button, { size: 'sm', variant: 'text', autoFocus: true, onClick: () => setForget(null), 'data-hh': 'settings-forget-no', children: FA.answers[1].label }, 'no')
                     ]
                   }, 'b')
                 ]

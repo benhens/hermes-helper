@@ -4279,6 +4279,47 @@ const TALK_DATA = {
   ]
 }
 
+// ---- src/kept.js ----
+// The one stored record of what Helper keeps about the person (JSON keeps.storage), under the
+// storage key 'kept': { name, mod, msg, svc, asked: [...], told }. Every field is optional.
+// cleanKept() is how it is read back: anything unexpected is dropped, so a record edited by hand
+// or written by an older build can never put something into Helper's lines that the rules would
+// not keep. The page and the settings page do the reading and writing with their own storage
+// calls (tests/state.test.mjs lists them); nothing here touches storage.
+
+const KEPT_DATA = TALK_DATA.keeps
+const KEPT_MODS = KEPT_DATA.answers.mod.values.map(v => v.need)
+const KEPT_APPS = new Set(Object.values(KEPT_DATA.answers.msg.names))
+// A service is kept from the services named in keeps.answers, or from a picked answer's own service.
+const KEPT_SERVICES = new Set([...Object.values(KEPT_DATA.answers.svc.names), ...TALK_DATA.topics.flatMap(t => t.question.answers.map(a => a.service).filter(Boolean))])
+const KEPT_LIM = KEPT_DATA.remember.limits
+const KEPT_NAME_MAX = 30
+const keptPlain = (v, max) => typeof v === 'string' && v.trim() !== '' && Array.from(v).length <= max && !looksLikeKey(v)
+
+function cleanKept(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+  const out = {}
+  if (keptPlain(v.name, KEPT_NAME_MAX)) out.name = v.name
+  if (KEPT_MODS.includes(v.mod)) out.mod = v.mod
+  if (KEPT_APPS.has(v.msg)) out.msg = v.msg
+  if (KEPT_SERVICES.has(v.svc)) out.svc = v.svc
+  if (Array.isArray(v.asked)) {
+    const asked = v.asked.filter(t => keptPlain(t, KEPT_LIM.max_chars)).slice(0, KEPT_LIM.max_things)
+    if (asked.length) out.asked = asked
+  }
+  if (Object.keys(out).length && v.told === true) out.told = true
+  return out
+}
+
+const hasKept = kept => ['name', 'mod', 'msg', 'svc'].some(k => kept[k]) || (kept.asked || []).length > 0
+
+// What goes to storage: the cleaned record, or null when nothing is left (then the key is removed,
+// told with it, as "Forget all" does).
+function keptToStore(kept) {
+  const clean = cleanKept(kept)
+  return hasKept(clean) ? clean : null
+}
+
 // ---- src/talk.js ----
 // How Helper answers, as plain code: hhcontent's order of steps (content/helper-talk-v2.md
 // section 2.1, changes-7 and changes-8) ported from the team's route2.py, reading hhcontent's data
@@ -4503,7 +4544,10 @@ function remember(text, st, out) {
     if (n < lim.min_words) out.kind = 'RM3'
     else if (whichOf(talkNorm(thing), KEEP_REMEMBER.refuse.words).length || new RegExp(KEEP_REMEMBER.refuse.digits_pattern).test(thing)) out.kind = 'RM6'
     else if (n > lim.max_words || charCount(thing) > lim.max_chars) out.kind = 'RM5'
-    else if (asked.includes(thing)) out.kind = 'RM1'
+    // Builder, after review (route2.py compares exactly): the same thing in other capitals counts
+    // as kept already, as the settings page reads it (settings_read.py), which would otherwise
+    // refuse every Save with "This line is there twice".
+    else if (asked.some(a => a.toLowerCase() === thing.toLowerCase())) out.kind = 'RM1'
     else if (asked.length >= lim.max_things) out.kind = 'RM4'
     else {
       keep(st, out, 'asked', thing)
@@ -4545,7 +4589,7 @@ function typedAboutKept(text) {
   }
   return s
 }
-const hasKeptValues = kept => ['name', 'mod', 'msg', 'svc'].some(k => kept[k]) || (kept.asked || []).length > 0
+const hasKeptValues = kept => hasKept(kept)
 // What A1, A2 and A4 do to the visit: A1 answers at once, A2 and A4 ask for a Yes first, and
 // there is nothing to ask about when nothing like that is kept.
 function aboutKept(s, st) {
@@ -4596,6 +4640,13 @@ function dontKnow(text) {
 }
 
 function codeName(text, strongOnly = false) {
+  const name = codeNameAsRoute2(text, strongOnly)
+  // Builder, after review (not in route2.py): a "name" holding one of the words Helper never keeps
+  // (keeps.remember.refuse.words: password, PIN, ...) is no name, as a name with digits is none,
+  // because it would be kept and shown in "Kept: ...", and the settings page then refuses the box.
+  return name && !whichOf(talkNorm(name), KEEP_REMEMBER.refuse.words).length ? name : null
+}
+function codeNameAsRoute2(text, strongOnly) {
   let m = NAME_STRONG.exec(text)
   if (m) return capFirst(m[1])
   if (strongOnly) return null
@@ -5037,47 +5088,6 @@ function lineFor(result, st, typed = '', opts = {}) {
 // data has no words for it.
 const REPLY_HINT = 'Reply to Helper'
 const hintFor = entry => (entry && entry.answers && entry.answers.items.length ? entry.answers.hint : REPLY_HINT)
-
-// ---- src/kept.js ----
-// The one stored record of what Helper keeps about the person (JSON keeps.storage), under the
-// storage key 'kept': { name, mod, msg, svc, asked: [...], told }. Every field is optional.
-// cleanKept() is how it is read back: anything unexpected is dropped, so a record edited by hand
-// or written by an older build can never put something into Helper's lines that the rules would
-// not keep. The page and the settings page do the reading and writing with their own storage
-// calls (tests/state.test.mjs lists them); nothing here touches storage.
-
-const KEPT_DATA = TALK_DATA.keeps
-const KEPT_MODS = KEPT_DATA.answers.mod.values.map(v => v.need)
-const KEPT_APPS = new Set(Object.values(KEPT_DATA.answers.msg.names))
-// A service is kept from the services named in keeps.answers, or from a picked answer's own service.
-const KEPT_SERVICES = new Set([...Object.values(KEPT_DATA.answers.svc.names), ...TALK_DATA.topics.flatMap(t => t.question.answers.map(a => a.service).filter(Boolean))])
-const KEPT_LIM = KEPT_DATA.remember.limits
-const KEPT_NAME_MAX = 30
-const keptPlain = (v, max) => typeof v === 'string' && v.trim() !== '' && Array.from(v).length <= max && !looksLikeKey(v)
-
-function cleanKept(v) {
-  if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
-  const out = {}
-  if (keptPlain(v.name, KEPT_NAME_MAX)) out.name = v.name
-  if (KEPT_MODS.includes(v.mod)) out.mod = v.mod
-  if (KEPT_APPS.has(v.msg)) out.msg = v.msg
-  if (KEPT_SERVICES.has(v.svc)) out.svc = v.svc
-  if (Array.isArray(v.asked)) {
-    const asked = v.asked.filter(t => keptPlain(t, KEPT_LIM.max_chars)).slice(0, KEPT_LIM.max_things)
-    if (asked.length) out.asked = asked
-  }
-  if (Object.keys(out).length && v.told === true) out.told = true
-  return out
-}
-
-const hasKept = kept => ['name', 'mod', 'msg', 'svc'].some(k => kept[k]) || (kept.asked || []).length > 0
-
-// What goes to storage: the cleaned record, or null when nothing is left (then the key is removed,
-// told with it, as "Forget all" does).
-function keptToStore(kept) {
-  const clean = cleanKept(kept)
-  return hasKept(clean) ? clean : null
-}
 
 // ---- src/settings-file.js ----
 // Helper's settings page as a short file (content/helper-settings-edit-v1.md; JSON
@@ -7182,14 +7192,16 @@ function makePage(ctx, opts = {}) {
     m.stored = JSON.stringify(keptToStore(kept))
   }
   // After everything the person does: the record is written when it changed, and removed whole
-  // when nothing is left in it (told with it).
+  // when nothing is left in it (told with it). A storage that fails is not kept from answering.
   const writeKept = () => {
     const next = keptToStore(memory.visit.kept)
     const text = JSON.stringify(next)
     if (text === memory.stored) return
-    if (next) ctx.storage.set('kept', next)
-    else ctx.storage.remove('kept')
-    memory.stored = text
+    try {
+      if (next) ctx.storage.set('kept', next)
+      else ctx.storage.remove('kept')
+      memory.stored = text
+    } catch {}
   }
   const helperEntry = said => {
     const id = memory.nextId++
@@ -7403,7 +7415,7 @@ function makePage(ctx, opts = {}) {
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
     // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
-    // Nothing is sent anywhere: there is no AI step (tests/no-ai-step.test.mjs).
+    // Nothing is sent anywhere: there is no AI step (tests/talk-window.test.mjs, "no AI step").
     function send() {
       const typed = draft
       if (!typed.trim()) return
@@ -8059,6 +8071,8 @@ function makeSettingsPage(ctx) {
     const [said, setSaid] = useState(null)
     // "Forget all of this": null, 'ask' (the question shows) or 'done'
     const [forget, setForget] = useState(null)
+    // the box differs from what is stored
+    const changed = box !== renderKept(stored)
 
     // After a write: read it back and draw the box again from storage, with Helper's reasons.
     function showStored() {
@@ -8081,6 +8095,7 @@ function makeSettingsPage(ctx) {
     function undo() {
       showStored()
       setSaid(null)
+      setForget(null)
     }
     function forgetAll() {
       ctx.storage.remove('kept')
@@ -8095,9 +8110,10 @@ function makeSettingsPage(ctx) {
             className: K.settingsAsk,
             'data-hh': 'settings-ask',
             children: [
-              jsx('p', { className: K.settingsText, children: said.question }, 'q'),
+              // read out when it comes; the keyboard goes to No, the answer that changes nothing
+              jsx('p', { className: K.settingsText, role: 'status', children: said.question }, 'q'),
               jsx(Button, { size: 'sm', onClick: () => save('yes'), 'data-hh': 'settings-yes', children: SETTINGS_WORDS.would_delete.answers[0].label }, 'yes'),
-              jsx(Button, { size: 'sm', variant: 'text', onClick: () => save('no'), 'data-hh': 'settings-no', children: SETTINGS_WORDS.would_delete.answers[1].label }, 'no')
+              jsx(Button, { size: 'sm', variant: 'text', autoFocus: true, onClick: () => save('no'), 'data-hh': 'settings-no', children: SETTINGS_WORDS.would_delete.answers[1].label }, 'no')
             ]
           })
         : jsx('div', { className: K.settingsMessage, role: 'status', 'data-hh': `settings-${said.kind}`, children: said.lines.map((l, i) => jsx('p', { children: l }, i)) })
@@ -8135,8 +8151,9 @@ function makeSettingsPage(ctx) {
             : jsxs('div', {
                 className: K.settingsButtons,
                 children: [
-                  jsx(Button, { size: 'sm', onClick: () => save(undefined), 'data-hh': 'settings-save', children: SETTINGS_WORDS.buttons[0] }, 'save'),
-                  jsx(Button, { size: 'sm', variant: 'text', onClick: undo, 'data-hh': 'settings-undo', children: SETTINGS_WORDS.buttons[1] }, 'undo')
+                  // as Hermes's own plugin settings form: Save and Undo wait for a change
+                  jsx(Button, { size: 'sm', disabled: !changed, onClick: () => save(undefined), 'data-hh': 'settings-save', children: SETTINGS_WORDS.buttons[0] }, 'save'),
+                  jsx(Button, { size: 'sm', variant: 'text', disabled: !changed, onClick: undo, 'data-hh': 'settings-undo', children: SETTINGS_WORDS.buttons[1] }, 'undo')
                 ]
               }, 'buttons')
         ]
@@ -8153,14 +8170,14 @@ function makeSettingsPage(ctx) {
           children:
             forget === 'ask'
               ? [
-                  jsx('p', { className: K.settingsText, children: FA.question }, 'q'),
+                  jsx('p', { className: K.settingsText, role: 'status', children: FA.question }, 'q'),
                   // (FA.with_question, "What was already sent to your AI cannot be taken back.", is
                   // left out: in this build nothing is ever sent to an AI)
                   jsxs('div', {
                     className: K.settingsButtons,
                     children: [
                       jsx(Button, { size: 'sm', variant: 'secondary', onClick: forgetAll, 'data-hh': 'settings-forget-yes', children: FA.answers[0].label }, 'yes'),
-                      jsx(Button, { size: 'sm', variant: 'text', onClick: () => setForget(null), 'data-hh': 'settings-forget-no', children: FA.answers[1].label }, 'no')
+                      jsx(Button, { size: 'sm', variant: 'text', autoFocus: true, onClick: () => setForget(null), 'data-hh': 'settings-forget-no', children: FA.answers[1].label }, 'no')
                     ]
                   }, 'b')
                 ]

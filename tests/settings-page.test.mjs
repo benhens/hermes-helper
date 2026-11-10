@@ -115,11 +115,34 @@ test('deleting lines asks first: "Save, and forget 2 things?"; No saves nothing 
   assert.equal(storage.data.has('kept'), false)
 })
 
-test('Undo changes puts the box back as stored', async () => {
+test('Undo changes puts the box back as stored; Save and Undo wait for a change, as in Hermes\'s own plugin settings form', async () => {
   const { view } = await openSettings({ kept: PETER })
+  assert.equal(find(view, 'save').props.disabled, true)
+  assert.equal(find(view, 'undo').props.disabled, true)
   type(view, 'Name: Somebody else')
+  assert.equal(find(view, 'save').props.disabled, false)
   press(view, 'undo')
   assert.equal(box(view).props.value, renderKept(PETER))
+  assert.equal(find(view, 'save').props.disabled, true)
+  // Undo also closes an open "Forget all of this" question
+  press(view, 'forget-all')
+  type(view, 'Name: Pete')
+  press(view, 'undo')
+  assert.ok(!shown(view, 'forget').includes(SF.forget_all.question))
+})
+
+test('the questions are read out when they come, and the keyboard goes to No, the answer that changes nothing', async () => {
+  const { view } = await openSettings({ kept: PETER })
+  type(view, 'Name: Peter')
+  press(view, 'save')
+  const ask = find(view, 'ask')
+  assert.equal(ask.props.children[0].props.role, 'status')
+  assert.equal(find(view, 'no').props.autoFocus, true)
+  assert.equal(find(view, 'yes').props.autoFocus, undefined)
+  press(view, 'no')
+  press(view, 'forget-all')
+  assert.equal(find(view, 'forget-no').props.autoFocus, true)
+  assert.equal(all(find(view, 'forget'), n => n.props && n.props.role === 'status').length, 1)
 })
 
 test('"Forget all of this" asks first; Yes removes the record whole and says so; No keeps it', async () => {
@@ -167,6 +190,9 @@ test('the conversation reads the record again when it is put on screen: a name d
   const rows = all(byData(byData(again.tree, 'bubble'), 'kept-rows'), n => n.type === 'li').map(n => text(n))
   assert.ok(!rows.some(r => /Peter/.test(r)), rows.join(' / '))
   assert.ok(rows.some(r => /WhatsApp/.test(r)))
-  // and nothing the conversation writes brings the old name back
+  // and what the conversation writes next does not bring the old name back
+  send('remember that the courts open at nine')
   assert.equal(storage.data.get('kept').name, undefined)
+  assert.deepEqual(storage.data.get('kept').asked, ['my club has six courts', 'the courts open at nine'])
+  assert.equal(storage.data.get('kept').msg, 'WhatsApp')
 })
