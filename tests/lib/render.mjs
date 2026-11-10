@@ -31,7 +31,7 @@ export async function loadPlugin(change = null) {
 
 export function fakeStorage(initial = {}) {
   const data = new Map(Object.entries(initial))
-  return { data, get: (k, d) => (data.has(k) ? data.get(k) : d), set: (k, v) => data.set(k, v) }
+  return { data, get: (k, d) => (data.has(k) ? data.get(k) : d), set: (k, v) => data.set(k, v), remove: k => data.delete(k) }
 }
 
 // The host's timers (ctx.setTimeout / ctx.setInterval), faked. A short wait (under 30 s: the 1 s
@@ -79,21 +79,24 @@ export function fakeTimers() {
 }
 
 // Registers the plugin with a fake ctx; returns its contributions and the page component.
-// extra: more ctx doors (e.g. os) for a test. change: see loadPlugin.
+// extra: more ctx doors (e.g. os) for a test; { registerSettingsPage: undefined } is a Hermes too
+// old to have plugin settings pages. change: see loadPlugin. settingsPages: what was registered there.
 export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers(), extra = {}, change = null) {
   const plugin = await loadPlugin(change)
   const contributions = []
+  const settingsPages = []
   const ctx = {
     storage,
     setTimeout: timers.setTimeout,
     setInterval: timers.setInterval,
     registerMany: list => contributions.push(...list),
+    registerSettingsPage: p => settingsPages.push(p),
     register: c => contributions.push(c),
     ...extra
   }
   plugin.register(ctx)
   const page = contributions.find(c => c.area === 'routes')
-  return { plugin, contributions, storage, timers, ctx, Page: page.render().type }
+  return { plugin, contributions, settingsPages, storage, timers, ctx, Page: page.render().type }
 }
 
 // One src file that imports React, loaded with the stand-ins (its own ./ imports stay real files).

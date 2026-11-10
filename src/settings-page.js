@@ -129,7 +129,8 @@ export function makeSettingsPage(ctx) {
             forget === 'ask'
               ? [
                   jsx('p', { className: K.settingsText, children: FA.question }, 'q'),
-                  jsx('p', { className: K.settingsHint, children: FA.with_question }, 'with'),
+                  // (FA.with_question, "What was already sent to your AI cannot be taken back.", is
+                  // left out: in this build nothing is ever sent to an AI)
                   jsxs('div', {
                     className: K.settingsButtons,
                     children: [

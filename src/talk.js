@@ -730,8 +730,9 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'A1': {
       const rows = keptRows(st.kept)
       if (!rows.length) return said('A1-none', KEEPS.tell.see.see_line_nothing)
+      // with Helper's settings page: its button, and under the list the way there by hand
       const next = opts.settingsPage ? { kind: 'settings', label: KEEPS.after_settings_page_exists.button_under_see } : { kind: 'forget-all', label: ALL.label }
-      return said('A1', KEEPS.tell.see.see_line, { rows, next })
+      return said('A1', KEEPS.tell.see.see_line, { rows, next, hint: opts.settingsPage ? KEEPS.after_settings_page_exists.by_hand : null })
     }
     case 'A2':
       return said('A2-' + result.what, ONE.questions[result.what], { answers: yesNo(ONE.answers, result.what) })

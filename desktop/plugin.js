@@ -1531,13 +1531,14 @@ function cleanAnswers(value) {
 // Keys: tab (setup | yours), step (1-4), answers ({ stepId: optionId }, the person's picks on the
 // steps), helperWidth (the width Helper's window was dragged to, 360 to 600 px).
 // Anything unexpected in storage falls back to the default.
-// Nothing about the person is stored: not the name, not what they do, nothing of the
-// conversation (row 1 of docs/build/talk-v1-plan.md). STORED_KEYS is every key the plugin may
+// About the person, only the record of what Helper keeps (talk v2 row 3): never what they do,
+// never the conversation. STORED_KEYS is every key the plugin may
 // write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
 
 const STEP_COUNT = STEPS.length
 // 'remember' is the person's answer to the memory test on Your setup (src/setup-tab.js).
-const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember']
+// 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
+const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept']
 
 function readState(get) {
   const pick = (key, allowed, fallback) => {
@@ -5009,8 +5010,9 @@ function lineFor(result, st, typed = '', opts = {}) {
     case 'A1': {
       const rows = keptRows(st.kept)
       if (!rows.length) return said('A1-none', KEEPS.tell.see.see_line_nothing)
+      // with Helper's settings page: its button, and under the list the way there by hand
       const next = opts.settingsPage ? { kind: 'settings', label: KEEPS.after_settings_page_exists.button_under_see } : { kind: 'forget-all', label: ALL.label }
-      return said('A1', KEEPS.tell.see.see_line, { rows, next })
+      return said('A1', KEEPS.tell.see.see_line, { rows, next, hint: opts.settingsPage ? KEEPS.after_settings_page_exists.by_hand : null })
     }
     case 'A2':
       return said('A2-' + result.what, ONE.questions[result.what], { answers: yesNo(ONE.answers, result.what) })
@@ -8152,7 +8154,8 @@ function makeSettingsPage(ctx) {
             forget === 'ask'
               ? [
                   jsx('p', { className: K.settingsText, children: FA.question }, 'q'),
-                  jsx('p', { className: K.settingsHint, children: FA.with_question }, 'with'),
+                  // (FA.with_question, "What was already sent to your AI cannot be taken back.", is
+                  // left out: in this build nothing is ever sent to an AI)
                   jsxs('div', {
                     className: K.settingsButtons,
                     children: [

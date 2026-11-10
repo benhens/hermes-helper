@@ -1,11 +1,18 @@
-// Helper's conversation on the page (talk v1), rendered from the built plugin with the stand-ins
-// (tests/lib/render.mjs): the opening, the bubble, the conversation so far, answers to pick and
-// their keyboard rules, buttons inside the bubble, "Skip", a pasted key, and that nothing about
-// the person is written anywhere. What Helper answers is tests/talk.test.mjs; the page's frame and
-// narrow windows tests/page-render.test.mjs; the character tests/helper-character.test.mjs.
+// Helper's conversation on the page (talk v2: design/talk-r5, option 4), rendered from the built
+// plugin with the stand-ins (tests/lib/render.mjs): the opening, the bubble, the conversation so
+// far, the things to pick inside the message box and their keyboard rules, buttons inside the
+// bubble, "Skip", a pasted key, what Helper keeps (one stored record, the faint "Kept: ..." line,
+// "See what I keep", "Change", a later visit, forgetting) and that nothing is sent anywhere.
+// What Helper answers is tests/talk.test.mjs (compared with route2.py); the page's frame and
+// narrow windows tests/page-render.test.mjs; the character tests/helper-character.test.mjs;
+// Helper's settings page tests/settings-page.test.mjs.
+// Builder, 10 Nov 2026 (talk v2: rewritten from the talk v1 tests; the topics now show only when
+// the person asks what they can ask, so the tests reach a topic through "what can I ask").
 import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData, byLabel } from './lib/render.mjs'
+import fs from 'node:fs'
+import path from 'node:path'
+import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData } from './lib/render.mjs'
 import { TALK_DATA } from '../src/talk-data.js'
 import { T, K } from '../src/look.js'
 
@@ -23,10 +30,11 @@ function useHost({ runtime = { ok: true, model: 'mock-small' } } = {}) {
   }
 }
 
-async function open({ storage = fakeStorage(), host = {} } = {}) {
+// extra: { registerSettingsPage: undefined } is a Hermes without plugin settings pages
+async function open({ storage = fakeStorage(), host = {}, extra = {} } = {}) {
   useHost(host)
   const timers = fakeTimers()
-  const { Page } = await registerPlugin(storage, timers)
+  const { Page } = await registerPlugin(storage, timers, extra)
   const view = mount(Page)
   await settle()
   return { view, timers, storage, Page }
@@ -38,12 +46,19 @@ const root = view => byData(view.tree, 'page')
 const bubble = view => byData(helper(view), 'bubble')
 const line = view => bubble(view).props['data-line']
 const said = view => spoken(byData(bubble(view), 'said')).trim()
+// Everything above the bubble: older lines, the person's messages and the faint lines.
 const conversation = view => byData(helper(view), 'conversation-lines').props.children
+// Only the older lines and the person's messages.
+const lines = view => conversation(view).filter(c => c.props['data-hh'] === 'old' || c.props['data-hh'] === 'me')
+const notes = view => conversation(view).filter(c => c.props['data-hh'] === 'kept-note' || c.props['data-hh'] === 'used-note')
 // What is on screen in an older line or a message, without the words only a screen reader hears.
 const words = node => text(node).replace(/^(?:You|Helper) said: /, '').trim()
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
-const group = view => byData(helper(view), 'answers')
-const answers = view => all(helper(view), n => n.props['data-hh'] === 'answer')
+const composer = view => byData(view.tree, 'composer')
+// The things to pick live in the message box (talk-r5), not in Helper's window.
+const picks = view => byData(view.tree, 'picks')
+const group = view => byData(view.tree, 'answers')
+const answers = view => all(view.tree, n => n.props['data-hh'] === 'answer')
 const labels = view => answers(view).map(a => text(a).trim())
 const answer = (view, label) => answers(view).find(a => text(a).trim() === label)
 const button = view => byData(bubble(view), 'bubble-button')
@@ -63,6 +78,16 @@ const pickNow = (view, label) => {
   finish(view)
   click(answer(view, label))
 }
+// The box of things to pick has shrunk away (the end of its 0.3 s transition).
+const shrunk = view => {
+  const p = picks(view)
+  if (p) p.props.onTransitionEnd({ target: p, currentTarget: p })
+}
+// Asks what one can ask: the topics, said out.
+const askTopics = view => {
+  send(view, 'what can I ask')
+  finish(view)
+}
 // Past the opening: name, what the person does.
 async function pastOpening(options) {
   const opened = await open(options)
@@ -73,7 +98,14 @@ async function pastOpening(options) {
   finish(opened.view)
   return opened
 }
+// Past the opening, then the topics.
+async function atTopics(options) {
+  const opened = await pastOpening(options)
+  askTopics(opened.view)
+  return opened
+}
 const TOPIC_LABELS = TALK_DATA.topic_picks.map(p => p.label)
+const SETTINGS_HREF = '/settings?tab=plugins&plugin=helper'
 
 beforeEach(() => {
   delete globalThis.__hhHost
@@ -87,6 +119,7 @@ test('the opening: the greeting in the bubble, nothing above it, nothing to pick
   assert.equal(said(view), OPEN)
   assert.equal(bubble(view).props.className, T.bubble)
   assert.deepEqual(conversation(view), [])
+  assert.equal(picks(view), null)
   assert.equal(group(view), null)
   assert.equal(byData(bubble(view), 'in-bubble'), null, 'no button in the opening')
   assert.equal(box(view).props.placeholder, 'Reply to Helper')
@@ -95,40 +128,57 @@ test('the opening: the greeting in the bubble, nothing above it, nothing to pick
   assert.equal(skipLink(view).props.className, T.skip)
 })
 
-test('the opening, played: the name, what the person does, then the line that offers the topics; "Skip" leaves with the two questions', async () => {
+test('the opening, played: the name, what the person does, then "Ask me anything" with nothing to pick; the faint "Kept: Peter." line with its first-time line', async () => {
   const { view } = await open()
   finish(view)
   send(view, 'Peter')
   assert.equal(said(view), 'Nice to meet you, Peter. What do you do?')
   assert.equal(group(view), null, 'still nothing to pick')
   assert.ok(skipLink(view), 'Skip stays at the second question')
-  assert.equal(box(view).props.placeholder, 'Reply to Helper')
   finish(view)
   send(view, 'I run a tennis club')
-  assert.equal(said(view), 'Thanks, Peter. Ask me anything about Hermes, or pick one of these.')
+  assert.equal(line(view), 'F2')
+  assert.equal(said(view), 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(skipLink(view), null)
   finish(view)
-  assert.deepEqual(labels(view), TOPIC_LABELS)
-  assert.ok(labels(view).length <= 5)
-  assert.equal(box(view).props.placeholder, 'Or type your question')
+  // talk v2 (changes-7): no topics after the greeting
+  assert.equal(picks(view), null)
+  assert.equal(box(view).props.placeholder, 'Reply to Helper')
   // what was said before has moved up: Helper's lines small on its side, the person's on theirs
-  assert.deepEqual(conversation(view).map(c => [c.props['data-hh'], c.props.className, words(c)]), [
+  assert.deepEqual(lines(view).map(c => [c.props['data-hh'], c.props.className, words(c)]), [
     ['old', T.old, OPEN],
     ['me', T.me, 'Peter'],
     ['old', T.old, 'Nice to meet you, Peter. What do you do?'],
     ['me', T.me, 'I run a tennis club']
   ])
+  // last above the bubble: the faint line about what was kept, with its link and, this once,
+  // where it is kept (the no-model wording: there is no AI step)
+  const note = conversation(view).at(-1)
+  assert.equal(note.props['data-hh'], 'kept-note')
+  assert.equal(note.props.className, T.note)
+  assert.equal(text(note.props.children[0]), 'Kept: Peter.')
+  const link = byData(note, 'kept-link')
+  assert.equal(link.type, 'button')
+  assert.equal(link.props.className, T.link)
+  assert.equal(text(link), 'See what I keep')
+  assert.equal(text(byData(note, 'kept-first')), TALK_DATA.keeps.tell.first_time_if_no_model_call)
+  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing is sent to us.')
+  // the first-time line comes once only
+  send(view, 'remember that my club has six courts')
+  assert.equal(line(view), 'RM1')
+  assert.equal(text(notes(view).at(-1).props.children[0]), 'Kept: my club has six courts.')
+  assert.equal(byData(notes(view).at(-1), 'kept-first'), null)
 })
 
-test('"Skip" at the name question: it becomes the person\'s message, Helper says "That\'s fine" and offers the topics; no name is asked for again', async () => {
+test('"Skip" at the name question: it becomes the person\'s message, Helper says "That\'s fine", nothing to pick; no name is asked for again', async () => {
   const { view } = await open()
   click(skipLink(view))
   assert.equal(line(view), 'F3')
-  assert.equal(said(view), "That's fine. Ask me anything about Hermes, or pick one of these.")
+  assert.equal(said(view), "That's fine. Ask me anything about Hermes.")
   assert.equal(skipLink(view), null)
-  assert.deepEqual(conversation(view).map(c => words(c)), [OPEN, 'Skip'])
+  assert.deepEqual(lines(view).map(c => words(c)), [OPEN, 'Skip'])
   finish(view)
-  assert.deepEqual(labels(view), TOPIC_LABELS)
+  assert.equal(picks(view), null)
   // and at the second question
   const second = await open()
   send(second.view, 'Peter')
@@ -136,8 +186,23 @@ test('"Skip" at the name question: it becomes the person\'s message, Helper says
   assert.equal(line(second.view), 'F3')
 })
 
-test('answers to pick: a named group of real buttons on the person\'s side, drawn like the person\'s messages', async () => {
+test('the topics only when asked: "what can I ask" gives line TP with the four topics, in the message box', async () => {
   const { view } = await pastOpening()
+  send(view, 'what can I ask')
+  assert.equal(line(view), 'TP')
+  assert.equal(said(view), 'You can ask me how Hermes works and how to set it up. Pick one, or type your own question.')
+  finish(view)
+  assert.deepEqual(labels(view), TOPIC_LABELS)
+  assert.equal(labels(view).length, 4)
+  assert.equal(box(view).props.placeholder, 'Or type your question')
+  for (const asked of ['help', 'what should I ask?', 'Hey Helper, what do you know?']) {
+    send(view, asked)
+    assert.equal(line(view), 'TP', asked)
+  }
+})
+
+test('things to pick: a named group of real buttons inside the message box, above the line where one types, in full even rows', async () => {
+  const { view } = await atTopics()
   const g = group(view)
   assert.equal(g.props.role, 'group')
   assert.equal(g.props['aria-label'], 'Answers to pick')
@@ -147,69 +212,116 @@ test('answers to pick: a named group of real buttons on the person\'s side, draw
     assert.equal(a.props.type, 'button')
     assert.equal(a.props.className, T.answer)
   }
-  // beside the character, in the row under the bubble
-  const under = byData(helper(view), 'under')
-  assert.equal(under.props.children.filter(Boolean).at(-1), g)
+  // inside the message box, before the line where one types; none beside the character any more
+  const surface = composer(view).props.children
+  assert.ok(all(surface, n => n === picks(view)).length === 1, 'in the message box')
+  assert.equal(all(byData(helper(view), 'under'), n => n.props['data-hh'] === 'answer').length, 0)
+  const kids = surface.props.children.filter(Boolean)
+  assert.ok(kids.indexOf(picks(view)) < kids.findIndex(k => all(k, n => n.type === 'sdk:Textarea').length), 'above the line where one types')
+  assert.equal(picks(view).props.className, T.picks)
+  // four: two rows of two
+  assert.equal(g.props['data-columns'], 2)
+  assert.equal(g.props.style['--hh-cols'], 2)
+  // three: one row
+  click(answer(view, 'What Hermes can do'))
+  finish(view)
+  assert.equal(group(view).props['data-columns'], 3)
+  // two: one row
+  send(view, 'does the memory work with claude')
+  finish(view)
+  assert.equal(labels(view).length, 2)
+  assert.equal(group(view).props['data-columns'], 2)
 })
 
-test('answers wait for the line: their room is held from the first word, but they are unseen, unread and out of the Tab order until the line is said', async () => {
-  const { view, timers } = await open()
-  finish(view)
-  send(view, 'Peter')
-  finish(view)
-  send(view, 'x') // the line that offers the topics starts to appear, word by word
-  assert.equal(line(view), 'F2')
+test('the box of things to pick grows only once the line is said and shrinks after a pick: unseen, unread and out of the Tab order until then', async () => {
+  const { view, timers } = await pastOpening()
+  send(view, 'what can I ask') // the line that offers the topics starts to appear, word by word
+  assert.equal(line(view), 'TP')
   assert.equal(bubble(view).props['data-said'], false)
-  const waiting = group(view)
-  assert.ok(waiting, 'in the tree from the first word: the room is held')
-  assert.equal(waiting.props.className, `${T.answers} ${T.wait}`)
+  const waiting = picks(view)
+  assert.ok(waiting, 'in the tree from the first word, at height 0, so that it can grow')
+  assert.equal(waiting.props['data-open'], false)
   assert.equal(waiting.props['aria-hidden'], true)
-  assert.deepEqual(labels(view), TOPIC_LABELS)
+  assert.equal(waiting.props.style.height, '0px')
   for (const a of answers(view)) assert.equal(a.props.tabIndex, -1)
   // pressing one that is not seen yet does nothing
   const before = conversation(view).length
   answers(view)[1].props.onClick({ preventDefault() {} })
-  assert.equal(line(view), 'F2')
+  assert.equal(line(view), 'TP')
   assert.equal(conversation(view).length, before)
   // word by word to the last word: then they are there
   for (let i = 0; i < 40; i++) timers.tick()
   assert.equal(bubble(view).props['data-said'], true)
-  assert.equal(group(view).props.className, T.answers)
-  assert.equal(group(view).props['aria-hidden'], undefined)
+  assert.equal(picks(view).props['data-open'], true)
+  assert.equal(picks(view).props['aria-hidden'], undefined)
   for (const a of answers(view)) assert.equal(a.props.tabIndex, 0)
+  // a pick that leads to a new list: the box closes at once, the new labels wait at height 0 for
+  // their line. (Keeping the old labels while it shrinks is the component's own state, which these
+  // stand-ins do not keep for an inner component: that part is checked in the running app, row 7.)
+  click(answer(view, 'Phone and chat apps'))
+  assert.equal(line(view), 'msg-q')
+  assert.equal(picks(view).props['data-open'], false)
+  assert.equal(picks(view).props.style.height, '0px')
+  for (const a of answers(view)) assert.equal(a.props.tabIndex, -1)
+  finish(view)
+  assert.equal(picks(view).props['data-open'], true)
+  assert.deepEqual(labels(view), ['Telegram', 'WhatsApp', 'Discord', 'Slack'])
+  // a pick that leads to a line with nothing to pick: nothing open
+  click(answer(view, 'WhatsApp'))
+  assert.ok(!picks(view) || picks(view).props['data-open'] === false)
+  shrunk(view)
+  // the grow and shrink is the style sheet's, 0.3 s on the height (cut to nothing under reduce motion)
+  assert.match(fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', 'talk.css'), 'utf8'), /\.hh-picks\{transition:height \.3s ease-in-out\}/)
 })
 
 test('a pick becomes the person\'s message and Helper answers at once; the keyboard goes back to the message box', async () => {
-  const { view } = await pastOpening()
+  const { view } = await atTopics()
   let focused = 0
   box(view).props.ref.current = { focus: () => focused++ }
   click(answer(view, 'Phone and chat apps'))
   assert.equal(focused, 1)
   assert.equal(line(view), 'msg-q')
   assert.equal(said(view), 'Which chat app do you use most?')
-  assert.deepEqual(conversation(view).slice(-2).map(c => [c.props['data-hh'], words(c)]), [
-    ['old', 'Thanks, Peter. Ask me anything about Hermes, or pick one of these.'],
+  assert.deepEqual(lines(view).slice(-2).map(c => [c.props['data-hh'], words(c)]), [
+    ['old', 'You can ask me how Hermes works and how to set it up. Pick one, or type your own question.'],
     ['me', 'Phone and chat apps']
   ])
-  // the old line's picks are gone with it: only the newest line has things to pick
+  // only the newest line has things to pick
   finish(view)
   assert.deepEqual(labels(view), ['Telegram', 'WhatsApp', 'Discord', 'Slack'])
   assert.equal(box(view).props.placeholder, 'Or type your own answer')
   click(answer(view, 'WhatsApp'))
   assert.equal(focused, 2)
   assert.equal(line(view), 'msg2')
+  shrunk(view)
   assert.equal(group(view), null, 'an answer line has nothing to pick')
   assert.equal(box(view).props.placeholder, 'Reply to Helper')
-  assert.equal(conversation(view).at(-1).props['data-hh'], 'me')
-  assert.equal(words(conversation(view).at(-1)), 'WhatsApp')
+  assert.equal(lines(view).at(-1).props['data-hh'], 'me')
+  assert.equal(words(lines(view).at(-1)), 'WhatsApp')
+})
+
+test('answers to pick only under the questions that carry them: an open question has none, and is answered by typing', async () => {
+  // the team's own list (answers.when_shown), read from the data file: the build keeps only the code's part
+  const raw = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, '..', 'content', 'helper-talk-v2.json'), 'utf8'))
+  const carry = raw.answers.when_shown.questions
+  for (const topic of TALK_DATA.topics) {
+    const { view } = await atTopics()
+    const held = TALK_DATA.topic_picks.find(p => p.holds && p.holds.includes(topic.id))
+    if (held) pickNow(view, held.label)
+    pickNow(view, topic.pick.label)
+    assert.equal(line(view), topic.question.id)
+    finish(view)
+    assert.equal(labels(view).length, topic.question.answers.length, topic.id)
+    const key = Object.keys(carry).find(q => q.startsWith(topic.question.id + ' '))
+    assert.equal(labels(view).length > 0, carry[key], `${topic.id}: ${key}`)
+  }
 })
 
 test('a pick goes by its own id, never through the key words: every answer of every question gives exactly its row', async () => {
+  let checked = 0
   for (const topic of TALK_DATA.topics) {
     for (const [i, a] of topic.question.answers.entries()) {
-      const { view } = await open()
-      click(skipLink(view))
-      finish(view)
+      const { view } = await atTopics()
       // the topic's pick, through "What Hermes can do" where it is held there
       const held = TALK_DATA.topic_picks.find(p => p.holds && p.holds.includes(topic.id))
       if (held) {
@@ -222,21 +334,25 @@ test('a pick goes by its own id, never through the key words: every answer of ev
       assert.equal(text(answers(view)[i]).trim(), a.label)
       click(answers(view)[i])
       assert.equal(line(view), a.gives, `${topic.id}: "${a.label}"`)
+      checked++
     }
   }
+  assert.equal(checked, 12)
 })
 
-test('the pick that holds two topics: "What Hermes can do" gives its own line with those two to pick', async () => {
-  const { view } = await pastOpening()
+test('the pick that holds three topics: "What Hermes can do" gives its own line with those three to pick (the wants are row 5, not built)', async () => {
+  const { view } = await atTopics()
   click(answer(view, 'What Hermes can do'))
   assert.equal(line(view), 'C1')
+  assert.equal(said(view), 'Hermes can do jobs on a schedule and use services like Gmail. You can also have more than one Hermes. Pick one.')
   finish(view)
-  assert.deepEqual(labels(view), ['Daily jobs and reminders', 'Gmail and other services'])
+  assert.deepEqual(labels(view), ['Daily jobs and reminders', 'Gmail and other services', 'More than one Hermes'])
+  assert.doesNotMatch(labels(view).join(' '), /Web, files, pictures and voice/)
   assert.equal(box(view).props.placeholder, 'Or type your question')
 })
 
 test('the picked service fills the text to paste: "Notion" → "Show me what to ask" opens the text with Notion in it, with Copy; pressed again it closes', async () => {
-  const { view } = await pastOpening()
+  const { view } = await atTopics()
   click(answer(view, 'What Hermes can do'))
   pickNow(view, 'Gmail and other services')
   pickNow(view, 'Notion')
@@ -253,7 +369,6 @@ test('the picked service fills the text to paste: "Notion" → "Show me what to 
   const copy = all(bubble(view), n => n.type === 'sdk:CopyButton')
   assert.equal(copy.length, 1)
   assert.equal(copy[0].props.text, 'Please connect Notion. If there is a ready-made MCP for it, add that. Ask me before you change anything.')
-  // the same text is on screen, not only inside the Copy button
   const shown = all(bubble(view), n => n.type === 'span' && n.props.className === K.cardPasteText)
   assert.equal(text(shown[0]), copy[0].props.text)
   assert.equal(byData(bubble(view), 'in-bubble').props.className, `${T.inBubble} ${T.inBubbleColumn}`)
@@ -263,7 +378,7 @@ test('the picked service fills the text to paste: "Notion" → "Show me what to 
 })
 
 test('a button in the bubble sits under a thin line, waits for the line like the answers do, and is a real button with a small arrow', async () => {
-  const { view, timers } = await pastOpening()
+  const { view, timers } = await atTopics()
   click(answer(view, 'Phone and chat apps'))
   pickNow(view, 'Telegram')
   assert.equal(line(view), 'msg1')
@@ -290,15 +405,14 @@ test('"Open Messaging", "Open Model" and "Open Capabilities" open Hermes\'s own 
     [['Which AI to use', 'ChatGPT'], 'Open Model', '/settings?tab=config:model'],
     [['What Hermes can do', 'Gmail and other services', 'Is it safe to connect?'], 'Open Capabilities', '/capabilities']
   ]
-  for (const [path, label, to] of cases) {
-    const { view } = await pastOpening()
-    for (const pick of path) pickNow(view, pick)
+  for (const [route, label, to] of cases) {
+    const { view } = await atTopics()
+    for (const p of route) pickNow(view, p)
     finish(view)
     assert.equal(text(button(view)).trim(), label)
     click(button(view))
     assert.deepEqual(globalThis.__hhHost.navigated, [to])
-    assert.equal(conversation(view).at(-1).props['data-hh'], 'me', 'pressing it says nothing in the conversation')
-    // the same press when Hermes's door throws: the page stays as it is
+    assert.equal(lines(view).at(-1).props['data-hh'], 'me', 'pressing it says nothing in the conversation')
     globalThis.__hhHost.navigateThrows = true
     const before = line(view)
     click(button(view))
@@ -307,10 +421,12 @@ test('"Open Messaging", "Open Model" and "Open Capabilities" open Hermes\'s own 
 })
 
 test('Bots: no button. In its place, under the thin line, Helper says where the tab is; it waits for the line too', async () => {
-  const { view } = await pastOpening()
-  click(answer(view, 'More than one Hermes'))
-  pickNow(view, 'Help the first one')
-  assert.equal(line(view), 'bot2')
+  const { view } = await atTopics()
+  click(answer(view, 'What Hermes can do'))
+  pickNow(view, 'More than one Hermes')
+  assert.equal(line(view), 'bot-q')
+  send(view, 'help the first one')
+  assert.equal(line(view), 'bot0')
   assert.equal(button(view), null)
   assert.equal(all(bubble(view), n => n.type === 'button').length, 0)
   const where = byData(bubble(view), 'where')
@@ -321,59 +437,59 @@ test('Bots: no button. In its place, under the thin line, Helper says where the 
   finish(view)
   assert.equal(byData(bubble(view), 'in-bubble').props['aria-hidden'], undefined)
   assert.equal(globalThis.__hhHost.navigated, undefined)
-  // no line of the data ends in a button that says "Open Bots"
   assert.doesNotMatch(text(helper(view)), /Open Bots/)
 })
 
 test('a button that makes Helper say one more line: "How to add one" becomes the person\'s message and the next line follows', async () => {
   const { view } = await pastOpening()
-  click(answer(view, 'More than one Hermes'))
-  pickNow(view, 'A different kind of work')
+  send(view, 'second bot for work')
+  assert.equal(line(view), 'bot1')
   finish(view)
   assert.equal(text(button(view)).trim(), 'How to add one')
   click(button(view))
   assert.equal(line(view), 'bot1-next')
   assert.match(said(view), /^Open "Bots", press "\+", then "New bot"\./)
-  assert.deepEqual(conversation(view).slice(-2).map(c => [c.props['data-hh'], c.props['data-line'] || words(c)]), [['old', 'bot1'], ['me', 'How to add one']])
+  assert.deepEqual(lines(view).slice(-2).map(c => [c.props['data-hh'], c.props['data-line'] || words(c)]), [['old', 'bot1'], ['me', 'How to add one']])
 })
 
 test('an older line keeps its button as a small link, and it still works: text to paste opens under the older line', async () => {
-  const { view } = await pastOpening()
+  const { view } = await atTopics()
   click(answer(view, 'What Hermes remembers'))
-  pickNow(view, 'Things about me')
+  assert.equal(line(view), 'mem-q')
+  send(view, 'things about me')
   assert.equal(line(view), 'mem1')
   finish(view)
   send(view, 'what is a skill')
   assert.equal(line(view), 'term-skill')
-  const old = conversation(view).find(c => c.props['data-line'] === 'mem1')
+  const old = lines(view).find(c => c.props['data-line'] === 'mem1')
   const link = byData(old, 'old-link')
   assert.equal(link.type, 'button')
   assert.equal(link.props.className, T.oldLink)
   assert.equal(text(link).trim(), 'Try it')
   assert.equal(link.props['aria-expanded'], false)
   click(link)
-  const again = conversation(view).find(c => c.props['data-line'] === 'mem1')
+  const again = lines(view).find(c => c.props['data-line'] === 'mem1')
   assert.equal(byData(again, 'old-link').props['aria-expanded'], true)
   assert.equal(all(again, n => n.type === 'sdk:CopyButton')[0].props.text, 'Please save this to your memory: <one thing about you>. Then tell me what you saved.')
   assert.equal(line(view), 'term-skill', 'the bubble is not touched')
-  // an older line whose button opens a screen: the small link opens it
   finish(view)
   click(byData(bubble(view), 'bubble-button'))
   send(view, 'hello there')
-  const term = conversation(view).find(c => c.props['data-line'] === 'term-skill')
+  const term = lines(view).find(c => c.props['data-line'] === 'term-skill')
   globalThis.__hhHost.navigated = []
   click(byData(term, 'old-link'))
   assert.deepEqual(globalThis.__hhHost.navigated, ['/capabilities'])
 })
 
 test('text to paste that was opened stays open when its line moves up', async () => {
-  const { view } = await pastOpening()
+  const { view } = await atTopics()
   click(answer(view, 'What Hermes remembers'))
-  pickNow(view, 'What we talked about')
+  send(view, 'what we talked about')
+  assert.equal(line(view), 'mem2')
   finish(view)
   click(button(view))
   send(view, 'what is a plugin')
-  const old = conversation(view).find(c => c.props['data-line'] === 'mem2')
+  const old = lines(view).find(c => c.props['data-line'] === 'mem2')
   assert.equal(all(old, n => n.type === 'sdk:CopyButton').length, 1)
 })
 
@@ -400,19 +516,20 @@ test('a pasted key: Helper\'s fixed line, the box empties, and the key is nowher
   assert.equal(said(view), 'That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat.')
   assert.ok(!JSON.stringify(view.tree).includes(key))
   assert.ok(!JSON.stringify([...storage.data]).includes(key))
-  // the message is not shown back at all: the last thing above the bubble is still Helper's
-  assert.equal(conversation(view).at(-1).props['data-hh'], 'old')
-  // not after leaving the page and coming back either
+  assert.equal(lines(view).at(-1).props['data-hh'], 'old')
+  // "remember that" with a key in it: the key line, nothing kept
+  send(view, `remember that my key is ${key}`)
+  assert.equal(line(view), 'K1')
+  assert.ok(!JSON.stringify([...storage.data]).includes(key))
   view.unmount()
   const again = mount(Page)
   assert.ok(!JSON.stringify(again.tree).includes(key))
-  // a key after character 500 is caught too: the check reads the whole text
   send(again, 'x'.repeat(600) + ' ' + key)
   assert.equal(byData(byData(again.tree, 'helper'), 'bubble').props['data-line'], 'K1')
   assert.ok(!JSON.stringify(again.tree).includes(key))
 })
 
-test('"Which one do you mean?": the matches to pick, at most five; the pick answers the message that led to it', async () => {
+test('"Which one do you mean?": the matches to pick, at most four; the pick answers the message that led to it', async () => {
   const { view } = await pastOpening()
   send(view, 'does the memory work with claude')
   assert.equal(line(view), 'W1')
@@ -421,49 +538,65 @@ test('"Which one do you mean?": the matches to pick, at most five; the pick answ
   assert.equal(box(view).props.placeholder, 'Or type your own answer')
   click(answer(view, 'Which AI to use'))
   assert.equal(line(view), 'mod2', 'Claude was in the message: the Claude line, not the question')
-  assert.equal(words(conversation(view).at(-1)), 'Which AI to use')
-  // more than five matches: the first five in the list's order
+  assert.equal(words(lines(view).at(-1)), 'Which AI to use')
   send(view, 'memory model telegram schedule gmail second bot')
   finish(view)
-  assert.equal(labels(view).length, 5)
+  assert.deepEqual(labels(view), ['What Hermes remembers', 'Which AI to use', 'Phone and chat apps', 'Daily jobs and reminders'])
 })
 
-test('a message nobody has an answer for: the fixed line and the topics again', async () => {
+test('a message nobody has an answer for: the fixed line and, small under it, the hint (N_HINT); no topics', async () => {
   const { view } = await pastOpening()
   send(view, 'what is the weather in Riga')
   assert.equal(line(view), 'N1')
   finish(view)
-  assert.deepEqual(labels(view), TOPIC_LABELS)
+  assert.equal(picks(view), null)
+  const hint = byData(bubble(view), 'hint')
+  assert.equal(hint.type, 'p')
+  assert.equal(hint.props.className, T.where)
+  assert.equal(text(hint), TALK_DATA.fixed.N_HINT.text)
 })
 
 test('a long message is shown back cut to 500 characters; Helper still reads all of it', async () => {
   const { view } = await pastOpening()
   send(view, 'why '.repeat(140) + 'does memory forget')
-  const mine = conversation(view).at(-1)
+  const mine = lines(view).at(-1)
   assert.equal(mine.props['data-hh'], 'me')
   assert.equal(Array.from(words(mine)).length, 501)
   assert.ok(text(mine).endsWith('…'))
   assert.equal(line(view), 'mem-q', 'the word after character 500 was read')
 })
 
-test('nothing about the person is written anywhere: after a whole conversation the storage holds nothing of it', async () => {
+test('what is kept about the person: one stored record ("kept") by fixed rules, never what they do or the conversation; nothing is sent', async () => {
   const { view, storage } = await open()
   finish(view)
   send(view, 'Peter')
   finish(view)
   send(view, 'I run a tennis club')
-  pickNow(view, 'What Hermes remembers')
-  pickNow(view, 'Things about me')
-  finish(view)
-  click(button(view))
+  askTopics(view)
+  pickNow(view, 'Phone and chat apps')
+  pickNow(view, 'WhatsApp')
   send(view, 'remember that my club has six courts')
   send(view, 'please install a skill')
-  assert.deepEqual([...storage.data.keys()], [], 'no key was written at all')
-  assert.doesNotMatch(JSON.stringify([...storage.data]), /Peter|tennis|courts/)
+  send(view, 'what is a skill')
+  assert.deepEqual([...storage.data.keys()], ['kept'], 'one key was written')
+  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', msg: 'WhatsApp', asked: ['my club has six courts'], told: true })
+  assert.doesNotMatch(JSON.stringify([...storage.data]), /tennis|install|skill/)
   assert.deepEqual(globalThis.__hhHost.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'and nothing was sent to Hermes')
 })
 
-test('the conversation lives while the plugin is loaded (leaving the page and coming back keeps it), and is gone when Hermes starts again', async () => {
+test('no AI step: the conversation\'s code reaches no model and no request; the built file has no model call in the conversation', () => {
+  const src = f => fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', f), 'utf8')
+  for (const f of ['talk.js', 'talk-view.js', 'kept.js', 'settings-file.js', 'settings-page.js']) {
+    assert.doesNotMatch(src(f), /request\(|askModel|model-call|turnWithModel|fetch\(|XMLHttpRequest|WebSocket|rest\(|socket\(/, f)
+  }
+  // page.js uses the model check only for "Your setup" (the setup cards), never in the conversation
+  const page = src('page.js')
+  assert.doesNotMatch(page, /turnWithModel|askModel|model-call/)
+  const built = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'desktop', 'plugin.js'), 'utf8')
+  assert.doesNotMatch(built, /turnWithModel|talk\.model|model_hint/)
+})
+
+test('the conversation lives while the plugin is loaded; when Hermes starts again it is gone, but the kept name is not: a later visit skips the opening\'s questions', async () => {
   useHost()
   const storage = fakeStorage()
   const first = await registerPlugin(storage, fakeTimers())
@@ -476,13 +609,88 @@ test('the conversation lives while the plugin is loaded (leaving the page and co
   await settle()
   assert.equal(spoken(byData(byData(back.tree, 'bubble'), 'said')).trim(), 'Nice to meet you, Peter. What do you do?')
   assert.equal(byData(back.tree, 'conversation-lines').props.children.length, 2)
+  // not answered yet: nothing kept (the name is kept with "What do you do?" answered)
+  assert.deepEqual([...storage.data.keys()], [])
+  finish(back)
+  send(back, 'I run a tennis club')
+  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', told: true })
   // Hermes starts again: the plugin is loaded anew, with the same storage
   const second = await registerPlugin(storage, fakeTimers())
   const fresh = mount(second.Page)
   await settle()
-  assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'OPEN')
+  assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'OPEN-again')
   assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children, [])
-  assert.doesNotMatch(text(fresh.tree), /Peter/)
+  assert.equal(byData(fresh.tree, 'skip'), null, 'no question to skip')
+  assert.doesNotMatch(text(fresh.tree), /tennis/)
+  send(fresh, 'what do you know about me')
+  assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'A1')
+  assert.deepEqual(all(byData(fresh.tree, 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter'])
+})
+
+test('"See what I keep" opens Helper\'s settings page; "what do you know about me" lists what is kept with "Open Helper settings" and the way there by hand', async () => {
+  const { view } = await pastOpening()
+  click(byData(conversation(view).at(-1), 'kept-link'))
+  assert.deepEqual(globalThis.__hhHost.navigated, [SETTINGS_HREF])
+  assert.equal(line(view), 'F2', 'Helper says nothing for it')
+  send(view, 'what do you know about me')
+  assert.equal(line(view), 'A1')
+  assert.equal(said(view), 'This is all I keep about you.')
+  assert.deepEqual(all(byData(bubble(view), 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter'])
+  assert.equal(text(byData(bubble(view), 'hint')), 'By hand: open "Settings", then "Plugins", then "Helper".')
+  finish(view)
+  assert.equal(text(button(view)).trim(), 'Open Helper settings')
+  click(button(view))
+  assert.deepEqual(globalThis.__hhHost.navigated, [SETTINGS_HREF, SETTINGS_HREF])
+})
+
+test('on a Hermes without plugin settings pages: "See what I keep" shows the list in the conversation, with "Delete all of it" that asks first', async () => {
+  const { view, storage } = await pastOpening({ extra: { registerSettingsPage: undefined } })
+  click(byData(conversation(view).at(-1), 'kept-link'))
+  assert.equal(globalThis.__hhHost.navigated, undefined)
+  assert.equal(line(view), 'A1')
+  assert.equal(words(lines(view).at(-1)), 'See what I keep')
+  assert.equal(byData(bubble(view), 'hint'), null)
+  finish(view)
+  assert.equal(text(button(view)).trim(), 'Delete all of it')
+  click(button(view))
+  assert.equal(line(view), 'A4')
+  finish(view)
+  assert.deepEqual(labels(view), TALK_DATA.keeps.tell.see.delete_all.answers.map(a => a.label))
+  assert.ok(storage.data.has('kept'), 'nothing deleted before the Yes')
+  click(answer(view, TALK_DATA.keeps.tell.see.delete_all.answers[0].label))
+  assert.equal(line(view), 'A-yes')
+  assert.equal(storage.data.has('kept'), false, 'the record is removed whole')
+})
+
+test('"forget my name": Yes and No to pick in the message box; Yes forgets it in storage, No keeps it', async () => {
+  for (const [i, kept] of [[0, null], [1, 'Peter']]) {
+    const { view, storage } = await pastOpening()
+    send(view, 'forget my name')
+    assert.equal(line(view), 'A2-name')
+    assert.equal(said(view), 'Delete your name?')
+    finish(view)
+    assert.deepEqual(labels(view), ['Yes, delete it', 'No'])
+    click(answers(view)[i])
+    assert.equal(line(view), i === 0 ? 'A-yes' : 'A-no')
+    assert.equal((storage.data.get('kept') || {}).name || null, kept)
+  }
+})
+
+test('"From what I keep: ... Change": a kept answer is used, and Change asks the question again', async () => {
+  const { view, storage } = await atTopics()
+  pickNow(view, 'Which AI to use')
+  pickNow(view, 'ChatGPT')
+  assert.equal(line(view), 'mod1')
+  assert.equal(storage.data.get('kept').mod, 'mod1')
+  askTopics(view)
+  pickNow(view, 'Which AI to use')
+  assert.equal(line(view), 'mod1', 'not asked again')
+  const used = notes(view).at(-1)
+  assert.equal(used.props['data-hh'], 'used-note')
+  assert.equal(text(used.props.children[0]), 'From what I keep: you pay for ChatGPT.')
+  click(byData(used, 'used-link'))
+  assert.equal(line(view), 'mod-q')
+  assert.equal(words(lines(view).at(-1)), 'Change')
 })
 
 test('the conversation so far is a named, scrolling part of its own, kept at its newest; the bubble is not inside it', async () => {
@@ -496,24 +704,23 @@ test('the conversation so far is a named, scrolling part of its own, kept at its
   conv.props.ref.current = el
   send(view, 'what is a skill')
   assert.equal(el.scrollTop, 900)
-  // one bubble only, ever: the newest sentence
   assert.equal(all(helper(view), n => n.props['data-hh'] === 'bubble').length, 1)
 })
 
 test('Helper\'s lines hold no link out of the page and no model\'s words: every line said is one of the pre-written ones', async () => {
   const { view } = await pastOpening()
-  const lines = new Set([...TALK_DATA.topics.flatMap(t => [t.question.text, t.plain.text, ...t.needs.map(n => n.text)]), ...TALK_DATA.terms.map(t => t.text), ...Object.values(TALK_DATA.fixed).flatMap(f => [f.text, f.text_no_name])])
-  for (const words of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work']) {
-    send(view, words)
+  const pre = new Set([...TALK_DATA.topics.flatMap(t => [t.question.text, t.plain.text, ...t.needs.map(n => n.text)]), ...TALK_DATA.terms.map(t => t.text), ...Object.values(TALK_DATA.fixed).flatMap(f => [f.text, f.text_no_name])])
+  for (const w of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work', 'what can I ask']) {
+    send(view, w)
     const now = said(view).replace('Thanks, Peter.', 'Thanks, {name}.')
-    assert.ok(lines.has(now), `${words} → ${now}`)
+    assert.ok(pre.has(now), `${w} → ${now}`)
     assert.equal(all(helper(view), n => n.type === 'a').length, 0)
   }
 })
 
 test('a screen reader hears who said each line of the conversation so far: "Helper said:" or "You said:" before the words, unseen on screen', async () => {
   const { view } = await pastOpening()
-  const [first, mine] = conversation(view)
+  const [first, mine] = lines(view)
   const who = n => n.props.children[0]
   assert.equal(who(first).type, 'span')
   assert.equal(who(first).props.className, K.srOnly)
@@ -523,7 +730,6 @@ test('a screen reader hears who said each line of the conversation so far: "Help
   assert.equal(who(mine).props.className, K.srOnly)
   assert.equal(text(who(mine)), 'You said: ')
   assert.equal(words(mine), 'Peter')
-  // the newest sentence, in the bubble, is Helper's by its place: no such words there
   assert.doesNotMatch(text(bubble(view)), /said: /)
 })
 
@@ -537,7 +743,6 @@ test('a pasted key at "What\'s your name?": Helper\'s line about keys, and "Skip
   click(skipLink(view))
   assert.equal(line(view), 'F3')
   assert.equal(skipLink(view), null)
-  // and a name typed after the key line still answers the question
   const second = await open()
   send(second.view, key)
   send(second.view, 'Peter')
