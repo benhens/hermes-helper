@@ -1,4 +1,4 @@
-// Helping Hand: a Hermes Desktop plugin. Built by scripts/build.mjs from src/; edit src/, not this file.
+// Helper: a Hermes Desktop plugin. Built by scripts/build.mjs from src/; edit src/, not this file.
 // Licence: MIT (see LICENSE).
 import { Button, Codicon, CopyButton, GlyphSpinner, PRIMARY_ICON_BTN, ROUTES_AREA, RowButton, SIDEBAR_NAV_AREA, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Textarea, Tip, composerInputBacking, composerSurfaceRing, host, useValue } from '@hermes/plugin-sdk'
 import { useEffect, useId, useRef, useState } from 'react'
@@ -655,8 +655,8 @@ function memoryCard(read) {
 /* ---- card 7: Does it really remember? (the person runs the test in their own chat) ---- */
 const REMEMBER = {
   intro: "A test you run in your own chat, because this page can't write to your memory.",
-  part1: 'Use the memory tool to save this exact note: Helping Hand test 7Q4.',
-  part2: 'What is the Helping Hand test note?',
+  part1: 'Use the memory tool to save this exact note: Helper test 7Q4.',
+  part2: 'What is the Helper test note?',
   steps: ['Paste the test text into a new chat.', 'Open another new chat and ask for the note.', 'Tell us what it said.'],
   yes: 'It said 7Q4',
   no: "It didn't",
@@ -1973,7 +1973,7 @@ const INK_LINE = { fill: 'none', stroke: 'var(--ui-text-primary)', strokeWidth: 
 
 // size: the character's height in px. pose: one of POSE_ROW's names. sheet: a pet sheet, or null
 // for the drawn hand (default: src/pet-sheet.js).
-function Character({ size = 48, pose = 'idle', sheet = PET_SHEET, shadow = true, label = 'Helping Hand' }) {
+function Character({ size = 48, pose = 'idle', sheet = PET_SHEET, shadow = true, label = 'Helper' }) {
   const gid = 'hh-g' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const ink = useRef(null)
   const fill = useRef(null)
@@ -2415,7 +2415,7 @@ function renderYourSetup(s, { openStep, cardColumns = 2 }) {
 }
 
 // ---- src/page.js ----
-// The Helping Hand page: header with two text tabs, step list, open step, helper panel.
+// The Helper page: header with two text tabs, step list, open step, helper panel.
 // B1 = the page shell; B2 = the "Your setup" cards; B3a = the native pass (hhdesign's
 // b1-design-review.md fixes) and narrow windows (src/layout.js); B3 = Setup steps 1-4 from
 // hhcontent's data (src/steps.js) and the helper panel from Pēteris's sketch. The helper's model
@@ -2529,7 +2529,7 @@ function makePage(ctx) {
     return [status, run]
   }
 
-  return function HelpingHandPage() {
+  return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
     const [side, setSide] = useState(initial.side)
     const [helper, setHelper] = useState(initial.helper)
@@ -2710,7 +2710,7 @@ function makePage(ctx) {
     const tabRow = jsx('div', {
       className: K.tabs,
       role: 'tablist',
-      'aria-label': 'Helping Hand',
+      'aria-label': 'Helper',
       'data-hh': 'tabs',
       children: TABS.map((t, i) => {
         const on = tab === t.id
@@ -3288,17 +3288,17 @@ function makePage(ctx) {
 // Plugin entry: one sidebar row and one full page. Nothing else is registered: no tools, hooks,
 // panes, timers or network.
 
-const ID = 'helping-hand'
-const PATH = '/helping-hand'
+const ID = 'helper'
+const PATH = '/helper'
 
 export default {
   id: ID,
-  name: 'Helping Hand',
+  name: 'Helper',
   register(ctx) {
     const Page = makePage(ctx)
     ctx.registerMany([
       { id: 'page', area: ROUTES_AREA, data: { path: PATH }, render: () => jsx(Page, {}) },
-      { id: 'nav', area: SIDEBAR_NAV_AREA, data: { path: PATH, label: 'Helping Hand', codicon: 'compass' } }
+      { id: 'nav', area: SIDEBAR_NAV_AREA, data: { path: PATH, label: 'Helper', codicon: 'compass' } }
     ])
   }
 }

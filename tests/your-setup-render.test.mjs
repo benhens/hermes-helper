@@ -214,7 +214,7 @@ test('card 7: It didn\'t = Needs a fix with three reasons; It said 7Q4 = Works; 
   const again = await openYours({}, storage)
   assert.equal(status(again.view, 'remember'), 'works')
   const texts = all(card(view, 'remember'), n => n.type === 'sdk:CopyButton').map(n => n.props.text)
-  assert.deepEqual(texts, ['Use the memory tool to save this exact note: Helping Hand test 7Q4.', 'What is the Helping Hand test note?'])
+  assert.deepEqual(texts, ['Use the memory tool to save this exact note: Helper test 7Q4.', 'What is the Helper test note?'])
 })
 
 test('two bots: a picker names the bot once; the other bot\'s cards read with its name; titles carry no bot name', async () => {

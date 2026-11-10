@@ -38,13 +38,13 @@ beforeEach(() => {
   delete globalThis.__hhHost
 })
 
-test('registers exactly one sidebar row (Helping Hand, compass) and one page at /helping-hand', async () => {
+test('registers exactly one sidebar row (Helper, compass) and one page at /helper', async () => {
   useHost()
   const { contributions } = await registerPlugin()
   assert.equal(contributions.length, 2)
   const nav = contributions.find(c => c.area === 'sidebar.nav')
-  assert.deepEqual(nav.data, { path: '/helping-hand', label: 'Helping Hand', codicon: 'compass' })
-  assert.deepEqual(contributions.find(c => c.area === 'routes').data, { path: '/helping-hand' })
+  assert.deepEqual(nav.data, { path: '/helper', label: 'Helper', codicon: 'compass' })
+  assert.deepEqual(contributions.find(c => c.area === 'routes').data, { path: '/helper' })
 })
 
 test('model connected: no model name in the message box (the sketch drops it), Ask about this step is offered', async () => {
@@ -171,7 +171,8 @@ test('header: no page title, two text tabs in a tablist (Capabilities\' look), t
   const { view } = await open()
   const head = byData(view.tree, 'header')
   assert.equal(all(head, n => /^h[1-6]$/.test(n.type)).length, 0)
-  assert.doesNotMatch(text(head), /Helping Hand/)
+  assert.doesNotMatch(text(head), /\bHelper\b/)
+  assert.equal(byData(view.tree, 'tabs').props['aria-label'], 'Helper')
   assert.equal(all(view.tree, n => n.type === 'sdk:SegmentedControl').length, 0)
   assert.equal(byData(view.tree, 'tabs').props.role, 'tablist')
   const [setupTab, yoursTab] = tabButtons(view)

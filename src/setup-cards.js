@@ -227,8 +227,8 @@ export function memoryCard(read) {
 /* ---- card 7: Does it really remember? (the person runs the test in their own chat) ---- */
 export const REMEMBER = {
   intro: "A test you run in your own chat, because this page can't write to your memory.",
-  part1: 'Use the memory tool to save this exact note: Helping Hand test 7Q4.',
-  part2: 'What is the Helping Hand test note?',
+  part1: 'Use the memory tool to save this exact note: Helper test 7Q4.',
+  part2: 'What is the Helper test note?',
   steps: ['Paste the test text into a new chat.', 'Open another new chat and ask for the note.', 'Tell us what it said.'],
   yes: 'It said 7Q4',
   no: "It didn't",

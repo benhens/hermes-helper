@@ -63,7 +63,7 @@ export function buildSource() {
     .map(s => `import { ${[...named.get(s)].sort().join(', ')} } from '${s}'`)
     .join('\n')
   return [
-    '// Helping Hand: a Hermes Desktop plugin. Built by scripts/build.mjs from src/; edit src/, not this file.',
+    '// Helper: a Hermes Desktop plugin. Built by scripts/build.mjs from src/; edit src/, not this file.',
     '// Licence: MIT (see LICENSE).',
     imports,
     '',

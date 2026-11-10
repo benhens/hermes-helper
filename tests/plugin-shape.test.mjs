@@ -44,11 +44,32 @@ test('every SDK name used is imported (a missing one is a ReferenceError at rend
   }
 })
 
-test('sidebar row: "Helping Hand", compass icon, no tier; page at the same path', () => {
-  assert.match(code, /area:\s*SIDEBAR_NAV_AREA,\s*data:\s*\{\s*path:\s*PATH,\s*label:\s*'Helping Hand',\s*codicon:\s*'compass'\s*\}/)
+test('sidebar row: "Helper", compass icon, no tier; page at the same path', () => {
+  assert.match(code, /area:\s*SIDEBAR_NAV_AREA,\s*data:\s*\{\s*path:\s*PATH,\s*label:\s*'Helper',\s*codicon:\s*'compass'\s*\}/)
   assert.match(code, /area:\s*ROUTES_AREA,\s*data:\s*\{\s*path:\s*PATH\s*\}/)
-  assert.match(code, /const PATH = '\/helping-hand'/)
+  assert.match(code, /const PATH = '\/helper'/)
   assert.doesNotMatch(code, /\btier\s*:/)
+})
+
+// The id is what `hermes plugins install` and the install folder use, and it can't change once the
+// catalog entry is in. The same id must be in all three places, or Hermes sees two plugins.
+test('the plugin is "Helper", id helper, in plugin.yaml, package.json and the built file', () => {
+  assert.match(fs.readFileSync(path.join(ROOT, 'plugin.yaml'), 'utf8'), /^name: helper$/m)
+  assert.equal(JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).name, 'helper')
+  assert.match(code, /const ID = 'helper'/)
+  assert.match(code, /export default \{\s*id: ID,\s*name: 'Helper',/)
+})
+
+// The old name may stay in two places only: the hidden model-call task name (written with an
+// underscore, which this search skips on purpose) and the note at the top of hhcontent's step data.
+test('the old name is gone from everything a person can read', () => {
+  const OLD = /helping[ -]?hand/i
+  const files = ['plugin.yaml', 'package.json', 'README.md', 'content/README.md', 'content/steps-v1.json', 'scripts/build.mjs', 'desktop/plugin.js',
+    ...fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js')).map(f => 'src/' + f)]
+  const found = files.flatMap(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l)).map(l => `${f}: ${l.trim().slice(0, 60)}`))
+  const allowed = l => /^(content\/steps-v1\.json|src\/steps-data\.js|desktop\/plugin\.js): "about": "Helping Hand v1 step data/.test(l)
+  assert.deepEqual(found.filter(l => !allowed(l)), [])
+  assert.equal(found.filter(allowed).length, 3)
 })
 
 test('helper panel is a div with role complementary, never an <aside>', () => {

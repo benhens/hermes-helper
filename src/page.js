@@ -1,4 +1,4 @@
-// The Helping Hand page: header with two text tabs, step list, open step, helper panel.
+// The Helper page: header with two text tabs, step list, open step, helper panel.
 // B1 = the page shell; B2 = the "Your setup" cards; B3a = the native pass (hhdesign's
 // b1-design-review.md fixes) and narrow windows (src/layout.js); B3 = Setup steps 1-4 from
 // hhcontent's data (src/steps.js) and the helper panel from Pēteris's sketch. The helper's model
@@ -123,7 +123,7 @@ export function makePage(ctx) {
     return [status, run]
   }
 
-  return function HelpingHandPage() {
+  return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
     const [side, setSide] = useState(initial.side)
     const [helper, setHelper] = useState(initial.helper)
@@ -304,7 +304,7 @@ export function makePage(ctx) {
     const tabRow = jsx('div', {
       className: K.tabs,
       role: 'tablist',
-      'aria-label': 'Helping Hand',
+      'aria-label': 'Helper',
       'data-hh': 'tabs',
       children: TABS.map((t, i) => {
         const on = tab === t.id

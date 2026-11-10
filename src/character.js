@@ -93,7 +93,7 @@ const INK_LINE = { fill: 'none', stroke: 'var(--ui-text-primary)', strokeWidth: 
 
 // size: the character's height in px. pose: one of POSE_ROW's names. sheet: a pet sheet, or null
 // for the drawn hand (default: src/pet-sheet.js).
-export function Character({ size = 48, pose = 'idle', sheet = PET_SHEET, shadow = true, label = 'Helping Hand' }) {
+export function Character({ size = 48, pose = 'idle', sheet = PET_SHEET, shadow = true, label = 'Helper' }) {
   const gid = 'hh-g' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const ink = useRef(null)
   const fill = useRef(null)
