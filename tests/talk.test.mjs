@@ -33,6 +33,10 @@ function show(o) {
     H1: () => `H1 (${o.why})`,
     term: () => 'term line ' + o.term,
     W1: () => 'W1 buttons ' + o.buttons.join('+'),
+    // changes-11
+    W2: () => 'W2 buttons ' + o.buttons.join('+'),
+    NAME_AGAIN: () => 'NAME_AGAIN name=' + o.name,
+    NAME_NEW: () => 'NAME_NEW name=' + o.name,
     F1: () => `F1 name=${py(o.name)}`,
     F2: () => `F2 name=${py(o.name)} work=${py(o.work)}`,
     C1: () => 'C1 picks ' + o.buttons.join('+'),
@@ -201,7 +205,7 @@ test('the opening: greeting, name, what the person does, then a line with nothin
   const f2 = lineFor(turn('I run a tennis club', st), st)
   assert.equal(f2.text, 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(f2.answers, null, 'no topics after the greeting')
-  assert.deepEqual(f2.note, { text: 'Kept: Peter.', link: 'See what I keep', first: 'I keep this in the Hermes app on this computer. Nothing is sent to us.' })
+  assert.deepEqual(f2.note, { text: 'Kept: Peter.', link: 'See what I keep', first: 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.', items: [['name', 'Peter']] })
   assert.deepEqual(st.kept, { name: 'Peter', told: true })
   assert.equal(st.work, 'I run a tennis club', 'what the person does is used for this visit')
   assert.equal(st.kept.work, undefined, 'and never kept')
@@ -383,10 +387,10 @@ test('the grey kept line: the values as kept, one line for one moment, the first
   const st = freshVisit()
   pickTopic('mod', st)
   let said = lineFor(pick('mod', 0, st), st)
-  assert.deepEqual(said.note, { text: 'Kept: you pay for ChatGPT.', link: 'See what I keep', first: TALK_DATA.keeps.tell.first_time_if_no_model_call })
+  assert.deepEqual(said.note, { text: 'Kept: you pay for ChatGPT.', link: 'See what I keep', first: TALK_DATA.keeps.tell.first_time_if_no_model_call, items: [['mod', 'mod1']] })
   pickTopic('msg', st)
   said = lineFor(pick('msg', 1, st), st)
-  assert.deepEqual(said.note, { text: 'Kept: you use WhatsApp.', link: 'See what I keep', first: null })
+  assert.deepEqual(said.note, { text: 'Kept: you use WhatsApp.', link: 'See what I keep', first: null, items: [['msg', 'WhatsApp']] })
   said = lineFor(turn('remember that I only use a Windows laptop', st), st)
   assert.equal(said.text, 'Done. It is on your list now. I do not act on it, and your Hermes is not told.')
   assert.equal(said.note.text, 'Kept: I only use a Windows laptop.')
@@ -406,7 +410,7 @@ test('the grey kept line: the values as kept, one line for one moment, the first
 
 test('the first-time line is the one for a build with no AI step: nothing about sending to an AI', () => {
   const first = TALK_DATA.keeps.tell.first_time_if_no_model_call
-  assert.equal(first, 'I keep this in the Hermes app on this computer. Nothing is sent to us.')
+  assert.equal(first, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.')
   assert.doesNotMatch(JSON.stringify(TALK_DATA), /Only your name goes to your AI/)
 })
 
@@ -423,7 +427,7 @@ test('a kept answer is used where its question would be asked: "From what I keep
   const st = laterVisit({ mod: 'mod1', told: true })
   let said = lineFor(pickTopic('mod', st), st)
   assert.equal(said.line, 'mod1')
-  assert.deepEqual(said.used, { text: 'From what I keep: you pay for ChatGPT.', link: 'Change', topic: 'mod' })
+  assert.deepEqual(said.used, { text: 'From what I keep: you pay for ChatGPT.', link: 'Change', topic: 'mod', value: 'mod1' })
   said = lineFor(change('mod', st), st)
   assert.equal(said.line, 'mod-q')
   assert.ok(said.answers)

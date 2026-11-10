@@ -30,6 +30,10 @@ function show(o) {
     H1: () => `H1 (${o.why})`,
     term: () => 'term line ' + o.term,
     W1: () => 'W1 buttons ' + o.buttons.slice(0, 4).join('+'),
+    // changes-11 (route2.py show)
+    W2: () => 'W2 buttons ' + o.buttons.join('+'),
+    NAME_AGAIN: () => 'NAME_AGAIN name=' + o.name,
+    NAME_NEW: () => 'NAME_NEW name=' + o.name,
     F1: () => `F1 name=${py(o.name)}`,
     F2: () => `F2 name=${py(o.name)} work=${py(o.work)}`,
     want: () => 'ROW ' + o.row,
@@ -41,7 +45,12 @@ function show(o) {
 const isWants = o => ['want', 'skillS', 'N2'].includes(o.kind) || (o.kind === 'W1' && o.buttons.some(b => WANT_ROWS[b]))
 // The oracle's steps where they are the wants steps; route2.py's own result everywhere else (the
 // oracle's turn is older than route2.py's in its other steps: no "what can I ask", no N1a or N1b).
-const expected = m => (isWants(m.oracle) ? m.oracle.shown : m.route2.shown)
+// changes-11: route2.py checks a name on a later visit and "what is ..." before the topics, so where it
+// gives one of those, that is the result even when the reference (older than changes-11) has a row.
+// The cost and where lines come after the rows in the plugin (the Builder's rule, tests/talk-fixes):
+// there the reference's row stays the result.
+const before11 = r => ['NAME_AGAIN', 'NAME_NEW'].includes(r.kind) || (r.kind === 'plain' && r.why === 'what is')
+const expected = m => (before11(m.route2) ? m.route2.shown : isWants(m.oracle) ? m.oracle.shown : m.route2.shown)
 function ours(m) {
   const st = freshVisit({ '': 'open', name: 'name', work: 'work' }[m.after || ''])
   if (m.after === 'work') st.name = 'Sam'

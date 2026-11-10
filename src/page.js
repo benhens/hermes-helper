@@ -359,7 +359,7 @@ export function makePage(ctx, opts = {}) {
       const result = turn(typed, visit)
       // Kept only while "Which one do you mean?" is open, for the pick that answers it. A message
       // with a key in it never gets that line, so a key is never kept here.
-      memory.typed = result.kind === 'W1' ? typed : ''
+      memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       answer(result, result.kind === 'K1' ? null : shown, typed)
@@ -916,7 +916,7 @@ export function makePage(ctx, opts = {}) {
             : undefined,
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
-            jsx(Conversation, { entries: older, newest: inBubble, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
+            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
             inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { lit: 0 }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer

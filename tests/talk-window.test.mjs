@@ -163,7 +163,7 @@ test('the opening, played: the name, what the person does, then "Ask me anything
   assert.equal(link.props.className, T.link)
   assert.equal(text(link), 'See what I keep')
   assert.equal(text(byData(note, 'kept-first')), TALK_DATA.keeps.tell.first_time_if_no_model_call)
-  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing is sent to us.')
+  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.')
   // the first-time line comes once only
   send(view, 'remember that my club has six courts')
   assert.equal(line(view), 'RM1')
@@ -919,4 +919,139 @@ test('Gmail picked under "Which service": the Connectors line (CN1) in place of 
   assert.equal(line(view), 'CN1')
   assert.equal(said(view), 'The Hermes app links apps such as Gmail through its "Connectors" page. Click "Capabilities", then the "Connectors" tab.')
   assert.equal(storage.get('kept').svc, 'Gmail')
+})
+
+/* ---------- the fixes from hhtech's newcomer run of e86b410 (talk v2 fixes) ---------- */
+const ANNA = () => ({ name: 'Anna', mod: 'mod1', msg: 'Telegram', told: true })
+const keptNotes = view => conversation(view).filter(c => c.props['data-hh'] === 'kept-note')
+// A faint line marked as forgotten: its words struck through (a <del>), the link still there.
+const forgotten = note => note.props['data-forgotten'] === 'true' && !!byData(note, 'kept-gone')
+const yesLabel = TALK_DATA.keeps.typed.forget_one.answers.find(a => a.gives === 'yes').label
+
+test('after "Forget all", the older "Kept: ..." lines above are marked as forgotten (struck through), and "what do you know about me" says nothing is kept; a line still kept is not marked', async () => {
+  const { view, storage } = await pastOpening()
+  send(view, 'remember that my club has six courts')
+  finish(view)
+  assert.deepEqual(keptNotes(view).map(forgotten), [false, false], 'nothing forgotten yet')
+  // one thing forgotten: only its line is marked
+  send(view, 'forget my name')
+  finish(view)
+  click(answer(view, yesLabel))
+  finish(view)
+  assert.deepEqual(keptNotes(view).map(n => [text(n.props.children[0]), forgotten(n)]), [['Kept: Peter.', true], ['Kept: my club has six courts.', false]])
+  // everything forgotten
+  send(view, 'forget everything')
+  finish(view)
+  click(answer(view, TALK_DATA.keeps.tell.see.delete_all.answers.find(a => a.gives === 'yes').label))
+  assert.equal(storage.data.has('kept'), false)
+  send(view, 'what do you know about me')
+  assert.equal(said(view), 'I keep nothing about you yet.')
+  const old = keptNotes(view)
+  assert.deepEqual(old.map(forgotten), [true, true])
+  // the words are still there to read, struck through; the link still works
+  assert.equal(byData(old[0], 'kept-gone').type, 'del')
+  assert.equal(byData(old[0], 'kept-gone').props.className, T.gone)
+  assert.equal(text(byData(old[0], 'kept-gone')), 'Kept: Peter.')
+  assert.ok(byData(old[0], 'kept-link'))
+  // the first-time line under the first one is about where things are kept, still true: not struck
+  assert.equal(byData(byData(old[0], 'kept-gone'), 'kept-first'), null)
+  assert.ok(byData(old[0], 'kept-first'))
+})
+
+test('forgotten on Helper\'s settings page: back in the conversation, the "Kept:" line of what was deleted is marked too', async () => {
+  useHost()
+  const storage = fakeStorage()
+  const { Page } = await registerPlugin(storage, fakeTimers())
+  const view = mount(Page)
+  await settle()
+  finish(view)
+  send(view, 'Peter')
+  finish(view)
+  send(view, 'I run a tennis club')
+  finish(view)
+  assert.equal(forgotten(keptNotes(view)[0]), false)
+  // the settings page's "Forget all of this" removes the record; Hermes draws the page fresh after Settings
+  view.unmount()
+  storage.remove('kept')
+  const back = mount(Page)
+  await settle()
+  assert.equal(forgotten(byData(back.tree, 'conversation-lines').props.children.find(c => c.props['data-hh'] === 'kept-note')), true)
+})
+
+test('a chat app typed after a different pick: the newest replaces the kept one, the old "Kept: you use Telegram." is marked, the new "Kept: you use WhatsApp." is not', async () => {
+  const { view, storage } = await atTopics()
+  pickNow(view, 'Phone and chat apps')
+  pickNow(view, 'Telegram')
+  assert.equal(storage.data.get('kept').msg, 'Telegram')
+  send(view, 'my chat app is WhatsApp')
+  assert.equal(line(view), 'msg2')
+  assert.equal(storage.data.get('kept').msg, 'WhatsApp')
+  finish(view)
+  assert.deepEqual(keptNotes(view).map(n => [text(n.props.children[0]), forgotten(n)]), [
+    ['Kept: Peter.', false],
+    ['Kept: you use Telegram.', true],
+    ['Kept: you use WhatsApp.', false]
+  ])
+  // a question about another app changes nothing
+  send(view, 'does it work with discord')
+  assert.equal(storage.data.get('kept').msg, 'WhatsApp')
+})
+
+test('a "From what I keep: ..." line whose answer was forgotten is marked the same way', async () => {
+  const { view } = await open({ storage: fakeStorage({ kept: ANNA() }) })
+  finish(view)
+  send(view, 'which AI should I use')
+  finish(view)
+  const used = () => conversation(view).filter(c => c.props['data-hh'] === 'used-note')
+  assert.equal(text(used()[0].props.children[0]), 'From what I keep: you pay for ChatGPT.')
+  assert.equal(used()[0].props['data-forgotten'], undefined)
+  send(view, 'forget everything')
+  finish(view)
+  click(answer(view, TALK_DATA.keeps.tell.see.delete_all.answers.find(a => a.gives === 'yes').label))
+  assert.equal(used()[0].props['data-forgotten'], 'true')
+  assert.equal(text(byData(used()[0], 'kept-gone')), 'From what I keep: you pay for ChatGPT.')
+})
+
+test('a later visit (the name question skipped), then the name typed anyway: "Hi again, Anna."; "my name is Bea" is kept in its place; nothing about the old name is said', async () => {
+  const { view, storage } = await open({ storage: fakeStorage({ kept: ANNA() }) })
+  assert.equal(line(view), 'OPEN-again')
+  finish(view)
+  send(view, 'Anna')
+  assert.equal(line(view), 'NAME_AGAIN')
+  assert.equal(said(view), 'Hi again, Anna. Ask me anything about Hermes.')
+  assert.deepEqual(storage.data.get('kept'), ANNA())
+  finish(view)
+  send(view, 'my name is Bea')
+  assert.equal(line(view), 'NAME_NEW')
+  assert.equal(said(view), 'Thanks, Bea. Ask me anything about Hermes.')
+  finish(view)
+  assert.equal(text(keptNotes(view).at(-1).props.children[0]), 'Kept: Bea.')
+  assert.equal(storage.data.get('kept').name, 'Bea')
+})
+
+test('hhtech\'s ten typed messages and "my chat app is WhatsApp" in the window, with his kept record: the line he wanted for each, the skill-and-plugin picks in the message box', async () => {
+  const { view, storage } = await open({ storage: fakeStorage({ kept: ANNA() }) })
+  const ten = [
+    ['how do I connect telegram', 'msg1'], ['what is a model', 'mod0'], ['can hermes check my email every morning', 'sch5'],
+    ['which AI should I use', 'mod1'], ['how much does it cost', 'COST'], ['whats the difference between a skill and a plugin', 'W2'],
+    ['can you install the github plugin for me', 'H1'], ['my bot forgets everything', 'mem3'], ['what is soul.md', 'term-soul'],
+    ['should I run it on my laptop or a server', 'WHERE']
+  ]
+  for (const [typed, want] of ten) {
+    finish(view)
+    send(view, typed)
+    assert.equal(line(view), want, typed)
+    if (want === 'W2') {
+      finish(view)
+      assert.deepEqual(labels(view), ['Skills', 'Plugins'])
+    }
+  }
+  assert.equal(said(view), 'Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on.')
+  assert.deepEqual(storage.data.get('kept'), ANNA(), 'the ten changed nothing kept')
+  finish(view)
+  send(view, 'my chat app is WhatsApp')
+  assert.equal(storage.data.get('kept').msg, 'WhatsApp')
+  finish(view)
+  send(view, 'what do you know about me')
+  assert.ok(all(byData(bubble(view), 'kept-rows'), n => n.type === 'li').map(n => text(n)).includes('Your chat app: WhatsApp'))
 })

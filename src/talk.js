@@ -78,14 +78,20 @@ export function buildHit(text) {
   return null
 }
 const questionForm = t => t.includes('?') || startsWith(t, OPENING.question_starts)
+// changes-11 mail_on_schedule: when sch and svc both match by full key words and the message has a
+// key word of sch5 (email on a schedule), only sch counts.
+const SCH5_WORDS = ((TOPICS.sch && TOPICS.sch.needs) || []).filter(n => n.id === 'sch5').flatMap(n => n.key_words)
 function strongTopics(t) {
   let ids = TOPIC_IDS.filter(k => whichOf(t, TOPICS[k].key_words.concat(TOPICS[k].misspellings)).length)
   if (whichOf(t, TALK_DATA.chat_apps).length) ids = ids.filter(k => k !== 'svc')
+  if (ids.includes('sch') && ids.includes('svc') && whichOf(t, SCH5_WORDS).length) ids = ids.filter(k => k !== 'svc')
   return ids
 }
 const anyTerm = t => TERM_IDS.some(k => whichOf(t, TERMS[k].key_words).length)
 function needsFor(t, topic, answering) {
   let ns = TOPICS[topic].needs.filter(n => whichOf(t, n.key_words).length && (answering || !n.only_when_answering))
+  // changes-11: a need that wins over the others (sch5, email on a schedule)
+  if (ns.some(n => n.wins_over_other_needs)) ns = ns.filter(n => n.wins_over_other_needs)
   if (ns.length > 1) ns = ns.filter(n => !n.only_if_no_other_need)
   return ns.map(n => n.id)
 }
@@ -432,6 +438,65 @@ function nameWithMore(text) {
   return questionForm(rt) || (hasKey && !startsWith(rt, more.self_starts)) ? [capFirst(m[1]), rest] : [null, null]
 }
 
+/* ---------- changes-11: route2.py's steps after hhtech's run of e86b410 ---------- */
+// A name typed at stage open (a later visit skips the name question): NAME_AGAIN for the kept name
+// (alone, or caught by the name patterns), NAME_NEW for a clear "my name is ..." (at most six words,
+// no question mark), which replaces the kept name. A single other word is not taken as a name.
+// Nothing while Helper's own question is open. Returns { kind, name } or null; NAME_NEW keeps.
+function nameLater(text, st, out) {
+  if (st.pending || st.lastq) return null
+  const kn = st.kept.name
+  const raw = String(text).trim().replace(/[.!]+$/, '')
+  if (kn && raw.toLowerCase() === kn.toLowerCase()) return { kind: 'NAME_AGAIN', name: kn }
+  if (String(text).includes('?') || typedWords(text).length > 6) return null
+  const strong = codeName(text, true)
+  const m = NAME_WEAK.exec(text)
+  const weak = m ? capFirst(m[1]) : null
+  if (kn && [(strong || '').toLowerCase(), (weak || '').toLowerCase()].includes(kn.toLowerCase())) return { kind: 'NAME_AGAIN', name: kn }
+  if (!strong) return null
+  keep(st, out, 'name', strong)
+  st.name = strong
+  return { kind: 'NAME_NEW', name: strong }
+}
+// "what is ..." (JSON what_is): the topic whose plain line explains the one word asked about, or null.
+const WHAT_IS = TALK_DATA.what_is ? new RegExp(TALK_DATA.what_is.pattern) : null
+export function whatIs(t) {
+  const m = WHAT_IS && WHAT_IS.exec(t)
+  if (!m) return null
+  const x = m[1].replace(/^[ ?.!]+|[ ?.!]+$/g, '')
+  const found = Object.entries(TALK_DATA.what_is.words).filter(([, ws]) => ws.includes(x)).map(([k]) => k)
+  return found.length === 1 ? found[0] : null
+}
+// COST (a question with a cost word) or WHERE (a where word), when no topic and no term matched.
+// Builder (not in route2.py, which has no rows; please check): a row of the wants counts as a topic
+// here, so "can it keep an eye on airline ticket prices" is the prices row, not the cost line.
+function fixedByWords(t, st) {
+  if (strongTopics(t).length || anyTerm(t)) return null
+  if (st.wants !== false && wantsOf(t).length) return null
+  if (questionForm(t) && whichOf(t, TALK_DATA.cost.words).length) return 'COST'
+  if (whichOf(t, TALK_DATA.where.words).length) return 'WHERE'
+  return null
+}
+// keeps.typed_change: where a row shows for a topic something is already kept for (chat app,
+// service, ChatGPT or Claude), the person says of themselves that they use another one: the newest
+// replaces the kept one. Not in a question, not with a not-word or an unsure word, and only when
+// code finds exactly one new name.
+function typedChange(t, topic, st, out) {
+  const TC = KEEPS.typed_change
+  if (!TC || !['msg', 'svc', 'mod'].includes(topic) || !st.kept[topic]) return
+  if (t.includes('?') || questionForm(t) || whichOf(t, TC.question_words).length || whichOf(t, TC.not_words).length || whichOf(t, TALK_DATA.unsure_words).length) return
+  if (!whichOf(t, TC.self_words).length) return
+  let vs
+  if (topic === 'mod') vs = KEEPS.answers.mod.values.filter(v => (v.need === 'mod1' || v.need === 'mod2') && whichOf(t, v.typed_words).length).map(v => v.need)
+  else {
+    const names = new Set(Object.entries(KEEPS.answers[topic].names).filter(([w]) => hits(t, w)).map(([, n]) => n))
+    if (names.has('Google Calendar')) names.delete('Google')
+    vs = [...names]
+  }
+  if (vs.length === 1 && vs[0] !== st.kept[topic]) keep(st, out, topic, vs[0])
+}
+const samePair = (a, b) => a.length === b.length && [...a].sort().join('\u0000') === [...b].sort().join('\u0000')
+
 // The service a "named service" line is about, for its text to paste: the picked answer's own, the
 // name of the first of the need's key words that is in the message (the list has the longest
 // first), the message itself when it was the answer to "Which service?", or the one named earlier
@@ -535,6 +600,16 @@ export function turn(text, st) {
   // a skill named in a clear pattern is looked up before the terms
   const dk = dontKnow(text)
   if (dk === 'N1a' || dk === 'N1b') return done(dk)
+  // changes-11, in route2.py's order: a name on a later visit, "what is ...", cost, where
+  if (st.stage === 'open') {
+    const nl = nameLater(text, st, out)
+    if (nl) return done(nl.kind, { name: nl.name })
+    const tw = cutIgnored(talkNorm(text))
+    const wi = whatIs(tw)
+    if (wi) return done('plain', { topic: wi, why: 'what is' })
+    const fx = fixedByWords(tw, st)
+    if (fx) return done(fx)
+  }
   // 4 and 5. the topic and the need, by key words
   const code = byCode(text, st)
   out.code = code
@@ -543,11 +618,15 @@ export function turn(text, st) {
   // "More" when over four; wants_step.py shows the first four)
   if (code.rows) return code.rows.length === 1 ? done('want', { row: code.rows[0] }) : done('W1', { buttons: code.rows })
   if (code.term) return done('term', { term: code.term })
+  // changes-11: two terms that are a pair (skill and plugin) get W2, which compares them
+  if (several && (TALK_DATA.w1_pairs || []).some(p => samePair(p.terms, several))) return done('W2', { buttons: several })
   // 7. the first that fits
   if (topic && need) {
     const answered = st.pending === topic
-    // keeps rule 2: only an answer to Helper's own open question, and only when code found it
+    // keeps rule 2: only an answer to Helper's own open question, and only when code found it;
+    // changes-11 (keeps.typed_change): otherwise the newest thing said may replace the kept one
     if (answered) keepTyped(t, topic, need, st, out)
+    else typedChange(t, topic, st, out)
     st.found[topic] = need
     if (topic === 'svc') st.service = serviceIn(text, st, answered)
     return withServiceLine(done('row', { topic, need }), st)
@@ -799,7 +878,23 @@ export function keptRows(kept) {
 function keptNote(result, st) {
   if (!result.kept || !result.kept.length) return null
   const words = result.kept.map(k => (k === 'asked' ? result.thing : keptWords(k, st.kept[k])))
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null }
+  // items: what this line says was kept, [key, value] each, so the page can mark the line once
+  // that is no longer kept (forgotten, or replaced by a newer one)
+  const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null, items }
+}
+// Is one thing a faint line named still kept, as it was then? ("asked": in any capitals, as the
+// remember step and the settings page count the same thing.)
+export function stillKept(kept, [key, value]) {
+  if (key === 'asked') return (kept.asked || []).some(a => String(a).toLowerCase() === String(value).toLowerCase())
+  return kept[key] === value
+}
+// A faint line (note: "Kept: ...", or used: "From what I keep: ...") that is no longer true: none
+// of what it named is kept any more.
+export function noteForgotten(note, kept) {
+  if (!note || !kept) return false
+  const items = note.items || (note.topic ? [[note.topic, note.value]] : [])
+  return items.length > 0 && !items.some(item => stillKept(kept, item))
 }
 
 // The opening line. On a later visit with a kept name, the opening's question is not asked: the
@@ -852,6 +947,19 @@ export function lineFor(result, st, typed = '', opts = {}) {
       const items = result.buttons.map(id => ({ id, label: labelOf(id), which: id }))
       return said('W1', FIXED.W1.text, { answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: pageOf(items) } })
     }
+    // changes-11: skill and plugin compared, then the same two picks as under W1
+    case 'W2': {
+      const items = result.buttons.map(id => ({ id, label: labelOf(id), which: id }))
+      return said('W2', FIXED.W2.text, { source: FIXED.W2.source || null, answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: pageOf(items) } })
+    }
+    // changes-11: the cost line and where to run Hermes, each with its "Open ..." button
+    case 'COST':
+    case 'WHERE':
+      return said(result.kind, FIXED[result.kind].text, { source: FIXED[result.kind].source || null, next: nextFor(FIXED[result.kind].next, null, st) })
+    // changes-11: a name typed on a later visit
+    case 'NAME_AGAIN':
+    case 'NAME_NEW':
+      return said(result.kind, fillSlots(FIXED[result.kind].text, { name: result.name }))
     case 'can-q': {
       const q = WANTS_DATA.question
       return said('can-q', q.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: q.answers.map(a => ({ id: 'group-' + a.gives_group, label: a.label, group: a.gives_group })) } })
@@ -881,7 +989,7 @@ export function lineFor(result, st, typed = '', opts = {}) {
     }
     case 'row': {
       const n = TOPICS[result.topic].needs.find(x => x.id === result.need)
-      const used = result.used === 'kept' ? { text: fillSlots(KEEPS.use.used_line, { kept_words: keptWords(result.topic, st.kept[result.topic]) }), link: KEEPS.use.used_link.words, topic: result.topic } : null
+      const used = result.used === 'kept' ? { text: fillSlots(KEEPS.use.used_line, { kept_words: keptWords(result.topic, st.kept[result.topic]) }), link: KEEPS.use.used_link.words, topic: result.topic, value: st.kept[result.topic] } : null
       // changes-6 fix 6: Gmail, Google Calendar, Google Drive: CN1; GitHub: the github skill (S1)
       if (result.serviceLine && result.serviceLine.line === 'S1') return { ...skillLine(result.serviceLine.skill, said), used }
       if (result.serviceLine) {

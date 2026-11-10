@@ -114,6 +114,43 @@
    "found": []
   },
   {
+   "id": "COST",
+   "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "WHERE",
+   "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on.",
+   "kind": "reply",
+   "words": 22,
+   "found": []
+  },
+  {
+   "id": "W2",
+   "text": "A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.",
+   "kind": "reply",
+   "words": 23,
+   "found": [
+    "2 Hermes terms in one line"
+   ]
+  },
+  {
+   "id": "NAME_AGAIN",
+   "text": "Hi again, {name}. Ask me anything about Hermes.",
+   "kind": "reply",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "NAME_NEW",
+   "text": "Thanks, {name}. Ask me anything about Hermes.",
+   "kind": "reply",
+   "words": 7,
+   "found": []
+  },
+  {
    "id": "RM1",
    "text": "Done. It is on your list now. I do not act on it, and your Hermes is not told.",
    "kind": "reply",
@@ -255,9 +292,9 @@
   },
   {
    "id": "kept-first",
-   "text": "I keep this in the Hermes app on this computer. Nothing is sent to us.",
+   "text": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.",
    "kind": "reply",
-   "words": 15,
+   "words": 21,
    "found": []
   },
   {
@@ -643,6 +680,13 @@
    "text": "Jobs run only while Hermes is running on a computer that is on.",
    "kind": "reply",
    "words": 13,
+   "found": []
+  },
+  {
+   "id": "sch5",
+   "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+   "kind": "reply",
+   "words": 14,
    "found": []
   },
   {

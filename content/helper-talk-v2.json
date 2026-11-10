@@ -296,6 +296,62 @@
    "id": "K1",
    "kind": "reply",
    "text": "That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat."
+  },
+  {
+   "id": "COST",
+   "kind": "reply",
+   "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose.",
+   "answers": "none",
+   "next": {
+    "kind": "part",
+    "label": "Open Model",
+    "part": "model"
+   },
+   "when": "The message is a question (question form), has one of cost.words, and no topic matched by a full key word and no term. Checked after what_is, before topics. Nothing kept is used.",
+   "source": "getting-started/official-domains.md line 61 (Hermes Agent is MIT-licensed and free to self-host); user-guide/configuring-models.md lines 13 to 15 (a subscription, token-billed providers); integrations/providers.md rows Claude Max + OAuth (extra paid credits); user-guide/local-models.md lines 9 to 15 (an AI on your own computer, no account)",
+   "added": "changes-11, hhtech-run-e86b410 section 3 item 5"
+  },
+  {
+   "id": "WHERE",
+   "kind": "reply",
+   "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on.",
+   "answers": "none",
+   "next": {
+    "kind": "part",
+    "label": "Open Messaging",
+    "part": "messaging"
+   },
+   "when": "The message has one of where.words, and no topic matched by a full key word and no term. Checked after cost, before topics.",
+   "source": "index.mdx line 115 (it lives wherever you put it: a $5 VPS, a GPU cluster or serverless; not tied to your laptop) and line 144 (runs anywhere, not just your laptop); user-guide/features/cron.md lines 313 to 315 and 423 (jobs run inside the gateway, which must be running); start-v1.md g2 and g3 with user-guide/desktop.md line 668 (it answers only while its computer is on; the line of msg3). R6: server and VPS are said as a computer that stays on (r6_say_instead).",
+   "next_note": "Open Messaging, because that part's facts g2 and g3 say the same thing about a computer that stays on. No part is about where to run Hermes.",
+   "added": "changes-11, hhtech-run-e86b410 section 3 item 10"
+  },
+  {
+   "id": "W2",
+   "kind": "reply",
+   "text": "A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.",
+   "under": "the two term picks, as under W1: Skills, Plugins",
+   "answers": "pair",
+   "when": "In place of W1 when the two matched terms are a pair in w1_pairs (any order). Each pick then shows that term's line, as under W1.",
+   "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin",
+   "added": "changes-11, hhtech-run-e86b410 section 3 item 6"
+  },
+  {
+   "id": "NAME_AGAIN",
+   "kind": "reply",
+   "text": "Hi again, {name}. Ask me anything about Hermes.",
+   "answers": "none",
+   "when": "Stage open, nothing pending, a name is kept, and the whole message is the kept name (any capitals), or the name patterns (opening.name_strong_pattern or name_weak_pattern) catch the kept name. Nothing is written.",
+   "added": "changes-11, hhtech-run-e86b410 section 6 item 6"
+  },
+  {
+   "id": "NAME_NEW",
+   "kind": "reply",
+   "text": "Thanks, {name}. Ask me anything about Hermes.",
+   "answers": "none",
+   "when": "Stage open, nothing pending, at most six words, no question mark, and opening.name_strong_pattern catches a name that passes opening.name_refused and differs from the kept one (or none is kept). The name is written (it replaces the kept one) and the grey line Kept: {name}. shows under it.",
+   "note": "A single word that is not the kept name is not taken as a name here: on a later visit it could be anything. It goes on as before (often N1).",
+   "added": "changes-11, hhtech-run-e86b410 section 6 item 6"
   }
  ],
  "keeps": {
@@ -545,9 +601,9 @@
     "Kept: you use WhatsApp.",
     "Kept: I only use a Windows laptop."
    ],
-   "first_time": "I keep this in the Hermes app on this computer. Only your name goes to your AI. Nothing is sent to us.",
+   "first_time": "I keep this in the Hermes app on this computer. Only your name goes to your AI. It goes to no one else.",
    "first_time_when": "Under the kept line, the first time anything is kept (told is not set). Once. Shown again after everything was deleted and something new is kept.",
-   "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing is sent to us.",
+   "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.",
    "link": {
     "words": "See what I keep",
     "after": "the kept line, every time",
@@ -582,7 +638,10 @@
      "note": "One row per kept thing, in this order. Rows, not a sentence, because a thing can be 15 words."
     }
    },
-   "first_time_was": "I keep this in the Hermes app on this computer. Messages you type to me take it to your AI. Nothing is sent to us."
+   "first_time_was": "I keep this in the Hermes app on this computer. Messages you type to me take it to your AI. Nothing is sent to us.",
+   "first_time_was_10": "I keep this in the Hermes app on this computer. Only your name goes to your AI. Nothing is sent to us.",
+   "first_time_if_no_model_call_was_10": "I keep this in the Hermes app on this computer. Nothing is sent to us.",
+   "first_time_note_11": "Was: Nothing is sent to us. Us was never introduced (hhtech-run-e86b410 section 6 item 4). This release has no AI call, so first_time_if_no_model_call is the one shown. True per hhtech's run: 0 model calls, nothing stored but hermes.plugin.helper.kept (section 5). first_time is for a later release with a model and is not checked by a run."
   },
   "remember": {
    "rule": "Step 1 b, straight after the key check and before the build words. Skipped while the memory question (mem-q) is the open one: there the message is the answer about Hermes. Lower-case the message and cut lead_ins from its start. If it then starts with a request start and has no question mark, it is a request to Helper. {thing} = the rest of the message as typed, without a leading that or colon. For the starts that end in i, i'm, im, my, we or our, {thing} begins at that word.",
@@ -1096,6 +1155,65 @@
    "ai_step_status": "ONLY IF A BUILD CALLS A MODEL. Not true of this build. Kept so it can come back.",
    "true_when": "The Builder's row 6 test passes: the page makes no request when a message is typed, and turnWithModel is not in the built file (docs/build/talk-v2-plan.md row 6). Points 2 to 4 are true when row 3's storage test passes (no other key, nothing in localStorage or cookies besides the plugin's own storage).",
    "lines_that_go_with_it": "no_ai_step: keeps.tell.first_time_if_no_model_call is the first-time line; keeps.settings_file.top_line_2 is left out. ai_step: keeps.tell.first_time and top_line_2."
+  },
+  "typed_change": {
+   "rule": "The newest thing the person says replaces the kept one. Only for msg, svc and mod (mod1, mod2), only when something is already kept for that topic, and only when all hold: (1) the message has one of self_words; (2) it is not a question: no question mark, no question start, none of question_words; (3) it has none of not_words and no unsure_words; (4) code finds exactly one new value, by keeps.answers (msg and svc names; mod typed_words of mod1 or mod2), and it differs from the kept one. Then the row for the message shows as usual, the value is written, and a new grey line Kept: ... shows under it (keeps.tell.kept_line), as for any keep.",
+   "self_words": [
+    "my",
+    "i use",
+    "i have",
+    "i pay",
+    "i'm on",
+    "im on",
+    "i am on",
+    "we use",
+    "i switched",
+    "i moved"
+   ],
+   "question_words": [
+    "can",
+    "could",
+    "how",
+    "does",
+    "do",
+    "should",
+    "which",
+    "what",
+    "will",
+    "is it"
+   ],
+   "not_words": [
+    "not",
+    "don't",
+    "dont",
+    "no longer",
+    "anymore",
+    "stopped",
+    "never",
+    "used to",
+    "instead of"
+   ],
+   "examples": [
+    {
+     "after": "Telegram kept",
+     "says": "my chat app is WhatsApp",
+     "row": "msg2",
+     "grey": "Kept: you use WhatsApp."
+    },
+    {
+     "after": "Telegram kept",
+     "says": "does it work with whatsapp",
+     "row": "msg2",
+     "grey": "none, it is a question"
+    },
+    {
+     "after": "Telegram kept",
+     "says": "I don't use WhatsApp",
+     "row": "msg2",
+     "grey": "none, a not word"
+    }
+   ],
+   "added": "changes-11, hhtech-run-e86b410 section 6 item 2"
   }
  },
  "opening": {
@@ -2212,6 +2330,31 @@
       "label": "Open Messaging",
       "part": "messaging"
      }
+    },
+    {
+     "id": "sch5",
+     "when": "checking email on a schedule",
+     "model_hint": "checking their email on a schedule",
+     "key_words": [
+      "email",
+      "emails",
+      "e-mail",
+      "mail",
+      "my mail",
+      "gmail",
+      "inbox",
+      "outlook"
+     ],
+     "wins_over_other_needs": true,
+     "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+     "source": "user-guide/features/cron.md lines 15 and 24 (jobs on a schedule, made by asking in plain language); user-guide/skills/bundled/productivity/productivity-google-workspace.md lines 11 and 34 (a built-in skill that reads Gmail)",
+     "next": {
+      "kind": "paste",
+      "label": "Show me what to ask",
+      "paste_text": "Every morning at 8, check my email and send me a short summary."
+     },
+     "where_note": "The right place is the paste box: a job is made by asking Hermes (cron.md line 24). Open Capabilities opens our own page's part, whose schedule fact sits under More. The app's sidebar row Scheduled jobs (desktop.md line 449: view and manage scheduled jobs) is where the job shows afterwards, but Simple mode hides that row (desktop.md line 292), so the line does not send the person there.",
+     "added": "changes-11, hhtech-run-e86b410 section 3 item 3"
     }
    ]
   },
@@ -2949,5 +3092,110 @@
   "used_by": "K1 on every typed message (before anything else); keeps.remember.refuse; the settings page's secret check (keeps.settings_file.read step 4); a name is never one (opening.name_refused).",
   "changed_10": "Patterns 4 to 7 and the new starts in 1 added in changes-10 (Builder's review: AWS-style keys got through). Tests: dev/checks/hhcontent-changes-10/refuse_tests.py."
  },
- "changed_10": "key_patterns (new, one list), keeps.remember.refuse.words widened, keeps.remember.same_thing, opening.name_refused, mem0 next. content/helper-talk-v2-changes-10.md"
+ "changed_10": "key_patterns (new, one list), keeps.remember.refuse.words widened, keeps.remember.same_thing, opening.name_refused, mem0 next. content/helper-talk-v2-changes-10.md",
+ "what_is": {
+  "rule": "Checked right after the skill-name check (N1a), before topics and terms. Lower-case the message and cut the ignore phrases. If pattern matches and the part it catches (group 1) is exactly one of a topic's what_is_words, Helper shows that topic's plain line (its explanation) and its next. Nothing kept is used, and the topic's question is not asked. A term (skill, plugin, MCP, SOUL.md, tool, profile) is not in these lists: the term step already explains it.",
+  "pattern": "^(?:(?:so|ok|okay|and|hi|hey|helper)[ ,]+)*(?:what is|what's|whats|what are|what exactly is|what does|explain|tell me what)\\s+(?:a |an |the )?(.+?)(?:\\s+(?:is|are|means|mean))?\\s*[?.!]*$",
+  "words": {
+   "mod": [
+    "model",
+    "models",
+    "ai model",
+    "ai models",
+    "llm",
+    "llms",
+    "language model",
+    "large language model"
+   ],
+   "mem": [
+    "memory",
+    "memories",
+    "hermes memory"
+   ],
+   "msg": [
+    "messaging"
+   ],
+   "sch": [
+    "scheduled job",
+    "scheduled jobs",
+    "schedule",
+    "cron",
+    "cron job",
+    "cron jobs"
+   ],
+   "bot": [
+    "bot",
+    "bots"
+   ]
+  },
+  "kept_after": "Not shown. Lead's job allowed a kept answer to follow; left out so the reply stays one line (his words: as short as it possibly can be). The kept answer still shows when the person asks which AI to use.",
+  "added": "changes-11, hhtech-run-e86b410 section 3 item 2"
+ },
+ "cost": {
+  "words": [
+   "cost",
+   "costs",
+   "price",
+   "prices",
+   "pricing",
+   "how much is it",
+   "how much is hermes",
+   "how much does it",
+   "how much does hermes",
+   "is it free",
+   "is hermes free",
+   "free to use",
+   "have to pay",
+   "need to pay",
+   "pay for hermes",
+   "pay for it",
+   "fee",
+   "fees"
+  ],
+  "note": "Whole words, as key words. A message that also names an AI (chatgpt, claude ...) is a topic mod message and gets the mod lines, as before."
+ },
+ "where": {
+  "words": [
+   "server",
+   "servers",
+   "vps",
+   "cloud",
+   "in the cloud",
+   "hosting",
+   "host it",
+   "host hermes",
+   "self-host",
+   "self host",
+   "raspberry pi",
+   "mac mini",
+   "always on",
+   "24/7",
+   "run it on my laptop",
+   "run it on my computer",
+   "run hermes on my laptop",
+   "run hermes on my computer",
+   "where should i run",
+   "where do i run",
+   "where to run",
+   "where can i run",
+   "where should i install",
+   "where do i install",
+   "where to install"
+  ],
+  "note": "Whole words. MCP server is the term mcp (terms come first)."
+ },
+ "w1_pairs": [
+  {
+   "terms": [
+    "skill",
+    "plugin"
+   ],
+   "line": "W2"
+  }
+ ],
+ "mail_on_schedule": {
+  "rule": "When topics sch and svc are both matched by full key words and the message has a key word of sch5, only sch counts (no W1). Example: check my gmail every morning.",
+  "added": "changes-11"
+ },
+ "changed_11": "10 Nov, 22:25 UTC job (content/helper-talk-v2-changes-11.md): what_is (explanation first), COST and cost, WHERE and where, W2 and w1_pairs, sch5 and mail_on_schedule, keeps.tell first-time lines, keeps.typed_change, NAME_AGAIN and NAME_NEW. route2.py runs them before topics, in this order: NAME, what_is, COST, WHERE."
 }

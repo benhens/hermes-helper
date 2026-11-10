@@ -55,6 +55,34 @@ export const TALK_DATA = {
     },
     "K1": {
       "text": "That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat."
+    },
+    "COST": {
+      "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose.",
+      "source": "getting-started/official-domains.md line 61 (Hermes Agent is MIT-licensed and free to self-host); user-guide/configuring-models.md lines 13 to 15 (a subscription, token-billed providers); integrations/providers.md rows Claude Max + OAuth (extra paid credits); user-guide/local-models.md lines 9 to 15 (an AI on your own computer, no account)",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "WHERE": {
+      "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on.",
+      "source": "index.mdx line 115 (it lives wherever you put it: a $5 VPS, a GPU cluster or serverless; not tied to your laptop) and line 144 (runs anywhere, not just your laptop); user-guide/features/cron.md lines 313 to 315 and 423 (jobs run inside the gateway, which must be running); start-v1.md g2 and g3 with user-guide/desktop.md line 668 (it answers only while its computer is on; the line of msg3). R6: server and VPS are said as a computer that stays on (r6_say_instead).",
+      "next": {
+        "kind": "part",
+        "label": "Open Messaging",
+        "part": "messaging"
+      }
+    },
+    "W2": {
+      "text": "A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.",
+      "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin"
+    },
+    "NAME_AGAIN": {
+      "text": "Hi again, {name}. Ask me anything about Hermes."
+    },
+    "NAME_NEW": {
+      "text": "Thanks, {name}. Ask me anything about Hermes."
     }
   },
   "opening": {
@@ -485,6 +513,101 @@ export const TALK_DATA = {
       "?"
     ]
   },
+  "what_is": {
+    "pattern": "^(?:(?:so|ok|okay|and|hi|hey|helper)[ ,]+)*(?:what is|what's|whats|what are|what exactly is|what does|explain|tell me what)\\s+(?:a |an |the )?(.+?)(?:\\s+(?:is|are|means|mean))?\\s*[?.!]*$",
+    "words": {
+      "mod": [
+        "model",
+        "models",
+        "ai model",
+        "ai models",
+        "llm",
+        "llms",
+        "language model",
+        "large language model"
+      ],
+      "mem": [
+        "memory",
+        "memories",
+        "hermes memory"
+      ],
+      "msg": [
+        "messaging"
+      ],
+      "sch": [
+        "scheduled job",
+        "scheduled jobs",
+        "schedule",
+        "cron",
+        "cron job",
+        "cron jobs"
+      ],
+      "bot": [
+        "bot",
+        "bots"
+      ]
+    }
+  },
+  "cost": {
+    "words": [
+      "cost",
+      "costs",
+      "price",
+      "prices",
+      "pricing",
+      "how much is it",
+      "how much is hermes",
+      "how much does it",
+      "how much does hermes",
+      "is it free",
+      "is hermes free",
+      "free to use",
+      "have to pay",
+      "need to pay",
+      "pay for hermes",
+      "pay for it",
+      "fee",
+      "fees"
+    ]
+  },
+  "where": {
+    "words": [
+      "server",
+      "servers",
+      "vps",
+      "cloud",
+      "in the cloud",
+      "hosting",
+      "host it",
+      "host hermes",
+      "self-host",
+      "self host",
+      "raspberry pi",
+      "mac mini",
+      "always on",
+      "24/7",
+      "run it on my laptop",
+      "run it on my computer",
+      "run hermes on my laptop",
+      "run hermes on my computer",
+      "where should i run",
+      "where do i run",
+      "where to run",
+      "where can i run",
+      "where should i install",
+      "where do i install",
+      "where to install"
+    ]
+  },
+  "w1_pairs": [
+    {
+      "terms": [
+        "skill",
+        "plugin"
+      ],
+      "line": "W2"
+    }
+  ],
   "topic_picks": [
     {
       "label": "What Hermes can do",
@@ -1224,6 +1347,27 @@ export const TALK_DATA = {
             "label": "Open Messaging",
             "part": "messaging"
           }
+        },
+        {
+          "id": "sch5",
+          "key_words": [
+            "email",
+            "emails",
+            "e-mail",
+            "mail",
+            "my mail",
+            "gmail",
+            "inbox",
+            "outlook"
+          ],
+          "wins_over_other_needs": true,
+          "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+          "source": "user-guide/features/cron.md lines 15 and 24 (jobs on a schedule, made by asking in plain language); user-guide/skills/bundled/productivity/productivity-google-workspace.md lines 11 and 34 (a built-in skill that reads Gmail)",
+          "next": {
+            "kind": "paste",
+            "label": "Show me what to ask",
+            "paste_text": "Every morning at 8, check my email and send me a short summary."
+          }
         }
       ]
     },
@@ -1770,6 +1914,43 @@ export const TALK_DATA = {
         "kept_words": "{thing}"
       }
     ],
+    "typed_change": {
+      "self_words": [
+        "my",
+        "i use",
+        "i have",
+        "i pay",
+        "i'm on",
+        "im on",
+        "i am on",
+        "we use",
+        "i switched",
+        "i moved"
+      ],
+      "question_words": [
+        "can",
+        "could",
+        "how",
+        "does",
+        "do",
+        "should",
+        "which",
+        "what",
+        "will",
+        "is it"
+      ],
+      "not_words": [
+        "not",
+        "don't",
+        "dont",
+        "no longer",
+        "anymore",
+        "stopped",
+        "never",
+        "used to",
+        "instead of"
+      ]
+    },
     "use": {
       "used_line": "From what I keep: {kept_words}.",
       "used_link": {
@@ -1778,7 +1959,7 @@ export const TALK_DATA = {
     },
     "tell": {
       "kept_line": "Kept: {kept_words}.",
-      "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing is sent to us.",
+      "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.",
       "link": {
         "words": "See what I keep"
       },

@@ -221,6 +221,8 @@ export const T = {
   // the faint lines: what was kept, what is used; the first-time line on a line of its own
   note: 'hh-note',
   noteFirst: 'hh-note-first',
+  // talk v2 fixes: the words of a faint line that is no longer true (forgotten), struck through
+  gone: 'hh-gone',
   link: 'hh-link',
   // the list of what Helper keeps (A1)
   rows: 'hh-rows',

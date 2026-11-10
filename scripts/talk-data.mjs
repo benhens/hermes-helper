@@ -65,8 +65,14 @@ export function checkLine(line, kind = 'reply') {
 }
 
 const NEXT_KINDS = ['part', 'paste', 'line', 'none']
-// The fixed lines the code says, and which of them show things to pick.
-export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'K1']
+// The fixed lines the code says, and which of them show things to pick. changes-11: COST, WHERE,
+// W2 (skill and plugin compared), NAME_AGAIN and NAME_NEW (a name typed on a later visit).
+export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'K1', 'COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW']
+// changes-11 (check_json.py): W2 compares the two terms the person typed, so for W2 alone the
+// two-terms rule is lifted; each term must still be explained in the line.
+const LIFTED = { W2: ['2 Hermes terms in one line'] }
+// The parts a fixed line's "Open ..." button may name (src/talk.js PARTS has these).
+const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots']
 // Row 5 of docs/build/talk-v2-plan.md (the wants: "Web, files, pictures and voice" under C1) is in
 // this build (job talk-v2-wants): C1 says its full text and holds the wants pick first. With
 // WANTS_BUILT false, held_picks.note: the held picks that are not topics are dropped, and C1 says
@@ -196,9 +202,34 @@ export function talkProblems(d) {
     if (!l.source) problems.push(`${l.id}: no source`)
     let found = checkLine(l.text, l.kind === 'question' ? 'question' : 'reply')
     if (l.kind === 'opening') found = found.filter(x => x !== 'an answer line ends with a question')
+    if (LIFTED[l.id]) found = found.filter(x => !LIFTED[l.id].includes(x))
     for (const x of found) problems.push(`${l.id}: ${x}`)
   }
   for (const id of FIXED_USED) if (!(d.fixed_lines || []).some(f => f.id === id)) problems.push(`fixed line ${id} is missing`)
+  // changes-11: a fixed line's own button (COST, WHERE: "Open Model", "Open Messaging")
+  for (const f of d.fixed_lines || []) {
+    if (!FIXED_USED.includes(f.id) || !f.next) continue
+    if (!NEXT_KINDS.includes(f.next.kind)) problems.push(`${f.id}: button of an unknown kind ${f.next.kind}`)
+    else if (f.next.kind !== 'none' && !f.next.label) problems.push(`${f.id}: button with no label`)
+    else if (f.next.kind === 'part' && !FIXED_PARTS.includes(f.next.part)) problems.push(`${f.id}: a button to a part the plugin cannot open: ${f.next.part}`)
+  }
+  // changes-11: the rules the code reads as data. A pattern JavaScript cannot read would stop the
+  // plugin; a word list that is missing or names no topic would quietly turn its step off.
+  const topicIdsAll = (d.topics || []).map(t => t.id)
+  const wi = d.what_is || {}
+  try {
+    new RegExp(wi.pattern)
+    if (!/\(/.test(wi.pattern || '')) problems.push('what_is.pattern has no part to catch')
+  } catch (e) {
+    problems.push(`what_is.pattern is not a JavaScript pattern (${e.message})`)
+  }
+  if (!wi.words || !Object.keys(wi.words).length) problems.push('what_is.words is empty: "what is ..." would never get the explanation')
+  for (const k of Object.keys(wi.words || {})) if (!topicIdsAll.includes(k)) problems.push(`what_is.words names ${k}, which is not a topic`)
+  for (const k of ['cost', 'where']) if (!(d[k] && (d[k].words || []).length)) problems.push(`${k}.words is empty`)
+  const termIds = (d.terms || []).map(t => t.id)
+  for (const p of d.w1_pairs || []) if (!(p.terms || []).every(x => termIds.includes(x)) || (p.terms || []).length !== 2) problems.push(`w1_pairs: ${JSON.stringify(p.terms)} is not two terms`)
+  const tc = (d.keeps && d.keeps.typed_change) || {}
+  for (const k of ['self_words', 'question_words', 'not_words']) if (!(tc[k] || []).length) problems.push(`keeps.typed_change.${k} is empty`)
   // Builder: the key shapes (changes-10) are read as JavaScript patterns when the plugin loads. An
   // empty list would turn the key check off; a Python-only pattern would stop the whole plugin.
   const kp = (d.key_patterns && d.key_patterns.patterns) || []
@@ -252,6 +283,8 @@ function slimKeeps(K) {
       svc: { names: K.answers.svc.names }
     },
     things: K.things.map(t => pickKeys(t, ['id', 'kept_words'])),
+    // changes-11: a chat app, service or AI the person says they use replaces the kept one
+    typed_change: pickKeys(K.typed_change, ['self_words', 'question_words', 'not_words']),
     use: { used_line: K.use.used_line, used_link: { words: K.use.used_link.words } },
     tell: {
       kept_line: K.tell.kept_line,
@@ -288,7 +321,7 @@ function slimKeeps(K) {
 // skills: content/skills-list-v1.json (the official skills), for the don't-know lines N1a and N1b.
 export function slimTalkData(d, skills = { skills: [] }) {
   const fixed = {}
-  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source']), text: C1_TEXT(f) }
+  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source']), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
   return {
     docs_version: d.docs_version,
     limits: pickKeys(d.limits, ['request_chars_in_paste', 'service_chars_in_paste']),
@@ -307,6 +340,11 @@ export function slimTalkData(d, skills = { skills: [] }) {
     chat_apps: d.chat_apps,
     hermes_words: d.hermes_words,
     asks_for_topics: pickKeys(d.asks_for_topics, ['phrases', 'whole_message']),
+    // changes-11: "what is ..." gets the explanation; the cost and where lines; the term pairs W2 compares
+    what_is: pickKeys(d.what_is, ['pattern', 'words']),
+    cost: { words: d.cost.words },
+    where: { words: d.where.words },
+    w1_pairs: (d.w1_pairs || []).map(p => pickKeys(p, ['terms', 'line'])),
     topic_picks: d.topic_picks.map(p => ({ ...pickKeys(p, ['label', 'gives', 'line']), ...(p.holds ? { holds: heldOf(d, p) } : {}) })),
     // the held picks that are not topics (changes-9: wants), each with its label
     held_picks: Object.keys(d.held_picks || {}).filter(k => k !== 'note' && WANTS_BUILT),
@@ -317,7 +355,7 @@ export function slimTalkData(d, skills = { skills: [] }) {
       question: { id: t.question.id, text: t.question.text, answers: (t.question.answers || []).map(a => pickKeys(a, ['label', 'gives', 'service'])) },
       plain: { ...pickKeys(t.plain, ['id', 'text', 'source']), next: slimNext(t.plain.next) },
       needs: t.needs.map(n => ({
-        ...pickKeys(n, ['id', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'service_names', 'text', 'source']),
+        ...pickKeys(n, ['id', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'wins_over_other_needs', 'service_names', 'text', 'source']),
         next: slimNext(n.next)
       }))
     })),

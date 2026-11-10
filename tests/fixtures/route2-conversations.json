@@ -2005,7 +2005,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "W1 buttons skill+plugin",
+   "expect": "W2 buttons skill+plugin",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -2022,14 +2022,14 @@
        "plugin"
       ],
       "calls": 0,
-      "kind": "W1"
+      "kind": "W2"
      },
-     "shown": "W1 buttons skill+plugin",
+     "shown": "W2 buttons skill+plugin",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
-      "lastq": true,
+      "lastq": false,
       "name": null,
       "pending": null,
       "stage": "open",
@@ -2589,7 +2589,7 @@
       "stage": "open",
       "work": null
      },
-     "text": "whats an llm"
+     "text": "which llm"
     }
    ]
   },
@@ -8656,17 +8656,1353 @@
      "text": "what is the weather like?"
     }
    ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line msg1",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 1: how do I connect telegram",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "msg1",
+      "topic": "msg"
+     },
+     "shown": "line msg1",
+     "state": {
+      "asked": [],
+      "found": {
+       "msg": "msg1"
+      },
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how do I connect telegram"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "plain line mod0",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 2: what is a model (ChatGPT kept): the explanation, not the kept answer",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mod",
+      "why": "what is"
+     },
+     "shown": "plain line mod0",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a model"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mod0",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "hhtech 2: what is a model (nothing kept)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mod",
+      "why": "what is"
+     },
+     "shown": "plain line mod0",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a model"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line sch5",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 3: can hermes check my email every morning: the mail line",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "sch5",
+      "topic": "sch"
+     },
+     "shown": "line sch5",
+     "state": {
+      "asked": [],
+      "found": {
+       "sch": "sch5"
+      },
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can hermes check my email every morning"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line mod1 +from-kept",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 4: which AI should I use (ChatGPT kept): the kept answer",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mod1",
+      "topic": "mod",
+      "used": "kept"
+     },
+     "shown": "line mod1 +from-kept",
+     "state": {
+      "asked": [],
+      "found": {
+       "mod": "mod1"
+      },
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "which AI should I use"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question mod",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "hhtech 4: which AI should I use (nothing kept): the question",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mod"
+     },
+     "shown": "question mod",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "name": null,
+      "pending": "mod",
+      "stage": "open",
+      "work": null
+     },
+     "text": "which AI should I use"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "COST",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 5: how much does it cost (ChatGPT kept)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "COST"
+     },
+     "shown": "COST",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how much does it cost"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "COST",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "hhtech 5: how much does it cost (nothing kept)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "COST"
+     },
+     "shown": "COST",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how much does it cost"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "W2 buttons skill+plugin",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 6: skill and plugin compared, then the two picks",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "buttons": [
+       "skill",
+       "plugin"
+      ],
+      "calls": 0,
+      "kind": "W2"
+     },
+     "shown": "W2 buttons skill+plugin",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "whats the difference between a skill and a plugin"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "H1 (can you install)",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 7: install the github plugin for me",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "H1",
+      "why": "can you install"
+     },
+     "shown": "H1 (can you install)",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can you install the github plugin for me"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line mem3",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 8: my bot forgets everything",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem3",
+      "topic": "mem"
+     },
+     "shown": "line mem3",
+     "state": {
+      "asked": [],
+      "found": {
+       "mem": "mem3"
+      },
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "my bot forgets everything"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "term line soul",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 9: what is soul.md",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "soul"
+     },
+     "shown": "term line soul",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is soul.md"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "WHERE",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "hhtech 10: laptop or a server",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WHERE"
+     },
+     "shown": "WHERE",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "should I run it on my laptop or a server"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line msg2 +kept=msg",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Anna"
+   },
+   "name": "hhtech: my chat app is WhatsApp (Telegram kept): replaced, new Kept line",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kept": [
+       "msg"
+      ],
+      "kind": "row",
+      "need": "msg2",
+      "topic": "msg"
+     },
+     "shown": "line msg2 +kept=msg",
+     "state": {
+      "asked": [],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "mod": "mod1",
+       "msg": "WhatsApp",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "my chat app is WhatsApp"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line msg2",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "a question about WhatsApp does not replace Telegram",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "msg2",
+      "topic": "msg"
+     },
+     "shown": "line msg2",
+     "state": {
+      "asked": [],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "does it work with whatsapp"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line msg2",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "a not word does not replace Telegram",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "msg2",
+      "topic": "msg"
+     },
+     "shown": "line msg2",
+     "state": {
+      "asked": [],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "I don't use whatsapp"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "line mod2 +kept=mod",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod2",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "I pay for Claude now (ChatGPT kept): replaced",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kept": [
+       "mod"
+      ],
+      "kind": "row",
+      "need": "mod2",
+      "topic": "mod"
+     },
+     "shown": "line mod2 +kept=mod",
+     "state": {
+      "asked": [],
+      "found": {
+       "mod": "mod2"
+      },
+      "kept": {
+       "mod": "mod2",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "I pay for Claude now"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line msg2",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "nothing kept: a statement keeps nothing (rule 2 unchanged)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "msg2",
+      "topic": "msg"
+     },
+     "shown": "line msg2",
+     "state": {
+      "asked": [],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "my chat app is WhatsApp"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "NAME_AGAIN name=Anna",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "later visit, the kept name typed",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "NAME_AGAIN",
+      "name": "Anna"
+     },
+     "shown": "NAME_AGAIN name=Anna",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "Anna"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "NAME_AGAIN name=Anna",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "later visit, I'm anna",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "NAME_AGAIN",
+      "name": "Anna"
+     },
+     "shown": "NAME_AGAIN name=Anna",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "I'm anna"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "NAME_NEW name=Bea +kept=name",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Bea"
+   },
+   "name": "later visit, a new name: replaced",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kept": [
+       "name"
+      ],
+      "kind": "NAME_NEW",
+      "name": "Bea"
+     },
+     "shown": "NAME_NEW name=Bea +kept=name",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Bea",
+       "told": true
+      },
+      "lastq": false,
+      "name": "Bea",
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "my name is Bea"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "N1",
+   "failed": null,
+   "kept": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna",
+    "told": true
+   },
+   "kept_after": {
+    "mod": "mod1",
+    "msg": "Telegram",
+    "name": "Anna"
+   },
+   "name": "later visit, a bare other word is not a name",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "mod": "mod1",
+       "msg": "Telegram",
+       "name": "Anna",
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "Bea"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "NAME_NEW name=Bea +kept=name +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": {
+    "name": "Bea"
+   },
+   "name": "no name kept, my name is Bea",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "name"
+      ],
+      "kind": "NAME_NEW",
+      "name": "Bea"
+     },
+     "shown": "NAME_NEW name=Bea +kept=name +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Bea",
+       "told": true
+      },
+      "lastq": false,
+      "name": "Bea",
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "my name is Bea"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "what is memory",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what is"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is memory?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question mod",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "what is the best ai: not a what-is",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mod"
+     },
+     "shown": "question mod",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "name": null,
+      "pending": "mod",
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is the best ai"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line bot0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "what is a bot",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "bot",
+      "why": "what is"
+     },
+     "shown": "plain line bot0",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what's a bot?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "WHERE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "where: always on",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WHERE"
+     },
+     "shown": "WHERE",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can hermes be always on"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "term line mcp",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "where: an mcp server is the term",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "mcp"
+     },
+     "shown": "term line mcp",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is an mcp server"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line sch3",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "cost: prices with a schedule is the schedule",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "sch3",
+      "topic": "sch"
+     },
+     "shown": "line sch3",
+     "state": {
+      "asked": [],
+      "found": {
+       "sch": "sch3"
+      },
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can it check prices every day"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line mod3",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "cost: not a question is the model topic",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mod3",
+      "topic": "mod"
+     },
+     "shown": "line mod3",
+     "state": {
+      "asked": [],
+      "found": {
+       "mod": "mod3"
+      },
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "I dont want to pay for anything"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line sch5",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "mail on schedule: gmail every morning",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "sch5",
+      "topic": "sch"
+     },
+     "shown": "line sch5",
+     "state": {
+      "asked": [],
+      "found": {
+       "sch": "sch5"
+      },
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "check my gmail every morning"
+    }
+   ]
   }
  ],
- "json_sha256": "e69f3f4edffdd8badc64f0cf83f720bff0c1cb2520c63c4a90cdde9d4f98f368",
+ "json_sha256": "471deff0ce066d61153c2e43ca0547472fd77189b986b5f203d4c5ba008ce6fe",
  "keeps_off": false,
  "last_printed_lines": [
-  "answers to pick: 12 of 12 give a row of their own topic",
+  "ok    mail on schedule: gmail every morning: line sch5",
   "",
-  "conversations: 170 of 170 as expected"
+  "conversations: 201 of 201 as expected"
  ],
  "no_wants": false,
- "route2_sha256": "1f281e69340b830cc2f6fbb84e6807327e340a598de80316821f5d6447a8065e",
+ "route2_sha256": "c7edb97ac41e007b5c4a7df277475143866fd49612b0a98f7c2956b9b196b48e",
  "singles": [
   {
    "landed": "mem",
@@ -9880,28 +11216,25 @@
    ]
   },
   {
-   "landed": "mod",
+   "landed": "COST",
    "out": {
     "calls": 0,
-    "kind": "question",
-    "topic": "mod"
+    "kind": "COST"
    },
-   "shown": "question mod",
+   "shown": "COST",
    "state": {
-    "asked": [
-     "mod"
-    ],
+    "asked": [],
     "found": {},
     "kept": {},
-    "lastq": true,
+    "lastq": false,
     "name": null,
-    "pending": "mod",
+    "pending": null,
     "stage": "open",
     "work": null
    },
    "text": "how much does hermes cost",
    "want": [
-    "mod"
+    "COST"
    ]
   },
   {

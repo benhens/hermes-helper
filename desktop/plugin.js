@@ -445,6 +445,34 @@ const TALK_DATA = {
     },
     "K1": {
       "text": "That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat."
+    },
+    "COST": {
+      "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose.",
+      "source": "getting-started/official-domains.md line 61 (Hermes Agent is MIT-licensed and free to self-host); user-guide/configuring-models.md lines 13 to 15 (a subscription, token-billed providers); integrations/providers.md rows Claude Max + OAuth (extra paid credits); user-guide/local-models.md lines 9 to 15 (an AI on your own computer, no account)",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "WHERE": {
+      "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on.",
+      "source": "index.mdx line 115 (it lives wherever you put it: a $5 VPS, a GPU cluster or serverless; not tied to your laptop) and line 144 (runs anywhere, not just your laptop); user-guide/features/cron.md lines 313 to 315 and 423 (jobs run inside the gateway, which must be running); start-v1.md g2 and g3 with user-guide/desktop.md line 668 (it answers only while its computer is on; the line of msg3). R6: server and VPS are said as a computer that stays on (r6_say_instead).",
+      "next": {
+        "kind": "part",
+        "label": "Open Messaging",
+        "part": "messaging"
+      }
+    },
+    "W2": {
+      "text": "A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.",
+      "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin"
+    },
+    "NAME_AGAIN": {
+      "text": "Hi again, {name}. Ask me anything about Hermes."
+    },
+    "NAME_NEW": {
+      "text": "Thanks, {name}. Ask me anything about Hermes."
     }
   },
   "opening": {
@@ -875,6 +903,101 @@ const TALK_DATA = {
       "?"
     ]
   },
+  "what_is": {
+    "pattern": "^(?:(?:so|ok|okay|and|hi|hey|helper)[ ,]+)*(?:what is|what's|whats|what are|what exactly is|what does|explain|tell me what)\\s+(?:a |an |the )?(.+?)(?:\\s+(?:is|are|means|mean))?\\s*[?.!]*$",
+    "words": {
+      "mod": [
+        "model",
+        "models",
+        "ai model",
+        "ai models",
+        "llm",
+        "llms",
+        "language model",
+        "large language model"
+      ],
+      "mem": [
+        "memory",
+        "memories",
+        "hermes memory"
+      ],
+      "msg": [
+        "messaging"
+      ],
+      "sch": [
+        "scheduled job",
+        "scheduled jobs",
+        "schedule",
+        "cron",
+        "cron job",
+        "cron jobs"
+      ],
+      "bot": [
+        "bot",
+        "bots"
+      ]
+    }
+  },
+  "cost": {
+    "words": [
+      "cost",
+      "costs",
+      "price",
+      "prices",
+      "pricing",
+      "how much is it",
+      "how much is hermes",
+      "how much does it",
+      "how much does hermes",
+      "is it free",
+      "is hermes free",
+      "free to use",
+      "have to pay",
+      "need to pay",
+      "pay for hermes",
+      "pay for it",
+      "fee",
+      "fees"
+    ]
+  },
+  "where": {
+    "words": [
+      "server",
+      "servers",
+      "vps",
+      "cloud",
+      "in the cloud",
+      "hosting",
+      "host it",
+      "host hermes",
+      "self-host",
+      "self host",
+      "raspberry pi",
+      "mac mini",
+      "always on",
+      "24/7",
+      "run it on my laptop",
+      "run it on my computer",
+      "run hermes on my laptop",
+      "run hermes on my computer",
+      "where should i run",
+      "where do i run",
+      "where to run",
+      "where can i run",
+      "where should i install",
+      "where do i install",
+      "where to install"
+    ]
+  },
+  "w1_pairs": [
+    {
+      "terms": [
+        "skill",
+        "plugin"
+      ],
+      "line": "W2"
+    }
+  ],
   "topic_picks": [
     {
       "label": "What Hermes can do",
@@ -1614,6 +1737,27 @@ const TALK_DATA = {
             "label": "Open Messaging",
             "part": "messaging"
           }
+        },
+        {
+          "id": "sch5",
+          "key_words": [
+            "email",
+            "emails",
+            "e-mail",
+            "mail",
+            "my mail",
+            "gmail",
+            "inbox",
+            "outlook"
+          ],
+          "wins_over_other_needs": true,
+          "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+          "source": "user-guide/features/cron.md lines 15 and 24 (jobs on a schedule, made by asking in plain language); user-guide/skills/bundled/productivity/productivity-google-workspace.md lines 11 and 34 (a built-in skill that reads Gmail)",
+          "next": {
+            "kind": "paste",
+            "label": "Show me what to ask",
+            "paste_text": "Every morning at 8, check my email and send me a short summary."
+          }
         }
       ]
     },
@@ -2160,6 +2304,43 @@ const TALK_DATA = {
         "kept_words": "{thing}"
       }
     ],
+    "typed_change": {
+      "self_words": [
+        "my",
+        "i use",
+        "i have",
+        "i pay",
+        "i'm on",
+        "im on",
+        "i am on",
+        "we use",
+        "i switched",
+        "i moved"
+      ],
+      "question_words": [
+        "can",
+        "could",
+        "how",
+        "does",
+        "do",
+        "should",
+        "which",
+        "what",
+        "will",
+        "is it"
+      ],
+      "not_words": [
+        "not",
+        "don't",
+        "dont",
+        "no longer",
+        "anymore",
+        "stopped",
+        "never",
+        "used to",
+        "instead of"
+      ]
+    },
     "use": {
       "used_line": "From what I keep: {kept_words}.",
       "used_link": {
@@ -2168,7 +2349,7 @@ const TALK_DATA = {
     },
     "tell": {
       "kept_line": "Kept: {kept_words}.",
-      "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing is sent to us.",
+      "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.",
       "link": {
         "words": "See what I keep"
       },
@@ -7063,14 +7244,20 @@ function buildHit(text) {
   return null
 }
 const questionForm = t => t.includes('?') || startsWith(t, OPENING.question_starts)
+// changes-11 mail_on_schedule: when sch and svc both match by full key words and the message has a
+// key word of sch5 (email on a schedule), only sch counts.
+const SCH5_WORDS = ((TOPICS.sch && TOPICS.sch.needs) || []).filter(n => n.id === 'sch5').flatMap(n => n.key_words)
 function strongTopics(t) {
   let ids = TOPIC_IDS.filter(k => whichOf(t, TOPICS[k].key_words.concat(TOPICS[k].misspellings)).length)
   if (whichOf(t, TALK_DATA.chat_apps).length) ids = ids.filter(k => k !== 'svc')
+  if (ids.includes('sch') && ids.includes('svc') && whichOf(t, SCH5_WORDS).length) ids = ids.filter(k => k !== 'svc')
   return ids
 }
 const anyTerm = t => TERM_IDS.some(k => whichOf(t, TERMS[k].key_words).length)
 function needsFor(t, topic, answering) {
   let ns = TOPICS[topic].needs.filter(n => whichOf(t, n.key_words).length && (answering || !n.only_when_answering))
+  // changes-11: a need that wins over the others (sch5, email on a schedule)
+  if (ns.some(n => n.wins_over_other_needs)) ns = ns.filter(n => n.wins_over_other_needs)
   if (ns.length > 1) ns = ns.filter(n => !n.only_if_no_other_need)
   return ns.map(n => n.id)
 }
@@ -7417,6 +7604,65 @@ function nameWithMore(text) {
   return questionForm(rt) || (hasKey && !startsWith(rt, more.self_starts)) ? [capFirst(m[1]), rest] : [null, null]
 }
 
+/* ---------- changes-11: route2.py's steps after hhtech's run of e86b410 ---------- */
+// A name typed at stage open (a later visit skips the name question): NAME_AGAIN for the kept name
+// (alone, or caught by the name patterns), NAME_NEW for a clear "my name is ..." (at most six words,
+// no question mark), which replaces the kept name. A single other word is not taken as a name.
+// Nothing while Helper's own question is open. Returns { kind, name } or null; NAME_NEW keeps.
+function nameLater(text, st, out) {
+  if (st.pending || st.lastq) return null
+  const kn = st.kept.name
+  const raw = String(text).trim().replace(/[.!]+$/, '')
+  if (kn && raw.toLowerCase() === kn.toLowerCase()) return { kind: 'NAME_AGAIN', name: kn }
+  if (String(text).includes('?') || typedWords(text).length > 6) return null
+  const strong = codeName(text, true)
+  const m = NAME_WEAK.exec(text)
+  const weak = m ? capFirst(m[1]) : null
+  if (kn && [(strong || '').toLowerCase(), (weak || '').toLowerCase()].includes(kn.toLowerCase())) return { kind: 'NAME_AGAIN', name: kn }
+  if (!strong) return null
+  keep(st, out, 'name', strong)
+  st.name = strong
+  return { kind: 'NAME_NEW', name: strong }
+}
+// "what is ..." (JSON what_is): the topic whose plain line explains the one word asked about, or null.
+const WHAT_IS = TALK_DATA.what_is ? new RegExp(TALK_DATA.what_is.pattern) : null
+function whatIs(t) {
+  const m = WHAT_IS && WHAT_IS.exec(t)
+  if (!m) return null
+  const x = m[1].replace(/^[ ?.!]+|[ ?.!]+$/g, '')
+  const found = Object.entries(TALK_DATA.what_is.words).filter(([, ws]) => ws.includes(x)).map(([k]) => k)
+  return found.length === 1 ? found[0] : null
+}
+// COST (a question with a cost word) or WHERE (a where word), when no topic and no term matched.
+// Builder (not in route2.py, which has no rows; please check): a row of the wants counts as a topic
+// here, so "can it keep an eye on airline ticket prices" is the prices row, not the cost line.
+function fixedByWords(t, st) {
+  if (strongTopics(t).length || anyTerm(t)) return null
+  if (st.wants !== false && wantsOf(t).length) return null
+  if (questionForm(t) && whichOf(t, TALK_DATA.cost.words).length) return 'COST'
+  if (whichOf(t, TALK_DATA.where.words).length) return 'WHERE'
+  return null
+}
+// keeps.typed_change: where a row shows for a topic something is already kept for (chat app,
+// service, ChatGPT or Claude), the person says of themselves that they use another one: the newest
+// replaces the kept one. Not in a question, not with a not-word or an unsure word, and only when
+// code finds exactly one new name.
+function typedChange(t, topic, st, out) {
+  const TC = KEEPS.typed_change
+  if (!TC || !['msg', 'svc', 'mod'].includes(topic) || !st.kept[topic]) return
+  if (t.includes('?') || questionForm(t) || whichOf(t, TC.question_words).length || whichOf(t, TC.not_words).length || whichOf(t, TALK_DATA.unsure_words).length) return
+  if (!whichOf(t, TC.self_words).length) return
+  let vs
+  if (topic === 'mod') vs = KEEPS.answers.mod.values.filter(v => (v.need === 'mod1' || v.need === 'mod2') && whichOf(t, v.typed_words).length).map(v => v.need)
+  else {
+    const names = new Set(Object.entries(KEEPS.answers[topic].names).filter(([w]) => hits(t, w)).map(([, n]) => n))
+    if (names.has('Google Calendar')) names.delete('Google')
+    vs = [...names]
+  }
+  if (vs.length === 1 && vs[0] !== st.kept[topic]) keep(st, out, topic, vs[0])
+}
+const samePair = (a, b) => a.length === b.length && [...a].sort().join('\u0000') === [...b].sort().join('\u0000')
+
 // The service a "named service" line is about, for its text to paste: the picked answer's own, the
 // name of the first of the need's key words that is in the message (the list has the longest
 // first), the message itself when it was the answer to "Which service?", or the one named earlier
@@ -7520,6 +7766,16 @@ function turn(text, st) {
   // a skill named in a clear pattern is looked up before the terms
   const dk = dontKnow(text)
   if (dk === 'N1a' || dk === 'N1b') return done(dk)
+  // changes-11, in route2.py's order: a name on a later visit, "what is ...", cost, where
+  if (st.stage === 'open') {
+    const nl = nameLater(text, st, out)
+    if (nl) return done(nl.kind, { name: nl.name })
+    const tw = cutIgnored(talkNorm(text))
+    const wi = whatIs(tw)
+    if (wi) return done('plain', { topic: wi, why: 'what is' })
+    const fx = fixedByWords(tw, st)
+    if (fx) return done(fx)
+  }
   // 4 and 5. the topic and the need, by key words
   const code = byCode(text, st)
   out.code = code
@@ -7528,11 +7784,15 @@ function turn(text, st) {
   // "More" when over four; wants_step.py shows the first four)
   if (code.rows) return code.rows.length === 1 ? done('want', { row: code.rows[0] }) : done('W1', { buttons: code.rows })
   if (code.term) return done('term', { term: code.term })
+  // changes-11: two terms that are a pair (skill and plugin) get W2, which compares them
+  if (several && (TALK_DATA.w1_pairs || []).some(p => samePair(p.terms, several))) return done('W2', { buttons: several })
   // 7. the first that fits
   if (topic && need) {
     const answered = st.pending === topic
-    // keeps rule 2: only an answer to Helper's own open question, and only when code found it
+    // keeps rule 2: only an answer to Helper's own open question, and only when code found it;
+    // changes-11 (keeps.typed_change): otherwise the newest thing said may replace the kept one
     if (answered) keepTyped(t, topic, need, st, out)
+    else typedChange(t, topic, st, out)
     st.found[topic] = need
     if (topic === 'svc') st.service = serviceIn(text, st, answered)
     return withServiceLine(done('row', { topic, need }), st)
@@ -7784,7 +8044,23 @@ function keptRows(kept) {
 function keptNote(result, st) {
   if (!result.kept || !result.kept.length) return null
   const words = result.kept.map(k => (k === 'asked' ? result.thing : keptWords(k, st.kept[k])))
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null }
+  // items: what this line says was kept, [key, value] each, so the page can mark the line once
+  // that is no longer kept (forgotten, or replaced by a newer one)
+  const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null, items }
+}
+// Is one thing a faint line named still kept, as it was then? ("asked": in any capitals, as the
+// remember step and the settings page count the same thing.)
+function stillKept(kept, [key, value]) {
+  if (key === 'asked') return (kept.asked || []).some(a => String(a).toLowerCase() === String(value).toLowerCase())
+  return kept[key] === value
+}
+// A faint line (note: "Kept: ...", or used: "From what I keep: ...") that is no longer true: none
+// of what it named is kept any more.
+function noteForgotten(note, kept) {
+  if (!note || !kept) return false
+  const items = note.items || (note.topic ? [[note.topic, note.value]] : [])
+  return items.length > 0 && !items.some(item => stillKept(kept, item))
 }
 
 // The opening line. On a later visit with a kept name, the opening's question is not asked: the
@@ -7837,6 +8113,19 @@ function lineFor(result, st, typed = '', opts = {}) {
       const items = result.buttons.map(id => ({ id, label: labelOf(id), which: id }))
       return said('W1', FIXED.W1.text, { answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: pageOf(items) } })
     }
+    // changes-11: skill and plugin compared, then the same two picks as under W1
+    case 'W2': {
+      const items = result.buttons.map(id => ({ id, label: labelOf(id), which: id }))
+      return said('W2', FIXED.W2.text, { source: FIXED.W2.source || null, answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: pageOf(items) } })
+    }
+    // changes-11: the cost line and where to run Hermes, each with its "Open ..." button
+    case 'COST':
+    case 'WHERE':
+      return said(result.kind, FIXED[result.kind].text, { source: FIXED[result.kind].source || null, next: nextFor(FIXED[result.kind].next, null, st) })
+    // changes-11: a name typed on a later visit
+    case 'NAME_AGAIN':
+    case 'NAME_NEW':
+      return said(result.kind, fillSlots(FIXED[result.kind].text, { name: result.name }))
     case 'can-q': {
       const q = WANTS_DATA.question
       return said('can-q', q.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: q.answers.map(a => ({ id: 'group-' + a.gives_group, label: a.label, group: a.gives_group })) } })
@@ -7866,7 +8155,7 @@ function lineFor(result, st, typed = '', opts = {}) {
     }
     case 'row': {
       const n = TOPICS[result.topic].needs.find(x => x.id === result.need)
-      const used = result.used === 'kept' ? { text: fillSlots(KEEPS.use.used_line, { kept_words: keptWords(result.topic, st.kept[result.topic]) }), link: KEEPS.use.used_link.words, topic: result.topic } : null
+      const used = result.used === 'kept' ? { text: fillSlots(KEEPS.use.used_line, { kept_words: keptWords(result.topic, st.kept[result.topic]) }), link: KEEPS.use.used_link.words, topic: result.topic, value: st.kept[result.topic] } : null
       // changes-6 fix 6: Gmail, Google Calendar, Google Drive: CN1; GitHub: the github skill (S1)
       if (result.serviceLine && result.serviceLine.line === 'S1') return { ...skillLine(result.serviceLine.skill, said), used }
       if (result.serviceLine) {
@@ -8279,6 +8568,8 @@ const T = {
   // the faint lines: what was kept, what is used; the first-time line on a line of its own
   note: 'hh-note',
   noteFirst: 'hh-note-first',
+  // talk v2 fixes: the words of a faint line that is no longer true (forgotten), struck through
+  gone: 'hh-gone',
   link: 'hh-link',
   // the list of what Helper keeps (A1)
   rows: 'hh-rows',
@@ -8304,7 +8595,7 @@ const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arro
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:8px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:0;padding:1px 0 1px 10px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li+li{margin-top:3px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:8px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:0;padding:1px 0 1px 10px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li+li{margin-top:3px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-gone{text-decoration:line-through}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -9701,15 +9992,21 @@ const Steps = ({ next }) => [
 // The faint lines that go with a Helper line: "Kept: ..." with its link, the first-time line under
 // it once, and "From what I keep: ..." with Change. Small faint text on Helper's side, never a
 // question; the link is the only thing to press. hhdesign draws them just above the line.
-function notesOf(entry, onNote) {
+// kept: the record as it is now. A faint line whose thing is no longer kept (forgotten, or replaced
+// by a newer one) keeps its words, struck through (<del>), so it no longer reads as kept; its link
+// still works. The first-time line under it is about where things are kept and stays as it is.
+function notesOf(entry, onNote, kept) {
   const out = []
+  const words = (text, gone) => (gone ? jsx('del', { className: T.gone, 'data-hh': 'kept-gone', children: text }, 'gone') : text)
   if (entry.note) {
+    const gone = noteForgotten(entry.note, kept)
     out.push(
       jsxs('p', {
         className: T.note,
         'data-hh': 'kept-note',
+        'data-forgotten': gone ? 'true' : undefined,
         children: [
-          entry.note.text,
+          words(entry.note.text, gone),
           jsx('button', { type: 'button', className: T.link, 'data-hh': 'kept-link', onClick: () => onNote(entry, 'see'), children: entry.note.link }, 'link'),
           entry.note.first ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-first', children: entry.note.first }, 'first') : null
         ]
@@ -9717,11 +10014,13 @@ function notesOf(entry, onNote) {
     )
   }
   if (entry.used) {
+    const gone = noteForgotten(entry.used, kept)
     out.push(
       jsxs('p', {
         className: T.note,
         'data-hh': 'used-note',
-        children: [entry.used.text, jsx('button', { type: 'button', className: T.link, 'data-hh': 'used-link', onClick: () => onNote(entry, 'change'), children: entry.used.link }, 'link')]
+        'data-forgotten': gone ? 'true' : undefined,
+        children: [words(entry.used.text, gone), jsx('button', { type: 'button', className: T.link, 'data-hh': 'used-link', onClick: () => onNote(entry, 'change'), children: entry.used.link }, 'link')]
       }, `${entry.id}-used`)
     )
   }
@@ -9769,16 +10068,16 @@ function OldLine({ entry, onNext }) {
 // lines of the newest sentence. It scrolls when it is full and stays at its newest when its room
 // changes (the style sheet does that: the outer box stacks from its bottom). A screen reader hears
 // who said each line; the eye sees it by the side.
-function Conversation({ entries, newest, onNext, onNote, scrollRef }) {
+function Conversation({ entries, newest, kept, onNext, onNote, scrollRef }) {
   const items = []
   for (const e of entries) {
     if (e.who === 'you') items.push(jsxs('div', { className: T.me, 'data-hh': 'me', children: [jsx('span', { className: K.srOnly, children: 'You said: ' }, 'who'), e.text] }, e.id))
     else {
-      items.push(...notesOf(e, onNote))
+      items.push(...notesOf(e, onNote, kept))
       items.push(jsx(OldLine, { entry: e, onNext }, e.id))
     }
   }
-  if (newest) items.push(...notesOf(newest, onNote))
+  if (newest) items.push(...notesOf(newest, onNote, kept))
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,
@@ -10290,7 +10589,7 @@ function makePage(ctx, opts = {}) {
       const result = turn(typed, visit)
       // Kept only while "Which one do you mean?" is open, for the pick that answers it. A message
       // with a key in it never gets that line, so a key is never kept here.
-      memory.typed = result.kind === 'W1' ? typed : ''
+      memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       answer(result, result.kind === 'K1' ? null : shown, typed)
@@ -10847,7 +11146,7 @@ function makePage(ctx, opts = {}) {
             : undefined,
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
-            jsx(Conversation, { entries: older, newest: inBubble, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
+            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
             inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { lit: 0 }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer

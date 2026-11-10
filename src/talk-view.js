@@ -25,6 +25,7 @@ import { K, T, cx } from './look.js'
 import { Said } from './reveal.js'
 import { BubbleLink } from './bubble-link.js'
 import { PasteBox } from './setup-tab.js'
+import { noteForgotten } from './talk.js'
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
 export const nextIcon = next => (next.kind === 'paste' || next.kind === 'steps' ? 'chevron-down' : 'arrow-right')
@@ -51,15 +52,21 @@ const Steps = ({ next }) => [
 // The faint lines that go with a Helper line: "Kept: ..." with its link, the first-time line under
 // it once, and "From what I keep: ..." with Change. Small faint text on Helper's side, never a
 // question; the link is the only thing to press. hhdesign draws them just above the line.
-function notesOf(entry, onNote) {
+// kept: the record as it is now. A faint line whose thing is no longer kept (forgotten, or replaced
+// by a newer one) keeps its words, struck through (<del>), so it no longer reads as kept; its link
+// still works. The first-time line under it is about where things are kept and stays as it is.
+function notesOf(entry, onNote, kept) {
   const out = []
+  const words = (text, gone) => (gone ? jsx('del', { className: T.gone, 'data-hh': 'kept-gone', children: text }, 'gone') : text)
   if (entry.note) {
+    const gone = noteForgotten(entry.note, kept)
     out.push(
       jsxs('p', {
         className: T.note,
         'data-hh': 'kept-note',
+        'data-forgotten': gone ? 'true' : undefined,
         children: [
-          entry.note.text,
+          words(entry.note.text, gone),
           jsx('button', { type: 'button', className: T.link, 'data-hh': 'kept-link', onClick: () => onNote(entry, 'see'), children: entry.note.link }, 'link'),
           entry.note.first ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-first', children: entry.note.first }, 'first') : null
         ]
@@ -67,11 +74,13 @@ function notesOf(entry, onNote) {
     )
   }
   if (entry.used) {
+    const gone = noteForgotten(entry.used, kept)
     out.push(
       jsxs('p', {
         className: T.note,
         'data-hh': 'used-note',
-        children: [entry.used.text, jsx('button', { type: 'button', className: T.link, 'data-hh': 'used-link', onClick: () => onNote(entry, 'change'), children: entry.used.link }, 'link')]
+        'data-forgotten': gone ? 'true' : undefined,
+        children: [words(entry.used.text, gone), jsx('button', { type: 'button', className: T.link, 'data-hh': 'used-link', onClick: () => onNote(entry, 'change'), children: entry.used.link }, 'link')]
       }, `${entry.id}-used`)
     )
   }
@@ -119,16 +128,16 @@ function OldLine({ entry, onNext }) {
 // lines of the newest sentence. It scrolls when it is full and stays at its newest when its room
 // changes (the style sheet does that: the outer box stacks from its bottom). A screen reader hears
 // who said each line; the eye sees it by the side.
-export function Conversation({ entries, newest, onNext, onNote, scrollRef }) {
+export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef }) {
   const items = []
   for (const e of entries) {
     if (e.who === 'you') items.push(jsxs('div', { className: T.me, 'data-hh': 'me', children: [jsx('span', { className: K.srOnly, children: 'You said: ' }, 'who'), e.text] }, e.id))
     else {
-      items.push(...notesOf(e, onNote))
+      items.push(...notesOf(e, onNote, kept))
       items.push(jsx(OldLine, { entry: e, onNext }, e.id))
     }
   }
-  if (newest) items.push(...notesOf(newest, onNote))
+  if (newest) items.push(...notesOf(newest, onNote, kept))
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,

@@ -116,3 +116,6 @@
 .hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}
 .hh-steps li+li{margin-top:3px}
 .hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}
+/* talk v2 fixes: a faint "Kept: ..." or "From what I keep: ..." line whose thing was forgotten or
+   replaced since: its words stay, struck through, in the same faint colour (no new words). */
+.hh-gone{text-decoration:line-through}
