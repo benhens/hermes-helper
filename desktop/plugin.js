@@ -7097,7 +7097,10 @@ const SKILL_NEXT_PATTERNS = ['(?:the|a|an|this|that) {n} skills?', 'skills? (?:c
 const SKILL_RES = WANTS_DATA.skills.map(s => {
   const names = [...new Set([s.name, s.name.replace(/-/g, ' ')])]
   const alts = names.flatMap(n => SKILL_NEXT_PATTERNS.map(p => p.replace(/\\"/g, '"').replace('{n}', escapeRe(n))))
-  return [s.name, new RegExp('(^|[^a-z0-9])(?:' + alts.join('|') + ')($|[^a-z0-9])')]
+  // Builder (not in skill_next.py, changed after the first test run, please check): a name never
+  // ends right before a hyphen, so 'a skill called "brag-slim"' names brag-slim only, not brag too
+  // (skill_next.py finds both, and two names fall through to the skill line about what a skill is).
+  return [s.name, new RegExp('(^|[^a-z0-9])(?:' + alts.join('|') + ')($|[^a-z0-9-])')]
 })
 const skillOf = t => [...new Set(SKILL_RES.filter(([, re]) => re.test(t)).map(([n]) => n))].sort()
 // The row a skill has, if any (a hand-written row wins over S1 and S2).

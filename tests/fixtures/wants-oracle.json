@@ -1,0 +1,8158 @@
+{
+ "about": "Written by dev/checks/talk-v2-wants/dump_oracle.py. Do not edit: make it again.",
+ "route2_sha256": "1f281e69340b830cc2f6fbb84e6807327e340a598de80316821f5d6447a8065e",
+ "wants_step_sha256": "491b7f75865c4d61219476632e5d56270081ef6146f77c5fbd5323fed420a23f",
+ "fixes6_step_sha256": "cd6d53f51b1bcac27fc2436c1ac0431199a650d6cb6c5a120c47e02d02ba9142",
+ "skill_next_patterns": [
+  "(?:the|a|an|this|that) {n} skills?",
+  "skills? (?:called|named) \\\"?{n}\\\"?",
+  "skills? for {n}",
+  "\\\"{n}\\\" skills?"
+ ],
+ "sets": [
+  {
+   "name": "first56",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "Hey, something about memory",
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "Do you know anything about how AI memory works?",
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "how does memory work?",
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "will it remember my name?",
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "it forgot what I told it yesterday",
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "can it rember stuff about me",
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "how do I use memmory",
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "does hermes know what we talked about last week",
+     "route2": {
+      "shown": "line mem2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem2"
+     },
+     "oracle": {
+      "shown": "line mem2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem2"
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "it keeps losing track of what I told it",
+     "route2": {
+      "shown": "line mem3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem3"
+     },
+     "oracle": {
+      "shown": "line mem3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem3"
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "how do I turn on the memory",
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "which model should I use?",
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "I have chatgpt plus, can I use that",
+     "route2": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1"
+     },
+     "oracle": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1"
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "can I use claude",
+     "route2": {
+      "shown": "line mod2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod2"
+     },
+     "oracle": {
+      "shown": "line mod2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod2"
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "is there a free one",
+     "route2": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     },
+     "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "what ai is the best",
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "I dont want to pay for anything",
+     "route2": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     },
+     "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "what's the difference between a model and a plugin",
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "how do I connect hermes to my model",
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "can I talk to it from my phone?",
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "does it work with whatsapp",
+     "route2": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     },
+     "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     }
+    },
+    {
+     "n": 21,
+     "after": "",
+     "text": "telegram?",
+     "route2": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     },
+     "oracle": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     }
+    },
+    {
+     "n": 22,
+     "after": "",
+     "text": "can I text it",
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 23,
+     "after": "",
+     "text": "I want to use it on my iphone",
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 24,
+     "after": "",
+     "text": "how do I connect my phone",
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 25,
+     "after": "",
+     "text": "can I get my email on my phone",
+     "route2": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     },
+     "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     }
+    },
+    {
+     "n": 26,
+     "after": "",
+     "text": "can it send me a summary every morning?",
+     "route2": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     },
+     "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     }
+    },
+    {
+     "n": 27,
+     "after": "",
+     "text": "remind me to call mum tomorrow",
+     "route2": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2"
+     },
+     "oracle": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2"
+     }
+    },
+    {
+     "n": 28,
+     "after": "",
+     "text": "can it check prices every day",
+     "route2": {
+      "shown": "line sch3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch3"
+     },
+     "oracle": {
+      "shown": "line sch3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch3"
+     }
+    },
+    {
+     "n": 29,
+     "after": "",
+     "text": "can hermes do things automaticaly",
+     "route2": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     }
+    },
+    {
+     "n": 30,
+     "after": "",
+     "text": "does it still do the morning job when my laptop is closed",
+     "route2": {
+      "shown": "line sch4",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch4"
+     },
+     "oracle": {
+      "shown": "line sch4",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch4"
+     }
+    },
+    {
+     "n": 31,
+     "after": "",
+     "text": "can it read my gmail",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 32,
+     "after": "",
+     "text": "does it work with notion",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 33,
+     "after": "",
+     "text": "is it safe to give it access to my email",
+     "route2": {
+      "shown": "line svc2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc2"
+     },
+     "oracle": {
+      "shown": "line svc2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc2"
+     }
+    },
+    {
+     "n": 34,
+     "after": "",
+     "text": "can I link my spotify",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 35,
+     "after": "",
+     "text": "can I have two bots",
+     "route2": {
+      "shown": "question bot",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question bot",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": null
+     }
+    },
+    {
+     "n": 36,
+     "after": "",
+     "text": "I want one for work and one for personal stuff",
+     "route2": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     },
+     "oracle": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     }
+    },
+    {
+     "n": 37,
+     "after": "",
+     "text": "can my bots talk to each other",
+     "route2": {
+      "shown": "line bot2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot2"
+     },
+     "oracle": {
+      "shown": "line bot2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot2"
+     }
+    },
+    {
+     "n": 38,
+     "after": "",
+     "text": "do I need a second bot for my emails",
+     "route2": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     },
+     "oracle": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     }
+    },
+    {
+     "n": 39,
+     "after": "",
+     "text": "I don't remember which model I picked",
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 40,
+     "after": "",
+     "text": "can it remember things and also message me on telegram",
+     "route2": {
+      "shown": "W1 buttons mem+msg",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "msg"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons mem+msg",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "msg"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 41,
+     "after": "",
+     "text": "remind me every morning on whatsapp",
+     "route2": {
+      "shown": "W1 buttons msg+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "sch"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons msg+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "sch"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 42,
+     "after": "",
+     "text": "can you connect my Google Calendar?",
+     "route2": {
+      "shown": "H1 (can you connect)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (can you connect)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 43,
+     "after": "",
+     "text": "connect my google calendar",
+     "route2": {
+      "shown": "H1 (connect my)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (connect my)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 44,
+     "after": "",
+     "text": "please install the github plugin",
+     "route2": {
+      "shown": "H1 (please install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (please install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 45,
+     "after": "",
+     "text": "set up telegram for me",
+     "route2": {
+      "shown": "H1 (for me + set up)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (for me + set up)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 46,
+     "after": "",
+     "text": "my key is sk-a1B2a1B2a1B2a1B2a1B2a1B2",
+     "route2": {
+      "shown": "K1",
+      "kind": "K1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "K1",
+      "kind": "K1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 47,
+     "after": "",
+     "text": "what is the weather like?",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 48,
+     "after": "",
+     "text": "what is a skill",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 49,
+     "after": "",
+     "text": "how much does hermes cost",
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 50,
+     "after": "",
+     "text": "can you write me a poem",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 51,
+     "after": "",
+     "text": "what is SOUL.md",
+     "route2": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 52,
+     "after": "",
+     "text": "hi",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 53,
+     "after": "",
+     "text": "the service was slow yesterday",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 54,
+     "after": "",
+     "text": "my daily work is coaching tennis",
+     "route2": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     },
+     "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     }
+    },
+    {
+     "n": 55,
+     "after": "",
+     "text": "I run a small online shop and check orders every day",
+     "route2": {
+      "shown": "line sch3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch3"
+     },
+     "oracle": {
+      "shown": "line sch3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch3"
+     }
+    },
+    {
+     "n": 56,
+     "after": "",
+     "text": "my name is Peter, and I do club management for a company called Tournated",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "set2-60",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "will it know who I am next week",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "why did it forget my dog's name",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "where is the stuff it learned about me saved",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "it doesnt recall anything from yesterday",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "line mem2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem2"
+     },
+     "oracle": {
+      "shown": "line mem2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem2"
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "memroy isnt working",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "which ai is best for writing",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "do i have to pay for this",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "I already have a chatgpt subscription",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1"
+     },
+     "oracle": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1"
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "I pay my phone bill every month, can it remind me",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "W1 buttons msg+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "sch"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons msg+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "sch"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "can I run a modle on my own laptop",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     },
+     "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "whats an llm",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "i dont want to spend any money",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     },
+     "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "I'd like to chat with hermes on my phone",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "get answers on telegrm",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     },
+     "oracle": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "can it send me a text message",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "how do I reach it when im not at my computer",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "can it do something every monday",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "I want a summary each morning at 8",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     },
+     "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "is there a way to get reminders",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2"
+     },
+     "oracle": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2"
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "can it do things on a schedual",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     }
+    },
+    {
+     "n": 21,
+     "after": "",
+     "text": "can hermes read my gmail",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 22,
+     "after": "",
+     "text": "I use google drive a lot, can it see my files",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     }
+    },
+    {
+     "n": 23,
+     "after": "",
+     "text": "how do I link github",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 24,
+     "after": "",
+     "text": "can it check my email",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     }
+    },
+    {
+     "n": 25,
+     "after": "",
+     "text": "what's an mcp server",
+     "want": [
+      "word:mcp",
+      "svc"
+     ],
+     "route2": {
+      "shown": "term line mcp",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line mcp",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 26,
+     "after": "",
+     "text": "can I have two bots",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "question bot",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question bot",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": null
+     }
+    },
+    {
+     "n": 27,
+     "after": "",
+     "text": "I need a separate agent for my business",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     },
+     "oracle": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     }
+    },
+    {
+     "n": 28,
+     "after": "",
+     "text": "what's a profile",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "term line profile",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line profile",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 29,
+     "after": "",
+     "text": "can it remember my meetings and remind me each morning",
+     "want": [
+      "which"
+     ],
+     "route2": {
+      "shown": "W1 buttons mem+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "sch"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons mem+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "sch"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 30,
+     "after": "",
+     "text": "which model works best on telegram",
+     "want": [
+      "which"
+     ],
+     "route2": {
+      "shown": "W1 buttons mod+msg",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mod",
+       "msg"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons mod+msg",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mod",
+       "msg"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 31,
+     "after": "",
+     "text": "I want a second bot that answers on discord",
+     "want": [
+      "which"
+     ],
+     "route2": {
+      "shown": "W1 buttons msg+bot",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "bot"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons msg+bot",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "bot"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 32,
+     "after": "",
+     "text": "can it read my email every morning",
+     "want": [
+      "which"
+     ],
+     "route2": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     },
+     "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     }
+    },
+    {
+     "n": 33,
+     "after": "",
+     "text": "do bots share one memory",
+     "want": [
+      "which"
+     ],
+     "route2": {
+      "shown": "W1 buttons mem+bot",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "bot"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons mem+bot",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "bot"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 34,
+     "after": "",
+     "text": "I forgot which chat app I connected",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 35,
+     "after": "",
+     "text": "i don't remember how to change the model",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 36,
+     "after": "",
+     "text": "install the spotify plugin for me",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "H1 (for me + install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (for me + install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 37,
+     "after": "",
+     "text": "can you set up a morning briefing for me",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "H1 (can you set up)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (can you set up)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 38,
+     "after": "",
+     "text": "please connect my gmail",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "H1 (please connect)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (please connect)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 39,
+     "after": "",
+     "text": "link my calendar to it",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "H1 (link my)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (link my)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 40,
+     "after": "",
+     "text": "create a daily schedule for me",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "H1 (for me + create)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (for me + create)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 41,
+     "after": "",
+     "text": "is telegram a good choice for me",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     },
+     "oracle": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     }
+    },
+    {
+     "n": 42,
+     "after": "",
+     "text": "could you explain how to connect discord for me",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     },
+     "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     }
+    },
+    {
+     "n": 43,
+     "after": "",
+     "text": "how would I build a bot for my mom",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     },
+     "oracle": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     }
+    },
+    {
+     "n": 44,
+     "after": "",
+     "text": "what's good for me to start with",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 45,
+     "after": "",
+     "text": "what's the weather in riga",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 46,
+     "after": "",
+     "text": "my screen is frozen",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 47,
+     "after": "",
+     "text": "how do I update hermes",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 48,
+     "after": "",
+     "text": "can it make pictures",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_image",
+      "kind": "want",
+      "row": "w_image",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 49,
+     "after": "",
+     "text": "I forgot my password",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 50,
+     "after": "",
+     "text": "how do I link two paragraphs in word",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group files",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "files",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 51,
+     "after": "",
+     "text": "cant connect to the wifi",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 52,
+     "after": "",
+     "text": "I sent an email to my boss yesterday",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 53,
+     "after": "",
+     "text": "what is a skill",
+     "want": [
+      "word:skill"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 54,
+     "after": "",
+     "text": "do I need plugins",
+     "want": [
+      "word:plugin"
+     ],
+     "route2": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 55,
+     "after": "name",
+     "text": "Anna",
+     "want": [
+      "name"
+     ],
+     "route2": {
+      "shown": "F1 name=Anna",
+      "kind": "F1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "F1 name=Anna",
+      "kind": "F1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 56,
+     "after": "name",
+     "text": "my name is Jānis",
+     "want": [
+      "name"
+     ],
+     "route2": {
+      "shown": "F1 name=Jānis",
+      "kind": "F1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "F1 name=Jānis",
+      "kind": "F1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 57,
+     "after": "name",
+     "text": "I'm Tom, can it remember things",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem +kept=name +first +name=Tom",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem +kept=name +first +name=Tom",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 58,
+     "after": "work",
+     "text": "I'm a nurse",
+     "want": [
+      "work"
+     ],
+     "route2": {
+      "shown": "F2 name=Sam work=I'm a nurse +kept=name +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "F2 name=Sam work=I'm a nurse +kept=name,work +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 59,
+     "after": "work",
+     "text": "I teach piano every day after school",
+     "want": [
+      "work"
+     ],
+     "route2": {
+      "shown": "F2 name=Sam work=I teach piano every day after school +kept=name +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "F2 name=Sam work=I teach piano every day after school +kept=name,work +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 60,
+     "after": "work",
+     "text": "I write emails and connect clients with suppliers",
+     "want": [
+      "work"
+     ],
+     "route2": {
+      "shown": "F2 name=Sam work=I write emails and connect clients with suppliers +kept=name +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "F2 name=Sam work=I write emails and connect clients with suppliers +kept=name,work +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "new20",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "which AI is it actually using under the hood",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "do I need to buy a chatgpt subscription for this",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1"
+     },
+     "oracle": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1"
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "can it talk to me on whatsapp",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     },
+     "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "I'd like to message it from my watch",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "will it forget everything when I close the window",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "does it know my birthday if I told it last month",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "can it do my backups at midnight",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "I want a summary of my sales waiting for me when I get up",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "can I have a different one for my kids",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     },
+     "oracle": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "I want a work version and a private version",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "what's the difference between a skill and a plugin",
+     "want": [
+      "which",
+      "word:skill",
+      "word:plugin"
+     ],
+     "route2": {
+      "shown": "W1 buttons skill+plugin",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "skill",
+       "plugin"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons skill+plugin",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "skill",
+       "plugin"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "can it search the web",
+     "want": [
+      "word:tool"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_web",
+      "kind": "want",
+      "row": "w_web",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "how do I teach it a new trick",
+     "want": [
+      "word:skill"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "can it see my google calendar",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "does it work with notion",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "what is mcp",
+     "want": [
+      "word:mcp"
+     ],
+     "route2": {
+      "shown": "term line mcp",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line mcp",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "my cat is sick",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "write me a website for my bakery",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "is the thinking part running on my laptop or somewhere else",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "does it answer in discord",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     },
+     "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     }
+    }
+   ]
+  },
+  {
+   "name": "new20b",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "is my stuff saved between conversations",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "it called me by the wrong name today",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "do i have to pay every month",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "can I run the brain on my own pc",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "i want to chat with it while i'm on the bus",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "does it have a telegram thing",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     },
+     "oracle": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1"
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "can it ping me when my package ships",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "every sunday i want a list of what i did this week",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     },
+     "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1"
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "can it open my dropbox",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "is it risky to hook up my bank account",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "i need one helper for my shop and one for my family",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     },
+     "oracle": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "can two of them pass work between them",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "what does plugin mean",
+     "want": [
+      "word:plugin"
+     ],
+     "route2": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "someone mentioned a soul file, what's that",
+     "want": [
+      "word:soul"
+     ],
+     "route2": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "can it open files on my computer",
+     "want": [
+      "word:tool"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "make me a logo for my cafe",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_image",
+      "kind": "want",
+      "row": "w_image",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "install the spotify thing for me",
+     "want": [
+      "build"
+     ],
+     "route2": {
+      "shown": "H1 (for me + install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (for me + install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "the football was great last night",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "how tall is mount everest",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "thanks, that helps",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "fresh20",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "does it keep notes on what I like",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "every time I open it I have to introduce myself again",
+     "want": [
+      "mem"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "can I pick a different brain for it",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "is hermes free to use",
+     "want": [
+      "mod"
+     ],
+     "route2": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     },
+     "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3"
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "can I ask it stuff while I'm on the bus",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "does it have an app for android",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "can it ping me on signal",
+     "want": [
+      "msg"
+     ],
+     "route2": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     },
+     "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2"
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "send me the news at 7am",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "I want it to look at my inbox on fridays",
+     "want": [
+      "which"
+     ],
+     "route2": {
+      "shown": "W1 buttons sch+svc",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "sch",
+       "svc"
+      ],
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "W1 buttons sch+svc",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "sch",
+       "svc"
+      ],
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "wake me up with a weather report",
+     "want": [
+      "sch"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "can it look at my dropbox files",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "does it work with my bank",
+     "want": [
+      "svc"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "could I have one hermes for my shop and one for home",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     },
+     "oracle": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1"
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "can my wife have her own",
+     "want": [
+      "bot"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "how do I make it install a plugin",
+     "want": [
+      "word:plugin"
+     ],
+     "route2": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "please hook up my trello",
+     "want": [
+      "build",
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "my printer is out of ink",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "is it hard to link my printer?",
+     "want": [
+      "none"
+     ],
+     "route2": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "what does a soul file do",
+     "want": [
+      "word:soul"
+     ],
+     "route2": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "name",
+     "text": "Hi, I'm Maria. What can hermes do on a schedule?",
+     "want": [
+      "sch+name=Maria"
+     ],
+     "route2": {
+      "shown": "question sch +kept=name +first +name=Maria",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question sch +kept=name +first +name=Maria",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "new30",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "is hermes able to google stuff for me",
+     "want": [
+      "w_web"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "I want it to book a table on a restaurant's website",
+     "want": [
+      "w_browser"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_browser",
+      "kind": "want",
+      "row": "w_browser",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "can it tweet for my business",
+     "want": [
+      "w_xpost"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_xpost",
+      "kind": "want",
+      "row": "w_xpost",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "I'd like a summary of a long pdf contract",
+     "want": [
+      "w_docs"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "turn my notes into a nice powerpoint",
+     "want": [
+      "w_office",
+      "build"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group files",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "files",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "help me with my python homework",
+     "want": [
+      "w_code"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_code",
+      "kind": "want",
+      "row": "w_code",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "draw me a cat wearing a hat",
+     "want": [
+      "w_image",
+      "build"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "what's in this photo i took",
+     "want": [
+      "w_see"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_see",
+      "kind": "want",
+      "row": "w_see",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "I want to turn my blog post into a short video",
+     "want": [
+      "w_video"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "can I speak to it instead of typing",
+     "want": [
+      "w_voice"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group voice",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "voice",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "can it read its replies to me out loud",
+     "want": [
+      "w_aloud"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "give me the key points of this youtube talk",
+     "want": [
+      "w_youtube"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "ROW w_youtube",
+      "kind": "want",
+      "row": "w_youtube",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "find me scientific studies on intermittent fasting",
+     "want": [
+      "w_papers"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_papers",
+      "kind": "want",
+      "row": "w_papers",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "how far is riga from vilnius by car",
+     "want": [
+      "w_maps",
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "can it keep an eye on airline ticket prices",
+     "want": [
+      "w_prices"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_prices",
+      "kind": "want",
+      "row": "w_prices",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "edit my video",
+     "want": [
+      "N2:pics",
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "can it remove the background from a photo",
+     "want": [
+      "N2:pics",
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "can it make a podcast out of my notes",
+     "want": [
+      "N2:voice",
+      "N2:files",
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group voice",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "voice",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "can it scan a paper letter for me",
+     "want": [
+      "N2:files",
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "can it watch my security camera",
+     "want": [
+      "N2:pics",
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 21,
+     "after": "",
+     "text": "can it do my taxes",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 22,
+     "after": "",
+     "text": "can it order groceries",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 23,
+     "after": "",
+     "text": "can it translate a letter into spanish",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 24,
+     "after": "",
+     "text": "can it help me learn guitar",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 25,
+     "after": "",
+     "text": "can it play music on my speakers",
+     "want": [
+      "N1",
+      "N2:voice"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group voice",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "voice",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 26,
+     "after": "",
+     "text": "can it call my mom",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 27,
+     "after": "",
+     "text": "can it manage my instagram",
+     "want": [
+      "N1",
+      "N2:web"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 28,
+     "after": "",
+     "text": "can it control my smart lights",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 29,
+     "after": "",
+     "text": "can it send a fax",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 30,
+     "after": "",
+     "text": "can it tell me why my car makes a noise",
+     "want": [
+      "N1"
+     ],
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "Q4",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "what does the himalaya skill do",
+     "skill_want": "himalaya",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL himalaya",
+      "kind": "skillS",
+      "row": null,
+      "skill": "himalaya",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "is there a github skill",
+     "skill_want": "github",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "SKILL github",
+      "kind": "skillS",
+      "row": null,
+      "skill": "github",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "tell me about the excalidraw skill",
+     "skill_want": "excalidraw",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL excalidraw",
+      "kind": "skillS",
+      "row": null,
+      "skill": "excalidraw",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "is there a skill for google workspace",
+     "skill_want": "google-workspace",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "SKILL google-workspace",
+      "kind": "skillS",
+      "row": null,
+      "skill": "google-workspace",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "what is the solana skill",
+     "skill_want": "solana",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL solana",
+      "kind": "skillS",
+      "row": null,
+      "skill": "solana",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "do you have the docker management skill",
+     "skill_want": "docker-management",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL docker-management",
+      "kind": "skillS",
+      "row": null,
+      "skill": "docker-management",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "how do I get the rss feeds skill",
+     "skill_want": "rss-feeds",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL rss-feeds",
+      "kind": "skillS",
+      "row": null,
+      "skill": "rss-feeds",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "is the openhue skill for smart lights",
+     "skill_want": "openhue",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL openhue",
+      "kind": "skillS",
+      "row": null,
+      "skill": "openhue",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "what's the 1password skill",
+     "skill_want": "1password",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL 1password",
+      "kind": "skillS",
+      "row": null,
+      "skill": "1password",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "explain the meme generation skill",
+     "skill_want": "meme-generation",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL meme-generation",
+      "kind": "skillS",
+      "row": null,
+      "skill": "meme-generation",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "can it read a map",
+     "skill_want": null,
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "I need a spike in sales",
+     "skill_want": null,
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "my people skills are bad and I use canvas at school",
+     "skill_want": null,
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "what skills do I need to sketch well",
+     "skill_want": null,
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "I want to shop for new skills courses",
+     "skill_want": null,
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "my stocks went down",
+     "skill_want": null,
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "is coding a useful skill to learn",
+     "skill_want": null,
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_code",
+      "kind": "want",
+      "row": "w_code",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "I'm learning new skills at the box office",
+     "skill_want": null,
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "do I have the skills to build a website",
+     "skill_want": null,
+     "route2": {
+      "shown": "H1 (build a website)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "H1 (build a website)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "can it help me with my brag document",
+     "skill_want": null,
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group files",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "files",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "probes",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "will it forget everything when I close the window",
+     "probe": [
+      "fix1",
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "does hermes forget everything after a chat",
+     "probe": [
+      "fix1",
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "will my bot forget my name",
+     "probe": [
+      "fix1",
+      "mem"
+     ],
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "forget everything",
+     "probe": [
+      "fix1",
+      "A4"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "please forget my name",
+     "probe": [
+      "fix1",
+      "A2 name"
+     ],
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "delete everything you know about me",
+     "probe": [
+      "fix1",
+      "A4"
+     ],
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "can you forget my name?",
+     "probe": [
+      "fix1",
+      "A2 name"
+     ],
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "will you forget everything when I close the window",
+     "probe": [
+      "fix1",
+      "?"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "is it possible to delete everything you know about me?",
+     "probe": [
+      "fix1",
+      "?"
+     ],
+     "route2": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     },
+     "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1"
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "forget everything, it was a mistake",
+     "probe": [
+      "fix1",
+      "A4"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "can I make it forget everything?",
+     "probe": [
+      "fix1",
+      "mem"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "can it look at my dropbox files",
+     "probe": [
+      "fix2",
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "can it read pdf files in my google drive",
+     "probe": [
+      "fix2",
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "can it summarize youtube videos",
+     "probe": [
+      "fix2",
+      "w_youtube"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "ROW w_youtube",
+      "kind": "want",
+      "row": "w_youtube",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "can it work with my obsidian notes",
+     "probe": [
+      "fix2",
+      "w_notes"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "ROW w_notes",
+      "kind": "want",
+      "row": "w_notes",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "can it fill in my excel spreadsheet",
+     "probe": [
+      "fix2",
+      "w_office/w_docs"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "can it read word documents from onedrive",
+     "probe": [
+      "fix2",
+      "svc"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "can it make slides from my notion page",
+     "probe": [
+      "fix2",
+      "svc?"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "is there a github skill",
+     "probe": [
+      "fix3",
+      "skill:github"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "SKILL github",
+      "kind": "skillS",
+      "row": null,
+      "skill": "github",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "is there a skill for google workspace",
+     "probe": [
+      "fix3",
+      "skill:google-workspace"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "SKILL google-workspace",
+      "kind": "skillS",
+      "row": null,
+      "skill": "google-workspace",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 21,
+     "after": "",
+     "text": "what does the pdf skill do",
+     "probe": [
+      "fix3",
+      "skill:pdf"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_pdf",
+      "kind": "want",
+      "row": "w_pdf",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 22,
+     "after": "",
+     "text": "I want to improve my simple english skills",
+     "probe": [
+      "fix3",
+      "nothing"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 23,
+     "after": "",
+     "text": "my sketch skills are terrible",
+     "probe": [
+      "fix3",
+      "nothing"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 24,
+     "after": "",
+     "text": "I'm working on my anatomy skills for drawing",
+     "probe": [
+      "fix3",
+      "nothing"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 25,
+     "after": "",
+     "text": "how do I get better maps skills for orienteering",
+     "probe": [
+      "fix3",
+      "nothing"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_maps",
+      "kind": "want",
+      "row": "w_maps",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 26,
+     "after": "",
+     "text": "I have no canvas skills",
+     "probe": [
+      "fix3",
+      "nothing"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 27,
+     "after": "",
+     "text": "teach me some box skills",
+     "probe": [
+      "fix3",
+      "nothing"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 28,
+     "after": "",
+     "text": "are there skills for stocks",
+     "probe": [
+      "fix3",
+      "skill:stocks (true, a skill exists)"
+     ],
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_stocks",
+      "kind": "want",
+      "row": "w_stocks",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 29,
+     "after": "",
+     "text": "is there a gmail skill",
+     "probe": [
+      "fix3",
+      "?"
+     ],
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 30,
+     "after": "",
+     "text": "can it forget a skill?",
+     "probe": [
+      "fix3",
+      "?"
+     ],
+     "route2": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     },
+     "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "test_wants40",
+   "messages": [
+    {
+     "n": 1,
+     "after": "",
+     "text": "I want to make videos",
+     "hhcontent_expects": "w_video",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_video",
+      "kind": "want",
+      "row": "w_video",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 2,
+     "after": "",
+     "text": "can it read PDFs",
+     "hhcontent_expects": "w_docs",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 3,
+     "after": "",
+     "text": "can it post for me",
+     "hhcontent_expects": "N2:web",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 4,
+     "after": "",
+     "text": "can it search the web",
+     "hhcontent_expects": "w_web",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_web",
+      "kind": "want",
+      "row": "w_web",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 5,
+     "after": "",
+     "text": "can hermes look things up online",
+     "hhcontent_expects": "w_web",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 6,
+     "after": "",
+     "text": "can it edit my videos",
+     "hhcontent_expects": "N2:pics",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 7,
+     "after": "",
+     "text": "can it cut and trim a video",
+     "hhcontent_expects": "N2:pics",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 8,
+     "after": "",
+     "text": "can it fill in a form on a website",
+     "hhcontent_expects": "w_browser",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_browser",
+      "kind": "want",
+      "row": "w_browser",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 9,
+     "after": "",
+     "text": "can it post on twitter for me",
+     "hhcontent_expects": "w_xpost",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_xpost",
+      "kind": "want",
+      "row": "w_xpost",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 10,
+     "after": "",
+     "text": "does it read reddit",
+     "hhcontent_expects": "w_reddit",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_reddit",
+      "kind": "want",
+      "row": "w_reddit",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 11,
+     "after": "",
+     "text": "can it summarize a word document",
+     "hhcontent_expects": "w_docs",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 12,
+     "after": "",
+     "text": "can it merge two pdfs",
+     "hhcontent_expects": "w_pdf",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_pdf",
+      "kind": "want",
+      "row": "w_pdf",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 13,
+     "after": "",
+     "text": "can it make a powerpoint",
+     "hhcontent_expects": "w_office",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_office",
+      "kind": "want",
+      "row": "w_office",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 14,
+     "after": "",
+     "text": "can it use my obsidian notes",
+     "hhcontent_expects": "w_notes",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "ROW w_notes",
+      "kind": "want",
+      "row": "w_notes",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 15,
+     "after": "",
+     "text": "turn my meeting notes into action items",
+     "hhcontent_expects": "w_meeting",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_meeting",
+      "kind": "want",
+      "row": "w_meeting",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 16,
+     "after": "",
+     "text": "can it write code",
+     "hhcontent_expects": "w_code",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_code",
+      "kind": "want",
+      "row": "w_code",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 17,
+     "after": "",
+     "text": "can it click things on my screen",
+     "hhcontent_expects": "w_computer",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_computer",
+      "kind": "want",
+      "row": "w_computer",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 18,
+     "after": "",
+     "text": "can it make a logo",
+     "hhcontent_expects": "w_image",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_image",
+      "kind": "want",
+      "row": "w_image",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 19,
+     "after": "",
+     "text": "can it look at a screenshot",
+     "hhcontent_expects": "w_see",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_see",
+      "kind": "want",
+      "row": "w_see",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 20,
+     "after": "",
+     "text": "make an animated explainer",
+     "hhcontent_expects": "w_anim",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_anim",
+      "kind": "want",
+      "row": "w_anim",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 21,
+     "after": "",
+     "text": "can it summarize a youtube video",
+     "hhcontent_expects": "w_youtube",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "ROW w_youtube",
+      "kind": "want",
+      "row": "w_youtube",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 22,
+     "after": "",
+     "text": "can I use voice mode",
+     "hhcontent_expects": "w_voice",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_voice",
+      "kind": "want",
+      "row": "w_voice",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 23,
+     "after": "",
+     "text": "can it read aloud its answers",
+     "hhcontent_expects": "w_aloud",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_aloud",
+      "kind": "want",
+      "row": "w_aloud",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 24,
+     "after": "",
+     "text": "can it write a song",
+     "hhcontent_expects": "w_music",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_music",
+      "kind": "want",
+      "row": "w_music",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 25,
+     "after": "",
+     "text": "find research papers about sleep",
+     "hhcontent_expects": "w_papers",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_papers",
+      "kind": "want",
+      "row": "w_papers",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 26,
+     "after": "",
+     "text": "can it get directions to the airport",
+     "hhcontent_expects": "w_maps",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_maps",
+      "kind": "want",
+      "row": "w_maps",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 27,
+     "after": "",
+     "text": "can it check stocks",
+     "hhcontent_expects": "w_stocks",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_stocks",
+      "kind": "want",
+      "row": "w_stocks",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 28,
+     "after": "",
+     "text": "watch the price of a flight",
+     "hhcontent_expects": "w_prices",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_prices",
+      "kind": "want",
+      "row": "w_prices",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 29,
+     "after": "",
+     "text": "is there a skill for docker management",
+     "hhcontent_expects": "S:docker-management",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL docker-management",
+      "kind": "skillS",
+      "row": null,
+      "skill": "docker-management",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 30,
+     "after": "",
+     "text": "what does the humanizer skill do",
+     "hhcontent_expects": "S:humanizer",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "SKILL humanizer",
+      "kind": "skillS",
+      "row": null,
+      "skill": "humanizer",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 31,
+     "after": "",
+     "text": "is there a skill for knitting",
+     "hhcontent_expects": "N1",
+     "route2": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 32,
+     "after": "",
+     "text": "can it translate a letter",
+     "hhcontent_expects": "N1",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 33,
+     "after": "",
+     "text": "can it post on instagram",
+     "hhcontent_expects": "N2:web",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 34,
+     "after": "",
+     "text": "can it download youtube videos",
+     "hhcontent_expects": "N2:pics",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 35,
+     "after": "",
+     "text": "can it make a video of me talking",
+     "hhcontent_expects": "w_video",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_video",
+      "kind": "want",
+      "row": "w_video",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 36,
+     "after": "",
+     "text": "can it remind me to call mum",
+     "hhcontent_expects": "topic:sch",
+     "route2": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2"
+     },
+     "oracle": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2"
+     }
+    },
+    {
+     "n": 37,
+     "after": "",
+     "text": "can it check my gmail",
+     "hhcontent_expects": "topic:svc",
+     "route2": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     },
+     "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1"
+     }
+    },
+    {
+     "n": 38,
+     "after": "",
+     "text": "what is the weather like",
+     "hhcontent_expects": "N1",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 39,
+     "after": "",
+     "text": "can it make music",
+     "hhcontent_expects": "w_music",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "ROW w_music",
+      "kind": "want",
+      "row": "w_music",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    },
+    {
+     "n": 40,
+     "after": "",
+     "text": "can it edit a photo",
+     "hhcontent_expects": "N2:pics",
+     "route2": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null
+     },
+     "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null
+     }
+    }
+   ]
+  }
+ ]
+}

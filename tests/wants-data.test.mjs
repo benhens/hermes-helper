@@ -9,6 +9,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import { wantsProblems, slimWantsData, serviceLines, MAX_GROUPS } from '../scripts/wants-data.mjs'
 import { WANTS_DATA } from '../src/wants-data.js'
+import { wantsDataSource } from '../scripts/build.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const TEAM = path.resolve(ROOT, '..')
@@ -70,6 +71,11 @@ for (const [what, breakIt, reason] of BREAKS) {
 }
 
 test('the docs lines file is the one the build reads, and a quote is checked against the docs\' own line, not the file as a whole', () => {
+  // the build itself stops, with nothing written, on a quote that is not on its line
+  const w = copy(W)
+  row(w, 'w_web').sources[0].line = 28
+  assert.throws(() => wantsDataSource(w), /helper-wants-v1.json has \d+ problem\(s\); the build stops and nothing is written/)
+  assert.doesNotThrow(() => wantsDataSource())
   const d = copy(DOCS)
   const f = d.files['user-guide/features/tools.md']
   f.lines['27'] = f.lines['27'].replace('Search the web and extract page content.', 'Search the web.')
