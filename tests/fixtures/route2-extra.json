@@ -1,6 +1,6 @@
 {
- "about": "Written by dev/checks/talk-v1/dump_set2.py: hhtech's set2-messages.json through hhcontent's route2.py, keeping off. Do not edit: make it again.",
- "json_sha256": "d23871cede89a358deb887c0337f8b2cc383774e8d3479b8b0d19afcc7d5fb11",
+ "about": "Written by dev/checks/talk-v2/dump_set2.py: single messages through hhcontent's route2.py, keeping on. Do not edit: make it again.",
+ "json_sha256": "1a78abb01ab209f6915c8b2e2cda1ea4aa956ac55887d7a37511d54da8d61a39",
  "messages": [
   {
    "after": "",
@@ -11,6 +11,7 @@
     "found": {
      "msg": "msg1"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -29,6 +30,7 @@
     "found": {
      "msg": "msg2"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -47,6 +49,7 @@
     "found": {
      "msg": "msg2"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -65,6 +68,7 @@
     "found": {
      "msg": "msg1"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -83,6 +87,7 @@
     "found": {
      "msg": "msg1"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -101,6 +106,7 @@
     "found": {
      "msg": "msg2"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -119,6 +125,7 @@
      "mem"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mem",
@@ -135,6 +142,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -153,6 +161,7 @@
      "mod"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mod",
@@ -171,6 +180,7 @@
      "mod"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mod",
@@ -189,6 +199,7 @@
      "mem"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mem",
@@ -207,6 +218,7 @@
      "mod"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mod",
@@ -223,6 +235,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -239,6 +252,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": null,
@@ -255,6 +269,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": null,
@@ -273,6 +288,7 @@
     "found": {
      "msg": "msg1"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -289,6 +305,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": null,
@@ -305,6 +322,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -323,6 +341,7 @@
      "sch"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "sch",
@@ -341,6 +360,7 @@
     "found": {
      "sch": "sch2"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -357,6 +377,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -375,6 +396,7 @@
      "bot"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "bot",
@@ -387,10 +409,11 @@
   {
    "after": "",
    "n": 23,
-   "shown": "N1",
+   "shown": "TP",
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -409,6 +432,7 @@
      "mem"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mem",
@@ -427,6 +451,7 @@
      "mem"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mem",
@@ -445,6 +470,7 @@
      "mem"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mem",
@@ -463,6 +489,7 @@
     "found": {
      "mod": "mod3"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -481,6 +508,7 @@
      "mod"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mod",
@@ -499,6 +527,7 @@
     "found": {
      "mod": "mod3"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -517,6 +546,7 @@
      "svc"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "svc",
@@ -533,6 +563,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -549,6 +580,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": "Tom",
     "pending": null,
@@ -561,11 +593,15 @@
   {
    "after": "name",
    "n": 33,
-   "shown": "line svc1 +name=Li",
+   "shown": "line svc1 +kept=name +first +name=Li",
    "state": {
     "asked": [],
     "found": {
      "svc": "svc1"
+    },
+    "kept": {
+     "name": "Li",
+     "told": true
     },
     "lastq": false,
     "name": "Li",
@@ -585,6 +621,7 @@
     "found": {
      "msg": "msg1"
     },
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -601,6 +638,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -617,6 +655,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": "Jean-Luc",
     "pending": null,
@@ -633,6 +672,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -649,6 +689,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": "Māra",
     "pending": null,
@@ -665,6 +706,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": "Bob",
     "pending": null,
@@ -681,6 +723,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -693,10 +736,14 @@
   {
    "after": "work",
    "n": 41,
-   "shown": "F2 name=Sam work=I teach tennis to kids",
+   "shown": "F2 name=Sam work=I teach tennis to kids +kept=name +first",
    "state": {
     "asked": [],
     "found": {},
+    "kept": {
+     "name": "Sam",
+     "told": true
+    },
     "lastq": false,
     "name": "Sam",
     "pending": null,
@@ -713,6 +760,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": "Sam",
     "pending": null,
@@ -725,10 +773,14 @@
   {
    "after": "work",
    "n": 43,
-   "shown": "F2 name=Sam work=None",
+   "shown": "F2 name=Sam work=None +kept=name +first",
    "state": {
     "asked": [],
     "found": {},
+    "kept": {
+     "name": "Sam",
+     "told": true
+    },
     "lastq": false,
     "name": "Sam",
     "pending": null,
@@ -741,10 +793,14 @@
   {
    "after": "work",
    "n": 44,
-   "shown": "F2 name=Sam work=I connect people with gmail",
+   "shown": "F2 name=Sam work=I connect people with gmail +kept=name +first",
    "state": {
     "asked": [],
     "found": {},
+    "kept": {
+     "name": "Sam",
+     "told": true
+    },
     "lastq": false,
     "name": "Sam",
     "pending": null,
@@ -761,6 +817,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": "Sam",
     "pending": null,
@@ -777,6 +834,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -793,6 +851,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -809,6 +868,7 @@
    "state": {
     "asked": [],
     "found": {},
+    "kept": {},
     "lastq": false,
     "name": null,
     "pending": null,
@@ -827,6 +887,7 @@
      "mem"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mem",
@@ -845,6 +906,7 @@
      "mod"
     ],
     "found": {},
+    "kept": {},
     "lastq": true,
     "name": null,
     "pending": "mod",
@@ -855,5 +917,5 @@
    "want": "ignore phrases"
   }
  ],
- "route2_sha256": "88808bff917f3a89b9c17612cac3ac085b7e911cbeceebf667fc316a8a3c5efe"
+ "route2_sha256": "33a98ecfe8242d5ca8d4767a3b777093462f5493f716a22b8744d992c7c406d1"
 }

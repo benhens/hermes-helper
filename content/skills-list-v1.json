@@ -1,0 +1,4625 @@
+{
+ "about": "Every official Hermes skill, read by script from the docs' two pages, with what each is for in plain words. hhcontent, 10 Nov 2026. Built and checked by dev/checks/hhcontent-skills-list/build_skills_list.py; edit plain.py or the script, never this file. Readable list: content/skills-list-v1.md. Alike skills and the left-out list: content/skills-duplicates-v1.md.",
+ "why_its_own_file": "content/helper-wants-v1.json holds the rows Helper speaks and is already queued for the Builder; this file adds per-skill fields without touching it. Join by name. The build refuses if the two lists differ.",
+ "docs_root": "/hermes-docs",
+ "docs_version": "v0.23.0",
+ "fields": {
+  "for": "what it is for, plain, at most 14 words, passes the R rules; or exactly 'not clear from the docs', and then Helper shows only docs_words",
+  "for_from": "page = written using the skill's own page; line = from the catalog line only; unclear",
+  "needs": "what the first lines of its own page say it needs, plus the Platforms row of that page",
+  "left_out": "true: Helper answers a question about it with its don't-know line (his words, 10 Nov 19:30). Approved by him: not yet",
+  "alike_groups": "ids of groups in alike_groups",
+  "found_by": "built-in only: want_row id, or things and actions, or none with the reason"
+ },
+ "left_out_criterion": "A skill is left out when its purpose is to get around safety or security, or when it can do real harm to the person or to others in a beginner's hands.",
+ "left_out_status": "proposal, waiting for his approval",
+ "pair_rule": "Looked at only after the topics and the want rows found nothing, and only on a message the person typed. A skill is named when one of its things and one of its actions are both in the message as whole words. Two or more skills found: show them as picks, at most four. Never named out of nowhere.",
+ "counts": {
+  "built_in": 44,
+  "optional": 142,
+  "all": 186,
+  "from_page": 172,
+  "from_line": 3,
+  "not_clear": 11,
+  "left_out": 5,
+  "with_platform_limit": 38,
+  "with_needs": 80,
+  "builtin_with_pairs": 23,
+  "builtin_with_want_row": 11,
+  "builtin_not_found": 10,
+  "built_in_done": 44,
+  "optional_done": 142
+ },
+ "alike_groups": [
+  {
+   "id": "g_brag",
+   "near": 1,
+   "skills": [
+    "brag",
+    "brag-slim"
+   ],
+   "also": [],
+   "differ": "Both come from the same outside project. brag-slim is its one-file, smaller version.",
+   "helper": "Name brag only. Mention brag-slim only if asked by name."
+  },
+  {
+   "id": "g_pptx",
+   "near": 1,
+   "skills": [
+    "microsoft-office",
+    "pptx-author"
+   ],
+   "also": [],
+   "differ": "Both make PowerPoint files. pptx-author's own page points to microsoft-office as the broader, built-in one.",
+   "helper": "Name the built-in microsoft-office first. pptx-author only if asked by name."
+  },
+  {
+   "id": "g_computer",
+   "near": 1,
+   "skills": [
+    "computer-use"
+   ],
+   "also": [
+    "built-in tool computer_use (want row w_computer)"
+   ],
+   "differ": "The skill is the written steps for using the built-in Computer Use tool, not a second way to do it.",
+   "helper": "Say the tool, Computer Use. Do not name the skill as a separate thing."
+  },
+  {
+   "id": "g_websearch",
+   "near": 1,
+   "skills": [
+    "parallel-cli"
+   ],
+   "also": [
+    "built-in tools web_search and web_extract (want row w_web)"
+   ],
+   "differ": "Its own page: it overlaps with Hermes's own web search, is paid with a free tier, and is not to be preferred.",
+   "helper": "Name the built-in web search. parallel-cli only if asked by name."
+  },
+  {
+   "id": "g_feeds",
+   "near": 1,
+   "skills": [
+    "rss-feeds",
+    "blogwatcher",
+    "watchers"
+   ],
+   "also": [],
+   "differ": "rss-feeds reads a feed once, nothing to add. blogwatcher keeps a list of blogs with read and unread, needs its own app. watchers checks feeds, GitHub or data links on a timer.",
+   "helper": "Ask one question: once, or keep watching? Once: rss-feeds. Keep watching: blogwatcher and watchers."
+  },
+  {
+   "id": "g_coding",
+   "near": 2,
+   "skills": [
+    "claude-code",
+    "codex",
+    "grok",
+    "opencode",
+    "openhands",
+    "blackbox",
+    "antigravity-cli"
+   ],
+   "also": [
+    "Hermes itself writes and runs code (want row w_code)"
+   ],
+   "differ": "Each hands a coding job to a different outside coding app: Anthropic, OpenAI, xAI, OpenCode, OpenHands, Blackbox, Antigravity.",
+   "helper": "Say first that Hermes codes by itself. Name an outside app only when the person names it or says they use it."
+  },
+  {
+   "id": "g_actions",
+   "near": 2,
+   "skills": [
+    "meeting-action-items",
+    "document-to-action-items",
+    "teams-meeting-pipeline"
+   ],
+   "also": [],
+   "differ": "meeting-action-items works on meeting notes from anywhere. document-to-action-items on contracts, reports and forms. teams-meeting-pipeline fetches Teams meetings first.",
+   "helper": "Pick by the thing named: meeting, document, or Teams. One name each time."
+  },
+  {
+   "id": "g_email",
+   "near": 2,
+   "skills": [
+    "himalaya",
+    "google-workspace",
+    "email-inbox-triage",
+    "agentmail"
+   ],
+   "also": [
+    "topic svc (Gmail and other services)",
+    "Hermes's own Email messaging, where people email Hermes (himalaya's page says it is separate)"
+   ],
+   "differ": "himalaya opens any mailbox. google-workspace is Gmail and the rest of Google. email-inbox-triage sorts an inbox through one of those two. agentmail gives Hermes its own new inbox.",
+   "helper": "Ask one question: Gmail or another mailbox? Gmail: google-workspace. Other: himalaya. Name email-inbox-triage only for sorting. agentmail only if asked by name."
+  },
+  {
+   "id": "g_google",
+   "near": 2,
+   "skills": [
+    "google-workspace"
+   ],
+   "also": [
+    "topic svc (Gmail and other services), whose key words include gmail, google calendar, drive, sheets"
+   ],
+   "differ": "The topic answers \"use Gmail or Calendar\" with its own line. The skill is how Hermes does it.",
+   "helper": "The topic speaks first. Its line or paste text may name google-workspace as the built-in skill. Not checked whether svc1's words already do."
+  },
+  {
+   "id": "g_svc_other",
+   "near": 2,
+   "skills": [
+    "github",
+    "obsidian",
+    "youtube-content"
+   ],
+   "also": [
+    "topic svc, whose key words include github, obsidian, youtube"
+   ],
+   "differ": "The topic catches these names before any skill is looked at, so the skill is never named by key words.",
+   "helper": "Add the skill's name to the topic's line for that service, or let the skill row win for these three names. hhcontent's next pass."
+  },
+  {
+   "id": "g_diagram",
+   "near": 2,
+   "skills": [
+    "architecture-diagram",
+    "archify",
+    "system-atlas",
+    "excalidraw",
+    "concept-diagrams"
+   ],
+   "also": [],
+   "differ": "architecture-diagram: one dark picture of a system. archify: clickable diagram, kept up elsewhere. system-atlas: a 3D-style clickable map. excalidraw: hand-drawn look. concept-diagrams: teaching drawings, not software.",
+   "helper": "Name the built-in architecture-diagram for software. Name concept-diagrams for school topics. The rest only if asked by name."
+  },
+  {
+   "id": "g_rewrite",
+   "near": 2,
+   "skills": [
+    "humanizer",
+    "simple-english"
+   ],
+   "also": [],
+   "differ": "humanizer removes signs of AI writing. simple-english rewrites in very simple English and its page says it removes those signs as a side effect.",
+   "helper": "Name the built-in humanizer. simple-english when the person wants simpler words."
+  },
+  {
+   "id": "g_review",
+   "near": 2,
+   "skills": [
+    "requesting-code-review",
+    "simplify-code"
+   ],
+   "also": [],
+   "differ": "requesting-code-review checks new code for safety and errors before saving. simplify-code tidies code that already works.",
+   "helper": "Pick by the word: check or review, then the first. Tidy or simplify, then the second."
+  },
+  {
+   "id": "g_webdesign",
+   "near": 2,
+   "skills": [
+    "claude-design",
+    "sketch",
+    "popular-web-designs",
+    "auteur",
+    "impeccable",
+    "scrollcraft",
+    "design-md"
+   ],
+   "also": [],
+   "differ": "claude-design: a one-off page or deck. sketch: two or three quick drafts to compare. popular-web-designs: copy a famous site's look. auteur, scrollcraft: showy pages. impeccable: advice, kept up elsewhere. design-md: a file describing a look.",
+   "helper": "Name the two built-in ones, claude-design and popular-web-designs. The rest only if asked by name."
+  },
+  {
+   "id": "g_publish",
+   "near": 2,
+   "skills": [
+    "publish-site",
+    "cloudflare-temporary-deploy",
+    "here-now"
+   ],
+   "also": [],
+   "differ": "publish-site: on the person's own GitHub, Cloudflare or Netlify. cloudflare-temporary-deploy: one hour, no account. here-now: on here.now.",
+   "helper": "Ask one question: for an hour, or to stay? Hour: cloudflare-temporary-deploy. Stay: publish-site."
+  },
+  {
+   "id": "g_pictures",
+   "near": 3,
+   "skills": [
+    "comfyui",
+    "inference-sh-cli",
+    "meme-generation",
+    "pixel-art",
+    "mono-color",
+    "baoyu-article-illustrator",
+    "ip-as-logo",
+    "baoyu-infographic"
+   ],
+   "also": [
+    "built-in tool image_generate (want row w_image)"
+   ],
+   "differ": "comfyui and inference-sh-cli make any picture with an outside app. The rest each make one kind: memes, pixel art, posters, article pictures, mascot logos, infographics.",
+   "helper": "Name the built-in picture tool first. A one-kind skill only when the person names that kind."
+  },
+  {
+   "id": "g_video",
+   "near": 3,
+   "skills": [
+    "manim-video",
+    "ascii-video",
+    "hyperframes",
+    "ai-presenter-video",
+    "kanban-video-orchestrator",
+    "comfyui",
+    "inference-sh-cli",
+    "brag"
+   ],
+   "also": [
+    "built-in tool video_generate, off at first (want row w_video)"
+   ],
+   "differ": "manim-video: maths explainers. ascii-video: letters. hyperframes: motion graphics from web pages. ai-presenter-video: a talking person. kanban-video-orchestrator: splits a big job. comfyui, inference-sh-cli: outside apps. brag: launch videos.",
+   "helper": "Ask one question: what kind of video? Then one name. The built-in video tool for plain text-to-video."
+  },
+  {
+   "id": "g_music",
+   "near": 3,
+   "skills": [
+    "songwriting-and-ai-music",
+    "heartmula"
+   ],
+   "also": [],
+   "differ": "songwriting-and-ai-music helps write a song and the text for Suno, a paid music website. heartmula makes the song itself on the person's computer.",
+   "helper": "Name the built-in one first. heartmula when they want the music made on their own computer."
+  },
+  {
+   "id": "g_notes",
+   "near": 3,
+   "skills": [
+    "obsidian",
+    "apple-notes",
+    "siyuan",
+    "llm-wiki",
+    "qmd"
+   ],
+   "also": [
+    "Hermes's own memory (topic mem)"
+   ],
+   "differ": "Each works with a different notes app or folder. llm-wiki builds new linked notes. qmd searches notes already there.",
+   "helper": "Pick by the app the person names. With no app named, ask which notes app they use."
+  },
+  {
+   "id": "g_localai",
+   "near": 3,
+   "skills": [
+    "llama-cpp",
+    "serving-llms-vllm",
+    "tensorrt-llm"
+   ],
+   "also": [
+    "topic mod (Which AI to use), where a model on your own computer is one answer"
+   ],
+   "differ": "All run an AI model on the person's own machine. llama-cpp on an ordinary computer. vLLM and TensorRT-LLM need strong graphics cards.",
+   "helper": "The Model topic speaks first. Name llama-cpp only if asked how to run a model on their own computer."
+  },
+  {
+   "id": "g_finetune",
+   "near": 3,
+   "skills": [
+    "axolotl",
+    "unsloth",
+    "peft",
+    "accelerate",
+    "pytorch-fsdp",
+    "pytorch-lightning",
+    "torchtitan",
+    "simpo",
+    "slime"
+   ],
+   "also": [],
+   "differ": "All are for training AI models. They differ in method and scale, which the pages explain in terms a newcomer will not know.",
+   "helper": "Do not name these unless asked by name. Then show only the docs' words."
+  },
+  {
+   "id": "g_hermes_help",
+   "near": 3,
+   "skills": [
+    "hermes-agent"
+   ],
+   "also": [
+    "Helper itself"
+   ],
+   "differ": "The skill lets the person's own Hermes answer questions about Hermes. Helper does the same from checked lines.",
+   "helper": "Nothing. Worth knowing: the paste boxes already send the person to their own Hermes, which has this skill."
+  }
+ ],
+ "borderline_not_marked": {
+  "blocked-page-recovery": "Built in. Gets a copy of a page that blocks you, paywalls too. It fetches copies, it does not break in.",
+  "osint-investigation": "Digs through public records about companies and people. Public data only.",
+  "stripe-link-cli": "Spends real money. Every payment must be approved by the person in the Link app.",
+  "telephony": "Buys phone numbers and makes AI phone calls to real people. Paid.",
+  "pinggy-tunnel": "Opens something on the person's computer to the whole internet for a while."
+ },
+ "skills": [
+  {
+   "name": "apple-notes",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Manage Apple Notes via memo CLI: create, search, edit.",
+   "page": "reference/skills-catalog.md",
+   "line": 19,
+   "own_page": "user-guide/skills/bundled/apple/apple-apple-notes.md",
+   "platforms": [
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac",
+   "for": "Write, find and change notes in the Notes app on a Mac.",
+   "for_from": "page",
+   "needs": "a Mac, and the memo app, added with Homebrew, and your OK in Mac settings",
+   "left_out": false,
+   "alike_groups": [
+    "g_notes"
+   ],
+   "found_by": {
+    "things": [
+     "apple notes",
+     "notes app",
+     "mac notes"
+    ],
+    "actions": [
+     "write",
+     "add",
+     "find",
+     "search",
+     "edit",
+     "read",
+     "make",
+     "change"
+    ]
+   }
+  },
+  {
+   "name": "apple-reminders",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Apple Reminders via remindctl: add, list, complete.",
+   "page": "reference/skills-catalog.md",
+   "line": 20,
+   "own_page": "user-guide/skills/bundled/apple/apple-apple-reminders.md",
+   "platforms": [
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac",
+   "for": "Add, list and tick off items in the Reminders app on a Mac.",
+   "for_from": "page",
+   "needs": "a Mac, and the remindctl app, added with Homebrew",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "apple reminders",
+     "reminders app"
+    ],
+    "actions": [
+     "add",
+     "list",
+     "tick",
+     "check",
+     "make",
+     "complete"
+    ]
+   }
+  },
+  {
+   "name": "findmy",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Track Apple devices/AirTags via FindMy.app on macOS.",
+   "page": "reference/skills-catalog.md",
+   "line": 21,
+   "own_page": "user-guide/skills/bundled/apple/apple-findmy.md",
+   "platforms": [
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac",
+   "for": "See where your Apple devices and AirTags are, using the Find My app.",
+   "for_from": "page",
+   "needs": "a Mac, and Find My, signed in to iCloud",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "airtag",
+     "airtags",
+     "find my",
+     "my iphone",
+     "my ipad",
+     "my apple watch"
+    ],
+    "actions": [
+     "find",
+     "track",
+     "locate",
+     "where is",
+     "where's"
+    ]
+   }
+  },
+  {
+   "name": "imessage",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Send and receive iMessages/SMS via the imsg CLI on macOS.",
+   "page": "reference/skills-catalog.md",
+   "line": 22,
+   "own_page": "user-guide/skills/bundled/apple/apple-imessage.md",
+   "platforms": [
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac",
+   "for": "Send and read iMessages and texts from the Messages app on a Mac.",
+   "for_from": "page",
+   "needs": "a Mac, and the imsg app and Full Disk Access in Mac settings",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "imessage",
+     "imessages",
+     "sms",
+     "text message",
+     "text messages"
+    ],
+    "actions": [
+     "send",
+     "read",
+     "reply",
+     "write",
+     "answer"
+    ]
+   }
+  },
+  {
+   "name": "claude-code",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to Claude Code CLI (features, PRs).",
+   "page": "reference/skills-catalog.md",
+   "line": 28,
+   "own_page": "user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-claude-code.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Hand a coding job to Claude Code, a separate coding app by Anthropic.",
+   "for_from": "page",
+   "needs": "Claude Code added and signed in",
+   "left_out": false,
+   "alike_groups": [
+    "g_coding"
+   ],
+   "found_by": {
+    "things": [
+     "claude code"
+    ],
+    "actions": [
+     "use",
+     "hand",
+     "give",
+     "code",
+     "build",
+     "fix",
+     "write"
+    ]
+   }
+  },
+  {
+   "name": "codex",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to OpenAI Codex CLI (features, PRs).",
+   "page": "reference/skills-catalog.md",
+   "line": 29,
+   "own_page": "user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Hand a coding job to Codex, a separate coding app by OpenAI.",
+   "for_from": "page",
+   "needs": "Codex added",
+   "left_out": false,
+   "alike_groups": [
+    "g_coding"
+   ],
+   "found_by": {
+    "things": [
+     "codex cli",
+     "openai codex"
+    ],
+    "actions": [
+     "use",
+     "hand",
+     "give",
+     "code",
+     "build",
+     "fix",
+     "write"
+    ]
+   }
+  },
+  {
+   "name": "computer-use",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Drive the desktop background-first; escalate on signal.",
+   "page": "reference/skills-catalog.md",
+   "line": 30,
+   "own_page": "user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-computer-use.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Teach Hermes good habits when it clicks and types in your apps.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_computer"
+   ],
+   "found_by": {
+    "none": "the built-in tool row w_computer answers it"
+   }
+  },
+  {
+   "name": "hermes-agent",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Use, configure, theme, extend, and orchestrate Hermes Agent.",
+   "page": "reference/skills-catalog.md",
+   "line": 31,
+   "own_page": "user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-hermes-agent.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Lets Hermes answer questions about Hermes itself and change its own settings.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_hermes_help"
+   ],
+   "found_by": {
+    "none": "Helper's own topics answer questions about Hermes"
+   }
+  },
+  {
+   "name": "architecture-diagram",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Dark-themed SVG architecture/cloud/infra diagrams as HTML.",
+   "page": "reference/skills-catalog.md",
+   "line": 37,
+   "own_page": "user-guide/skills/bundled/creative/creative-architecture-diagram.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Draw a dark-themed picture of how a software system fits together.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_diagram"
+   ],
+   "found_by": {
+    "things": [
+     "architecture diagram",
+     "system diagram",
+     "infrastructure diagram",
+     "cloud diagram"
+    ],
+    "actions": [
+     "make",
+     "draw",
+     "create",
+     "design"
+    ]
+   }
+  },
+  {
+   "name": "ascii-video",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "ASCII video: convert video/audio to colored ASCII MP4/GIF.",
+   "page": "reference/skills-catalog.md",
+   "line": 38,
+   "own_page": "user-guide/skills/bundled/creative/creative-ascii-video.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Turn a video or sound into a moving picture made of letters.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_video"
+   ],
+   "found_by": {
+    "things": [
+     "ascii video",
+     "ascii animation"
+    ],
+    "actions": [
+     "make",
+     "create",
+     "turn",
+     "convert"
+    ]
+   }
+  },
+  {
+   "name": "baoyu-infographic",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Infographics: 21 layouts x 21 styles (信息图, 可视化).",
+   "page": "reference/skills-catalog.md",
+   "line": 39,
+   "own_page": "user-guide/skills/bundled/creative/creative-baoyu-infographic.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make an infographic: one picture that sums up facts, in many layouts.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures"
+   ],
+   "found_by": {
+    "things": [
+     "infographic",
+     "infographics"
+    ],
+    "actions": [
+     "make",
+     "create",
+     "design",
+     "draw"
+    ]
+   }
+  },
+  {
+   "name": "claude-design",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Design one-off HTML artifacts (landing, deck, prototype).",
+   "page": "reference/skills-catalog.md",
+   "line": 40,
+   "own_page": "user-guide/skills/bundled/creative/creative-claude-design.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Design a one-off web page, slide deck or clickable mockup.",
+   "for_from": "line",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_webdesign"
+   ],
+   "found_by": {
+    "things": [
+     "landing page",
+     "mockup",
+     "prototype",
+     "slide deck"
+    ],
+    "actions": [
+     "design",
+     "make",
+     "create"
+    ]
+   }
+  },
+  {
+   "name": "humanizer",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Humanize text: strip AI-isms and add real voice.",
+   "page": "reference/skills-catalog.md",
+   "line": 41,
+   "own_page": "user-guide/skills/bundled/creative/creative-humanizer.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Rewrite text so it sounds less like an AI wrote it.",
+   "for_from": "line",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_rewrite"
+   ],
+   "found_by": {
+    "things": [
+     "ai text",
+     "my writing",
+     "ai writing",
+     "chatgpt text"
+    ],
+    "actions": [
+     "humanize",
+     "humanise",
+     "sound human",
+     "less like ai",
+     "sound natural",
+     "less robotic"
+    ]
+   }
+  },
+  {
+   "name": "manim-video",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Manim CE animations: 3Blue1Brown math/algo videos.",
+   "page": "reference/skills-catalog.md",
+   "line": 42,
+   "own_page": "user-guide/skills/bundled/creative/creative-manim-video.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make animated videos that explain maths or how something works.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_video"
+   ],
+   "found_by": {
+    "want_row": "w_anim"
+   }
+  },
+  {
+   "name": "p5js",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "p5.js sketches: gen art, shaders, interactive, 3D.",
+   "page": "reference/skills-catalog.md",
+   "line": 43,
+   "own_page": "user-guide/skills/bundled/creative/creative-p5js.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make moving art and drawings that run in a web browser.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "p5js",
+     "p5.js",
+     "generative art",
+     "creative coding"
+    ],
+    "actions": [
+     "make",
+     "create",
+     "draw",
+     "build"
+    ]
+   }
+  },
+  {
+   "name": "popular-web-designs",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.",
+   "page": "reference/skills-catalog.md",
+   "line": 44,
+   "own_page": "user-guide/skills/bundled/creative/creative-popular-web-designs.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make web pages in the style of 54 well-known sites, such as Stripe.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_webdesign"
+   ],
+   "found_by": {
+    "none": "no plain pair: the want is 'look like Stripe', a name, not a thing and action"
+   }
+  },
+  {
+   "name": "songwriting-and-ai-music",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Songwriting craft and Suno AI music prompts.",
+   "page": "reference/skills-catalog.md",
+   "line": 45,
+   "own_page": "user-guide/skills/bundled/creative/creative-songwriting-and-ai-music.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Help write songs, and write the text you give Suno, a music AI.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_music"
+   ],
+   "found_by": {
+    "want_row": "w_music"
+   }
+  },
+  {
+   "name": "sdlc-review",
+   "kind": "built_in",
+   "category": "devops",
+   "docs_words": "Review Kanban handoffs and route verified outcomes.",
+   "page": "reference/skills-catalog.md",
+   "line": 51,
+   "own_page": "user-guide/skills/bundled/devops/devops-sdlc-review.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "none": "not clear from the docs"
+   }
+  },
+  {
+   "name": "email-inbox-triage",
+   "kind": "built_in",
+   "category": "email",
+   "docs_words": "Triage an inbox: prioritize threads, draft replies safely.",
+   "page": "reference/skills-catalog.md",
+   "line": 57,
+   "own_page": "user-guide/skills/bundled/email/email-email-inbox-triage.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Sort your inbox by what matters most, and draft replies for you to check.",
+   "for_from": "page",
+   "needs": "another email skill set up first, such as himalaya",
+   "left_out": false,
+   "alike_groups": [
+    "g_email"
+   ],
+   "found_by": {
+    "things": [
+     "inbox",
+     "emails",
+     "my email",
+     "my mail"
+    ],
+    "actions": [
+     "sort",
+     "triage",
+     "prioritize",
+     "prioritise",
+     "go through",
+     "clean up",
+     "what needs"
+    ]
+   }
+  },
+  {
+   "name": "himalaya",
+   "kind": "built_in",
+   "category": "email",
+   "docs_words": "Himalaya CLI: IMAP/SMTP email from terminal.",
+   "page": "reference/skills-catalog.md",
+   "line": 58,
+   "own_page": "user-guide/skills/bundled/email/email-himalaya.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Read, send and sort email from your own mailbox.",
+   "for_from": "page",
+   "needs": "the himalaya app",
+   "left_out": false,
+   "alike_groups": [
+    "g_email"
+   ],
+   "found_by": {
+    "things": [
+     "email",
+     "emails",
+     "mailbox"
+    ],
+    "actions": [
+     "send",
+     "read",
+     "check",
+     "reply"
+    ]
+   }
+  },
+  {
+   "name": "youtube-content",
+   "kind": "built_in",
+   "category": "media",
+   "docs_words": "YouTube transcripts to summaries, threads, blogs.",
+   "page": "reference/skills-catalog.md",
+   "line": 64,
+   "own_page": "user-guide/skills/bundled/media/media-youtube-content.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Turn a YouTube video's spoken words into a summary, thread or blog post.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_svc_other"
+   ],
+   "found_by": {
+    "want_row": "w_youtube"
+   }
+  },
+  {
+   "name": "obsidian",
+   "kind": "built_in",
+   "category": "note-taking",
+   "docs_words": "Read, search, create, and edit notes in the Obsidian vault.",
+   "page": "reference/skills-catalog.md",
+   "line": 70,
+   "own_page": "user-guide/skills/bundled/note-taking/note-taking-obsidian.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Read, search, write and change notes in your Obsidian notes folder.",
+   "for_from": "page",
+   "needs": "the place of your Obsidian folder",
+   "left_out": false,
+   "alike_groups": [
+    "g_svc_other",
+    "g_notes"
+   ],
+   "found_by": {
+    "want_row": "w_notes"
+   }
+  },
+  {
+   "name": "document-to-action-items",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Extract cited obligations, deadlines, tasks from documents.",
+   "page": "reference/skills-catalog.md",
+   "line": 76,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-document-to-action-items.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Pull deadlines, duties and tasks out of a document, with where each was found.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_actions"
+   ],
+   "found_by": {
+    "things": [
+     "contract",
+     "contracts",
+     "report",
+     "reports",
+     "document",
+     "documents",
+     "form",
+     "forms"
+    ],
+    "actions": [
+     "deadlines",
+     "obligations",
+     "action items",
+     "to-dos",
+     "todos",
+     "tasks from"
+    ]
+   }
+  },
+  {
+   "name": "google-workspace",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Gmail, Calendar, Drive, Docs, Sheets via gws CLI or Python.",
+   "page": "reference/skills-catalog.md",
+   "line": 77,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-google-workspace.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Use your Gmail, Google Calendar, Drive, Docs, Sheets and Contacts.",
+   "for_from": "page",
+   "needs": "a Google account, signed in through Hermes",
+   "left_out": false,
+   "alike_groups": [
+    "g_email",
+    "g_google"
+   ],
+   "found_by": {
+    "none": "topic svc catches gmail, calendar, drive first"
+   }
+  },
+  {
+   "name": "maps",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.",
+   "page": "reference/skills-catalog.md",
+   "line": 78,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-maps.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find places, addresses, routes and time zones, using free open map data.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "want_row": "w_maps"
+   }
+  },
+  {
+   "name": "meeting-action-items",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Turn meeting notes into cited decisions, owners, tickets.",
+   "page": "reference/skills-catalog.md",
+   "line": 79,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-meeting-action-items.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Turn meeting notes into decisions, who does what, and follow-up tasks.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_actions"
+   ],
+   "found_by": {
+    "want_row": "w_meeting"
+   }
+  },
+  {
+   "name": "microsoft-office",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Create, read, and edit Word, PowerPoint, and Excel files.",
+   "page": "reference/skills-catalog.md",
+   "line": 80,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-microsoft-office.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make, read and change Word, PowerPoint and Excel files, without Office.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pptx"
+   ],
+   "found_by": {
+    "want_row": "w_office"
+   }
+  },
+  {
+   "name": "pdf",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "PDF files: create, read, merge, fill, OCR, edit text.",
+   "page": "reference/skills-catalog.md",
+   "line": 81,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-pdf.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make, read, merge, split and fill in PDF files, also scanned ones.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "want_row": "w_pdf"
+   }
+  },
+  {
+   "name": "product-price-monitor",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Watch product, flight, or listing prices; alert on target.",
+   "page": "reference/skills-catalog.md",
+   "line": 82,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-product-price-monitor.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Watch a product, flight or listing price and tell you at your target.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "want_row": "w_prices"
+   }
+  },
+  {
+   "name": "teams-meeting-pipeline",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Teams meeting summaries, job replay, Graph subscriptions.",
+   "page": "reference/skills-catalog.md",
+   "line": 83,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-teams-meeting-pipeline.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Get summaries, notes and tasks from Microsoft Teams meetings.",
+   "for_from": "page",
+   "needs": "a Microsoft Teams setup",
+   "left_out": false,
+   "alike_groups": [
+    "g_actions"
+   ],
+   "found_by": {
+    "things": [
+     "teams meeting",
+     "teams meetings",
+     "microsoft teams"
+    ],
+    "actions": [
+     "summarize",
+     "summarise",
+     "summary",
+     "transcript",
+     "notes",
+     "recording"
+    ]
+   }
+  },
+  {
+   "name": "weekly-review-planning",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Weekly reset: commitments, stalled work, next-week plan.",
+   "page": "reference/skills-catalog.md",
+   "line": 84,
+   "own_page": "user-guide/skills/bundled/productivity/productivity-weekly-review-planning.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look back at your week and plan the next, from your calendar and notes.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "my week",
+     "next week",
+     "weekly review",
+     "the week"
+    ],
+    "actions": [
+     "plan",
+     "review",
+     "look back",
+     "reset"
+    ]
+   }
+  },
+  {
+   "name": "arxiv",
+   "kind": "built_in",
+   "category": "research",
+   "docs_words": "Search arXiv papers by keyword, author, category, or ID.",
+   "page": "reference/skills-catalog.md",
+   "line": 90,
+   "own_page": "user-guide/skills/bundled/research/research-arxiv.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Search and read science papers on arXiv, a free paper website.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "want_row": "w_papers"
+   }
+  },
+  {
+   "name": "competitor-news-monitor",
+   "kind": "built_in",
+   "category": "research",
+   "docs_words": "Watch named companies for material news; cited digests.",
+   "page": "reference/skills-catalog.md",
+   "line": 91,
+   "own_page": "user-guide/skills/bundled/research/research-competitor-news-monitor.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Watch companies you name and report only important news about them.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "competitor",
+     "competitors",
+     "rival",
+     "rivals"
+    ],
+    "actions": [
+     "watch",
+     "monitor",
+     "track",
+     "follow",
+     "news"
+    ]
+   }
+  },
+  {
+   "name": "grounded-citations",
+   "kind": "built_in",
+   "category": "research",
+   "docs_words": "Ground answers and documents in cited, verifiable sources.",
+   "page": "reference/skills-catalog.md",
+   "line": 92,
+   "own_page": "user-guide/skills/bundled/research/research-grounded-citations.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Give answers where every fact has a numbered link to where it came from.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "sources",
+     "citations"
+    ],
+    "actions": [
+     "cite",
+     "with",
+     "add",
+     "include",
+     "show"
+    ]
+   }
+  },
+  {
+   "name": "xurl",
+   "kind": "built_in",
+   "category": "social-media",
+   "docs_words": "X/Twitter via xurl CLI: raw post search, posting, DM, media.",
+   "page": "reference/skills-catalog.md",
+   "line": 98,
+   "own_page": "user-guide/skills/bundled/social-media/social-media-xurl.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Post, reply and search on X, the site that was Twitter.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and access to X's tools for developers",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "want_row": "w_xpost"
+   }
+  },
+  {
+   "name": "codebase-inspection",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Inspect codebases w/ pygount: LOC, languages, ratios.",
+   "page": "reference/skills-catalog.md",
+   "line": 104,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-codebase-inspection.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Count how much code a project has, and in which languages.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "codebase",
+     "repo",
+     "repository",
+     "project"
+    ],
+    "actions": [
+     "lines of code",
+     "how big",
+     "how much code",
+     "which languages",
+     "size"
+    ]
+   }
+  },
+  {
+   "name": "dogfood",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Exploratory QA of web apps: find bugs, evidence, reports.",
+   "page": "reference/skills-catalog.md",
+   "line": 105,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-dogfood.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Test a web app like a user would, and write up the bugs found.",
+   "for_from": "page",
+   "needs": "Hermes's browser switched on",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "web app",
+     "my app",
+     "my website"
+    ],
+    "actions": [
+     "test",
+     "find bugs",
+     "qa",
+     "try out"
+    ]
+   }
+  },
+  {
+   "name": "github",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
+   "page": "reference/skills-catalog.md",
+   "line": 106,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-github.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Work with GitHub: issues, pull requests, reviews and code folders.",
+   "for_from": "page",
+   "needs": "the gh app, signed in to GitHub",
+   "left_out": false,
+   "alike_groups": [
+    "g_svc_other"
+   ],
+   "found_by": {
+    "none": "topic svc catches github first"
+   }
+  },
+  {
+   "name": "requesting-code-review",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Pre-commit review: security scan, quality gates, auto-fix.",
+   "page": "reference/skills-catalog.md",
+   "line": 107,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-requesting-code-review.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Check new code for safety and quality before it is saved for good.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_review"
+   ],
+   "found_by": {
+    "none": "its pair (code, review) is want row w_code's"
+   }
+  },
+  {
+   "name": "simplify-code",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Parallel 4-agent cleanup of recent code changes.",
+   "page": "reference/skills-catalog.md",
+   "line": 108,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-simplify-code.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Tidy up code that already works: less repeated and simpler.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_review"
+   ],
+   "found_by": {
+    "things": [
+     "code",
+     "my code"
+    ],
+    "actions": [
+     "simplify",
+     "clean up",
+     "tidy",
+     "cleaner"
+    ]
+   }
+  },
+  {
+   "name": "spike",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Throwaway experiments to validate an idea before build.",
+   "page": "reference/skills-catalog.md",
+   "line": 109,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-spike.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Try out an idea with quick throwaway code before building it for real.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "none": "no plain pair: 'try an idea' fits too many wants"
+   }
+  },
+  {
+   "name": "systematic-debugging",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "4-phase root cause debugging: understand bugs before fixing.",
+   "page": "reference/skills-catalog.md",
+   "line": 110,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-systematic-debugging.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find the real cause of a bug before trying to fix it.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "things": [
+     "bug",
+     "bugs",
+     "error",
+     "errors",
+     "crash"
+    ],
+    "actions": [
+     "fix",
+     "debug",
+     "find",
+     "track down",
+     "why"
+    ]
+   }
+  },
+  {
+   "name": "test-driven-development",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "TDD: enforce RED-GREEN-REFACTOR, tests before code.",
+   "page": "reference/skills-catalog.md",
+   "line": 111,
+   "own_page": "user-guide/skills/bundled/software-development/software-development-test-driven-development.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Write code by writing a test first, then the code that passes it.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "none": "no plain pair: found by its name only"
+   }
+  },
+  {
+   "name": "blocked-page-recovery",
+   "kind": "built_in",
+   "category": "web",
+   "docs_words": "Use when a fetch fails: 403/429, paywall, WAF, bot wall.",
+   "page": "reference/skills-catalog.md",
+   "line": 117,
+   "own_page": "user-guide/skills/bundled/web/web-blocked-page-recovery.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find a copy of a web page that will not open, from other sites.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [],
+   "found_by": {
+    "none": "on the borderline list for him; no pair until he decides"
+   }
+  },
+  {
+   "name": "agent-merge-conflict-arbiter",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Neutral arbiter for merge conflicts between two agents.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 34,
+   "own_page": "user-guide/skills/optional/autonomous-ai-agents/autonomous-ai-agents-agent-merge-conflict-arbiter.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Settle a clash when two AI helpers changed the same code.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "antigravity-cli",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Operate the Antigravity CLI (agy): plugins, auth, sandbox.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 35,
+   "own_page": "user-guide/skills/optional/autonomous-ai-agents/autonomous-ai-agents-antigravity-cli.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Use Antigravity, a separate coding app, through Hermes.",
+   "for_from": "page",
+   "needs": "the agy app",
+   "left_out": false,
+   "alike_groups": [
+    "g_coding"
+   ]
+  },
+  {
+   "name": "blackbox",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding tasks to the Blackbox AI multi-model CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 36,
+   "own_page": "user-guide/skills/optional/autonomous-ai-agents/autonomous-ai-agents-blackbox.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Hand a coding job to Blackbox AI, a separate coding app.",
+   "for_from": "page",
+   "needs": "Node.js 20 or newer and the Blackbox app",
+   "left_out": false,
+   "alike_groups": [
+    "g_coding"
+   ]
+  },
+  {
+   "name": "dynamic-workflow",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Plan-in-code fan-outs, adversarial verification, waves.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 37,
+   "own_page": "user-guide/skills/optional/autonomous-ai-agents/autonomous-ai-agents-dynamic-workflow.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "grok",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to xAI Grok Build CLI (features, PRs).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 38,
+   "own_page": "user-guide/skills/optional/autonomous-ai-agents/autonomous-ai-agents-grok.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Hand a coding job to Grok Build, a separate coding app by xAI.",
+   "for_from": "page",
+   "needs": "Grok Build added",
+   "left_out": false,
+   "alike_groups": [
+    "g_coding"
+   ]
+  },
+  {
+   "name": "opencode",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to OpenCode CLI (features, PR review).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 39,
+   "own_page": "user-guide/skills/optional/autonomous-ai-agents/autonomous-ai-agents-opencode.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Hand a coding job to OpenCode, a separate open coding app.",
+   "for_from": "page",
+   "needs": "OpenCode added",
+   "left_out": false,
+   "alike_groups": [
+    "g_coding"
+   ]
+  },
+  {
+   "name": "openhands",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to OpenHands CLI (model-agnostic, LiteLLM).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 40,
+   "own_page": "user-guide/skills/optional/autonomous-ai-agents/autonomous-ai-agents-openhands.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Hand a coding job to OpenHands, a coding app that works with many AIs.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and OpenHands added",
+   "left_out": false,
+   "alike_groups": [
+    "g_coding"
+   ]
+  },
+  {
+   "name": "evm",
+   "kind": "optional",
+   "category": "blockchain",
+   "docs_words": "Read-only EVM client: wallets, tokens, gas across 8 chains.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 46,
+   "own_page": "user-guide/skills/optional/blockchain/blockchain-evm.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look up wallets, coins and fees on Ethereum and seven other blockchains. Read only.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "hyperliquid",
+   "kind": "optional",
+   "category": "blockchain",
+   "docs_words": "Hyperliquid market data, account history, trade review.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 47,
+   "own_page": "user-guide/skills/optional/blockchain/blockchain-hyperliquid.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look up prices and your past trades on Hyperliquid, a crypto exchange. Read only.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "solana",
+   "kind": "optional",
+   "category": "blockchain",
+   "docs_words": "Query Solana wallets, tokens, txs, and NFTs in USD.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 48,
+   "own_page": "user-guide/skills/optional/blockchain/blockchain-solana.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look up Solana wallets, coins and NFTs, with prices in dollars.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "one-three-one-rule",
+   "kind": "optional",
+   "category": "communication",
+   "docs_words": "1-3-1 decision briefs: problem, three options, one pick.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 54,
+   "own_page": "user-guide/skills/optional/communication/communication-one-three-one-rule.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Answer a hard choice as one problem, three options and one pick.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "ai-presenter-video",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Make a verified AI presenter video from script + image.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 60,
+   "own_page": "user-guide/skills/optional/creative/creative-ai-presenter-video.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Make a video of a talking presenter from a script and one photo.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and a photo of an adult you may use",
+   "left_out": false,
+   "alike_groups": [
+    "g_video"
+   ]
+  },
+  {
+   "name": "anatomy",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Explain an idea as an interactive isometric machine figure.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 61,
+   "own_page": "user-guide/skills/optional/creative/creative-anatomy.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Explain an idea as a web page with a small moving machine drawing.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "archify",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Validated interactive HTML diagrams, upstream-maintained.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 62,
+   "own_page": "user-guide/skills/optional/creative/creative-archify.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make clickable diagrams as web pages.",
+   "for_from": "page",
+   "needs": "it is kept up by another project and fetched live",
+   "left_out": false,
+   "alike_groups": [
+    "g_diagram"
+   ]
+  },
+  {
+   "name": "ascii-art",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 63,
+   "own_page": "user-guide/skills/optional/creative/creative-ascii-art.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make pictures and big banner text out of letters.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "auteur",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Design and build cinematic, award-level web pages.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 64,
+   "own_page": "user-guide/skills/optional/creative/creative-auteur.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Design and build web pages with a film-like, cinematic feel.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_webdesign"
+   ]
+  },
+  {
+   "name": "baoyu-article-illustrator",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Article illustrations: type × style × palette consistency.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 65,
+   "own_page": "user-guide/skills/optional/creative/creative-baoyu-article-illustrator.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make matching pictures to illustrate an article you wrote.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures"
+   ]
+  },
+  {
+   "name": "baoyu-comic",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Knowledge comics (知识漫画): educational, biography, tutorial.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 66,
+   "own_page": "user-guide/skills/optional/creative/creative-baoyu-comic.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make comics that teach a topic or tell someone's life story.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "brag",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Project launch video via Hyperframes, upstream-maintained.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 67,
+   "own_page": "user-guide/skills/optional/creative/creative-brag.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make a launch video for a project you built.",
+   "for_from": "page",
+   "needs": "it is kept up by another project and fetched live",
+   "left_out": false,
+   "alike_groups": [
+    "g_brag",
+    "g_video"
+   ]
+  },
+  {
+   "name": "brag-slim",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Launch video from a project or URL, upstream-maintained.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 68,
+   "own_page": "user-guide/skills/optional/creative/creative-brag-slim.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make a launch video for a project or web address. Smaller than brag.",
+   "for_from": "page",
+   "needs": "it is kept up by another project and fetched live",
+   "left_out": false,
+   "alike_groups": [
+    "g_brag"
+   ]
+  },
+  {
+   "name": "comfyui",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate images, video, and audio via diffusion workflows.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 69,
+   "own_page": "user-guide/skills/optional/creative/creative-comfyui.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make pictures, video and sound with ComfyUI, an app for making pictures.",
+   "for_from": "page",
+   "needs": "ComfyUI",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures",
+    "g_video"
+   ]
+  },
+  {
+   "name": "concept-diagrams",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate flat, minimal educational SVG visuals as HTML.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 70,
+   "own_page": "user-guide/skills/optional/creative/creative-concept-diagrams.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make simple, flat teaching diagrams, such as physics or biology drawings.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_diagram"
+   ]
+  },
+  {
+   "name": "creative-ideation",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate ideas via named methods from creative practice.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 71,
+   "own_page": "user-guide/skills/optional/creative/creative-creative-ideation.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Come up with ideas, using named methods from creative work.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "design-md",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Author/validate/export Google's DESIGN.md token spec files.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 72,
+   "own_page": "user-guide/skills/optional/creative/creative-design-md.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Write and check a DESIGN.md file that describes a brand's look.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_webdesign"
+   ]
+  },
+  {
+   "name": "draw-your-font",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Turn a handwriting photo into an installable TTF font.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 73,
+   "own_page": "user-guide/skills/optional/creative/creative-draw-your-font.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Turn a photo of your handwriting into a font you can install.",
+   "for_from": "page",
+   "needs": "Node.js 18 or newer",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "dream-loop",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Build stunning 3D scenes via a concept-art fidelity loop.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 74,
+   "own_page": "user-guide/skills/optional/creative/creative-dream-loop.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Build 3D scenes for web games or apps, checking each against a target picture.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "excalidraw",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 75,
+   "own_page": "user-guide/skills/optional/creative/creative-excalidraw.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make hand-drawn style diagrams you can open on the Excalidraw website.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_diagram"
+   ]
+  },
+  {
+   "name": "heartmula",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "HeartMuLa: Suno-like song generation from lyrics + tags.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 76,
+   "own_page": "user-guide/skills/optional/creative/creative-heartmula.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Make whole songs from lyrics, with a free music AI on your computer.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": [
+    "g_music"
+   ]
+  },
+  {
+   "name": "hyperframes",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Render MP4/WebM videos from HTML compositions.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 77,
+   "own_page": "user-guide/skills/optional/creative/creative-hyperframes.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make MP4 videos from web pages: motion graphics, captions, product tours.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_video"
+   ]
+  },
+  {
+   "name": "impeccable",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Frontend design guidance, upstream-maintained (impeccable).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 78,
+   "own_page": "user-guide/skills/optional/creative/creative-impeccable.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Advice for designing the look of web pages.",
+   "for_from": "page",
+   "needs": "it is kept up by another project and fetched live",
+   "left_out": false,
+   "alike_groups": [
+    "g_webdesign"
+   ]
+  },
+  {
+   "name": "ip-as-logo",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Design minimal cute IP mascot marks readable at 32px.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 79,
+   "own_page": "user-guide/skills/optional/creative/creative-ip-as-logo.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Design a tiny, cute mascot logo that still reads when very small.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures"
+   ]
+  },
+  {
+   "name": "kanban-video-orchestrator",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Plan and run multi-agent video production pipelines.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 80,
+   "own_page": "user-guide/skills/optional/creative/creative-kanban-video-orchestrator.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Split a big video job among several Hermes helpers and run it.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_video"
+   ]
+  },
+  {
+   "name": "meme-generation",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Create meme PNGs from templates with Pillow text overlay.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 81,
+   "own_page": "user-guide/skills/optional/creative/creative-meme-generation.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make meme pictures from a topic, with text on a known template.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures"
+   ]
+  },
+  {
+   "name": "mono-color",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate one- or two-ink editorial print poster images.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 82,
+   "own_page": "user-guide/skills/optional/creative/creative-mono-color.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make poster pictures in one or two ink colours, like printed art.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures"
+   ]
+  },
+  {
+   "name": "pixel-art",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Pixel art w/ era palettes (NES, Game Boy, PICO-8).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 83,
+   "own_page": "user-guide/skills/optional/creative/creative-pixel-art.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Turn a picture into retro pixel art, like old game consoles.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures"
+   ]
+  },
+  {
+   "name": "pretext",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Build creative browser demos with DOM-free text layout.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 84,
+   "own_page": "user-guide/skills/optional/creative/creative-pretext.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Build playful web demos where text flows around moving things.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "simple-english",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Rewrite text to ASD-STE100 Simplified Technical English.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 85,
+   "own_page": "user-guide/skills/optional/creative/creative-simple-english.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Rewrite text in very simple English, as in aircraft manuals.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_rewrite"
+   ]
+  },
+  {
+   "name": "sketch",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Throwaway HTML mockups: 2-3 design variants to compare.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 86,
+   "own_page": "user-guide/skills/optional/creative/creative-sketch.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make two or three quick throwaway designs of a screen to compare.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_webdesign"
+   ]
+  },
+  {
+   "name": "social-media-content-calendar",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Plan multi-platform social campaigns: briefs to posting.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 87,
+   "own_page": "user-guide/skills/optional/creative/creative-social-media-content-calendar.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Plan posts for several social media sites, from first idea to posting.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "system-atlas",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Build explorable isometric architecture atlases as HTML.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 88,
+   "own_page": "user-guide/skills/optional/creative/creative-system-atlas.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Build a clickable 3D-style map of how a software system works.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": [
+    "g_diagram"
+   ]
+  },
+  {
+   "name": "tldraw-offline",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Drive and script tldraw offline canvases with an agent.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 89,
+   "own_page": "user-guide/skills/optional/creative/creative-tldraw-offline.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Read and change drawings in the tldraw offline app.",
+   "for_from": "page",
+   "needs": "the tldraw offline app",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "unreal-mcp",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Automate Unreal Engine editor scenes, actors, and renders.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 90,
+   "own_page": "user-guide/skills/optional/creative/creative-unreal-mcp.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Control scenes and objects in Unreal Engine, a game-making app.",
+   "for_from": "page",
+   "needs": "Unreal Engine with its MCP add-on",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "jupyter-notebook",
+   "kind": "optional",
+   "category": "data-science",
+   "docs_words": "Iterative Python via live Jupyter kernel (hamelnb).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 96,
+   "own_page": "user-guide/skills/optional/data-science/data-science-jupyter-notebook.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Run Python step by step in a Jupyter notebook that keeps its results.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "actual-setup",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Set up Actual Computer (actual.inc) inference in Hermes.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 102,
+   "own_page": "user-guide/skills/optional/devops/devops-actual-setup.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Set up Actual Computer to run AI on your own machines.",
+   "for_from": "page",
+   "needs": "an Actual Computer account",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "docker-management",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Manage Docker containers, images, volumes, and Compose.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 103,
+   "own_page": "user-guide/skills/optional/devops/devops-docker-management.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Start, stop and tidy Docker containers, a way to run apps boxed in.",
+   "for_from": "page",
+   "needs": "Docker",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "hermes-s6-container-supervision",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Modify or debug s6 services in the Hermes Docker image.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 104,
+   "own_page": "user-guide/skills/optional/devops/devops-hermes-s6-container-supervision.md",
+   "platforms": [
+    "linux"
+   ],
+   "platforms_line": 22,
+   "platform_need": "Linux only",
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "Linux only",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "inference-sh-cli",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Run 150+ AI apps (image, video, LLM) via inference.sh CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 105,
+   "own_page": "user-guide/skills/optional/devops/devops-inference-sh-cli.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make pictures and video with over 150 AI apps run on inference.sh.",
+   "for_from": "page",
+   "needs": "an inference.sh account",
+   "left_out": false,
+   "alike_groups": [
+    "g_pictures",
+    "g_video"
+   ]
+  },
+  {
+   "name": "pinggy-tunnel",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Zero-install localhost tunnels over SSH via Pinggy.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 106,
+   "own_page": "user-guide/skills/optional/devops/devops-pinggy-tunnel.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Give something running on your computer a public web address for a while.",
+   "for_from": "page",
+   "needs": "free for 60 minutes, paid plan for more",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "setup-wizard-generator",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Generate a bash wizard guiding a human through manual setup.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 107,
+   "own_page": "user-guide/skills/optional/devops/devops-setup-wizard-generator.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Make a step-by-step script that walks a person through a manual setup.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "watchers",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Poll RSS, JSON APIs, and GitHub with watermark dedup.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 108,
+   "own_page": "user-guide/skills/optional/devops/devops-watchers.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Check news feeds, GitHub or data links on a timer and report new items.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": [
+    "g_feeds"
+   ]
+  },
+  {
+   "name": "adversarial-ux-test",
+   "kind": "optional",
+   "category": "dogfood",
+   "docs_words": "Roleplay a hostile user to find and triage UX pain points.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 114,
+   "own_page": "user-guide/skills/optional/dogfood/dogfood-adversarial-ux-test.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Play an angry, impatient user to find what is confusing in your app.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "agentmail",
+   "kind": "optional",
+   "category": "email",
+   "docs_words": "Use when an agent needs AgentMail CLI email inboxes.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 120,
+   "own_page": "user-guide/skills/optional/email/email-agentmail.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Give Hermes its own email inbox to send and get mail.",
+   "for_from": "page",
+   "needs": "an AgentMail account",
+   "left_out": false,
+   "alike_groups": [
+    "g_email"
+   ]
+  },
+  {
+   "name": "3-statement-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build integrated IS/BS/CF financial workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 126,
+   "own_page": "user-guide/skills/optional/finance/finance-3-statement-model.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Fill in a company's linked money statements in an Excel file.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "comps-analysis",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build comparable-company valuation workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 127,
+   "own_page": "user-guide/skills/optional/finance/finance-comps-analysis.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Value a company against similar companies, in an Excel file.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "dcf-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build discounted cash flow valuation workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 128,
+   "own_page": "user-guide/skills/optional/finance/finance-dcf-model.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Value a company from its future cash, in an Excel file.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "excel-author",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build auditable financial workbooks headless via openpyxl.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 129,
+   "own_page": "user-guide/skills/optional/finance/finance-excel-author.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Build careful financial Excel files that others can check.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "lbo-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build leveraged buyout workbooks with IRR/MOIC in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 130,
+   "own_page": "user-guide/skills/optional/finance/finance-lbo-model.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Plan the numbers for buying a company with borrowed money, in Excel.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "merger-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build M&A accretion/dilution workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 131,
+   "own_page": "user-guide/skills/optional/finance/finance-merger-model.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Work out what a merger does to earnings per share, in Excel.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "polymarket",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Query Polymarket: markets, prices, orderbooks, history.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 132,
+   "own_page": "user-guide/skills/optional/finance/finance-polymarket.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look up prediction market odds and prices on Polymarket. Read only.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "pptx-author",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build PowerPoint decks headless with python-pptx.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 133,
+   "own_page": "user-guide/skills/optional/finance/finance-pptx-author.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Make simple PowerPoint files. Smaller than the built-in Microsoft Office one.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_pptx"
+   ]
+  },
+  {
+   "name": "stocks",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Stock quotes, history, search, compare, crypto via Yahoo.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 134,
+   "own_page": "user-guide/skills/optional/finance/finance-stocks.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look up stock and crypto prices, history and comparisons, from Yahoo.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "minecraft-modpack-server",
+   "kind": "optional",
+   "category": "gaming",
+   "docs_words": "Host modded Minecraft servers (CurseForge, Modrinth).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 140,
+   "own_page": "user-guide/skills/optional/gaming/gaming-minecraft-modpack-server.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Set up and run a Minecraft game world with mods for friends.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "pokemon-player",
+   "kind": "optional",
+   "category": "gaming",
+   "docs_words": "Play Pokemon via headless emulator + RAM reads.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 141,
+   "own_page": "user-guide/skills/optional/gaming/gaming-pokemon-player.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Let Hermes play old Pokemon games while you watch.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "fitness-nutrition",
+   "kind": "optional",
+   "category": "health",
+   "docs_words": "Workout planning, macros, and body metrics via wger/USDA.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 147,
+   "own_page": "user-guide/skills/optional/health/health-fitness-nutrition.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Plan workouts and look up food values and exercises.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "neuroskill-bci",
+   "kind": "optional",
+   "category": "health",
+   "docs_words": "Use live BCI cognitive and mood state from NeuroSkill.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 148,
+   "own_page": "user-guide/skills/optional/health/health-neuroskill-bci.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Read mood and focus from a brain-sensing headband, for research use.",
+   "for_from": "page",
+   "needs": "NeuroSkill and a brain-sensing headband",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "fastmcp",
+   "kind": "optional",
+   "category": "mcp",
+   "docs_words": "Build, test, and deploy Python MCP servers.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 154,
+   "own_page": "user-guide/skills/optional/mcp/mcp-fastmcp.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Build your own MCP service in Python, to give Hermes new actions.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "mcp-oauth-remote-gateway",
+   "kind": "optional",
+   "category": "mcp",
+   "docs_words": "Manual OAuth for remote MCP servers on headless gateways.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 155,
+   "own_page": "user-guide/skills/optional/mcp/mcp-mcp-oauth-remote-gateway.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "mcporter",
+   "kind": "optional",
+   "category": "mcp",
+   "docs_words": "List, auth, and call MCP servers/tools from the terminal.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 156,
+   "own_page": "user-guide/skills/optional/mcp/mcp-mcporter.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "List and try MCP services, which connect Hermes to other apps.",
+   "for_from": "page",
+   "needs": "Node.js",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "gif-search",
+   "kind": "optional",
+   "category": "media",
+   "docs_words": "Search/download GIFs from Tenor via curl + jq.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 162,
+   "own_page": "user-guide/skills/optional/media/media-gif-search.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find and save GIFs from Tenor.",
+   "for_from": "page",
+   "needs": "a Tenor secret key",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "songsee",
+   "kind": "optional",
+   "category": "media",
+   "docs_words": "Audio spectrograms/features (mel, chroma, MFCC) via CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 163,
+   "own_page": "user-guide/skills/optional/media/media-songsee.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Draw pictures of a sound file, such as its pitch over time.",
+   "for_from": "page",
+   "needs": "Go, and ffmpeg for some files",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "accelerate",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Run PyTorch training across GPUs with minimal changes.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 169,
+   "own_page": "user-guide/skills/optional/mlops/mlops-accelerate.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "Train AI models on several graphics cards with few code changes.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "axolotl",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Axolotl: YAML LLM fine-tuning (LoRA, DPO, GRPO).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 170,
+   "own_page": "user-guide/skills/optional/mlops/mlops-training-axolotl.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Train your own version of an AI model from a settings file.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "chroma",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Embedding database for RAG and semantic search.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 171,
+   "own_page": "user-guide/skills/optional/mlops/mlops-chroma.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "Keep text in a search store so an AI can find it by meaning.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "dspy",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "DSPy: declarative LM programs, auto-optimize prompts, RAG.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 172,
+   "own_page": "user-guide/skills/optional/mlops/mlops-research-dspy.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "evaluating-llms-harness",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 173,
+   "own_page": "user-guide/skills/optional/mlops/mlops-evaluation-evaluating-llms-harness.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Test AI models on standard exams to compare how good they are.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "faiss",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Fast vector similarity search at billion scale.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 174,
+   "own_page": "user-guide/skills/optional/mlops/mlops-faiss.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Search huge collections of numbers for the closest matches, very fast.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "flash-attention",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Speed up long-sequence transformer training and inference.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 175,
+   "own_page": "user-guide/skills/optional/mlops/mlops-flash-attention.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Make training and running AI models faster on graphics cards.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and a graphics card",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "lambda-labs",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "On-demand GPU cloud instances for ML training.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 176,
+   "own_page": "user-guide/skills/optional/mlops/mlops-lambda-labs.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "Rent strong graphics cards from Lambda Labs to train AI models.",
+   "for_from": "page",
+   "needs": "a Lambda Labs account, paid",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "llama-cpp",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "llama.cpp local GGUF inference + HF Hub model discovery.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 177,
+   "own_page": "user-guide/skills/optional/mlops/mlops-inference-llama-cpp.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "Run an AI model on your own computer with llama.cpp.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_localai"
+   ]
+  },
+  {
+   "name": "modal",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Serverless GPU cloud for ML jobs and model APIs.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 178,
+   "own_page": "user-guide/skills/optional/mlops/mlops-modal.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "Run AI jobs on Modal's rented graphics cards, paid by use.",
+   "for_from": "page",
+   "needs": "a Modal account, paid",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "nemo-curator",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Curate LLM training data: dedupe, filter, PII redaction.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 179,
+   "own_page": "user-guide/skills/optional/mlops/mlops-nemo-curator.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Clean up large piles of text before training an AI model on it.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and an NVIDIA graphics card",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "obliteratus",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "OBLITERATUS: abliterate LLM refusals (diff-in-means).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 180,
+   "own_page": "user-guide/skills/optional/mlops/mlops-obliteratus.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Remove the safety refusals built into open AI models.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and a graphics card",
+   "left_out": true,
+   "left_out_why": "Its purpose is to remove the safety refusals from AI models.",
+   "alike_groups": []
+  },
+  {
+   "name": "peft",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Fine-tune large LLMs with LoRA on limited GPU memory.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 181,
+   "own_page": "user-guide/skills/optional/mlops/mlops-peft.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "Train your own version of a big AI model on one graphics card.",
+   "for_from": "page",
+   "needs": "a graphics card",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "pytorch-fsdp",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Fully sharded data-parallel training for large models.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 182,
+   "own_page": "user-guide/skills/optional/mlops/mlops-pytorch-fsdp.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "pytorch-lightning",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Clean training loops with built-in distributed support.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 183,
+   "own_page": "user-guide/skills/optional/mlops/mlops-pytorch-lightning.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "saelens",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Train sparse autoencoders to interpret model features.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 184,
+   "own_page": "user-guide/skills/optional/mlops/mlops-saelens.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "segment-anything-model",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "SAM: zero-shot image segmentation via points, boxes, masks.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 185,
+   "own_page": "user-guide/skills/optional/mlops/mlops-models-segment-anything-model.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "Cut out any object in a picture, by pointing at it.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "serving-llms-vllm",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "vLLM: high-throughput LLM serving, OpenAI API, quantization.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 186,
+   "own_page": "user-guide/skills/optional/mlops/mlops-inference-serving-llms-vllm.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Run an AI model fast for many users at once, with vLLM.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and a graphics card",
+   "left_out": false,
+   "alike_groups": [
+    "g_localai"
+   ]
+  },
+  {
+   "name": "simpo",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Reference-free preference alignment, simpler than DPO.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 187,
+   "own_page": "user-guide/skills/optional/mlops/mlops-simpo.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 23,
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "slime",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "RL post-training for LLMs with Megatron and SGLang.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 188,
+   "own_page": "user-guide/skills/optional/mlops/mlops-slime.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "tensorrt-llm",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "High-throughput LLM inference on NVIDIA GPUs.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 189,
+   "own_page": "user-guide/skills/optional/mlops/mlops-tensorrt-llm.md",
+   "platforms": [
+    "linux"
+   ],
+   "platforms_line": 23,
+   "platform_need": "Linux only",
+   "for": "Run AI models as fast as possible on NVIDIA graphics cards.",
+   "for_from": "page",
+   "needs": "Linux only, and an NVIDIA graphics card",
+   "left_out": false,
+   "alike_groups": [
+    "g_localai"
+   ]
+  },
+  {
+   "name": "torchtitan",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Pretrain LLMs at scale with PyTorch 4D parallelism.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 190,
+   "own_page": "user-guide/skills/optional/mlops/mlops-torchtitan.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Train a new AI model from scratch on many graphics cards.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and many graphics cards",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "unsloth",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Unsloth: 2-5x faster LoRA/QLoRA fine-tuning, less VRAM.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 191,
+   "own_page": "user-guide/skills/optional/mlops/mlops-training-unsloth.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Train your own version of an AI model faster, on a smaller graphics card.",
+   "for_from": "line",
+   "needs": "a Mac or Linux, not Windows, and a graphics card",
+   "left_out": false,
+   "alike_groups": [
+    "g_finetune"
+   ]
+  },
+  {
+   "name": "stripe-link-cli",
+   "kind": "optional",
+   "category": "payments",
+   "docs_words": "Agent payments via Stripe Link — cards, SPT, approvals.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 197,
+   "own_page": "user-guide/skills/optional/payments/payments-stripe-link-cli.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Let Hermes buy things for you, with each payment approved in Link.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and a Stripe Link account, in the US only",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "stripe-projects",
+   "kind": "optional",
+   "category": "payments",
+   "docs_words": "Provision SaaS services + sync creds via Stripe Projects.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 198,
+   "own_page": "user-guide/skills/optional/payments/payments-stripe-projects.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Sign up for web services like Neon or Vercel, and pay in one place.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and a Stripe account",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "box",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Box manages cloud files, sharing, search, and metadata.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 204,
+   "own_page": "user-guide/skills/optional/productivity/productivity-box.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Organise, share and search your files on Box, a cloud file store.",
+   "for_from": "page",
+   "needs": "a Box account and the Box app",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "canvas",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Fetch Canvas LMS courses and assignments via API token.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 205,
+   "own_page": "user-guide/skills/optional/productivity/productivity-canvas.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "See your courses and assignments in Canvas, a school website. Read only.",
+   "for_from": "page",
+   "needs": "a Canvas login",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "decision-questionnaire",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Turn an unanswerable decision into a questionnaire doc.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 206,
+   "own_page": "user-guide/skills/optional/productivity/productivity-decision-questionnaire.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Turn a decision you cannot make alone into questions for someone else.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "here-now",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Publish sites to {slug}.here.now and store files in Drives.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 207,
+   "own_page": "user-guide/skills/optional/productivity/productivity-here-now.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Put a web page online at here.now and keep private files there.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows, and a here.now account",
+   "left_out": false,
+   "alike_groups": [
+    "g_publish"
+   ]
+  },
+  {
+   "name": "live-dashboard",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Build self-updating dashboards from live sources.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 208,
+   "own_page": "user-guide/skills/optional/productivity/productivity-live-dashboard.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Build a page that shows live facts and refreshes itself each day.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "memento-flashcards",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Spaced-repetition flashcards: create, review, quiz, export.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 209,
+   "own_page": "user-guide/skills/optional/productivity/productivity-memento-flashcards.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Learn facts with flashcards that come back at the right time.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "property-listings",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Present property and rental listings as desktop cards.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 210,
+   "own_page": "user-guide/skills/optional/productivity/productivity-property-listings.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Show homes or rentals you found as cards to compare, in the Hermes app.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "shop",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Shop catalog search, checkout, order tracking, returns.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 211,
+   "own_page": "user-guide/skills/optional/productivity/productivity-shop.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Search Shopify shops, buy, and track orders and returns.",
+   "for_from": "page",
+   "needs": "the shop app",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "siyuan",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Query and edit a SiYuan knowledge base via its API.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 212,
+   "own_page": "user-guide/skills/optional/productivity/productivity-siyuan.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Search and change notes in SiYuan, a notes app you run yourself.",
+   "for_from": "page",
+   "needs": "SiYuan running, and its secret key",
+   "left_out": false,
+   "alike_groups": [
+    "g_notes"
+   ]
+  },
+  {
+   "name": "telephony",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Provision Twilio numbers, SMS/MMS, and AI outbound calls.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 213,
+   "own_page": "user-guide/skills/optional/productivity/productivity-telephony.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Get a phone number, send texts and make AI phone calls, through Twilio.",
+   "for_from": "page",
+   "needs": "a Twilio account, paid",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "bioinformatics",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Gateway to 400+ genomics and computational biology skills.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 219,
+   "own_page": "user-guide/skills/optional/research/research-bioinformatics.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Find the right method for gene and biology data work.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "blogwatcher",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 220,
+   "own_page": "user-guide/skills/optional/research/research-blogwatcher.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Follow blogs and news feeds and see what is new.",
+   "for_from": "page",
+   "needs": "the blogwatcher app",
+   "left_out": false,
+   "alike_groups": [
+    "g_feeds"
+   ]
+  },
+  {
+   "name": "darwinian-evolver",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Evolve prompts/regex/SQL/code with Imbue's evolution loop.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 221,
+   "own_page": "user-guide/skills/optional/research/research-darwinian-evolver.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Improve a short text or code by trying many versions and keeping the best.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "domain-intel",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Passive recon of subdomains, SSL certs, WHOIS, and DNS.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 222,
+   "own_page": "user-guide/skills/optional/research/research-domain-intel.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look up public facts about a website's address: owner, certificates, subdomains.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "drug-discovery",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Drug discovery: ChEMBL search, drug-likeness, interactions.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 223,
+   "own_page": "user-guide/skills/optional/research/research-drug-discovery.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look up medicines and how they act, for drug research.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "gitnexus-explorer",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Serve an interactive codebase knowledge graph web UI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 224,
+   "own_page": "user-guide/skills/optional/research/research-gitnexus-explorer.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Show a code project as a clickable map of its parts.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "llm-wiki",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Karpathy's LLM Wiki: build/query interlinked markdown KB.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 225,
+   "own_page": "user-guide/skills/optional/research/research-llm-wiki.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Build a growing set of linked notes that an AI keeps up to date.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_notes"
+   ]
+  },
+  {
+   "name": "osint-investigation",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Follow the money via public records and sanctions data.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 226,
+   "own_page": "user-guide/skills/optional/research/research-osint-investigation.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Dig through public records to trace money, companies and links between them.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "parallel-cli",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Agent-native web search, deep research, and enrichment.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 227,
+   "own_page": "user-guide/skills/optional/research/research-parallel-cli.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Search the web and do deep research with Parallel, a paid service.",
+   "for_from": "page",
+   "needs": "a Parallel account, paid, with a free tier",
+   "left_out": false,
+   "alike_groups": [
+    "g_websearch"
+   ]
+  },
+  {
+   "name": "qmd",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Hybrid local search over notes, docs, and transcripts.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 228,
+   "own_page": "user-guide/skills/optional/research/research-qmd.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Search your own notes and documents on your computer, by words and meaning.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": [
+    "g_notes"
+   ]
+  },
+  {
+   "name": "research-paper-writing",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Write ML papers for NeurIPS/ICML/ICLR: design→submit.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 229,
+   "own_page": "user-guide/skills/optional/research/research-research-paper-writing.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 23,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Plan, run and write up AI research for big science meetings.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "rss-feeds",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Read RSS, Atom, JSON feeds; discover feeds behind a page.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 230,
+   "own_page": "user-guide/skills/optional/research/research-rss-feeds.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Read news feeds from a website and list the newest entries.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_feeds"
+   ]
+  },
+  {
+   "name": "scrapling",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Scrape sites with stealth browsing and Cloudflare bypass.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 231,
+   "own_page": "user-guide/skills/optional/research/research-scrapling.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Copy data from websites, also ones that try to block robots.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": true,
+   "left_out_why": "Its page sells getting past sites that block robots, Cloudflare bypass in the docs' words.",
+   "alike_groups": []
+  },
+  {
+   "name": "1password",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Set up op CLI, sign in, and read or inject secrets.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 237,
+   "own_page": "user-guide/skills/optional/security/security-1password.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Keep secret keys in 1Password and let Hermes read them from there.",
+   "for_from": "page",
+   "needs": "a 1Password account and its op app",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "godmode",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 238,
+   "own_page": "user-guide/skills/optional/security/security-godmode.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Get around the safety rules of AI models.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": true,
+   "left_out_why": "Its purpose is to get around the safety rules of AI models. The page calls it jailbreaking.",
+   "alike_groups": []
+  },
+  {
+   "name": "oss-forensics",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "GitHub supply-chain forensics: recovery, IOCs, reporting.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 239,
+   "own_page": "user-guide/skills/optional/security/security-oss-forensics.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Investigate an attack on open-source code on GitHub and write a report.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "sherlock",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Find accounts for a username across 400+ platforms.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 240,
+   "own_page": "user-guide/skills/optional/security/security-sherlock.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find which websites have an account with a given username.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": true,
+   "left_out_why": "It finds a person's accounts across 400 sites from one username. Easy to misuse on others.",
+   "alike_groups": []
+  },
+  {
+   "name": "unbroker",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Remove your info from data-broker sites, by name or phone.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 241,
+   "own_page": "user-guide/skills/optional/security/security-unbroker.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find and remove your personal details from people-search websites.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "web-pentest",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Authorized web pentest: recon, proof-based exploits, report.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 242,
+   "own_page": "user-guide/skills/optional/security/security-web-pentest.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Attack a website you are allowed to test, to find its security holes.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": true,
+   "left_out_why": "It attacks websites. Pointed at a site you may not test, it breaks the law.",
+   "alike_groups": []
+  },
+  {
+   "name": "openhue",
+   "kind": "optional",
+   "category": "smart-home",
+   "docs_words": "Control Philips Hue lights, scenes, rooms via OpenHue CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 248,
+   "own_page": "user-guide/skills/optional/smart-home/smart-home-openhue.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Turn Philips Hue lights and scenes on and off.",
+   "for_from": "page",
+   "needs": "a Hue Bridge and the openhue app",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "reddit-reading",
+   "kind": "optional",
+   "category": "social-media",
+   "docs_words": "Read Reddit: subreddits, search, threads, users. No browser.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 254,
+   "own_page": "user-guide/skills/optional/social-media/social-media-reddit-reading.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Read and search Reddit posts and comments. It does not post.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "ast-grep",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "AST-aware structural code search and rewrite via ast-grep.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 260,
+   "own_page": "user-guide/skills/optional/software-development/software-development-ast-grep.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Search and change code by its structure, not only its letters.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "code-wiki",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Generate wiki docs + Mermaid diagrams for any codebase.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 261,
+   "own_page": "user-guide/skills/optional/software-development/software-development-code-wiki.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Write a wiki with diagrams that explains a code project.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "grill-me",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Adversarial plan interview before implementation.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 262,
+   "own_page": "user-guide/skills/optional/software-development/software-development-grill-me.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Get your plan questioned hard, step by step, before you build it.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "hermes-agent-skill-authoring",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Author in-repo SKILL.md files: frontmatter and structure.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 263,
+   "own_page": "user-guide/skills/optional/software-development/software-development-hermes-agent-skill-authoring.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Write new skills, the steps that teach Hermes a task, for the Hermes project.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "inspecting-hermes-desktop-dom",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Read the live Hermes desktop DOM/CSS over CDP.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 264,
+   "own_page": "user-guide/skills/optional/software-development/software-development-inspecting-hermes-desktop-dom.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Look inside the running Hermes app's page, for people changing the app.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "node-inspect-debugger",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Debug Node.js via --inspect + Chrome DevTools Protocol CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 265,
+   "own_page": "user-guide/skills/optional/software-development/software-development-node-inspect-debugger.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find bugs in Node.js programs by pausing them step by step.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "pr-lens",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Draw code changes as animated architecture/data-flow SVGs.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 266,
+   "own_page": "user-guide/skills/optional/software-development/software-development-pr-lens.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Draw a code change as a moving diagram that shows how it works.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "python-debugpy",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Debug Python: pdb REPL + debugpy remote (DAP).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 267,
+   "own_page": "user-guide/skills/optional/software-development/software-development-python-debugpy.md",
+   "platforms": [
+    "linux",
+    "macos"
+   ],
+   "platforms_line": 22,
+   "platform_need": "a Mac or Linux, not Windows",
+   "for": "Find bugs in Python programs by pausing them step by step.",
+   "for_from": "page",
+   "needs": "a Mac or Linux, not Windows",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "rest-graphql-debug",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Debug REST/GraphQL APIs: status codes, auth, schemas, repro.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 268,
+   "own_page": "user-guide/skills/optional/software-development/software-development-rest-graphql-debug.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Find out why a web service answers with an error.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "subagent-driven-development",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Execute plans via delegate_task subagents (2-stage review).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 269,
+   "own_page": "user-guide/skills/optional/software-development/software-development-subagent-driven-development.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Carry out a coding plan by handing each task to a fresh AI helper.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "cloudflare-temporary-deploy",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Deploy a Worker live, no account, via wrangler --temporary.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 275,
+   "own_page": "user-guide/skills/optional/web-development/web-development-cloudflare-temporary-deploy.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Put a small web app online for an hour, with no account.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_publish"
+   ]
+  },
+  {
+   "name": "har-derived-api-client",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Record a site's XHR into a HAR, derive an HTTP client.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 276,
+   "own_page": "user-guide/skills/optional/web-development/web-development-har-derived-api-client.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Record what a website sends, then fetch the same data without the browser.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "page-agent",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Embed an in-page natural-language GUI copilot in web apps.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 277,
+   "own_page": "user-guide/skills/optional/web-development/web-development-page-agent.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Add an AI helper inside your own web app that clicks for its users.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  },
+  {
+   "name": "publish-site",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Versioned site deploys to GitHub/Cloudflare/Netlify Pages.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 278,
+   "own_page": "user-guide/skills/optional/web-development/web-development-publish-site.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Put a website you built online on GitHub, Cloudflare or Netlify Pages.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_publish"
+   ]
+  },
+  {
+   "name": "scrollcraft",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Premium scroll-driven landing pages; scroll = timeline.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 279,
+   "own_page": "user-guide/skills/optional/web-development/web-development-scrollcraft.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "Build landing pages where scrolling plays like a film.",
+   "for_from": "page",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": [
+    "g_webdesign"
+   ]
+  },
+  {
+   "name": "yuanbao",
+   "kind": "optional",
+   "category": "yuanbao",
+   "docs_words": "Yuanbao (元宝) groups: @mention users, query info/members.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 285,
+   "own_page": "user-guide/skills/optional/yuanbao/yuanbao-yuanbao.md",
+   "platforms": [
+    "linux",
+    "macos",
+    "windows"
+   ],
+   "platforms_line": 22,
+   "for": "not clear from the docs",
+   "for_from": "unclear",
+   "needs": "",
+   "left_out": false,
+   "alike_groups": []
+  }
+ ]
+}

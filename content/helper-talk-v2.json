@@ -155,13 +155,13 @@
  ],
  "r9_pattern": "\\bI(?:'ll| will| can)?\\s+(?:set up|install|connect|build|create)\\b",
  "answers": {
-  "rule": "Under every question Helper asks, the person sees answers to pick, and can always type in the message box instead. An answer under a topic question carries the need id it gives (gives). Picking it shows that need's row at once: no key words, no model call. Under W1 the answers are the pick labels of the matched topics, or the labels of the matched terms, at most max_at_once of them in list order. Under F2, F3 and N1 the topic_picks are shown, in their order. A topic pick asks that topic's question if it was not asked yet in this visit and nothing is kept for it (keeps.use), else shows its row or plain line. A pick that holds two topics (topic_picks.holds) shows line C1 with those two topics to pick. There is no answer labelled none of these: the message box is that answer.",
+  "rule": "Answers to pick show only under the questions that carry them (when_shown). Under such a question the person sees its answers and can always type instead. An answer under a topic question carries the need id it gives (gives). Picking it shows that need's row at once: no key words, no model call. A question with no answers is answered by typing; the typed answer goes through the order of steps as before. Under W1 the answers are the pick labels of the matched topics, or the labels of the matched terms, at most max_at_once in list order. The topic picks show only under line TP, which shows only when the person asks what they can ask (asks_for_topics). Nothing offers topics by itself. A topic pick asks that topic's question if it was not asked yet in this visit and nothing is kept for it (keeps.use), else shows its row or plain line. A pick that holds several topics (topic_picks.holds) shows line C1 with those topics to pick. There is no answer labelled none of these: the message box is that answer.",
   "max_per_question": 4,
   "max_words": 5,
-  "max_at_once": 5,
-  "max_at_once_note": "His words, 10 Nov: Let's try to minimize the options to 4 or 5. Taken as a rule for every list of things to pick: never more than five on screen at once, four where it can be. A list with more rows shows the first four and a fifth pick, More, which shows the next ones the same way. Checked by check_json.py.",
+  "max_at_once": 4,
+  "max_at_once_note": "His words, 10 Nov, 20:05: let's not have more than 4. Never more than four things to pick on screen at once, anywhere. A longer list shows three and a fourth pick, More, which shows the next ones the same way. Checked by check_json.py.",
   "more": {
-   "shown_before_more": 4,
+   "shown_before_more": 3,
    "label": "More"
   },
   "hint_under_question": "Or type your own answer",
@@ -169,10 +169,31 @@
   "hint_note": "The grey text in the empty message box while answers, or topic picks, are showing.",
   "no_answers": [
    "OPEN",
-   "F1"
+   "F1",
+   "mem-q",
+   "sch-q",
+   "bot-q"
   ],
-  "no_answers_note": "What's your name? and What do you do? have no answers to pick. Skip stays.",
-  "term_labels_note": "A term label under W1 (Tools, Skills, Profile and so on) is the word the person just typed. It is not checked against R5 and R6."
+  "no_answers_note": "These questions have no answers to pick (answers.when_shown). Skip stays under OPEN and F1.",
+  "term_labels_note": "A term label under W1 (Tools, Skills, Profile and so on) is the word the person just typed. It is not checked against R5 and R6.",
+  "when_shown": {
+   "rule": "A question carries answers to pick only in three cases. 1: its answer is one of a few names a newcomer may not know or may not spell (which AI, which chat app, which service). 2: it can only be answered by choosing between things Helper itself names (W1, RM2). 3: it asks for a Yes before deleting. Every other question carries none and the person types. A question with no answers must read clearly on its own.",
+   "from": "His words, 10 Nov, 20:05: when we give example answers we should not give them all the time, only sometimes. Lead's proposal, checked question by question in content/helper-talk-v2-changes-7.md.",
+   "questions": {
+    "OPEN What's your name?": false,
+    "F1 What do you do?": false,
+    "mem-q What do you want Hermes to remember?": false,
+    "mod-q Do you already pay for ChatGPT or Claude?": true,
+    "msg-q Which chat app do you use most?": true,
+    "sch-q What should Hermes do on a schedule, such as a daily summary?": false,
+    "svc-q Which service should Hermes use, such as Gmail?": true,
+    "bot-q What would a second Hermes do for you?": false,
+    "W1 Which one do you mean?": true,
+    "RM2 Do you mean me, or your own Hermes?": true,
+    "A2 and A4 Delete ...?": true,
+    "settings page: Save, and forget ...?": true
+   }
+  }
  },
  "fixed_lines": [
   {
@@ -190,26 +211,59 @@
   {
    "id": "F2",
    "kind": "reply",
-   "text": "Thanks, {name}. Ask me anything about Hermes, or pick one of these.",
-   "text_no_name": "Thanks. Ask me anything about Hermes, or pick one of these.",
-   "under": "the grey kept line (keeps.tell), then the topic picks (topic_picks)",
-   "answers": "topics",
+   "text": "Thanks, {name}. Ask me anything about Hermes.",
+   "text_no_name": "Thanks. Ask me anything about Hermes.",
+   "under": "the grey kept line (keeps.tell) when something was kept. No topic picks.",
+   "answers": "none",
    "when": "After What do you do?, always. The name and what-you-do that passed the checks are written to storage at this moment (keeps rule 1)."
   },
   {
    "id": "F3",
    "kind": "reply",
-   "text": "That's fine. Ask me anything about Hermes, or pick one of these.",
-   "under": "the grey kept line if a name was given (keeps.tell), then the topic picks (topic_picks)",
-   "answers": "topics",
+   "text": "That's fine. Ask me anything about Hermes.",
+   "under": "the grey kept line if a name was given (keeps.tell). No topic picks.",
+   "answers": "none",
    "when": "Skip pressed at What's your name? or What do you do?. A name given before Skip is written to storage at this moment."
   },
   {
    "id": "N1",
    "kind": "reply",
-   "text": "I don't have a checked answer for that yet. Here is what I can help with.",
-   "under": "the topic picks (topic_picks)",
-   "answers": "topics"
+   "text": "Sorry, I don't have checked information on that yet. I only say what I have checked.",
+   "under": "the grey line N_HINT. No topic picks.",
+   "answers": "none",
+   "when": "No row, no term and no other line fits. True in every case, because it gives no reason. His pick of the three lines is open; this is option 4 of content/helper-dont-know-v1.md."
+  },
+  {
+   "id": "N1a",
+   "kind": "reply",
+   "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
+   "under": "the grey line N_HINT. No topic picks.",
+   "answers": "none",
+   "when": "The message names a skill with skill called NAME, skill named NAME, or a quoted \"NAME\" skill, and NAME is not on content/skills-list-v1.json. Only skills: Helper has no full list of official plugins, so a plugin name gets N1.",
+   "note": "His reason (not official), kept true by using it only when the name is on no official list. His words, 10 Nov 19:30, ended with \"we're working on expanding it\": left out here because it promises updates after the hackathon. His call (Questions for Pēteris)."
+  },
+  {
+   "id": "N1b",
+   "kind": "reply",
+   "text": "Sorry, I leave that one out for now. It is not meant for getting started.",
+   "under": "the grey line N_HINT. No topic picks.",
+   "answers": "none",
+   "status": "ONLY IF HE LEAVES SOME OFFICIAL SKILLS OUT. If he confirms that all official skills stay in, this line is not used.",
+   "when": "The message names, in the same patterns as N1a, a skill whose left_out is true in content/skills-list-v1.json."
+  },
+  {
+   "id": "N_HINT",
+   "kind": "grey",
+   "text": "To see what I can help with, type \"what can I ask you\".",
+   "when": "Small and grey under N1, N1a and N1b, every time. Not a question and nothing to press: the person types it if they want the topics."
+  },
+  {
+   "id": "TP",
+   "kind": "reply",
+   "text": "You can ask me how Hermes works and how to set it up. Pick one, or type your own question.",
+   "under": "the topic picks (topic_picks), four",
+   "answers": "topics",
+   "when": "Only when the person asks what they can ask (asks_for_topics). Nothing else shows the topic picks."
   },
   {
    "id": "W1",
@@ -221,12 +275,14 @@
   {
    "id": "C1",
    "kind": "reply",
-   "text": "Hermes can do jobs on a schedule and use services like Gmail. Pick one, or type what you want.",
-   "under": "the pick labels of the two topics this pick holds: Daily jobs and reminders, Gmail and other services",
-   "answers": "pair",
+   "text": "Hermes can work with the web, files and pictures. It can do jobs on a schedule and use services like Gmail. Pick one.",
+   "under": "four picks, in this order: Web, files, pictures and voice (held_picks.wants), then the pick labels of sch, svc and bot: Daily jobs and reminders, Gmail and other services, More than one Hermes. Two rows of two.",
+   "answers": "held",
    "when": "The pick What Hermes can do is pressed (topic_picks, gives can). Not a question, so the topic's own question may follow it.",
-   "source": "user-guide/features/cron.md line 15; user-guide/features/mcp.md line 13 (the same sources as sch0 and svc0)",
-   "depends_on_his_answer": "which way for the topics"
+   "source": "user-guide/features/tools.md line 17 (web search, file editing); user-guide/features/image-generation.md line 10 (pictures); user-guide/features/cron.md line 15; user-guide/features/mcp.md line 13 (the sources of can0, w_image, sch0, svc0). More than one Hermes is not in the line, only in the picks: user-guide/profiles.md lines 7 and 11 (bot0).",
+   "depends_on_his_answer": "which way for the topics",
+   "text_without_wants": "Hermes can do jobs on a schedule and use services like Gmail. You can also have more than one Hermes. Pick one.",
+   "changed_9": "Was three picks and the text now in text_without_wants. The wants file's five groups sat under the same pick; now they are one tap further, under Web, files, pictures and voice, as four groups."
   },
   {
    "id": "H1",
@@ -665,24 +721,35 @@
   "typed": {
    "about": "What the person can type to Helper about what it keeps (helper-settings-v1.md section 3, A1, A2, A4). Step 1 b, after the key check and the remember step, before the build words and the topics. Whole phrases. No model.",
    "not_when": {
-    "rule": "A2 and A4 do not apply when the message is a question about Hermes: it has a question mark or starts with a question start (opening.question_starts), AND it has one of hermes_words. Then the message goes on as usual (the memory topic). Fix 1 of changes-6.",
+    "rule": "A2 and A4 do not apply when the message is a question about Hermes. That is: it has a question mark or starts with a question start (opening.question_starts), AND either it has one of hermes_words, or it has one of it_words and none of helper_words. Then the message goes on as usual (the memory topic). Whole words. Fix 1 of changes-6, narrowed in changes-8: the it in is it possible ... you know about me does not make it a question about Hermes, because you is Helper.",
     "hermes_words": [
-     "it",
      "hermes",
      "my bot",
      "the bot",
      "my hermes"
     ],
+    "it_words": [
+     "it"
+    ],
+    "helper_words": [
+     "you",
+     "your",
+     "yours"
+    ],
     "examples_go_on": [
      "will it forget everything when I close the window",
      "does hermes forget everything after a chat",
-     "will my bot forget my name"
+     "will my bot forget my name",
+     "does hermes forget everything you tell it",
+     "can I make it forget everything?"
     ],
     "examples_taken": [
      "forget everything",
      "please forget my name",
-     "delete everything you know about me"
-    ]
+     "delete everything you know about me",
+     "is it possible to delete everything you know about me?"
+    ],
+    "known_miss_changes_8": "does it forget everything you tell it? names Hermes only by it and has you, so it gets the delete question (ran: dev/checks/hhcontent-changes-8/out8.txt). Nothing is lost: that question needs a Yes first."
    },
    "see": {
     "id": "A1",
@@ -781,6 +848,209 @@
    "button_under_see": "Open Helper settings",
    "by_hand": "By hand: open \"Settings\", then \"Plugins\", then \"Helper\".",
    "page_lines": "content/helper-settings-v1.md sections 1 and 2"
+  },
+  "settings_file": {
+   "status": "Wanted in this release (his words, 10 Nov 20:05: like memory.md under Helper in Settings). Whether it fits before the deadline is hhtech's and the Builder's to say (hhtech's cut order put it first to go).",
+   "where": "Settings, then Plugins, then Helper (hhtech ran: docs/answers/hhtech-helper-settings.md).",
+   "top_line": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
+   "top_line_2": "Only your name goes to your AI, when you type to Helper.",
+   "top_line_2_note": "Left out in a build that never calls a model.",
+   "box_lines": {
+    "name": {
+     "label": "Name",
+     "reason": "Helper greets you with it"
+    },
+    "mod": {
+     "label": "Paying for an AI",
+     "reason": "so Helper does not ask again",
+     "values": {
+      "ChatGPT": "mod1",
+      "Claude": "mod2",
+      "Neither": "mod4",
+      "Free": "mod3"
+     }
+    },
+    "msg": {
+     "label": "Chat app",
+     "reason": "so Helper shows that app's setup",
+     "values": "keeps.answers.msg.names, written with the app's own spelling"
+    },
+    "svc": {
+     "label": "Service",
+     "reason": "so Helper can write the text to paste",
+     "values": "keeps.answers.svc.names, written with the service's own spelling"
+    },
+    "asked": {
+     "label": "Remember",
+     "reason": "you asked Helper to keep it",
+     "max": 3
+    }
+   },
+   "line_form": "{label}: {value} ({reason})",
+   "order": [
+    "name",
+    "mod",
+    "msg",
+    "svc",
+    "asked"
+   ],
+   "example": [
+    "Name: Peter (Helper greets you with it)",
+    "Paying for an AI: ChatGPT (so Helper does not ask again)",
+    "Chat app: WhatsApp (so Helper shows that app's setup)",
+    "Remember: I only use a Windows laptop (you asked Helper to keep it)"
+   ],
+   "under_box": [
+    "One thing per line. Delete a line to forget it.",
+    "The words in brackets are Helper's reasons. Helper puts them back when you save."
+   ],
+   "empty": "Helper keeps nothing about you yet.",
+   "buttons": [
+    "Save",
+    "Undo changes"
+   ],
+   "read_rule": "See read. Words and reasons: content/helper-settings-edit-v1.md. Reference code and tests: dev/checks/hhcontent-settings-edit/settings_read.py.",
+   "all_or_nothing": "If any line cannot be read, nothing is saved, the box stays exactly as typed, and the message names the first line that failed. A line code cannot read is refused, never kept as unused text.",
+   "cannot_read": "Nothing was saved. Helper could not read line {n}:",
+   "why": {
+    "no_label": "Start it with a word such as Name or Remember, then a colon.",
+    "empty": "Write something after the colon, or delete the line.",
+    "name_value": "A name has letters only, 30 at most.",
+    "mod_value": "After Paying for an AI, write ChatGPT, Claude, Neither or Free.",
+    "msg_value": "Helper knows these chat apps: Telegram, WhatsApp, Discord, Slack, Signal, SMS, Email, Teams, iMessage, Matrix.",
+    "svc_value": "Helper does not know that service. Try one such as Gmail or Notion, or delete the line.",
+    "remember_short": "Write at least two words after Remember.",
+    "remember_long": "Keep it to 15 words and 100 letters or fewer.",
+    "remember_bracket": "Brackets at the end of a line are for Helper's reasons. Leave yours out.",
+    "twice": "There is a {label} line already. Keep one of them.",
+    "same_twice": "This line is there twice. Delete one.",
+    "too_many": "Helper keeps three Remember lines at most. Delete one."
+   },
+   "would_delete": {
+    "question": "Save, and forget {n} things?",
+    "question_one": "Save, and forget one thing?",
+    "answers": [
+     {
+      "label": "Yes, save",
+      "gives": "yes"
+     },
+     {
+      "label": "No",
+      "gives": "no"
+     }
+    ],
+    "when": "Save would remove something that was kept. Not asked when Save only adds or changes."
+   },
+   "saved": "Saved.",
+   "after_save": "The box is shown again from storage, with Helper's reasons put back.",
+   "forget_all": {
+    "label": "Forget all of this",
+    "under": "Deletes everything on this page from this computer. What Hermes itself remembers is not touched.",
+    "question": "Delete everything Helper keeps about you?",
+    "answers": [
+     {
+      "label": "Yes, delete it",
+      "gives": "yes"
+     },
+     {
+      "label": "No",
+      "gives": "no"
+     }
+    ],
+    "with_question": "What was already sent to your AI cannot be taken back.",
+    "after_yes": "Done. Helper keeps nothing about you now.",
+    "shown": "only when something is kept"
+   },
+   "also_tell": "You can also tell Helper. In its conversation, type: forget my name.",
+   "facts": [
+    "Kept as plain text in the Hermes app on this computer.",
+    "Shared by all your bots, each a separate Hermes.",
+    "Removing Helper does not delete it."
+   ],
+   "words_in": "content/helper-settings-v1.md section 1",
+   "buttons_note": "Undo changes puts the box back as it is stored (was Cancel; hhtech ran Undo changes and hhdesign drew it, design/talk-r5/notes.md section 4). Esc inside the box must not close Settings (hhtech-hours-r2.md section 2).",
+   "read": {
+    "write_form": "{label}: {value} ({reason})",
+    "write_rules": [
+     "One line per kept thing, in the order of order; Remember lines in the order they were kept.",
+     "label and reason from box_lines; one space after the colon, one space before the bracket.",
+     "value: the name as stored; for mod the word from box_lines.mod.values (mod1 ChatGPT, mod2 Claude, mod4 Neither, mod3 Free); msg and svc in their own spelling; Remember as stored.",
+     "No empty lines. Nothing kept: the box is empty and shows the grey text empty."
+    ],
+    "steps_on_save": [
+     "1. If the whole text is longer than max_box_chars: refuse with too_much.",
+     "2. Split into lines on line breaks. Lines are numbered from 1, counting empty lines, as the person sees them. A line that is only spaces is skipped.",
+     "3. Go through the lines top to bottom. The first line that fails stops the reading; only that line is named.",
+     "4. Secret check on the whole line as typed: the K1 key patterns, keeps.remember.refuse.words (whole words, any case) and refuse.digits_pattern. Fails: secret_line. The line is not quoted back.",
+     "5. Take off one leading bullet: '-', '*' or the dot sign, with the spaces after it.",
+     "6. Label: the text before the FIRST colon, lower-cased, spaces squeezed to one and trimmed, must be in labels. Fails: no_label. Only a colon counts; 'Name - Pete' and 'Name Pete' fail.",
+     "7. Value: the text after the first colon, trimmed, spaces squeezed. So 'Remember: notes at 10:30' keeps '10:30'.",
+     "8. Reason: for name, mod, msg and svc, if the value ends with a bracket group '( ... )', that last group is taken off, whatever it says. For Remember, it is taken off only when its words are Helper's Remember reason (any case). A Remember value that still ends with ')' after that, and had no Helper reason taken off, fails remember_bracket.",
+     "9. Empty value after that: fails empty.",
+     "10. name, mod, msg, svc: a second line with the same label fails twice (the second line is named).",
+     "11. The value check for that label (value_rules). Fails: that label's why.",
+     "12. Remember: the same words as an earlier Remember line (any case) fail same_twice; a fourth Remember line fails too_many.",
+     "13. All lines read: the new record holds exactly what was read. Nothing else is added and told is kept as it was.",
+     "14. Forget count n = name, mod, msg, svc that were stored and are not in the new record, plus (stored Remember count minus new Remember count) when that is above 0. If n is 1 or more: ask would_delete (question_one for 1). No: nothing saved, box stays as typed. Yes: go on. The question goes away if the text is changed while it shows.",
+     "15. Write. If the new record has no values, remove the whole record, as Forget all does. Read it back and draw the box again from storage with Helper's reasons (write_rules). Show saved."
+    ],
+    "labels": {
+     "name": [
+      "name",
+      "your name",
+      "my name"
+     ],
+     "mod": [
+      "paying for an ai",
+      "paying for ai"
+     ],
+     "msg": [
+      "chat app",
+      "your chat app",
+      "my chat app"
+     ],
+     "svc": [
+      "service",
+      "a service you use",
+      "my service"
+     ],
+     "asked": [
+      "remember",
+      "you asked helper to remember"
+     ]
+    },
+    "labels_note": "Besides Helper's own five labels, the labels of the list in the conversation (keeps.tell.see) and 'my ...', so a line copied from there is read too.",
+    "value_rules": {
+     "name": "1 to 30 characters: letters, spaces, apostrophe, hyphen and full stop only, at least one letter. Kept as typed (spaces squeezed); not re-capitalised.",
+     "mod": "Lower-cased with all spaces taken out, one of chatgpt, claude, neither, free. Gives mod1, mod2, mod4, mod3.",
+     "msg": "Lower-cased, spaces squeezed: a key of keeps.answers.msg.names or one of its values lower-cased. Stored in the value's own spelling (whatsap gives WhatsApp).",
+     "svc": "The same with keeps.answers.svc.names (drive and google drive both give Google Drive).",
+     "asked": "2 to 15 words, at most 100 characters (keeps.remember.limits). Kept as typed (spaces squeezed)."
+    },
+    "max_box_chars": 2000,
+    "quote_max_chars": 60,
+    "messages": {
+     "saved": "Saved.",
+     "cannot_read": "Nothing was saved. Helper could not read line {n}:",
+     "quote": "\"{line}\"",
+     "quote_note": "The line as typed, cut to quote_max_chars with ... added. The box shows no line numbers, so the words are how the person finds it.",
+     "fix": "{why}",
+     "layout": "Three short rows under the box: cannot_read, then quote, then the why. secret_line and too_much are one row on their own.",
+     "secret_line": "Nothing was saved. Line {n} looks like a password, a secret key or a long number. Delete it.",
+     "too_much": "Nothing was saved. That is too much text for Helper's few short lines."
+    }
+   },
+   "tests": "dev/checks/hhcontent-settings-edit/tests.json (run by settings_read.py)",
+   "changed_settings_edit": "10 Nov 2026, 20:45 UTC: read, the new why lines and messages, Undo changes, second under_box line. Account: content/helper-settings-edit-v1.md."
+  },
+  "disclosure_point_11": {
+   "use_now": "no_ai_step",
+   "use_now_note": "Decided for this build (Lead, 10 Nov 20:50, unless Pēteris says otherwise): no AI step reads the conversation. Use no_ai_step in the README, the catalog entry and the pull-request text. The full list of twelve points: content/helper-keeps-v1.md section 7.",
+   "no_ai_step": "11. Nothing you type to Helper is sent to any AI, including the AI your Hermes uses. Helper answers with fixed text, picked by fixed rules on this computer. Of what you type, it keeps only the things in points 2 to 4, in the Hermes app's own storage on this computer. You can see and delete them as point 10 says.",
+   "ai_step": "11. When you type a message to Helper, your message, the last few messages, and your name are sent through Hermes to the AI model your Hermes is set to use. That is usually your main model. Deleting does not take back what was already sent.",
+   "ai_step_status": "ONLY IF A BUILD CALLS A MODEL. Not true of this build. Kept so it can come back.",
+   "true_when": "The Builder's row 6 test passes: the page makes no request when a message is typed, and turnWithModel is not in the built file (docs/build/talk-v2-plan.md row 6). Points 2 to 4 are true when row 3's storage test passes (no other key, nothing in localStorage or cookies besides the plugin's own storage).",
+   "lines_that_go_with_it": "no_ai_step: keeps.tell.first_time_if_no_model_call is the first-time line; keeps.settings_file.top_line_2 is left out. ai_step: keeps.tell.first_time and top_line_2."
   }
  },
  "opening": {
@@ -1033,14 +1303,16 @@
   "my bot"
  ],
  "hermes_words_note": "Used by the weak key words of topic svc: they count only in a question that also has one of these words.",
- "topic_picks_note": "The picks shown under F2, F3 and N1. Five, not six: his rule of 10 Nov. This is way 1 of content/helper-talk-v2-changes-5.md and DEPENDS ON HIS ANSWER; way 2 is topic_picks_way_2. The six topics below, their key words and their questions are unchanged. A typed message still reaches every topic directly. When the wants (content/helper-wants-v1.md) are built, they go under the pick What Hermes can do.",
+ "topic_picks_note": "The picks shown under TP only, and only when the person asks what they can ask. Four since changes-7 (his words: let's not have more than 4). What Hermes can do leads to line C1, which since changes-9 shows four picks: Web, files, pictures and voice (the wants, helper-wants-v1.json), Daily jobs and reminders, Gmail and other services, More than one Hermes. A typed message still reaches every topic and every want directly.",
  "topic_picks": [
   {
    "label": "What Hermes can do",
    "gives": "can",
    "holds": [
+    "wants",
     "sch",
-    "svc"
+    "svc",
+    "bot"
    ],
    "line": "C1"
   },
@@ -1055,10 +1327,6 @@
   {
    "label": "What Hermes remembers",
    "gives": "mem"
-  },
-  {
-   "label": "More than one Hermes",
-   "gives": "bot"
   }
  ],
  "topic_picks_way_2": [
@@ -1066,6 +1334,7 @@
    "label": "What Hermes can do",
    "gives": "can",
    "holds": [
+    "wants",
     "sch",
     "svc"
    ],
@@ -1170,7 +1439,8 @@
    "question": {
     "id": "mem-q",
     "text": "What do you want Hermes to remember?",
-    "answers": [
+    "answers": [],
+    "answers_off_7": [
      {
       "label": "Things about me",
       "gives": "mem1"
@@ -1187,7 +1457,8 @@
       "label": "Work and home, kept apart",
       "gives": "mem4"
      }
-    ]
+    ],
+    "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them."
    },
    "plain": {
     "id": "mem0",
@@ -1770,8 +2041,9 @@
    "weak_key_words": [],
    "question": {
     "id": "sch-q",
-    "text": "What should Hermes do on a schedule?",
-    "answers": [
+    "text": "What should Hermes do on a schedule, such as a daily summary?",
+    "answers": [],
+    "answers_off_7": [
      {
       "label": "Send me a summary",
       "gives": "sch1"
@@ -1788,7 +2060,9 @@
       "label": "Work while I'm away",
       "gives": "sch4"
      }
-    ]
+    ],
+    "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them.",
+    "text_before_7": "What should Hermes do on a schedule?"
    },
    "plain": {
     "id": "sch0",
@@ -2126,7 +2400,8 @@
    "question": {
     "id": "bot-q",
     "text": "What would a second Hermes do for you?",
-    "answers": [
+    "answers": [],
+    "answers_off_7": [
      {
       "label": "A different kind of work",
       "gives": "bot1"
@@ -2139,7 +2414,8 @@
       "label": "Just start a new chat",
       "gives": "bot3"
      }
-    ]
+    ],
+    "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them."
    },
    "plain": {
     "id": "bot0",
@@ -2529,5 +2805,73 @@
    "name",
    "work"
   ]
- }
+ },
+ "changed_7": "10 Nov, 20:10 UTC job, his words in inputs/pb-words-10nov-option4-sometimes.md. 1: no topics are offered; F2 and F3 end at the invitation; the topics show only on request (line TP, asks_for_topics). 2: at most four things to pick anywhere (answers.max_at_once 4); four topic picks, More than one Hermes moved under What Hermes can do (C1 now holds three). 3: answers to pick only under some questions (answers.when_shown); the memory, schedule and second-Hermes questions have none (question.answers empty, old ones in answers_off_7); the schedule question reworded. 4: Helper's settings page as a short file the person edits (keeps.settings_file). 5: N1 is now the don't-know line for everything else, N1a for a skill name on no official list, N1b for a left-out skill (only if he leaves some out); none of them shows topics; the grey line N_HINT under each. Account: content/helper-talk-v2-changes-7.md.",
+ "asks_for_topics": {
+  "id": "TP",
+  "step": "1 c: after the key check (1) and step 1 b (remember on request, A1 to A4), before the build words (2).",
+  "rule": "Cut these from the start of the message, again and again: hey, hi, hello, ok, okay, so, helper, and. Cut ?, !, . and spaces from its end. Then it asks for the topics when it is one of whole_message, or has one of phrases anywhere (whole words), and in both cases has no topic key word, no misspelling and no term key word. Show TP with the topic picks. Stage becomes open, pending is dropped, lastq false. No model call.",
+  "phrases": [
+   "what can i ask",
+   "what should i ask",
+   "what could i ask",
+   "what do i ask",
+   "what else can i ask",
+   "what can you help with",
+   "what can you help me with",
+   "what do you help with",
+   "how can you help",
+   "what can you tell me",
+   "what can you explain",
+   "what do you know",
+   "what can you do",
+   "what are you for",
+   "what topics",
+   "which topics",
+   "what questions",
+   "where do i start",
+   "where should i start",
+   "where to start",
+   "give me ideas",
+   "give me some ideas",
+   "i don't know what to ask",
+   "i dont know what to ask",
+   "not sure what to ask",
+   "no idea what to ask",
+   "show me the topics",
+   "show me topics"
+  ],
+  "whole_message": [
+   "help",
+   "help me",
+   "i need help",
+   "can you help",
+   "can you help me",
+   "topics",
+   "options",
+   "menu",
+   "ideas",
+   "examples",
+   "?"
+  ],
+  "not_when": "what do you know about me and the other A1 key words (keeps.typed.see) are handled at step 1 b first, so they never reach this step.",
+  "examples": {
+   "what can I ask you?": "TP",
+   "help": "TP",
+   "Hey Helper, what do you know?": "TP",
+   "what can you tell me about memory": "the memory topic (a topic key word)",
+   "help me set up telegram": "not TP (not the whole message): build words, H1",
+   "what do you know about me": "A1"
+  }
+ },
+ "topic_picks_way_2_note": "Option 2 for him (changes-7): four picks, memory and a second Hermes merged behind line C2. If he picks it, C1 holds sch and svc again and its text goes back to: Hermes can do jobs on a schedule and use services like Gmail. Pick one, or type what you want.",
+ "held_picks": {
+  "wants": {
+   "label": "Web, files, pictures and voice",
+   "opens": "helper-wants-v1.json topic wants: the question can-q at once, with its four groups as answers",
+   "note": "The only held pick that is not one of the six topics. Its label and target live in helper-wants-v1.json (topic.pick). If the wants are cut from the build, drop wants from holds: C1 then shows three picks and the old C1 text (C1.text_without_wants)."
+  },
+  "note": "changes-9: a held id that is not a topic id is described here. The other held ids are topic ids and show the topic's pick label."
+ },
+ "changed_9": "10 Nov, 20:50 UTC job (content/helper-talk-v2-changes-9.md). 1: one list under What Hermes can do: line C1 shows four picks, Web, files, pictures and voice (new, the wants), Daily jobs and reminders, Gmail and other services, More than one Hermes (topic_picks holds, held_picks). C1 text changed; the old text is C1.text_without_wants. helper-wants-v1.json has four groups (Look something up joined Use the web). 2: keeps.disclosure_point_11, the version for no AI step in use, the AI version kept and marked."
 }

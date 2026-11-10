@@ -2,9 +2,11 @@
 // window on the right.
 // B1 = the page shell; B2 = the "Your setup" cards; B3a = the native pass and narrow windows
 // (src/layout.js); B3 = Setup steps 1-4 from hhcontent's data (src/steps.js); talk v1 = Helper's
-// conversation window (design/talk-r3, version 1 of the speech bubble): the newest sentence in a
-// bubble above the character, the conversation so far above it, answers to pick beside the
-// character. What Helper says is decided by code (src/talk.js) from hhcontent's pre-written lines.
+// conversation window: the newest sentence in a bubble above the character, the conversation so
+// far above it; talk v2 = design/talk-r5 (option 4: the things to pick inside the message box,
+// shown only sometimes), what Helper keeps (src/kept.js) and Helper's settings page
+// (src/settings-page.js). What Helper says is decided by code (src/talk.js) from hhcontent's
+// pre-written lines; there is no AI step.
 // Look: the left side wears Hermes's own UI kit components and the class strings its own screens
 // use (K in src/look.js). Helper's window has the one style sheet of our own (src/talk.css, the T
 // table), put into a <style> element inside our own page.
@@ -22,8 +24,9 @@ import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { freshVisit, turn, pick, pickTopic, press, skip, sayLine, lineFor, openingLine, hintFor } from './talk.js'
-import { Conversation, Bubble, BusyDots, Under, Grip } from './talk-view.js'
+import { laterVisit, turn, pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { cleanKept, keptToStore } from './kept.js'
+import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
 import { makeSetupCards, renderYourSetup } from './setup-tab.js'
 import { layoutFor, clampHelperWidth, RAIL_PX, RAIL_NUMBERS_PX, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
 
@@ -68,7 +71,13 @@ function useOwnSize() {
   return [size, holder.current.ref]
 }
 
-export function makePage(ctx) {
+// opts.settingsPage: Helper's page in Hermes's Settings was registered (src/main.js); then "See what
+// I keep" and "Open Helper settings" open it. opts.pluginId: whose settings page that is.
+export function makePage(ctx, opts = {}) {
+  const settingsPage = !!opts.settingsPage
+  // The documented address of a plugin's settings page (desktop-plugin-sdk.md, "Deep link"),
+  // written out here rather than imported, so the plugin still loads on a Hermes too old to have it.
+  const settingsHref = `/settings?tab=plugins&plugin=${encodeURIComponent(opts.pluginId || 'helper')}`
   // Kept while the plugin is loaded, shared by every mount of the page:
   // busy = how many model calls are running (the character shows busy while it is above 0);
   // clock = which words of Helper's lines are visible (a line is revealed once, then stays whole).
@@ -79,17 +88,42 @@ export function makePage(ctx) {
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
   let lastCheck = null
+  // What Helper keeps about the person: one record in storage under 'kept' (src/kept.js), read
+  // back cleaned. The settings page writes the same record, so it is read again every time the
+  // page is put on screen.
+  const readKept = () => cleanKept(ctx.storage.get('kept', null))
   // The conversation, kept while the plugin is loaded (leaving the page and coming back keeps
   // it). Nothing of it is written anywhere: it is gone when Hermes restarts. visit = what Helper
-  // knows in this visit (src/talk.js); log = what was said, each entry with an id; typed = the
-  // message that led to "Which one do you mean?", kept only while that line is the newest.
+  // knows in this visit (src/talk.js), its `kept` the stored record; log = what was said, each
+  // entry with an id; typed = the message that led to "Which one do you mean?", kept only while
+  // that line is the newest; stored = the record as last written or read.
   let memory = null
   const remembered = () => {
     if (!memory) {
-      memory = { visit: freshVisit('name'), log: [], nextId: 1, typed: '' }
-      memory.log = [helperEntry(openingLine())]
+      const kept = readKept()
+      // a later visit: a kept name means the opening's two questions are not asked again
+      memory = { visit: laterVisit(kept), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)) }
+      memory.log = [helperEntry(openingLine(memory.visit))]
     }
     return memory
+  }
+  // The page is on screen again (Hermes draws it fresh after Settings): the record as stored now.
+  const rereadKept = () => {
+    const m = remembered()
+    const kept = readKept()
+    for (const k of Object.keys(m.visit.kept)) delete m.visit.kept[k]
+    Object.assign(m.visit.kept, kept)
+    m.stored = JSON.stringify(keptToStore(kept))
+  }
+  // After everything the person does: the record is written when it changed, and removed whole
+  // when nothing is left in it (told with it).
+  const writeKept = () => {
+    const next = keptToStore(memory.visit.kept)
+    const text = JSON.stringify(next)
+    if (text === memory.stored) return
+    if (next) ctx.storage.set('kept', next)
+    else ctx.storage.remove('kept')
+    memory.stored = text
   }
   const helperEntry = said => {
     const id = memory.nextId++
@@ -147,6 +181,8 @@ export function makePage(ctx) {
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
     const [folded, setFolded] = useState(false)
+    // Put on screen (again): the stored record may have changed on Helper's settings page.
+    useState(rereadKept)
     const [log, setLog] = useState(() => remembered().log)
     // The person's "reduce motion" setting, watched for changes. With it on the character neither
     // moves nor rises, and every line appears whole: a new line is never "fresh" (say(), below),
@@ -290,14 +326,18 @@ export function makePage(ctx) {
       setLog(old => (memory.log = [...old, ...entries].slice(-LOG_MAX)))
     }
     // Helper's answer to something the person did. shown: the person's side of it, as their message.
+    // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     function answer(result, shown, typed = '') {
       if (!result) return
-      addToLog([shown ? youEntry(shown) : null, helperEntry(lineFor(result, visit, typed))].filter(Boolean))
+      const said = lineFor(result, visit, typed, { settingsPage })
+      writeKept()
+      addToLog([shown ? youEntry(shown) : null, helperEntry(said)].filter(Boolean))
       setFocusAsk(true)
     }
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
     // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
+    // Nothing is sent anywhere: there is no AI step (tests/no-ai-step.test.mjs).
     function send() {
       const typed = draft
       if (!typed.trim()) return
@@ -311,25 +351,47 @@ export function makePage(ctx) {
       answer(result, result.kind === 'K1' ? null : shown, typed)
     }
 
-    // An answer or a topic picked under Helper's line: it becomes the person's message, and Helper
-    // answers at once. The pick goes by its id, never through the key words.
+    // Something picked in the message box: it becomes the person's message, and Helper answers at
+    // once. The pick goes by its id, never through the key words: an answer to a topic question, a
+    // topic under "Which one do you mean?", a topic, "You, Helper" / "My Hermes", or Yes / No under
+    // a delete question.
     function pickAnswer(item) {
-      const result = item.answer ? pick(item.answer[0], item.answer[1], visit) : item.which ? press(item.which, memory.typed, visit) : pickTopic(item.topic, visit)
+      let result
+      if (item.answer) result = pick(item.answer[0], item.answer[1], visit)
+      else if (item.which) result = press(item.which, memory.typed, visit)
+      else if (item.rm) result = rmPick(item.rm, visit)
+      else if (item.forget) result = forgetAnswer(item.forget[0], item.forget[1], visit)
+      else result = pickTopic(item.topic, visit)
       answer(result, item.label)
     }
 
+    // Opens one of Hermes's own screens (a missing door is ignored).
+    function go(to) {
+      try {
+        host.navigate(to)
+      } catch {}
+    }
+
     // A button in a Helper line: text to paste opens under it (and closes again); a part opens
-    // Hermes's own screen; a line makes Helper say one more pre-written line.
+    // Hermes's own screen; a line makes Helper say one more pre-written line; "Open Helper
+    // settings" opens Helper's page in Settings; "Delete all of it" asks first.
     function pressNext(entry) {
       const next = entry.next
       if (!next) return
       if (next.kind === 'paste') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
       if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
-      if (next.kind === 'part') {
-        try {
-          host.navigate(next.to)
-        } catch {}
-      }
+      if (next.kind === 'settings') return go(settingsHref)
+      if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)
+      if (next.kind === 'part') go(next.to)
+    }
+
+    // The links in the faint lines: "See what I keep" opens Helper's settings page (or, where that
+    // page cannot open, shows the list in the conversation); "Change" asks the question again.
+    function pressNote(entry, which) {
+      if (which === 'change' && entry.used) return answer(change(entry.used.topic, visit), entry.used.link)
+      if (which !== 'see' || !entry.note) return
+      if (settingsPage) return go(settingsHref)
+      answer(seeKept(visit), entry.note.link)
     }
 
     // Skip, at "What's your name?" and "What do you do?".
@@ -713,7 +775,7 @@ export function makePage(ctx) {
       'main'
     )
 
-    /* ---------- Helper's conversation window (design/talk-r3, version 1 of the speech bubble) ---------- */
+    /* ---------- Helper's conversation window (design/talk-r5: option 4, the things to pick in the message box) ---------- */
     // The newest thing said is Helper's: it is in the bubble, and everything before it is the
     // conversation so far. (While Helper works on an answer the newest thing is the person's
     // message; then the bubble is the three dots.)
@@ -756,6 +818,8 @@ export function makePage(ctx) {
           className: cx(K.composerSurface, composerSurfaceRing),
           children: [
             jsx('div', { 'aria-hidden': true, className: composerInputBacking }, 'backing'),
+            // the things to pick (talk-r5, option 4): above the line where the person types
+            jsx(Picks, { answers: toPick, open: !!toPick && said, onPick: pickAnswer, width: fit.helperPx }, 'picks'),
             jsxs(
               'div',
               {
@@ -830,9 +894,9 @@ export function makePage(ctx) {
             : undefined,
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
-            jsx(Conversation, { entries: older, onNext: pressNext, scrollRef: helperScroll }, 'conversation'),
+            jsx(Conversation, { entries: older, newest: inBubble, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
             inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { lit: 0 }, 'bubble'),
-            jsx(Under, { character, answers: toPick, said, onPick: pickAnswer }, 'under'),
+            jsx(Under, { character }, 'under'),
             composer
           ]
         },

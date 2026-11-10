@@ -31,9 +31,10 @@ test('what the old helper header stored (side, hidden or closed, chat log) is no
   assert.deepEqual(Object.keys(s).sort(), ['answers', 'helperWidth', 'step', 'tab'])
 })
 
-test('every key the plugin stores is on the allowed list: nothing about the person is written', () => {
-  // The allowed list: the page's own state and the answer to the memory test on Your setup.
-  assert.deepEqual([...STORED_KEYS].sort(), ['answers', 'helperWidth', 'remember', 'step', 'tab'])
+test('every key the plugin stores is on the allowed list: about the person, only the one record of what Helper keeps', () => {
+  // The allowed list: the page's own state, the answer to the memory test on Your setup, and
+  // 'kept', the record of what Helper keeps by fixed rules (src/kept.js; talk v2 row 3).
+  assert.deepEqual([...STORED_KEYS].sort(), ['answers', 'helperWidth', 'kept', 'remember', 'step', 'tab'])
   const dir = path.resolve(import.meta.dirname, '..', 'src')
   const found = new Set()
   let calls = 0
@@ -46,17 +47,23 @@ test('every key the plugin stores is on the allowed list: nothing about the pers
       if (arg === 'key' || arg === 'k') continue
       const literal = arg.match(/^'([\w-]+)'$/)
       assert.ok(literal, `${f}: a storage call whose key is not a plain text: ${m[0]}`)
-      assert.ok(['get', 'set'].includes(m[1]), `${f}: storage.${m[1]}`)
+      // remove only for the record of what Helper keeps: deleting everything removes it whole
+      assert.ok(['get', 'set'].includes(m[1]) || (m[1] === 'remove' && literal[1] === 'kept'), `${f}: storage.${m[1]}(${literal[1]})`)
       found.add(literal[1])
     }
     for (const m of src.matchAll(/\bkeep\(\s*'([\w-]+)'/g)) found.add(m[1])
     // storage is reached in no other way (handed on whole, or under another name)
     const code = src.split('\n').filter(line => !line.trim().startsWith('//')).join('\n')
-    assert.doesNotMatch(code, /\bstorage\b(?!\.(?:get|set)\()/, `${f}: storage reached another way`)
+    assert.doesNotMatch(code, /\bstorage\b(?!\.(?:get|set|remove)\()/, `${f}: storage reached another way`)
+    // and nothing is kept outside the plugin's own storage: no browser storage, no cookies
+    assert.doesNotMatch(code, /localStorage|sessionStorage|indexedDB|document\s*\.\s*cookie|caches\s*\.\s*open|navigator\s*\.\s*storage/, `${f}: storage outside ctx.storage`)
   }
-  assert.ok(calls >= 5, `${calls} storage calls read`)
+  assert.ok(calls >= 8, `${calls} storage calls read`)
   for (const key of found) assert.ok(STORED_KEYS.includes(key), `a stored key that is not on the allowed list: ${key}`)
   for (const key of STORED_KEYS) assert.ok(found.has(key), `on the list but never stored: ${key}`)
+  // the same in the built file Hermes loads
+  const built = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'desktop', 'plugin.js'), 'utf8')
+  assert.doesNotMatch(built, /localStorage|sessionStorage|indexedDB|document\s*\.\s*cookie|caches\s*\.\s*open|navigator\s*\.\s*storage/)
 })
 
 test('answers keep only real options of real steps (an old or made-up id is dropped)', () => {

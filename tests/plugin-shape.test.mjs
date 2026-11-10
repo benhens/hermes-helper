@@ -143,7 +143,9 @@ test('model names, counts and source tags in normal letters: mono is only for te
     assert.doesNotMatch(K[key], /font-mono/, key)
   }
   const mono = Object.entries(K).filter(([, v]) => /font-mono/.test(v)).map(([k]) => k)
-  assert.deepEqual(mono, ['cardPasteText'])
+  // and the text box on Helper's settings page: Hermes's own config-field.tsx draws a JSON value in
+  // mono, and hhdesign drew this box that way (design/talk-r5/settings.html, "like memory.md")
+  assert.deepEqual(mono, ['cardPasteText', 'settingsBox'])
 })
 
 test('header clears Hermes\'s title-bar band, where its window buttons float (top-right corner stays empty)', () => {
@@ -214,8 +216,11 @@ test('buttons are Hermes Button components; bare <button>s only where Hermes use
   // older line's small link are our own shapes from hhdesign's sheet (row 11 of the plan), each a
   // real <button type="button"> wearing a class of the T table and nothing else.
   const own = [...src('talk-view.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (T\.\w+),/g)].map(m => m[1])
-  assert.deepEqual(own.sort(), ['T.answer', 'T.button', 'T.oldLink'])
-  assert.equal([...src('talk-view.js').matchAll(/jsxs?\(\s*'button'/g)].length, 3)
+  // (talk v2: and the links in the faint lines, "See what I keep" and "Change", wearing T.link)
+  assert.deepEqual(own.sort(), ['T.answer', 'T.button', 'T.link', 'T.link', 'T.oldLink'])
+  assert.equal([...src('talk-view.js').matchAll(/jsxs?\(\s*'button'/g)].length, 5)
+  // Helper's settings page uses Hermes's Button only
+  assert.doesNotMatch(src('settings-page.js'), /jsxs?\(\s*'button'/)
 })
 
 test('every codicon named in the code is in the ICONS list (which hermes-checks.sh checks against Hermes)', () => {

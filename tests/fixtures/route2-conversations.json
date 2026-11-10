@@ -1,5 +1,5 @@
 {
- "about": "Written by dev/checks/talk-v1/dump_route2.py from hhcontent's route2.py. Do not edit: make it again.",
+ "about": "Written by dev/checks/talk-v2/dump_route2.py from hhcontent's route2.py. Do not edit: make it again.",
  "conversations": [
   {
    "about_keeping": false,
@@ -2929,7 +2929,7 @@
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "answer picked: mem, Things about me",
+   "name": "answer typed (no picks under mem since changes-7): things about me",
    "stage": "open",
    "steps": [
     {
@@ -2957,9 +2957,11 @@
      "text": "how does memory work?"
     },
     {
-     "do": "pick",
-     "i": 0,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "mem1",
       "topic": "mem"
@@ -2979,7 +2981,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "mem"
+     "text": "things about me"
     }
    ]
   },
@@ -3256,7 +3258,7 @@
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "answer picked, then the need is reused",
+   "name": "answer typed, then the need is reused",
    "stage": "open",
    "steps": [
     {
@@ -3284,9 +3286,11 @@
      "text": "how does memory work?"
     },
     {
-     "do": "pick",
-     "i": 1,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "mem2",
       "topic": "mem"
@@ -3306,7 +3310,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "mem"
+     "text": "what we talked about before"
     },
     {
      "do": "say",
@@ -3412,7 +3416,7 @@
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "topic picked after F2, then an answer",
+   "name": "topic picked under TP, then an answer typed",
    "stage": "open",
    "steps": [
     {
@@ -3437,9 +3441,11 @@
      "topic": "bot"
     },
     {
-     "do": "pick",
-     "i": 2,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "bot3",
       "topic": "bot"
@@ -3459,7 +3465,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "bot"
+     "text": "I just want a new chat"
     }
    ]
   },
@@ -5221,7 +5227,7 @@
    "failed": null,
    "kept": null,
    "kept_after": {},
-   "name": "mem picked: not kept",
+   "name": "mem typed: not kept",
    "stage": "open",
    "steps": [
     {
@@ -5246,9 +5252,11 @@
      "topic": "mem"
     },
     {
-     "do": "pick",
-     "i": 0,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "mem1",
       "topic": "mem"
@@ -5268,7 +5276,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "mem"
+     "text": "things about me"
     }
    ]
   },
@@ -5278,7 +5286,7 @@
    "failed": null,
    "kept": null,
    "kept_after": {},
-   "name": "sch picked: not kept",
+   "name": "sch typed: not kept",
    "stage": "open",
    "steps": [
     {
@@ -5303,9 +5311,11 @@
      "topic": "sch"
     },
     {
-     "do": "pick",
-     "i": 1,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "sch2",
       "topic": "sch"
@@ -5325,7 +5335,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "sch"
+     "text": "remind me of something"
     }
    ]
   },
@@ -5335,7 +5345,7 @@
    "failed": null,
    "kept": null,
    "kept_after": {},
-   "name": "bot picked: not kept",
+   "name": "bot typed: not kept",
    "stage": "open",
    "steps": [
     {
@@ -5360,9 +5370,11 @@
      "topic": "bot"
     },
     {
-     "do": "pick",
-     "i": 2,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "bot3",
       "topic": "bot"
@@ -5382,7 +5394,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "bot"
+     "text": "I just want a new chat"
     }
    ]
   },
@@ -6294,9 +6306,11 @@
      "topic": "mem"
     },
     {
-     "do": "pick",
-     "i": 0,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "mem1",
       "topic": "mem"
@@ -6316,7 +6330,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "mem"
+     "text": "things about me"
     },
     {
      "do": "visit"
@@ -7198,11 +7212,11 @@
   },
   {
    "about_keeping": false,
-   "expect": "C1 picks sch+svc",
+   "expect": "C1 picks wants+sch+svc+bot",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "What Hermes can do: line C1 with two picks",
+   "name": "What Hermes can do: line C1 with four picks (changes-9)",
    "stage": "open",
    "steps": [
     {
@@ -7210,11 +7224,12 @@
      "out": {
       "buttons": [
        "sch",
-       "svc"
+       "svc",
+       "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc",
+     "shown": "C1 picks sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7226,6 +7241,119 @@
       "work": null
      },
      "topic": "can"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question can-q groups web+files+pics+voice",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "then Web, files, pictures and voice: the wants question with four groups (changes-9)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "topic",
+     "out": {
+      "buttons": [
+       "sch",
+       "svc",
+       "bot"
+      ],
+      "kind": "C1"
+     },
+     "shown": "C1 picks sch+svc+bot",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "topic": "can"
+    },
+    {
+     "do": "topic",
+     "out": {
+      "buttons": [
+       "web",
+       "files",
+       "pics",
+       "voice"
+      ],
+      "kind": "can-q"
+     },
+     "shown": "question can-q groups web+files+pics+voice",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "topic": "wants"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question bot",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "then More than one Hermes: its question (changes-9)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "topic",
+     "out": {
+      "buttons": [
+       "sch",
+       "svc",
+       "bot"
+      ],
+      "kind": "C1"
+     },
+     "shown": "C1 picks sch+svc+bot",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "topic": "can"
+    },
+    {
+     "do": "topic",
+     "out": {
+      "kind": "question",
+      "topic": "bot"
+     },
+     "shown": "question bot",
+     "state": {
+      "asked": [
+       "bot"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "name": null,
+      "pending": "bot",
+      "stage": "open",
+      "work": null
+     },
+     "topic": "bot"
     }
    ]
   },
@@ -7243,11 +7371,12 @@
      "out": {
       "buttons": [
        "sch",
-       "svc"
+       "svc",
+       "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc",
+     "shown": "C1 picks sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7289,7 +7418,7 @@
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "then an answer: the row",
+   "name": "then an answer typed: the row",
    "stage": "open",
    "steps": [
     {
@@ -7297,11 +7426,12 @@
      "out": {
       "buttons": [
        "sch",
-       "svc"
+       "svc",
+       "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc",
+     "shown": "C1 picks sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7336,9 +7466,11 @@
      "topic": "sch"
     },
     {
-     "do": "pick",
-     "i": 0,
+     "do": "say",
+     "has_model": false,
+     "model": null,
      "out": {
+      "calls": 0,
       "kind": "row",
       "need": "sch1",
       "topic": "sch"
@@ -7358,7 +7490,7 @@
       "stage": "open",
       "work": null
      },
-     "topic": "sch"
+     "text": "send me a summary"
     }
    ]
   },
@@ -7378,11 +7510,12 @@
      "out": {
       "buttons": [
        "sch",
-       "svc"
+       "svc",
+       "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc",
+     "shown": "C1 picks sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7514,16 +7647,492 @@
      "text": "can you book me a flight?"
     }
    ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "F2 name=Peter work=I run a tennis club +kept=name +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "F2 offers nothing to pick",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "F1",
+      "name": "Peter"
+     },
+     "shown": "F1 name=Peter",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": "Peter",
+      "pending": null,
+      "stage": "work",
+      "work": null
+     },
+     "text": "Peter"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "name"
+      ],
+      "kind": "F2",
+      "name": "Peter",
+      "work": "I run a tennis club"
+     },
+     "shown": "F2 name=Peter work=I run a tennis club +kept=name +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "name": "Peter",
+      "pending": null,
+      "stage": "open",
+      "work": "I run a tennis club"
+     },
+     "text": "I run a tennis club"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "TP",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "what can I ask you?",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "TP"
+     },
+     "shown": "TP",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what can I ask you?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "TP",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "help",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "TP"
+     },
+     "shown": "TP",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "help"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "TP",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "Hey Helper, what do you know?",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "TP"
+     },
+     "shown": "TP",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "Hey Helper, what do you know?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "TP",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "what can you help me with",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "TP"
+     },
+     "shown": "TP",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what can you help me with"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "TP",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "i don't know what to ask",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "TP"
+     },
+     "shown": "TP",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "i don't know what to ask"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question mem",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "what can you tell me about memory: the topic, not TP",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "what can you tell me about memory"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line msg1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "help me set up telegram: not TP (it is not the whole message)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "msg1",
+      "topic": "msg"
+     },
+     "shown": "line msg1",
+     "state": {
+      "asked": [],
+      "found": {
+       "msg": "msg1"
+      },
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "help me set up telegram"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "TP",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "what can I ask you? at the name question",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "TP"
+     },
+     "shown": "TP",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what can I ask you?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question msg",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "TP, then a topic picked: its question",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "TP"
+     },
+     "shown": "TP",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what can I ask you?"
+    },
+    {
+     "do": "topic",
+     "out": {
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "topic": "msg"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "don't know, everything else",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can you book me a flight?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1a",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "don't know, a skill on no list",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1a"
+     },
+     "shown": "N1a",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "is there a skill called \"zorbo\""
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "don't know, weather",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is the weather like?"
+    }
+   ]
   }
  ],
- "json_sha256": "d23871cede89a358deb887c0337f8b2cc383774e8d3479b8b0d19afcc7d5fb11",
+ "json_sha256": "1a78abb01ab209f6915c8b2e2cda1ea4aa956ac55887d7a37511d54da8d61a39",
  "keeps_off": false,
  "last_printed_lines": [
-  "answers to pick: 23 of 23 give a row of their own topic",
+  "answers to pick: 12 of 12 give a row of their own topic",
   "",
-  "conversations: 141 of 141 as expected"
+  "conversations: 155 of 156 as expected"
  ],
- "route2_sha256": "88808bff917f3a89b9c17612cac3ac085b7e911cbeceebf667fc316a8a3c5efe",
+ "no_wants": true,
+ "route2_sha256": "33a98ecfe8242d5ca8d4767a3b777093462f5493f716a22b8744d992c7c406d1",
  "singles": [
   {
    "landed": "mem",

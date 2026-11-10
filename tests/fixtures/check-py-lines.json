@@ -31,30 +31,58 @@
   },
   {
    "id": "F2",
-   "text": "Thanks, {name}. Ask me anything about Hermes, or pick one of these.",
+   "text": "Thanks, {name}. Ask me anything about Hermes.",
    "kind": "reply",
-   "words": 12,
+   "words": 7,
    "found": []
   },
   {
    "id": "F2-no-name",
-   "text": "Thanks. Ask me anything about Hermes, or pick one of these.",
+   "text": "Thanks. Ask me anything about Hermes.",
    "kind": "reply",
-   "words": 11,
+   "words": 6,
    "found": []
   },
   {
    "id": "F3",
-   "text": "That's fine. Ask me anything about Hermes, or pick one of these.",
+   "text": "That's fine. Ask me anything about Hermes.",
    "kind": "reply",
-   "words": 12,
+   "words": 7,
    "found": []
   },
   {
    "id": "N1",
-   "text": "I don't have a checked answer for that yet. Here is what I can help with.",
+   "text": "Sorry, I don't have checked information on that yet. I only say what I have checked.",
    "kind": "reply",
    "words": 16,
+   "found": []
+  },
+  {
+   "id": "N1a",
+   "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "N1b",
+   "text": "Sorry, I leave that one out for now. It is not meant for getting started.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "N_HINT",
+   "text": "To see what I can help with, type \"what can I ask you\".",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "TP",
+   "text": "You can ask me how Hermes works and how to set it up. Pick one, or type your own question.",
+   "kind": "reply",
+   "words": 20,
    "found": []
   },
   {
@@ -66,9 +94,9 @@
   },
   {
    "id": "C1",
-   "text": "Hermes can do jobs on a schedule and use services like Gmail. Pick one, or type what you want.",
+   "text": "Hermes can do jobs on a schedule and use services like Gmail. You can also have more than one Hermes. Pick one.",
    "kind": "reply",
-   "words": 19,
+   "words": 22,
    "found": []
   },
   {
@@ -83,6 +111,377 @@
    "text": "That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat.",
    "kind": "reply",
    "words": 20,
+   "found": []
+  },
+  {
+   "id": "RM1",
+   "text": "Done. It is on your list now. I do not act on it, and your Hermes is not told.",
+   "kind": "reply",
+   "words": 19,
+   "found": []
+  },
+  {
+   "id": "RM2",
+   "text": "Do you mean me, or your own Hermes?",
+   "kind": "question",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "RM3",
+   "text": "Tell me what to keep. Start with: remember that.",
+   "kind": "reply",
+   "words": 9,
+   "found": []
+  },
+  {
+   "id": "RM4",
+   "text": "I keep three such things at most. Delete one first, then ask again.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "RM5",
+   "text": "That is too long for me to keep. Try it in 15 words or fewer.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "RM6",
+   "text": "That looks like a password or a private number. I did not keep it.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "A2-name",
+   "text": "Delete your name?",
+   "kind": "question",
+   "words": 3,
+   "found": []
+  },
+  {
+   "id": "A2-mod",
+   "text": "Delete what you told me about paying?",
+   "kind": "question",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "A2-msg",
+   "text": "Delete your chat app?",
+   "kind": "question",
+   "words": 4,
+   "found": []
+  },
+  {
+   "id": "A2-svc",
+   "text": "Delete the service you named?",
+   "kind": "question",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "A2-asked",
+   "text": "Delete all you asked me to remember?",
+   "kind": "question",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "A2-after-yes",
+   "text": "Done. I no longer keep that.",
+   "kind": "reply",
+   "words": 6,
+   "found": []
+  },
+  {
+   "id": "A2-after-no",
+   "text": "Fine. Nothing is changed.",
+   "kind": "reply",
+   "words": 4,
+   "found": []
+  },
+  {
+   "id": "A2-nothing",
+   "text": "I keep nothing like that, so there is nothing to delete.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "A1",
+   "text": "This is all I keep about you.",
+   "kind": "reply",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "A1-none",
+   "text": "I keep nothing about you yet.",
+   "kind": "reply",
+   "words": 6,
+   "found": []
+  },
+  {
+   "id": "A4",
+   "text": "Delete everything I keep about you?",
+   "kind": "question",
+   "words": 6,
+   "found": []
+  },
+  {
+   "id": "A4-after-yes",
+   "text": "Done. I keep nothing about you now. What Hermes itself remembers is not touched.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "A4-after-no",
+   "text": "Fine. Nothing is changed.",
+   "kind": "reply",
+   "words": 4,
+   "found": []
+  },
+  {
+   "id": "kept-line",
+   "text": "Kept: {kept_words}.",
+   "kind": "reply",
+   "words": 2,
+   "found": []
+  },
+  {
+   "id": "kept-first",
+   "text": "I keep this in the Hermes app on this computer. Nothing is sent to us.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "used-line",
+   "text": "From what I keep: {kept_words}.",
+   "kind": "reply",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "by-hand",
+   "text": "By hand: open \"Settings\", then \"Plugins\", then \"Helper\".",
+   "kind": "reply",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "settings-top",
+   "text": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "settings-under-1",
+   "text": "One thing per line. Delete a line to forget it.",
+   "kind": "reply",
+   "words": 10,
+   "found": []
+  },
+  {
+   "id": "settings-under-2",
+   "text": "The words in brackets are Helper's reasons. Helper puts them back when you save.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "settings-empty",
+   "text": "Helper keeps nothing about you yet.",
+   "kind": "reply",
+   "words": 6,
+   "found": []
+  },
+  {
+   "id": "settings-cannot-read",
+   "text": "Nothing was saved. Helper could not read line {n}:",
+   "kind": "reply",
+   "words": 9,
+   "found": []
+  },
+  {
+   "id": "settings-why-no_label",
+   "text": "Start it with a word such as Name or Remember, then a colon.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "settings-why-empty",
+   "text": "Write something after the colon, or delete the line.",
+   "kind": "reply",
+   "words": 9,
+   "found": []
+  },
+  {
+   "id": "settings-why-name_value",
+   "text": "A name has letters only, 30 at most.",
+   "kind": "reply",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "settings-why-mod_value",
+   "text": "After Paying for an AI, write ChatGPT, Claude, Neither or Free.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "settings-why-msg_value",
+   "text": "Helper knows these chat apps: Telegram, WhatsApp, Discord, Slack, Signal, SMS, Email, Teams, iMessage, Matrix.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "settings-why-svc_value",
+   "text": "Helper does not know that service. Try one such as Gmail or Notion, or delete the line.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "settings-why-remember_short",
+   "text": "Write at least two words after Remember.",
+   "kind": "reply",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "settings-why-remember_long",
+   "text": "Keep it to 15 words and 100 letters or fewer.",
+   "kind": "reply",
+   "words": 10,
+   "found": []
+  },
+  {
+   "id": "settings-why-remember_bracket",
+   "text": "Brackets at the end of a line are for Helper's reasons. Leave yours out.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "settings-why-twice",
+   "text": "There is a {label} line already. Keep one of them.",
+   "kind": "reply",
+   "words": 10,
+   "found": []
+  },
+  {
+   "id": "settings-why-same_twice",
+   "text": "This line is there twice. Delete one.",
+   "kind": "reply",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "settings-why-too_many",
+   "text": "Helper keeps three Remember lines at most. Delete one.",
+   "kind": "reply",
+   "words": 9,
+   "found": []
+  },
+  {
+   "id": "settings-forget-n",
+   "text": "Save, and forget {n} things?",
+   "kind": "question",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "settings-forget-one",
+   "text": "Save, and forget one thing?",
+   "kind": "question",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "settings-saved",
+   "text": "Saved.",
+   "kind": "reply",
+   "words": 1,
+   "found": []
+  },
+  {
+   "id": "settings-forget-all-under",
+   "text": "Deletes everything on this page from this computer. What Hermes itself remembers is not touched.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "settings-forget-all",
+   "text": "Delete everything Helper keeps about you?",
+   "kind": "question",
+   "words": 6,
+   "found": []
+  },
+  {
+   "id": "settings-forget-all-with",
+   "text": "What was already sent to your AI cannot be taken back.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "settings-forget-all-after",
+   "text": "Done. Helper keeps nothing about you now.",
+   "kind": "reply",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "settings-also-tell",
+   "text": "You can also tell Helper. In its conversation, type: forget my name.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "settings-fact-1",
+   "text": "Kept as plain text in the Hermes app on this computer.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "settings-fact-2",
+   "text": "Shared by all your bots, each a separate Hermes.",
+   "kind": "reply",
+   "words": 9,
+   "found": []
+  },
+  {
+   "id": "settings-fact-3",
+   "text": "Removing Helper does not delete it.",
+   "kind": "reply",
+   "words": 6,
+   "found": []
+  },
+  {
+   "id": "settings-secret-line",
+   "text": "Nothing was saved. Line {n} looks like a password, a secret key or a long number. Delete it.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "settings-too-much",
+   "text": "Nothing was saved. That is too much text for Helper's few short lines.",
+   "kind": "reply",
+   "words": 13,
    "found": []
   },
   {
@@ -206,9 +605,9 @@
   },
   {
    "id": "sch-q",
-   "text": "What should Hermes do on a schedule?",
+   "text": "What should Hermes do on a schedule, such as a daily summary?",
    "kind": "question",
-   "words": 7,
+   "words": 12,
    "found": []
   },
   {

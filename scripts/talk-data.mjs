@@ -66,7 +66,62 @@ export function checkLine(line, kind = 'reply') {
 
 const NEXT_KINDS = ['part', 'paste', 'line', 'none']
 // The fixed lines the code says, and which of them show things to pick.
-export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'W1', 'C1', 'H1', 'K1']
+export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'K1']
+// Row 5 of docs/build/talk-v2-plan.md (the wants: "Web, files, pictures and voice" under C1) is not
+// in this build. held_picks.note: then the held picks that are not topics are dropped, and C1 says
+// its text_without_wants.
+export const WANTS_BUILT = false
+const C1_TEXT = f => (f.id === 'C1' && !WANTS_BUILT && f.text_without_wants ? f.text_without_wants : f.text)
+const heldOf = (d, p) => (p.holds || []).filter(x => WANTS_BUILT || !(d.held_picks || {})[x])
+
+// Helper's own lines about what it keeps (keeps): [id, kind, text]. They name no docs page, so
+// they need no source; the word rules apply to them as to every line.
+function keepLines(d) {
+  const K = d.keeps || {}
+  const out = []
+  const add = (id, text, kind = 'reply') => text && out.push([id, kind, text])
+  for (const l of (K.remember && K.remember.lines) || []) add(l.id, l.text, l.kind === 'question' ? 'question' : 'reply')
+  const T = K.typed || {}
+  const one = T.forget_one || {}
+  for (const [what, q] of Object.entries(one.questions || {})) add('A2-' + what, q, 'question')
+  add('A2-after-yes', one.after_yes)
+  add('A2-after-no', one.after_no)
+  add('A2-nothing', one.nothing_kept)
+  const tell = K.tell || {}
+  const see = tell.see || {}
+  add('A1', see.see_line)
+  add('A1-none', see.see_line_nothing)
+  const all = see.delete_all || {}
+  add('A4', all.question, 'question')
+  add('A4-after-yes', all.after_yes)
+  add('A4-after-no', all.after_no)
+  add('kept-line', tell.kept_line)
+  add('kept-first', tell.first_time_if_no_model_call)
+  add('used-line', K.use && K.use.used_line)
+  const after = K.after_settings_page_exists || {}
+  add('by-hand', after.by_hand)
+  const S = K.settings_file || {}
+  add('settings-top', S.top_line)
+  ;(S.under_box || []).forEach((x, i) => add('settings-under-' + (i + 1), x))
+  add('settings-empty', S.empty)
+  add('settings-cannot-read', S.cannot_read)
+  for (const [k, x] of Object.entries(S.why || {})) add('settings-why-' + k, x)
+  const wd = S.would_delete || {}
+  add('settings-forget-n', wd.question, 'question')
+  add('settings-forget-one', wd.question_one, 'question')
+  add('settings-saved', S.saved)
+  const fa = S.forget_all || {}
+  add('settings-forget-all-under', fa.under)
+  add('settings-forget-all', fa.question, 'question')
+  add('settings-forget-all-with', fa.with_question)
+  add('settings-forget-all-after', fa.after_yes)
+  add('settings-also-tell', S.also_tell)
+  ;(S.facts || []).forEach((x, i) => add('settings-fact-' + (i + 1), x))
+  const M = (S.read && S.read.messages) || {}
+  add('settings-secret-line', M.secret_line)
+  add('settings-too-much', M.too_much)
+  return out
+}
 
 // Every pre-written line the plugin can say: [id, kind, text, has a source].
 export function talkLines(d) {
@@ -77,9 +132,10 @@ export function talkLines(d) {
   }
   for (const f of d.fixed_lines || []) {
     if (!FIXED_USED.includes(f.id)) continue
-    add(f.id, f.text, f.kind)
+    add(f.id, C1_TEXT(f), f.kind === 'grey' ? 'reply' : f.kind)
     if (f.text_no_name) add(f.id + '-no-name', f.text_no_name, f.kind)
   }
+  for (const [id, kind, text] of keepLines(d)) add(id, text, kind)
   for (const t of d.topics || []) {
     add(t.question.id, t.question.text, 'question')
     add(t.plain.id, t.plain.text, 'reply', !!t.plain.source)
@@ -98,18 +154,40 @@ export function talkLines(d) {
   return lines
 }
 
-// Every list of things a person can be shown to pick from: [name, how many].
+// Every list of things a person can be shown to pick from: [name, how many]. (W1's list is cut to
+// max_at_once by the code.)
 export function pickLists(d) {
   const lists = [['the topic picks', (d.topic_picks || []).length]]
   for (const p of d.topic_picks || []) if (p.holds) lists.push([`the picks under "${p.label}"`, p.holds.length])
   for (const t of d.topics || []) lists.push([`the answers under ${t.question.id}`, (t.question.answers || []).length])
+  const K = d.keeps || {}
+  for (const l of (K.remember && K.remember.lines) || []) if (l.answers) lists.push([`the answers under ${l.id}`, l.answers.length])
+  const T = K.typed || {}
+  if (T.forget_one) lists.push(['the answers under A2', (T.forget_one.answers || []).length])
+  const all = K.tell && K.tell.see && K.tell.see.delete_all
+  if (all) lists.push(['the answers under A4', (all.answers || []).length])
+  const S = K.settings_file || {}
+  if (S.would_delete) lists.push(['the answers under "Save, and forget"', (S.would_delete.answers || []).length])
+  if (S.forget_all) lists.push(['the answers under "Forget all of this"', (S.forget_all.answers || []).length])
   return lists
 }
+
+// His words of 10 Nov, 20:05: never more than four things to pick at once.
+export const MAX_TO_PICK = 4
 
 export function talkProblems(d) {
   const problems = []
   const cap = d.answers && d.answers.max_at_once
-  if (cap !== 5) problems.push(`answers.max_at_once is ${cap}, the rule is five`)
+  if (cap !== MAX_TO_PICK) problems.push(`answers.max_at_once is ${cap}, the rule is four`)
+  // answers to pick only under the questions that carry them (answers.when_shown)
+  const shown = (d.answers && d.answers.when_shown && d.answers.when_shown.questions) || {}
+  const carries = Object.fromEntries(Object.entries(shown).map(([k, v]) => [k.split(' ')[0], v]))
+  for (const t of d.topics || []) {
+    const n = (t.question.answers || []).length
+    if (!(t.question.id in carries)) problems.push(`${t.question.id}: not in answers.when_shown`)
+    else if (carries[t.question.id] && !n) problems.push(`${t.question.id}: no answers to pick, but when_shown says it carries them`)
+    else if (!carries[t.question.id] && n) problems.push(`${t.question.id}: answers to pick, but when_shown says it carries none`)
+  }
   const ids = new Set()
   for (const l of talkLines(d)) {
     if (ids.has(l.id)) problems.push(`line id twice: ${l.id}`)
@@ -120,12 +198,11 @@ export function talkProblems(d) {
     for (const x of found) problems.push(`${l.id}: ${x}`)
   }
   for (const id of FIXED_USED) if (!(d.fixed_lines || []).some(f => f.id === id)) problems.push(`fixed line ${id} is missing`)
-  for (const [name, count] of pickLists(d)) if (count > 5) problems.push(`over five to pick at once: ${name} has ${count}`)
+  for (const [name, count] of pickLists(d)) if (count > MAX_TO_PICK) problems.push(`over four to pick at once: ${name} has ${count}`)
   const topicIds = (d.topics || []).map(t => t.id)
   for (const t of d.topics || []) {
     const needIds = t.needs.map(n => n.id)
     const answers = t.question.answers || []
-    if (!answers.length) problems.push(`${t.question.id}: no answers to pick`)
     for (const a of answers) if (!needIds.includes(a.gives)) problems.push(`${t.question.id}: the answer "${a.label}" gives ${a.gives}, which is not a need of ${t.id}`)
     for (const n of [t.plain, ...t.needs]) {
       const k = n.next && n.next.kind
@@ -135,9 +212,10 @@ export function talkProblems(d) {
     }
   }
   for (const t of d.terms || []) if (!NEXT_KINDS.includes(t.next && t.next.kind)) problems.push(`term ${t.id}: button of an unknown kind`)
-  const reach = (d.topic_picks || []).flatMap(p => p.holds || [p.gives]).sort()
+  const reach = (d.topic_picks || []).flatMap(p => (p.holds ? heldOf(d, p) : [p.gives])).sort()
   if (reach.join() !== [...topicIds].sort().join()) problems.push(`the topic picks do not reach every topic exactly once: ${reach.join(' ')}`)
   for (const p of d.topic_picks || []) {
+    for (const x of p.holds || []) if (!topicIds.includes(x) && !(d.held_picks || {})[x]) problems.push(`the pick "${p.label}" holds ${x}, which is not a topic`)
     if (p.holds && !(d.fixed_lines || []).some(f => f.id === p.line)) problems.push(`the pick "${p.label}" names a line that is missing: ${p.line}`)
     const t = (d.topics || []).find(x => x.id === p.gives)
     if (!p.holds && t && t.pick.label !== p.label) problems.push(`the pick for ${p.gives} is labelled differently from the topic's own pick`)
@@ -147,10 +225,57 @@ export function talkProblems(d) {
 
 const pickKeys = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undefined).map(k => [k, o[k]]))
 const slimNext = n => (n ? pickKeys(n, ['kind', 'label', 'part', 'paste_text', 'id', 'text', 'source']) : { kind: 'none' })
+const slimAnswers = list => (list || []).map(a => pickKeys(a, ['label', 'gives']))
 
-export function slimTalkData(d) {
+// What src/talk.js and the settings page read of keeps: the rules as data, Helper's lines and the
+// settings page's words. The notes, the reasons and the version for a build that calls a model
+// (first_time, top_line_2) stay out.
+function slimKeeps(K) {
+  const S = K.settings_file
+  return {
+    answers: {
+      mod: { values: K.answers.mod.values.map(v => pickKeys(v, ['need', 'value', 'typed_words', 'typed_not_with_unsure_words'])) },
+      msg: { names: K.answers.msg.names },
+      svc: { names: K.answers.svc.names }
+    },
+    things: K.things.map(t => pickKeys(t, ['id', 'kept_words'])),
+    use: { used_line: K.use.used_line, used_link: { words: K.use.used_link.words } },
+    tell: {
+      kept_line: K.tell.kept_line,
+      first_time_if_no_model_call: K.tell.first_time_if_no_model_call,
+      link: { words: K.tell.link.words },
+      see: {
+        ...pickKeys(K.tell.see, ['see_line', 'see_line_nothing']),
+        delete_all: { ...pickKeys(K.tell.see.delete_all, ['label', 'question', 'after_yes', 'after_no']), answers: slimAnswers(K.tell.see.delete_all.answers) },
+        rows: pickKeys(K.tell.see.rows, ['name', 'mod', 'msg', 'svc', 'asked'])
+      }
+    },
+    remember: {
+      ...pickKeys(K.remember, ['lead_ins', 'request_starts', 'thing_starts_at_last_word', 'limits']),
+      refuse: pickKeys(K.remember.refuse, ['words', 'digits_pattern']),
+      unsure: pickKeys(K.remember.unsure, ['about', 'said_to']),
+      lines: K.remember.lines.map(l => ({ ...pickKeys(l, ['id', 'kind', 'text']), ...(l.answers ? { answers: slimAnswers(l.answers) } : {}) }))
+    },
+    typed: {
+      not_when: pickKeys(K.typed.not_when, ['hermes_words', 'it_words', 'helper_words']),
+      see: { key_words: K.typed.see.key_words },
+      forget_one: { ...pickKeys(K.typed.forget_one, ['key_words', 'questions', 'after_yes', 'after_no', 'nothing_kept']), answers: slimAnswers(K.typed.forget_one.answers) },
+      forget_all: { key_words: K.typed.forget_all.key_words }
+    },
+    after_settings_page_exists: pickKeys(K.after_settings_page_exists, ['button_under_see', 'by_hand']),
+    settings_file: {
+      ...pickKeys(S, ['top_line', 'box_lines', 'order', 'under_box', 'empty', 'buttons', 'cannot_read', 'why', 'saved', 'also_tell', 'facts']),
+      would_delete: { ...pickKeys(S.would_delete, ['question', 'question_one']), answers: slimAnswers(S.would_delete.answers) },
+      forget_all: { ...pickKeys(S.forget_all, ['label', 'under', 'question', 'with_question', 'after_yes']), answers: slimAnswers(S.forget_all.answers) },
+      read: { ...pickKeys(S.read, ['labels', 'max_box_chars', 'quote_max_chars']), messages: pickKeys(S.read.messages, ['saved', 'cannot_read', 'quote', 'secret_line', 'too_much']) }
+    }
+  }
+}
+
+// skills: content/skills-list-v1.json (the official skills), for the don't-know lines N1a and N1b.
+export function slimTalkData(d, skills = { skills: [] }) {
   const fixed = {}
-  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = pickKeys(f, ['kind', 'text', 'text_no_name', 'answers', 'paste_text', 'source'])
+  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source']), text: C1_TEXT(f) }
   return {
     docs_version: d.docs_version,
     limits: pickKeys(d.limits, ['request_chars_in_paste', 'service_chars_in_paste']),
@@ -165,23 +290,25 @@ export function slimTalkData(d) {
     unsure_words: d.unsure_words,
     chat_apps: d.chat_apps,
     hermes_words: d.hermes_words,
-    topic_picks: d.topic_picks.map(p => pickKeys(p, ['label', 'gives', 'holds', 'line'])),
+    asks_for_topics: pickKeys(d.asks_for_topics, ['phrases', 'whole_message']),
+    topic_picks: d.topic_picks.map(p => ({ ...pickKeys(p, ['label', 'gives', 'line']), ...(p.holds ? { holds: heldOf(d, p) } : {}) })),
     topics: d.topics.map(t => ({
-      ...pickKeys(t, ['id', 'part', 'part_if_no_memory_part', 'model_hint', 'key_words', 'misspellings', 'weak_key_words', 'weak_only_in_question_about_hermes']),
+      ...pickKeys(t, ['id', 'part', 'part_if_no_memory_part', 'key_words', 'misspellings', 'weak_key_words', 'weak_only_in_question_about_hermes']),
       pick: pickKeys(t.pick, ['label']),
-      question: { id: t.question.id, text: t.question.text, answers: t.question.answers.map(a => pickKeys(a, ['label', 'gives', 'service'])) },
+      question: { id: t.question.id, text: t.question.text, answers: (t.question.answers || []).map(a => pickKeys(a, ['label', 'gives', 'service'])) },
       plain: { ...pickKeys(t.plain, ['id', 'text', 'source']), next: slimNext(t.plain.next) },
       needs: t.needs.map(n => ({
-        ...pickKeys(n, ['id', 'model_hint', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'service_names', 'text', 'source']),
+        ...pickKeys(n, ['id', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'service_names', 'text', 'source']),
         next: slimNext(n.next)
       }))
     })),
-    terms: d.terms.map(t => ({ ...pickKeys(t, ['id', 'label', 'model_hint', 'key_words', 'text', 'source']), next: slimNext(t.next) })),
+    terms: d.terms.map(t => ({ ...pickKeys(t, ['id', 'label', 'key_words', 'text', 'source']), next: slimNext(t.next) })),
     parts: {
       model: { navigate: d.parts.model.hermes_button.navigate },
       messaging: { navigate: d.parts.messaging.hermes_button.navigate },
       bots: { where_line: pickKeys(d.parts.bots.where_line, ['id', 'text', 'source']) }
     },
-    model: pickKeys(d.model, ['max_tokens', 'topic_ids', 'fields'])
+    keeps: slimKeeps(d.keeps),
+    skills: (skills.skills || []).map(s => (s.left_out ? { name: s.name, left_out: true } : { name: s.name }))
   }
 }

@@ -157,7 +157,21 @@ export const K = {
   cardPaste: 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5',
   cardPasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
   cardList: 'list-decimal space-y-1 pl-4 text-[0.72rem] leading-snug text-(--ui-text-secondary)',
-  pageActions: 'flex flex-wrap items-center gap-2 pt-1'
+  pageActions: 'flex flex-wrap items-center gap-2 pt-1',
+
+  // ---- Helper's page in Hermes's Settings (src/settings-page.js): Hermes's settings rows (ListRow
+  // in app/settings/primitives.tsx), the text box as config-field.tsx draws a JSON value (mono,
+  // min-h-28, resize-y) and ListRow's own description tone for every small line ----
+  settingsPage: 'flex min-w-0 flex-col gap-2',
+  settingsBelow: 'mt-3 flex min-w-0 flex-col gap-2',
+  settingsBox: 'min-h-28 resize-y bg-background font-mono text-xs',
+  settingsHint: 'text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)',
+  settingsText: 'text-[length:var(--conversation-text-font-size)] font-medium text-foreground',
+  settingsMessage: 'text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-secondary)',
+  settingsAsk: 'flex flex-wrap items-center gap-2',
+  settingsButtons: 'flex flex-wrap items-center gap-2',
+  settingsFacts: 'flex flex-col gap-1 py-3 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)',
+  settingsForget: 'flex flex-col items-start gap-2 py-3'
 }
 
 // Joins class names, skipping empty ones. Only K and T values go in.
@@ -202,6 +216,14 @@ export const T = {
   character: 'hh-char',
   answers: 'hh-answers',
   answer: 'hh-answer',
+  // the things to pick inside the message box (talk-r5), growing and shrinking
+  picks: 'hh-picks',
+  // the faint lines: what was kept, what is used; the first-time line on a line of its own
+  note: 'hh-note',
+  noteFirst: 'hh-note-first',
+  link: 'hh-link',
+  // the list of what Helper keeps (A1)
+  rows: 'hh-rows',
   // held room: there, not seen yet
   wait: 'hh-wait',
   skip: 'hh-link hh-skip',

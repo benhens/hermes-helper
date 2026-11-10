@@ -1,12 +1,13 @@
 // The build's checks on hhcontent's talk data (scripts/talk-data.mjs): the build stops, and writes
 // nothing, on a line with no source, a line over hhcontent's limits, an answer that gives a need of
-// another topic, or any list of things to pick longer than five. Each is shown to bite on a copy
+// another topic, any list of things to pick longer than four, or answers under a question that
+// carries none. Each is shown to bite on a copy
 // of the data broken on purpose. The line rules are compared with hhcontent's own check.py.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import { checkLine, talkLines, talkProblems, slimTalkData, pickLists, FIXED_USED } from '../scripts/talk-data.mjs'
+import { checkLine, talkLines, talkProblems, slimTalkData, pickLists, FIXED_USED, WANTS_BUILT } from '../scripts/talk-data.mjs'
 import { talkDataSource } from '../scripts/build.mjs'
 import { TALK_DATA } from '../src/talk-data.js'
 
@@ -23,7 +24,7 @@ const topic = (d, id) => d.topics.find(t => t.id === id)
 test('the data as copied has no problem, and the built data file is what the build makes from it', () => {
   assert.deepEqual(talkProblems(read()), [])
   assert.equal(fs.readFileSync(path.join(ROOT, 'src/talk-data.js'), 'utf8'), talkDataSource())
-  assert.deepEqual(TALK_DATA, slimTalkData(read()))
+  assert.deepEqual(TALK_DATA, slimTalkData(read(), JSON.parse(fs.readFileSync(path.join(ROOT, 'content/skills-list-v1.json'), 'utf8'))))
 })
 
 test('the line rules are hhcontent\'s check.py: the same findings for every line of the data and for lines broken on purpose', () => {
@@ -74,37 +75,63 @@ test('the build stops on a line over hhcontent\'s limits', () => {
 })
 
 test('the build stops on an answer that gives a need of another topic', () => {
-  const d = broken(x => (topic(x, 'mem').question.answers[1].gives = 'mod1'))
-  assert.deepEqual(talkProblems(d), ['mem-q: the answer "What we talked about" gives mod1, which is not a need of mem'])
+  const d = broken(x => (topic(x, 'mod').question.answers[1].gives = 'mem1'))
+  assert.deepEqual(talkProblems(d), [`mod-q: the answer "${topic(d, 'mod').question.answers[1].label}" gives mem1, which is not a need of mod`])
   assert.throws(() => talkDataSource(d), /the build stops/)
 })
 
-test('the build stops on any list of things to pick longer than five', () => {
-  const six = { label: 'One more', gives: 'x' }
+test('the build stops on any list of things to pick longer than four (his words of 10 Nov 20:05); four is allowed', () => {
   for (const [name, change] of [
     ['the topic picks', d => d.topic_picks.push({ ...d.topic_picks[1] })],
-    ['the answers under a question', d => topic(d, 'sch').question.answers.push({ label: 'Five', gives: 'sch1' }, { label: 'Six', gives: 'sch2' })],
-    ['the picks a pick holds', d => (d.topic_picks[0].holds = ['sch', 'svc', 'mem', 'mod', 'msg', 'bot'])]
+    ['the answers under a question', d => topic(d, 'mod').question.answers.push({ label: 'Five', gives: 'mod1' })],
+    ['the picks a pick holds', d => (d.topic_picks[0].holds = ['sch', 'svc', 'bot', 'mem', 'wants'])],
+    ['the answers under "Do you mean me"', d => d.keeps.remember.lines.find(l => l.id === 'RM2').answers.push({ label: 'a', gives: 'RM3' }, { label: 'b', gives: 'RM3' }, { label: 'c', gives: 'RM3' })],
+    ['the Yes and No under a delete question', d => d.keeps.typed.forget_one.answers.push({ label: 'a', gives: 'no' }, { label: 'b', gives: 'no' }, { label: 'c', gives: 'no' })]
   ]) {
     const d = broken(change)
-    assert.ok(talkProblems(d).some(p => /^over five to pick at once: /.test(p)), name)
+    assert.ok(talkProblems(d).some(p => /^over four to pick at once: /.test(p)), name)
     assert.throws(() => talkDataSource(d), /the build stops/, name)
   }
-  assert.ok(six)
-  // five is allowed
-  const five = broken(d => topic(d, 'bot').question.answers.push({ label: 'Four', gives: 'bot1' }, { label: 'Five', gives: 'bot2' }))
-  assert.ok(!talkProblems(five).some(p => /over five/.test(p)))
+  const four = broken(d => topic(d, 'msg').question.answers.splice(3))
+  assert.ok(!talkProblems(four).some(p => /over four/.test(p)))
   // every list in the data today, counted
-  for (const [name, count] of pickLists(read())) assert.ok(count >= 1 && count <= 5, `${name}: ${count}`)
+  for (const [name, count] of pickLists(read())) assert.ok(count <= 4, `${name}: ${count}`)
+})
+
+test('answers to pick only under the questions that carry them (answers.when_shown): the build stops on answers under an open question, or none under a question that carries them', () => {
+  const extra = broken(d => (topic(d, 'mem').question.answers = [{ label: 'Things about me', gives: 'mem1' }]))
+  assert.ok(talkProblems(extra).includes('mem-q: answers to pick, but when_shown says it carries none'))
+  const none = broken(d => (topic(d, 'msg').question.answers = []))
+  assert.ok(talkProblems(none).includes('msg-q: no answers to pick, but when_shown says it carries them'))
+  const missing = broken(d => delete d.answers.when_shown.questions['sch-q What should Hermes do on a schedule, such as a daily summary?'])
+  assert.ok(talkProblems(missing).includes('sch-q: not in answers.when_shown'))
+  assert.throws(() => talkDataSource(extra), /the build stops/)
+})
+
+test('the wants (row 5) are not in this build: C1 says its text without them and holds the three topics; a held pick that is neither a topic nor described stops the build', () => {
+  assert.equal(WANTS_BUILT, false)
+  const d = read()
+  assert.deepEqual(d.topic_picks[0].holds, ['wants', 'sch', 'svc', 'bot'], 'the team\'s data holds the wants')
+  assert.deepEqual(TALK_DATA.topic_picks[0].holds, ['sch', 'svc', 'bot'])
+  assert.equal(TALK_DATA.fixed.C1.text, d.fixed_lines.find(f => f.id === 'C1').text_without_wants)
+  assert.ok(talkProblems(broken(x => x.topic_picks[0].holds.push('zzz'))).some(p => /holds zzz, which is not a topic/.test(p)))
 })
 
 test('the build stops on a missing fixed line, a button of an unknown kind, picks that miss a topic', () => {
   assert.ok(talkProblems(broken(d => (d.fixed_lines = d.fixed_lines.filter(f => f.id !== 'W1')))).includes('fixed line W1 is missing'))
+  assert.ok(talkProblems(broken(d => (d.fixed_lines = d.fixed_lines.filter(f => f.id !== 'TP')))).includes('fixed line TP is missing'))
   assert.ok(talkProblems(broken(d => (topic(d, 'mem').needs[0].next.kind = 'popup'))).some(p => /mem1: button of an unknown kind popup/.test(p)))
   assert.ok(talkProblems(broken(d => (topic(d, 'mem').needs[0].next.paste_text = ''))).some(p => /mem1: text to paste is empty/.test(p)))
   assert.ok(talkProblems(broken(d => d.topic_picks.pop())).some(p => /do not reach every topic exactly once/.test(p)))
   assert.ok(talkProblems(broken(d => (d.topic_picks[0].line = 'C9'))).some(p => /names a line that is missing: C9/.test(p)))
-  assert.ok(talkProblems(broken(d => (d.answers.max_at_once = 6))).some(p => /the rule is five/.test(p)))
+  assert.ok(talkProblems(broken(d => (d.answers.max_at_once = 5))).some(p => /the rule is four/.test(p)))
+})
+
+test('Helper\'s own lines about what it keeps pass the same word rules (and a broken one stops the build)', () => {
+  const ids = talkLines(read()).map(l => l.id)
+  for (const id of ['RM1', 'RM2', 'A2-name', 'A4', 'A1', 'kept-first', 'used-line', 'settings-top', 'settings-why-msg_value', 'settings-forget-all']) assert.ok(ids.includes(id), id)
+  const d = broken(x => (x.keeps.remember.lines.find(l => l.id === 'RM1').text = 'Done! I keep that.'))
+  assert.ok(talkProblems(d).includes('RM1: has !'))
 })
 
 test('with a problem the build writes no file at all (the texts are all made before the first is written)', () => {
@@ -114,17 +141,20 @@ test('with a problem the build writes no file at all (the texts are all made bef
   assert.match(build, /\[TALK_JS, talkDataSource\(\), 'content\/helper-talk-v2\.json'\]/)
 })
 
-test('what goes into the public built file: only what the code reads, and each line\'s source; no notes, nothing about keeping', () => {
+test('what goes into the public built file: only what the code reads, and each line\'s source; no notes, no model data, nothing for a build that calls a model', () => {
   const built = fs.readFileSync(path.join(ROOT, 'src/talk-data.js'), 'utf8')
-  assert.doesNotMatch(built, /"(?:note|\w+_note|about|when|rule|seen|used_in)":/)
-  assert.doesNotMatch(built, /"keeps"|kept_words|"tell"|request_starts|topic_picks_way_2|r6_never|screen_names|depends_on_his_answer/)
+  // (unsure.about is a list of words the code reads, not a note: notes are texts)
+  assert.doesNotMatch(built, /"(?:note|\w+_note|about|when|rule|seen|used_in|status)": "/)
+  assert.doesNotMatch(built, /topic_picks_way_2|r6_never|screen_names|depends_on_his_answer|model_hint|"topic_ids"|max_tokens|"first_time":|top_line_2|ai_step|disclosure/)
   // A team member is named only where a line's own source names who saw it in the running app.
   const withoutSources = JSON.stringify(TALK_DATA, (key, value) => (key === 'source' ? undefined : value))
   assert.doesNotMatch(withoutSources, /hhtech|hhcontent|hhdesign|\bLead\b|\bBuilder\b|P\u0113teris|his words/i)
   for (const t of TALK_DATA.topics) for (const n of [t.plain, ...t.needs]) assert.ok(n.source, n.id)
   for (const t of TALK_DATA.terms) assert.ok(t.source, t.id)
   assert.deepEqual(Object.keys(TALK_DATA.fixed), FIXED_USED)
-  // about two thirds of the team's file stays out
+  // of the skills list, only the names and which are left out
+  for (const s of TALK_DATA.skills) assert.deepEqual(Object.keys(s).filter(k => k !== 'left_out'), ['name'])
+  // more than half of the team's file stays out
   const whole = fs.statSync(path.join(ROOT, 'content/helper-talk-v2.json')).size
-  assert.ok(JSON.stringify(TALK_DATA).length < whole / 2, `${JSON.stringify(TALK_DATA).length} of ${whole}`)
+  assert.ok(JSON.stringify(TALK_DATA).length < whole * 0.6, `${JSON.stringify(TALK_DATA).length} of ${whole}`)
 })

@@ -1,0 +1,1910 @@
+{
+ "about": "Written by dev/checks/talk-v2/dump_settings.py from hhcontent's settings_read.py. Do not edit: make it again.",
+ "cases": [
+  {
+   "answer": null,
+   "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I only use a Windows laptop"
+     ],
+     "mod": "mod1",
+     "msg": "WhatsApp",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "S01",
+   "rendered": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "Save with nothing changed"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I only use a Windows laptop"
+     ],
+     "mod": "mod1",
+     "msg": "WhatsApp",
+     "name": "Pete",
+     "told": true
+    }
+   },
+   "id": "S02",
+   "rendered": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "name changed, reason left as it was"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pete",
+     "told": true
+    }
+   },
+   "id": "S03",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "name changed and the reason deleted: Name: Pete"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter (you told me)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "S04",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "the reason changed: Name: Peter (you told me)"
+  },
+  {
+   "answer": null,
+   "box": "   NAME :   Pete    ",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pete",
+     "told": true
+    }
+   },
+   "id": "S05",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "label in capitals, extra spaces, space before the colon"
+  },
+  {
+   "answer": null,
+   "box": "- Name: Pete",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pete",
+     "told": true
+    }
+   },
+   "id": "S06",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "a bullet before the line"
+  },
+  {
+   "answer": null,
+   "box": "Your name: Pete",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pete",
+     "told": true
+    }
+   },
+   "id": "S07",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "label copied from the list in the conversation: Your name"
+  },
+  {
+   "answer": null,
+   "box": "Name: Anna-Liisa Berg",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Anna-Liisa Berg (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Anna-Liisa Berg"
+    }
+   },
+   "id": "S08",
+   "rendered": "",
+   "stored": {},
+   "what": "a two-word name with a hyphen"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\nChat app: whatsap",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nChat app: WhatsApp (so Helper shows that app's setup)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "msg": "WhatsApp",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "S09",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "chat app misspelt: whatsap is stored as WhatsApp"
+  },
+  {
+   "answer": null,
+   "box": "Service: google drive",
+   "from": "hhcontent",
+   "got": {
+    "box": "Service: Google Drive (so Helper can write the text to paste)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "svc": "Google Drive"
+    }
+   },
+   "id": "S10",
+   "rendered": "",
+   "stored": {},
+   "what": "service written in full: Google Drive"
+  },
+  {
+   "answer": null,
+   "box": "Paying for an AI: chat gpt",
+   "from": "hhcontent",
+   "got": {
+    "box": "Paying for an AI: ChatGPT (so Helper does not ask again)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "mod": "mod1"
+    }
+   },
+   "id": "S11",
+   "rendered": "",
+   "stored": {},
+   "what": "paying, written with a space: chat gpt"
+  },
+  {
+   "answer": null,
+   "box": "Paying for an AI: Free (so Helper does not ask again)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Paying for an AI: Free (so Helper does not ask again)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "mod": "mod3",
+     "told": true
+    }
+   },
+   "id": "S12",
+   "rendered": "Paying for an AI: ChatGPT (so Helper does not ask again)",
+   "stored": {
+    "mod": "mod1",
+    "told": true
+   },
+   "what": "paying changed to Free"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter (Helper greets you with it)\nRemember: I like short answers",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nRemember: I like short answers (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I like short answers"
+     ],
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "S13",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "a Remember line added by hand"
+  },
+  {
+   "answer": null,
+   "box": "Remember: meeting notes at 10:30 go in Notion",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: meeting notes at 10:30 go in Notion (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "meeting notes at 10:30 go in Notion"
+     ]
+    }
+   },
+   "id": "S14",
+   "rendered": "",
+   "stored": {},
+   "what": "a Remember line with a colon and a time in it"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I use Windows (not Mac) (you asked Helper to keep it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I use Windows (not Mac) (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I use Windows (not Mac)"
+     ],
+     "told": true
+    }
+   },
+   "id": "S15",
+   "rendered": "Remember: I use Windows (not Mac) (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I use Windows (not Mac)"
+    ],
+    "told": true
+   },
+   "what": "a kept Remember line that has its own brackets reads back the same"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I only use a Linux laptop (you asked Helper to keep it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I only use a Linux laptop (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I only use a Linux laptop"
+     ],
+     "told": true
+    }
+   },
+   "id": "S16",
+   "rendered": "Remember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "told": true
+   },
+   "what": "a Remember line edited in place: no forget question"
+  },
+  {
+   "answer": null,
+   "box": "\n\nName: Peter\n\n\nChat app: Telegram\n",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nChat app: Telegram (so Helper shows that app's setup)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "msg": "Telegram",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "S17",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "empty lines between the lines are skipped"
+  },
+  {
+   "answer": null,
+   "box": "Chat app: Slack\nName: Peter",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nChat app: Slack (so Helper shows that app's setup)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "msg": "Slack",
+     "name": "Peter"
+    }
+   },
+   "id": "S18",
+   "rendered": "",
+   "stored": {},
+   "what": "lines in another order are saved and shown in Helper's order"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+    "count": 1,
+    "question": "Save, and forget one thing?",
+    "result": "ask",
+    "stored": {
+     "asked": [
+      "I only use a Windows laptop"
+     ],
+     "mod": "mod1",
+     "msg": "WhatsApp",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "D01",
+   "rendered": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "one line deleted: asks first"
+  },
+  {
+   "answer": "yes",
+   "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I only use a Windows laptop"
+     ],
+     "mod": "mod1",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "D02",
+   "rendered": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "one line deleted, Yes, save"
+  },
+  {
+   "answer": "no",
+   "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+    "result": "not_saved",
+    "stored": {
+     "asked": [
+      "I only use a Windows laptop"
+     ],
+     "mod": "mod1",
+     "msg": "WhatsApp",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "D03",
+   "rendered": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "one line deleted, No"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\nPaying for an AI: ChatGPT",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter\nPaying for an AI: ChatGPT",
+    "count": 2,
+    "question": "Save, and forget 2 things?",
+    "result": "ask",
+    "stored": {
+     "asked": [
+      "I only use a Windows laptop"
+     ],
+     "mod": "mod1",
+     "msg": "WhatsApp",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "D04",
+   "rendered": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "two lines deleted"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Pete",
+    "count": 1,
+    "question": "Save, and forget one thing?",
+    "result": "ask",
+    "stored": {
+     "msg": "WhatsApp",
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "D05",
+   "rendered": "Name: Peter (Helper greets you with it)\nChat app: WhatsApp (so Helper shows that app's setup)",
+   "stored": {
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "name changed and chat app deleted: asks about one thing"
+  },
+  {
+   "answer": "yes",
+   "box": "",
+   "from": "hhcontent",
+   "got": {
+    "box": "",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {}
+   },
+   "id": "D06",
+   "rendered": "Name: Peter (Helper greets you with it)\nPaying for an AI: ChatGPT (so Helper does not ask again)\nChat app: WhatsApp (so Helper shows that app's setup)\nRemember: I only use a Windows laptop (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I only use a Windows laptop"
+    ],
+    "mod": "mod1",
+    "msg": "WhatsApp",
+    "name": "Peter",
+    "told": true
+   },
+   "what": "everything deleted, Yes: the whole record goes, as with Forget all"
+  },
+  {
+   "answer": null,
+   "box": "Name: (Helper greets you with it)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: (Helper greets you with it)",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name: (Helper greets you with it)\"",
+     "Write something after the colon, or delete the line."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "empty"
+   },
+   "id": "D07",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "only the value deleted (Name: with the reason left): refused, not forgotten"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\nI like short answers",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter\nI like short answers",
+    "line": 2,
+    "message": [
+     "Nothing was saved. Helper could not read line 2:",
+     "\"I like short answers\"",
+     "Start it with a word such as Name or Remember, then a colon."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "no_label"
+   },
+   "id": "R01",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "a line of their own with no label"
+  },
+  {
+   "answer": null,
+   "box": "Name - Pete",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name - Pete",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name - Pete\"",
+     "Start it with a word such as Name or Remember, then a colon."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "no_label"
+   },
+   "id": "R02",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "another form: Name - Pete"
+  },
+  {
+   "answer": null,
+   "box": "Job: teacher",
+   "from": "hhcontent",
+   "got": {
+    "box": "Job: teacher",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Job: teacher\"",
+     "Start it with a word such as Name or Remember, then a colon."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "no_label"
+   },
+   "id": "R03",
+   "rendered": "",
+   "stored": {},
+   "what": "a label Helper does not know: Job: teacher"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete2",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Pete2",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name: Pete2\"",
+     "A name has letters only, 30 at most."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "name_value"
+   },
+   "id": "R04",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "a name with a digit"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter Paul Johannes Maximilian Berg",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter Paul Johannes Maximilian Berg",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name: Peter Paul Johannes Maximilian Berg\"",
+     "A name has letters only, 30 at most."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "name_value"
+   },
+   "id": "R05",
+   "rendered": "",
+   "stored": {},
+   "what": "a name over 30 characters"
+  },
+  {
+   "answer": null,
+   "box": "Paying for an AI: yes",
+   "from": "hhcontent",
+   "got": {
+    "box": "Paying for an AI: yes",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Paying for an AI: yes\"",
+     "After Paying for an AI, write ChatGPT, Claude, Neither or Free."
+    ],
+    "result": "refused",
+    "stored": {
+     "mod": "mod1",
+     "told": true
+    },
+    "why": "mod_value"
+   },
+   "id": "R06",
+   "rendered": "Paying for an AI: ChatGPT (so Helper does not ask again)",
+   "stored": {
+    "mod": "mod1",
+    "told": true
+   },
+   "what": "paying: an answer that is not one of the four"
+  },
+  {
+   "answer": null,
+   "box": "Chat app: Viber",
+   "from": "hhcontent",
+   "got": {
+    "box": "Chat app: Viber",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Chat app: Viber\"",
+     "Helper knows these chat apps: Telegram, WhatsApp, Discord, Slack, Signal, SMS, Email, Teams, iMessage, Matrix."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "msg_value"
+   },
+   "id": "R07",
+   "rendered": "",
+   "stored": {},
+   "what": "a chat app Helper does not know"
+  },
+  {
+   "answer": null,
+   "box": "Service: Fitbit",
+   "from": "hhcontent",
+   "got": {
+    "box": "Service: Fitbit",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Service: Fitbit\"",
+     "Helper does not know that service. Try one such as Gmail or Notion, or delete the line."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "svc_value"
+   },
+   "id": "R08",
+   "rendered": "",
+   "stored": {},
+   "what": "a service Helper does not know"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\nName: Pete",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter\nName: Pete",
+    "line": 2,
+    "message": [
+     "Nothing was saved. Helper could not read line 2:",
+     "\"Name: Pete\"",
+     "There is a Name line already. Keep one of them."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "twice"
+   },
+   "id": "R09",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "two Name lines: the second is named"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I use a Mac\nRemember: I live in Riga\nRemember: I like short answers\nRemember: I work at night",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I use a Mac\nRemember: I live in Riga\nRemember: I like short answers\nRemember: I work at night",
+    "line": 4,
+    "message": [
+     "Nothing was saved. Helper could not read line 4:",
+     "\"Remember: I work at night\"",
+     "Helper keeps three Remember lines at most. Delete one."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "too_many"
+   },
+   "id": "R10",
+   "rendered": "",
+   "stored": {},
+   "what": "four Remember lines"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I use a Mac\nremember: i use a mac",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I use a Mac\nremember: i use a mac",
+    "line": 2,
+    "message": [
+     "Nothing was saved. Helper could not read line 2:",
+     "\"remember: i use a mac\"",
+     "This line is there twice. Delete one."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "same_twice"
+   },
+   "id": "R11",
+   "rendered": "",
+   "stored": {},
+   "what": "the same Remember line twice"
+  },
+  {
+   "answer": null,
+   "box": "Remember: Windows",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: Windows",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Remember: Windows\"",
+     "Write at least two words after Remember."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "remember_short"
+   },
+   "id": "R12",
+   "rendered": "",
+   "stored": {},
+   "what": "Remember with one word"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I use a Windows laptop at work and a Mac at home with two big screens",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I use a Windows laptop at work and a Mac at home with two big screens",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Remember: I use a Windows laptop at work and a Mac at home w...\"",
+     "Keep it to 15 words and 100 letters or fewer."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "remember_long"
+   },
+   "id": "R13",
+   "rendered": "",
+   "stored": {},
+   "what": "Remember with 16 words"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I use Windows (not Mac)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I use Windows (not Mac)",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Remember: I use Windows (not Mac)\"",
+     "Brackets at the end of a line are for Helper's reasons. Leave yours out."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "remember_bracket"
+   },
+   "id": "R14",
+   "rendered": "",
+   "stored": {},
+   "what": "a new Remember line ending in its own brackets"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\nChat app: Viber\nName: Pete\nhello",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter\nChat app: Viber\nName: Pete\nhello",
+    "line": 2,
+    "message": [
+     "Nothing was saved. Helper could not read line 2:",
+     "\"Chat app: Viber\"",
+     "Helper knows these chat apps: Telegram, WhatsApp, Discord, Slack, Signal, SMS, Email, Teams, iMessage, Matrix."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "msg_value"
+   },
+   "id": "R15",
+   "rendered": "",
+   "stored": {},
+   "what": "the first bad line is named, not the later one"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\n\n\nhello",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter\n\n\nhello",
+    "line": 4,
+    "message": [
+     "Nothing was saved. Helper could not read line 4:",
+     "\"hello\"",
+     "Start it with a word such as Name or Remember, then a colon."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "no_label"
+   },
+   "id": "R16",
+   "rendered": "",
+   "stored": {},
+   "what": "line numbers count empty lines, as the person sees them"
+  },
+  {
+   "answer": null,
+   "box": "This is a long line that the person typed without any label at all in front",
+   "from": "hhcontent",
+   "got": {
+    "box": "This is a long line that the person typed without any label at all in front",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"This is a long line that the person typed without any label...\"",
+     "Start it with a word such as Name or Remember, then a colon."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "no_label"
+   },
+   "id": "R17",
+   "rendered": "",
+   "stored": {},
+   "what": "a long line is quoted cut to 60 characters"
+  },
+  {
+   "answer": null,
+   "box": "Remember: aaaa bbbb\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: aaaa bbbb\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ",
+    "line": null,
+    "message": [
+     "Nothing was saved. That is too much text for Helper's few short lines."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "too_much"
+   },
+   "id": "R18",
+   "rendered": "",
+   "stored": {},
+   "what": "too much text in the box (2,000 spaces added after one short line)"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\nRemember: my password is hunter2",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter\nRemember: my password is hunter2",
+    "line": 2,
+    "message": [
+     "Nothing was saved. Line 2 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "secret"
+   },
+   "id": "X01",
+   "rendered": "",
+   "stored": {},
+   "what": "a password on a Remember line: the line is not quoted back"
+  },
+  {
+   "answer": null,
+   "box": "Remember: my card 4111 1111 1111 1111",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: my card 4111 1111 1111 1111",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "secret"
+   },
+   "id": "X02",
+   "rendered": "",
+   "stored": {},
+   "what": "a card number with spaces"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\n12345678901",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter\n12345678901",
+    "line": 2,
+    "message": [
+     "Nothing was saved. Line 2 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "secret"
+   },
+   "id": "X03",
+   "rendered": "",
+   "stored": {},
+   "what": "a long number on its own line, no label"
+  },
+  {
+   "answer": null,
+   "box": "Name: sk-a1B2a1B2a1B2a1B2a1B2a1B2",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: sk-a1B2a1B2a1B2a1B2a1B2a1B2",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X04",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "a key pasted as the name"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter (pin code 4471)",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Peter (pin code 4471)",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X05",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "a secret inside the brackets is refused too"
+  },
+  {
+   "answer": null,
+   "box": "Name: Room 101",
+   "from": "hhcontent",
+   "got": {
+    "box": "Name: Room 101",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name: Room 101\"",
+     "A name has letters only, 30 at most."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "name_value"
+   },
+   "id": "X06",
+   "rendered": "",
+   "stored": {},
+   "what": "a short number is not a secret: refused only as a bad name"
+  },
+  {
+   "answer": null,
+   "box": "Remember: my key is sk-a1B2a1B2a1B2a1B2a1B2a1B2",
+   "from": "builder",
+   "got": {
+    "box": "Remember: my key is sk-a1B2a1B2a1B2a1B2a1B2a1B2",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "secret"
+   },
+   "id": "B01",
+   "rendered": "",
+   "stored": {},
+   "what": "a key on a Remember line"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter\nRemember: my Password is in the drawer",
+   "from": "builder",
+   "got": {
+    "box": "Name: Peter\nRemember: my Password is in the drawer",
+    "line": 2,
+    "message": [
+     "Nothing was saved. Line 2 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "B02",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "a password word on line 2"
+  },
+  {
+   "answer": null,
+   "box": "Remember: call 4111 1111 1111 1111 later",
+   "from": "builder",
+   "got": {
+    "box": "Remember: call 4111 1111 1111 1111 later",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "secret"
+   },
+   "id": "B03",
+   "rendered": "",
+   "stored": {},
+   "what": "a long number"
+  },
+  {
+   "answer": null,
+   "box": "Name: Peter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ",
+   "from": "builder",
+   "got": {
+    "box": "Name: Peter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ",
+    "line": null,
+    "message": [
+     "Nothing was saved. That is too much text for Helper's few short lines."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "too_much"
+   },
+   "id": "B04",
+   "rendered": "",
+   "stored": {},
+   "what": "more than 2000 characters"
+  },
+  {
+   "answer": null,
+   "box": "• Name: Pete",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pete"
+    }
+   },
+   "id": "B05",
+   "rendered": "",
+   "stored": {},
+   "what": "the dot bullet"
+  },
+  {
+   "answer": null,
+   "box": "*Name: Pete",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pete"
+    }
+   },
+   "id": "B06",
+   "rendered": "",
+   "stored": {},
+   "what": "a star bullet with no space"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete\r\nChat app: Slack\r\n",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)\nChat app: Slack (so Helper shows that app's setup)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "msg": "Slack",
+     "name": "Pete"
+    }
+   },
+   "id": "B07",
+   "rendered": "",
+   "stored": {},
+   "what": "Windows line ends"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete\n     \nChat app: Slack",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)\nChat app: Slack (so Helper shows that app's setup)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "msg": "Slack",
+     "name": "Pete"
+    }
+   },
+   "id": "B08",
+   "rendered": "",
+   "stored": {},
+   "what": "a line of spaces only"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I use Windows (not Mac)",
+   "from": "builder",
+   "got": {
+    "box": "Remember: I use Windows (not Mac)",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Remember: I use Windows (not Mac)\"",
+     "Brackets at the end of a line are for Helper's reasons. Leave yours out."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "remember_bracket"
+   },
+   "id": "B09",
+   "rendered": "",
+   "stored": {},
+   "what": "Remember with a bracket of its own and no reason"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I like tea (YOU ASKED HELPER TO KEEP IT)",
+   "from": "builder",
+   "got": {
+    "box": "Remember: I like tea (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I like tea"
+     ]
+    }
+   },
+   "id": "B10",
+   "rendered": "",
+   "stored": {},
+   "what": "Remember reason in other case"
+  },
+  {
+   "answer": null,
+   "box": "Remember: tea",
+   "from": "builder",
+   "got": {
+    "box": "Remember: tea",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Remember: tea\"",
+     "Write at least two words after Remember."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "remember_short"
+   },
+   "id": "B11",
+   "rendered": "",
+   "stored": {},
+   "what": "Remember of one word"
+  },
+  {
+   "answer": null,
+   "box": "Remember: one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen",
+   "from": "builder",
+   "got": {
+    "box": "Remember: one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Remember: one two three four five six seven eight nine ten e...\"",
+     "Keep it to 15 words and 100 letters or fewer."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "remember_long"
+   },
+   "id": "B12",
+   "rendered": "",
+   "stored": {},
+   "what": "Remember of 16 words"
+  },
+  {
+   "answer": null,
+   "box": "Remember: aaaaaaaaaa bbbbbbbbbb cccccccccc dddddddddd eeeeeeeeee ffffffffff gggggggggg hhhhhhhhhh iiiiiiiiii jjjjjjjj",
+   "from": "builder",
+   "got": {
+    "box": "Remember: aaaaaaaaaa bbbbbbbbbb cccccccccc dddddddddd eeeeeeeeee ffffffffff gggggggggg hhhhhhhhhh iiiiiiiiii jjjjjjjj",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Remember: aaaaaaaaaa bbbbbbbbbb cccccccccc dddddddddd eeeeee...\"",
+     "Keep it to 15 words and 100 letters or fewer."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "remember_long"
+   },
+   "id": "B13",
+   "rendered": "",
+   "stored": {},
+   "what": "Remember of 101 characters"
+  },
+  {
+   "answer": null,
+   "box": "Name: J. O'Neil",
+   "from": "builder",
+   "got": {
+    "box": "Name: J. O'Neil (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "J. O'Neil"
+    }
+   },
+   "id": "B14",
+   "rendered": "",
+   "stored": {},
+   "what": "name with a full stop and an apostrophe"
+  },
+  {
+   "answer": null,
+   "box": "Name: .",
+   "from": "builder",
+   "got": {
+    "box": "Name: .",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name: .\"",
+     "A name has letters only, 30 at most."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "name_value"
+   },
+   "id": "B15",
+   "rendered": "",
+   "stored": {},
+   "what": "name of a full stop only"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pēteris",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pēteris (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pēteris"
+    }
+   },
+   "id": "B16",
+   "rendered": "",
+   "stored": {},
+   "what": "name with letters of another alphabet"
+  },
+  {
+   "answer": null,
+   "box": "Paying for an AI: Chat GPT",
+   "from": "builder",
+   "got": {
+    "box": "Paying for an AI: ChatGPT (so Helper does not ask again)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "mod": "mod1"
+    }
+   },
+   "id": "B17",
+   "rendered": "",
+   "stored": {},
+   "what": "paying written Chat GPT in capitals"
+  },
+  {
+   "answer": null,
+   "box": "paying for ai: neither",
+   "from": "builder",
+   "got": {
+    "box": "Paying for an AI: Neither (so Helper does not ask again)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "mod": "mod4"
+    }
+   },
+   "id": "B18",
+   "rendered": "",
+   "stored": {},
+   "what": "paying for ai, short label"
+  },
+  {
+   "answer": null,
+   "box": "Service: drive",
+   "from": "builder",
+   "got": {
+    "box": "Service: Google Drive (so Helper can write the text to paste)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "svc": "Google Drive"
+    }
+   },
+   "id": "B19",
+   "rendered": "",
+   "stored": {},
+   "what": "service written drive"
+  },
+  {
+   "answer": null,
+   "box": "A service you use: gmail",
+   "from": "builder",
+   "got": {
+    "box": "Service: Gmail (so Helper can write the text to paste)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "svc": "Gmail"
+    }
+   },
+   "id": "B20",
+   "rendered": "",
+   "stored": {},
+   "what": "service label from the list"
+  },
+  {
+   "answer": null,
+   "box": "Chat app: iMessage",
+   "from": "builder",
+   "got": {
+    "box": "Chat app: iMessage (so Helper shows that app's setup)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "msg": "iMessage"
+    }
+   },
+   "id": "B21",
+   "rendered": "",
+   "stored": {},
+   "what": "chat app by its value name"
+  },
+  {
+   "answer": null,
+   "box": "You asked Helper to remember: I like tea",
+   "from": "builder",
+   "got": {
+    "box": "Remember: I like tea (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I like tea"
+     ]
+    }
+   },
+   "id": "B22",
+   "rendered": "",
+   "stored": {},
+   "what": "label of the list: You asked Helper to remember"
+  },
+  {
+   "answer": null,
+   "box": "Remember: a b",
+   "from": "builder",
+   "got": {
+    "box": "Remember: a b",
+    "count": 2,
+    "question": "Save, and forget 2 things?",
+    "result": "ask",
+    "stored": {
+     "asked": [
+      "a b",
+      "c d",
+      "e f"
+     ],
+     "told": true
+    }
+   },
+   "id": "B23",
+   "rendered": "Remember: a b (you asked Helper to keep it)\nRemember: c d (you asked Helper to keep it)\nRemember: e f (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "a b",
+     "c d",
+     "e f"
+    ],
+    "told": true
+   },
+   "what": "two Remember lines deleted of three: asks about two"
+  },
+  {
+   "answer": null,
+   "box": "Remember: a b\nRemember: x y",
+   "from": "builder",
+   "got": {
+    "box": "Remember: a b\nRemember: x y",
+    "count": 1,
+    "question": "Save, and forget one thing?",
+    "result": "ask",
+    "stored": {
+     "asked": [
+      "a b",
+      "c d"
+     ],
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "B24",
+   "rendered": "Name: Peter (Helper greets you with it)\nRemember: a b (you asked Helper to keep it)\nRemember: c d (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "a b",
+     "c d"
+    ],
+    "name": "Peter",
+    "told": true
+   },
+   "what": "two deleted and one added: asks about one"
+  },
+  {
+   "answer": null,
+   "box": "",
+   "from": "builder",
+   "got": {
+    "box": "",
+    "count": 1,
+    "question": "Save, and forget one thing?",
+    "result": "ask",
+    "stored": {
+     "name": "Peter",
+     "told": true
+    }
+   },
+   "id": "B25",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "everything deleted, not answered yet"
+  },
+  {
+   "answer": null,
+   "box": "",
+   "from": "builder",
+   "got": {
+    "box": "",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {}
+   },
+   "id": "B26",
+   "rendered": "",
+   "stored": {},
+   "what": "nothing stored, empty box saved"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete\nChat app: Discord",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)\nChat app: Discord (so Helper shows that app's setup)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "msg": "Discord",
+     "name": "Pete",
+     "told": true
+    }
+   },
+   "id": "B27",
+   "rendered": "Name: Peter (Helper greets you with it)",
+   "stored": {
+    "name": "Peter",
+    "told": true
+   },
+   "what": "told kept through a save"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pete2\nJob: teacher",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pete2\nJob: teacher",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name: Pete2\"",
+     "A name has letters only, 30 at most."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "name_value"
+   },
+   "id": "B28",
+   "rendered": "",
+   "stored": {},
+   "what": "the first failing line is named, not a later one"
+  },
+  {
+   "answer": null,
+   "box": "This line has no label at all and it goes on and on and on for a long while",
+   "from": "builder",
+   "got": {
+    "box": "This line has no label at all and it goes on and on and on for a long while",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"This line has no label at all and it goes on and on and on f...\"",
+     "Start it with a word such as Name or Remember, then a colon."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "no_label"
+   },
+   "id": "B29",
+   "rendered": "",
+   "stored": {},
+   "what": "a quote longer than 60 characters is cut"
+  },
+  {
+   "answer": null,
+   "box": "Chat app:",
+   "from": "builder",
+   "got": {
+    "box": "Chat app:",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Chat app:\"",
+     "Write something after the colon, or delete the line."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "empty"
+   },
+   "id": "B30",
+   "rendered": "",
+   "stored": {},
+   "what": "colon with no value"
+  },
+  {
+   "answer": null,
+   "box": "Remember: my login is peter",
+   "from": "builder",
+   "got": {
+    "box": "Remember: my login is peter",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "secret"
+   },
+   "id": "B31",
+   "rendered": "",
+   "stored": {},
+   "what": "a login word"
+  },
+  {
+   "answer": null,
+   "box": "Name:Pete",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pete (Helper greets you with it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "name": "Pete"
+    }
+   },
+   "id": "B32",
+   "rendered": "",
+   "stored": {},
+   "what": "label with no space before the value"
+  },
+  {
+   "answer": null,
+   "box": "Name: Pe (x) te",
+   "from": "builder",
+   "got": {
+    "box": "Name: Pe (x) te",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Helper could not read line 1:",
+     "\"Name: Pe (x) te\"",
+     "A name has letters only, 30 at most."
+    ],
+    "result": "refused",
+    "stored": {},
+    "why": "name_value"
+   },
+   "id": "B33",
+   "rendered": "",
+   "stored": {},
+   "what": "a bracket in the middle of a name line is not taken off"
+  },
+  {
+   "answer": null,
+   "box": "Paying for an AI: Neither (so Helper does not ask again)\nService: Google Calendar (so Helper can write the text to paste)",
+   "from": "builder",
+   "got": {
+    "box": "Paying for an AI: Neither (so Helper does not ask again)\nService: Google Calendar (so Helper can write the text to paste)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "mod": "mod4",
+     "svc": "Google Calendar",
+     "told": true
+    }
+   },
+   "id": "B34",
+   "rendered": "Paying for an AI: Neither (so Helper does not ask again)\nService: Google Calendar (so Helper can write the text to paste)",
+   "stored": {
+    "mod": "mod4",
+    "svc": "Google Calendar",
+    "told": true
+   },
+   "what": "Undo after a stored record with svc and mod4"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I like coffee (you asked Helper to keep it)",
+   "from": "builder",
+   "got": {
+    "box": "Remember: I like coffee (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I like coffee"
+     ],
+     "told": true
+    }
+   },
+   "id": "B35",
+   "rendered": "Remember: I like tea (you asked Helper to keep it)",
+   "stored": {
+    "asked": [
+     "I like tea"
+    ],
+    "told": true
+   },
+   "what": "the same Remember as stored kept in place"
+  }
+ ],
+ "settings_read_sha256": "3995ddd0525a437f2d0d53776864b5ae88584f61305d0a025e21ed1de589fa6d",
+ "tests_sha256": "b4959023597fbeeffcea04e515828575999125eb0944ef9ee6d11367b302c9be"
+}
