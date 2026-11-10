@@ -17,8 +17,8 @@ test('the box Helper writes from a stored record is settings_read.py\'s, for eve
   for (const c of S.cases) assert.equal(renderKept(c.stored), c.rendered, c.id)
 })
 
-test('every one of hhcontent\'s 49 cases and the Builder\'s 35 boxes: the same result as settings_read.py', () => {
-  assert.equal(S.cases.filter(c => c.from === 'hhcontent').length, 49)
+test('every one of hhcontent\'s 53 cases and the Builder\'s 35 boxes: the same result as settings_read.py', () => {
+  assert.equal(S.cases.filter(c => c.from === 'hhcontent').length, 53)
   assert.ok(S.cases.filter(c => c.from === 'builder').length >= 35)
   const kinds = new Set()
   for (const c of S.cases) {

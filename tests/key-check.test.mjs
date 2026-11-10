@@ -2,16 +2,22 @@
 // hhtech's own cases from dev/checks/hhtech/check-key-pattern.mjs (copied into tests/fixtures/).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
 import { looksLikeKey, prepareInput, KEY_PATTERNS, KEY_LINE, LONG_LINE, MAX_INPUT_CHARS } from '../src/key-check.js'
 import { KEYS, SENTENCES, orKey } from './fixtures/hhtech-key-cases.mjs'
+import { turn, freshVisit } from '../src/talk.js'
 
-test('the three patterns are hhtech\'s, exactly', () => {
-  assert.deepEqual(KEY_PATTERNS.map(r => r.source), [
-    '(?<![A-Za-z0-9])(?:sk-|sk_|xai-|AIza|ghp_|gho_|github_pat_|hf_|gsk_|pplx-|r8_|fw_)[A-Za-z0-9_-]{16,}',
-    '(?<![A-Za-z0-9])eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}',
-    '(?<![A-Za-z0-9])(?=[A-Za-z]*[0-9])(?=[0-9]*[A-Za-z])[A-Za-z0-9]{32,}(?![A-Za-z0-9])'
-  ])
+test('the patterns are hhcontent\'s key_patterns, exactly, with no flags (changes-10: one list for route2.py, settings_read.py and the plugin)', () => {
+  const data = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'content', 'helper-talk-v2.json'), 'utf8'))
+  assert.deepEqual(KEY_PATTERNS.map(r => r.source), data.key_patterns.patterns)
+  assert.equal(KEY_PATTERNS.length, 7)
   assert.ok(KEY_PATTERNS.every(r => r.flags === ''))
+})
+
+test('changes-10: AWS keys, bot tokens and private key files are caught; web addresses, file paths, "AKIA" alone and times are not', () => {
+  for (const k of ['AKIA' + 'IOSFODNN7EXAMPLE', 'my secret is wJalrXUtnFEMI/K7MDENG/bPxRfiCY' + 'EXAMPLEKEY', 'here it is 123456789:AAH' + 'dqTcvCH1vGWJxfSeofSAs0K5PALDsaw', '-----BEGIN OPENSSH PRIVATE KEY-----', 'glpat-' + 'abcdefghij0123456789', 'xoxb-' + '1234567890abcdefghij', 'rk_live_' + 'abcdefghij0123456789']) assert.ok(looksLikeKey(k), k)
+  for (const s of ['see https://example.com/shop/autumn-sale-2026/boots/and-more-of-it', '/Users/peter/Documents/Club/2026/schedule-autumn.xlsx', 'C:/Users/peter/Documents/schedule.xlsx', 'AKIA', 'we meet at 12:30', 'the key point is speed']) assert.ok(!looksLikeKey(s), s)
 })
 
 test(`all ${KEYS.length} of hhtech's key shapes are caught`, () => {
@@ -64,4 +70,19 @@ test('empty text sends nothing', () => {
 test('the fixed lines are hhcontent\'s words', () => {
   assert.equal(KEY_LINE, "That looks like a secret key, so I didn't send it to your model. Keys go in Settings, then Providers, then API keys, never in a chat.")
   assert.equal(LONG_LINE, 'Your message was long, so I read only the first 500 characters.')
+})
+
+// changes-10: hhcontent's 57 refusal cases (refuse_tests.py, run in Python by
+// dev/checks/talk-v2-wants/dump_refuse.py), through the conversation's own "remember that ...":
+// a key shape gets K1, a refused word or a long number RM6, anything else is not refused.
+test('hhcontent\'s 57 refusal cases: "remember that ..." refuses exactly what the Python refuses, and a key shape is K1', () => {
+  const R = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'fixtures', 'refuse-cases.json'), 'utf8'))
+  assert.equal(R.cases.length, 57)
+  for (const c of R.cases) {
+    const o = turn('remember that ' + c.text, freshVisit())
+    const want = c.python === null ? 'kept or too short' : c.python.startsWith('key pattern') ? 'K1' : 'RM6'
+    const got = o.kind === 'K1' ? 'K1' : o.kind === 'RM6' ? 'RM6' : 'kept or too short'
+    assert.equal(got, want, `${c.text} (Python: ${c.python})`)
+    assert.equal(c.python !== null, c.want, `hhcontent's own expectation: ${c.text}`)
+  }
 })

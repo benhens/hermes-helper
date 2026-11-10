@@ -1169,6 +1169,99 @@
   },
   {
    "answer": null,
+   "box": "Remember: my passwords are in the drawer",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: my passwords are in the drawer",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X07",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-10: a plural refused word is refused"
+  },
+  {
+   "answer": null,
+   "box": "Remember: AKIAIOSFODNN7EXAMPLE is the shop",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: AKIAIOSFODNN7EXAMPLE is the shop",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X08",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-10: an AWS access key is refused"
+  },
+  {
+   "answer": null,
+   "box": "Remember: bot 123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: bot 123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X09",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-10: a Telegram bot token is refused"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I pin my favourite chats",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I pin my favourite chats (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I pin my favourite chats"
+     ],
+     "told": true
+    }
+   },
+   "id": "X10",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-10: pin as an ordinary word is saved"
+  },
+  {
+   "answer": null,
    "box": "Remember: my key is sk-a1B2a1B2a1B2a1B2a1B2a1B2",
    "from": "builder",
    "got": {
@@ -1905,6 +1998,6 @@
    "what": "the same Remember as stored kept in place"
   }
  ],
- "settings_read_sha256": "3995ddd0525a437f2d0d53776864b5ae88584f61305d0a025e21ed1de589fa6d",
- "tests_sha256": "b4959023597fbeeffcea04e515828575999125eb0944ef9ee6d11367b302c9be"
+ "settings_read_sha256": "470c4c774a34d4fa95915495f1365e7e3cd4ecefe9e93b46bd3e31a8a55cefdf",
+ "tests_sha256": "c2ac3bb4a32c1dd2a779a67636b16a5dfd35a2daa0e569c119eea29b34c6a8c7"
 }

@@ -24,7 +24,7 @@ import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { laterVisit, turn, pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turn, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
 import { makeSetupCards, renderYourSetup } from './setup-tab.js'
@@ -355,14 +355,21 @@ export function makePage(ctx, opts = {}) {
 
     // Something picked in the message box: it becomes the person's message, and Helper answers at
     // once. The pick goes by its id, never through the key words: an answer to a topic question, a
-    // topic under "Which one do you mean?", a topic, "You, Helper" / "My Hermes", or Yes / No under
-    // a delete question.
+    // topic under "Which one do you mean?", a topic, "You, Helper" / "My Hermes", Yes / No under
+    // a delete question, a group of the wants or one of its rows. "More" is not a message: the next
+    // ones take the picks' place under the same line.
     function pickAnswer(item) {
+      if (item.more) {
+        const items = pageOf(item.more)
+        return setLog(old => (memory.log = old.map((e, i) => (i === old.length - 1 && e.answers ? { ...e, answers: { ...e.answers, items } } : e))))
+      }
       let result
       if (item.answer) result = pick(item.answer[0], item.answer[1], visit)
       else if (item.which) result = press(item.which, memory.typed, visit)
       else if (item.rm) result = rmPick(item.rm, visit)
       else if (item.forget) result = forgetAnswer(item.forget[0], item.forget[1], visit)
+      else if (item.group) result = pickGroup(item.group, visit)
+      else if (item.want) result = pickWant(item.want, visit)
       else result = pickTopic(item.topic, visit)
       answer(result, item.label)
     }
@@ -380,7 +387,7 @@ export function makePage(ctx, opts = {}) {
     function pressNext(entry) {
       const next = entry.next
       if (!next) return
-      if (next.kind === 'paste') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
+      if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
       if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)

@@ -17,6 +17,7 @@
 // everything" (keeps.typed, A1, A2, A4) are not in route2.py; they are ported from hhtech's
 // settings_step and hhcontent's changes-8 rule, and come straight after the remember step.
 import { TALK_DATA } from './talk-data.js'
+import { WANTS_DATA } from './wants-data.js'
 import { looksLikeKey } from './key-check.js'
 import { hasKept } from './kept.js'
 
@@ -89,17 +90,77 @@ function needsFor(t, topic, answering) {
   return ns.map(n => n.id)
 }
 
+/* ---------- the wants (row 5): hhcontent's content/helper-wants-v1.json, as src/wants-data.js ---------- */
+// The order of steps is hhtech's wants_step.py with fixes6_step.py on top of route2.py (changes-6
+// fixes 2 and 3, changes-8's article before "NAME skill"); route2.py itself stops at the wants
+// question. visit.wants false: the steps below do nothing, which is route2.py exactly (the tests
+// replay route2.py's own conversations that way).
+const WROWS = WANTS_DATA.rows
+export const WANT_ROWS = Object.fromEntries(WROWS.map(r => [r.id, r]))
+const WGROUPS = Object.fromEntries(WANTS_DATA.groups.map(g => [g.id, g]))
+const WSKILLS = new Map(WANTS_DATA.skills.map(s => [s.name, s]))
+const SERVICE_LINES = WANTS_DATA.service_lines
+// A row matches when one of its key words is in the message, or one of its things and one of its
+// actions are both in it. Whole words, as every key word (helper-wants-v1.json match_rule).
+export const wantsOf = t => WROWS.filter(r => whichOf(t, r.key_words || []).length || (whichOf(t, r.things || []).length && whichOf(t, r.actions || []).length)).map(r => r.id)
+// The near miss: the groups one of whose subject words is in the message.
+export const nearOf = t => WANTS_DATA.groups.filter(g => whichOf(t, g.subject_words).length).map(g => g.id)
+// A skill by its name only when the name and "skill" sit next to each other (changes-6 fix 3,
+// changes-8): hhcontent's skill_next.py PATTERNS, word for word; {n} is the name, or the name with
+// spaces for its hyphens. tests/talk-wants.test.mjs compares these with skill_next.py's own.
+export const SKILL_NEXT_PATTERNS = ['(?:the|a|an|this|that) {n} skills?', 'skills? (?:called|named) \\"?{n}\\"?', 'skills? for {n}', '\\"{n}\\" skills?']
+const SKILL_RES = WANTS_DATA.skills.map(s => {
+  const names = [...new Set([s.name, s.name.replace(/-/g, ' ')])]
+  const alts = names.flatMap(n => SKILL_NEXT_PATTERNS.map(p => p.replace(/\\"/g, '"').replace('{n}', escapeRe(n))))
+  return [s.name, new RegExp('(^|[^a-z0-9])(?:' + alts.join('|') + ')($|[^a-z0-9])')]
+})
+export const skillOf = t => [...new Set(SKILL_RES.filter(([, re]) => re.test(t)).map(([n]) => n))].sort()
+// The row a skill has, if any (a hand-written row wins over S1 and S2).
+const rowOfSkill = name => WROWS.find(r => r.thing === name)
+// Changes-6 fix 6: where svc's row for a named service would show, Gmail, Google Calendar and
+// Google Drive get line CN1 (the app's Connectors page) and GitHub gets S1 for the built-in skill
+// github. A result gets serviceLine; the rest stays as it was (found, kept, the visit).
+function withServiceLine(out, st) {
+  if (st.wants === false || out.topic !== 'svc' || out.need !== 'svc1') return out
+  const s = SERVICE_LINES[st.service]
+  if (s) out.serviceLine = s.line === 'S1' ? { line: 'S1', skill: s.skill } : { line: s.line }
+  return out
+}
+// At most four things to pick on screen (answers.max_at_once): a longer list shows three and
+// "More", which shows the next ones the same way (helper-talk-v2.json answers.more).
+export function pageOf(items) {
+  const max = TALK_DATA.answers.max_at_once
+  if (items.length <= max) return items
+  const shown = max - 1
+  return [...items.slice(0, shown), { id: 'more-' + items[shown].id, label: 'More', more: items.slice(shown) }]
+}
+
 // Steps 4 and 5: the topic and the need, by key words.
 function byCode(text, st) {
   const t = cutIgnored(talkNorm(text))
-  const strong = strongTopics(t)
-  const r = { topic: null, need: null, term: null, several: null, strong_one: strong.length === 1 }
+  let strong = strongTopics(t)
+  // the rows (wants_step.py by_code2): while a topic question is open, only in a question
+  let rows = st.wants === false ? [] : wantsOf(t)
+  if (rows.length && st.pending && !questionForm(t)) rows = []
+  // fix 2: a row takes svc off only when the svc word matched is that row's own key word or thing;
+  // otherwise svc stays and the rows are not looked at
+  if (rows.length && strong.includes('svc')) {
+    const svcWords = whichOf(t, TOPICS.svc.key_words.concat(TOPICS.svc.misspellings))
+    const owned = rows.some(id => svcWords.some(w => (WANT_ROWS[id].key_words || []).includes(w) || (WANT_ROWS[id].things || []).includes(w)))
+    if (owned) strong = strong.filter(k => k !== 'svc')
+    else rows = []
+  }
+  const r = { topic: null, need: null, term: null, several: null, strong_one: strong.length === 1, rows: null }
   if (strong.length > 1) {
     r.several = strong
     return r
   }
   if (strong.length === 1) r.topic = strong[0]
   else {
+    if (rows.length) {
+      r.rows = rows
+      return r
+    }
     if (!st.pending || questionForm(t)) {
       const terms = TERM_IDS.filter(k => whichOf(t, TERMS[k].key_words).length)
       if (terms.length === 1) {
@@ -140,8 +201,9 @@ function byCode(text, st) {
 // found: { topic: need } shown in this visit. lastq: Helper's last line was a question.
 // service: the service last named, for the text to paste. kept: the stored record (keeps.storage).
 // rmText: the message that led to "Do you mean me, or your own Hermes?", for the answer to it.
+// wants: the wants steps are on (row 5); false only for replaying route2.py, which has none.
 export function freshVisit(stage = 'open', kept = {}) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true }
 }
 // A later visit: only the stored record is carried over. A kept name means the opening's two
 // questions are not asked again (content/helper-keeps-v1.md section 4).
@@ -224,9 +286,8 @@ function remember(text, st, out) {
     if (n < lim.min_words) out.kind = 'RM3'
     else if (whichOf(talkNorm(thing), KEEP_REMEMBER.refuse.words).length || new RegExp(KEEP_REMEMBER.refuse.digits_pattern).test(thing)) out.kind = 'RM6'
     else if (n > lim.max_words || charCount(thing) > lim.max_chars) out.kind = 'RM5'
-    // Builder, after review (route2.py compares exactly): the same thing in other capitals counts
-    // as kept already, as the settings page reads it (settings_read.py), which would otherwise
-    // refuse every Save with "This line is there twice".
+    // keeps.remember.same_thing (changes-10, the Builder's review fix now in route2.py): the same
+    // thing in other capitals counts as kept already, as the settings page reads it.
     else if (asked.some(a => a.toLowerCase() === thing.toLowerCase())) out.kind = 'RM1'
     else if (asked.length >= lim.max_things) out.kind = 'RM4'
     else {
@@ -319,14 +380,15 @@ export function dontKnow(text) {
   return 'N1'
 }
 
+// changes-10 (opening.name_refused, the Builder's review fix now in route2.py): a name holding a
+// word Helper never keeps (keeps.remember.refuse.words, and in a name also opening
+// .name_refused_words_also: pin, pins) or a key shape is no name, as a name with digits is none.
+const refusedName = s => whichOf(talkNorm(s), KEEP_REMEMBER.refuse.words.concat(OPENING.name_refused_words_also || [])).length > 0 || looksLikeKey(s)
 function codeName(text, strongOnly = false) {
-  const name = codeNameAsRoute2(text, strongOnly)
-  // Builder, after review (not in route2.py): a "name" holding one of the words Helper never keeps
-  // (keeps.remember.refuse.words: password, PIN, ...) is no name, as a name with digits is none,
-  // because it would be kept and shown in "Kept: ...", and the settings page then refuses the box.
-  return name && !whichOf(talkNorm(name), KEEP_REMEMBER.refuse.words).length ? name : null
+  const name = codeNameRaw(text, strongOnly)
+  return name && !refusedName(name) ? name : null
 }
-function codeNameAsRoute2(text, strongOnly) {
+function codeNameRaw(text, strongOnly) {
   let m = NAME_STRONG.exec(text)
   if (m) return capFirst(m[1])
   if (strongOnly) return null
@@ -351,6 +413,7 @@ function nameWithMore(text) {
     }
   }
   if (!m) return [null, null]
+  if (refusedName(m[1])) return [null, null] // changes-10: opening.name_refused
   const rest = text.slice(m.index + m[0].length).replace(/^(?:[\s,.!:]+|and\b|here\b)+/i, '')
   const rt = cutIgnored(talkNorm(rest))
   if (!rt) return [null, null]
@@ -442,6 +505,18 @@ export function turn(text, st) {
     st.stage = 'open'
     st.lastq = false
   }
+  // a skill by its name, next to "skill" (changes-6 fix 3): before the topics, so "is there a
+  // github skill" gets the skill, not the service question. A row for that skill wins; a skill
+  // marked left out gets N1b; else S1 (built in) or S2 (optional, with the clicks to add it).
+  if (st.wants !== false) {
+    const sk = skillOf(cutIgnored(talkNorm(text)))
+    if (sk.length === 1) {
+      const row = rowOfSkill(sk[0])
+      if (row) return done('want', { row: row.id })
+      if (WSKILLS.get(sk[0]).left_out) return done('N1b')
+      return done('skill', { skill: sk[0] })
+    }
+  }
   // a skill named in a clear pattern is looked up before the terms
   const dk = dontKnow(text)
   if (dk === 'N1a' || dk === 'N1b') return done(dk)
@@ -449,6 +524,9 @@ export function turn(text, st) {
   const code = byCode(text, st)
   out.code = code
   const { topic, need, several } = code
+  // the rows: one is shown; two or more, "Which one do you mean?" with their labels (three and
+  // "More" when over four; wants_step.py shows the first four)
+  if (code.rows) return code.rows.length === 1 ? done('want', { row: code.rows[0] }) : done('W1', { buttons: code.rows })
   if (code.term) return done('term', { term: code.term })
   // 7. the first that fits
   if (topic && need) {
@@ -457,13 +535,13 @@ export function turn(text, st) {
     if (answered) keepTyped(t, topic, need, st, out)
     st.found[topic] = need
     if (topic === 'svc') st.service = serviceIn(text, st, answered)
-    return done('row', { topic, need })
+    return withServiceLine(done('row', { topic, need }), st)
   }
   if (several) return done('W1', { buttons: several.slice(0, TALK_DATA.answers.max_at_once) })
   // keeps.use: something is kept for this topic, so its question is not asked
   if (topic && keptNeed(topic, st)) {
     const r = fromKept(topic, st)
-    return done('row', { topic: r.topic, need: r.need, used: 'kept' })
+    return withServiceLine(done('row', { topic: r.topic, need: r.need, used: 'kept' }), st)
   }
   if (topic && !st.lastq && !st.asked.includes(topic)) {
     st.asked.push(topic)
@@ -472,6 +550,11 @@ export function turn(text, st) {
     return r
   }
   if (topic) return done('plain', { topic })
+  // the near miss: no row, but a subject word of exactly one group: N2 with that group's rows
+  if (st.wants !== false) {
+    const g = nearOf(t)
+    if (g.length === 1) return done('N2', { group: g[0] })
+  }
   return done(dontKnow(text) || 'skill by name')
 }
 
@@ -488,12 +571,19 @@ export function pick(topic, i, st) {
   if (topic === 'mod') keep(st, out, 'mod', a.gives)
   else if (topic === 'msg' && (a.gives === 'msg1' || a.gives === 'msg2')) keep(st, out, 'msg', a.label)
   else if (topic === 'svc' && a.service) keep(st, out, 'svc', a.service)
-  return out
+  return withServiceLine(out, st)
 }
 
 // A topic picked under TP or C1. A pick that holds several topics: line C1. Else the kept row, the
-// topic's question if not asked yet, or its plain line.
+// topic's question if not asked yet, or its plain line. The held pick "Web, files, pictures and
+// voice" (held_picks.wants, changes-9): the wants question can-q at once, its four groups to pick
+// (route2.py pick_topic).
 export function pickTopic(topic, st) {
+  if (TALK_DATA.held_picks && TALK_DATA.held_picks.includes(topic)) {
+    st.pending = null
+    st.lastq = false
+    return { kind: 'can-q', buttons: WANTS_DATA.groups.map(g => g.id) }
+  }
   const held = TOPIC_PICKS[topic]
   if (held && held.holds) {
     st.pending = null
@@ -504,7 +594,7 @@ export function pickTopic(topic, st) {
     const r = fromKept(topic, st)
     st.pending = null
     st.lastq = false
-    return r
+    return withServiceLine(r, st)
   }
   if (!st.asked.includes(topic) && !st.lastq) {
     st.asked.push(topic)
@@ -526,15 +616,31 @@ export function change(topic, st) {
   return { kind: 'question', topic }
 }
 
-// A button under "Which one do you mean?", with the message that led to it.
+// A button under "Which one do you mean?", with the message that led to it. A row's button: that
+// row.
 export function press(choice, text, st) {
   st.lastq = false
+  if (WANT_ROWS[choice]) return pickWant(choice, st)
   if (TERMS[choice]) return { kind: 'term', term: choice }
   const ns = needsFor(cutIgnored(talkNorm(text)), choice, false)
   if (ns.length !== 1) return { kind: 'plain', topic: choice }
   st.found[choice] = ns[0]
   if (choice === 'svc') st.service = serviceIn(text, st, false)
-  return { kind: 'row', topic: choice, need: ns[0] }
+  return withServiceLine({ kind: 'row', topic: choice, need: ns[0] }, st)
+}
+
+// A group picked under "What do you want Hermes to do?": line G1 with the group's rows to pick.
+// Not a question, so lastq stays false (helper-wants-v1.md 6.3).
+export function pickGroup(group, st) {
+  st.pending = null
+  st.lastq = false
+  return { kind: 'G1', group, buttons: WROWS.filter(r => r.group === group).map(r => r.id) }
+}
+// A row picked (under G1, N2 or "Which one do you mean?"): its line and its button. No key words.
+export function pickWant(id, st) {
+  st.pending = null
+  st.lastq = false
+  return { kind: 'want', row: id }
 }
 
 // An answer under "Do you mean me, or your own Hermes?" (RM2): 'helper' or 'hermes'.
@@ -630,8 +736,26 @@ function nextFor(next, topic, st) {
 }
 
 const topicPicks = () => ({ kind: 'topics', hint: TALK_DATA.answers.hint_under_topics, items: TALK_DATA.topic_picks.map(p => ({ id: p.gives, label: p.label, topic: p.gives })) })
-const labelOf = id => (TOPICS[id] ? TOPICS[id].pick.label : TERMS[id].label)
+const labelOf = id => (TOPICS[id] ? TOPICS[id].pick.label : WANT_ROWS[id] ? WANT_ROWS[id].label : TALK_DATA.held_labels[id] || TERMS[id].label)
 const yesNo = (answers, what) => ({ kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: answers.map(a => ({ id: `forget-${what}-${a.gives}`, label: a.label, forget: [what, a.gives === 'yes'] })) })
+// A group's rows to pick (under G1 and N2), three and "More" when over four.
+const rowPicks = (ids, kind) => ({ kind, hint: TALK_DATA.answers.hint_under_question, items: pageOf(ids.map(id => ({ id, label: WANT_ROWS[id].label, want: id }))) })
+// A row's button: "Show me what to ask" (text to paste) or, for an optional skill, "Show me how to
+// add it" (the app's clicks, then the line that it works from the next new chat).
+function wantNext(n, name) {
+  if (n.kind === 'steps') return { kind: 'steps', label: n.label, steps: n.steps.map(s => fillSlots(s, { name })), after: n.after }
+  return { kind: 'paste', label: n.label, text: n.paste_text }
+}
+// A source as the talk data writes it: "file line N" (or "lines" for several of one file).
+const sourceText = sources => (sources || []).map(s => `${s.file} line ${s.line}`).join('; ') || null
+// S1 or S2 for a skill with no row of its own: Helper's fixed line, the box "From the Hermes docs"
+// with the page's own words (not Helper's voice), and for an optional skill the clicks to add it.
+function skillLine(name, said) {
+  const s = WSKILLS.get(name)
+  const f = WANTS_DATA.fixed[s.kind === 'optional' ? 'S2' : 'S1']
+  const docs = { head: WANTS_DATA.fixed['box-head'].text, words: s.docs_words, source: `${s.page} line ${s.line}` }
+  return said(s.kind === 'optional' ? 'S2' : 'S1', fillSlots(f.text, { name }), { source: docs.source, docs, next: f.next ? wantNext(f.next, name) : null })
+}
 
 // The words for one kept thing (keeps.things[].kept_words): "Peter", "you pay for ChatGPT",
 // "you use WhatsApp", "you use Gmail", or the thing as asked.
@@ -666,7 +790,7 @@ function keptNote(result, st) {
 // The opening line. On a later visit with a kept name, the opening's question is not asked: the
 // same line without it (the data has no line of its own for a later visit: Questions for Lead).
 export function openingLine(st = null) {
-  const said = { line: 'OPEN', text: FIXED.OPEN.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null }
+  const said = { line: 'OPEN', text: FIXED.OPEN.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }
   if (st && st.stage === 'open') return { ...said, line: 'OPEN-again', text: FIXED.OPEN.text.replace(/\s*[^.?]*\?\s*$/, '') }
   return said
 }
@@ -674,11 +798,14 @@ export function openingLine(st = null) {
 // result: what turn, pick, pickTopic, press, skip, sayLine, change, rmPick or forgetAnswer
 // returned. typed: the person's words (for the text to paste under "your own Hermes can").
 // opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it).
-// Returns { line, text, source, answers, next, paste, note, used, hint, rows }:
+// Returns { line, text, source, answers, next, paste, note, used, hint, rows, docs }:
+//   docs: the box "From the Hermes docs" { head, words, source } (S1, S2), the page's own words;
+//   next may also be { kind: 'steps', label, steps, after } (the clicks to add an optional skill);
+//   an answer to pick may be { more: [the next ones] } ("More", three at a time, src/page.js).
 //   note: the faint "Kept: ..." line { text, link, first }; used: "From what I keep: ..." { text,
 //   link, topic }; hint: a small faint line (N_HINT); rows: the list of kept things (A1).
 export function lineFor(result, st, typed = '', opts = {}) {
-  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, ...more })
+  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
   const dontKnowLine = id => said(id, FIXED[id].text, { hint: FIXED.N_HINT.text })
   const RM = Object.fromEntries(KEEP_REMEMBER.lines.map(l => [l.id, l]))
@@ -704,10 +831,26 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'N1b':
       return dontKnowLine(result.kind)
     case 'skill by name':
-      // an official skill asked about by its name: the skills by name are row 5 of the plan
+      // an official skill asked about by its name that the skill step did not settle (two at once)
       return { ...dontKnowLine('N1'), line: 'N1-skill' }
-    case 'W1':
-      return said('W1', FIXED.W1.text, { answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: result.buttons.map(id => ({ id, label: labelOf(id), which: id })) } })
+    case 'W1': {
+      const items = result.buttons.map(id => ({ id, label: labelOf(id), which: id }))
+      return said('W1', FIXED.W1.text, { answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: pageOf(items) } })
+    }
+    case 'can-q': {
+      const q = WANTS_DATA.question
+      return said('can-q', q.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: q.answers.map(a => ({ id: 'group-' + a.gives_group, label: a.label, group: a.gives_group })) } })
+    }
+    case 'G1':
+      return said('G1', WANTS_DATA.fixed.G1.text, { answers: rowPicks(result.buttons, 'rows') })
+    case 'N2':
+      return said('N2', WANTS_DATA.fixed.N2.text, { answers: rowPicks(WROWS.filter(r => r.group === result.group).map(r => r.id), 'rows') })
+    case 'want': {
+      const r = WANT_ROWS[result.row]
+      return said(r.id, r.text, { source: sourceText(r.sources), next: wantNext(r.next, r.thing) })
+    }
+    case 'skill':
+      return skillLine(result.skill, said)
     case 'term': {
       const t = TERMS[result.term]
       return said('term-' + t.id, t.text, { source: t.source, next: nextFor(t.next, null, st) })
@@ -724,6 +867,12 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'row': {
       const n = TOPICS[result.topic].needs.find(x => x.id === result.need)
       const used = result.used === 'kept' ? { text: fillSlots(KEEPS.use.used_line, { kept_words: keptWords(result.topic, st.kept[result.topic]) }), link: KEEPS.use.used_link.words, topic: result.topic } : null
+      // changes-6 fix 6: Gmail, Google Calendar, Google Drive: CN1; GitHub: the github skill (S1)
+      if (result.serviceLine && result.serviceLine.line === 'S1') return { ...skillLine(result.serviceLine.skill, said), used }
+      if (result.serviceLine) {
+        const f = WANTS_DATA.fixed[result.serviceLine.line]
+        return said(result.serviceLine.line, f.text, { source: sourceText(f.sources), used })
+      }
       return said(n.id, n.text, { source: n.source, next: nextFor(n.next, result.topic, st), used })
     }
     case 'extra': {

@@ -1,0 +1,291 @@
+{
+ "about": "Written by dev/checks/talk-v2-wants/dump_refuse.py from hhcontent's refuse_tests.py. Do not edit: make it again.",
+ "refuse_tests_sha256": "f8b237bcd6dce49bace472dcef7ba36b1682614dc4ed3f0e57d8e86e2514292d",
+ "cases": [
+  {
+   "text": "my passwords are in the drawer",
+   "want": true,
+   "python": "word 'passwords'"
+  },
+  {
+   "text": "Passwords: see notebook",
+   "want": true,
+   "python": "word 'passwords'"
+  },
+  {
+   "text": "the passcodes for the alarm",
+   "want": true,
+   "python": "word 'passcodes'"
+  },
+  {
+   "text": "my pins are 1234",
+   "want": true,
+   "python": "word 'my pins'"
+  },
+  {
+   "text": "my PIN is 4321",
+   "want": true,
+   "python": "word 'my pin'"
+  },
+  {
+   "text": "the bank pin is 9999",
+   "want": true,
+   "python": "word 'pin is'"
+  },
+  {
+   "text": "pin codes for the doors",
+   "want": true,
+   "python": "word 'pin codes'"
+  },
+  {
+   "text": "pin number 1234",
+   "want": true,
+   "python": "word 'pin number'"
+  },
+  {
+   "text": "the logins are on the fridge",
+   "want": true,
+   "python": "word 'logins'"
+  },
+  {
+   "text": "my log-in for the bank",
+   "want": true,
+   "python": "word 'log-in'"
+  },
+  {
+   "text": "my credit cards are both Visa",
+   "want": true,
+   "python": "word 'credit cards'"
+  },
+  {
+   "text": "card numbers are in the safe",
+   "want": true,
+   "python": "word 'card numbers'"
+  },
+  {
+   "text": "api keys go in the vault",
+   "want": true,
+   "python": "word 'api keys'"
+  },
+  {
+   "text": "my api-key is in the email",
+   "want": true,
+   "python": "word 'api-key'"
+  },
+  {
+   "text": "the recovery phrase is in my desk",
+   "want": true,
+   "python": "word 'recovery phrase'"
+  },
+  {
+   "text": "seed phrase on paper",
+   "want": true,
+   "python": "word 'seed phrase'"
+  },
+  {
+   "text": "backup codes for Google",
+   "want": true,
+   "python": "word 'backup codes'"
+  },
+  {
+   "text": "my bot token is in Telegram",
+   "want": true,
+   "python": "word 'bot token'"
+  },
+  {
+   "text": "the credentials are with Anna",
+   "want": true,
+   "python": "word 'credentials'"
+  },
+  {
+   "text": "my IBAN ends in 44",
+   "want": true,
+   "python": "word 'iban'"
+  },
+  {
+   "text": "the sort code is 20-00-00",
+   "want": true,
+   "python": "word 'sort code'"
+  },
+  {
+   "text": "CVC on the back",
+   "want": true,
+   "python": "word 'cvc'"
+  },
+  {
+   "text": "AKIAIOSFODNN7EXAMPLE",
+   "want": true,
+   "python": "key pattern [4]"
+  },
+  {
+   "text": "ASIAY34FZKBOKMUTVV7A",
+   "want": true,
+   "python": "key pattern [4]"
+  },
+  {
+   "text": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+   "want": true,
+   "python": "key pattern [5]"
+  },
+  {
+   "text": "aws_secret_access_key=wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY",
+   "want": true,
+   "python": "key pattern [5]"
+  },
+  {
+   "text": "AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+   "want": true,
+   "python": "key pattern [4, 5]"
+  },
+  {
+   "text": "123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw",
+   "want": true,
+   "python": "key pattern [3, 6]"
+  },
+  {
+   "text": "xoxb-1234567890-abcdefghijklmnop",
+   "want": true,
+   "python": "key pattern [1]"
+  },
+  {
+   "text": "glpat-abcdefghij1234567890",
+   "want": true,
+   "python": "key pattern [1]"
+  },
+  {
+   "text": "ghs_abcdefghij1234567890",
+   "want": true,
+   "python": "key pattern [1]"
+  },
+  {
+   "text": "sk-ant-api03-abcdefghij1234567890",
+   "want": true,
+   "python": "key pattern [1]"
+  },
+  {
+   "text": "npm_abcdefghij1234567890",
+   "want": true,
+   "python": "key pattern [1]"
+  },
+  {
+   "text": "-----BEGIN OPENSSH PRIVATE KEY-----",
+   "want": true,
+   "python": "key pattern [7]"
+  },
+  {
+   "text": "-----BEGIN RSA PRIVATE KEY-----",
+   "want": true,
+   "python": "key pattern [7]"
+  },
+  {
+   "text": "sk-a1B2a1B2a1B2a1B2a1B2a1B2",
+   "want": true,
+   "python": "key pattern [1]"
+  },
+  {
+   "text": "a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+   "want": true,
+   "python": "key pattern [3]"
+  },
+  {
+   "text": "I pin my favourite chats",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "the key point is speed",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "my keyboard has a broken key",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "a secret santa at work",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "I keep a password-free laptop",
+   "want": true,
+   "python": "word 'password'"
+  },
+  {
+   "text": "my card game club meets Fridays",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "my account is with Hetzner",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "I use a token system for chores",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "the shop code is BLACKFRIDAY",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "https://example.com/shop/autumn-sale-2026/boots-and-more",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "/Users/peter/Documents/project2026/notes",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "C:/Users/Peter/Documents/Project2026/Budget",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "supercalifragilisticexpialidocious",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "task-management-for-my-tennis-club-2026",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "I asked about AKIA on the forum",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "we meet at 12:30",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "I spin on Mondays",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "Pinja",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "my spinning class",
+   "want": false,
+   "python": null
+  },
+  {
+   "text": "the login page looks odd",
+   "want": true,
+   "python": "word 'login'"
+  }
+ ]
+}

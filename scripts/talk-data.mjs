@@ -67,10 +67,11 @@ export function checkLine(line, kind = 'reply') {
 const NEXT_KINDS = ['part', 'paste', 'line', 'none']
 // The fixed lines the code says, and which of them show things to pick.
 export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'K1']
-// Row 5 of docs/build/talk-v2-plan.md (the wants: "Web, files, pictures and voice" under C1) is not
-// in this build. held_picks.note: then the held picks that are not topics are dropped, and C1 says
+// Row 5 of docs/build/talk-v2-plan.md (the wants: "Web, files, pictures and voice" under C1) is in
+// this build (job talk-v2-wants): C1 says its full text and holds the wants pick first. With
+// WANTS_BUILT false, held_picks.note: the held picks that are not topics are dropped, and C1 says
 // its text_without_wants.
-export const WANTS_BUILT = false
+export const WANTS_BUILT = true
 const C1_TEXT = f => (f.id === 'C1' && !WANTS_BUILT && f.text_without_wants ? f.text_without_wants : f.text)
 const heldOf = (d, p) => (p.holds || []).filter(x => WANTS_BUILT || !(d.held_picks || {})[x])
 
@@ -212,7 +213,8 @@ export function talkProblems(d) {
     }
   }
   for (const t of d.terms || []) if (!NEXT_KINDS.includes(t.next && t.next.kind)) problems.push(`term ${t.id}: button of an unknown kind`)
-  const reach = (d.topic_picks || []).flatMap(p => (p.holds ? heldOf(d, p) : [p.gives])).sort()
+  // the held picks that are not topics (the wants) are checked by scripts/wants-data.mjs
+  const reach = (d.topic_picks || []).flatMap(p => (p.holds ? heldOf(d, p) : [p.gives])).filter(x => !(d.held_picks || {})[x]).sort()
   if (reach.join() !== [...topicIds].sort().join()) problems.push(`the topic picks do not reach every topic exactly once: ${reach.join(' ')}`)
   for (const p of d.topic_picks || []) {
     for (const x of p.holds || []) if (!topicIds.includes(x) && !(d.held_picks || {})[x]) problems.push(`the pick "${p.label}" holds ${x}, which is not a topic`)
@@ -282,9 +284,12 @@ export function slimTalkData(d, skills = { skills: [] }) {
     answers: pickKeys(d.answers, ['max_at_once', 'hint_under_question', 'hint_under_topics']),
     fixed,
     opening: {
-      ...pickKeys(d.opening, ['name_strong_pattern', 'name_weak_pattern', 'pattern_flags', 'short_answer_max_words', 'name_max_chars', 'not_a_name', 'question_starts', 'work_max_words', 'work_max_chars']),
+      ...pickKeys(d.opening, ['name_strong_pattern', 'name_weak_pattern', 'pattern_flags', 'short_answer_max_words', 'name_max_chars', 'not_a_name', 'question_starts', 'work_max_words', 'work_max_chars', 'name_refused_words_also']),
       name_with_more: pickKeys(d.opening.name_with_more, ['after_name', 'self_starts'])
     },
+    // changes-10: the K1 key shapes, one list for the message box, "remember that ..." and the
+    // settings page (src/key-check.js)
+    key_patterns: d.key_patterns.patterns,
     build: pickKeys(d.build, ['skip_starts', 'how_phrases', 'build_words', 'build_pair']),
     ignore_phrases: d.ignore_phrases,
     unsure_words: d.unsure_words,
@@ -292,6 +297,9 @@ export function slimTalkData(d, skills = { skills: [] }) {
     hermes_words: d.hermes_words,
     asks_for_topics: pickKeys(d.asks_for_topics, ['phrases', 'whole_message']),
     topic_picks: d.topic_picks.map(p => ({ ...pickKeys(p, ['label', 'gives', 'line']), ...(p.holds ? { holds: heldOf(d, p) } : {}) })),
+    // the held picks that are not topics (changes-9: wants), each with its label
+    held_picks: Object.keys(d.held_picks || {}).filter(k => k !== 'note' && WANTS_BUILT),
+    held_labels: Object.fromEntries(Object.entries(d.held_picks || {}).filter(([k]) => k !== 'note' && WANTS_BUILT).map(([k, v]) => [k, v.label])),
     topics: d.topics.map(t => ({
       ...pickKeys(t, ['id', 'part', 'part_if_no_memory_part', 'key_words', 'misspellings', 'weak_key_words', 'weak_only_in_question_about_hermes']),
       pick: pickKeys(t.pick, ['label']),

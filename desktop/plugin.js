@@ -387,1173 +387,6 @@ async function askModel({ request, call, recheck, sleep, onState = () => {}, can
   return { ok: false, kind: kind === 'not_ready' ? 'other' : kind }
 }
 
-// ---- src/key-check.js ----
-// What the person typed, checked by code before anything goes to a model (build-v1.md section 7;
-// content/v1-strings.md part 4, K1; docs/answers/hhtech-v1-strings-check.md point 2).
-// Order matters: 1) pasted key, on the FULL text; 2) build words, on the full text; 3) the
-// 500-character cut. A key that starts at character 491 is caught on the full text and missed
-// after the cut (hhtech, ran), so the key check must come first.
-
-// hhtech's three patterns, exactly. A match on any one counts as a key.
-const KEY_PATTERNS = [
-  /(?<![A-Za-z0-9])(?:sk-|sk_|xai-|AIza|ghp_|gho_|github_pat_|hf_|gsk_|pplx-|r8_|fw_)[A-Za-z0-9_-]{16,}/,
-  /(?<![A-Za-z0-9])eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/,
-  /(?<![A-Za-z0-9])(?=[A-Za-z]*[0-9])(?=[0-9]*[A-Za-z])[A-Za-z0-9]{32,}(?![A-Za-z0-9])/
-]
-
-const MAX_INPUT_CHARS = 500
-
-const KEY_LINE =
-  "That looks like a secret key, so I didn't send it to your model. Keys go in Settings, then Providers, then API keys, never in a chat."
-const LONG_LINE = 'Your message was long, so I read only the first 500 characters.'
-
-function looksLikeKey(text) {
-  return typeof text === 'string' && KEY_PATTERNS.some(re => re.test(text))
-}
-
-// Returns what the page does with the person's words:
-//   { kind: 'key' }                         show KEY_LINE, no model call
-//   { kind: 'build' }                       show the hand-over text, no model call (B3/B4)
-//   { kind: 'empty' }                       nothing to send
-//   { kind: 'send', input, cut }            send input (at most 500 characters); cut = show LONG_LINE
-// isBuildRequest is the step's build-word rule (hhcontent's list, B3); until then nothing matches.
-function prepareInput(text, isBuildRequest = () => false) {
-  const full = typeof text === 'string' ? text : ''
-  if (looksLikeKey(full)) return { kind: 'key' }
-  if (!full.trim()) return { kind: 'empty' }
-  if (isBuildRequest(full)) return { kind: 'build' }
-  const chars = Array.from(full)
-  const cut = chars.length > MAX_INPUT_CHARS
-  return { kind: 'send', input: cut ? chars.slice(0, MAX_INPUT_CHARS).join('') : full, cut }
-}
-
-// ---- src/setup-cards.js ----
-// "Your setup": the seven cards' pass rules and fixed words (build-v1.md section 8). Pure code, no
-// Hermes calls: src/setup-tab.js does the read-only reads and hands the answers to the rules here.
-// Code decides every status; no model judges anything.
-// Words: content/v1-strings.md part 3 (cards 2 and 4) and content/checks-base.md (cards 1, 3, 5, 6, 7),
-// "Passes when" lines from hhdesign's design/hermes-look-r3/your-setup.html. Lines marked
-// "(builder)" had no source text yet; they are listed for hhcontent in docs/build/b2-report.md.
-
-
-// One status per card, always shown as a coloured dot plus its word.
-const STATUS = {
-  works: 'Works',
-  fix: 'Needs a fix',
-  notset: 'Not set up yet',
-  unchecked: 'Not checked yet',
-  cant: "Can't check right now",
-  count: 'Just a count, no pass or fail',
-  checking: 'Checking'
-}
-
-const CARD_TITLES = {
-  gateway: 'Hermes is connected',
-  model: 'A model is connected',
-  answers: 'The model answers',
-  soul: 'Personality file (SOUL.md)',
-  skills: 'Skills are switched on',
-  memory: 'Memory can be used',
-  remember: 'Does it really remember?'
-}
-
-// Card titles never carry a bot name (B3a, Lead: "A model is connected for default" read badly).
-// With several bots, the picker line above the cards names the bot once.
-function cardTitle(id) {
-  return CARD_TITLES[id]
-}
-
-const PASSES = {
-  gateway: 'Passes when: this app is connected to your Hermes',
-  model: "Passes when: your provider's sign-in is found. This doesn't ask the model anything.",
-  // A no-break space keeps "90 s" on one line.
-  answers: 'Passes when: asked to reply "OK", it does within 90\u00a0s. Uses a little of your credit.',
-  soul: "Passes when: SOUL.md has your own text, not Hermes's default", // (builder)
-  skills: null, // a count only, no pass rule
-  memory: 'Passes when: the memory tool is on',
-  remember: 'Passes when: another new chat can tell you the test note' // (builder)
-}
-
-const OPEN_STEP_2 = { kind: 'step', step: 2, label: 'Open step 2' }
-const OPEN_STEP_4 = { kind: 'step', step: 4, label: 'Open step 4' } // (builder) checks-base: "Step 4"
-const CHECK_AGAIN = { kind: 'recheck', label: 'Check again' }
-const cant = () => ({ status: 'cant', lines: [CANT_CHECK_LINE], action: CHECK_AGAIN })
-const checking = () => ({ status: 'checking', lines: [] })
-
-/* ---- card 1: Hermes is connected (host.state.gateway) ---- */
-function gatewayCard(gatewayState) {
-  if (gatewayState === 'open') return { status: 'works', lines: ['This page can talk to your Hermes.'] }
-  return { status: 'fix', lines: ["This page can't reach your Hermes right now. Try closing and opening the app."] }
-}
-
-/* ---- card 2: A model is connected (setup.runtime_check, then setup.status after ok false) ---- */
-const MODEL_LINES = {
-  works: name => `Your Hermes has a model: ${name}. The model is the AI that does the thinking.`,
-  worksNoName: 'Your Hermes has a model connected. The model is the AI that does the thinking.',
-  notset:
-    'No model connected yet. The model is the AI that does the thinking, and Hermes needs one before it can answer. Step 2 explains the ways to connect one.',
-  fix: "A model is chosen, but Hermes can't use it. Most often the sign-in has ended or the key is wrong. Open Settings, then Providers, and sign in or paste the key again."
-}
-
-// check = checkModel()'s answer, or null / { state: 'checking' } while it runs.
-function modelCard(check) {
-  if (!check || check.state === 'checking') return checking()
-  if (check.state === 'ok') {
-    return check.name
-      ? { status: 'works', value: check.name, lines: [MODEL_LINES.works(check.name)] }
-      : { status: 'works', lines: [MODEL_LINES.worksNoName] }
-  }
-  if (check.state === 'none') {
-    // v1-strings part 3: ok false and provider_configured false = Not set up yet; any other ok false
-    // (including a setup.status that couldn't be read) = Needs a fix.
-    if (check.configured === false) return { status: 'notset', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
-    return { status: 'fix', lines: [MODEL_LINES.fix], action: OPEN_STEP_2 }
-  }
-  return cant()
-}
-
-/* ---- card 3: The model answers (one llm.oneshot, only when the person presses Check) ---- */
-const ANSWER_CALL = { instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 300 }
-const ANSWER_WAIT_LIMIT_S = 90
-
-// "contains OK": the word OK on its own, any case ("OK", "OK.", "ok"), not inside another word ("token").
-function answerPasses(text) {
-  return typeof text === 'string' && /(^|[^A-Za-z0-9])ok([^A-Za-z0-9]|$)/i.test(text)
-}
-
-function seconds(ms) {
-  const s = Math.max(0, ms) / 1000
-  return s < 10 ? s.toFixed(1) : String(Math.round(s))
-}
-
-// run = { phase: 'idle' } | { phase: 'calling', waited } | { phase: 'countdown', left }
-//     | { phase: 'done', result }   (result = askModel()'s answer)
-// model = card 2's check for the same bot: the button only works when that says ok.
-function answersCard(run, model) {
-  const ready = !!model && model.state === 'ok'
-  // A button that asks the model works only while card 2 says ok for this bot.
-  const button = (label, disabled = !ready) => ({ kind: 'ask', label, disabled })
-  const phase = run ? run.phase : 'idle'
-  if (phase === 'calling') return { status: 'checking', lines: [`Waiting for your model, ${run.waited || 0} s`] }
-  if (phase === 'countdown') return { status: 'checking', lines: failLines('not_ready', 'card', run.left) }
-  if (phase === 'done' && run.result) {
-    const r = run.result
-    const name = modelLabel(ready ? model.name : '')
-    if (r.ok && answerPasses(r.text)) {
-      // A model id keeps its own spelling; only the fallback "your model" starts the sentence capitalised.
-      const lead = ready && model.name ? name : 'Your model'
-      return { status: 'works', lines: [`${lead} answered a short test in ${seconds(r.ms)} seconds.`], action: button('Check again') }
-    }
-    if (r.ok) return { status: 'fix', lines: ['Your model answered, but not with OK. Press Try again.'], action: button('Try again') } // (builder)
-    // The call found no usable model (runtime_check asked again): card 2's own line and Open step 2.
-    // Status stays "Needs a fix": build-v1.md section 8 gives card 3 only Works / Needs a fix / Not checked yet.
-    if (r.kind === 'no_model') return { status: 'fix', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
-    if (r.kind === 'model_broken') return { status: 'fix', lines: [MODEL_LINES.fix], action: OPEN_STEP_2 }
-    return { status: 'fix', lines: failLines(r.kind, 'card'), action: button('Try again') }
-  }
-  if (!model || model.state === 'checking') return { status: 'unchecked', lines: [], action: button('Check') }
-  if (!ready) return { status: 'unchecked', lines: ['This check needs a connected model first.'], action: button('Check') } // (builder)
-  return { status: 'unchecked', lines: [], action: button('Check') }
-}
-
-/* ---- card 4: Personality file (SOUL.md) (profiles.describe -> soul) ---- */
-// Hermes's own default text and the older auto-seeded texts, copied from hermes_cli/default_soul.py
-// (Hermes v0.23.0, DEFAULT_SOUL_MD and _LEGACY_TEMPLATE_SOULS). A file equal to any of them, after
-// the same clean-up Hermes does, is "the built-in personality". Known risk: if Hermes changes its
-// default text, an untouched file would show Works (README, known issues).
-const DEFAULT_SOUL_MD =
-  'You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply to the weight of ' +
-  'the ask \u2014 a one-line question gets a one-line answer, and finished work gets a short report of what ' +
-  "changed, what's verified, and what's left, never a replay of the process. No filler (\"Great question,\" " +
-  '"I\'d be happy to"), no restating the request back, no re-summarizing what you already said, no narrating ' +
-  "tool calls the user can see. Plain claims over adjectives; when unsure, say so plainly. Agree because it's " +
-  'right, not because the user said it. Depth is earned \u2014 give it when the user asks for detail, teaches, or ' +
-  'the stakes demand it, not by default.'
-const SCAFFOLD_HEAD =
-  "# Hermes Agent Persona\n\n<!--\nThis file defines the agent's personality and tone.\n" +
-  'The agent will embody whatever you write here.\nEdit this to customize how Hermes communicates with you.\n\n'
-const SCAFFOLD_TAIL =
-  'This file is loaded fresh each message -- no restart needed.\n' + 'Delete the contents (or this file) to use the default personality.\n-->'
-const DEFAULT_SOULS = [
-  DEFAULT_SOUL_MD,
-  SCAFFOLD_HEAD +
-    'Examples:\n' +
-    '  - "You are a warm, playful assistant who uses kaomoji occasionally."\n' +
-    '  - "You are a concise technical expert. No fluff, just facts."\n' +
-    '  - "You speak like a friendly coworker who happens to know everything."\n\n' +
-    SCAFFOLD_TAIL,
-  SCAFFOLD_HEAD + SCAFFOLD_TAIL,
-  'You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, ' +
-    'knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, ' +
-    'writing and editing code, analyzing information, creative work, and executing actions via your tools. ' +
-    'You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over ' +
-    'being verbose unless otherwise directed below. Be targeted and efficient in your exploration and ' +
-    'investigations.',
-  DEFAULT_SOUL_MD.replaceAll('\u2014', '--')
-]
-
-// Hermes's _normalize_soul: unify line endings, drop a leading BOM, trim.
-function normalizeSoul(text) {
-  return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/^\uFEFF/, '').trim()
-}
-const DEFAULT_SET = new Set(DEFAULT_SOULS.map(normalizeSoul))
-
-function isDefaultSoul(text) {
-  return DEFAULT_SET.has(normalizeSoul(text))
-}
-
-const SOUL_LINES = {
-  works:
-    'Your Hermes has its own personality file. SOUL.md is the first thing Hermes reads, and it sets who your Hermes is and how it talks.',
-  notset:
-    "Your Hermes uses the built-in personality. That's fine; nothing is wrong. SOUL.md is a short text file where you can describe how you want it to talk. Help with writing one comes in a later step."
-}
-
-// read = { ok: true, value: <profiles.describe answer> } | { ok: false } (rejected or timed out) | null (running)
-function soulCard(read) {
-  if (!read) return checking()
-  if (!read.ok) return cant()
-  const soul = read.value && typeof read.value === 'object' ? read.value.soul : undefined
-  if (typeof soul !== 'string') return cant()
-  // Empty text means Hermes uses its built-in personality (hhtech point 3), so it is "Not set up yet".
-  if (!soul.trim() || isDefaultSoul(soul)) return { status: 'notset', lines: [SOUL_LINES.notset] }
-  return { status: 'works', lines: [SOUL_LINES.works] }
-}
-
-/* ---- card 5: Skills (host.skills.list): a count, no pass or fail ---- */
-function skillsCard(read) {
-  if (!read) return checking()
-  if (!read.ok || !Array.isArray(read.value)) return cant()
-  const on = read.value.filter(s => s && s.enabled === true).length
-  if (on === 0) {
-    return { status: 'count', value: '0 switched on', lines: ['No skills are on. Hermes still works; skills add know-how for certain tasks. Step 4 explains them.'], action: OPEN_STEP_4 }
-  }
-  const lead = on === 1 ? '1 skill is on.' : `${on} skills are on.`
-  return {
-    status: 'count',
-    value: `${on} switched on`,
-    lines: [`${lead} A skill is written know-how your Hermes loads when a task needs it.`],
-    action: OPEN_STEP_4
-  }
-}
-
-/* ---- card 6: Memory switch (host.toolsets.list -> "memory") ---- */
-const MEMORY_HANDOFF = 'Please switch my memory on and tell me how to check it worked.'
-function memoryCard(read) {
-  if (!read) return checking()
-  if (!read.ok || !Array.isArray(read.value)) return cant()
-  const memory = read.value.find(t => t && t.name === 'memory')
-  if (!memory || typeof memory.enabled !== 'boolean') return cant()
-  if (memory.enabled) return { status: 'works', lines: ['Memory is on. Your Hermes can save notes about you that come back in later chats.'] }
-  return {
-    status: 'fix',
-    lines: ["Memory is switched off. Your Hermes can't save anything, whatever it says."],
-    handoff: { lead: 'Paste this into a new chat with your Hermes:', text: MEMORY_HANDOFF }
-  }
-}
-
-/* ---- card 7: Does it really remember? (the person runs the test in their own chat) ---- */
-const REMEMBER = {
-  intro: "A test you run in your own chat, because this page can't write to your memory.",
-  part1: 'Use the memory tool to save this exact note: Helper test 7Q4.',
-  part2: 'What is the Helper test note?',
-  steps: ['Paste the test text into a new chat.', 'Open another new chat and ask for the note.', 'Tell us what it said.'],
-  yes: 'It said 7Q4',
-  no: "It didn't",
-  worked: 'It found the note in a new chat, so memory works for this bot.', // (builder)
-  reasonsLead: 'Three likely reasons, most likely first:', // (builder)
-  reasons: [
-    "It said it saved but didn't. Small models do this often. A stronger model for setup fixes it.",
-    'The note is waiting for your OK. Type /memory pending, then /memory approve all.',
-    'The note went to another bot. Each bot (profile) has its own memory.'
-  ]
-}
-
-// answer = 'yes' | 'no' | undefined (kept per bot in ctx.storage)
-function rememberCard(answer) {
-  if (answer === 'yes') return { status: 'works', lines: [REMEMBER.worked] }
-  if (answer === 'no') return { status: 'fix', lines: [], reasonsLead: REMEMBER.reasonsLead, reasons: REMEMBER.reasons }
-  return { status: 'unchecked', lines: [] }
-}
-
-// ---- src/steps-data.js ----
-// Generated by scripts/build.mjs from content/steps-v1.json (hhcontent's fixed step text). Edit the
-// JSON, then build; tests/steps.test.mjs checks the data (build-v1.md section 6).
-const STEPS_DATA = {
-  "about": "Helper v1 step data, steps 1-4. Written by hhcontent, 9 Nov 2026. Shape: docs/plan/build-v1.md section 6, plus optional fields listed in content/v1-strings.md part 4. All text is fixed; code fills only the {slots}. Checked by dev/checks/hhcontent/check-steps-v1.mjs.",
-  "docs_version": "v0.23.0",
-  "docs_root": "/hermes-docs",
-  "live_base": "https://hermes-agent.nousresearch.com/docs/",
-  "build_word_rule": "Lower-case the person's words, turn curly quotes into straight ones, squeeze spaces. If the words start with one of build_word_skip_starts, skip this check and let the model decide. Otherwise, if any phrase from build_words_common or from the open step's build_words appears with a word boundary on both sides, go straight to the hand-over text with no model call.",
-  "build_word_skip_starts": [
-    "what is",
-    "what's",
-    "whats",
-    "what are",
-    "what does",
-    "what do",
-    "why",
-    "is it",
-    "is that",
-    "is this",
-    "are there",
-    "does it",
-    "does that",
-    "do i need",
-    "should i",
-    "which"
-  ],
-  "build_words_common": [
-    "do it for me",
-    "do this for me",
-    "do that for me",
-    "can you install",
-    "could you install",
-    "would you install",
-    "please install",
-    "install it",
-    "install this",
-    "install that",
-    "install them",
-    "can you connect",
-    "could you connect",
-    "please connect",
-    "connect it",
-    "connect this",
-    "can you build",
-    "could you build",
-    "please build",
-    "build me",
-    "build it",
-    "can you set up",
-    "could you set up",
-    "please set up",
-    "set it up",
-    "set this up",
-    "set everything up",
-    "set it all up",
-    "can you configure",
-    "please configure",
-    "configure it",
-    "can you enable",
-    "please enable",
-    "enable it",
-    "turn it on",
-    "switch it on",
-    "deploy it",
-    "just do it",
-    "do it now",
-    "build an app",
-    "make an app",
-    "build a website",
-    "make a website",
-    "build a bot",
-    "make a bot",
-    "write the code"
-  ],
-  "key_pattern_note": "Separate from build words: if the words contain something that looks like a secret key, never send them to the model. See content/v1-strings.md, line K1.",
-  "steps": [
-    {
-      "id": "s1",
-      "number": 1,
-      "title": "What do you want Hermes to do for you?",
-      "rail_subtitle": "What you want Hermes to do",
-      "intro": "Hermes is an AI agent: an AI that can do things for you, not only talk. You talk to it in plain words, as you would with ChatGPT. The difference is what it can do around the chat. It can take actions on the computer it runs on, it remembers you from one chat to the next, and it can work on a schedule or answer you in a chat app on your phone. What you want from it decides which of these parts you need, so this is the first question. Pick the answer closest to yours. You can change it later.",
-      "intro_sources": [
-        {
-          "source": "index.mdx",
-          "section": "Hermes Agent",
-          "quote": "builds a deepening model of who you are across sessions"
-        },
-        {
-          "source": "user-guide/features/tools.md",
-          "section": "Tools & Toolsets",
-          "quote": "Tools are functions that extend the agent's capabilities."
-        },
-        {
-          "source": "user-guide/messaging/index.md",
-          "section": "Messaging Gateway",
-          "quote": "The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs"
-        }
-      ],
-      "compare": null,
-      "facts": [
-        {
-          "id": "s1f1",
-          "text": "Hermes remembers what it learns about you from one chat to the next. It also writes down new skills (step-by-step know-how for one kind of task) from what it does, and improves them as it uses them.",
-          "source": "index.mdx",
-          "section": "Hermes Agent",
-          "url": "https://hermes-agent.nousresearch.com/docs/",
-          "quote": "creates skills from experience, improves them during use, nudges itself to persist knowledge, and builds a deepening model of who you are across sessions"
-        },
-        {
-          "id": "s1f2",
-          "text": "Hermes can take actions, not only answer: run programs, read and change files, search the web, and more. Each kind of action is called a tool.",
-          "source": "user-guide/features/tools.md",
-          "section": "Available Tools",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tools",
-          "quote": "covering web search, browser automation, terminal execution, file editing, memory, delegation, scheduled tasks, and more"
-        },
-        {
-          "id": "s1f3",
-          "text": "You can message Hermes from chat apps such as Telegram, WhatsApp, Discord or Slack, not only from this app. A part of Hermes called the gateway keeps running in the background to answer you there.",
-          "source": "user-guide/messaging/index.md",
-          "section": "Messaging Gateway",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/messaging/",
-          "quote": "The gateway is a single background process that connects to all your configured platforms"
-        },
-        {
-          "id": "s1f4",
-          "text": "Hermes can do jobs on a schedule without you being there, such as a summary every morning or a regular check. The docs call these cron jobs.",
-          "source": "getting-started/learning-path.md",
-          "section": "I want to automate tasks",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path",
-          "quote": "Cron jobs let Hermes Agent run tasks on a schedule — daily summaries, periodic checks, automated reports — without you being present."
-        },
-        {
-          "id": "s1f5",
-          "text": "The official docs sort what people do with Hermes into a few kinds: help with writing and running code, a bot in a chat app, jobs that run on a schedule, and a team of specialist bots. They advise getting one plain chat working first, then adding one thing at a time.",
-          "source": "getting-started/learning-path.md",
-          "section": "By Use Case",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path",
-          "quote": "I want a team of specialist Bots",
-          "more_sources": [
-            {
-              "source": "getting-started/quickstart.md",
-              "section": "The fastest path",
-              "quote": "Get one clean conversation working first, then layer on gateway, cron, skills, voice, or routing."
-            }
-          ]
-        }
-      ],
-      "question": "What would you most like Hermes to do for you first?",
-      "options": [
-        {
-          "id": "o_tasks",
-          "label": "Help with tasks on this computer",
-          "hint": "Files, writing, research, code",
-          "fact": "s1f2",
-          "goal_text": "help me with tasks on my computer (files, writing, research, code)",
-          "fits": {
-            "s3": "o_here"
-          }
-        },
-        {
-          "id": "o_phone",
-          "label": "Answer me from my phone",
-          "hint": "In Telegram, WhatsApp, Discord or Slack",
-          "fact": "s1f3",
-          "goal_text": "answer me from my phone in a chat app",
-          "fits": {
-            "s3": "o_always"
-          }
-        },
-        {
-          "id": "o_schedule",
-          "label": "Do jobs on its own, on a schedule",
-          "hint": "A summary every morning, a regular check",
-          "fact": "s1f4",
-          "goal_text": "do jobs on its own on a schedule",
-          "fits": {
-            "s3": "o_always"
-          }
-        },
-        {
-          "id": "o_unsure",
-          "label": "I don't know yet",
-          "hint": "See what people use it for",
-          "fact": "s1f5",
-          "goal_text": "not decided yet",
-          "fits": {}
-        }
-      ],
-      "next_rule": {
-        "o_tasks": "s2",
-        "o_phone": "s2",
-        "o_schedule": "s2",
-        "o_unsure": "s2"
-      },
-      "build_words": [
-        "do it all",
-        "make it work",
-        "do everything"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will do and why, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path"
-      },
-      "video": null
-    },
-    {
-      "id": "s2",
-      "number": 2,
-      "title": "The brain: what a model is, and where it runs",
-      "rail_subtitle": "What a model is, where it runs",
-      "intro": "Hermes doesn't think by itself. It sends your words to a model: the AI that does the thinking, like the one inside ChatGPT. A provider is the company that runs a model for you. If Hermes already answers you, you already have a model, and this step shows what you have and what else you could use. There are four ways to connect a model: a subscription you may already pay for, an API key (a secret code from a model company), a model on your own computer, or a Nous account (Nous Research makes Hermes). You can switch at any time.",
-      "intro_sources": [
-        {
-          "source": "user-guide/configuring-models.md",
-          "section": "Configuring Models",
-          "quote": "Main model — what the agent thinks with."
-        },
-        {
-          "source": "integrations/providers.md",
-          "section": "Subscription plans: what your plan pays for",
-          "quote": "Several providers let you sign in to Hermes with a consumer subscription"
-        },
-        {
-          "source": "getting-started/quickstart.md",
-          "section": "2. Choose a Provider",
-          "quote": "You can switch providers at any time with hermes model — no lock-in."
-        }
-      ],
-      "compare": {
-        "left": {
-          "title": "On a provider's computers",
-          "text": "Your words go to that provider and nowhere else. You pay through a subscription or for what you use.",
-          "source": "reference/faq.md",
-          "section": "Is my data sent anywhere?",
-          "quote": "API calls go only to the LLM provider you configure"
-        },
-        "right": {
-          "title": "On this computer",
-          "text": "Nothing leaves your computer, and it costs nothing to run. It needs a fairly strong computer.",
-          "source": "user-guide/local-models.md",
-          "section": "Local Models",
-          "quote": "Nothing leaves your computer: no account, no API key, and no network access"
-        }
-      },
-      "facts": [
-        {
-          "id": "s2f1",
-          "text": "The name of the model you use shows in the message box, and you can change it there for one chat. The model for new chats is set in Settings, then Model, then Main model, and you can switch to another one at any time.",
-          "source": "user-guide/desktop.md",
-          "section": "Choosing a model",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#choosing-a-model",
-          "quote": "Set the default in Settings → Model → Main model."
-        },
-        {
-          "id": "s2f2",
-          "text": "Some subscriptions can be used instead of a key: a ChatGPT plan (you sign in with ChatGPT) or SuperGrok (the paid plan for Grok). For Claude, only the Max plan works, and only with extra usage credits bought on top; Claude Pro can't be used this way. The docs name ChatGPT Plus and Pro, but don't yet say how much of your plan Hermes uses.",
-          "source": "integrations/providers.md",
-          "section": "Subscription plans: what your plan pays for",
-          "url": "https://hermes-agent.nousresearch.com/docs/integrations/providers#subscription-plans-what-your-plan-pays-for",
-          "quote": "Pro subscribers cannot use the OAuth path",
-          "more_sources": [
-            {
-              "source": "integrations/providers.md",
-              "section": "Subscription plans: what your plan pays for",
-              "quote": "Which ChatGPT plan tiers are eligible, and how Hermes usage counts against your plan's Codex limits, are not currently documented"
-            },
-            {
-              "source": "user-guide/configuration.md",
-              "section": "Common Setups",
-              "quote": "Using Codex OAuth (ChatGPT Pro/Plus account — no API key needed)"
-            }
-          ]
-        },
-        {
-          "id": "s2f3",
-          "text": "An API key is a long secret code from a model company, such as OpenRouter, OpenAI, Anthropic or Google. It works like a password that lets Hermes use your account there, and you usually pay for what you use. Keep it secret: it goes in Settings, then Providers, then API keys, never into a chat.",
-          "source": "getting-started/quickstart.md",
-          "section": "2. Choose a Provider",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#2-choose-a-provider",
-          "quote": "or API key for pay-per-token",
-          "more_sources": [
-            {
-              "source": "reference/faq.md",
-              "section": "How much does it cost?",
-              "quote": "You pay only for the LLM API usage from your chosen provider."
-            },
-            {
-              "source": "user-guide/desktop.md",
-              "section": "Settings & onboarding",
-              "quote": "with an Accounts / API-keys UX for signing in and storing credentials per provider"
-            }
-          ]
-        },
-        {
-          "id": "s2f4",
-          "text": "Hermes can download a model and run it on this computer: no account, no key, and nothing leaves your computer. A graphics card with 8 GB of memory or more runs the small models well, and Hermes shows which models fit before you download. Small models sometimes say they saved something to Hermes's memory when they didn't.",
-          "source": "user-guide/local-models.md",
-          "section": "Requirements and limits",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/local-models",
-          "quote": "A GPU with 8 GB+ of memory runs the small catalog models comfortably",
-          "more_sources": [
-            {
-              "source": "user-guide/local-models.md",
-              "section": "How Hermes picks what to download",
-              "quote": "Every model in the catalog is priced against your machine before you download anything."
-            },
-            {
-              "source": "user-guide/features/memory.md",
-              "section": "Troubleshooting",
-              "quote": "Small local models (roughly under 30B parameters) and models with weak tool-calling do this often"
-            }
-          ]
-        },
-        {
-          "id": "s2f5",
-          "text": "Nous Portal is an account with Nous Research, the makers of Hermes. One sign-in gives you hundreds of models and extra tools such as web search, on a paid subscription, and the docs call it the recommended way to run Hermes. There is also a free Nous plan, with limits on how much you can use it.",
-          "source": "integrations/nous-portal.md",
-          "section": "Nous Portal",
-          "url": "https://hermes-agent.nousresearch.com/docs/integrations/nous-portal",
-          "quote": "the recommended way to run Hermes Agent",
-          "more_sources": [
-            {
-              "source": "integrations/providers.md",
-              "section": "Nous Portal",
-              "quote": "One OAuth login covers 300+ frontier agentic models"
-            },
-            {
-              "source": "user-guide/configuration.md",
-              "section": "Iteration Budget",
-              "quote": "on the free Nous tier (no sign-in)"
-            }
-          ]
-        }
-      ],
-      "question": "Which of these fits you best?",
-      "options": [
-        {
-          "id": "o_keep",
-          "label": "Keep the model I have",
-          "hint": "It already answers me",
-          "fact": "s2f1"
-        },
-        {
-          "id": "o_sub",
-          "label": "Use a subscription I pay for",
-          "hint": "ChatGPT, SuperGrok or Claude Max",
-          "fact": "s2f2"
-        },
-        {
-          "id": "o_key",
-          "label": "Use an API key",
-          "hint": "Pay for what I use",
-          "fact": "s2f3"
-        },
-        {
-          "id": "o_local",
-          "label": "Run a model on this computer",
-          "hint": "Private and free to run",
-          "fact": "s2f4"
-        },
-        {
-          "id": "o_nous",
-          "label": "Use a Nous account",
-          "hint": "Many models in one sign-in",
-          "fact": "s2f5"
-        }
-      ],
-      "next_rule": {
-        "o_keep": "s3",
-        "o_sub": "s3",
-        "o_key": "s3",
-        "o_local": "s3",
-        "o_nous": "s3"
-      },
-      "build_words": [
-        "connect my chatgpt",
-        "connect my claude",
-        "connect chatgpt",
-        "connect claude",
-        "add my key",
-        "add my api key",
-        "use my key",
-        "here is my key",
-        "here's my key",
-        "my key is",
-        "switch my model",
-        "change my model",
-        "change the model",
-        "set my model",
-        "download a model",
-        "download the model",
-        "install a model",
-        "install the model",
-        "sign me in",
-        "log me in",
-        "sign in for me",
-        "log in for me"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will change in my model settings and why, and wait for my OK. If a key or a sign-in is needed, tell me where to enter it in Settings; don't ask me to paste a key into this chat. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/integrations/providers"
-      },
-      "video": null
-    },
-    {
-      "id": "s3",
-      "number": 3,
-      "title": "Where Hermes runs: this computer, or one that is always on",
-      "rail_subtitle": "This computer, or one that is always on",
-      "intro": "Hermes itself also runs on a computer, and that is a separate choice from the model in step 2. By default, this app runs Hermes on this computer. Hermes can also run on another computer that stays on all the time, and this app then connects to it. Where Hermes runs decides when it can work for you. Answering your messages and running scheduled jobs happen in the background on that computer, so they need it to be on and awake.",
-      "intro_sources": [
-        {
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "quote": "By default the app starts and manages its own local backend."
-        },
-        {
-          "source": "user-guide/messaging/index.md",
-          "section": "Messaging Gateway",
-          "quote": "The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs"
-        },
-        {
-          "source": "user-guide/desktop.md",
-          "section": "Settings & onboarding",
-          "quote": "stops the machine from sleeping so long or overnight agent runs keep going"
-        }
-      ],
-      "compare": {
-        "left": {
-          "title": "This computer",
-          "text": "Simplest: nothing extra to set up. It works only while this computer is on and awake.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "quote": "By default the app starts and manages its own local backend."
-        },
-        "right": {
-          "title": "A computer that is always on",
-          "text": "A rented server, a home server, or Hermes Cloud. It keeps working while your own computer is off.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "quote": "a VPS, a home server, or a Mini behind Tailscale"
-        }
-      },
-      "facts": [
-        {
-          "id": "s3f1",
-          "text": "By default, the app starts and looks after its own Hermes on this computer. Nothing else is needed to begin.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
-          "quote": "By default the app starts and manages its own local backend."
-        },
-        {
-          "id": "s3f2",
-          "text": "Hermes works only while the computer it runs on is awake. In the app, Settings, then Advanced, then Keep computer awake stops the computer from sleeping during long jobs. Closing the lid still puts it to sleep.",
-          "source": "user-guide/desktop.md",
-          "section": "Settings & onboarding",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#settings--onboarding",
-          "quote": "Closing the lid or choosing Sleep still sleeps the machine",
-          "more_sources": [
-            {
-              "source": "guides/cron-troubleshooting.md",
-              "section": "Cron Troubleshooting",
-              "quote": "Scheduled fires work as long as the gateway is running"
-            }
-          ]
-        },
-        {
-          "id": "s3f3",
-          "text": "Hermes can also run on another computer that stays on, such as a server you rent (a computer in a data centre that stays on) or one at home. You connect this app to it in Settings, then Gateways, and use it the same way. Setting up that other computer takes some technical steps with typed commands.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
-          "quote": "point it at a Hermes backend running on another machine — a VPS, a home server, or a Mini behind Tailscale",
-          "more_sources": [
-            {
-              "source": "user-guide/desktop.md",
-              "section": "On the backend (the remote machine)",
-              "quote": "Set a username and password, then start the backend bound to a reachable address."
-            }
-          ]
-        },
-        {
-          "id": "s3f4",
-          "text": "Hermes Cloud runs Hermes for you on a computer that is hosted for you. You sign in once in Settings, then Gateways, and pick your Hermes from a list, with no address to type in. The Hermes docs don't list its price.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
-          "quote": "sign in once to Hermes Cloud and pick from the agents on your account; no URL to paste",
-          "more_sources": [
-            {
-              "source": "user-guide/multi-connection-desktop.md",
-              "section": "The gateway registry",
-              "quote": "A hosted instance discovered through your Hermes Cloud account."
-            }
-          ]
-        },
-        {
-          "id": "s3f5",
-          "text": "Your chats, memory and skills are kept on the computer where Hermes runs. Hermes sends your words only to your model's provider, and it collects no usage data.",
-          "source": "reference/faq.md",
-          "section": "Is my data sent anywhere?",
-          "url": "https://hermes-agent.nousresearch.com/docs/reference/faq#is-my-data-sent-anywhere",
-          "quote": "Hermes Agent does not collect telemetry, usage data, or analytics. Your conversations, memory, and skills are stored locally in ~/.hermes/."
-        }
-      ],
-      "question": "Where should your Hermes run?",
-      "options": [
-        {
-          "id": "o_here",
-          "label": "This computer is fine for now",
-          "hint": "Simplest to start",
-          "fact": "s3f1"
-        },
-        {
-          "id": "o_always",
-          "label": "A computer that is always on",
-          "hint": "My own server",
-          "fact": "s3f3"
-        },
-        {
-          "id": "o_cloud",
-          "label": "Hermes Cloud",
-          "hint": "Hosted for me",
-          "fact": "s3f4"
-        },
-        {
-          "id": "o_unsure",
-          "label": "I'm not sure yet",
-          "hint": "What decides it?",
-          "fact": "s3f2"
-        }
-      ],
-      "next_rule": {
-        "o_here": "s4",
-        "o_always": "s4",
-        "o_cloud": "s4",
-        "o_unsure": "s4"
-      },
-      "build_words": [
-        "set up a server",
-        "set up my server",
-        "rent a server",
-        "rent me a server",
-        "deploy hermes",
-        "move hermes",
-        "move it to",
-        "connect to my server",
-        "connect my server",
-        "set up hermes cloud",
-        "sign up for hermes cloud",
-        "sign me up",
-        "install hermes",
-        "keep my computer awake"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will do, what it needs (another computer, an account, any cost) and why, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend"
-      },
-      "video": null
-    },
-    {
-      "id": "s4",
-      "number": 4,
-      "title": "Connecting things: tools, skills, plugins, MCP",
-      "rail_subtitle": "Tools, skills, plugins, MCP",
-      "intro": "Hermes does things through tools: actions it can take, like searching the web. You can give it more abilities in three ways: skills, plugins and MCP. The names sound alike, but they are different kinds of things. Knowing which kind fits your goal tells you what to ask your Hermes for. This page explains and advises. Your own Hermes does the adding, after you say yes.",
-      "intro_sources": [
-        {
-          "source": "user-guide/features/tools.md",
-          "section": "Tools & Toolsets",
-          "quote": "Tools are functions that extend the agent's capabilities."
-        },
-        {
-          "source": "getting-started/learning-path.md",
-          "section": "I want to build custom tools/skills",
-          "quote": "Extend Hermes Agent with your own tools and reusable skill packages."
-        }
-      ],
-      "compare": null,
-      "facts": [
-        {
-          "id": "s4f1",
-          "text": "A tool is one kind of action Hermes can take, such as searching the web, running a program or reading a file. Hermes comes with many, grouped into toolsets that you can switch on or off.",
-          "source": "user-guide/features/tools.md",
-          "section": "Tools & Toolsets",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tools",
-          "quote": "They're organized into logical toolsets that can be enabled or disabled per platform."
-        },
-        {
-          "id": "s4f2",
-          "text": "A skill is written know-how: a document with step-by-step instructions for one kind of task. Hermes reads only each skill's short description until a task needs it, so having many doesn't slow it down. It comes with many skills, and you can add more from the Skills Hub.",
-          "source": "getting-started/quickstart.md",
-          "section": "Skills",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#skills",
-          "quote": "The agent reads the short descriptions for free and only loads a skill's full content when a task actually calls for it",
-          "more_sources": [
-            {
-              "source": "user-guide/features/skills.md",
-              "section": "Skills System",
-              "quote": "Skills are on-demand knowledge documents the agent can load when needed."
-            }
-          ]
-        },
-        {
-          "id": "s4f3",
-          "text": "A plugin is an add-on made of code. It can give Hermes new tools or features without changing Hermes itself. The plugin catalog lists plugins that people have reviewed, and each one installs with one command or one click.",
-          "source": "user-guide/features/plugins.md",
-          "section": "Plugins",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/plugins",
-          "quote": "Hermes has a plugin system for adding custom tools, hooks, and integrations without modifying core code.",
-          "more_sources": [
-            {
-              "source": "user-guide/features/plugin-catalog.md",
-              "section": "Plugin Catalog",
-              "quote": "The plugin catalog is a curated, human-reviewed directory of Hermes plugins you can install by name with a single command"
-            }
-          ]
-        },
-        {
-          "id": "s4f4",
-          "text": "MCP (Model Context Protocol) is a shared standard, a bit like a plug that fits many sockets. It lets Hermes use tools that live outside it, such as GitHub or a database, without anyone writing a new Hermes tool first.",
-          "source": "user-guide/features/mcp.md",
-          "section": "MCP (Model Context Protocol)",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp",
-          "quote": "Access to external tool ecosystems without writing a native Hermes tool first",
-          "more_sources": [
-            {
-              "source": "user-guide/features/mcp.md",
-              "section": "MCP (Model Context Protocol)",
-              "quote": "MCP lets Hermes Agent connect to external tool servers so the agent can use tools that live outside Hermes itself — GitHub, databases"
-            }
-          ]
-        },
-        {
-          "id": "s4f5",
-          "text": "Add only what your goal needs, one thing at a time. The official quickstart says to get a normal chat working first, then add skills, scheduled jobs or messaging one layer at a time.",
-          "source": "getting-started/quickstart.md",
-          "section": "The fastest path",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#the-fastest-path",
-          "quote": "Get one clean conversation working first, then layer on gateway, cron, skills, voice, or routing."
-        }
-      ],
-      "question": "What would you like Hermes to be able to do next?",
-      "options": [
-        {
-          "id": "o_knowhow",
-          "label": "Do a task my way, every time",
-          "hint": "Written know-how: a skill",
-          "fact": "s4f2"
-        },
-        {
-          "id": "o_service",
-          "label": "Use a service I already use",
-          "hint": "Such as GitHub or a database",
-          "fact": "s4f4"
-        },
-        {
-          "id": "o_feature",
-          "label": "Get a new feature",
-          "hint": "An add-on: a plugin",
-          "fact": "s4f3"
-        },
-        {
-          "id": "o_actions",
-          "label": "See what it can already do",
-          "hint": "Its built-in tools",
-          "fact": "s4f1"
-        },
-        {
-          "id": "o_enough",
-          "label": "Nothing more for now",
-          "hint": "Keep it simple",
-          "fact": "s4f5"
-        }
-      ],
-      "next_rule": {
-        "o_knowhow": "done",
-        "o_service": "done",
-        "o_feature": "done",
-        "o_actions": "done",
-        "o_enough": "done"
-      },
-      "build_words": [
-        "install a skill",
-        "install the skill",
-        "install a plugin",
-        "install the plugin",
-        "add a skill",
-        "add the skill",
-        "add this skill",
-        "add a plugin",
-        "add the plugin",
-        "add this plugin",
-        "add an mcp",
-        "add the mcp",
-        "set up mcp",
-        "set up an mcp",
-        "connect gmail",
-        "connect my gmail",
-        "connect my email",
-        "connect my calendar",
-        "connect github",
-        "connect my github",
-        "connect notion",
-        "connect my notion",
-        "write a skill",
-        "create a skill",
-        "make a skill",
-        "build a plugin",
-        "make a plugin",
-        "write a plugin",
-        "turn on the",
-        "switch on the",
-        "enable the"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words whether this is a skill, a plugin or an MCP server, what it will be able to read or change, and why it fits my goal, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/plugin-catalog"
-      },
-      "video": null
-    }
-  ]
-}
-
-// ---- src/steps.js ----
-// Setup steps 1-4 (B3): hhcontent's fixed text (content/steps-v1.json, built into src/steps-data.js)
-// and the small rules around it, all plain code with no model: which step comes next
-// (next_rule), the build-word rule (straight to the hand-over text), the hand-over text itself,
-// the "Fits your goal" tag and the docs links. Every sentence the page shows comes from the data
-// or from content/v1-strings.md part 4, word for word.
-
-const STEPS = STEPS_DATA.steps
-const STEP_IDS = STEPS.map(s => s.id)
-
-// Steps 5-7 show greyed under "After these", with no content (build-v1.md section 6).
-const LATER_STEPS = [
-  { number: 5, title: 'Personality and memory' },
-  { number: 6, title: 'Messaging' },
-  { number: 7, title: 'Several bots' }
-]
-const VERSION_LINE = 'Hermes v0.23 · docs checked 9 Nov 2026'
-
-// content/v1-strings.md part 4 (hhcontent). {slots} are filled by code only.
-const LINES = {
-  greeting: "Open a step and ask me about it here. I explain things; I don't change your settings.",
-  yourAnswer: 'Your answer: {option_label}',
-  fitsGoal: 'Fits your goal',
-  afterLast: "That's the first four steps. Your setup shows what you have now.",
-  noCheckedAnswer: "I don't have a checked answer for that yet. The closest official page is: {docs_url}",
-  handoffLead: ["I don't do that here. I help you understand and decide; your own Hermes does the doing.", 'Paste this into a new chat with your Hermes:'],
-  handoffAfter: "When it's done, come back and check it under Your setup.",
-  // The video slot (build-v1.md section 6: video is null in v1, the slot stays).
-  videoLater: 'A short video for this step comes later. It will need the internet when you press Play.'
-}
-
-const fill = (line, slots) => line.replace(/\{(\w+)\}/g, (m, k) => (k in slots ? String(slots[k]) : m))
-
-function stepByNumber(n) {
-  return STEPS.find(s => s.number === n) || null
-}
-
-function stepById(id) {
-  return STEPS.find(s => s.id === id) || null
-}
-
-// The step list's two lines. The title up to its colon ("The brain"); a title without one (step 1
-// is a question) gives its place to the data's own short line, which then isn't repeated below.
-function railLines(step) {
-  const colon = step.title.indexOf(':')
-  if (colon > 0) return { title: step.title.slice(0, colon), sub: step.rail_subtitle || '' }
-  return { title: step.rail_subtitle || step.title, sub: '' }
-}
-
-// A docs path ("user-guide/desktop.md") as its live page, the same rule hhcontent's check uses
-// for every fact url (dev/checks/hhcontent/check-steps-v1.mjs, checkUrl).
-function docsUrl(source) {
-  const rel = String(source).replace(/\.(md|mdx)$/, '').replace(/^index$/, '').replace(/\/index$/, '/')
-  return STEPS_DATA.live_base + rel
-}
-
-// The label on a source chip (v1-strings part 5: "Hermes docs › {section}").
-const chipLabel = section => `Hermes docs › ${section}`
-
-// Only the official Hermes docs open from the page (a content slip can't open anything else).
-const isDocsUrl = url => typeof url === 'string' && url.startsWith(STEPS_DATA.live_base) && !/[\s"'<>]/.test(url)
-
-// The step after this one, by the step's next_rule (code, not the model). No answer picked yet:
-// the next step in order (every rule in v1 leads there too). Returns a step number, or 'done'.
-function nextAfter(step, optionId) {
-  const target = optionId && step.next_rule ? step.next_rule[optionId] : undefined
-  if (target === 'done') return 'done'
-  const byRule = target ? stepById(target) : null
-  if (byRule) return byRule.number
-  const following = stepByNumber(step.number + 1)
-  return following ? following.number : 'done'
-}
-
-// answers: { [stepId]: optionId }, the person's picks. The step-1 answer can tag one option of a
-// later step "Fits your goal" (its `fits`).
-function fitsGoal(answers, stepId) {
-  const first = STEPS[0]
-  const picked = first.options.find(o => o.id === (answers || {})[first.id])
-  return picked && picked.fits ? picked.fits[stepId] || null : null
-}
-
-// The build-word rule, as steps-v1.json's build_word_rule says it: lower-case, straight quotes,
-// squeezed spaces; a question start skips the check; otherwise any phrase from the common list or
-// the open step's list, with a word boundary on both sides, means "go straight to the hand-over".
-const normalise = s =>
-  String(s).toLowerCase().replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/\s+/g, ' ').trim()
-const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-function isBuildRequest(step, text) {
-  const t = normalise(text)
-  if (STEPS_DATA.build_word_skip_starts.some(p => t.startsWith(p + ' ') || t === p)) return false
-  const phrases = [...STEPS_DATA.build_words_common, ...((step && step.build_words) || [])]
-  return phrases.some(p => new RegExp(`(^|[^a-z0-9])${escape(p)}($|[^a-z0-9])`).test(t))
-}
-
-// The hand-over text (v1-strings part 4, "Slots in the hand-over template"):
-//   {goal}     the step-1 answer's goal_text, else "not chosen yet"
-//   {request}  the person's words, cut to 300 characters, double quotes turned into single ones
-//   {docs_url} the step's handoff.docs_url
-const REQUEST_MAX_CHARS = 300
-function handoffText(step, answers, request) {
-  const first = STEPS[0]
-  const picked = first.options.find(o => o.id === (answers || {})[first.id])
-  const words = Array.from(String(request || '').replace(/["\u201c\u201d]/g, "'").trim())
-  return fill(step.handoff.template, {
-    goal: picked && picked.goal_text ? picked.goal_text : 'not chosen yet',
-    request: words.slice(0, REQUEST_MAX_CHARS).join(''),
-    docs_url: step.handoff.docs_url
-  })
-}
-
-// Only answers that are real options of real steps survive (storage can hold anything).
-function cleanAnswers(value) {
-  const out = {}
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return out
-  for (const s of STEPS) {
-    const v = value[s.id]
-    if (typeof v === 'string' && s.options.some(o => o.id === v)) out[s.id] = v
-  }
-  return out
-}
-
-// ---- src/state.js ----
-// What the page keeps in ctx.storage on the person's computer.
-// Keys: tab (setup | yours), step (1-4), answers ({ stepId: optionId }, the person's picks on the
-// steps), helperWidth (the width Helper's window was dragged to, 360 to 600 px).
-// Anything unexpected in storage falls back to the default.
-// About the person, only the record of what Helper keeps (talk v2 row 3): never what they do,
-// never the conversation. STORED_KEYS is every key the plugin may
-// write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
-
-const STEP_COUNT = STEPS.length
-// 'remember' is the person's answer to the memory test on Your setup (src/setup-tab.js).
-// 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
-const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept']
-
-function readState(get) {
-  const pick = (key, allowed, fallback) => {
-    const v = get(key, fallback)
-    return allowed.includes(v) ? v : fallback
-  }
-  const step = get('step', 1)
-  return {
-    tab: pick('tab', ['setup', 'yours'], 'setup'),
-    step: Number.isInteger(step) && step >= 1 && step <= STEP_COUNT ? step : 1,
-    answers: cleanAnswers(get('answers', {})),
-    helperWidth: clampHelperWidth(get('helperWidth', HELPER_PX))
-  }
-}
-
 // ---- src/talk-data.js ----
 // Generated by scripts/build.mjs from content/helper-talk-v2.json (hhcontent's talk data) and the
 // skill names of content/skills-list-v1.json: only the fields the code reads, and each line's source.
@@ -1603,7 +436,7 @@ const TALK_DATA = {
       "text": "Which one do you mean?"
     },
     "C1": {
-      "text": "Hermes can do jobs on a schedule and use services like Gmail. You can also have more than one Hermes. Pick one.",
+      "text": "Hermes can work with the web, files and pictures. It can do jobs on a schedule and use services like Gmail. Pick one.",
       "source": "user-guide/features/tools.md line 17 (web search, file editing); user-guide/features/image-generation.md line 10 (pictures); user-guide/features/cron.md line 15; user-guide/features/mcp.md line 13 (the sources of can0, w_image, sch0, svc0). More than one Hermes is not in the line, only in the picks: user-guide/profiles.md lines 7 and 11 (bot0)."
     },
     "H1": {
@@ -1735,6 +568,10 @@ const TALK_DATA = {
     ],
     "work_max_words": 12,
     "work_max_chars": 60,
+    "name_refused_words_also": [
+      "pin",
+      "pins"
+    ],
     "name_with_more": {
       "after_name": [
         ",",
@@ -1754,6 +591,15 @@ const TALK_DATA = {
       ]
     }
   },
+  "key_patterns": [
+    "(?<![A-Za-z0-9])(?:sk-|sk_|rk_|xai-|AIza|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|glpat-|hf_|gsk_|pplx-|r8_|fw_|npm_|xox[abposr]-|xapp-)[A-Za-z0-9_-]{16,}",
+    "(?<![A-Za-z0-9])eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
+    "(?<![A-Za-z0-9])(?=[A-Za-z]*[0-9])(?=[0-9]*[A-Za-z])[A-Za-z0-9]{32,}(?![A-Za-z0-9])",
+    "(?<![A-Za-z0-9])(?:AKIA|ASIA)[A-Z0-9]{16}(?![A-Za-z0-9])",
+    "(?<![A-Za-z0-9/+.:_-])(?=[A-Za-z0-9/+]*[A-Z])(?=[A-Za-z0-9/+]*[a-z])(?=[A-Za-z0-9/+]*[0-9])[A-Za-z0-9+][A-Za-z0-9/+]{39}(?![A-Za-z0-9/+=.:_-])",
+    "(?<![0-9])[0-9]{6,12}:[A-Za-z0-9_-]{30,}",
+    "-----BEGIN [A-Z ]*PRIVATE KEY-----"
+  ],
   "build": {
     "skip_starts": [
       "what is",
@@ -2035,6 +881,7 @@ const TALK_DATA = {
       "gives": "can",
       "line": "C1",
       "holds": [
+        "wants",
         "sch",
         "svc",
         "bot"
@@ -2053,6 +900,12 @@ const TALK_DATA = {
       "gives": "mem"
     }
   ],
+  "held_picks": [
+    "wants"
+  ],
+  "held_labels": {
+    "wants": "Web, files, pictures and voice"
+  },
   "topics": [
     {
       "id": "mem",
@@ -2127,8 +980,9 @@ const TALK_DATA = {
         "text": "Memory is short notes Hermes keeps about you and your work.",
         "source": "user-guide/features/memory.md lines 9, 17 to 18",
         "next": {
-          "kind": "part",
-          "label": "Open {part}"
+          "kind": "paste",
+          "label": "Try it",
+          "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
         }
       },
       "needs": [
@@ -3393,20 +2247,63 @@ const TALK_DATA = {
       "refuse": {
         "words": [
           "password",
+          "passwords",
+          "passwd",
           "passcode",
+          "passcodes",
+          "passphrase",
+          "passphrases",
           "pin code",
+          "pin codes",
+          "pin number",
+          "pin numbers",
           "my pin",
+          "my pins",
+          "pin is",
+          "pins are",
+          "bank pin",
           "card number",
+          "card numbers",
           "credit card",
+          "credit cards",
           "cvv",
+          "cvc",
+          "security code",
           "iban",
+          "ibans",
           "account number",
+          "account numbers",
+          "sort code",
+          "routing number",
           "social security",
           "ssn",
           "passport number",
+          "passport numbers",
           "secret key",
+          "secret keys",
           "api key",
-          "login"
+          "api keys",
+          "api-key",
+          "apikey",
+          "access key",
+          "access keys",
+          "private key",
+          "private keys",
+          "access token",
+          "access tokens",
+          "api token",
+          "auth token",
+          "bot token",
+          "recovery code",
+          "recovery codes",
+          "backup code",
+          "backup codes",
+          "recovery phrase",
+          "seed phrase",
+          "login",
+          "logins",
+          "log-in",
+          "credentials"
         ],
         "digits_pattern": "(?:\\d[ -]?){8,}"
       },
@@ -4279,6 +3176,3775 @@ const TALK_DATA = {
   ]
 }
 
+// ---- src/wants-data.js ----
+// Generated by scripts/build.mjs from content/helper-wants-v1.json (hhcontent's wants: the rows, the
+// groups, the skills of the two docs pages) and content/skills-list-v1.json (which skills are left
+// out), checked against content/docs-lines-v0.23.0.json. Only the fields the code reads. Edit the JSON, then build.
+const WANTS_DATA = {
+  "docs_version": "v0.23.0",
+  "pick": {
+    "label": "Web, files, pictures and voice"
+  },
+  "question": {
+    "text": "What do you want Hermes to do?",
+    "answers": [
+      {
+        "label": "Search and use the web",
+        "gives_group": "web"
+      },
+      {
+        "label": "Files and my computer",
+        "gives_group": "files"
+      },
+      {
+        "label": "Pictures and video",
+        "gives_group": "pics"
+      },
+      {
+        "label": "Voice and sound",
+        "gives_group": "voice"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "web",
+      "label": "Search and use the web",
+      "subject_words": [
+        "web",
+        "internet",
+        "online",
+        "website",
+        "websites",
+        "twitter",
+        "tweet",
+        "reddit",
+        "post",
+        "posting",
+        "social media",
+        "papers",
+        "maps",
+        "map",
+        "stocks",
+        "stock",
+        "prices",
+        "price",
+        "flights"
+      ]
+    },
+    {
+      "id": "files",
+      "label": "Files and my computer",
+      "subject_words": [
+        "pdf",
+        "pdfs",
+        "word",
+        "excel",
+        "powerpoint",
+        "document",
+        "documents",
+        "spreadsheet",
+        "obsidian",
+        "code",
+        "coding",
+        "my computer"
+      ]
+    },
+    {
+      "id": "pics",
+      "label": "Pictures and video",
+      "subject_words": [
+        "video",
+        "videos",
+        "picture",
+        "pictures",
+        "image",
+        "images",
+        "photo",
+        "photos",
+        "youtube",
+        "animation"
+      ]
+    },
+    {
+      "id": "voice",
+      "label": "Voice and sound",
+      "subject_words": [
+        "voice",
+        "speak",
+        "speech",
+        "audio",
+        "song",
+        "songs",
+        "music",
+        "podcast"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "w_web",
+      "group": "web",
+      "label": "Search the web",
+      "kind": "built_in_tool",
+      "thing": "web_search, web_extract",
+      "key_words": [
+        "web search",
+        "search engine",
+        "google things",
+        "google something",
+        "google it"
+      ],
+      "things": [
+        "web",
+        "internet",
+        "online",
+        "google",
+        "news"
+      ],
+      "actions": [
+        "search",
+        "searches",
+        "searching",
+        "look up",
+        "looks up",
+        "find",
+        "research",
+        "check",
+        "browse"
+      ],
+      "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
+      "sources": [
+        {
+          "file": "user-guide/features/tools.md",
+          "line": 27,
+          "quote": "Search the web and extract page content."
+        },
+        {
+          "file": "user-guide/features/web-search.md",
+          "line": 16,
+          "quote": "search the web and return ranked results"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please search the web for <what you want to know>, and list the pages you used. If web search is not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_browser",
+      "group": "web",
+      "label": "Use a website for me",
+      "kind": "built_in_tool",
+      "thing": "browser_exec",
+      "key_words": [
+        "browser automation",
+        "use a browser",
+        "use the browser"
+      ],
+      "things": [
+        "website",
+        "websites",
+        "web page",
+        "web pages",
+        "site",
+        "sites",
+        "form",
+        "forms",
+        "browser"
+      ],
+      "actions": [
+        "click",
+        "clicks",
+        "fill",
+        "fills",
+        "fill in",
+        "fill out",
+        "log in",
+        "sign in",
+        "open",
+        "opens",
+        "navigate",
+        "book",
+        "order",
+        "use",
+        "control"
+      ],
+      "text": "Hermes can open a website, click, type and fill in forms. That is a built-in tool, an action it can take.",
+      "sources": [
+        {
+          "file": "user-guide/features/browser.md",
+          "line": 10,
+          "quote": "gives the agent a real web browser"
+        },
+        {
+          "file": "user-guide/features/browser.md",
+          "line": 18,
+          "quote": "Navigate, read, click, type, scrape and screenshot"
+        },
+        {
+          "file": "user-guide/features/browser.md",
+          "line": 25,
+          "quote": "No API key, no setup."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please open <website> with your browser tool and <what to do there>. Ask me before you send, buy or sign in to anything."
+      }
+    },
+    {
+      "id": "w_xpost",
+      "group": "web",
+      "label": "Post on X for me",
+      "kind": "built_in_skill",
+      "thing": "xurl",
+      "key_words": [],
+      "things": [
+        "twitter",
+        "tweet",
+        "tweets",
+        "on x",
+        "to x",
+        "x account",
+        "x.com"
+      ],
+      "actions": [
+        "post",
+        "posts",
+        "posting",
+        "tweet",
+        "reply",
+        "publish",
+        "send",
+        "write",
+        "search",
+        "read",
+        "dm"
+      ],
+      "text": "Hermes comes with a skill called \"xurl\". Its written steps teach Hermes to search and post on X.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 98,
+          "quote": "X/Twitter via xurl CLI: raw post search, posting, DM, media."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"xurl\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_reddit",
+      "group": "web",
+      "label": "Read Reddit",
+      "kind": "optional_skill",
+      "thing": "reddit-reading",
+      "key_words": [],
+      "things": [
+        "reddit",
+        "subreddit",
+        "subreddits"
+      ],
+      "actions": [
+        "read",
+        "reads",
+        "search",
+        "check",
+        "follow",
+        "summarize",
+        "summarise",
+        "browse",
+        "watch",
+        "look at",
+        "find"
+      ],
+      "text": "There is an optional skill, \"reddit-reading\". You add it first. Its written steps teach Hermes to read and search Reddit.",
+      "sources": [
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 254,
+          "quote": "Read Reddit: subreddits, search, threads, users. No browser."
+        },
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 9,
+          "quote": "Install them explicitly"
+        }
+      ],
+      "next": {
+        "kind": "steps",
+        "label": "Show me how to add it",
+        "steps": [
+          "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+          "Click \"Source\", then pick \"Optional\".",
+          "Find the card \"reddit-reading\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+          "Click the card, then click \"Install\"."
+        ],
+        "after": "It works from your next new chat, not this one."
+      }
+    },
+    {
+      "id": "w_docs",
+      "group": "files",
+      "label": "Read my documents",
+      "kind": "built_in_tool",
+      "thing": "read_file",
+      "key_words": [],
+      "things": [
+        "pdf",
+        "pdfs",
+        "word file",
+        "word files",
+        "word document",
+        "word documents",
+        "docx",
+        "excel",
+        "spreadsheet",
+        "spreadsheets",
+        "document",
+        "documents",
+        "file",
+        "files",
+        "contract",
+        "contracts"
+      ],
+      "actions": [
+        "read",
+        "reads",
+        "open",
+        "summarize",
+        "summarise",
+        "summary",
+        "go through",
+        "look at",
+        "understand",
+        "extract",
+        "analyze",
+        "analyse"
+      ],
+      "text": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.",
+      "sources": [
+        {
+          "file": "user-guide/features/document-extraction.md",
+          "line": 9,
+          "quote": "automatically converts common document formats to readable text"
+        },
+        {
+          "file": "user-guide/features/document-extraction.md",
+          "line": 16,
+          "quote": "`.docx`"
+        },
+        {
+          "file": "user-guide/features/document-extraction.md",
+          "line": 17,
+          "quote": "`.xlsx`"
+        },
+        {
+          "file": "user-guide/features/document-extraction.md",
+          "line": 19,
+          "quote": "`.pdf`"
+        },
+        {
+          "file": "user-guide/features/document-extraction.md",
+          "line": 38,
+          "quote": "contain no text layer and silently convert to nothing"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part."
+      }
+    },
+    {
+      "id": "w_pdf",
+      "group": "files",
+      "label": "Make or change a PDF",
+      "kind": "built_in_skill",
+      "thing": "pdf",
+      "key_words": [],
+      "things": [
+        "pdf",
+        "pdfs"
+      ],
+      "actions": [
+        "make",
+        "create",
+        "merge",
+        "combine",
+        "fill",
+        "fill in",
+        "fill out",
+        "edit",
+        "change",
+        "split",
+        "ocr"
+      ],
+      "text": "Hermes comes with a skill called \"pdf\". Its written steps teach Hermes to make, merge, fill in and edit PDF files.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 81,
+          "quote": "PDF files: create, read, merge, fill, OCR, edit text."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"pdf\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_office",
+      "group": "files",
+      "label": "Make Word or Excel files",
+      "kind": "built_in_skill",
+      "thing": "microsoft-office",
+      "key_words": [],
+      "things": [
+        "word",
+        "powerpoint",
+        "excel",
+        "slides",
+        "presentation",
+        "presentations",
+        "deck",
+        "spreadsheet",
+        "spreadsheets",
+        "docx",
+        "pptx",
+        "xlsx"
+      ],
+      "actions": [
+        "make",
+        "create",
+        "write",
+        "edit",
+        "change",
+        "draft",
+        "prepare"
+      ],
+      "text": "Hermes comes with a skill called \"microsoft-office\". Its written steps teach Hermes to make and edit Word, PowerPoint and Excel files.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 80,
+          "quote": "Create, read, and edit Word, PowerPoint, and Excel files."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"microsoft-office\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_notes",
+      "group": "files",
+      "label": "Use my Obsidian notes",
+      "kind": "built_in_skill",
+      "thing": "obsidian",
+      "key_words": [],
+      "things": [
+        "obsidian"
+      ],
+      "actions": [
+        "read",
+        "search",
+        "find",
+        "write",
+        "edit",
+        "create",
+        "add",
+        "make",
+        "use",
+        "open",
+        "notes",
+        "note",
+        "vault",
+        "work with",
+        "access"
+      ],
+      "text": "Hermes comes with a skill called \"obsidian\". Its written steps teach Hermes to read, search and edit your Obsidian notes.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 70,
+          "quote": "Read, search, create, and edit notes in the Obsidian vault."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"obsidian\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_meeting",
+      "group": "files",
+      "label": "Sort out meeting notes",
+      "kind": "built_in_skill",
+      "thing": "meeting-action-items",
+      "key_words": [],
+      "things": [
+        "meeting",
+        "meetings",
+        "meeting notes",
+        "minutes"
+      ],
+      "actions": [
+        "action items",
+        "action points",
+        "tasks",
+        "decisions",
+        "to-do",
+        "to-dos",
+        "todo",
+        "todos",
+        "owners",
+        "tickets",
+        "who does what",
+        "follow-ups",
+        "follow ups"
+      ],
+      "text": "Hermes comes with a skill called \"meeting-action-items\". Its written steps teach Hermes to turn meeting notes into decisions and tasks.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 79,
+          "quote": "Turn meeting notes into cited decisions, owners, tickets."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"meeting-action-items\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_code",
+      "group": "files",
+      "label": "Write and run code",
+      "kind": "built_in_tool",
+      "thing": "terminal, read_file, patch",
+      "key_words": [
+        "coding",
+        "programming"
+      ],
+      "things": [
+        "code",
+        "script",
+        "scripts",
+        "program",
+        "programs",
+        "python",
+        "javascript"
+      ],
+      "actions": [
+        "write",
+        "writes",
+        "run",
+        "runs",
+        "fix",
+        "read",
+        "edit",
+        "debug",
+        "review",
+        "change",
+        "help"
+      ],
+      "text": "Hermes can read, change and run code on your computer. This is built in.",
+      "sources": [
+        {
+          "file": "getting-started/learning-path.md",
+          "line": 49,
+          "quote": "Hermes Agent can read, edit, and run code in your projects."
+        },
+        {
+          "file": "user-guide/features/tools.md",
+          "line": 29,
+          "quote": "Execute commands and manipulate files."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please look at the code in <folder> and <what you want>. Ask me before you change or run anything."
+      }
+    },
+    {
+      "id": "w_computer",
+      "group": "files",
+      "label": "Click and type for me",
+      "kind": "built_in_tool",
+      "thing": "computer_use",
+      "key_words": [
+        "computer use"
+      ],
+      "things": [
+        "mouse",
+        "keyboard",
+        "my screen",
+        "my desktop",
+        "my computer",
+        "my mac",
+        "my pc",
+        "my laptop",
+        "my apps"
+      ],
+      "actions": [
+        "click",
+        "clicks",
+        "type",
+        "types",
+        "control",
+        "controls",
+        "drive",
+        "operate",
+        "take over",
+        "move"
+      ],
+      "text": "Hermes can click and type in the apps on your computer. It is built in, and the docs call it Computer Use.",
+      "sources": [
+        {
+          "file": "user-guide/features/computer-use.md",
+          "line": 8,
+          "quote": "Hermes Agent can drive your desktop"
+        },
+        {
+          "file": "user-guide/features/computer-use.md",
+          "line": 21,
+          "quote": "The built-in `computer_use` toolset"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "I want you to click and type in an app on my computer: <which app, and what to do>. Tell me first what Computer Use needs. Ask me before you change anything."
+      }
+    },
+    {
+      "id": "w_image",
+      "group": "pics",
+      "label": "Make pictures",
+      "kind": "built_in_tool",
+      "thing": "image_generate",
+      "key_words": [
+        "image generation"
+      ],
+      "things": [
+        "image",
+        "images",
+        "picture",
+        "pictures",
+        "photo",
+        "photos",
+        "logo",
+        "logos",
+        "drawing",
+        "drawings",
+        "art",
+        "illustration",
+        "illustrations"
+      ],
+      "actions": [
+        "make",
+        "makes",
+        "create",
+        "creates",
+        "generate",
+        "generates",
+        "draw",
+        "draws",
+        "design",
+        "paint"
+      ],
+      "text": "Hermes can make pictures from your words. That is a built-in tool, an action it can take. The picture service costs money.",
+      "sources": [
+        {
+          "file": "user-guide/features/image-generation.md",
+          "line": 10,
+          "quote": "Hermes Agent generates images from text prompts via FAL.ai."
+        },
+        {
+          "file": "user-guide/features/image-generation.md",
+          "line": 14,
+          "quote": "| Price |"
+        },
+        {
+          "file": "user-guide/features/image-generation.md",
+          "line": 158,
+          "quote": "Direct FAL requires a funded `FAL_KEY`"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please make a picture of <what>. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
+      }
+    },
+    {
+      "id": "w_see",
+      "group": "pics",
+      "label": "Look at my pictures",
+      "kind": "built_in",
+      "thing": "vision",
+      "key_words": [],
+      "things": [
+        "image",
+        "images",
+        "picture",
+        "pictures",
+        "photo",
+        "photos",
+        "screenshot",
+        "screenshots"
+      ],
+      "actions": [
+        "look at",
+        "looks at",
+        "see",
+        "sees",
+        "describe",
+        "read",
+        "reads",
+        "analyze",
+        "analyse",
+        "understand",
+        "explain",
+        "what is in",
+        "what's in"
+      ],
+      "text": "Hermes can look at a picture you give it. This is built in. The AI you use must be able to read pictures.",
+      "sources": [
+        {
+          "file": "user-guide/features/vision.md",
+          "line": 10,
+          "quote": "any vision-capable model can process them"
+        },
+        {
+          "file": "user-guide/features/tools.md",
+          "line": 31,
+          "quote": "`vision_analyze`"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "I am giving you a picture. Please tell me what you see in it. If you cannot look at pictures, tell me what is missing."
+      }
+    },
+    {
+      "id": "w_video",
+      "group": "pics",
+      "label": "Make a video from text",
+      "kind": "built_in_tool_off",
+      "thing": "video_generate",
+      "key_words": [
+        "text to video",
+        "text-to-video",
+        "video generation"
+      ],
+      "things": [
+        "video",
+        "videos",
+        "clip",
+        "clips"
+      ],
+      "actions": [
+        "make",
+        "makes",
+        "create",
+        "creates",
+        "generate",
+        "generates",
+        "produce"
+      ],
+      "text": "Hermes can make a video from text or from a picture. That tool, an action it can take, is switched off at first.",
+      "sources": [
+        {
+          "file": "reference/tools-reference.md",
+          "line": 312,
+          "quote": "Opt-in toolset (not loaded in the default"
+        },
+        {
+          "file": "reference/tools-reference.md",
+          "line": 325,
+          "quote": "Generate a video from a text prompt (text-to-video) or animate a still image (image-to-video)"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "I want to make a video from text. Please tell me what the Video Generation tool needs and what it costs. Turn it on only if I say yes."
+      }
+    },
+    {
+      "id": "w_anim",
+      "group": "pics",
+      "label": "Make an animated explainer",
+      "kind": "built_in_skill",
+      "thing": "manim-video",
+      "key_words": [],
+      "things": [
+        "animation",
+        "animations",
+        "animated",
+        "explainer",
+        "explainers",
+        "manim"
+      ],
+      "actions": [
+        "make",
+        "makes",
+        "create",
+        "creates",
+        "generate",
+        "produce",
+        "video",
+        "videos"
+      ],
+      "text": "Hermes comes with a skill called \"manim-video\". Its written steps teach Hermes to make animated maths videos.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 42,
+          "quote": "Manim CE animations: 3Blue1Brown math/algo videos."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"manim-video\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_presenter",
+      "group": "pics",
+      "label": "Make a presenter video",
+      "kind": "optional_skill",
+      "thing": "ai-presenter-video",
+      "key_words": [],
+      "things": [
+        "presenter",
+        "talking head",
+        "avatar",
+        "spokesperson"
+      ],
+      "actions": [
+        "video",
+        "videos",
+        "make",
+        "create",
+        "generate"
+      ],
+      "text": "There is an optional skill, \"ai-presenter-video\". You add it first. Its written steps teach Hermes to make a video of an AI presenter.",
+      "sources": [
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 60,
+          "quote": "Make a verified AI presenter video from script + image."
+        },
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 9,
+          "quote": "Install them explicitly"
+        }
+      ],
+      "next": {
+        "kind": "steps",
+        "label": "Show me how to add it",
+        "steps": [
+          "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+          "Click \"Source\", then pick \"Optional\".",
+          "Find the card \"ai-presenter-video\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+          "Click the card, then click \"Install\"."
+        ],
+        "after": "It works from your next new chat, not this one."
+      }
+    },
+    {
+      "id": "w_youtube",
+      "group": "pics",
+      "label": "Sum up a YouTube video",
+      "kind": "built_in_skill",
+      "thing": "youtube-content",
+      "key_words": [],
+      "things": [
+        "youtube",
+        "yt video",
+        "yt videos"
+      ],
+      "actions": [
+        "summarize",
+        "summarise",
+        "summary",
+        "summaries",
+        "sum up",
+        "transcript",
+        "transcripts",
+        "notes",
+        "tldr",
+        "key points",
+        "blog",
+        "thread"
+      ],
+      "text": "Hermes comes with a skill called \"youtube-content\". Its written steps teach Hermes to turn a YouTube video's words into a summary.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 64,
+          "quote": "YouTube transcripts to summaries, threads, blogs."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"youtube-content\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_voice",
+      "group": "voice",
+      "label": "Talk to it out loud",
+      "kind": "built_in",
+      "thing": "Voice Mode",
+      "key_words": [
+        "voice mode",
+        "by voice",
+        "with my voice",
+        "use my voice",
+        "talk out loud",
+        "speak out loud",
+        "voice chat",
+        "voice conversation",
+        "voice conversations",
+        "microphone",
+        "talk to it out loud"
+      ],
+      "things": [],
+      "actions": [],
+      "text": "You can talk to Hermes out loud and hear it answer. It is built in, and the docs call it Voice Mode.",
+      "sources": [
+        {
+          "file": "user-guide/features/voice-mode.md",
+          "line": 9,
+          "quote": "Talk to the agent using your microphone, hear spoken replies"
+        },
+        {
+          "file": "user-guide/desktop.md",
+          "line": 350,
+          "quote": "Talk to Hermes and hear it back"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "I want to talk to you with my voice. Please tell me what Voice Mode needs here and how I start it. Ask me before you change anything."
+      }
+    },
+    {
+      "id": "w_aloud",
+      "group": "voice",
+      "label": "Read answers out loud",
+      "kind": "built_in_tool",
+      "thing": "text_to_speech",
+      "key_words": [
+        "text to speech",
+        "text-to-speech",
+        "tts",
+        "read aloud",
+        "read it out",
+        "voice message",
+        "voice messages"
+      ],
+      "things": [
+        "answers",
+        "answer",
+        "replies",
+        "reply",
+        "text",
+        "messages"
+      ],
+      "actions": [
+        "read aloud",
+        "read out",
+        "aloud",
+        "spoken",
+        "audio"
+      ],
+      "text": "Hermes can turn its answers into speech. This is built in, and the standard voice is free.",
+      "sources": [
+        {
+          "file": "user-guide/features/tts.md",
+          "line": 13,
+          "quote": "supports both text-to-speech output and voice message transcription"
+        },
+        {
+          "file": "user-guide/features/tts.md",
+          "line": 25,
+          "quote": "| **Edge TTS** (default) | Good | Free | None needed |"
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please read your next answer out loud. If speech is not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_music",
+      "group": "voice",
+      "label": "Write a song",
+      "kind": "built_in_skill",
+      "thing": "songwriting-and-ai-music",
+      "key_words": [],
+      "things": [
+        "song",
+        "songs",
+        "music",
+        "lyrics"
+      ],
+      "actions": [
+        "write",
+        "writes",
+        "make",
+        "create",
+        "compose",
+        "generate"
+      ],
+      "text": "Hermes comes with a skill called \"songwriting-and-ai-music\". Its written steps teach Hermes songwriting, and how to brief Suno, a music AI.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 45,
+          "quote": "Songwriting craft and Suno AI music prompts."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"songwriting-and-ai-music\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_papers",
+      "group": "web",
+      "label": "Find research papers",
+      "kind": "built_in_skill",
+      "thing": "arxiv",
+      "key_words": [],
+      "things": [
+        "paper",
+        "papers",
+        "arxiv",
+        "studies"
+      ],
+      "actions": [
+        "find",
+        "search",
+        "look up",
+        "read",
+        "summarize",
+        "summarise",
+        "check"
+      ],
+      "text": "Hermes comes with a skill called \"arxiv\". Its written steps teach Hermes to search research papers on arXiv.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 90,
+          "quote": "Search arXiv papers by keyword, author, category, or ID."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"arxiv\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_maps",
+      "group": "web",
+      "label": "Find places and routes",
+      "kind": "built_in_skill",
+      "thing": "maps",
+      "key_words": [],
+      "things": [
+        "map",
+        "maps",
+        "route",
+        "routes",
+        "directions",
+        "address",
+        "addresses",
+        "nearby",
+        "time zone",
+        "time zones"
+      ],
+      "actions": [
+        "find",
+        "get",
+        "look up",
+        "plan",
+        "show",
+        "search",
+        "check",
+        "how far"
+      ],
+      "text": "Hermes comes with a skill called \"maps\". Its written steps teach Hermes to find places, routes and time zones.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 78,
+          "quote": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"maps\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_stocks",
+      "group": "web",
+      "label": "Check stock prices",
+      "kind": "optional_skill",
+      "thing": "stocks",
+      "key_words": [],
+      "things": [
+        "stock",
+        "stocks",
+        "shares",
+        "crypto",
+        "bitcoin"
+      ],
+      "actions": [
+        "check",
+        "look up",
+        "compare",
+        "follow",
+        "quote",
+        "quotes",
+        "price",
+        "prices"
+      ],
+      "text": "There is an optional skill, \"stocks\". You add it first. Its written steps teach Hermes to look up stock and crypto prices.",
+      "sources": [
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 134,
+          "quote": "Stock quotes, history, search, compare, crypto via Yahoo."
+        },
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 9,
+          "quote": "Install them explicitly"
+        }
+      ],
+      "next": {
+        "kind": "steps",
+        "label": "Show me how to add it",
+        "steps": [
+          "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+          "Click \"Source\", then pick \"Optional\".",
+          "Find the card \"stocks\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+          "Click the card, then click \"Install\"."
+        ],
+        "after": "It works from your next new chat, not this one."
+      }
+    },
+    {
+      "id": "w_prices",
+      "group": "web",
+      "label": "Watch a price for me",
+      "kind": "built_in_skill",
+      "thing": "product-price-monitor",
+      "key_words": [],
+      "things": [
+        "price",
+        "prices",
+        "flight",
+        "flights",
+        "listing",
+        "listings",
+        "deal",
+        "deals"
+      ],
+      "actions": [
+        "watch",
+        "watches",
+        "track",
+        "tracks",
+        "monitor",
+        "alert",
+        "alerts",
+        "drops",
+        "tell me when",
+        "keep an eye"
+      ],
+      "text": "Hermes comes with a skill called \"product-price-monitor\". Its written steps teach Hermes to watch prices and alert you at your target.",
+      "sources": [
+        {
+          "file": "reference/skills-catalog.md",
+          "line": 82,
+          "quote": "Watch product, flight, or listing prices; alert on target."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please use your \"product-price-monitor\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+      }
+    }
+  ],
+  "fixed": {
+    "N2": {
+      "text": "I don't know that one. These are the nearest things I have checked."
+    },
+    "G1": {
+      "text": "Here is what I have checked for that. Pick one, or type your own."
+    },
+    "S1": {
+      "text": "Hermes comes with a skill called \"{name}\". Skills are written steps that teach Hermes one task. The docs say this."
+    },
+    "S2": {
+      "text": "The optional skill \"{name}\" must be added first. Skills are written steps that teach Hermes one task. The docs say this.",
+      "sources": [
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 9,
+          "quote": "Install them explicitly"
+        }
+      ],
+      "next": {
+        "kind": "steps",
+        "label": "Show me how to add it",
+        "steps": [
+          "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+          "Click \"Source\", then pick \"Optional\".",
+          "Find the card \"{name}\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+          "Click the card, then click \"Install\"."
+        ],
+        "after": "It works from your next new chat, not this one."
+      }
+    },
+    "box-head": {
+      "text": "From the Hermes docs"
+    },
+    "CN1": {
+      "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. Click \"Capabilities\", then the \"Connectors\" tab.",
+      "sources": [
+        {
+          "file": "user-guide/features/tool-gateway.md",
+          "line": 124,
+          "quote": "Connectors are hosted apps such as Gmail that the agent reaches through the Nous tool gateway"
+        },
+        {
+          "file": "user-guide/features/tool-gateway.md",
+          "line": 139,
+          "quote": "The desktop app's **Connectors** page."
+        }
+      ]
+    }
+  },
+  "service_lines": {
+    "Gmail": {
+      "line": "CN1"
+    },
+    "Google Calendar": {
+      "line": "CN1"
+    },
+    "Google Drive": {
+      "line": "CN1"
+    },
+    "GitHub": {
+      "line": "S1",
+      "skill": "github"
+    }
+  },
+  "skills": [
+    {
+      "name": "apple-notes",
+      "kind": "built_in",
+      "docs_words": "Manage Apple Notes via memo CLI: create, search, edit.",
+      "page": "reference/skills-catalog.md",
+      "line": 19
+    },
+    {
+      "name": "apple-reminders",
+      "kind": "built_in",
+      "docs_words": "Apple Reminders via remindctl: add, list, complete.",
+      "page": "reference/skills-catalog.md",
+      "line": 20
+    },
+    {
+      "name": "findmy",
+      "kind": "built_in",
+      "docs_words": "Track Apple devices/AirTags via FindMy.app on macOS.",
+      "page": "reference/skills-catalog.md",
+      "line": 21
+    },
+    {
+      "name": "imessage",
+      "kind": "built_in",
+      "docs_words": "Send and receive iMessages/SMS via the imsg CLI on macOS.",
+      "page": "reference/skills-catalog.md",
+      "line": 22
+    },
+    {
+      "name": "claude-code",
+      "kind": "built_in",
+      "docs_words": "Delegate coding to Claude Code CLI (features, PRs).",
+      "page": "reference/skills-catalog.md",
+      "line": 28
+    },
+    {
+      "name": "codex",
+      "kind": "built_in",
+      "docs_words": "Delegate coding to OpenAI Codex CLI (features, PRs).",
+      "page": "reference/skills-catalog.md",
+      "line": 29
+    },
+    {
+      "name": "computer-use",
+      "kind": "built_in",
+      "docs_words": "Drive the desktop background-first; escalate on signal.",
+      "page": "reference/skills-catalog.md",
+      "line": 30
+    },
+    {
+      "name": "hermes-agent",
+      "kind": "built_in",
+      "docs_words": "Use, configure, theme, extend, and orchestrate Hermes Agent.",
+      "page": "reference/skills-catalog.md",
+      "line": 31
+    },
+    {
+      "name": "architecture-diagram",
+      "kind": "built_in",
+      "docs_words": "Dark-themed SVG architecture/cloud/infra diagrams as HTML.",
+      "page": "reference/skills-catalog.md",
+      "line": 37
+    },
+    {
+      "name": "ascii-video",
+      "kind": "built_in",
+      "docs_words": "ASCII video: convert video/audio to colored ASCII MP4/GIF.",
+      "page": "reference/skills-catalog.md",
+      "line": 38
+    },
+    {
+      "name": "baoyu-infographic",
+      "kind": "built_in",
+      "docs_words": "Infographics: 21 layouts x 21 styles (信息图, 可视化).",
+      "page": "reference/skills-catalog.md",
+      "line": 39
+    },
+    {
+      "name": "claude-design",
+      "kind": "built_in",
+      "docs_words": "Design one-off HTML artifacts (landing, deck, prototype).",
+      "page": "reference/skills-catalog.md",
+      "line": 40
+    },
+    {
+      "name": "humanizer",
+      "kind": "built_in",
+      "docs_words": "Humanize text: strip AI-isms and add real voice.",
+      "page": "reference/skills-catalog.md",
+      "line": 41
+    },
+    {
+      "name": "manim-video",
+      "kind": "built_in",
+      "docs_words": "Manim CE animations: 3Blue1Brown math/algo videos.",
+      "page": "reference/skills-catalog.md",
+      "line": 42
+    },
+    {
+      "name": "p5js",
+      "kind": "built_in",
+      "docs_words": "p5.js sketches: gen art, shaders, interactive, 3D.",
+      "page": "reference/skills-catalog.md",
+      "line": 43
+    },
+    {
+      "name": "popular-web-designs",
+      "kind": "built_in",
+      "docs_words": "54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.",
+      "page": "reference/skills-catalog.md",
+      "line": 44
+    },
+    {
+      "name": "songwriting-and-ai-music",
+      "kind": "built_in",
+      "docs_words": "Songwriting craft and Suno AI music prompts.",
+      "page": "reference/skills-catalog.md",
+      "line": 45
+    },
+    {
+      "name": "sdlc-review",
+      "kind": "built_in",
+      "docs_words": "Review Kanban handoffs and route verified outcomes.",
+      "page": "reference/skills-catalog.md",
+      "line": 51
+    },
+    {
+      "name": "email-inbox-triage",
+      "kind": "built_in",
+      "docs_words": "Triage an inbox: prioritize threads, draft replies safely.",
+      "page": "reference/skills-catalog.md",
+      "line": 57
+    },
+    {
+      "name": "himalaya",
+      "kind": "built_in",
+      "docs_words": "Himalaya CLI: IMAP/SMTP email from terminal.",
+      "page": "reference/skills-catalog.md",
+      "line": 58
+    },
+    {
+      "name": "youtube-content",
+      "kind": "built_in",
+      "docs_words": "YouTube transcripts to summaries, threads, blogs.",
+      "page": "reference/skills-catalog.md",
+      "line": 64
+    },
+    {
+      "name": "obsidian",
+      "kind": "built_in",
+      "docs_words": "Read, search, create, and edit notes in the Obsidian vault.",
+      "page": "reference/skills-catalog.md",
+      "line": 70
+    },
+    {
+      "name": "document-to-action-items",
+      "kind": "built_in",
+      "docs_words": "Extract cited obligations, deadlines, tasks from documents.",
+      "page": "reference/skills-catalog.md",
+      "line": 76
+    },
+    {
+      "name": "google-workspace",
+      "kind": "built_in",
+      "docs_words": "Gmail, Calendar, Drive, Docs, Sheets via gws CLI or Python.",
+      "page": "reference/skills-catalog.md",
+      "line": 77
+    },
+    {
+      "name": "maps",
+      "kind": "built_in",
+      "docs_words": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.",
+      "page": "reference/skills-catalog.md",
+      "line": 78
+    },
+    {
+      "name": "meeting-action-items",
+      "kind": "built_in",
+      "docs_words": "Turn meeting notes into cited decisions, owners, tickets.",
+      "page": "reference/skills-catalog.md",
+      "line": 79
+    },
+    {
+      "name": "microsoft-office",
+      "kind": "built_in",
+      "docs_words": "Create, read, and edit Word, PowerPoint, and Excel files.",
+      "page": "reference/skills-catalog.md",
+      "line": 80
+    },
+    {
+      "name": "pdf",
+      "kind": "built_in",
+      "docs_words": "PDF files: create, read, merge, fill, OCR, edit text.",
+      "page": "reference/skills-catalog.md",
+      "line": 81
+    },
+    {
+      "name": "product-price-monitor",
+      "kind": "built_in",
+      "docs_words": "Watch product, flight, or listing prices; alert on target.",
+      "page": "reference/skills-catalog.md",
+      "line": 82
+    },
+    {
+      "name": "teams-meeting-pipeline",
+      "kind": "built_in",
+      "docs_words": "Teams meeting summaries, job replay, Graph subscriptions.",
+      "page": "reference/skills-catalog.md",
+      "line": 83
+    },
+    {
+      "name": "weekly-review-planning",
+      "kind": "built_in",
+      "docs_words": "Weekly reset: commitments, stalled work, next-week plan.",
+      "page": "reference/skills-catalog.md",
+      "line": 84
+    },
+    {
+      "name": "arxiv",
+      "kind": "built_in",
+      "docs_words": "Search arXiv papers by keyword, author, category, or ID.",
+      "page": "reference/skills-catalog.md",
+      "line": 90
+    },
+    {
+      "name": "competitor-news-monitor",
+      "kind": "built_in",
+      "docs_words": "Watch named companies for material news; cited digests.",
+      "page": "reference/skills-catalog.md",
+      "line": 91
+    },
+    {
+      "name": "grounded-citations",
+      "kind": "built_in",
+      "docs_words": "Ground answers and documents in cited, verifiable sources.",
+      "page": "reference/skills-catalog.md",
+      "line": 92
+    },
+    {
+      "name": "xurl",
+      "kind": "built_in",
+      "docs_words": "X/Twitter via xurl CLI: raw post search, posting, DM, media.",
+      "page": "reference/skills-catalog.md",
+      "line": 98
+    },
+    {
+      "name": "codebase-inspection",
+      "kind": "built_in",
+      "docs_words": "Inspect codebases w/ pygount: LOC, languages, ratios.",
+      "page": "reference/skills-catalog.md",
+      "line": 104
+    },
+    {
+      "name": "dogfood",
+      "kind": "built_in",
+      "docs_words": "Exploratory QA of web apps: find bugs, evidence, reports.",
+      "page": "reference/skills-catalog.md",
+      "line": 105
+    },
+    {
+      "name": "github",
+      "kind": "built_in",
+      "docs_words": "GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
+      "page": "reference/skills-catalog.md",
+      "line": 106
+    },
+    {
+      "name": "requesting-code-review",
+      "kind": "built_in",
+      "docs_words": "Pre-commit review: security scan, quality gates, auto-fix.",
+      "page": "reference/skills-catalog.md",
+      "line": 107
+    },
+    {
+      "name": "simplify-code",
+      "kind": "built_in",
+      "docs_words": "Parallel 4-agent cleanup of recent code changes.",
+      "page": "reference/skills-catalog.md",
+      "line": 108
+    },
+    {
+      "name": "spike",
+      "kind": "built_in",
+      "docs_words": "Throwaway experiments to validate an idea before build.",
+      "page": "reference/skills-catalog.md",
+      "line": 109
+    },
+    {
+      "name": "systematic-debugging",
+      "kind": "built_in",
+      "docs_words": "4-phase root cause debugging: understand bugs before fixing.",
+      "page": "reference/skills-catalog.md",
+      "line": 110
+    },
+    {
+      "name": "test-driven-development",
+      "kind": "built_in",
+      "docs_words": "TDD: enforce RED-GREEN-REFACTOR, tests before code.",
+      "page": "reference/skills-catalog.md",
+      "line": 111
+    },
+    {
+      "name": "blocked-page-recovery",
+      "kind": "built_in",
+      "docs_words": "Use when a fetch fails: 403/429, paywall, WAF, bot wall.",
+      "page": "reference/skills-catalog.md",
+      "line": 117
+    },
+    {
+      "name": "agent-merge-conflict-arbiter",
+      "kind": "optional",
+      "docs_words": "Neutral arbiter for merge conflicts between two agents.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 34
+    },
+    {
+      "name": "antigravity-cli",
+      "kind": "optional",
+      "docs_words": "Operate the Antigravity CLI (agy): plugins, auth, sandbox.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 35
+    },
+    {
+      "name": "blackbox",
+      "kind": "optional",
+      "docs_words": "Delegate coding tasks to the Blackbox AI multi-model CLI.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 36
+    },
+    {
+      "name": "dynamic-workflow",
+      "kind": "optional",
+      "docs_words": "Plan-in-code fan-outs, adversarial verification, waves.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 37
+    },
+    {
+      "name": "grok",
+      "kind": "optional",
+      "docs_words": "Delegate coding to xAI Grok Build CLI (features, PRs).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 38
+    },
+    {
+      "name": "opencode",
+      "kind": "optional",
+      "docs_words": "Delegate coding to OpenCode CLI (features, PR review).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 39
+    },
+    {
+      "name": "openhands",
+      "kind": "optional",
+      "docs_words": "Delegate coding to OpenHands CLI (model-agnostic, LiteLLM).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 40
+    },
+    {
+      "name": "evm",
+      "kind": "optional",
+      "docs_words": "Read-only EVM client: wallets, tokens, gas across 8 chains.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 46
+    },
+    {
+      "name": "hyperliquid",
+      "kind": "optional",
+      "docs_words": "Hyperliquid market data, account history, trade review.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 47
+    },
+    {
+      "name": "solana",
+      "kind": "optional",
+      "docs_words": "Query Solana wallets, tokens, txs, and NFTs in USD.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 48
+    },
+    {
+      "name": "one-three-one-rule",
+      "kind": "optional",
+      "docs_words": "1-3-1 decision briefs: problem, three options, one pick.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 54
+    },
+    {
+      "name": "ai-presenter-video",
+      "kind": "optional",
+      "docs_words": "Make a verified AI presenter video from script + image.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 60
+    },
+    {
+      "name": "anatomy",
+      "kind": "optional",
+      "docs_words": "Explain an idea as an interactive isometric machine figure.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 61
+    },
+    {
+      "name": "archify",
+      "kind": "optional",
+      "docs_words": "Validated interactive HTML diagrams, upstream-maintained.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 62
+    },
+    {
+      "name": "ascii-art",
+      "kind": "optional",
+      "docs_words": "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 63
+    },
+    {
+      "name": "auteur",
+      "kind": "optional",
+      "docs_words": "Design and build cinematic, award-level web pages.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 64
+    },
+    {
+      "name": "baoyu-article-illustrator",
+      "kind": "optional",
+      "docs_words": "Article illustrations: type × style × palette consistency.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 65
+    },
+    {
+      "name": "baoyu-comic",
+      "kind": "optional",
+      "docs_words": "Knowledge comics (知识漫画): educational, biography, tutorial.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 66
+    },
+    {
+      "name": "brag",
+      "kind": "optional",
+      "docs_words": "Project launch video via Hyperframes, upstream-maintained.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 67
+    },
+    {
+      "name": "brag-slim",
+      "kind": "optional",
+      "docs_words": "Launch video from a project or URL, upstream-maintained.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 68
+    },
+    {
+      "name": "comfyui",
+      "kind": "optional",
+      "docs_words": "Generate images, video, and audio via diffusion workflows.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 69
+    },
+    {
+      "name": "concept-diagrams",
+      "kind": "optional",
+      "docs_words": "Generate flat, minimal educational SVG visuals as HTML.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 70
+    },
+    {
+      "name": "creative-ideation",
+      "kind": "optional",
+      "docs_words": "Generate ideas via named methods from creative practice.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 71
+    },
+    {
+      "name": "design-md",
+      "kind": "optional",
+      "docs_words": "Author/validate/export Google's DESIGN.md token spec files.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 72
+    },
+    {
+      "name": "draw-your-font",
+      "kind": "optional",
+      "docs_words": "Turn a handwriting photo into an installable TTF font.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 73
+    },
+    {
+      "name": "dream-loop",
+      "kind": "optional",
+      "docs_words": "Build stunning 3D scenes via a concept-art fidelity loop.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 74
+    },
+    {
+      "name": "excalidraw",
+      "kind": "optional",
+      "docs_words": "Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 75
+    },
+    {
+      "name": "heartmula",
+      "kind": "optional",
+      "docs_words": "HeartMuLa: Suno-like song generation from lyrics + tags.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 76
+    },
+    {
+      "name": "hyperframes",
+      "kind": "optional",
+      "docs_words": "Render MP4/WebM videos from HTML compositions.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 77
+    },
+    {
+      "name": "impeccable",
+      "kind": "optional",
+      "docs_words": "Frontend design guidance, upstream-maintained (impeccable).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 78
+    },
+    {
+      "name": "ip-as-logo",
+      "kind": "optional",
+      "docs_words": "Design minimal cute IP mascot marks readable at 32px.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 79
+    },
+    {
+      "name": "kanban-video-orchestrator",
+      "kind": "optional",
+      "docs_words": "Plan and run multi-agent video production pipelines.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 80
+    },
+    {
+      "name": "meme-generation",
+      "kind": "optional",
+      "docs_words": "Create meme PNGs from templates with Pillow text overlay.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 81
+    },
+    {
+      "name": "mono-color",
+      "kind": "optional",
+      "docs_words": "Generate one- or two-ink editorial print poster images.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 82
+    },
+    {
+      "name": "pixel-art",
+      "kind": "optional",
+      "docs_words": "Pixel art w/ era palettes (NES, Game Boy, PICO-8).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 83
+    },
+    {
+      "name": "pretext",
+      "kind": "optional",
+      "docs_words": "Build creative browser demos with DOM-free text layout.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 84
+    },
+    {
+      "name": "simple-english",
+      "kind": "optional",
+      "docs_words": "Rewrite text to ASD-STE100 Simplified Technical English.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 85
+    },
+    {
+      "name": "sketch",
+      "kind": "optional",
+      "docs_words": "Throwaway HTML mockups: 2-3 design variants to compare.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 86
+    },
+    {
+      "name": "social-media-content-calendar",
+      "kind": "optional",
+      "docs_words": "Plan multi-platform social campaigns: briefs to posting.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 87
+    },
+    {
+      "name": "system-atlas",
+      "kind": "optional",
+      "docs_words": "Build explorable isometric architecture atlases as HTML.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 88
+    },
+    {
+      "name": "tldraw-offline",
+      "kind": "optional",
+      "docs_words": "Drive and script tldraw offline canvases with an agent.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 89
+    },
+    {
+      "name": "unreal-mcp",
+      "kind": "optional",
+      "docs_words": "Automate Unreal Engine editor scenes, actors, and renders.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 90
+    },
+    {
+      "name": "jupyter-notebook",
+      "kind": "optional",
+      "docs_words": "Iterative Python via live Jupyter kernel (hamelnb).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 96
+    },
+    {
+      "name": "actual-setup",
+      "kind": "optional",
+      "docs_words": "Set up Actual Computer (actual.inc) inference in Hermes.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 102
+    },
+    {
+      "name": "docker-management",
+      "kind": "optional",
+      "docs_words": "Manage Docker containers, images, volumes, and Compose.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 103
+    },
+    {
+      "name": "hermes-s6-container-supervision",
+      "kind": "optional",
+      "docs_words": "Modify or debug s6 services in the Hermes Docker image.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 104
+    },
+    {
+      "name": "inference-sh-cli",
+      "kind": "optional",
+      "docs_words": "Run 150+ AI apps (image, video, LLM) via inference.sh CLI.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 105
+    },
+    {
+      "name": "pinggy-tunnel",
+      "kind": "optional",
+      "docs_words": "Zero-install localhost tunnels over SSH via Pinggy.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 106
+    },
+    {
+      "name": "setup-wizard-generator",
+      "kind": "optional",
+      "docs_words": "Generate a bash wizard guiding a human through manual setup.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 107
+    },
+    {
+      "name": "watchers",
+      "kind": "optional",
+      "docs_words": "Poll RSS, JSON APIs, and GitHub with watermark dedup.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 108
+    },
+    {
+      "name": "adversarial-ux-test",
+      "kind": "optional",
+      "docs_words": "Roleplay a hostile user to find and triage UX pain points.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 114
+    },
+    {
+      "name": "agentmail",
+      "kind": "optional",
+      "docs_words": "Use when an agent needs AgentMail CLI email inboxes.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 120
+    },
+    {
+      "name": "3-statement-model",
+      "kind": "optional",
+      "docs_words": "Build integrated IS/BS/CF financial workbooks in Excel.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 126
+    },
+    {
+      "name": "comps-analysis",
+      "kind": "optional",
+      "docs_words": "Build comparable-company valuation workbooks in Excel.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 127
+    },
+    {
+      "name": "dcf-model",
+      "kind": "optional",
+      "docs_words": "Build discounted cash flow valuation workbooks in Excel.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 128
+    },
+    {
+      "name": "excel-author",
+      "kind": "optional",
+      "docs_words": "Build auditable financial workbooks headless via openpyxl.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 129
+    },
+    {
+      "name": "lbo-model",
+      "kind": "optional",
+      "docs_words": "Build leveraged buyout workbooks with IRR/MOIC in Excel.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 130
+    },
+    {
+      "name": "merger-model",
+      "kind": "optional",
+      "docs_words": "Build M&A accretion/dilution workbooks in Excel.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 131
+    },
+    {
+      "name": "polymarket",
+      "kind": "optional",
+      "docs_words": "Query Polymarket: markets, prices, orderbooks, history.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 132
+    },
+    {
+      "name": "pptx-author",
+      "kind": "optional",
+      "docs_words": "Build PowerPoint decks headless with python-pptx.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 133
+    },
+    {
+      "name": "stocks",
+      "kind": "optional",
+      "docs_words": "Stock quotes, history, search, compare, crypto via Yahoo.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 134
+    },
+    {
+      "name": "minecraft-modpack-server",
+      "kind": "optional",
+      "docs_words": "Host modded Minecraft servers (CurseForge, Modrinth).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 140
+    },
+    {
+      "name": "pokemon-player",
+      "kind": "optional",
+      "docs_words": "Play Pokemon via headless emulator + RAM reads.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 141
+    },
+    {
+      "name": "fitness-nutrition",
+      "kind": "optional",
+      "docs_words": "Workout planning, macros, and body metrics via wger/USDA.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 147
+    },
+    {
+      "name": "neuroskill-bci",
+      "kind": "optional",
+      "docs_words": "Use live BCI cognitive and mood state from NeuroSkill.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 148
+    },
+    {
+      "name": "fastmcp",
+      "kind": "optional",
+      "docs_words": "Build, test, and deploy Python MCP servers.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 154
+    },
+    {
+      "name": "mcp-oauth-remote-gateway",
+      "kind": "optional",
+      "docs_words": "Manual OAuth for remote MCP servers on headless gateways.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 155
+    },
+    {
+      "name": "mcporter",
+      "kind": "optional",
+      "docs_words": "List, auth, and call MCP servers/tools from the terminal.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 156
+    },
+    {
+      "name": "gif-search",
+      "kind": "optional",
+      "docs_words": "Search/download GIFs from Tenor via curl + jq.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 162
+    },
+    {
+      "name": "songsee",
+      "kind": "optional",
+      "docs_words": "Audio spectrograms/features (mel, chroma, MFCC) via CLI.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 163
+    },
+    {
+      "name": "accelerate",
+      "kind": "optional",
+      "docs_words": "Run PyTorch training across GPUs with minimal changes.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 169
+    },
+    {
+      "name": "axolotl",
+      "kind": "optional",
+      "docs_words": "Axolotl: YAML LLM fine-tuning (LoRA, DPO, GRPO).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 170
+    },
+    {
+      "name": "chroma",
+      "kind": "optional",
+      "docs_words": "Embedding database for RAG and semantic search.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 171
+    },
+    {
+      "name": "dspy",
+      "kind": "optional",
+      "docs_words": "DSPy: declarative LM programs, auto-optimize prompts, RAG.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 172
+    },
+    {
+      "name": "evaluating-llms-harness",
+      "kind": "optional",
+      "docs_words": "lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 173
+    },
+    {
+      "name": "faiss",
+      "kind": "optional",
+      "docs_words": "Fast vector similarity search at billion scale.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 174
+    },
+    {
+      "name": "flash-attention",
+      "kind": "optional",
+      "docs_words": "Speed up long-sequence transformer training and inference.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 175
+    },
+    {
+      "name": "lambda-labs",
+      "kind": "optional",
+      "docs_words": "On-demand GPU cloud instances for ML training.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 176
+    },
+    {
+      "name": "llama-cpp",
+      "kind": "optional",
+      "docs_words": "llama.cpp local GGUF inference + HF Hub model discovery.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 177
+    },
+    {
+      "name": "modal",
+      "kind": "optional",
+      "docs_words": "Serverless GPU cloud for ML jobs and model APIs.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 178
+    },
+    {
+      "name": "nemo-curator",
+      "kind": "optional",
+      "docs_words": "Curate LLM training data: dedupe, filter, PII redaction.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 179
+    },
+    {
+      "name": "obliteratus",
+      "kind": "optional",
+      "docs_words": "OBLITERATUS: abliterate LLM refusals (diff-in-means).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 180,
+      "left_out": true
+    },
+    {
+      "name": "peft",
+      "kind": "optional",
+      "docs_words": "Fine-tune large LLMs with LoRA on limited GPU memory.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 181
+    },
+    {
+      "name": "pytorch-fsdp",
+      "kind": "optional",
+      "docs_words": "Fully sharded data-parallel training for large models.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 182
+    },
+    {
+      "name": "pytorch-lightning",
+      "kind": "optional",
+      "docs_words": "Clean training loops with built-in distributed support.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 183
+    },
+    {
+      "name": "saelens",
+      "kind": "optional",
+      "docs_words": "Train sparse autoencoders to interpret model features.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 184
+    },
+    {
+      "name": "segment-anything-model",
+      "kind": "optional",
+      "docs_words": "SAM: zero-shot image segmentation via points, boxes, masks.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 185
+    },
+    {
+      "name": "serving-llms-vllm",
+      "kind": "optional",
+      "docs_words": "vLLM: high-throughput LLM serving, OpenAI API, quantization.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 186
+    },
+    {
+      "name": "simpo",
+      "kind": "optional",
+      "docs_words": "Reference-free preference alignment, simpler than DPO.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 187
+    },
+    {
+      "name": "slime",
+      "kind": "optional",
+      "docs_words": "RL post-training for LLMs with Megatron and SGLang.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 188
+    },
+    {
+      "name": "tensorrt-llm",
+      "kind": "optional",
+      "docs_words": "High-throughput LLM inference on NVIDIA GPUs.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 189
+    },
+    {
+      "name": "torchtitan",
+      "kind": "optional",
+      "docs_words": "Pretrain LLMs at scale with PyTorch 4D parallelism.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 190
+    },
+    {
+      "name": "unsloth",
+      "kind": "optional",
+      "docs_words": "Unsloth: 2-5x faster LoRA/QLoRA fine-tuning, less VRAM.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 191
+    },
+    {
+      "name": "stripe-link-cli",
+      "kind": "optional",
+      "docs_words": "Agent payments via Stripe Link — cards, SPT, approvals.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 197
+    },
+    {
+      "name": "stripe-projects",
+      "kind": "optional",
+      "docs_words": "Provision SaaS services + sync creds via Stripe Projects.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 198
+    },
+    {
+      "name": "box",
+      "kind": "optional",
+      "docs_words": "Box manages cloud files, sharing, search, and metadata.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 204
+    },
+    {
+      "name": "canvas",
+      "kind": "optional",
+      "docs_words": "Fetch Canvas LMS courses and assignments via API token.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 205
+    },
+    {
+      "name": "decision-questionnaire",
+      "kind": "optional",
+      "docs_words": "Turn an unanswerable decision into a questionnaire doc.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 206
+    },
+    {
+      "name": "here-now",
+      "kind": "optional",
+      "docs_words": "Publish sites to {slug}.here.now and store files in Drives.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 207
+    },
+    {
+      "name": "live-dashboard",
+      "kind": "optional",
+      "docs_words": "Build self-updating dashboards from live sources.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 208
+    },
+    {
+      "name": "memento-flashcards",
+      "kind": "optional",
+      "docs_words": "Spaced-repetition flashcards: create, review, quiz, export.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 209
+    },
+    {
+      "name": "property-listings",
+      "kind": "optional",
+      "docs_words": "Present property and rental listings as desktop cards.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 210
+    },
+    {
+      "name": "shop",
+      "kind": "optional",
+      "docs_words": "Shop catalog search, checkout, order tracking, returns.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 211
+    },
+    {
+      "name": "siyuan",
+      "kind": "optional",
+      "docs_words": "Query and edit a SiYuan knowledge base via its API.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 212
+    },
+    {
+      "name": "telephony",
+      "kind": "optional",
+      "docs_words": "Provision Twilio numbers, SMS/MMS, and AI outbound calls.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 213
+    },
+    {
+      "name": "bioinformatics",
+      "kind": "optional",
+      "docs_words": "Gateway to 400+ genomics and computational biology skills.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 219
+    },
+    {
+      "name": "blogwatcher",
+      "kind": "optional",
+      "docs_words": "Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 220
+    },
+    {
+      "name": "darwinian-evolver",
+      "kind": "optional",
+      "docs_words": "Evolve prompts/regex/SQL/code with Imbue's evolution loop.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 221
+    },
+    {
+      "name": "domain-intel",
+      "kind": "optional",
+      "docs_words": "Passive recon of subdomains, SSL certs, WHOIS, and DNS.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 222
+    },
+    {
+      "name": "drug-discovery",
+      "kind": "optional",
+      "docs_words": "Drug discovery: ChEMBL search, drug-likeness, interactions.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 223
+    },
+    {
+      "name": "gitnexus-explorer",
+      "kind": "optional",
+      "docs_words": "Serve an interactive codebase knowledge graph web UI.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 224
+    },
+    {
+      "name": "llm-wiki",
+      "kind": "optional",
+      "docs_words": "Karpathy's LLM Wiki: build/query interlinked markdown KB.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 225
+    },
+    {
+      "name": "osint-investigation",
+      "kind": "optional",
+      "docs_words": "Follow the money via public records and sanctions data.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 226
+    },
+    {
+      "name": "parallel-cli",
+      "kind": "optional",
+      "docs_words": "Agent-native web search, deep research, and enrichment.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 227
+    },
+    {
+      "name": "qmd",
+      "kind": "optional",
+      "docs_words": "Hybrid local search over notes, docs, and transcripts.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 228
+    },
+    {
+      "name": "research-paper-writing",
+      "kind": "optional",
+      "docs_words": "Write ML papers for NeurIPS/ICML/ICLR: design→submit.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 229
+    },
+    {
+      "name": "rss-feeds",
+      "kind": "optional",
+      "docs_words": "Read RSS, Atom, JSON feeds; discover feeds behind a page.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 230
+    },
+    {
+      "name": "scrapling",
+      "kind": "optional",
+      "docs_words": "Scrape sites with stealth browsing and Cloudflare bypass.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 231,
+      "left_out": true
+    },
+    {
+      "name": "1password",
+      "kind": "optional",
+      "docs_words": "Set up op CLI, sign in, and read or inject secrets.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 237
+    },
+    {
+      "name": "godmode",
+      "kind": "optional",
+      "docs_words": "Jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 238,
+      "left_out": true
+    },
+    {
+      "name": "oss-forensics",
+      "kind": "optional",
+      "docs_words": "GitHub supply-chain forensics: recovery, IOCs, reporting.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 239
+    },
+    {
+      "name": "sherlock",
+      "kind": "optional",
+      "docs_words": "Find accounts for a username across 400+ platforms.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 240,
+      "left_out": true
+    },
+    {
+      "name": "unbroker",
+      "kind": "optional",
+      "docs_words": "Remove your info from data-broker sites, by name or phone.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 241
+    },
+    {
+      "name": "web-pentest",
+      "kind": "optional",
+      "docs_words": "Authorized web pentest: recon, proof-based exploits, report.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 242,
+      "left_out": true
+    },
+    {
+      "name": "openhue",
+      "kind": "optional",
+      "docs_words": "Control Philips Hue lights, scenes, rooms via OpenHue CLI.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 248
+    },
+    {
+      "name": "reddit-reading",
+      "kind": "optional",
+      "docs_words": "Read Reddit: subreddits, search, threads, users. No browser.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 254
+    },
+    {
+      "name": "ast-grep",
+      "kind": "optional",
+      "docs_words": "AST-aware structural code search and rewrite via ast-grep.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 260
+    },
+    {
+      "name": "code-wiki",
+      "kind": "optional",
+      "docs_words": "Generate wiki docs + Mermaid diagrams for any codebase.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 261
+    },
+    {
+      "name": "grill-me",
+      "kind": "optional",
+      "docs_words": "Adversarial plan interview before implementation.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 262
+    },
+    {
+      "name": "hermes-agent-skill-authoring",
+      "kind": "optional",
+      "docs_words": "Author in-repo SKILL.md files: frontmatter and structure.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 263
+    },
+    {
+      "name": "inspecting-hermes-desktop-dom",
+      "kind": "optional",
+      "docs_words": "Read the live Hermes desktop DOM/CSS over CDP.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 264
+    },
+    {
+      "name": "node-inspect-debugger",
+      "kind": "optional",
+      "docs_words": "Debug Node.js via --inspect + Chrome DevTools Protocol CLI.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 265
+    },
+    {
+      "name": "pr-lens",
+      "kind": "optional",
+      "docs_words": "Draw code changes as animated architecture/data-flow SVGs.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 266
+    },
+    {
+      "name": "python-debugpy",
+      "kind": "optional",
+      "docs_words": "Debug Python: pdb REPL + debugpy remote (DAP).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 267
+    },
+    {
+      "name": "rest-graphql-debug",
+      "kind": "optional",
+      "docs_words": "Debug REST/GraphQL APIs: status codes, auth, schemas, repro.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 268
+    },
+    {
+      "name": "subagent-driven-development",
+      "kind": "optional",
+      "docs_words": "Execute plans via delegate_task subagents (2-stage review).",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 269
+    },
+    {
+      "name": "cloudflare-temporary-deploy",
+      "kind": "optional",
+      "docs_words": "Deploy a Worker live, no account, via wrangler --temporary.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 275
+    },
+    {
+      "name": "har-derived-api-client",
+      "kind": "optional",
+      "docs_words": "Record a site's XHR into a HAR, derive an HTTP client.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 276
+    },
+    {
+      "name": "page-agent",
+      "kind": "optional",
+      "docs_words": "Embed an in-page natural-language GUI copilot in web apps.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 277
+    },
+    {
+      "name": "publish-site",
+      "kind": "optional",
+      "docs_words": "Versioned site deploys to GitHub/Cloudflare/Netlify Pages.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 278
+    },
+    {
+      "name": "scrollcraft",
+      "kind": "optional",
+      "docs_words": "Premium scroll-driven landing pages; scroll = timeline.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 279
+    },
+    {
+      "name": "yuanbao",
+      "kind": "optional",
+      "docs_words": "Yuanbao (元宝) groups: @mention users, query info/members.",
+      "page": "reference/optional-skills-catalog.md",
+      "line": 285
+    }
+  ]
+}
+
+// ---- src/key-check.js ----
+// What the person typed, checked by code before anything goes to a model (build-v1.md section 7;
+// content/v1-strings.md part 4, K1; docs/answers/hhtech-v1-strings-check.md point 2).
+// Order matters: 1) pasted key, on the FULL text; 2) build words, on the full text; 3) the
+// 500-character cut. A key that starts at character 491 is caught on the full text and missed
+// after the cut (hhtech, ran), so the key check must come first.
+
+// hhcontent's key shapes (content/helper-talk-v2.json key_patterns, changes-10: one list, read
+// the same by route2.py and settings_read.py), exactly. A match on any one counts as a key. No
+// flags: case matters.
+const KEY_PATTERNS = TALK_DATA.key_patterns.map(p => new RegExp(p))
+
+const MAX_INPUT_CHARS = 500
+
+const KEY_LINE =
+  "That looks like a secret key, so I didn't send it to your model. Keys go in Settings, then Providers, then API keys, never in a chat."
+const LONG_LINE = 'Your message was long, so I read only the first 500 characters.'
+
+function looksLikeKey(text) {
+  return typeof text === 'string' && KEY_PATTERNS.some(re => re.test(text))
+}
+
+// Returns what the page does with the person's words:
+//   { kind: 'key' }                         show KEY_LINE, no model call
+//   { kind: 'build' }                       show the hand-over text, no model call (B3/B4)
+//   { kind: 'empty' }                       nothing to send
+//   { kind: 'send', input, cut }            send input (at most 500 characters); cut = show LONG_LINE
+// isBuildRequest is the step's build-word rule (hhcontent's list, B3); until then nothing matches.
+function prepareInput(text, isBuildRequest = () => false) {
+  const full = typeof text === 'string' ? text : ''
+  if (looksLikeKey(full)) return { kind: 'key' }
+  if (!full.trim()) return { kind: 'empty' }
+  if (isBuildRequest(full)) return { kind: 'build' }
+  const chars = Array.from(full)
+  const cut = chars.length > MAX_INPUT_CHARS
+  return { kind: 'send', input: cut ? chars.slice(0, MAX_INPUT_CHARS).join('') : full, cut }
+}
+
+// ---- src/setup-cards.js ----
+// "Your setup": the seven cards' pass rules and fixed words (build-v1.md section 8). Pure code, no
+// Hermes calls: src/setup-tab.js does the read-only reads and hands the answers to the rules here.
+// Code decides every status; no model judges anything.
+// Words: content/v1-strings.md part 3 (cards 2 and 4) and content/checks-base.md (cards 1, 3, 5, 6, 7),
+// "Passes when" lines from hhdesign's design/hermes-look-r3/your-setup.html. Lines marked
+// "(builder)" had no source text yet; they are listed for hhcontent in docs/build/b2-report.md.
+
+
+// One status per card, always shown as a coloured dot plus its word.
+const STATUS = {
+  works: 'Works',
+  fix: 'Needs a fix',
+  notset: 'Not set up yet',
+  unchecked: 'Not checked yet',
+  cant: "Can't check right now",
+  count: 'Just a count, no pass or fail',
+  checking: 'Checking'
+}
+
+const CARD_TITLES = {
+  gateway: 'Hermes is connected',
+  model: 'A model is connected',
+  answers: 'The model answers',
+  soul: 'Personality file (SOUL.md)',
+  skills: 'Skills are switched on',
+  memory: 'Memory can be used',
+  remember: 'Does it really remember?'
+}
+
+// Card titles never carry a bot name (B3a, Lead: "A model is connected for default" read badly).
+// With several bots, the picker line above the cards names the bot once.
+function cardTitle(id) {
+  return CARD_TITLES[id]
+}
+
+const PASSES = {
+  gateway: 'Passes when: this app is connected to your Hermes',
+  model: "Passes when: your provider's sign-in is found. This doesn't ask the model anything.",
+  // A no-break space keeps "90 s" on one line.
+  answers: 'Passes when: asked to reply "OK", it does within 90\u00a0s. Uses a little of your credit.',
+  soul: "Passes when: SOUL.md has your own text, not Hermes's default", // (builder)
+  skills: null, // a count only, no pass rule
+  memory: 'Passes when: the memory tool is on',
+  remember: 'Passes when: another new chat can tell you the test note' // (builder)
+}
+
+const OPEN_STEP_2 = { kind: 'step', step: 2, label: 'Open step 2' }
+const OPEN_STEP_4 = { kind: 'step', step: 4, label: 'Open step 4' } // (builder) checks-base: "Step 4"
+const CHECK_AGAIN = { kind: 'recheck', label: 'Check again' }
+const cant = () => ({ status: 'cant', lines: [CANT_CHECK_LINE], action: CHECK_AGAIN })
+const checking = () => ({ status: 'checking', lines: [] })
+
+/* ---- card 1: Hermes is connected (host.state.gateway) ---- */
+function gatewayCard(gatewayState) {
+  if (gatewayState === 'open') return { status: 'works', lines: ['This page can talk to your Hermes.'] }
+  return { status: 'fix', lines: ["This page can't reach your Hermes right now. Try closing and opening the app."] }
+}
+
+/* ---- card 2: A model is connected (setup.runtime_check, then setup.status after ok false) ---- */
+const MODEL_LINES = {
+  works: name => `Your Hermes has a model: ${name}. The model is the AI that does the thinking.`,
+  worksNoName: 'Your Hermes has a model connected. The model is the AI that does the thinking.',
+  notset:
+    'No model connected yet. The model is the AI that does the thinking, and Hermes needs one before it can answer. Step 2 explains the ways to connect one.',
+  fix: "A model is chosen, but Hermes can't use it. Most often the sign-in has ended or the key is wrong. Open Settings, then Providers, and sign in or paste the key again."
+}
+
+// check = checkModel()'s answer, or null / { state: 'checking' } while it runs.
+function modelCard(check) {
+  if (!check || check.state === 'checking') return checking()
+  if (check.state === 'ok') {
+    return check.name
+      ? { status: 'works', value: check.name, lines: [MODEL_LINES.works(check.name)] }
+      : { status: 'works', lines: [MODEL_LINES.worksNoName] }
+  }
+  if (check.state === 'none') {
+    // v1-strings part 3: ok false and provider_configured false = Not set up yet; any other ok false
+    // (including a setup.status that couldn't be read) = Needs a fix.
+    if (check.configured === false) return { status: 'notset', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
+    return { status: 'fix', lines: [MODEL_LINES.fix], action: OPEN_STEP_2 }
+  }
+  return cant()
+}
+
+/* ---- card 3: The model answers (one llm.oneshot, only when the person presses Check) ---- */
+const ANSWER_CALL = { instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 300 }
+const ANSWER_WAIT_LIMIT_S = 90
+
+// "contains OK": the word OK on its own, any case ("OK", "OK.", "ok"), not inside another word ("token").
+function answerPasses(text) {
+  return typeof text === 'string' && /(^|[^A-Za-z0-9])ok([^A-Za-z0-9]|$)/i.test(text)
+}
+
+function seconds(ms) {
+  const s = Math.max(0, ms) / 1000
+  return s < 10 ? s.toFixed(1) : String(Math.round(s))
+}
+
+// run = { phase: 'idle' } | { phase: 'calling', waited } | { phase: 'countdown', left }
+//     | { phase: 'done', result }   (result = askModel()'s answer)
+// model = card 2's check for the same bot: the button only works when that says ok.
+function answersCard(run, model) {
+  const ready = !!model && model.state === 'ok'
+  // A button that asks the model works only while card 2 says ok for this bot.
+  const button = (label, disabled = !ready) => ({ kind: 'ask', label, disabled })
+  const phase = run ? run.phase : 'idle'
+  if (phase === 'calling') return { status: 'checking', lines: [`Waiting for your model, ${run.waited || 0} s`] }
+  if (phase === 'countdown') return { status: 'checking', lines: failLines('not_ready', 'card', run.left) }
+  if (phase === 'done' && run.result) {
+    const r = run.result
+    const name = modelLabel(ready ? model.name : '')
+    if (r.ok && answerPasses(r.text)) {
+      // A model id keeps its own spelling; only the fallback "your model" starts the sentence capitalised.
+      const lead = ready && model.name ? name : 'Your model'
+      return { status: 'works', lines: [`${lead} answered a short test in ${seconds(r.ms)} seconds.`], action: button('Check again') }
+    }
+    if (r.ok) return { status: 'fix', lines: ['Your model answered, but not with OK. Press Try again.'], action: button('Try again') } // (builder)
+    // The call found no usable model (runtime_check asked again): card 2's own line and Open step 2.
+    // Status stays "Needs a fix": build-v1.md section 8 gives card 3 only Works / Needs a fix / Not checked yet.
+    if (r.kind === 'no_model') return { status: 'fix', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
+    if (r.kind === 'model_broken') return { status: 'fix', lines: [MODEL_LINES.fix], action: OPEN_STEP_2 }
+    return { status: 'fix', lines: failLines(r.kind, 'card'), action: button('Try again') }
+  }
+  if (!model || model.state === 'checking') return { status: 'unchecked', lines: [], action: button('Check') }
+  if (!ready) return { status: 'unchecked', lines: ['This check needs a connected model first.'], action: button('Check') } // (builder)
+  return { status: 'unchecked', lines: [], action: button('Check') }
+}
+
+/* ---- card 4: Personality file (SOUL.md) (profiles.describe -> soul) ---- */
+// Hermes's own default text and the older auto-seeded texts, copied from hermes_cli/default_soul.py
+// (Hermes v0.23.0, DEFAULT_SOUL_MD and _LEGACY_TEMPLATE_SOULS). A file equal to any of them, after
+// the same clean-up Hermes does, is "the built-in personality". Known risk: if Hermes changes its
+// default text, an untouched file would show Works (README, known issues).
+const DEFAULT_SOUL_MD =
+  'You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply to the weight of ' +
+  'the ask \u2014 a one-line question gets a one-line answer, and finished work gets a short report of what ' +
+  "changed, what's verified, and what's left, never a replay of the process. No filler (\"Great question,\" " +
+  '"I\'d be happy to"), no restating the request back, no re-summarizing what you already said, no narrating ' +
+  "tool calls the user can see. Plain claims over adjectives; when unsure, say so plainly. Agree because it's " +
+  'right, not because the user said it. Depth is earned \u2014 give it when the user asks for detail, teaches, or ' +
+  'the stakes demand it, not by default.'
+const SCAFFOLD_HEAD =
+  "# Hermes Agent Persona\n\n<!--\nThis file defines the agent's personality and tone.\n" +
+  'The agent will embody whatever you write here.\nEdit this to customize how Hermes communicates with you.\n\n'
+const SCAFFOLD_TAIL =
+  'This file is loaded fresh each message -- no restart needed.\n' + 'Delete the contents (or this file) to use the default personality.\n-->'
+const DEFAULT_SOULS = [
+  DEFAULT_SOUL_MD,
+  SCAFFOLD_HEAD +
+    'Examples:\n' +
+    '  - "You are a warm, playful assistant who uses kaomoji occasionally."\n' +
+    '  - "You are a concise technical expert. No fluff, just facts."\n' +
+    '  - "You speak like a friendly coworker who happens to know everything."\n\n' +
+    SCAFFOLD_TAIL,
+  SCAFFOLD_HEAD + SCAFFOLD_TAIL,
+  'You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, ' +
+    'knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, ' +
+    'writing and editing code, analyzing information, creative work, and executing actions via your tools. ' +
+    'You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over ' +
+    'being verbose unless otherwise directed below. Be targeted and efficient in your exploration and ' +
+    'investigations.',
+  DEFAULT_SOUL_MD.replaceAll('\u2014', '--')
+]
+
+// Hermes's _normalize_soul: unify line endings, drop a leading BOM, trim.
+function normalizeSoul(text) {
+  return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/^\uFEFF/, '').trim()
+}
+const DEFAULT_SET = new Set(DEFAULT_SOULS.map(normalizeSoul))
+
+function isDefaultSoul(text) {
+  return DEFAULT_SET.has(normalizeSoul(text))
+}
+
+const SOUL_LINES = {
+  works:
+    'Your Hermes has its own personality file. SOUL.md is the first thing Hermes reads, and it sets who your Hermes is and how it talks.',
+  notset:
+    "Your Hermes uses the built-in personality. That's fine; nothing is wrong. SOUL.md is a short text file where you can describe how you want it to talk. Help with writing one comes in a later step."
+}
+
+// read = { ok: true, value: <profiles.describe answer> } | { ok: false } (rejected or timed out) | null (running)
+function soulCard(read) {
+  if (!read) return checking()
+  if (!read.ok) return cant()
+  const soul = read.value && typeof read.value === 'object' ? read.value.soul : undefined
+  if (typeof soul !== 'string') return cant()
+  // Empty text means Hermes uses its built-in personality (hhtech point 3), so it is "Not set up yet".
+  if (!soul.trim() || isDefaultSoul(soul)) return { status: 'notset', lines: [SOUL_LINES.notset] }
+  return { status: 'works', lines: [SOUL_LINES.works] }
+}
+
+/* ---- card 5: Skills (host.skills.list): a count, no pass or fail ---- */
+function skillsCard(read) {
+  if (!read) return checking()
+  if (!read.ok || !Array.isArray(read.value)) return cant()
+  const on = read.value.filter(s => s && s.enabled === true).length
+  if (on === 0) {
+    return { status: 'count', value: '0 switched on', lines: ['No skills are on. Hermes still works; skills add know-how for certain tasks. Step 4 explains them.'], action: OPEN_STEP_4 }
+  }
+  const lead = on === 1 ? '1 skill is on.' : `${on} skills are on.`
+  return {
+    status: 'count',
+    value: `${on} switched on`,
+    lines: [`${lead} A skill is written know-how your Hermes loads when a task needs it.`],
+    action: OPEN_STEP_4
+  }
+}
+
+/* ---- card 6: Memory switch (host.toolsets.list -> "memory") ---- */
+const MEMORY_HANDOFF = 'Please switch my memory on and tell me how to check it worked.'
+function memoryCard(read) {
+  if (!read) return checking()
+  if (!read.ok || !Array.isArray(read.value)) return cant()
+  const memory = read.value.find(t => t && t.name === 'memory')
+  if (!memory || typeof memory.enabled !== 'boolean') return cant()
+  if (memory.enabled) return { status: 'works', lines: ['Memory is on. Your Hermes can save notes about you that come back in later chats.'] }
+  return {
+    status: 'fix',
+    lines: ["Memory is switched off. Your Hermes can't save anything, whatever it says."],
+    handoff: { lead: 'Paste this into a new chat with your Hermes:', text: MEMORY_HANDOFF }
+  }
+}
+
+/* ---- card 7: Does it really remember? (the person runs the test in their own chat) ---- */
+const REMEMBER = {
+  intro: "A test you run in your own chat, because this page can't write to your memory.",
+  part1: 'Use the memory tool to save this exact note: Helper test 7Q4.',
+  part2: 'What is the Helper test note?',
+  steps: ['Paste the test text into a new chat.', 'Open another new chat and ask for the note.', 'Tell us what it said.'],
+  yes: 'It said 7Q4',
+  no: "It didn't",
+  worked: 'It found the note in a new chat, so memory works for this bot.', // (builder)
+  reasonsLead: 'Three likely reasons, most likely first:', // (builder)
+  reasons: [
+    "It said it saved but didn't. Small models do this often. A stronger model for setup fixes it.",
+    'The note is waiting for your OK. Type /memory pending, then /memory approve all.',
+    'The note went to another bot. Each bot (profile) has its own memory.'
+  ]
+}
+
+// answer = 'yes' | 'no' | undefined (kept per bot in ctx.storage)
+function rememberCard(answer) {
+  if (answer === 'yes') return { status: 'works', lines: [REMEMBER.worked] }
+  if (answer === 'no') return { status: 'fix', lines: [], reasonsLead: REMEMBER.reasonsLead, reasons: REMEMBER.reasons }
+  return { status: 'unchecked', lines: [] }
+}
+
+// ---- src/steps-data.js ----
+// Generated by scripts/build.mjs from content/steps-v1.json (hhcontent's fixed step text). Edit the
+// JSON, then build; tests/steps.test.mjs checks the data (build-v1.md section 6).
+const STEPS_DATA = {
+  "about": "Helper v1 step data, steps 1-4. Written by hhcontent, 9 Nov 2026. Shape: docs/plan/build-v1.md section 6, plus optional fields listed in content/v1-strings.md part 4. All text is fixed; code fills only the {slots}. Checked by dev/checks/hhcontent/check-steps-v1.mjs.",
+  "docs_version": "v0.23.0",
+  "docs_root": "/hermes-docs",
+  "live_base": "https://hermes-agent.nousresearch.com/docs/",
+  "build_word_rule": "Lower-case the person's words, turn curly quotes into straight ones, squeeze spaces. If the words start with one of build_word_skip_starts, skip this check and let the model decide. Otherwise, if any phrase from build_words_common or from the open step's build_words appears with a word boundary on both sides, go straight to the hand-over text with no model call.",
+  "build_word_skip_starts": [
+    "what is",
+    "what's",
+    "whats",
+    "what are",
+    "what does",
+    "what do",
+    "why",
+    "is it",
+    "is that",
+    "is this",
+    "are there",
+    "does it",
+    "does that",
+    "do i need",
+    "should i",
+    "which"
+  ],
+  "build_words_common": [
+    "do it for me",
+    "do this for me",
+    "do that for me",
+    "can you install",
+    "could you install",
+    "would you install",
+    "please install",
+    "install it",
+    "install this",
+    "install that",
+    "install them",
+    "can you connect",
+    "could you connect",
+    "please connect",
+    "connect it",
+    "connect this",
+    "can you build",
+    "could you build",
+    "please build",
+    "build me",
+    "build it",
+    "can you set up",
+    "could you set up",
+    "please set up",
+    "set it up",
+    "set this up",
+    "set everything up",
+    "set it all up",
+    "can you configure",
+    "please configure",
+    "configure it",
+    "can you enable",
+    "please enable",
+    "enable it",
+    "turn it on",
+    "switch it on",
+    "deploy it",
+    "just do it",
+    "do it now",
+    "build an app",
+    "make an app",
+    "build a website",
+    "make a website",
+    "build a bot",
+    "make a bot",
+    "write the code"
+  ],
+  "key_pattern_note": "Separate from build words: if the words contain something that looks like a secret key, never send them to the model. See content/v1-strings.md, line K1.",
+  "steps": [
+    {
+      "id": "s1",
+      "number": 1,
+      "title": "What do you want Hermes to do for you?",
+      "rail_subtitle": "What you want Hermes to do",
+      "intro": "Hermes is an AI agent: an AI that can do things for you, not only talk. You talk to it in plain words, as you would with ChatGPT. The difference is what it can do around the chat. It can take actions on the computer it runs on, it remembers you from one chat to the next, and it can work on a schedule or answer you in a chat app on your phone. What you want from it decides which of these parts you need, so this is the first question. Pick the answer closest to yours. You can change it later.",
+      "intro_sources": [
+        {
+          "source": "index.mdx",
+          "section": "Hermes Agent",
+          "quote": "builds a deepening model of who you are across sessions"
+        },
+        {
+          "source": "user-guide/features/tools.md",
+          "section": "Tools & Toolsets",
+          "quote": "Tools are functions that extend the agent's capabilities."
+        },
+        {
+          "source": "user-guide/messaging/index.md",
+          "section": "Messaging Gateway",
+          "quote": "The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs"
+        }
+      ],
+      "compare": null,
+      "facts": [
+        {
+          "id": "s1f1",
+          "text": "Hermes remembers what it learns about you from one chat to the next. It also writes down new skills (step-by-step know-how for one kind of task) from what it does, and improves them as it uses them.",
+          "source": "index.mdx",
+          "section": "Hermes Agent",
+          "url": "https://hermes-agent.nousresearch.com/docs/",
+          "quote": "creates skills from experience, improves them during use, nudges itself to persist knowledge, and builds a deepening model of who you are across sessions"
+        },
+        {
+          "id": "s1f2",
+          "text": "Hermes can take actions, not only answer: run programs, read and change files, search the web, and more. Each kind of action is called a tool.",
+          "source": "user-guide/features/tools.md",
+          "section": "Available Tools",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tools",
+          "quote": "covering web search, browser automation, terminal execution, file editing, memory, delegation, scheduled tasks, and more"
+        },
+        {
+          "id": "s1f3",
+          "text": "You can message Hermes from chat apps such as Telegram, WhatsApp, Discord or Slack, not only from this app. A part of Hermes called the gateway keeps running in the background to answer you there.",
+          "source": "user-guide/messaging/index.md",
+          "section": "Messaging Gateway",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/messaging/",
+          "quote": "The gateway is a single background process that connects to all your configured platforms"
+        },
+        {
+          "id": "s1f4",
+          "text": "Hermes can do jobs on a schedule without you being there, such as a summary every morning or a regular check. The docs call these cron jobs.",
+          "source": "getting-started/learning-path.md",
+          "section": "I want to automate tasks",
+          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path",
+          "quote": "Cron jobs let Hermes Agent run tasks on a schedule — daily summaries, periodic checks, automated reports — without you being present."
+        },
+        {
+          "id": "s1f5",
+          "text": "The official docs sort what people do with Hermes into a few kinds: help with writing and running code, a bot in a chat app, jobs that run on a schedule, and a team of specialist bots. They advise getting one plain chat working first, then adding one thing at a time.",
+          "source": "getting-started/learning-path.md",
+          "section": "By Use Case",
+          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path",
+          "quote": "I want a team of specialist Bots",
+          "more_sources": [
+            {
+              "source": "getting-started/quickstart.md",
+              "section": "The fastest path",
+              "quote": "Get one clean conversation working first, then layer on gateway, cron, skills, voice, or routing."
+            }
+          ]
+        }
+      ],
+      "question": "What would you most like Hermes to do for you first?",
+      "options": [
+        {
+          "id": "o_tasks",
+          "label": "Help with tasks on this computer",
+          "hint": "Files, writing, research, code",
+          "fact": "s1f2",
+          "goal_text": "help me with tasks on my computer (files, writing, research, code)",
+          "fits": {
+            "s3": "o_here"
+          }
+        },
+        {
+          "id": "o_phone",
+          "label": "Answer me from my phone",
+          "hint": "In Telegram, WhatsApp, Discord or Slack",
+          "fact": "s1f3",
+          "goal_text": "answer me from my phone in a chat app",
+          "fits": {
+            "s3": "o_always"
+          }
+        },
+        {
+          "id": "o_schedule",
+          "label": "Do jobs on its own, on a schedule",
+          "hint": "A summary every morning, a regular check",
+          "fact": "s1f4",
+          "goal_text": "do jobs on its own on a schedule",
+          "fits": {
+            "s3": "o_always"
+          }
+        },
+        {
+          "id": "o_unsure",
+          "label": "I don't know yet",
+          "hint": "See what people use it for",
+          "fact": "s1f5",
+          "goal_text": "not decided yet",
+          "fits": {}
+        }
+      ],
+      "next_rule": {
+        "o_tasks": "s2",
+        "o_phone": "s2",
+        "o_schedule": "s2",
+        "o_unsure": "s2"
+      },
+      "build_words": [
+        "do it all",
+        "make it work",
+        "do everything"
+      ],
+      "handoff": {
+        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will do and why, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
+        "docs_url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path"
+      },
+      "video": null
+    },
+    {
+      "id": "s2",
+      "number": 2,
+      "title": "The brain: what a model is, and where it runs",
+      "rail_subtitle": "What a model is, where it runs",
+      "intro": "Hermes doesn't think by itself. It sends your words to a model: the AI that does the thinking, like the one inside ChatGPT. A provider is the company that runs a model for you. If Hermes already answers you, you already have a model, and this step shows what you have and what else you could use. There are four ways to connect a model: a subscription you may already pay for, an API key (a secret code from a model company), a model on your own computer, or a Nous account (Nous Research makes Hermes). You can switch at any time.",
+      "intro_sources": [
+        {
+          "source": "user-guide/configuring-models.md",
+          "section": "Configuring Models",
+          "quote": "Main model — what the agent thinks with."
+        },
+        {
+          "source": "integrations/providers.md",
+          "section": "Subscription plans: what your plan pays for",
+          "quote": "Several providers let you sign in to Hermes with a consumer subscription"
+        },
+        {
+          "source": "getting-started/quickstart.md",
+          "section": "2. Choose a Provider",
+          "quote": "You can switch providers at any time with hermes model — no lock-in."
+        }
+      ],
+      "compare": {
+        "left": {
+          "title": "On a provider's computers",
+          "text": "Your words go to that provider and nowhere else. You pay through a subscription or for what you use.",
+          "source": "reference/faq.md",
+          "section": "Is my data sent anywhere?",
+          "quote": "API calls go only to the LLM provider you configure"
+        },
+        "right": {
+          "title": "On this computer",
+          "text": "Nothing leaves your computer, and it costs nothing to run. It needs a fairly strong computer.",
+          "source": "user-guide/local-models.md",
+          "section": "Local Models",
+          "quote": "Nothing leaves your computer: no account, no API key, and no network access"
+        }
+      },
+      "facts": [
+        {
+          "id": "s2f1",
+          "text": "The name of the model you use shows in the message box, and you can change it there for one chat. The model for new chats is set in Settings, then Model, then Main model, and you can switch to another one at any time.",
+          "source": "user-guide/desktop.md",
+          "section": "Choosing a model",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#choosing-a-model",
+          "quote": "Set the default in Settings → Model → Main model."
+        },
+        {
+          "id": "s2f2",
+          "text": "Some subscriptions can be used instead of a key: a ChatGPT plan (you sign in with ChatGPT) or SuperGrok (the paid plan for Grok). For Claude, only the Max plan works, and only with extra usage credits bought on top; Claude Pro can't be used this way. The docs name ChatGPT Plus and Pro, but don't yet say how much of your plan Hermes uses.",
+          "source": "integrations/providers.md",
+          "section": "Subscription plans: what your plan pays for",
+          "url": "https://hermes-agent.nousresearch.com/docs/integrations/providers#subscription-plans-what-your-plan-pays-for",
+          "quote": "Pro subscribers cannot use the OAuth path",
+          "more_sources": [
+            {
+              "source": "integrations/providers.md",
+              "section": "Subscription plans: what your plan pays for",
+              "quote": "Which ChatGPT plan tiers are eligible, and how Hermes usage counts against your plan's Codex limits, are not currently documented"
+            },
+            {
+              "source": "user-guide/configuration.md",
+              "section": "Common Setups",
+              "quote": "Using Codex OAuth (ChatGPT Pro/Plus account — no API key needed)"
+            }
+          ]
+        },
+        {
+          "id": "s2f3",
+          "text": "An API key is a long secret code from a model company, such as OpenRouter, OpenAI, Anthropic or Google. It works like a password that lets Hermes use your account there, and you usually pay for what you use. Keep it secret: it goes in Settings, then Providers, then API keys, never into a chat.",
+          "source": "getting-started/quickstart.md",
+          "section": "2. Choose a Provider",
+          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#2-choose-a-provider",
+          "quote": "or API key for pay-per-token",
+          "more_sources": [
+            {
+              "source": "reference/faq.md",
+              "section": "How much does it cost?",
+              "quote": "You pay only for the LLM API usage from your chosen provider."
+            },
+            {
+              "source": "user-guide/desktop.md",
+              "section": "Settings & onboarding",
+              "quote": "with an Accounts / API-keys UX for signing in and storing credentials per provider"
+            }
+          ]
+        },
+        {
+          "id": "s2f4",
+          "text": "Hermes can download a model and run it on this computer: no account, no key, and nothing leaves your computer. A graphics card with 8 GB of memory or more runs the small models well, and Hermes shows which models fit before you download. Small models sometimes say they saved something to Hermes's memory when they didn't.",
+          "source": "user-guide/local-models.md",
+          "section": "Requirements and limits",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/local-models",
+          "quote": "A GPU with 8 GB+ of memory runs the small catalog models comfortably",
+          "more_sources": [
+            {
+              "source": "user-guide/local-models.md",
+              "section": "How Hermes picks what to download",
+              "quote": "Every model in the catalog is priced against your machine before you download anything."
+            },
+            {
+              "source": "user-guide/features/memory.md",
+              "section": "Troubleshooting",
+              "quote": "Small local models (roughly under 30B parameters) and models with weak tool-calling do this often"
+            }
+          ]
+        },
+        {
+          "id": "s2f5",
+          "text": "Nous Portal is an account with Nous Research, the makers of Hermes. One sign-in gives you hundreds of models and extra tools such as web search, on a paid subscription, and the docs call it the recommended way to run Hermes. There is also a free Nous plan, with limits on how much you can use it.",
+          "source": "integrations/nous-portal.md",
+          "section": "Nous Portal",
+          "url": "https://hermes-agent.nousresearch.com/docs/integrations/nous-portal",
+          "quote": "the recommended way to run Hermes Agent",
+          "more_sources": [
+            {
+              "source": "integrations/providers.md",
+              "section": "Nous Portal",
+              "quote": "One OAuth login covers 300+ frontier agentic models"
+            },
+            {
+              "source": "user-guide/configuration.md",
+              "section": "Iteration Budget",
+              "quote": "on the free Nous tier (no sign-in)"
+            }
+          ]
+        }
+      ],
+      "question": "Which of these fits you best?",
+      "options": [
+        {
+          "id": "o_keep",
+          "label": "Keep the model I have",
+          "hint": "It already answers me",
+          "fact": "s2f1"
+        },
+        {
+          "id": "o_sub",
+          "label": "Use a subscription I pay for",
+          "hint": "ChatGPT, SuperGrok or Claude Max",
+          "fact": "s2f2"
+        },
+        {
+          "id": "o_key",
+          "label": "Use an API key",
+          "hint": "Pay for what I use",
+          "fact": "s2f3"
+        },
+        {
+          "id": "o_local",
+          "label": "Run a model on this computer",
+          "hint": "Private and free to run",
+          "fact": "s2f4"
+        },
+        {
+          "id": "o_nous",
+          "label": "Use a Nous account",
+          "hint": "Many models in one sign-in",
+          "fact": "s2f5"
+        }
+      ],
+      "next_rule": {
+        "o_keep": "s3",
+        "o_sub": "s3",
+        "o_key": "s3",
+        "o_local": "s3",
+        "o_nous": "s3"
+      },
+      "build_words": [
+        "connect my chatgpt",
+        "connect my claude",
+        "connect chatgpt",
+        "connect claude",
+        "add my key",
+        "add my api key",
+        "use my key",
+        "here is my key",
+        "here's my key",
+        "my key is",
+        "switch my model",
+        "change my model",
+        "change the model",
+        "set my model",
+        "download a model",
+        "download the model",
+        "install a model",
+        "install the model",
+        "sign me in",
+        "log me in",
+        "sign in for me",
+        "log in for me"
+      ],
+      "handoff": {
+        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will change in my model settings and why, and wait for my OK. If a key or a sign-in is needed, tell me where to enter it in Settings; don't ask me to paste a key into this chat. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
+        "docs_url": "https://hermes-agent.nousresearch.com/docs/integrations/providers"
+      },
+      "video": null
+    },
+    {
+      "id": "s3",
+      "number": 3,
+      "title": "Where Hermes runs: this computer, or one that is always on",
+      "rail_subtitle": "This computer, or one that is always on",
+      "intro": "Hermes itself also runs on a computer, and that is a separate choice from the model in step 2. By default, this app runs Hermes on this computer. Hermes can also run on another computer that stays on all the time, and this app then connects to it. Where Hermes runs decides when it can work for you. Answering your messages and running scheduled jobs happen in the background on that computer, so they need it to be on and awake.",
+      "intro_sources": [
+        {
+          "source": "user-guide/desktop.md",
+          "section": "Connecting to a remote backend",
+          "quote": "By default the app starts and manages its own local backend."
+        },
+        {
+          "source": "user-guide/messaging/index.md",
+          "section": "Messaging Gateway",
+          "quote": "The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs"
+        },
+        {
+          "source": "user-guide/desktop.md",
+          "section": "Settings & onboarding",
+          "quote": "stops the machine from sleeping so long or overnight agent runs keep going"
+        }
+      ],
+      "compare": {
+        "left": {
+          "title": "This computer",
+          "text": "Simplest: nothing extra to set up. It works only while this computer is on and awake.",
+          "source": "user-guide/desktop.md",
+          "section": "Connecting to a remote backend",
+          "quote": "By default the app starts and manages its own local backend."
+        },
+        "right": {
+          "title": "A computer that is always on",
+          "text": "A rented server, a home server, or Hermes Cloud. It keeps working while your own computer is off.",
+          "source": "user-guide/desktop.md",
+          "section": "Connecting to a remote backend",
+          "quote": "a VPS, a home server, or a Mini behind Tailscale"
+        }
+      },
+      "facts": [
+        {
+          "id": "s3f1",
+          "text": "By default, the app starts and looks after its own Hermes on this computer. Nothing else is needed to begin.",
+          "source": "user-guide/desktop.md",
+          "section": "Connecting to a remote backend",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
+          "quote": "By default the app starts and manages its own local backend."
+        },
+        {
+          "id": "s3f2",
+          "text": "Hermes works only while the computer it runs on is awake. In the app, Settings, then Advanced, then Keep computer awake stops the computer from sleeping during long jobs. Closing the lid still puts it to sleep.",
+          "source": "user-guide/desktop.md",
+          "section": "Settings & onboarding",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#settings--onboarding",
+          "quote": "Closing the lid or choosing Sleep still sleeps the machine",
+          "more_sources": [
+            {
+              "source": "guides/cron-troubleshooting.md",
+              "section": "Cron Troubleshooting",
+              "quote": "Scheduled fires work as long as the gateway is running"
+            }
+          ]
+        },
+        {
+          "id": "s3f3",
+          "text": "Hermes can also run on another computer that stays on, such as a server you rent (a computer in a data centre that stays on) or one at home. You connect this app to it in Settings, then Gateways, and use it the same way. Setting up that other computer takes some technical steps with typed commands.",
+          "source": "user-guide/desktop.md",
+          "section": "Connecting to a remote backend",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
+          "quote": "point it at a Hermes backend running on another machine — a VPS, a home server, or a Mini behind Tailscale",
+          "more_sources": [
+            {
+              "source": "user-guide/desktop.md",
+              "section": "On the backend (the remote machine)",
+              "quote": "Set a username and password, then start the backend bound to a reachable address."
+            }
+          ]
+        },
+        {
+          "id": "s3f4",
+          "text": "Hermes Cloud runs Hermes for you on a computer that is hosted for you. You sign in once in Settings, then Gateways, and pick your Hermes from a list, with no address to type in. The Hermes docs don't list its price.",
+          "source": "user-guide/desktop.md",
+          "section": "Connecting to a remote backend",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
+          "quote": "sign in once to Hermes Cloud and pick from the agents on your account; no URL to paste",
+          "more_sources": [
+            {
+              "source": "user-guide/multi-connection-desktop.md",
+              "section": "The gateway registry",
+              "quote": "A hosted instance discovered through your Hermes Cloud account."
+            }
+          ]
+        },
+        {
+          "id": "s3f5",
+          "text": "Your chats, memory and skills are kept on the computer where Hermes runs. Hermes sends your words only to your model's provider, and it collects no usage data.",
+          "source": "reference/faq.md",
+          "section": "Is my data sent anywhere?",
+          "url": "https://hermes-agent.nousresearch.com/docs/reference/faq#is-my-data-sent-anywhere",
+          "quote": "Hermes Agent does not collect telemetry, usage data, or analytics. Your conversations, memory, and skills are stored locally in ~/.hermes/."
+        }
+      ],
+      "question": "Where should your Hermes run?",
+      "options": [
+        {
+          "id": "o_here",
+          "label": "This computer is fine for now",
+          "hint": "Simplest to start",
+          "fact": "s3f1"
+        },
+        {
+          "id": "o_always",
+          "label": "A computer that is always on",
+          "hint": "My own server",
+          "fact": "s3f3"
+        },
+        {
+          "id": "o_cloud",
+          "label": "Hermes Cloud",
+          "hint": "Hosted for me",
+          "fact": "s3f4"
+        },
+        {
+          "id": "o_unsure",
+          "label": "I'm not sure yet",
+          "hint": "What decides it?",
+          "fact": "s3f2"
+        }
+      ],
+      "next_rule": {
+        "o_here": "s4",
+        "o_always": "s4",
+        "o_cloud": "s4",
+        "o_unsure": "s4"
+      },
+      "build_words": [
+        "set up a server",
+        "set up my server",
+        "rent a server",
+        "rent me a server",
+        "deploy hermes",
+        "move hermes",
+        "move it to",
+        "connect to my server",
+        "connect my server",
+        "set up hermes cloud",
+        "sign up for hermes cloud",
+        "sign me up",
+        "install hermes",
+        "keep my computer awake"
+      ],
+      "handoff": {
+        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will do, what it needs (another computer, an account, any cost) and why, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
+        "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend"
+      },
+      "video": null
+    },
+    {
+      "id": "s4",
+      "number": 4,
+      "title": "Connecting things: tools, skills, plugins, MCP",
+      "rail_subtitle": "Tools, skills, plugins, MCP",
+      "intro": "Hermes does things through tools: actions it can take, like searching the web. You can give it more abilities in three ways: skills, plugins and MCP. The names sound alike, but they are different kinds of things. Knowing which kind fits your goal tells you what to ask your Hermes for. This page explains and advises. Your own Hermes does the adding, after you say yes.",
+      "intro_sources": [
+        {
+          "source": "user-guide/features/tools.md",
+          "section": "Tools & Toolsets",
+          "quote": "Tools are functions that extend the agent's capabilities."
+        },
+        {
+          "source": "getting-started/learning-path.md",
+          "section": "I want to build custom tools/skills",
+          "quote": "Extend Hermes Agent with your own tools and reusable skill packages."
+        }
+      ],
+      "compare": null,
+      "facts": [
+        {
+          "id": "s4f1",
+          "text": "A tool is one kind of action Hermes can take, such as searching the web, running a program or reading a file. Hermes comes with many, grouped into toolsets that you can switch on or off.",
+          "source": "user-guide/features/tools.md",
+          "section": "Tools & Toolsets",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tools",
+          "quote": "They're organized into logical toolsets that can be enabled or disabled per platform."
+        },
+        {
+          "id": "s4f2",
+          "text": "A skill is written know-how: a document with step-by-step instructions for one kind of task. Hermes reads only each skill's short description until a task needs it, so having many doesn't slow it down. It comes with many skills, and you can add more from the Skills Hub.",
+          "source": "getting-started/quickstart.md",
+          "section": "Skills",
+          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#skills",
+          "quote": "The agent reads the short descriptions for free and only loads a skill's full content when a task actually calls for it",
+          "more_sources": [
+            {
+              "source": "user-guide/features/skills.md",
+              "section": "Skills System",
+              "quote": "Skills are on-demand knowledge documents the agent can load when needed."
+            }
+          ]
+        },
+        {
+          "id": "s4f3",
+          "text": "A plugin is an add-on made of code. It can give Hermes new tools or features without changing Hermes itself. The plugin catalog lists plugins that people have reviewed, and each one installs with one command or one click.",
+          "source": "user-guide/features/plugins.md",
+          "section": "Plugins",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/plugins",
+          "quote": "Hermes has a plugin system for adding custom tools, hooks, and integrations without modifying core code.",
+          "more_sources": [
+            {
+              "source": "user-guide/features/plugin-catalog.md",
+              "section": "Plugin Catalog",
+              "quote": "The plugin catalog is a curated, human-reviewed directory of Hermes plugins you can install by name with a single command"
+            }
+          ]
+        },
+        {
+          "id": "s4f4",
+          "text": "MCP (Model Context Protocol) is a shared standard, a bit like a plug that fits many sockets. It lets Hermes use tools that live outside it, such as GitHub or a database, without anyone writing a new Hermes tool first.",
+          "source": "user-guide/features/mcp.md",
+          "section": "MCP (Model Context Protocol)",
+          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp",
+          "quote": "Access to external tool ecosystems without writing a native Hermes tool first",
+          "more_sources": [
+            {
+              "source": "user-guide/features/mcp.md",
+              "section": "MCP (Model Context Protocol)",
+              "quote": "MCP lets Hermes Agent connect to external tool servers so the agent can use tools that live outside Hermes itself — GitHub, databases"
+            }
+          ]
+        },
+        {
+          "id": "s4f5",
+          "text": "Add only what your goal needs, one thing at a time. The official quickstart says to get a normal chat working first, then add skills, scheduled jobs or messaging one layer at a time.",
+          "source": "getting-started/quickstart.md",
+          "section": "The fastest path",
+          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#the-fastest-path",
+          "quote": "Get one clean conversation working first, then layer on gateway, cron, skills, voice, or routing."
+        }
+      ],
+      "question": "What would you like Hermes to be able to do next?",
+      "options": [
+        {
+          "id": "o_knowhow",
+          "label": "Do a task my way, every time",
+          "hint": "Written know-how: a skill",
+          "fact": "s4f2"
+        },
+        {
+          "id": "o_service",
+          "label": "Use a service I already use",
+          "hint": "Such as GitHub or a database",
+          "fact": "s4f4"
+        },
+        {
+          "id": "o_feature",
+          "label": "Get a new feature",
+          "hint": "An add-on: a plugin",
+          "fact": "s4f3"
+        },
+        {
+          "id": "o_actions",
+          "label": "See what it can already do",
+          "hint": "Its built-in tools",
+          "fact": "s4f1"
+        },
+        {
+          "id": "o_enough",
+          "label": "Nothing more for now",
+          "hint": "Keep it simple",
+          "fact": "s4f5"
+        }
+      ],
+      "next_rule": {
+        "o_knowhow": "done",
+        "o_service": "done",
+        "o_feature": "done",
+        "o_actions": "done",
+        "o_enough": "done"
+      },
+      "build_words": [
+        "install a skill",
+        "install the skill",
+        "install a plugin",
+        "install the plugin",
+        "add a skill",
+        "add the skill",
+        "add this skill",
+        "add a plugin",
+        "add the plugin",
+        "add this plugin",
+        "add an mcp",
+        "add the mcp",
+        "set up mcp",
+        "set up an mcp",
+        "connect gmail",
+        "connect my gmail",
+        "connect my email",
+        "connect my calendar",
+        "connect github",
+        "connect my github",
+        "connect notion",
+        "connect my notion",
+        "write a skill",
+        "create a skill",
+        "make a skill",
+        "build a plugin",
+        "make a plugin",
+        "write a plugin",
+        "turn on the",
+        "switch on the",
+        "enable the"
+      ],
+      "handoff": {
+        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words whether this is a skill, a plugin or an MCP server, what it will be able to read or change, and why it fits my goal, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
+        "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/plugin-catalog"
+      },
+      "video": null
+    }
+  ]
+}
+
+// ---- src/steps.js ----
+// Setup steps 1-4 (B3): hhcontent's fixed text (content/steps-v1.json, built into src/steps-data.js)
+// and the small rules around it, all plain code with no model: which step comes next
+// (next_rule), the build-word rule (straight to the hand-over text), the hand-over text itself,
+// the "Fits your goal" tag and the docs links. Every sentence the page shows comes from the data
+// or from content/v1-strings.md part 4, word for word.
+
+const STEPS = STEPS_DATA.steps
+const STEP_IDS = STEPS.map(s => s.id)
+
+// Steps 5-7 show greyed under "After these", with no content (build-v1.md section 6).
+const LATER_STEPS = [
+  { number: 5, title: 'Personality and memory' },
+  { number: 6, title: 'Messaging' },
+  { number: 7, title: 'Several bots' }
+]
+const VERSION_LINE = 'Hermes v0.23 · docs checked 9 Nov 2026'
+
+// content/v1-strings.md part 4 (hhcontent). {slots} are filled by code only.
+const LINES = {
+  greeting: "Open a step and ask me about it here. I explain things; I don't change your settings.",
+  yourAnswer: 'Your answer: {option_label}',
+  fitsGoal: 'Fits your goal',
+  afterLast: "That's the first four steps. Your setup shows what you have now.",
+  noCheckedAnswer: "I don't have a checked answer for that yet. The closest official page is: {docs_url}",
+  handoffLead: ["I don't do that here. I help you understand and decide; your own Hermes does the doing.", 'Paste this into a new chat with your Hermes:'],
+  handoffAfter: "When it's done, come back and check it under Your setup.",
+  // The video slot (build-v1.md section 6: video is null in v1, the slot stays).
+  videoLater: 'A short video for this step comes later. It will need the internet when you press Play.'
+}
+
+const fill = (line, slots) => line.replace(/\{(\w+)\}/g, (m, k) => (k in slots ? String(slots[k]) : m))
+
+function stepByNumber(n) {
+  return STEPS.find(s => s.number === n) || null
+}
+
+function stepById(id) {
+  return STEPS.find(s => s.id === id) || null
+}
+
+// The step list's two lines. The title up to its colon ("The brain"); a title without one (step 1
+// is a question) gives its place to the data's own short line, which then isn't repeated below.
+function railLines(step) {
+  const colon = step.title.indexOf(':')
+  if (colon > 0) return { title: step.title.slice(0, colon), sub: step.rail_subtitle || '' }
+  return { title: step.rail_subtitle || step.title, sub: '' }
+}
+
+// A docs path ("user-guide/desktop.md") as its live page, the same rule hhcontent's check uses
+// for every fact url (dev/checks/hhcontent/check-steps-v1.mjs, checkUrl).
+function docsUrl(source) {
+  const rel = String(source).replace(/\.(md|mdx)$/, '').replace(/^index$/, '').replace(/\/index$/, '/')
+  return STEPS_DATA.live_base + rel
+}
+
+// The label on a source chip (v1-strings part 5: "Hermes docs › {section}").
+const chipLabel = section => `Hermes docs › ${section}`
+
+// Only the official Hermes docs open from the page (a content slip can't open anything else).
+const isDocsUrl = url => typeof url === 'string' && url.startsWith(STEPS_DATA.live_base) && !/[\s"'<>]/.test(url)
+
+// The step after this one, by the step's next_rule (code, not the model). No answer picked yet:
+// the next step in order (every rule in v1 leads there too). Returns a step number, or 'done'.
+function nextAfter(step, optionId) {
+  const target = optionId && step.next_rule ? step.next_rule[optionId] : undefined
+  if (target === 'done') return 'done'
+  const byRule = target ? stepById(target) : null
+  if (byRule) return byRule.number
+  const following = stepByNumber(step.number + 1)
+  return following ? following.number : 'done'
+}
+
+// answers: { [stepId]: optionId }, the person's picks. The step-1 answer can tag one option of a
+// later step "Fits your goal" (its `fits`).
+function fitsGoal(answers, stepId) {
+  const first = STEPS[0]
+  const picked = first.options.find(o => o.id === (answers || {})[first.id])
+  return picked && picked.fits ? picked.fits[stepId] || null : null
+}
+
+// The build-word rule, as steps-v1.json's build_word_rule says it: lower-case, straight quotes,
+// squeezed spaces; a question start skips the check; otherwise any phrase from the common list or
+// the open step's list, with a word boundary on both sides, means "go straight to the hand-over".
+const normalise = s =>
+  String(s).toLowerCase().replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/\s+/g, ' ').trim()
+const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+function isBuildRequest(step, text) {
+  const t = normalise(text)
+  if (STEPS_DATA.build_word_skip_starts.some(p => t.startsWith(p + ' ') || t === p)) return false
+  const phrases = [...STEPS_DATA.build_words_common, ...((step && step.build_words) || [])]
+  return phrases.some(p => new RegExp(`(^|[^a-z0-9])${escape(p)}($|[^a-z0-9])`).test(t))
+}
+
+// The hand-over text (v1-strings part 4, "Slots in the hand-over template"):
+//   {goal}     the step-1 answer's goal_text, else "not chosen yet"
+//   {request}  the person's words, cut to 300 characters, double quotes turned into single ones
+//   {docs_url} the step's handoff.docs_url
+const REQUEST_MAX_CHARS = 300
+function handoffText(step, answers, request) {
+  const first = STEPS[0]
+  const picked = first.options.find(o => o.id === (answers || {})[first.id])
+  const words = Array.from(String(request || '').replace(/["\u201c\u201d]/g, "'").trim())
+  return fill(step.handoff.template, {
+    goal: picked && picked.goal_text ? picked.goal_text : 'not chosen yet',
+    request: words.slice(0, REQUEST_MAX_CHARS).join(''),
+    docs_url: step.handoff.docs_url
+  })
+}
+
+// Only answers that are real options of real steps survive (storage can hold anything).
+function cleanAnswers(value) {
+  const out = {}
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return out
+  for (const s of STEPS) {
+    const v = value[s.id]
+    if (typeof v === 'string' && s.options.some(o => o.id === v)) out[s.id] = v
+  }
+  return out
+}
+
+// ---- src/state.js ----
+// What the page keeps in ctx.storage on the person's computer.
+// Keys: tab (setup | yours), step (1-4), answers ({ stepId: optionId }, the person's picks on the
+// steps), helperWidth (the width Helper's window was dragged to, 360 to 600 px).
+// Anything unexpected in storage falls back to the default.
+// About the person, only the record of what Helper keeps (talk v2 row 3): never what they do,
+// never the conversation. STORED_KEYS is every key the plugin may
+// write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
+
+const STEP_COUNT = STEPS.length
+// 'remember' is the person's answer to the memory test on Your setup (src/setup-tab.js).
+// 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
+const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept']
+
+function readState(get) {
+  const pick = (key, allowed, fallback) => {
+    const v = get(key, fallback)
+    return allowed.includes(v) ? v : fallback
+  }
+  const step = get('step', 1)
+  return {
+    tab: pick('tab', ['setup', 'yours'], 'setup'),
+    step: Number.isInteger(step) && step >= 1 && step <= STEP_COUNT ? step : 1,
+    answers: cleanAnswers(get('answers', {})),
+    helperWidth: clampHelperWidth(get('helperWidth', HELPER_PX))
+  }
+}
+
 // ---- src/kept.js ----
 // The one stored record of what Helper keeps about the person (JSON keeps.storage), under the
 // storage key 'kept': { name, mod, msg, svc, asked: [...], told }. Every field is optional.
@@ -4409,17 +7075,77 @@ function needsFor(t, topic, answering) {
   return ns.map(n => n.id)
 }
 
+/* ---------- the wants (row 5): hhcontent's content/helper-wants-v1.json, as src/wants-data.js ---------- */
+// The order of steps is hhtech's wants_step.py with fixes6_step.py on top of route2.py (changes-6
+// fixes 2 and 3, changes-8's article before "NAME skill"); route2.py itself stops at the wants
+// question. visit.wants false: the steps below do nothing, which is route2.py exactly (the tests
+// replay route2.py's own conversations that way).
+const WROWS = WANTS_DATA.rows
+const WANT_ROWS = Object.fromEntries(WROWS.map(r => [r.id, r]))
+const WGROUPS = Object.fromEntries(WANTS_DATA.groups.map(g => [g.id, g]))
+const WSKILLS = new Map(WANTS_DATA.skills.map(s => [s.name, s]))
+const SERVICE_LINES = WANTS_DATA.service_lines
+// A row matches when one of its key words is in the message, or one of its things and one of its
+// actions are both in it. Whole words, as every key word (helper-wants-v1.json match_rule).
+const wantsOf = t => WROWS.filter(r => whichOf(t, r.key_words || []).length || (whichOf(t, r.things || []).length && whichOf(t, r.actions || []).length)).map(r => r.id)
+// The near miss: the groups one of whose subject words is in the message.
+const nearOf = t => WANTS_DATA.groups.filter(g => whichOf(t, g.subject_words).length).map(g => g.id)
+// A skill by its name only when the name and "skill" sit next to each other (changes-6 fix 3,
+// changes-8): hhcontent's skill_next.py PATTERNS, word for word; {n} is the name, or the name with
+// spaces for its hyphens. tests/talk-wants.test.mjs compares these with skill_next.py's own.
+const SKILL_NEXT_PATTERNS = ['(?:the|a|an|this|that) {n} skills?', 'skills? (?:called|named) \\"?{n}\\"?', 'skills? for {n}', '\\"{n}\\" skills?']
+const SKILL_RES = WANTS_DATA.skills.map(s => {
+  const names = [...new Set([s.name, s.name.replace(/-/g, ' ')])]
+  const alts = names.flatMap(n => SKILL_NEXT_PATTERNS.map(p => p.replace(/\\"/g, '"').replace('{n}', escapeRe(n))))
+  return [s.name, new RegExp('(^|[^a-z0-9])(?:' + alts.join('|') + ')($|[^a-z0-9])')]
+})
+const skillOf = t => [...new Set(SKILL_RES.filter(([, re]) => re.test(t)).map(([n]) => n))].sort()
+// The row a skill has, if any (a hand-written row wins over S1 and S2).
+const rowOfSkill = name => WROWS.find(r => r.thing === name)
+// Changes-6 fix 6: where svc's row for a named service would show, Gmail, Google Calendar and
+// Google Drive get line CN1 (the app's Connectors page) and GitHub gets S1 for the built-in skill
+// github. A result gets serviceLine; the rest stays as it was (found, kept, the visit).
+function withServiceLine(out, st) {
+  if (st.wants === false || out.topic !== 'svc' || out.need !== 'svc1') return out
+  const s = SERVICE_LINES[st.service]
+  if (s) out.serviceLine = s.line === 'S1' ? { line: 'S1', skill: s.skill } : { line: s.line }
+  return out
+}
+// At most four things to pick on screen (answers.max_at_once): a longer list shows three and
+// "More", which shows the next ones the same way (helper-talk-v2.json answers.more).
+function pageOf(items) {
+  const max = TALK_DATA.answers.max_at_once
+  if (items.length <= max) return items
+  const shown = max - 1
+  return [...items.slice(0, shown), { id: 'more-' + items[shown].id, label: 'More', more: items.slice(shown) }]
+}
+
 // Steps 4 and 5: the topic and the need, by key words.
 function byCode(text, st) {
   const t = cutIgnored(talkNorm(text))
-  const strong = strongTopics(t)
-  const r = { topic: null, need: null, term: null, several: null, strong_one: strong.length === 1 }
+  let strong = strongTopics(t)
+  // the rows (wants_step.py by_code2): while a topic question is open, only in a question
+  let rows = st.wants === false ? [] : wantsOf(t)
+  if (rows.length && st.pending && !questionForm(t)) rows = []
+  // fix 2: a row takes svc off only when the svc word matched is that row's own key word or thing;
+  // otherwise svc stays and the rows are not looked at
+  if (rows.length && strong.includes('svc')) {
+    const svcWords = whichOf(t, TOPICS.svc.key_words.concat(TOPICS.svc.misspellings))
+    const owned = rows.some(id => svcWords.some(w => (WANT_ROWS[id].key_words || []).includes(w) || (WANT_ROWS[id].things || []).includes(w)))
+    if (owned) strong = strong.filter(k => k !== 'svc')
+    else rows = []
+  }
+  const r = { topic: null, need: null, term: null, several: null, strong_one: strong.length === 1, rows: null }
   if (strong.length > 1) {
     r.several = strong
     return r
   }
   if (strong.length === 1) r.topic = strong[0]
   else {
+    if (rows.length) {
+      r.rows = rows
+      return r
+    }
     if (!st.pending || questionForm(t)) {
       const terms = TERM_IDS.filter(k => whichOf(t, TERMS[k].key_words).length)
       if (terms.length === 1) {
@@ -4460,8 +7186,9 @@ function byCode(text, st) {
 // found: { topic: need } shown in this visit. lastq: Helper's last line was a question.
 // service: the service last named, for the text to paste. kept: the stored record (keeps.storage).
 // rmText: the message that led to "Do you mean me, or your own Hermes?", for the answer to it.
+// wants: the wants steps are on (row 5); false only for replaying route2.py, which has none.
 function freshVisit(stage = 'open', kept = {}) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true }
 }
 // A later visit: only the stored record is carried over. A kept name means the opening's two
 // questions are not asked again (content/helper-keeps-v1.md section 4).
@@ -4544,9 +7271,8 @@ function remember(text, st, out) {
     if (n < lim.min_words) out.kind = 'RM3'
     else if (whichOf(talkNorm(thing), KEEP_REMEMBER.refuse.words).length || new RegExp(KEEP_REMEMBER.refuse.digits_pattern).test(thing)) out.kind = 'RM6'
     else if (n > lim.max_words || charCount(thing) > lim.max_chars) out.kind = 'RM5'
-    // Builder, after review (route2.py compares exactly): the same thing in other capitals counts
-    // as kept already, as the settings page reads it (settings_read.py), which would otherwise
-    // refuse every Save with "This line is there twice".
+    // keeps.remember.same_thing (changes-10, the Builder's review fix now in route2.py): the same
+    // thing in other capitals counts as kept already, as the settings page reads it.
     else if (asked.some(a => a.toLowerCase() === thing.toLowerCase())) out.kind = 'RM1'
     else if (asked.length >= lim.max_things) out.kind = 'RM4'
     else {
@@ -4639,14 +7365,15 @@ function dontKnow(text) {
   return 'N1'
 }
 
+// changes-10 (opening.name_refused, the Builder's review fix now in route2.py): a name holding a
+// word Helper never keeps (keeps.remember.refuse.words, and in a name also opening
+// .name_refused_words_also: pin, pins) or a key shape is no name, as a name with digits is none.
+const refusedName = s => whichOf(talkNorm(s), KEEP_REMEMBER.refuse.words.concat(OPENING.name_refused_words_also || [])).length > 0 || looksLikeKey(s)
 function codeName(text, strongOnly = false) {
-  const name = codeNameAsRoute2(text, strongOnly)
-  // Builder, after review (not in route2.py): a "name" holding one of the words Helper never keeps
-  // (keeps.remember.refuse.words: password, PIN, ...) is no name, as a name with digits is none,
-  // because it would be kept and shown in "Kept: ...", and the settings page then refuses the box.
-  return name && !whichOf(talkNorm(name), KEEP_REMEMBER.refuse.words).length ? name : null
+  const name = codeNameRaw(text, strongOnly)
+  return name && !refusedName(name) ? name : null
 }
-function codeNameAsRoute2(text, strongOnly) {
+function codeNameRaw(text, strongOnly) {
   let m = NAME_STRONG.exec(text)
   if (m) return capFirst(m[1])
   if (strongOnly) return null
@@ -4671,6 +7398,7 @@ function nameWithMore(text) {
     }
   }
   if (!m) return [null, null]
+  if (refusedName(m[1])) return [null, null] // changes-10: opening.name_refused
   const rest = text.slice(m.index + m[0].length).replace(/^(?:[\s,.!:]+|and\b|here\b)+/i, '')
   const rt = cutIgnored(talkNorm(rest))
   if (!rt) return [null, null]
@@ -4762,6 +7490,18 @@ function turn(text, st) {
     st.stage = 'open'
     st.lastq = false
   }
+  // a skill by its name, next to "skill" (changes-6 fix 3): before the topics, so "is there a
+  // github skill" gets the skill, not the service question. A row for that skill wins; a skill
+  // marked left out gets N1b; else S1 (built in) or S2 (optional, with the clicks to add it).
+  if (st.wants !== false) {
+    const sk = skillOf(cutIgnored(talkNorm(text)))
+    if (sk.length === 1) {
+      const row = rowOfSkill(sk[0])
+      if (row) return done('want', { row: row.id })
+      if (WSKILLS.get(sk[0]).left_out) return done('N1b')
+      return done('skill', { skill: sk[0] })
+    }
+  }
   // a skill named in a clear pattern is looked up before the terms
   const dk = dontKnow(text)
   if (dk === 'N1a' || dk === 'N1b') return done(dk)
@@ -4769,6 +7509,9 @@ function turn(text, st) {
   const code = byCode(text, st)
   out.code = code
   const { topic, need, several } = code
+  // the rows: one is shown; two or more, "Which one do you mean?" with their labels (three and
+  // "More" when over four; wants_step.py shows the first four)
+  if (code.rows) return code.rows.length === 1 ? done('want', { row: code.rows[0] }) : done('W1', { buttons: code.rows })
   if (code.term) return done('term', { term: code.term })
   // 7. the first that fits
   if (topic && need) {
@@ -4777,13 +7520,13 @@ function turn(text, st) {
     if (answered) keepTyped(t, topic, need, st, out)
     st.found[topic] = need
     if (topic === 'svc') st.service = serviceIn(text, st, answered)
-    return done('row', { topic, need })
+    return withServiceLine(done('row', { topic, need }), st)
   }
   if (several) return done('W1', { buttons: several.slice(0, TALK_DATA.answers.max_at_once) })
   // keeps.use: something is kept for this topic, so its question is not asked
   if (topic && keptNeed(topic, st)) {
     const r = fromKept(topic, st)
-    return done('row', { topic: r.topic, need: r.need, used: 'kept' })
+    return withServiceLine(done('row', { topic: r.topic, need: r.need, used: 'kept' }), st)
   }
   if (topic && !st.lastq && !st.asked.includes(topic)) {
     st.asked.push(topic)
@@ -4792,6 +7535,11 @@ function turn(text, st) {
     return r
   }
   if (topic) return done('plain', { topic })
+  // the near miss: no row, but a subject word of exactly one group: N2 with that group's rows
+  if (st.wants !== false) {
+    const g = nearOf(t)
+    if (g.length === 1) return done('N2', { group: g[0] })
+  }
   return done(dontKnow(text) || 'skill by name')
 }
 
@@ -4808,12 +7556,19 @@ function pick(topic, i, st) {
   if (topic === 'mod') keep(st, out, 'mod', a.gives)
   else if (topic === 'msg' && (a.gives === 'msg1' || a.gives === 'msg2')) keep(st, out, 'msg', a.label)
   else if (topic === 'svc' && a.service) keep(st, out, 'svc', a.service)
-  return out
+  return withServiceLine(out, st)
 }
 
 // A topic picked under TP or C1. A pick that holds several topics: line C1. Else the kept row, the
-// topic's question if not asked yet, or its plain line.
+// topic's question if not asked yet, or its plain line. The held pick "Web, files, pictures and
+// voice" (held_picks.wants, changes-9): the wants question can-q at once, its four groups to pick
+// (route2.py pick_topic).
 function pickTopic(topic, st) {
+  if (TALK_DATA.held_picks && TALK_DATA.held_picks.includes(topic)) {
+    st.pending = null
+    st.lastq = false
+    return { kind: 'can-q', buttons: WANTS_DATA.groups.map(g => g.id) }
+  }
   const held = TOPIC_PICKS[topic]
   if (held && held.holds) {
     st.pending = null
@@ -4824,7 +7579,7 @@ function pickTopic(topic, st) {
     const r = fromKept(topic, st)
     st.pending = null
     st.lastq = false
-    return r
+    return withServiceLine(r, st)
   }
   if (!st.asked.includes(topic) && !st.lastq) {
     st.asked.push(topic)
@@ -4846,15 +7601,31 @@ function change(topic, st) {
   return { kind: 'question', topic }
 }
 
-// A button under "Which one do you mean?", with the message that led to it.
+// A button under "Which one do you mean?", with the message that led to it. A row's button: that
+// row.
 function press(choice, text, st) {
   st.lastq = false
+  if (WANT_ROWS[choice]) return pickWant(choice, st)
   if (TERMS[choice]) return { kind: 'term', term: choice }
   const ns = needsFor(cutIgnored(talkNorm(text)), choice, false)
   if (ns.length !== 1) return { kind: 'plain', topic: choice }
   st.found[choice] = ns[0]
   if (choice === 'svc') st.service = serviceIn(text, st, false)
-  return { kind: 'row', topic: choice, need: ns[0] }
+  return withServiceLine({ kind: 'row', topic: choice, need: ns[0] }, st)
+}
+
+// A group picked under "What do you want Hermes to do?": line G1 with the group's rows to pick.
+// Not a question, so lastq stays false (helper-wants-v1.md 6.3).
+function pickGroup(group, st) {
+  st.pending = null
+  st.lastq = false
+  return { kind: 'G1', group, buttons: WROWS.filter(r => r.group === group).map(r => r.id) }
+}
+// A row picked (under G1, N2 or "Which one do you mean?"): its line and its button. No key words.
+function pickWant(id, st) {
+  st.pending = null
+  st.lastq = false
+  return { kind: 'want', row: id }
 }
 
 // An answer under "Do you mean me, or your own Hermes?" (RM2): 'helper' or 'hermes'.
@@ -4950,8 +7721,26 @@ function nextFor(next, topic, st) {
 }
 
 const topicPicks = () => ({ kind: 'topics', hint: TALK_DATA.answers.hint_under_topics, items: TALK_DATA.topic_picks.map(p => ({ id: p.gives, label: p.label, topic: p.gives })) })
-const labelOf = id => (TOPICS[id] ? TOPICS[id].pick.label : TERMS[id].label)
+const labelOf = id => (TOPICS[id] ? TOPICS[id].pick.label : WANT_ROWS[id] ? WANT_ROWS[id].label : TALK_DATA.held_labels[id] || TERMS[id].label)
 const yesNo = (answers, what) => ({ kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: answers.map(a => ({ id: `forget-${what}-${a.gives}`, label: a.label, forget: [what, a.gives === 'yes'] })) })
+// A group's rows to pick (under G1 and N2), three and "More" when over four.
+const rowPicks = (ids, kind) => ({ kind, hint: TALK_DATA.answers.hint_under_question, items: pageOf(ids.map(id => ({ id, label: WANT_ROWS[id].label, want: id }))) })
+// A row's button: "Show me what to ask" (text to paste) or, for an optional skill, "Show me how to
+// add it" (the app's clicks, then the line that it works from the next new chat).
+function wantNext(n, name) {
+  if (n.kind === 'steps') return { kind: 'steps', label: n.label, steps: n.steps.map(s => fillSlots(s, { name })), after: n.after }
+  return { kind: 'paste', label: n.label, text: n.paste_text }
+}
+// A source as the talk data writes it: "file line N" (or "lines" for several of one file).
+const sourceText = sources => (sources || []).map(s => `${s.file} line ${s.line}`).join('; ') || null
+// S1 or S2 for a skill with no row of its own: Helper's fixed line, the box "From the Hermes docs"
+// with the page's own words (not Helper's voice), and for an optional skill the clicks to add it.
+function skillLine(name, said) {
+  const s = WSKILLS.get(name)
+  const f = WANTS_DATA.fixed[s.kind === 'optional' ? 'S2' : 'S1']
+  const docs = { head: WANTS_DATA.fixed['box-head'].text, words: s.docs_words, source: `${s.page} line ${s.line}` }
+  return said(s.kind === 'optional' ? 'S2' : 'S1', fillSlots(f.text, { name }), { source: docs.source, docs, next: f.next ? wantNext(f.next, name) : null })
+}
 
 // The words for one kept thing (keeps.things[].kept_words): "Peter", "you pay for ChatGPT",
 // "you use WhatsApp", "you use Gmail", or the thing as asked.
@@ -4986,7 +7775,7 @@ function keptNote(result, st) {
 // The opening line. On a later visit with a kept name, the opening's question is not asked: the
 // same line without it (the data has no line of its own for a later visit: Questions for Lead).
 function openingLine(st = null) {
-  const said = { line: 'OPEN', text: FIXED.OPEN.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null }
+  const said = { line: 'OPEN', text: FIXED.OPEN.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }
   if (st && st.stage === 'open') return { ...said, line: 'OPEN-again', text: FIXED.OPEN.text.replace(/\s*[^.?]*\?\s*$/, '') }
   return said
 }
@@ -4994,11 +7783,14 @@ function openingLine(st = null) {
 // result: what turn, pick, pickTopic, press, skip, sayLine, change, rmPick or forgetAnswer
 // returned. typed: the person's words (for the text to paste under "your own Hermes can").
 // opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it).
-// Returns { line, text, source, answers, next, paste, note, used, hint, rows }:
+// Returns { line, text, source, answers, next, paste, note, used, hint, rows, docs }:
+//   docs: the box "From the Hermes docs" { head, words, source } (S1, S2), the page's own words;
+//   next may also be { kind: 'steps', label, steps, after } (the clicks to add an optional skill);
+//   an answer to pick may be { more: [the next ones] } ("More", three at a time, src/page.js).
 //   note: the faint "Kept: ..." line { text, link, first }; used: "From what I keep: ..." { text,
 //   link, topic }; hint: a small faint line (N_HINT); rows: the list of kept things (A1).
 function lineFor(result, st, typed = '', opts = {}) {
-  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, ...more })
+  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
   const dontKnowLine = id => said(id, FIXED[id].text, { hint: FIXED.N_HINT.text })
   const RM = Object.fromEntries(KEEP_REMEMBER.lines.map(l => [l.id, l]))
@@ -5024,10 +7816,26 @@ function lineFor(result, st, typed = '', opts = {}) {
     case 'N1b':
       return dontKnowLine(result.kind)
     case 'skill by name':
-      // an official skill asked about by its name: the skills by name are row 5 of the plan
+      // an official skill asked about by its name that the skill step did not settle (two at once)
       return { ...dontKnowLine('N1'), line: 'N1-skill' }
-    case 'W1':
-      return said('W1', FIXED.W1.text, { answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: result.buttons.map(id => ({ id, label: labelOf(id), which: id })) } })
+    case 'W1': {
+      const items = result.buttons.map(id => ({ id, label: labelOf(id), which: id }))
+      return said('W1', FIXED.W1.text, { answers: { kind: 'which', hint: TALK_DATA.answers.hint_under_question, items: pageOf(items) } })
+    }
+    case 'can-q': {
+      const q = WANTS_DATA.question
+      return said('can-q', q.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: q.answers.map(a => ({ id: 'group-' + a.gives_group, label: a.label, group: a.gives_group })) } })
+    }
+    case 'G1':
+      return said('G1', WANTS_DATA.fixed.G1.text, { answers: rowPicks(result.buttons, 'rows') })
+    case 'N2':
+      return said('N2', WANTS_DATA.fixed.N2.text, { answers: rowPicks(WROWS.filter(r => r.group === result.group).map(r => r.id), 'rows') })
+    case 'want': {
+      const r = WANT_ROWS[result.row]
+      return said(r.id, r.text, { source: sourceText(r.sources), next: wantNext(r.next, r.thing) })
+    }
+    case 'skill':
+      return skillLine(result.skill, said)
     case 'term': {
       const t = TERMS[result.term]
       return said('term-' + t.id, t.text, { source: t.source, next: nextFor(t.next, null, st) })
@@ -5044,6 +7852,12 @@ function lineFor(result, st, typed = '', opts = {}) {
     case 'row': {
       const n = TOPICS[result.topic].needs.find(x => x.id === result.need)
       const used = result.used === 'kept' ? { text: fillSlots(KEEPS.use.used_line, { kept_words: keptWords(result.topic, st.kept[result.topic]) }), link: KEEPS.use.used_link.words, topic: result.topic } : null
+      // changes-6 fix 6: Gmail, Google Calendar, Google Drive: CN1; GitHub: the github skill (S1)
+      if (result.serviceLine && result.serviceLine.line === 'S1') return { ...skillLine(result.serviceLine.skill, said), used }
+      if (result.serviceLine) {
+        const f = WANTS_DATA.fixed[result.serviceLine.line]
+        return said(result.serviceLine.line, f.text, { source: sourceText(f.sources), used })
+      }
       return said(n.id, n.text, { source: n.source, next: nextFor(n.next, result.topic, st), used })
     }
     case 'extra': {
@@ -5453,6 +8267,12 @@ const T = {
   link: 'hh-link',
   // the list of what Helper keeps (A1)
   rows: 'hh-rows',
+  // the box "From the Hermes docs" (S1, S2): the docs' own words, not Helper's voice
+  docs: 'hh-docs',
+  docsHead: 'hh-docs-head',
+  docsWords: 'hh-docs-words',
+  // the numbered clicks to add an optional skill
+  steps: 'hh-steps',
   // held room: there, not seen yet
   wait: 'hh-wait',
   skip: 'hh-link hh-skip',
@@ -5469,7 +8289,7 @@ const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arro
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:8px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:8px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:0;padding:1px 0 1px 10px;border-left:2px solid var(--ui-stroke-secondary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li+li{margin-top:3px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -6841,12 +9661,27 @@ function BubbleLink() {
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
 
-// The small arrow on a button: down when it opens text under itself, right when it leads on.
-const nextIcon = next => (next.kind === 'paste' ? 'chevron-down' : 'arrow-right')
+// The small arrow on a button: down when it opens something under itself, right when it leads on.
+const nextIcon = next => (next.kind === 'paste' || next.kind === 'steps' ? 'chevron-down' : 'arrow-right')
 const ANSWERS_LABEL = 'Answers to pick'
+// A button that opens something under its line, and closes it again.
+const opens = next => next.kind === 'paste' || next.kind === 'steps'
 
 // The list of what Helper keeps, one row per thing (A1).
 const Rows = ({ rows }) => jsx('ul', { className: T.rows, 'data-hh': 'kept-rows', children: rows.map((r, i) => jsx('li', { children: r }, i)) })
+// The box "From the Hermes docs" (S1, S2): the docs page's own words, set apart from Helper's line
+// so it is plainly not Helper speaking (helper-wants-v1.md 1.2).
+const DocsBox = ({ docs }) =>
+  jsxs('div', {
+    className: T.docs,
+    'data-hh': 'docs',
+    children: [jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: docs.head }, 'h'), jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: docs.words }, 'w')]
+  })
+// The clicks to add an optional skill, numbered, and the line after them.
+const Steps = ({ next }) => [
+  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: s }, i)) }, 'steps'),
+  next.after ? jsx('p', { className: T.where, 'data-hh': 'steps-after', children: next.after }, 'after') : null
+]
 
 // The faint lines that go with a Helper line: "Kept: ..." with its link, the first-time line under
 // it once, and "From what I keep: ..." with Change. Small faint text on Helper's side, never a
@@ -6890,6 +9725,7 @@ function OldLine({ entry, onNext }) {
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
       entry.text,
+      entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: entry.hint }, 'hint') : null,
       next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: next.text }, 'where') : null,
@@ -6901,14 +9737,15 @@ function OldLine({ entry, onNext }) {
               className: T.oldLink,
               'data-hh': 'old-link',
               'data-kind': next.kind,
-              'aria-expanded': next.kind === 'paste' ? !!entry.opened : undefined,
+              'aria-expanded': opens(next) ? !!entry.opened : undefined,
               onClick: () => onNext(entry),
               children: [next.label, jsx(Codicon, { name: nextIcon(next) }, 'icon')]
             },
             'next'
           )
         : null,
-      pasteText ? jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste') : null
+      pasteText ? jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste') : null,
+      next && next.kind === 'steps' && entry.opened ? Steps({ next }) : null
     ]
   })
 }
@@ -6946,6 +9783,7 @@ function Bubble({ entry, clock, fresh, said, onNext }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
+  if (entry.docs) inside.push(jsx(DocsBox, { docs: entry.docs }, 'docs'))
   if (entry.rows) inside.push(jsx(Rows, { rows: entry.rows }, 'rows'))
   if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: entry.hint }, 'hint'))
   if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: next.text }, 'where'))
@@ -6959,7 +9797,7 @@ function Bubble({ entry, clock, fresh, said, onNext }) {
           'data-hh': 'bubble-button',
           'data-kind': next.kind,
           tabIndex: said ? 0 : -1,
-          'aria-expanded': next.kind === 'paste' ? !!entry.opened : undefined,
+          'aria-expanded': opens(next) ? !!entry.opened : undefined,
           onClick: () => said && onNext(entry),
           children: [next.label, jsx(Codicon, { name: nextIcon(next) }, 'icon')]
         },
@@ -6967,7 +9805,9 @@ function Bubble({ entry, clock, fresh, said, onNext }) {
       )
     )
   if (pasteText) inside.push(jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste'))
-  const column = pasteText || entry.rows || entry.hint
+  const steps = next && next.kind === 'steps' && entry.opened
+  if (steps) inside.push(...Steps({ next }).filter(Boolean))
+  const column = pasteText || entry.rows || entry.hint || entry.docs || steps
   return jsxs('div', {
     className: T.bubble,
     'data-hh': 'bubble',
@@ -7431,14 +10271,21 @@ function makePage(ctx, opts = {}) {
 
     // Something picked in the message box: it becomes the person's message, and Helper answers at
     // once. The pick goes by its id, never through the key words: an answer to a topic question, a
-    // topic under "Which one do you mean?", a topic, "You, Helper" / "My Hermes", or Yes / No under
-    // a delete question.
+    // topic under "Which one do you mean?", a topic, "You, Helper" / "My Hermes", Yes / No under
+    // a delete question, a group of the wants or one of its rows. "More" is not a message: the next
+    // ones take the picks' place under the same line.
     function pickAnswer(item) {
+      if (item.more) {
+        const items = pageOf(item.more)
+        return setLog(old => (memory.log = old.map((e, i) => (i === old.length - 1 && e.answers ? { ...e, answers: { ...e.answers, items } } : e))))
+      }
       let result
       if (item.answer) result = pick(item.answer[0], item.answer[1], visit)
       else if (item.which) result = press(item.which, memory.typed, visit)
       else if (item.rm) result = rmPick(item.rm, visit)
       else if (item.forget) result = forgetAnswer(item.forget[0], item.forget[1], visit)
+      else if (item.group) result = pickGroup(item.group, visit)
+      else if (item.want) result = pickWant(item.want, visit)
       else result = pickTopic(item.topic, visit)
       answer(result, item.label)
     }
@@ -7456,7 +10303,7 @@ function makePage(ctx, opts = {}) {
     function pressNext(entry) {
       const next = entry.next
       if (!next) return
-      if (next.kind === 'paste') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
+      if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
       if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)

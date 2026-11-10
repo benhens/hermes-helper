@@ -224,6 +224,12 @@ export const T = {
   link: 'hh-link',
   // the list of what Helper keeps (A1)
   rows: 'hh-rows',
+  // the box "From the Hermes docs" (S1, S2): the docs' own words, not Helper's voice
+  docs: 'hh-docs',
+  docsHead: 'hh-docs-head',
+  docsWords: 'hh-docs-words',
+  // the numbered clicks to add an optional skill
+  steps: 'hh-steps',
   // held room: there, not seen yet
   wait: 'hh-wait',
   skip: 'hh-link hh-skip',

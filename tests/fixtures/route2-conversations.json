@@ -7211,6 +7211,534 @@
    ]
   },
   {
+   "about_keeping": true,
+   "expect": "RM1",
+   "failed": null,
+   "kept": null,
+   "kept_after": {
+    "asked": [
+     "My club meets on Fridays"
+    ]
+   },
+   "name": "the same thing in other capitals is kept once",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "My club meets on Fridays"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "My club meets on Fridays"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that My club meets on Fridays"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM1"
+     },
+     "shown": "RM1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "My club meets on Fridays"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my club meets on fridays"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "F1 name=None",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "a name holding a refused word is no name",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "F1",
+      "name": null
+     },
+     "shown": "F1 name=None",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "work",
+      "work": null
+     },
+     "text": "password: swordfish"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line mem1",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "a name holding a refused word, with a question: no name kept",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "my name is PIN and I want to know about memory"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "F1 name=Pinja",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "an ordinary name is still a name",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "F1",
+      "name": "Pinja"
+     },
+     "shown": "F1 name=Pinja",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": "Pinja",
+      "pending": null,
+      "stage": "work",
+      "work": null
+     },
+     "text": "Pinja"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "plural: passwords are refused",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my passwords are in the blue notebook"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "plural: pins are refused",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my pins are 1234 and 5678"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "PIN in capitals is refused",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my PIN is 4321"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "logins are refused",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that the logins are on the fridge"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "K1",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "an AWS access key gets K1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "K1"
+     },
+     "shown": "K1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that AKIAIOSFODNN7EXAMPLE"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "K1",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "an AWS-style secret gets K1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "K1"
+     },
+     "shown": "K1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "my secret is wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "K1",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "a Telegram bot token gets K1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "K1"
+     },
+     "shown": "K1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "here it is 123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM1 +kept=asked +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": {
+    "asked": [
+     "I pin my favourite chats"
+    ]
+   },
+   "name": "ordinary: pin a chat is kept",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "I pin my favourite chats"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "I pin my favourite chats"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that I pin my favourite chats"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM1 +kept=asked +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "ordinary: a web address is kept",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "my shop is at https://example.com/shop/autumn-sale-2026/boots"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "my shop is at https://example.com/shop/autumn-sale-2026/boots"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my shop is at https://example.com/shop/autumn-sale-2026/boots"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM1 +kept=asked +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "ordinary: key point is kept",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "the key point is speed"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "the key point is speed"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that the key point is speed"
+    }
+   ]
+  },
+  {
    "about_keeping": false,
    "expect": "C1 picks wants+sch+svc+bot",
    "failed": null,
@@ -7223,13 +7751,14 @@
      "do": "topic",
      "out": {
       "buttons": [
+       "wants",
        "sch",
        "svc",
        "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc+bot",
+     "shown": "C1 picks wants+sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7257,13 +7786,14 @@
      "do": "topic",
      "out": {
       "buttons": [
+       "wants",
        "sch",
        "svc",
        "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc+bot",
+     "shown": "C1 picks wants+sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7315,13 +7845,14 @@
      "do": "topic",
      "out": {
       "buttons": [
+       "wants",
        "sch",
        "svc",
        "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc+bot",
+     "shown": "C1 picks wants+sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7370,13 +7901,14 @@
      "do": "topic",
      "out": {
       "buttons": [
+       "wants",
        "sch",
        "svc",
        "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc+bot",
+     "shown": "C1 picks wants+sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7425,13 +7957,14 @@
      "do": "topic",
      "out": {
       "buttons": [
+       "wants",
        "sch",
        "svc",
        "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc+bot",
+     "shown": "C1 picks wants+sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -7509,13 +8042,14 @@
      "do": "topic",
      "out": {
       "buttons": [
+       "wants",
        "sch",
        "svc",
        "bot"
       ],
       "kind": "C1"
      },
-     "shown": "C1 picks sch+svc+bot",
+     "shown": "C1 picks wants+sch+svc+bot",
      "state": {
       "asked": [],
       "found": {},
@@ -8124,15 +8658,15 @@
    ]
   }
  ],
- "json_sha256": "1a78abb01ab209f6915c8b2e2cda1ea4aa956ac55887d7a37511d54da8d61a39",
+ "json_sha256": "e69f3f4edffdd8badc64f0cf83f720bff0c1cb2520c63c4a90cdde9d4f98f368",
  "keeps_off": false,
  "last_printed_lines": [
   "answers to pick: 12 of 12 give a row of their own topic",
   "",
-  "conversations: 155 of 156 as expected"
+  "conversations: 170 of 170 as expected"
  ],
- "no_wants": true,
- "route2_sha256": "33a98ecfe8242d5ca8d4767a3b777093462f5493f716a22b8744d992c7c406d1",
+ "no_wants": false,
+ "route2_sha256": "1f281e69340b830cc2f6fbb84e6807327e340a598de80316821f5d6447a8065e",
  "singles": [
   {
    "landed": "mem",

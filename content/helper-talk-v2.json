@@ -632,23 +632,67 @@
    "refuse": {
     "words": [
      "password",
+     "passwords",
+     "passwd",
      "passcode",
+     "passcodes",
+     "passphrase",
+     "passphrases",
      "pin code",
+     "pin codes",
+     "pin number",
+     "pin numbers",
      "my pin",
+     "my pins",
+     "pin is",
+     "pins are",
+     "bank pin",
      "card number",
+     "card numbers",
      "credit card",
+     "credit cards",
      "cvv",
+     "cvc",
+     "security code",
      "iban",
+     "ibans",
      "account number",
+     "account numbers",
+     "sort code",
+     "routing number",
      "social security",
      "ssn",
      "passport number",
+     "passport numbers",
      "secret key",
+     "secret keys",
      "api key",
-     "login"
+     "api keys",
+     "api-key",
+     "apikey",
+     "access key",
+     "access keys",
+     "private key",
+     "private keys",
+     "access token",
+     "access tokens",
+     "api token",
+     "auth token",
+     "bot token",
+     "recovery code",
+     "recovery codes",
+     "backup code",
+     "backup codes",
+     "recovery phrase",
+     "seed phrase",
+     "login",
+     "logins",
+     "log-in",
+     "credentials"
     ],
     "digits_pattern": "(?:\\d[ -]?){8,}",
-    "note": "Also the K1 key patterns, which run first on every message. Everything kept is plain text on this computer and goes to the person's AI, so a secret must not be kept even on request."
+    "note": "Also the K1 key patterns, which run first on every message. Everything kept is plain text on this computer and goes to the person's AI, so a secret must not be kept even on request.",
+    "words_note_10": "Widened in changes-10: plurals and more words of the same kind. Not refused on their own, because they are ordinary words: pin (pin a chat), key (keyboard key, key point), token, secret, code, card, account. Tests: dev/checks/hhcontent-changes-10/refuse_tests.py."
    },
    "unsure": {
     "when": "Not a request by the rule above, Helper's last line was not a question, the message has one of about and one of said_to, and none of hermes_words (it, hermes, the bot, my bot).",
@@ -712,7 +756,8 @@
      "kind": "reply",
      "text": "That looks like a password or a private number. I did not keep it."
     }
-   ]
+   ],
+   "same_thing": "A thing is the same as one already kept when the words match with capitals ignored (\"My club\" = \"my club\"). The second one gets RM1 (kept already) and is not kept again. Same rule as the settings page (read step 12). Added in changes-10 from the Builder's review."
   },
   "model_line": {
    "text": null,
@@ -1192,7 +1237,12 @@
    "did"
   ],
   "work_max_words": 12,
-  "work_max_chars": 60
+  "work_max_chars": 60,
+  "name_refused": "A name that holds a refused word (keeps.remember.refuse.words or opening.name_refused_words_also, whole words, any case) or matches a key pattern is no name, as a name with digits is none: the reply goes on as if no name was given, and nothing is kept. Example: \"password: swordfish\" at \"What's your name?\" gives F1 with no name. Added in changes-10 from the Builder's review.",
+  "name_refused_words_also": [
+   "pin",
+   "pins"
+  ]
  },
  "build": {
   "skip_starts_from_steps_v1": "content/steps-v1.json build_word_skip_starts (16)",
@@ -1465,9 +1515,11 @@
     "text": "Memory is short notes Hermes keeps about you and your work.",
     "source": "user-guide/features/memory.md lines 9, 17 to 18",
     "next": {
-     "kind": "part",
-     "label": "Open {part}"
-    }
+     "kind": "paste",
+     "label": "Try it",
+     "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
+    },
+    "next_note_10": "Was the part button, which with no Memory part fell back to Bots and showed the line where Hermes's Bots tab is. That line answers a question the person did not ask. Changed in changes-10 to mem1's Try it: the person sees memory work in their own Hermes. part_if_no_memory_part still holds for the topic's own part, not for this line."
    },
    "needs": [
     {
@@ -2873,5 +2925,29 @@
   },
   "note": "changes-9: a held id that is not a topic id is described here. The other held ids are topic ids and show the topic's pick label."
  },
- "changed_9": "10 Nov, 20:50 UTC job (content/helper-talk-v2-changes-9.md). 1: one list under What Hermes can do: line C1 shows four picks, Web, files, pictures and voice (new, the wants), Daily jobs and reminders, Gmail and other services, More than one Hermes (topic_picks holds, held_picks). C1 text changed; the old text is C1.text_without_wants. helper-wants-v1.json has four groups (Look something up joined Use the web). 2: keeps.disclosure_point_11, the version for no AI step in use, the AI version kept and marked."
+ "changed_9": "10 Nov, 20:50 UTC job (content/helper-talk-v2-changes-9.md). 1: one list under What Hermes can do: line C1 shows four picks, Web, files, pictures and voice (new, the wants), Daily jobs and reminders, Gmail and other services, More than one Hermes (topic_picks holds, held_picks). C1 text changed; the old text is C1.text_without_wants. helper-wants-v1.json has four groups (Look something up joined Use the web). 2: keeps.disclosure_point_11, the version for no AI step in use, the AI version kept and marked.",
+ "key_patterns": {
+  "patterns": [
+   "(?<![A-Za-z0-9])(?:sk-|sk_|rk_|xai-|AIza|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|glpat-|hf_|gsk_|pplx-|r8_|fw_|npm_|xox[abposr]-|xapp-)[A-Za-z0-9_-]{16,}",
+   "(?<![A-Za-z0-9])eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
+   "(?<![A-Za-z0-9])(?=[A-Za-z]*[0-9])(?=[0-9]*[A-Za-z])[A-Za-z0-9]{32,}(?![A-Za-z0-9])",
+   "(?<![A-Za-z0-9])(?:AKIA|ASIA)[A-Z0-9]{16}(?![A-Za-z0-9])",
+   "(?<![A-Za-z0-9/+.:_-])(?=[A-Za-z0-9/+]*[A-Z])(?=[A-Za-z0-9/+]*[a-z])(?=[A-Za-z0-9/+]*[0-9])[A-Za-z0-9+][A-Za-z0-9/+]{39}(?![A-Za-z0-9/+=.:_-])",
+   "(?<![0-9])[0-9]{6,12}:[A-Za-z0-9_-]{30,}",
+   "-----BEGIN [A-Z ]*PRIVATE KEY-----"
+  ],
+  "flags": "none (case matters). Each pattern is written so it reads the same in Python re and JavaScript RegExp.",
+  "what_each_is": [
+   "1. Known key starts: OpenAI and Anthropic and OpenRouter (sk-), Stripe (sk_, rk_), xAI, Google (AIza), GitHub (ghp_ gho_ ghu_ ghs_ ghr_ github_pat_), GitLab (glpat-), Hugging Face (hf_), Groq (gsk_), Perplexity, Replicate, Fireworks, npm, Slack (xoxb- and the like, xapp-), then 16 or more letters, digits, _ or -.",
+   "2. A signed token (JWT): eyJ, two parts with a dot.",
+   "3. 32 or more letters and digits in one run, with at least one of each.",
+   "4. AWS access key: AKIA or ASIA and 16 capitals or digits.",
+   "5. AWS-style secret: exactly 40 characters of letters, digits, / and +, with a capital, a small letter and a digit, not starting with / and not touching a dot, colon or slash outside it (so web addresses and file paths do not match).",
+   "6. A chat bot token, as Telegram gives: 6 to 12 digits, a colon, 30 or more letters, digits, _ or -.",
+   "7. The first line of a private key file."
+  ],
+  "used_by": "K1 on every typed message (before anything else); keeps.remember.refuse; the settings page's secret check (keeps.settings_file.read step 4); a name is never one (opening.name_refused).",
+  "changed_10": "Patterns 4 to 7 and the new starts in 1 added in changes-10 (Builder's review: AWS-style keys got through). Tests: dev/checks/hhcontent-changes-10/refuse_tests.py."
+ },
+ "changed_10": "key_patterns (new, one list), keeps.remember.refuse.words widened, keeps.remember.same_thing, opening.name_refused, mem0 next. content/helper-talk-v2-changes-10.md"
 }

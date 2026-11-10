@@ -36,6 +36,7 @@ function show(o) {
     F1: () => `F1 name=${py(o.name)}`,
     F2: () => `F2 name=${py(o.name)} work=${py(o.work)}`,
     C1: () => 'C1 picks ' + o.buttons.join('+'),
+    'can-q': () => 'question can-q groups ' + o.buttons.join('+'),
     C2: () => 'C2 picks ' + o.buttons.join('+')
   }
   return (by[o.kind] || (() => o.kind))()
@@ -44,15 +45,19 @@ const stateOf = st => ({ stage: st.stage, pending: st.pending, found: { ...st.fo
 const expectedState = s => ({ stage: s.stage, pending: s.pending, found: s.found, asked: s.asked, lastq: s.lastq, name: s.name, work: s.work, kept: s.kept })
 const usesModel = c => c.steps.some(s => s.has_model)
 const usesWants = c => c.steps.some(s => s.do === 'topic' && s.topic === 'wants')
+// A visit as route2.py has it: the wants steps (rows, skills by name, the near miss, the service
+// lines) off, since route2.py has none of them. The held pick "Web, files, pictures and voice" is
+// route2.py's own (pick_topic), so it stays.
+const asRoute2 = st => Object.assign(st, { wants: false })
 
 function replay(conv) {
-  let st = freshVisit(conv.stage, conv.kept ? { ...conv.kept } : {})
+  let st = asRoute2(freshVisit(conv.stage, conv.kept ? { ...conv.kept } : {}))
   const got = []
   for (const step of conv.steps) {
     let o
     if (step.do === 'visit') {
       // a later visit: only the stored record is carried over (route2.py starts it at stage open)
-      st = freshVisit('open', st.kept)
+      st = asRoute2(freshVisit('open', st.kept))
       got.push(null)
       continue
     }
@@ -69,22 +74,21 @@ function replay(conv) {
   return got
 }
 
-test('the test files were made from the talk data this plugin holds, by one route2.py, and route2.py differed from its own expectations only where the wants are cut', () => {
+test('the test files were made from the talk data this plugin holds, by one route2.py, and route2.py met every one of its own expectations (the wants under C1 included)', () => {
   const ours = sha(path.join(ROOT, 'content/helper-talk-v2.json'))
   for (const f of [ON, fixture('route2-set2.json'), fixture('route2-extra.json')]) {
     assert.equal(f.json_sha256, ours, 'run bash dev/checks/talk-v2/recopy.sh again')
     assert.equal(f.route2_sha256, ON.route2_sha256)
   }
   assert.equal(ON.keeps_off, false)
-  assert.equal(ON.no_wants, true)
-  // with the wants cut, route2.py's own expectation fails for the one conversation that expects them under C1
+  assert.equal(ON.no_wants, false)
   const off = ON.conversations.filter(c => !c.failed && c.steps.length && c.steps[c.steps.length - 1].shown !== c.expect)
-  assert.deepEqual(off.map(c => c.expect), ['C1 picks wants+sch+svc+bot'])
+  assert.deepEqual(off.map(c => c.expect), [])
 })
 
-test('the plugin\'s copies are the team\'s files (when the team\'s folder is there): the talk data and the skills list', t => {
+test('the plugin\'s copies are the team\'s files (when the team\'s folder is there): the talk data, the skills list and the wants', t => {
   if (!fs.existsSync(path.join(TEAM, 'content'))) return t.skip('no team content folder beside the plugin')
-  for (const f of ['helper-talk-v2.json', 'skills-list-v1.json']) assert.equal(sha(path.join(ROOT, 'content', f)), sha(path.join(TEAM, 'content', f)), `content/${f} differs from the team's: bash dev/checks/talk-v2/recopy.sh`)
+  for (const f of ['helper-talk-v2.json', 'skills-list-v1.json', 'helper-wants-v1.json']) assert.equal(sha(path.join(ROOT, 'content', f)), sha(path.join(TEAM, 'content', f)), `content/${f} differs from the team's: bash dev/checks/talk-v2/recopy.sh`)
 })
 
 test('the reference scripts the test files were made from are still the team\'s (when the team\'s folder is there): route2.py, check.py, settings_read.py and its cases', t => {
@@ -97,8 +101,8 @@ test('the reference scripts the test files were made from are still the team\'s 
   assert.equal(s.tests_sha256, sha(path.join(checks, 'hhcontent-settings-edit', 'tests.json')), 'tests.json changed since the copy')
 })
 
-test('every conversation route2.py ran, keeping on: the same result and the same visit (stored record included) at every turn', () => {
-  const run = ON.conversations.filter(c => !c.failed && !usesModel(c) && !usesWants(c))
+test('every conversation route2.py ran, keeping on, the wants steps off as route2.py has none: the same result and the same visit (stored record included) at every turn', () => {
+  const run = ON.conversations.filter(c => !c.failed && !usesModel(c))
   let turns = 0
   for (const conv of run) {
     const got = replay(conv)
@@ -109,13 +113,13 @@ test('every conversation route2.py ran, keeping on: the same result and the same
       turns++
     })
   }
-  assert.ok(run.length >= 125, `only ${run.length} conversations replayed`)
-  assert.ok(turns >= 200, `only ${turns} turns compared`)
+  assert.ok(run.length >= 135, `only ${run.length} conversations replayed`)
+  assert.ok(turns >= 220, `only ${turns} turns compared`)
   // the ones left out are counted, so a change shows
   const model = ON.conversations.filter(usesModel).length
-  const wants = ON.conversations.filter(usesWants).length
-  assert.equal(ON.conversations.length - run.length, model + wants + ON.conversations.filter(c => c.failed).length)
-  assert.ok(model <= 30 && wants <= 2, `${model} with a model, ${wants} with the wants`)
+  assert.equal(ON.conversations.length - run.length, model + ON.conversations.filter(c => c.failed).length)
+  assert.ok(model <= 30, `${model} with a model`)
+  assert.ok(run.some(usesWants), 'the held pick "Web, files, pictures and voice" is replayed')
   // and the replayed ones reach every kind of keeping step
   const steps = new Set(run.flatMap(c => c.steps.map(s => s.do)))
   for (const s of ['say', 'pick', 'topic', 'press', 'skip', 'change', 'rm', 'visit']) assert.ok(steps.has(s), s)
@@ -127,7 +131,7 @@ test('hhtech\'s 56 messages, each as a fresh message: the same line as route2.py
   assert.equal(ON.singles.length, 56)
   let right = 0
   for (const m of ON.singles) {
-    const st = freshVisit()
+    const st = asRoute2(freshVisit())
     const o = turn(m.text, st)
     assert.equal(show(o), m.shown, m.text)
     assert.deepEqual(stateOf(st), expectedState(m.state), m.text)
@@ -141,7 +145,7 @@ for (const [file, count, what] of [['route2-set2.json', 60, 'hhtech\'s second se
     const set = fixture(file)
     assert.equal(set.messages.length, count)
     for (const m of set.messages) {
-      const st = freshVisit({ '': 'open', name: 'name', work: 'work' }[m.after])
+      const st = asRoute2(freshVisit({ '': 'open', name: 'name', work: 'work' }[m.after]))
       if (m.after === 'work') st.name = 'Sam'
       const o = turn(m.text, st)
       assert.equal(show(o), m.shown, `${m.n}: ${m.text}`)
@@ -246,11 +250,14 @@ test('the don\'t-know lines show no topics, and the small grey line under each t
   const st = freshVisit()
   assert.equal(lineFor(turn(`is there a skill called "${out.name}"`, st), st).line, 'N1b')
   assert.equal(TALK_DATA.skills.filter(s => s.left_out).length, 5)
-  // an official skill named that way: N1 for now (the skills by name are row 5)
+  // the same skill named the wants' way ("the NAME skill") is left out too
+  const st3 = freshVisit()
+  assert.equal(lineFor(turn(`what does the ${out.name} skill do`, st3), st3).line, 'N1b')
+  // an official skill named that way: S1 or S2 (the skills by name, tests/talk-wants.test.mjs)
   const ok = TALK_DATA.skills.find(s => !s.left_out)
   const st2 = freshVisit()
   const o = turn(`the skill named "${ok.name}" please`, st2)
-  assert.ok(['term', 'skill by name'].includes(o.kind), o.kind)
+  assert.deepEqual([o.kind, o.skill], ['skill', ok.name])
 })
 
 test('never more than four things to pick: the topics, every answer list, C1, and "Which one do you mean?" cut to four in list order', () => {
@@ -292,12 +299,12 @@ test('a pick goes by its id to its row, never through key words', () => {
   }
 })
 
-test('"What Hermes can do": C1 without the wants, its three topics to pick, then the topic\'s question', () => {
+test('"What Hermes can do": C1 with its full text and four picks, the wants first; then the topic\'s question', () => {
   const st = freshVisit()
   const c1 = lineFor(pickTopic('can', st), st)
   assert.equal(c1.line, 'C1')
-  assert.equal(c1.text, DATA.fixed_lines.find(f => f.id === 'C1').text_without_wants)
-  assert.deepEqual(c1.answers.items.map(a => a.label), ['Daily jobs and reminders', 'Gmail and other services', 'More than one Hermes'])
+  assert.equal(c1.text, DATA.fixed_lines.find(f => f.id === 'C1').text)
+  assert.deepEqual(c1.answers.items.map(a => a.label), ['Web, files, pictures and voice', 'Daily jobs and reminders', 'Gmail and other services', 'More than one Hermes'])
   assert.equal(c1.answers.hint, 'Or type your question')
   assert.equal(lineFor(pickTopic('sch', st), st).text, 'What should Hermes do on a schedule, such as a daily summary?')
 })
@@ -307,7 +314,7 @@ test('the service fills the text to paste: from the picked answer, from the key 
   pickTopic('svc', st)
   let said = lineFor(pick('svc', 2, st), st)
   assert.equal(said.next.text, 'Please connect Notion. If there is a ready-made MCP for it, add that. Ask me before you change anything.')
-  st = freshVisit()
+  st = asRoute2(freshVisit()) // Gmail has its own line with the wants (CN1, tests/talk-wants.test.mjs)
   said = lineFor(turn('can it read my gmial', st), st)
   assert.match(said.next.text, /^Please connect Gmail\./)
   st = freshVisit()
@@ -334,10 +341,18 @@ test('part buttons open Hermes\'s own screens; Bots has no screen a button can o
   assert.equal(said.line, 'bot3')
   st = freshVisit()
   st.lastq = true
+  // changes-10: mem0's button is mem1's "Try it" box now, not the Bots fallback
   const mem0 = lineFor(pickTopic('mem', st), st)
   assert.equal(mem0.line, 'mem0')
-  assert.equal(mem0.next.kind, 'where')
-  assert.equal(mem0.next.text, 'In the Hermes app, "Bots" is the tab next to "Sessions", top left.')
+  assert.deepEqual([mem0.next.kind, mem0.next.label], ['paste', 'Try it'])
+  assert.equal(mem0.next.text, 'Please save this to your memory: <one thing about you>. Then tell me what you saved.')
+  // the Bots tab line stays where a line is about bots
+  st = freshVisit()
+  st.lastq = true
+  const bot0 = lineFor(pickTopic('bot', st), st)
+  assert.equal(bot0.line, 'bot0')
+  assert.equal(bot0.next.kind, 'where')
+  assert.equal(bot0.next.text, 'In the Hermes app, "Bots" is the tab next to "Sessions", top left.')
 })
 
 test('every line a button can lead to exists, and every button in the data becomes a button, a line or nothing', () => {

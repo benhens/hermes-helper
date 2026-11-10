@@ -108,12 +108,14 @@ test('answers to pick only under the questions that carry them (answers.when_sho
   assert.throws(() => talkDataSource(extra), /the build stops/)
 })
 
-test('the wants (row 5) are not in this build: C1 says its text without them and holds the three topics; a held pick that is neither a topic nor described stops the build', () => {
-  assert.equal(WANTS_BUILT, false)
+test('the wants (row 5) are in this build: C1 says its full text and holds the wants pick first; a held pick that is neither a topic nor described stops the build', () => {
+  assert.equal(WANTS_BUILT, true)
   const d = read()
   assert.deepEqual(d.topic_picks[0].holds, ['wants', 'sch', 'svc', 'bot'], 'the team\'s data holds the wants')
-  assert.deepEqual(TALK_DATA.topic_picks[0].holds, ['sch', 'svc', 'bot'])
-  assert.equal(TALK_DATA.fixed.C1.text, d.fixed_lines.find(f => f.id === 'C1').text_without_wants)
+  assert.deepEqual(TALK_DATA.topic_picks[0].holds, ['wants', 'sch', 'svc', 'bot'])
+  assert.deepEqual(TALK_DATA.held_picks, ['wants'])
+  assert.equal(TALK_DATA.held_labels.wants, 'Web, files, pictures and voice')
+  assert.equal(TALK_DATA.fixed.C1.text, d.fixed_lines.find(f => f.id === 'C1').text)
   assert.ok(talkProblems(broken(x => x.topic_picks[0].holds.push('zzz'))).some(p => /holds zzz, which is not a topic/.test(p)))
 })
 

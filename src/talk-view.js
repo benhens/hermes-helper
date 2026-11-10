@@ -26,12 +26,27 @@ import { Said } from './reveal.js'
 import { BubbleLink } from './bubble-link.js'
 import { PasteBox } from './setup-tab.js'
 
-// The small arrow on a button: down when it opens text under itself, right when it leads on.
-export const nextIcon = next => (next.kind === 'paste' ? 'chevron-down' : 'arrow-right')
+// The small arrow on a button: down when it opens something under itself, right when it leads on.
+export const nextIcon = next => (next.kind === 'paste' || next.kind === 'steps' ? 'chevron-down' : 'arrow-right')
 export const ANSWERS_LABEL = 'Answers to pick'
+// A button that opens something under its line, and closes it again.
+const opens = next => next.kind === 'paste' || next.kind === 'steps'
 
 // The list of what Helper keeps, one row per thing (A1).
 const Rows = ({ rows }) => jsx('ul', { className: T.rows, 'data-hh': 'kept-rows', children: rows.map((r, i) => jsx('li', { children: r }, i)) })
+// The box "From the Hermes docs" (S1, S2): the docs page's own words, set apart from Helper's line
+// so it is plainly not Helper speaking (helper-wants-v1.md 1.2).
+const DocsBox = ({ docs }) =>
+  jsxs('div', {
+    className: T.docs,
+    'data-hh': 'docs',
+    children: [jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: docs.head }, 'h'), jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: docs.words }, 'w')]
+  })
+// The clicks to add an optional skill, numbered, and the line after them.
+const Steps = ({ next }) => [
+  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: s }, i)) }, 'steps'),
+  next.after ? jsx('p', { className: T.where, 'data-hh': 'steps-after', children: next.after }, 'after') : null
+]
 
 // The faint lines that go with a Helper line: "Kept: ..." with its link, the first-time line under
 // it once, and "From what I keep: ..." with Change. Small faint text on Helper's side, never a
@@ -75,6 +90,7 @@ function OldLine({ entry, onNext }) {
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
       entry.text,
+      entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: entry.hint }, 'hint') : null,
       next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: next.text }, 'where') : null,
@@ -86,14 +102,15 @@ function OldLine({ entry, onNext }) {
               className: T.oldLink,
               'data-hh': 'old-link',
               'data-kind': next.kind,
-              'aria-expanded': next.kind === 'paste' ? !!entry.opened : undefined,
+              'aria-expanded': opens(next) ? !!entry.opened : undefined,
               onClick: () => onNext(entry),
               children: [next.label, jsx(Codicon, { name: nextIcon(next) }, 'icon')]
             },
             'next'
           )
         : null,
-      pasteText ? jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste') : null
+      pasteText ? jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste') : null,
+      next && next.kind === 'steps' && entry.opened ? Steps({ next }) : null
     ]
   })
 }
@@ -131,6 +148,7 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
+  if (entry.docs) inside.push(jsx(DocsBox, { docs: entry.docs }, 'docs'))
   if (entry.rows) inside.push(jsx(Rows, { rows: entry.rows }, 'rows'))
   if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: entry.hint }, 'hint'))
   if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: next.text }, 'where'))
@@ -144,7 +162,7 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
           'data-hh': 'bubble-button',
           'data-kind': next.kind,
           tabIndex: said ? 0 : -1,
-          'aria-expanded': next.kind === 'paste' ? !!entry.opened : undefined,
+          'aria-expanded': opens(next) ? !!entry.opened : undefined,
           onClick: () => said && onNext(entry),
           children: [next.label, jsx(Codicon, { name: nextIcon(next) }, 'icon')]
         },
@@ -152,7 +170,9 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
       )
     )
   if (pasteText) inside.push(jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste'))
-  const column = pasteText || entry.rows || entry.hint
+  const steps = next && next.kind === 'steps' && entry.opened
+  if (steps) inside.push(...Steps({ next }).filter(Boolean))
+  const column = pasteText || entry.rows || entry.hint || entry.docs || steps
   return jsxs('div', {
     className: T.bubble,
     'data-hh': 'bubble',

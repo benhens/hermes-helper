@@ -14,6 +14,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData } from './lib/render.mjs'
 import { TALK_DATA } from '../src/talk-data.js'
+import { WANTS_DATA } from '../src/wants-data.js'
 import { T, K } from '../src/look.js'
 
 function useHost({ runtime = { ok: true, model: 'mock-small' } } = {}) {
@@ -222,9 +223,10 @@ test('things to pick: a named group of real buttons inside the message box, abov
   // four: two rows of two
   assert.equal(g.props['data-columns'], 2)
   assert.equal(g.props.style['--hh-cols'], 2)
-  // three: one row
-  click(answer(view, 'What Hermes can do'))
+  // three: one row ("Which one do you mean?" with three topics)
+  send(view, 'memory model telegram')
   finish(view)
+  assert.equal(labels(view).length, 3)
   assert.equal(group(view).props['data-columns'], 3)
   // two: one row
   send(view, 'does the memory work with claude')
@@ -333,22 +335,30 @@ test('a pick goes by its own id, never through the key words: every answer of ev
       finish(view)
       assert.equal(text(answers(view)[i]).trim(), a.label)
       click(answers(view)[i])
-      assert.equal(line(view), a.gives, `${topic.id}: "${a.label}"`)
+      // changes-6 fix 6: Gmail and Google Calendar have their own line, CN1 (tests/talk-wants.test.mjs)
+      const own = a.service && WANTS_DATA.service_lines[a.service]
+      assert.equal(line(view), own ? own.line : a.gives, `${topic.id}: "${a.label}"`)
       checked++
     }
   }
   assert.equal(checked, 12)
 })
 
-test('the pick that holds three topics: "What Hermes can do" gives its own line with those three to pick (the wants are row 5, not built)', async () => {
+test('the pick that holds four: "What Hermes can do" gives its own line with the wants first; "Web, files, pictures and voice" asks what you want Hermes to do, with the four groups', async () => {
   const { view } = await atTopics()
   click(answer(view, 'What Hermes can do'))
   assert.equal(line(view), 'C1')
-  assert.equal(said(view), 'Hermes can do jobs on a schedule and use services like Gmail. You can also have more than one Hermes. Pick one.')
+  assert.equal(said(view), 'Hermes can work with the web, files and pictures. It can do jobs on a schedule and use services like Gmail. Pick one.')
   finish(view)
-  assert.deepEqual(labels(view), ['Daily jobs and reminders', 'Gmail and other services', 'More than one Hermes'])
-  assert.doesNotMatch(labels(view).join(' '), /Web, files, pictures and voice/)
+  assert.deepEqual(labels(view), ['Web, files, pictures and voice', 'Daily jobs and reminders', 'Gmail and other services', 'More than one Hermes'])
   assert.equal(box(view).props.placeholder, 'Or type your question')
+  click(answer(view, 'Web, files, pictures and voice'))
+  assert.equal(line(view), 'can-q')
+  assert.equal(said(view), 'What do you want Hermes to do?')
+  finish(view)
+  assert.deepEqual(labels(view), ['Search and use the web', 'Files and my computer', 'Pictures and video', 'Voice and sound'])
+  assert.equal(group(view).props['data-columns'], 2)
+  assert.equal(box(view).props.placeholder, 'Or type your own answer')
 })
 
 test('the picked service fills the text to paste: "Notion" → "Show me what to ask" opens the text with Notion in it, with Copy; pressed again it closes', async () => {
@@ -709,8 +719,17 @@ test('the conversation so far is a named, scrolling part of its own, kept at its
 
 test('Helper\'s lines hold no link out of the page and no model\'s words: every line said is one of the pre-written ones', async () => {
   const { view } = await pastOpening()
-  const pre = new Set([...TALK_DATA.topics.flatMap(t => [t.question.text, t.plain.text, ...t.needs.map(n => n.text)]), ...TALK_DATA.terms.map(t => t.text), ...Object.values(TALK_DATA.fixed).flatMap(f => [f.text, f.text_no_name])])
-  for (const w of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work', 'what can I ask']) {
+  const W = WANTS_DATA
+  const pre = new Set([
+    ...TALK_DATA.topics.flatMap(t => [t.question.text, t.plain.text, ...t.needs.map(n => n.text)]),
+    ...TALK_DATA.terms.map(t => t.text),
+    ...Object.values(TALK_DATA.fixed).flatMap(f => [f.text, f.text_no_name]),
+    ...W.rows.map(r => r.text),
+    ...Object.values(W.fixed).map(f => f.text),
+    W.question.text,
+    ...W.skills.map(s => (s.kind === 'optional' ? W.fixed.S2 : W.fixed.S1).text.replace('{name}', s.name))
+  ])
+  for (const w of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work', 'what can I ask', 'can it read pdfs', 'can it edit my videos', 'is there a github skill', 'what does the dspy skill do']) {
     send(view, w)
     const now = said(view).replace('Thanks, Peter.', 'Thanks, {name}.')
     assert.ok(pre.has(now), `${w} → ${now}`)
@@ -762,4 +781,142 @@ test('a long conversation: it holds the newest 200 entries, and each new line st
   send(view, 'what is a plugin')
   assert.equal(conversation(view).length, full, 'full: the two oldest went')
   assert.equal(el.scrollTop, 5000)
+})
+
+/* ---------- the wants (talk v2 row 5) ---------- */
+// To "What do you want Hermes to do?": the topics, "What Hermes can do", "Web, files, pictures and voice".
+async function atWants() {
+  const opened = await atTopics()
+  pickNow(opened.view, 'What Hermes can do')
+  pickNow(opened.view, 'Web, files, pictures and voice')
+  finish(opened.view)
+  return opened
+}
+const docsBox = view => byData(bubble(view), 'docs')
+const stepsList = view => byData(bubble(view), 'steps')
+
+test('a group: "Here is what I have checked for that", its rows to pick; over four, three and "More", which shows the next ones the same way', async () => {
+  const { view } = await atWants()
+  pickNow(view, 'Search and use the web')
+  assert.equal(line(view), 'G1')
+  assert.equal(said(view), 'Here is what I have checked for that. Pick one, or type your own.')
+  finish(view)
+  assert.deepEqual(labels(view), ['Search the web', 'Use a website for me', 'Post on X for me', 'More'])
+  const before = lines(view).length
+  click(answer(view, 'More'))
+  // "More" says nothing new and is not the person's message: the next ones take the picks' place
+  assert.equal(line(view), 'G1')
+  assert.equal(lines(view).length, before)
+  assert.deepEqual(labels(view), ['Read Reddit', 'Find research papers', 'Find places and routes', 'More'])
+  click(answer(view, 'More'))
+  assert.deepEqual(labels(view), ['Check stock prices', 'Watch a price for me'])
+  assert.equal(group(view).props['data-columns'], 2)
+  // a group of three: one row of three
+  const second = await atWants()
+  pickNow(second.view, 'Voice and sound')
+  finish(second.view)
+  assert.deepEqual(labels(second.view), ['Talk to it out loud', 'Read answers out loud', 'Write a song'])
+})
+
+test('a row picked: the person\'s message is its label, Helper says the row\'s own line, and "Show me what to ask" opens the text to paste', async () => {
+  const { view } = await atWants()
+  pickNow(view, 'Files and my computer')
+  pickNow(view, 'Read my documents')
+  assert.equal(line(view), 'w_docs')
+  assert.equal(said(view), 'Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.')
+  assert.equal(words(lines(view).at(-1)), 'Read my documents')
+  finish(view)
+  assert.equal(text(button(view)).trim(), 'Show me what to ask')
+  click(button(view))
+  const copy = all(bubble(view), n => n.type === 'sdk:CopyButton')
+  assert.equal(copy[0].props.text, 'Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part.')
+  assert.equal(docsBox(view), null, 'a hand-written row shows no docs box')
+})
+
+test('an optional skill\'s row: "Show me how to add it" opens the app\'s clicks, "Show more" among them, then that it works from the next new chat; no command anywhere', async () => {
+  const { view } = await atWants()
+  pickNow(view, 'Search and use the web')
+  finish(view)
+  click(answer(view, 'More'))
+  pickNow(view, 'Read Reddit')
+  assert.equal(line(view), 'w_reddit')
+  finish(view)
+  const b = button(view)
+  assert.equal(text(b).trim(), 'Show me how to add it')
+  assert.equal(b.props['data-kind'], 'steps')
+  assert.equal(b.props['aria-expanded'], false)
+  assert.equal(stepsList(view), null)
+  click(b)
+  assert.equal(button(view).props['aria-expanded'], true)
+  const items = all(stepsList(view), n => n.type === 'li').map(n => text(n).trim())
+  assert.deepEqual(items, [
+    'In the Hermes app, click "Capabilities", then the "Skills" tab.',
+    'Click "Source", then pick "Optional".',
+    'Find the card "reddit-reading". If it is not there, scroll down and click "Show more". Do it again until you see it.',
+    'Click the card, then click "Install".'
+  ])
+  assert.equal(stepsList(view).type, 'ol')
+  assert.equal(text(byData(bubble(view), 'steps-after')).trim(), 'It works from your next new chat, not this one.')
+  assert.doesNotMatch(text(bubble(view)), /hermes skills install/)
+  assert.equal(all(bubble(view), n => n.type === 'sdk:CopyButton').length, 0, 'nothing to paste: the person clicks')
+  click(button(view))
+  assert.equal(stepsList(view), null, 'pressed again it closes')
+})
+
+test('a skill by its name: Helper\'s fixed line, and under it a box headed "From the Hermes docs" with the page\'s own words; an optional one also has the clicks', async () => {
+  const { view } = await pastOpening()
+  send(view, 'is there a github skill')
+  assert.equal(line(view), 'S1')
+  assert.equal(said(view), 'Hermes comes with a skill called "github". Skills are written steps that teach Hermes one task. The docs say this.')
+  finish(view)
+  const box1 = docsBox(view)
+  assert.equal(box1.props.className, T.docs)
+  assert.equal(text(byData(box1, 'docs-head')).trim(), 'From the Hermes docs')
+  assert.equal(text(byData(box1, 'docs-words')).trim(), 'GitHub via gh CLI: PRs, issues, reviews, repos, auth.')
+  assert.equal(button(view), null, 'a built-in skill has no button')
+  send(view, 'what does the dspy skill do')
+  assert.equal(line(view), 'S2')
+  assert.equal(said(view), 'The optional skill "dspy" must be added first. Skills are written steps that teach Hermes one task. The docs say this.')
+  finish(view)
+  assert.ok(docsBox(view))
+  click(button(view))
+  assert.match(all(stepsList(view), n => n.type === 'li').map(n => text(n)).join(' '), /Find the card "dspy"\. If it is not there, scroll down and click "Show more"\./)
+  // the older line keeps its docs box, small
+  send(view, 'thanks')
+  const older = lines(view).filter(c => c.props['data-hh'] === 'old').at(-1)
+  assert.equal(older.props['data-line'], 'S2')
+  assert.ok(byData(older, 'docs'))
+})
+
+test('the near miss: "can it edit my videos" gets "I don\'t know that one. These are the nearest things I have checked." with that group\'s rows to pick', async () => {
+  const { view } = await pastOpening()
+  send(view, 'can it edit my videos')
+  assert.equal(line(view), 'N2')
+  assert.equal(said(view), 'I don\'t know that one. These are the nearest things I have checked.')
+  finish(view)
+  assert.deepEqual(labels(view), ['Make pictures', 'Look at my pictures', 'Make a video from text', 'More'])
+  pickNow(view, 'Make a video from text')
+  assert.equal(line(view), 'w_video')
+})
+
+test('two rows match a typed message: "Which one do you mean?" with their labels; the pick gives that row', async () => {
+  const { view } = await pastOpening()
+  send(view, 'can it make a pdf from my word documents')
+  assert.equal(line(view), 'W1')
+  finish(view)
+  assert.ok(labels(view).length >= 2 && labels(view).length <= 4, labels(view).join(' | '))
+  const first = labels(view)[0]
+  const row = WANTS_DATA.rows.find(r => r.label === first)
+  pickNow(view, first)
+  assert.equal(line(view), row.id)
+})
+
+test('Gmail picked under "Which service": the Connectors line (CN1) in place of the service line, and Gmail is still kept', async () => {
+  const { view, storage } = await atTopics()
+  pickNow(view, 'What Hermes can do')
+  pickNow(view, 'Gmail and other services')
+  pickNow(view, 'Gmail')
+  assert.equal(line(view), 'CN1')
+  assert.equal(said(view), 'The Hermes app links apps such as Gmail through its "Connectors" page. Click "Capabilities", then the "Connectors" tab.')
+  assert.equal(storage.get('kept').svc, 'Gmail')
 })

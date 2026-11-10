@@ -46,7 +46,7 @@ export const TALK_DATA = {
       "text": "Which one do you mean?"
     },
     "C1": {
-      "text": "Hermes can do jobs on a schedule and use services like Gmail. You can also have more than one Hermes. Pick one.",
+      "text": "Hermes can work with the web, files and pictures. It can do jobs on a schedule and use services like Gmail. Pick one.",
       "source": "user-guide/features/tools.md line 17 (web search, file editing); user-guide/features/image-generation.md line 10 (pictures); user-guide/features/cron.md line 15; user-guide/features/mcp.md line 13 (the sources of can0, w_image, sch0, svc0). More than one Hermes is not in the line, only in the picks: user-guide/profiles.md lines 7 and 11 (bot0)."
     },
     "H1": {
@@ -178,6 +178,10 @@ export const TALK_DATA = {
     ],
     "work_max_words": 12,
     "work_max_chars": 60,
+    "name_refused_words_also": [
+      "pin",
+      "pins"
+    ],
     "name_with_more": {
       "after_name": [
         ",",
@@ -197,6 +201,15 @@ export const TALK_DATA = {
       ]
     }
   },
+  "key_patterns": [
+    "(?<![A-Za-z0-9])(?:sk-|sk_|rk_|xai-|AIza|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|glpat-|hf_|gsk_|pplx-|r8_|fw_|npm_|xox[abposr]-|xapp-)[A-Za-z0-9_-]{16,}",
+    "(?<![A-Za-z0-9])eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
+    "(?<![A-Za-z0-9])(?=[A-Za-z]*[0-9])(?=[0-9]*[A-Za-z])[A-Za-z0-9]{32,}(?![A-Za-z0-9])",
+    "(?<![A-Za-z0-9])(?:AKIA|ASIA)[A-Z0-9]{16}(?![A-Za-z0-9])",
+    "(?<![A-Za-z0-9/+.:_-])(?=[A-Za-z0-9/+]*[A-Z])(?=[A-Za-z0-9/+]*[a-z])(?=[A-Za-z0-9/+]*[0-9])[A-Za-z0-9+][A-Za-z0-9/+]{39}(?![A-Za-z0-9/+=.:_-])",
+    "(?<![0-9])[0-9]{6,12}:[A-Za-z0-9_-]{30,}",
+    "-----BEGIN [A-Z ]*PRIVATE KEY-----"
+  ],
   "build": {
     "skip_starts": [
       "what is",
@@ -478,6 +491,7 @@ export const TALK_DATA = {
       "gives": "can",
       "line": "C1",
       "holds": [
+        "wants",
         "sch",
         "svc",
         "bot"
@@ -496,6 +510,12 @@ export const TALK_DATA = {
       "gives": "mem"
     }
   ],
+  "held_picks": [
+    "wants"
+  ],
+  "held_labels": {
+    "wants": "Web, files, pictures and voice"
+  },
   "topics": [
     {
       "id": "mem",
@@ -570,8 +590,9 @@ export const TALK_DATA = {
         "text": "Memory is short notes Hermes keeps about you and your work.",
         "source": "user-guide/features/memory.md lines 9, 17 to 18",
         "next": {
-          "kind": "part",
-          "label": "Open {part}"
+          "kind": "paste",
+          "label": "Try it",
+          "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
         }
       },
       "needs": [
@@ -1836,20 +1857,63 @@ export const TALK_DATA = {
       "refuse": {
         "words": [
           "password",
+          "passwords",
+          "passwd",
           "passcode",
+          "passcodes",
+          "passphrase",
+          "passphrases",
           "pin code",
+          "pin codes",
+          "pin number",
+          "pin numbers",
           "my pin",
+          "my pins",
+          "pin is",
+          "pins are",
+          "bank pin",
           "card number",
+          "card numbers",
           "credit card",
+          "credit cards",
           "cvv",
+          "cvc",
+          "security code",
           "iban",
+          "ibans",
           "account number",
+          "account numbers",
+          "sort code",
+          "routing number",
           "social security",
           "ssn",
           "passport number",
+          "passport numbers",
           "secret key",
+          "secret keys",
           "api key",
-          "login"
+          "api keys",
+          "api-key",
+          "apikey",
+          "access key",
+          "access keys",
+          "private key",
+          "private keys",
+          "access token",
+          "access tokens",
+          "api token",
+          "auth token",
+          "bot token",
+          "recovery code",
+          "recovery codes",
+          "backup code",
+          "backup codes",
+          "recovery phrase",
+          "seed phrase",
+          "login",
+          "logins",
+          "log-in",
+          "credentials"
         ],
         "digits_pattern": "(?:\\d[ -]?){8,}"
       },
