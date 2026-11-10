@@ -1,9 +1,9 @@
 // The Setup steps and the helper panel on the page (B3), rendered from the built plugin with the
 // stand-ins (tests/lib/render.mjs): what each step shows, what picking and finishing do, the chat
-// log, the message box's code-only answers, and the character's pose for each page state.
+// log, and the message box's code-only answers. (The character on the page: tests/helper-character.test.mjs.)
 import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { registerPlugin, fakeStorage, mount, settle, all, text, byData, byLabel, click } from './lib/render.mjs'
+import { registerPlugin, fakeStorage, mount, settle, all, text, spoken, byData, byLabel, click } from './lib/render.mjs'
 import { STEPS, LINES, stepById } from '../src/steps.js'
 import { KEY_LINE } from '../src/key-check.js'
 import { CANT_CHECK_LINE, NO_MODEL_LINE } from '../src/model-status.js'
@@ -33,7 +33,6 @@ async function open(storage = fakeStorage(), host = {}, { settleFirst = true } =
 
 const helper = view => byData(view.tree, 'helper')
 const detail = view => byData(view.tree, 'detail')
-const pose = view => all(helper(view), n => n.props['data-pose'])[0].props['data-pose']
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
 const option = (view, id) => all(detail(view), n => n.props['data-option'] === id)[0]
 const type = (view, words) => box(view).props.onChange({ target: { value: words } })
@@ -151,7 +150,8 @@ test('"Fits your goal": after "Answer me from my phone" on step 1, step 3 tags "
 
 test('chat log off: only the newest thing the helper said, as plain text; on: the whole back-and-forth, newest at the bottom', async () => {
   const { view, storage } = await open(fakeStorage({ step: 2 }))
-  assert.equal(text(newest(view)).trim(), LINES.greeting)
+  // spoken(): what a screen reader gets, each line once (the word-by-word copy for the eye is hidden from it)
+  assert.equal(spoken(newest(view)).trim(), LINES.greeting)
   click(option(view, 'o_key'))
   type(view, 'What is a provider?')
   enter(view)
@@ -272,22 +272,8 @@ test('no model: the box is greyed and sends nothing; the fixed no-model line is 
   assert.equal(newest(view).props['data-kind'], 'no-model')
 })
 
-test('poses: waving when the helper opens, then idle; jumping when a step is finished; failed when the check fails', async () => {
-  const { view } = await open(fakeStorage(), {}, { settleFirst: false })
-  assert.equal(pose(view), 'waving')
-  await settle()
-  assert.equal(pose(view), 'idle')
-  click(all(detail(view), n => n.type === 'sdk:Button' && text(n).trim() === 'I understand, next step')[0])
-  assert.equal(pose(view), 'jumping')
-  await settle()
-  assert.equal(pose(view), 'idle')
-  // hide, then show again: it waves again
-  click(byLabel(helper(view), 'Hide the helper'))
-  click(byData(view.tree, 'helper-hidden'))
-  assert.equal(pose(view), 'waving')
-
+test('the check fails: "Can\'t check right now" is the newest thing said', async () => {
   const failed = await open(fakeStorage(), { runtime: new Error('timed out') })
-  assert.equal(pose(failed.view), 'failed')
   assert.ok(text(newest(failed.view)).includes(CANT_CHECK_LINE))
   assert.equal(newest(failed.view).props['data-kind'], 'error')
 })

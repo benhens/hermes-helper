@@ -33,7 +33,7 @@ export function readRemember(value) {
 
 const DOT = { works: K.dotWorks, fix: K.dotFix, cant: K.dotCant }
 
-export function makeSetupCards(ctx) {
+export function makeSetupCards(ctx, { busy = null } = {}) {
   const request = (method, params, timeout) => host.request(method, params, timeout)
   const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
   // A read that rejects after `ms` if Hermes hasn't answered; the timer is the host's, so it is
@@ -162,6 +162,9 @@ export function makeSetupCards(ctx) {
       if (!model || model.state !== 'ok') return
       if (asking.current.has(b)) return
       asking.current.add(b)
+      // The page's busy value (src/expressions.js makeBusy): up for the whole wait on the model,
+      // the "trying again" countdown included; the character shows busy while it is up.
+      const endBusy = busy ? busy.begin() : () => {}
       const setRun = run => alive.current && setRuns(r => ({ ...r, [b]: run }))
       let startedAt = 0
       let stopTick = null
@@ -207,6 +210,7 @@ export function makeSetupCards(ctx) {
         .finally(() => {
           stopTicking()
           asking.current.delete(b)
+          endBusy()
         })
     }
 

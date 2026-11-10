@@ -5,6 +5,7 @@ import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, mount, settle, all, text, byData, byLabel, click } from './lib/render.mjs'
 import { rpcError } from './lib/fake-request.mjs'
+import { withPickedGreeting } from './lib/picked-greeting.mjs'
 import { DEFAULT_SOULS } from '../src/setup-cards.js'
 
 let calls
@@ -114,7 +115,8 @@ test('Check on "The model answers": one llm.oneshot, task helping_hand, no sessi
   assert.equal(call.length, 1)
   assert.deepEqual(call[0].params, { task: 'helping_hand', instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 300 })
   assert.equal(call[0].timeout, 90000)
-  assert.equal(timers.intervals.size, 0) // the seconds counter stopped
+  // the seconds counter stopped (the only other host interval is the helper's word clock, 120 ms)
+  assert.equal([...timers.intervals].filter(e => e.ms === 1000).length, 0)
 })
 
 test('no model: card 2 Not set up yet with Open step 2; card 3 cannot be pressed; no model call', async () => {
@@ -361,4 +363,80 @@ test('card 3 after card 2 turns not-ok: the Try again button can\'t be pressed',
   assert.equal(status(view, 'model'), 'fix')
   const button = byLabel(card(view, 'answers'), 'Check')
   assert.equal(button.props.disabled, true) // the old answer was dropped by Check again
+})
+
+/* ---------- the character's busy expression: the page's busy value, raised by this card's model call ---------- */
+const expression = view => all(byData(view.tree, 'helper'), n => n.props['data-hh-character'])[0].props['data-expression']
+const eyesNow = view => all(byData(view.tree, 'helper'), n => n.props['data-hh-character'])[0].props['data-eyes']
+// n ticks of the helper's word clock only (120 ms each); the card's seconds counter is left alone
+const wordTicks = (timers, n) => {
+  for (let i = 0; i < n; i++) [...timers.intervals].filter(e => e.ms === 120).forEach(e => e.fn())
+}
+
+test('busy: while the model call of "The model answers" runs, the character shows busy; when the answer is in, it rests again', async () => {
+  let answer
+  const { view, timers } = await openYours({ oneshot: () => new Promise(r => (answer = r)) })
+  wordTicks(timers, 40) // the greeting is out, so nothing else decides the expression
+  assert.equal(expression(view), 'resting')
+  click(byLabel(card(view, 'answers'), 'Check'))
+  await settle(2)
+  assert.equal(status(view, 'answers'), 'checking')
+  assert.equal(expression(view), 'busy')
+  assert.equal(eyesNow(view), 'still', 'busy: the eyes do not follow the cursor')
+  timers.tick() // a second passes on the card's counter
+  assert.equal(expression(view), 'busy')
+  answer({ text: 'OK' })
+  await settle()
+  assert.equal(status(view, 'answers'), 'works')
+  assert.equal(expression(view), 'resting')
+  assert.equal(eyesNow(view), 'follow')
+})
+
+test('busy: the 60-second "trying again" countdown is part of the same wait', async () => {
+  let n = 0
+  const { view, timers } = await openYours({
+    oneshot: () => (n++ === 0 ? rpcError(5030, 'one-shot generation failed: No LLM provider configured for task=helping_hand provider=auto') : { text: 'OK' })
+  })
+  wordTicks(timers, 40)
+  click(byLabel(card(view, 'answers'), 'Check'))
+  await settle(3)
+  assert.match(text(card(view, 'answers')), /I'll try again in \d+ seconds\./)
+  assert.equal(expression(view), 'busy')
+  await settle(200)
+  assert.equal(status(view, 'answers'), 'works')
+  assert.equal(expression(view), 'resting')
+})
+
+test('busy and words at once: talking while words appear, busy again when they are out; a question shows asking only once the call has ended', async () => {
+  let answer
+  useHost({ oneshot: () => new Promise(r => (answer = r)) })
+  const reg = await registerPlugin(fakeStorage({ tab: 'yours' }), undefined, {}, withPickedGreeting)
+  const view = mount(reg.Page)
+  await settle(10)
+  click(byLabel(card(view, 'answers'), 'Check'))
+  await settle(2)
+  assert.equal(expression(view), 'busy', 'the greeting still waits for the rising: busy')
+  wordTicks(reg.timers, 7)
+  assert.equal(expression(view), 'talking', 'words appear: the mouth moves, also during a call')
+  assert.equal(eyesNow(view), 'follow', 'talking: the eyes follow, also during a call')
+  wordTicks(reg.timers, 40)
+  assert.equal(expression(view), 'busy', 'the question is out but the call still runs: busy, not asking')
+  answer({ text: 'OK' })
+  await settle()
+  assert.equal(expression(view), 'asking')
+})
+
+test('busy is not left stuck: leaving the page while the call runs, the count still goes down when the call ends', async () => {
+  let answer
+  const { view, timers, Page } = await openYours({ oneshot: () => new Promise(r => (answer = r)) })
+  wordTicks(timers, 40)
+  click(byLabel(card(view, 'answers'), 'Check'))
+  await settle(2)
+  view.unmount()
+  const again = mount(Page)
+  await settle(10)
+  assert.equal(expression(again), 'busy', 'the call is still running')
+  answer({ text: 'OK' })
+  await settle()
+  assert.equal(expression(again), 'resting')
 })

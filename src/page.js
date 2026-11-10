@@ -10,7 +10,11 @@ import { host, Button, Codicon, GlyphSpinner, RowButton, Switch, Textarea, Tip, 
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, cx } from './look.js'
-import { Character, poseFor, FLASH_MS } from './character.js'
+import { Character, CHARACTER_PX } from './character.js'
+import { FACE, RISE, expressionFor, asksQuestion, makeBusy } from './expressions.js'
+import { makeEyes } from './eyes.js'
+import { makeRevealClock, Said, wordsOf } from './reveal.js'
+import { prefersReducedMotion, watchReducedMotion } from './motion.js'
 import { readState, otherSide } from './state.js'
 import { checkModel, NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS, NO_MODEL_BOX, CANT_CHECK_LINE, RECHECK_AFTER_MS } from './model-status.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
@@ -22,6 +26,16 @@ import { layoutFor, RAIL_PX, RAIL_NUMBERS_PX, HELPER_PX } from './layout.js'
 const RAIL_WIDTH = `${RAIL_PX}px`
 const RAIL_NUMBERS_WIDTH = `${RAIL_NUMBERS_PX}px`
 const HELPER_WIDTH = `${HELPER_PX}px`
+// The character's row, directly above the message box (layout only, in px like the widths above):
+// at the box's left end, 14 px in (the form's own 12 px side padding plus 14); pulled down over
+// the form's 4 px top padding and by the part of the drawing that hangs below the edge (8 of its
+// 200 units: 5.6 px at 140 px wide), so the drawing's edge line lies on the box's top border and
+// the finger ends about 5 px over it, at any CHARACTER_PX; in front of the box; mouse presses pass
+// through it to the box.
+const BELOW_EDGE_PX = ((FACE.view.y + FACE.view.height - FACE.edge) * CHARACTER_PX) / FACE.view.width
+const CHARACTER_ROW = { position: 'relative', zIndex: 1, paddingLeft: 26, paddingRight: 12, marginBottom: -(4 + BELOW_EDGE_PX), pointerEvents: 'none' }
+// Keys that are not typing by themselves: pressing one alone does not end the word-by-word reveal.
+const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 
 export const TABS = [
   { id: 'setup', label: 'Setup' },
@@ -65,7 +79,12 @@ function useOwnWidth() {
 }
 
 export function makePage(ctx) {
-  const useSetupCards = makeSetupCards(ctx)
+  // Kept while the plugin is loaded, shared by every mount of the page:
+  // busy = how many model calls are running (the character shows busy while it is above 0);
+  // clock = which words of Helper's lines are visible (a line is revealed once, then stays whole).
+  const busy = makeBusy()
+  const clock = makeRevealClock({ setInterval: (fn, ms) => ctx.setInterval(fn, ms) })
+  const useSetupCards = makeSetupCards(ctx, { busy })
   const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
@@ -132,9 +151,36 @@ export function makePage(ctx) {
     const [chatlog, setChatlog] = useState(initial.chatlog)
     const [answers, setAnswers] = useState(initial.answers)
     const [log, setLog] = useState(() => chatMemory || (chatMemory = withIds([greetingEntry()])))
-    // A one-off pose of the character (waving, jumping), played for FLASH_MS.
-    const [flash, setFlash] = useState(null)
-    const cancelFlash = useRef(null)
+    // The person's "reduce motion" setting, watched for changes. With it on the character neither
+    // moves nor rises, and every line appears whole: a new line is never "fresh" (say(), below),
+    // and a line that is appearing when the setting is switched on shows its rest at once (here;
+    // declared before the effects that make words wait or appear).
+    const [reduced, setReduced] = useState(prefersReducedMotion)
+    useEffect(() => watchReducedMotion(setReduced), [])
+    useEffect(() => {
+      clock.setWhole(reduced)
+    }, [reduced])
+    // How many model calls are running. And the clock's cue: the page is drawn again when talking
+    // starts or stops and when a line becomes whole, never for a single word.
+    const [calls, setCalls] = useState(() => busy.count())
+    const [, setSaidChange] = useState(0)
+    useEffect(() => {
+      // Caught up first, in case it changed between the draw and this moment.
+      if (busy.count() !== calls) setCalls(busy.count())
+      const offBusy = busy.subscribe(setCalls)
+      const offClock = clock.onChange(() => setSaidChange(n => n + 1))
+      return () => {
+        offBusy()
+        offClock()
+      }
+    }, [])
+    const revealing = clock.talking()
+    // The eyes: one tracker per open page; our own outer box hands it the cursor and the focus.
+    const eyes = useRef(null)
+    if (!eyes.current) eyes.current = makeEyes({ setTimeout: (fn, ms) => ctx.setTimeout(fn, ms) })
+    useEffect(() => () => eyes.current.stop(), [])
+    // True once the character has come up after the helper opened (see the effect below).
+    const risen = useRef(false)
     // When the model-check line (no model / can't check) appeared: the last log entry then.
     const statusSeen = useRef({ kind: null, after: 0 })
     const [draft, setDraft] = useState('')
@@ -200,28 +246,43 @@ export function makePage(ctx) {
       setLog(old => (chatMemory = [...old, ...fresh].slice(-LOG_MAX)))
     }
 
-    function playFlash(pose) {
-      if (cancelFlash.current) cancelFlash.current()
-      setFlash(pose)
-      cancelFlash.current = ctx.setTimeout(() => {
-        cancelFlash.current = null
-        setFlash(null)
-      }, FLASH_MS)
-    }
-    useEffect(
-      () => () => {
-        if (cancelFlash.current) cancelFlash.current()
-      },
-      []
-    )
-
-    // The character waves when the helper comes on screen (the page opens with it, or the person
-    // opens it from the strip or "Show helper").
-    const wasShown = useRef(false)
+    // The helper comes on screen (the page opens with it, or the person opens it from the strip or
+    // "Show helper"): the character rises from behind the message box, once, and Helper's words
+    // wait until it is up. Not on a tab change that leaves the helper on screen. (In a window so
+    // narrow that the helper is folded away on Setup but has its column on Your setup, changing
+    // the tab does bring it on screen, so it rises then too.) `risen` keeps a later redraw from
+    // asking for the rising again. Declared before the effect that hands the
+    // clock its lines, so the wait is in place first.
     useEffect(() => {
-      if (helperShown && !wasShown.current) playFlash('waving')
-      wasShown.current = helperShown
+      if (!helperShown) return
+      if (reduced) {
+        risen.current = true
+        // forgotten when the helper leaves the screen, so that it rises on its next opening if
+        // reduce motion has been switched off by then
+        return () => {
+          risen.current = false
+        }
+      }
+      clock.holdFor(RISE.wordsWaitMs)
+      const stop = ctx.setTimeout(() => {
+        risen.current = true
+      }, RISE.ms)
+      return () => {
+        stop()
+        risen.current = false
+      }
     }, [helperShown])
+
+    // What Helper is saying on screen right now, in reading order (filled while the words are
+    // drawn below); after every draw the clock hears it and reveals what is new, word by word.
+    const saidNow = []
+    useEffect(() => {
+      clock.show(helperShown ? saidNow : [])
+    })
+
+    // (Whether the eyes follow the cursor is the drawing's own rule: not while busy, never under
+    // reduce motion. src/character.js.)
+    const busyNow = calls > 0
 
     // Something new was said, the log was switched on, or the helper came back: show the newest
     // words, at the bottom of the helper's scrolling area.
@@ -229,9 +290,6 @@ export function makePage(ctx) {
       const el = helperScroll.current
       if (el) el.scrollTop = el.scrollHeight
     }, [log.length, chatlog, helperShown, modelStatus.state])
-
-    // B3 never asks the model, so nothing sets answering yet; B4's call will (review pose).
-    const pose = poseFor({ model: modelStatus.state, answering: false, flash })
 
     // Picking an answer: saved, and the helper says "Your answer: …" with the fact it points to.
     function choose(option) {
@@ -243,9 +301,8 @@ export function makePage(ctx) {
     }
 
     // "I understand, next step": the step's next_rule picks the next step (code, not the model).
-    // After the last step the helper says so once; the character jumps either way.
+    // After the last step the helper says so once.
     function finishStep() {
-      playFlash('jumping')
       const to = nextAfter(currentStep, answers[currentStep.id])
       if (to !== 'done') return saveStep(to)
       if (!(chatMemory || log).some(e => e.kind === 'done')) addToLog([doneEntry()])
@@ -627,14 +684,27 @@ export function makePage(ctx) {
     if (statusSeen.current.kind !== statusKind) statusSeen.current = { kind: statusKind, after: log.length ? log[log.length - 1].id : 0 }
     const statusAfter = statusSeen.current.after
 
-    // One thing the helper (or the person) said, as plain text: no bubble, no card.
-    const entryParts = e => {
+    // One line Helper says, revealed word by word (src/reveal.js) and noted for the clock. Lines
+    // of the newest turn are fresh: they are revealed. An older line met for the first time (the
+    // Chat log switched on later) is shown whole.
+    const say = (e, part, line, className, fresh) => {
+      const key = `${e.id}${e.id === 'status' ? '-' + e.kind : ''}:${part}`
+      // Under reduce motion no line is fresh: it is whole from its first draw.
+      const appears = fresh && !reduced
+      saidNow.push({ key, words: wordsOf(line).length, fresh: appears, text: line })
+      return jsx(Said, { clock, id: key, text: line, className, fresh: appears }, part)
+    }
+
+    // One thing the helper (or the person) said, as plain text: no bubble, no card. Helper's texts
+    // appear in order: its lines, then its small note; the person's own words appear at once, and
+    // so do buttons, links and text to paste.
+    const entryParts = (e, fresh) => {
       const you = e.who === 'you'
-      const parts = e.lines.map((line, i) => jsx('p', { className: you ? K.logYou : K.say, children: line }, 'l' + i))
-      if (e.small) parts.push(jsx('p', { className: K.caption, children: e.small }, 'small'))
-      if (e.fact) parts.push(jsx('p', { className: K.caption, children: e.fact.text }, 'fact'), jsx('div', { children: factSource(e.fact) }, 'fact-src'))
+      const parts = e.lines.map((line, i) => (you ? jsx('p', { className: K.logYou, children: line }, 'l' + i) : say(e, 'l' + i, line, K.say, fresh)))
+      if (e.small) parts.push(say(e, 'small', e.small, K.caption, fresh))
+      if (e.fact) parts.push(say(e, 'fact', e.fact.text, K.caption, fresh), jsx('div', { children: factSource(e.fact) }, 'fact-src'))
       if (e.paste) parts.push(jsx(PasteBox, { text: e.paste, label: 'Copy' }, 'paste'))
-      if (e.after) parts.push(jsx('p', { className: K.say, children: e.after }, 'after'))
+      if (e.after) parts.push(say(e, 'after', e.after, K.say, fresh))
       if (e.link) parts.push(jsx('div', { children: sourceLink(e.link, e.link, 'link') }, 'link'))
       if (e.action === 'recheck') parts.push(jsx('div', { className: K.sayActions, children: checkAgain() }, 'act'))
       if (e.action === 'yours')
@@ -666,6 +736,11 @@ export function makePage(ctx) {
 
     // Chat log off: only the newest thing the helper said. On: the whole back-and-forth, newest at
     // the bottom. Either way it sits low in the panel with empty space above it.
+    // Fresh = part of the newest thing said (the newest turn, or the model-check line while nothing
+    // was said after it): these are the lines that appear word by word.
+    const newestTurn = log.length ? log[log.length - 1].turn : null
+    const statusNewest = !!statusEntry && !log.some(e => e.id > statusAfter)
+    const isFresh = e => (e.id === 'status' ? statusNewest : e.turn === newestTurn)
     let wordsView
     if (chatlog) {
       const entries = statusEntry ? [...log.filter(e => e.id <= statusAfter), statusEntry, ...log.filter(e => e.id > statusAfter)] : log
@@ -683,7 +758,7 @@ export function makePage(ctx) {
                 className: K.logEntry,
                 'data-who': e.who,
                 'data-kind': e.kind,
-                children: [jsx('span', { className: K.logWho, children: e.who === 'you' ? 'You' : 'Helper' }, 'who'), jsx('div', { className: K.sayStack, children: entryParts(e) }, 'what')]
+                children: [jsx('span', { className: K.logWho, children: e.who === 'you' ? 'You' : 'Helper' }, 'who'), jsx('div', { className: K.sayStack, children: entryParts(e, isFresh(e)) }, 'what')]
               },
               e.id
             )
@@ -694,9 +769,8 @@ export function makePage(ctx) {
     } else {
       // The newest turn's helper lines (an answer with its note, a reply after a long message); the
       // model-check line when nothing was said since it appeared.
-      const lastTurn = log.length ? log[log.length - 1].turn : null
-      const fromHelper = log.filter(e => e.turn === lastTurn && e.who === 'helper')
-      const shown = statusEntry && !log.some(e => e.id > statusAfter) ? [statusEntry] : fromHelper.length ? fromHelper : [log[log.length - 1]]
+      const fromHelper = log.filter(e => e.turn === newestTurn && e.who === 'helper')
+      const shown = statusNewest ? [statusEntry] : fromHelper.length ? fromHelper : [log[log.length - 1]]
       wordsView = jsx(
         'div',
         {
@@ -704,29 +778,28 @@ export function makePage(ctx) {
           'data-hh': 'say',
           'data-kind': shown[shown.length - 1].kind,
           'aria-live': 'polite',
-          children: shown.map(e => jsx('div', { className: K.sayStack, children: entryParts(e) }, e.id))
+          children: shown.map(e => jsx('div', { className: K.sayStack, children: entryParts(e, isFresh(e)) }, e.id))
         },
         'say'
       )
     }
     const helperBody = [topLine, jsx('div', { className: K.helperNewest, 'data-hh': 'helper-newest', children: wordsView }, 'newest')]
 
-    // The character stands small at the bottom right, just above the message box, with three
-    // thought dots trailing from it toward the words.
-    const characterRow = jsxs(
+    // Which expression the character shows (src/expressions.js). Asking: the last thing Helper
+    // said ends with a question mark and all of it is on screen.
+    const lastSaid = saidNow.length ? saidNow[saidNow.length - 1] : null
+    const question = !!lastSaid && asksQuestion(lastSaid.text) && clock.shown(lastSaid.key, lastSaid.words, lastSaid.fresh) >= lastSaid.words
+    const expression = expressionFor({ revealing, busy: busyNow, question })
+
+    // The character has its own row directly above the message box, at the box's left end, its
+    // finger ends over the box's top border (CHARACTER_ROW). It rises when the helper opens.
+    const characterRow = jsx(
       'div',
       {
         className: K.characterRow,
+        style: CHARACTER_ROW,
         'data-hh': 'character',
-        children: [
-          jsxs('span', {
-            className: K.thoughtDots,
-            'aria-hidden': true,
-            'data-hh': 'thought-dots',
-            children: [jsx('span', { className: K.thoughtDot1 }, 1), jsx('span', { className: K.thoughtDot2 }, 2), jsx('span', { className: K.thoughtDot3 }, 3)]
-          }, 'dots'),
-          jsx(Character, { size: 48, pose }, 'who')
-        ]
+        children: jsx(Character, { size: CHARACTER_PX, expression, rising: !risen.current, reduced, eyes: eyes.current })
       },
       'character'
     )
@@ -865,6 +938,20 @@ export function makePage(ctx) {
       'data-hh': 'page',
       // The measured width, for the screenshot checks (dev/checks/b3a-shots).
       'data-width': width,
+      // The eyes (src/eyes.js) hear the cursor, the keyboard's focus and scrolling from this box
+      // only, never from the Hermes window: so they follow only while the cursor is over our page.
+      onPointerMove: e => eyes.current.pointerMove(e.clientX, e.clientY),
+      onPointerLeave: () => eyes.current.pointerLeave(),
+      onFocus: e => eyes.current.focus(e.target),
+      onBlur: e => {
+        if (!e.relatedTarget || !e.currentTarget || !e.currentTarget.contains(e.relatedTarget)) eyes.current.blur()
+      },
+      onScrollCapture: () => eyes.current.scroll(),
+      // The person types or presses the mouse while words are still appearing: the rest appears at once.
+      onKeyDownCapture: e => {
+        if (!LONE_KEYS.includes(e.key)) clock.finishAll()
+      },
+      onPointerDownCapture: () => clock.finishAll(),
       children: [
         header,
         jsx('div', {

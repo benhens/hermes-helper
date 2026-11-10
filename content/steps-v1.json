@@ -1,5 +1,5 @@
 {
-  "about": "Helping Hand v1 step data, steps 1-4. Written by hhcontent, 9 Nov 2026. Shape: docs/plan/build-v1.md section 6, plus optional fields listed in content/v1-strings.md part 4. All text is fixed; code fills only the {slots}. Checked by dev/checks/hhcontent/check-steps-v1.mjs.",
+  "about": "Helper v1 step data, steps 1-4. Written by hhcontent, 9 Nov 2026. Shape: docs/plan/build-v1.md section 6, plus optional fields listed in content/v1-strings.md part 4. All text is fixed; code fills only the {slots}. Checked by dev/checks/hhcontent/check-steps-v1.mjs.",
   "docs_version": "v0.23.0",
   "docs_root": "/hermes-docs",
   "live_base": "https://hermes-agent.nousresearch.com/docs/",

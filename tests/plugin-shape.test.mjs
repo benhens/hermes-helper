@@ -60,16 +60,14 @@ test('the plugin is "Helper", id helper, in plugin.yaml, package.json and the bu
   assert.match(code, /export default \{\s*id: ID,\s*name: 'Helper',/)
 })
 
-// The old name may stay in two places only: the hidden model-call task name (written with an
-// underscore, which this search skips on purpose) and the note at the top of hhcontent's step data.
+// The old name may stay in one place only: the hidden model-call task name (written with an
+// underscore, which this search skips on purpose).
 test('the old name is gone from everything a person can read', () => {
   const OLD = /helping[ -]?hand/i
   const files = ['plugin.yaml', 'package.json', 'README.md', 'content/README.md', 'content/steps-v1.json', 'scripts/build.mjs', 'desktop/plugin.js',
     ...fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js')).map(f => 'src/' + f)]
   const found = files.flatMap(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l)).map(l => `${f}: ${l.trim().slice(0, 60)}`))
-  const allowed = l => /^(content\/steps-v1\.json|src\/steps-data\.js|desktop\/plugin\.js): "about": "Helping Hand v1 step data/.test(l)
-  assert.deepEqual(found.filter(l => !allowed(l)), [])
-  assert.equal(found.filter(allowed).length, 3)
+  assert.deepEqual(found, [])
 })
 
 test('helper panel is a div with role complementary, never an <aside>', () => {
@@ -171,7 +169,7 @@ function propsOf(text, name) {
 }
 
 test('every class comes from the Hermes class table: page code writes no class string of its own', () => {
-  for (const f of ['page.js', 'setup-tab.js', 'character.js', 'main.js']) {
+  for (const f of ['page.js', 'setup-tab.js', 'character.js', 'reveal.js', 'eyes.js', 'expressions.js', 'motion.js', 'main.js']) {
     assert.doesNotMatch(src(f), /className:\s*['"`]/, `${f} has a literal className`)
     // cx(...) may hold K values and conditions (side === 'right'), never a class string.
     for (const m of src(f).matchAll(/cx\(([^)]*)\)/g)) {
@@ -231,6 +229,42 @@ test('the character is one swappable component, used only through <Character>', 
   assert.equal((src('page.js').match(/jsx\(Character,/g) || []).length >= 1, true)
   assert.doesNotMatch(src('page.js'), /<svg|'svg'/)
   assert.match(src('character.js'), /var\(--ui-accent\)/)
+})
+
+test('the character is drawn, not loaded: no picture, no data URL, no sprite sheet anywhere in the built file', () => {
+  assert.doesNotMatch(code, /data:image|base64|\.(png|webp|gif|jpe?g|svg)['"`)?#]/)
+  assert.doesNotMatch(code, /maskImage|WebkitMask|background-image|backgroundImage/)
+  assert.doesNotMatch(code, /jsxs?\(\s*['"](img|image|canvas|picture|video|object|embed|use)['"]/)
+  // the 9 Nov sprite-sheet slot and the drawn hand's poses are gone (commit cff33f6 has them)
+  assert.equal(fs.existsSync(path.join(ROOT, 'src', 'pet-sheet.js')), false)
+  assert.doesNotMatch(code, /PET_SHEET|POSE_ROW|poseFor|spriteLayer|petdex/)
+  // one colour: the accent is the only theme colour the character names
+  const colours = [...src('character.js').matchAll(/var\(--[\w-]+\)/g)].map(m => m[0])
+  assert.deepEqual([...new Set(colours)], ['var(--ui-accent)'])
+  for (const f of ['expressions.js', 'eyes.js', 'reveal.js', 'motion.js']) assert.doesNotMatch(src(f), /var\(--/, f)
+})
+
+test('the eyes listen on our own page only: nothing is put on the Hermes window or document', () => {
+  assert.doesNotMatch(code, /ctx\.addEventListener/)
+  assert.doesNotMatch(code, /\b(window|document|globalThis|self)\s*\.\s*(addEventListener|on(pointer|mouse)\w*)/)
+  // the single listener the plugin adds is the watch on the reduce-motion setting itself
+  const added = [...code.matchAll(/(\w+)\.addEventListener\(\s*'([^']+)'/g)].map(m => `${m[1]}:${m[2]}`)
+  assert.deepEqual(added, ['setting:change'])
+  assert.equal((code.match(/removeEventListener\(/g) || []).length, 1)
+  // cursor, focus and scroll reach the eyes through React handlers on the page's outer box
+  const page = src('page.js')
+  const rootBox = page.slice(page.lastIndexOf('return jsxs('))
+  for (const handler of ['onPointerMove', 'onPointerLeave', 'onFocus', 'onBlur', 'onScrollCapture']) assert.ok(rootBox.includes(handler + ':'), handler)
+  assert.equal((page.match(/onPointerMove:/g) || []).length, 1)
+  // The page tests draw the character with stand-in hooks, so they cannot see the eyes move: the
+  // wiring is checked here by its shape, and in the real app (dev/checks/character-v2-shots).
+  assert.match(rootBox, /onPointerMove: e => eyes\.current\.pointerMove\(e\.clientX, e\.clientY\)/)
+  assert.match(rootBox, /onFocus: e => eyes\.current\.focus\(e\.target\)/)
+  assert.match(page, /jsx\(Character, \{[^}]*\beyes: eyes\.current\b[^}]*\}\)/)
+  assert.match(page, /eyes\.current = makeEyes\(\{ setTimeout: \(fn, ms\) => ctx\.setTimeout\(fn, ms\) \}\)/)
+  // drawn frames and the reduce-motion check are asked for in one place each
+  assert.equal((code.match(/requestAnimationFrame\(/g) || []).length, 1)
+  assert.equal((code.match(/\bmatchMedia\(/g) || []).length, 2)
 })
 
 test('Hermes-class checker: escapes like Tailwind and finds a missing class (it bites)', () => {

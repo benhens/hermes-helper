@@ -10,11 +10,13 @@ const ROOT = path.resolve(import.meta.dirname, '..', '..')
 const FAKES = path.join(ROOT, 'tests', 'fakes')
 
 let loads = 0
-export async function loadPlugin() {
+// change: an optional function that edits the built source before it is loaded (a test copy, e.g.
+// tests/lib/picked-greeting.mjs). The file on disk is never touched.
+export async function loadPlugin(change = null) {
   const reactUrl = pathToFileURL(path.join(FAKES, 'react.mjs')).href
   const sdkUrl = pathToFileURL(path.join(FAKES, 'sdk.mjs')).href
-  const src = fs
-    .readFileSync(path.join(ROOT, 'desktop', 'plugin.js'), 'utf8')
+  const built = fs.readFileSync(path.join(ROOT, 'desktop', 'plugin.js'), 'utf8')
+  const src = (change ? change(built) : built)
     .replace("from '@hermes/plugin-sdk'", `from '${sdkUrl}'`)
     .replace("from 'react/jsx-runtime'", `from '${reactUrl}'`)
     .replace("from 'react'", `from '${reactUrl}'`)
@@ -77,9 +79,9 @@ export function fakeTimers() {
 }
 
 // Registers the plugin with a fake ctx; returns its contributions and the page component.
-// extra: more ctx doors (e.g. os) for a test.
-export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers(), extra = {}) {
-  const plugin = await loadPlugin()
+// extra: more ctx doors (e.g. os) for a test. change: see loadPlugin.
+export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers(), extra = {}, change = null) {
+  const plugin = await loadPlugin(change)
   const contributions = []
   const ctx = {
     storage,
@@ -124,6 +126,9 @@ export function mount(Component) {
   let i = 0
   let pending = []
   let rendering = false
+  // True while the effects of one draw are running. As in React, a state change made by an effect
+  // is drawn after all effects of that draw have run, not in the middle of them.
+  let flushing = false
   let dirty = false
   const view = { tree: null }
 
@@ -135,7 +140,7 @@ export function mount(Component) {
       const slot = slots[k]
       const set = v => {
         slot.value = typeof v === 'function' ? v(slot.value) : v
-        if (rendering) dirty = true
+        if (rendering || flushing) dirty = true
         else render()
       }
       return [slot.value, set]
@@ -184,11 +189,16 @@ export function mount(Component) {
       const run = pending
       pending = []
       // As React does: an effect whose inputs changed first runs the cleanup its last run returned.
-      for (const { k, fn } of run) {
-        const slot = slots[k]
-        if (typeof slot.cleanup === 'function') slot.cleanup()
-        const cleanup = fn()
-        slot.cleanup = typeof cleanup === 'function' ? cleanup : undefined
+      flushing = true
+      try {
+        for (const { k, fn } of run) {
+          const slot = slots[k]
+          if (typeof slot.cleanup === 'function') slot.cleanup()
+          const cleanup = fn()
+          slot.cleanup = typeof cleanup === 'function' ? cleanup : undefined
+        }
+      } finally {
+        flushing = false
       }
     } while (dirty)
   }
@@ -219,6 +229,17 @@ export function text(node) {
   if (Array.isArray(node)) return node.map(text).join(' ')
   if (typeof node !== 'object') return String(node)
   return text(node.props.children)
+}
+
+// What a screen reader is given: the text without anything marked aria-hidden. A line Helper says
+// is in the tree twice (src/reveal.js): whole for screen readers, and word by word for the eye,
+// which is aria-hidden. So spoken() holds each line once.
+export function spoken(node) {
+  if (node == null) return ''
+  if (Array.isArray(node)) return node.map(spoken).join(' ')
+  if (typeof node !== 'object') return String(node)
+  if (node.props['aria-hidden'] === true) return ''
+  return spoken(node.props.children)
 }
 
 export const byData = (tree, name) => all(tree, n => n.props['data-hh'] === name)[0] || null

@@ -128,14 +128,13 @@ export const K = {
   logWho: 'text-[0.6875rem] font-medium text-(--ui-text-tertiary)',
   // The person's own words in the log: the same text, one tone quieter than the helper's
   logYou: 'wrap-anywhere text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-(--ui-text-secondary)',
-  // The character stands small at the bottom right, just above the message box, with three
-  // thought dots trailing from it up toward the words (the sketch). The dots are the room's typing
-  // dots (RoomTyping: size-1.5 rounded-full, secondary text colour), in three sizes, fainter.
-  characterRow: 'flex shrink-0 items-end justify-end gap-1 px-4',
-  thoughtDots: 'mb-6 flex items-end gap-1',
-  thoughtDot1: 'mb-4 size-1 rounded-full bg-(--ui-text-quaternary)',
-  thoughtDot2: 'mb-2 size-1.5 rounded-full bg-(--ui-text-quaternary)',
-  thoughtDot3: 'size-2 rounded-full bg-(--ui-text-quaternary)',
+  // The character (variation 2 of design/face-r2) has its own row directly above the message box,
+  // at the box's left end. The row's exact place (pulled down over the box's top border, in front
+  // of it) is in px and set inline by page.js, like the column widths.
+  characterRow: 'flex shrink-0',
+  // The whole line for screen readers while the eye sees it word by word (src/reveal.js): Hermes's
+  // own visually-hidden class (components/ui/dialog.tsx and others).
+  srOnly: 'sr-only',
   // Composer: plugins/hermes-bots/group-room-ui.tsx RoomComposer (rounded surface, round send
   // button), on one row like Hermes's chat composer. No model name (the sketch drops it; it stays
   // on the Your setup card).

@@ -235,7 +235,7 @@ test('message box: one line that grows, no resize grip; only the box and a round
   assert.equal(all(helper(view), n => /mic/i.test(String(n.props['aria-label'] || '')) || n.props.name === 'mic').length, 0)
 })
 
-test('the sketch: "On step" line on top, the words low as plain text (no bubble), character small at the bottom right with three thought dots, just above the box', async () => {
+test('the sketch: "On step" line on top, the words low as plain text (no bubble), then the character\'s row, then the message box', async () => {
   const { view } = await open()
   const h = helper(view)
   const kids = h.props.children.filter(Boolean)
@@ -255,19 +255,12 @@ test('the sketch: "On step" line on top, the words low as plain text (no bubble)
   assert.equal(byData(h, 'bubble'), null)
   for (const key of ['say', 'sayStack', 'helperNewest']) assert.doesNotMatch(K[key], /(^|\s)(bg-|rounded|border|shadow|p-|px-|py-)/, key)
   assert.equal(K.bubble, undefined)
-  // the character row: dots first, then the character, pushed to the right
+  // The character's row holds the character and nothing else. Since 10 Nov 2026 it is variation 2
+  // of design/face-r2 at the left end of the message box (tests/helper-character.test.mjs); the
+  // small hand at the bottom right with three thought dots (the 9 Nov sketch) is gone.
   const row = kids[2]
-  assert.match(K.characterRow, /(^|\s)justify-end(\s|$)/)
-  const [dots, who] = row.props.children.filter(Boolean)
-  assert.equal(dots.props['data-hh'], 'thought-dots')
-  assert.equal(dots.props['aria-hidden'], true)
-  assert.equal(dots.props.children.length, 3)
-  const sizes = dots.props.children.map(d => d.props.className.match(/(?:^|\s)size-([\d.]+)/)[1]).map(Number)
-  assert.deepEqual(sizes, [...sizes].sort((a, b) => a - b), 'the dots grow toward the character')
-  const lifts = dots.props.children.map(d => Number((d.props.className.match(/(?:^|\s)mb-([\d.]+)/) || [0, 0])[1]))
-  assert.deepEqual(lifts, [...lifts].sort((a, b) => b - a), 'the dots rise toward the words')
-  assert.ok(all(who, n => n.props['data-hh-character']).length === 1)
-  assert.ok(Number(all(who, n => n.props['data-hh-character'])[0].props.height) <= 52, 'small')
+  assert.equal(all(row, n => n.props['data-hh-character']).length, 1)
+  assert.equal(byData(row, 'thought-dots'), null)
 })
 
 test('no line on the helper\'s edge', () => {

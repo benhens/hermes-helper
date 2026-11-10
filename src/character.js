@@ -1,164 +1,285 @@
-// The helper's character: one swappable component, used by the page only through <Character>.
-// Today it draws hhdesign's hand (design/hermes-look-r3) as inline SVG. Given a pet sheet
-// (src/pet-sheet.js) it draws the pet instead, the way hhtech checked in the real app
-// (dev/checks/hhtech-pet/plugin.template.js): two stacked divs, the fill below and the ink on top,
-// each a CSS mask holding the sheet, painted in theme colours (the ink is var(--ui-accent)); the
-// mask position picks the frame, and element.animate() steps through the row's frames.
-// Poses are the petdex rows the helper uses: idle, waving, jumping, failed, review (poseFor).
-// Colours: theme variables only, as inline styles, so there is no stylesheet to clean up.
-import { useEffect, useId, useRef } from 'react'
+// The helper's character: variation 2 of hhdesign's drawings (design/face-r2), which Pēteris
+// picked on 10 Nov 2026. Two eyes that touch, a mouth, and four fingers a side holding on to the
+// top edge of the message box. The page draws it itself as inline SVG shapes, every one filled
+// with the theme's accent colour: no picture file, no data URL, no colour of our own.
+// Used by the page only through <Character>. The numbers live in src/expressions.js.
+//   expression  resting | busy | asking | talking (src/expressions.js says which, and when)
+//   rising      true while it comes up from behind the message box (once per opening of the helper)
+//   reduced     the person's "reduce motion" setting: expressions snap, nothing loops, no rising,
+//               and the eyes stay on the person
+//   eyes        the page's eyes tracker (src/eyes.js), which places the pupils
+// How it moves: a change of expression glides (CSS transitions written here as inline styles);
+// what repeats (the blink, drumming fingers, the talking mouth) and the rising are run from script
+// with element.animate(), which Hermes's own reduce-motion rule does not stop, so this file
+// starts none of them when `reduced` is set.
+// No script animation here changes `transform` or `opacity`, except the 0.7 s rising. Seen in the
+// real app (dev/checks/character-v2-shots, probe): the app draws such an animation on a layer of
+// its own for as long as it runs, also while it waits, and the whole drawing was then soft at its
+// edges. So the blink changes the eye's own height (ry) and the hole's own path (d), the fingers
+// their y and height, the mouth its path: with those the drawing stayed sharp.
+import { useEffect, useId, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
-import { PET_SHEET } from './pet-sheet.js'
+import { FACE, EXPRESSIONS, EXPRESSION_NAMES, GLIDE_MS, BLINK_MS, BLINK_EVERY_MS, TALK_MS, DRUM_MS, RISE, fingerRect, eyeTransform, eyeRy, pupilScale, pupilHole, talkFrames, drumHeights } from './expressions.js'
+import { makeEyes } from './eyes.js'
 
-/* ---------- which pose ---------- */
+// The character's width on the page, in px. One constant: the new beginning will set the final size.
+export const CHARACTER_PX = 140
 
-// The petdex layout (Hermes's pets: 8 columns × 9 rows of 192 × 208 cells; 6 frames a row over
-// 1.1 s unless the sheet says otherwise, as Hermes's own pet-sprite.tsx defaults).
-export const SHEET = { cols: 8, rows: 9, cellW: 192, cellH: 208, frames: 6, loopMs: 1100 }
-// Row of each pose in that layout (Hermes's DEFAULT_STATE_ROWS: 0 idle, 3 waving, 4 jumping,
-// 5 failed, 8 review).
-export const POSE_ROW = { idle: 0, waving: 3, jumping: 4, failed: 5, review: 8 }
-// How long a one-off pose (waving, jumping) plays before going back to idle: two loops.
-export const FLASH_MS = 2 * SHEET.loopMs
+const ACCENT = { fill: 'var(--ui-accent)' }
+const SIDES = ['left', 'right']
+const FINGER_COUNT = EXPRESSIONS.resting.fingers.length
+// A blink, piece by piece: [piece, what changes, open, shut] (src/expressions.js).
+const hole = (i, size) => `path("${pupilHole(FACE.eyes[i], size)}")`
+const BLINK = SIDES.flatMap((side, i) => [
+  [`eye-${side}`, 'ry', eyeRy(), eyeRy(true)],
+  [`pupil-hole-${side}`, 'd', hole(i, 1), hole(i, 0)]
+])
 
-// The page's state as a pose, in this order: an error (the check failed) = failed; the model
-// is answering = review; a one-off pose that is playing (waving when the helper opens, jumping
-// when a step is finished); otherwise idle.
-export function poseFor({ model, answering = false, flash = null } = {}) {
-  if (model === 'error') return 'failed'
-  if (answering) return 'review'
-  if (flash === 'waving' || flash === 'jumping') return flash
-  return 'idle'
+const play = (el, keys, options) => (el && typeof el.animate === 'function' ? el.animate(keys, options) : null)
+
+// Where a piece is drawn right now, as the first frame of a glide. A glide has to name it: one
+// that names only its last frame starts, in the real app, from the new expression's still
+// picture and not from what is on screen (dev/checks/character-v2-shots, probe3).
+function drawnNow(el, props) {
+  if (!el || typeof getComputedStyle !== 'function') return null
+  const now = getComputedStyle(el)
+  const frame = { offset: 0 }
+  for (const p of props) frame[p] = now[p]
+  return frame
 }
 
-/* ---------- the sprite (when a sheet is set) ---------- */
-
-const frameCount = (sheet, row) => {
-  const n = sheet && sheet.framesByRow ? sheet.framesByRow[row] : undefined
-  return Number.isInteger(n) && n > 0 && n <= SHEET.cols ? n : SHEET.frames
+// Stops a loop without a jump: the piece glides from where the loop left it to where the
+// expression now draws it.
+function stopLoop(el, loop, props, glide) {
+  const from = glide ? drawnNow(el, props) : null
+  loop.cancel()
+  if (from) play(el, [from], { duration: GLIDE_MS, easing: 'ease' })
 }
 
-// One layer's inline style: the whole sheet as a mask, scaled, moved to (frame, row).
-export function spriteLayer(url, colour, { row, frame = 0, scale }) {
-  const w = SHEET.cellW * scale
-  const h = SHEET.cellH * scale
-  const size = `${SHEET.cols * w}px ${SHEET.rows * h}px`
-  const pos = `${-frame * w}px ${-row * h}px`
-  return {
-    position: 'absolute',
-    inset: 0,
-    background: colour,
-    maskImage: `url("${url}")`,
-    WebkitMaskImage: `url("${url}")`,
-    maskSize: size,
-    WebkitMaskSize: size,
-    maskPosition: pos,
-    WebkitMaskPosition: pos,
-    maskRepeat: 'no-repeat',
-    WebkitMaskRepeat: 'no-repeat'
-  }
+// One blink: both eyes close and open again, and the pupils close with them.
+function blinkOnce(nodes, { reduced }) {
+  if (reduced) return
+  for (const [name, what, open, shut] of BLINK) play(nodes[name], [{ [what]: open }, { [what]: shut }, { [what]: open }], { duration: BLINK_MS, easing: 'ease-in-out' })
 }
 
-// The two key frames for element.animate(): from the row's first frame to just past its last,
-// played with steps(n), so each frame shows for an equal share of the loop.
-export function spriteAnimation(sheet, row, scale) {
-  const n = frameCount(sheet, row)
-  const w = SHEET.cellW * scale
-  const y = `${-row * SHEET.cellH * scale}px`
-  return {
-    keys: [
-      { maskPosition: `0px ${y}`, WebkitMaskPosition: `0px ${y}` },
-      { maskPosition: `${-n * w}px ${y}`, WebkitMaskPosition: `${-n * w}px ${y}` }
-    ],
-    options: { duration: Math.round((SHEET.loopMs * n) / SHEET.frames), iterations: Infinity, easing: `steps(${n}, end)` }
-  }
+// The drawn pieces by name, with one ref function per piece, made once.
+function makePieces() {
+  const nodes = {}
+  const setters = {}
+  const ref = name =>
+    setters[name] ||
+    (setters[name] = el => {
+      if (el) nodes[name] = el
+      else delete nodes[name]
+    })
+  return { nodes, ref }
 }
 
-const INK_COLOUR = 'var(--ui-accent)'
-// hhtech: --ui-bg-elevated as the fill is almost invisible in both themes; the hand's own body
-// tone (the accent mixed into the page surface) reads as a solid figure in light and dark.
-const FILL_COLOUR = 'color-mix(in oklab, var(--ui-accent) 18%, var(--ui-editor-surface-background))'
+export function Character({ size = CHARACTER_PX, expression = 'resting', rising = false, reduced = false, eyes = null, label = 'Helper' }) {
+  const uid = 'hh-face-' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const pieces = useRef(null)
+  if (!pieces.current) pieces.current = makePieces()
+  const { nodes, ref } = pieces.current
+  // Without the page's tracker (a plain drawing) a tracker of its own keeps the pupils at the
+  // expression's place; it has no timers, so it never follows anything.
+  const own = useRef(null)
+  if (!eyes && !own.current) own.current = makeEyes()
+  const tracker = eyes || own.current
+  // Rising: the drawing stays unseen until its rising has started, so it never shows whole first.
+  const [armed, setArmed] = useState(false)
+  const latest = useRef({})
 
-const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
-
-/* ---------- the drawn hand (no sheet) ---------- */
-
-const BODY =
-  'M31 73c-5.5 0-9-3.4-9-9v-10.5c-4.6-1.1-9-5.3-9.6-10.4-.5-4.3 3.4-6.9 7.1-4.6 1 .6 1.8 1.4 2.5 2.4V29c0-11 8.6-19 20-19s20 8 20 19v35c0 5.6-3.5 9-9 9z'
-
-const SURFACE = 'var(--ui-editor-surface-background)'
-const mix = pct => `color-mix(in oklab, var(--ui-accent) ${pct}%, ${SURFACE})`
-const INK = { fill: 'var(--ui-text-primary)' }
-const INK_LINE = { fill: 'none', stroke: 'var(--ui-text-primary)', strokeWidth: 2, strokeLinecap: 'round' }
-
-// size: the character's height in px. pose: one of POSE_ROW's names. sheet: a pet sheet, or null
-// for the drawn hand (default: src/pet-sheet.js).
-export function Character({ size = 48, pose = 'idle', sheet = PET_SHEET, shadow = true, label = 'Helper' }) {
-  const gid = 'hh-g' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
-  const ink = useRef(null)
-  const fill = useRef(null)
-  const shown = pose in POSE_ROW ? pose : 'idle'
-  const row = POSE_ROW[shown]
-  const scale = size / SHEET.cellH
+  const shown = EXPRESSION_NAMES.includes(expression) ? expression : 'resting'
+  const x = EXPRESSIONS[shown]
+  // comesUp: this draw is part of a rising (the table's own `rise` is how high the body sits).
+  const comesUp = rising && !reduced
+  latest.current = { shown, reduced }
+  const glide = what => (reduced ? 'none' : `${what} ${GLIDE_MS}ms ease`)
 
   useEffect(() => {
-    if (!sheet || reducedMotion()) return
-    const { keys, options } = spriteAnimation(sheet, row, scale)
-    const running = [ink.current, fill.current].filter(el => el && typeof el.animate === 'function').map(el => el.animate(keys, options))
-    return () => running.forEach(a => a.cancel())
-  }, [sheet, row, scale])
+    tracker.attach({
+      svg: nodes.svg,
+      eyes: SIDES.map(side => nodes[`eye-${side}`]),
+      pupils: SIDES.map(side => nodes[`pupil-${side}`]),
+      blink: () => blinkOnce(nodes, latest.current)
+    })
+    return () => tracker.detach()
+  }, [tracker])
 
-  const a11y = {
+  // Where the pupils sit when nothing is followed: the expression's own place. And whether they
+  // follow at all: not while busy (narrowed eyes, almost no room), never under reduce motion.
+  const follows = !reduced && shown !== 'busy'
+  useEffect(() => {
+    tracker.setGlide(!reduced)
+    tracker.setFollowing(follows)
+    tracker.setRest([x.pupil, x.pupil])
+  }, [tracker, shown, reduced])
+
+  // What repeats. Each loop starts GLIDE_MS after its expression. Drumming and the talking mouth
+  // do not start at the expression's still picture, so for those 0.3 s the piece glides from
+  // wherever it is to the loop's first frame (glideIn) and the loop takes over without a jump.
+  useEffect(() => {
+    if (reduced) return
+    const running = []
+    const loop = (name, keys, ms, props, glideIn = false) => {
+      const el = nodes[name]
+      let lead = null
+      if (glideIn) {
+        const from = drawnNow(el, props)
+        const to = { ...Object.fromEntries(props.map(p => [p, keys[0][p]])), offset: 1 }
+        lead = play(el, from ? [from, to] : [to], { duration: GLIDE_MS, easing: 'ease' })
+      }
+      const started = play(el, keys, { duration: ms, iterations: Infinity, delay: GLIDE_MS })
+      if (started) running.push([el, started, props, lead])
+    }
+    if (shown === 'resting') {
+      const at = [0, (BLINK_EVERY_MS - BLINK_MS) / BLINK_EVERY_MS, (BLINK_EVERY_MS - BLINK_MS / 2) / BLINK_EVERY_MS, 1]
+      for (const [name, what, open, shut] of BLINK) loop(name, [open, open, shut, open].map((value, k) => ({ [what]: value, offset: at[k] })), BLINK_EVERY_MS, [what])
+    }
+    if (shown === 'busy') {
+      SIDES.forEach((side, hand) => {
+        for (let i = 0; i < FINGER_COUNT; i++) {
+          const keys = drumHeights(i).map(h => {
+            const r = fingerRect(hand, i, h)
+            return { y: `${r.y}px`, height: `${r.height}px` }
+          })
+          loop(`finger-${side}-${i + 1}`, keys, DRUM_MS, ['y', 'height'], true)
+        }
+      })
+    }
+    if (shown === 'talking') loop('mouth', talkFrames().map(d => ({ d: `path("${d}")` })), TALK_MS, ['d'], true)
+    return () =>
+      running.forEach(([el, started, props, lead]) => {
+        stopLoop(el, started, props, !latest.current.reduced)
+        if (lead) lead.cancel()
+      })
+  }, [shown, reduced])
+
+  // Rising, once each time `rising` turns on: the fingers grow over the edge first, then the body
+  // comes up from behind it. Neither has an end frame of its own, so each lands on whatever the
+  // expression draws. Kept as the last effect: it ends by showing the drawing.
+  useEffect(() => {
+    if (!comesUp) {
+      if (armed) setArmed(false)
+      return
+    }
+    const started = []
+    SIDES.forEach(side => {
+      for (let i = 0; i < FINGER_COUNT; i++) {
+        started.push(play(nodes[`finger-${side}-${i + 1}`], [{ y: `${FACE.edge}px`, height: `${FACE.fingerOver}px`, opacity: 0, offset: 0 }, { opacity: 1, offset: 0.08 }], { duration: RISE.fingersMs, easing: 'linear' }))
+      }
+    })
+    started.push(play(nodes.body, [{ transform: `translateY(${RISE.hidden}px)`, offset: 0 }], { delay: RISE.bodyDelayMs, duration: RISE.bodyMs, easing: RISE.easing, fill: 'backwards' }))
+    setArmed(true)
+    // Taken off when it is over, when reduce motion is switched on, and when the helper is left.
+    return () => started.forEach(a => a && a.cancel())
+  }, [comesUp])
+
+  const view = FACE.view
+  const pupilMask = (side, i) => {
+    const eye = FACE.eyes[i]
+    return jsx(
+      'mask',
+      {
+        id: `${uid}-pupil-${side}`,
+        maskUnits: 'userSpaceOnUse',
+        x: -100,
+        y: -200,
+        width: 400,
+        height: 600,
+        style: { maskType: 'alpha' },
+        // lift: rides up with its eye (asking). pupil-<side>: moved by the eyes tracker only, so
+        // React writes no style on it. pupil-hole-<side>: the hole itself, which can shrink.
+        children: jsx('g', {
+          'data-hh': `pupil-lift-${side}`,
+          style: { transform: `translateY(${-(i === 0 ? x.leftEyeUp : 0)}px)`, transition: glide('transform') },
+          children: jsx('g', {
+            ref: ref(`pupil-${side}`),
+            'data-hh': `pupil-${side}`,
+            children: jsx('path', {
+              ref: ref(`pupil-hole-${side}`),
+              'data-hh': `pupil-hole-${side}`,
+              d: pupilHole(eye),
+              fillRule: 'evenodd',
+              style: { ...ACCENT, transformOrigin: `${eye.cx}px ${eye.cy}px`, transform: `scale(${pupilScale(shown)})`, transition: glide('transform') }
+            })
+          })
+        })
+      },
+      side
+    )
+  }
+  const eyeShape = (side, i) =>
+    jsx(
+      'g',
+      {
+        mask: `url(#${uid}-pupil-${side})`,
+        children: jsx('ellipse', {
+          ref: ref(`eye-${side}`),
+          'data-hh': `eye-${side}`,
+          cx: FACE.eyes[i].cx,
+          cy: FACE.eyes[i].cy,
+          rx: FACE.rx,
+          ry: FACE.ry,
+          style: { ...ACCENT, transformBox: 'fill-box', transformOrigin: 'center', transform: eyeTransform(shown, i), transition: glide('transform') }
+        })
+      },
+      side
+    )
+  const finger = (side, hand, i) => {
+    const name = `finger-${side}-${i + 1}`
+    const r = fingerRect(hand, i, x.fingers[i])
+    return jsx(
+      'rect',
+      {
+        ref: ref(name),
+        'data-hh': name,
+        x: r.x,
+        width: r.width,
+        rx: r.rx,
+        style: { ...ACCENT, y: `${r.y}px`, height: `${r.height}px`, transition: reduced ? 'none' : `y ${GLIDE_MS}ms ease, height ${GLIDE_MS}ms ease` }
+      },
+      name
+    )
+  }
+
+  return jsxs('svg', {
+    ref: ref('svg'),
     role: label ? 'img' : undefined,
     'aria-label': label || undefined,
     'aria-hidden': label ? undefined : true,
-    'data-hh-character': sheet ? 'pet' : 'hand',
-    'data-pose': shown
-  }
-
-  if (sheet) {
-    return jsxs('div', {
-      ...a11y,
-      style: { position: 'relative', flex: 'none', width: Math.round(SHEET.cellW * scale), height: size },
-      children: [
-        sheet.fill ? jsx('div', { ref: fill, 'data-hh': 'pet-fill', style: spriteLayer(sheet.fill, FILL_COLOUR, { row, scale }) }, 'fill') : null,
-        jsx('div', { ref: ink, 'data-hh': 'pet-ink', style: spriteLayer(sheet.ink, INK_COLOUR, { row, scale }) }, 'ink')
-      ]
-    })
-  }
-
-  const mouth = shown === 'failed' ? 'M39.5 45h8' : 'M39 43.5q4.5 4 9 0'
-  return jsxs('svg', {
-    ...a11y,
-    viewBox: '0 0 80 80',
+    'data-hh-character': 'face',
+    'data-expression': shown,
+    'data-eyes': follows ? 'follow' : 'still',
+    'data-rising': comesUp || undefined,
+    viewBox: `${view.x} ${view.y} ${view.width} ${view.height}`,
     width: size,
-    height: size,
-    style: { display: 'block', flex: 'none' },
+    height: Math.round(((size * view.height) / view.width) * 100) / 100,
+    // Never wider than its column; nothing of it is cut (the body's small overshoot on rising);
+    // mouse presses pass through it to the message box.
+    style: { display: 'block', flex: 'none', width: size, maxWidth: '100%', height: 'auto', overflow: 'visible', pointerEvents: 'none', visibility: comesUp && !armed ? 'hidden' : undefined },
     children: [
-      jsx('defs', {
-        children: jsxs('linearGradient', {
-          id: gid,
-          x1: 0,
-          y1: 0,
-          x2: 0,
-          y2: 1,
-          children: [
-            jsx('stop', { offset: 0, style: { stopColor: mix(62) } }),
-            jsx('stop', { offset: 1, style: { stopColor: mix(80) } })
-          ]
-        })
-      }),
-      shadow ? jsx('ellipse', { cx: 42, cy: 76.5, rx: 19, ry: 2.4, style: { fill: 'var(--ui-text-primary)', opacity: 0.1 } }) : null,
-      jsx('path', { d: BODY, fill: `url(#${gid})` }),
-      jsx('path', { d: 'M22 50.5c1.6 1.3 2.6 1.9 4.4 2.4', style: { fill: 'none', stroke: 'var(--ui-accent)', strokeWidth: 1.6, strokeLinecap: 'round' } }),
-      jsx('rect', { x: 22, y: 64, width: 40, height: 9, rx: 4.5, style: { fill: mix(30) } }),
-      jsx('ellipse', { cx: 37, cy: 35, rx: 3.3, ry: 4.3, style: INK }),
-      jsx('ellipse', { cx: 50, cy: 35, rx: 3.3, ry: 4.3, style: INK }),
-      jsx('circle', { cx: 38.3, cy: 33.3, r: 1.1, style: { fill: SURFACE } }),
-      jsx('circle', { cx: 51.3, cy: 33.3, r: 1.1, style: { fill: SURFACE } }),
-      jsx('circle', { cx: 31, cy: 43.5, r: 3, style: { fill: mix(35), opacity: 0.9 } }),
-      jsx('circle', { cx: 56, cy: 43.5, r: 3, style: { fill: mix(35), opacity: 0.9 } }),
-      jsx('path', { d: mouth, style: INK_LINE })
+      jsxs('defs', { children: [jsx('clipPath', { id: `${uid}-above`, children: jsx('rect', { ...FACE.above }) }, 'above'), ...SIDES.map(pupilMask)] }, 'defs'),
+      // The body shows only above the edge, so on rising it comes out from behind the message box.
+      jsx(
+        'g',
+        {
+          clipPath: `url(#${uid}-above)`,
+          children: jsxs('g', {
+            ref: ref('body'),
+            'data-hh': 'body',
+            style: { transform: `translateY(${-x.rise}px)`, transition: glide('transform') },
+            children: [
+              ...SIDES.map(eyeShape),
+              jsx('path', { ref: ref('mouth'), 'data-hh': 'mouth', d: x.mouth, style: { ...ACCENT, d: `path("${x.mouth}")`, transition: glide('d') } }, 'mouth')
+            ]
+          })
+        },
+        'body'
+      ),
+      // The fingers are drawn last, in front, and reach 7 units below the edge, over the message
+      // box's top border.
+      ...SIDES.flatMap((side, hand) => x.fingers.map((h, i) => finger(side, hand, i)))
     ]
   })
 }

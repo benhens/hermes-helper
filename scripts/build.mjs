@@ -12,7 +12,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const ORDER = ['model-name.js', 'model-status.js', 'model-call.js', 'key-check.js', 'setup-cards.js', 'steps-data.js', 'steps.js', 'state.js', 'helper-chat.js', 'look.js', 'layout.js', 'pet-sheet.js', 'character.js', 'setup-tab.js', 'page.js', 'main.js']
+const ORDER = ['model-name.js', 'model-status.js', 'model-call.js', 'key-check.js', 'setup-cards.js', 'steps-data.js', 'steps.js', 'state.js', 'helper-chat.js', 'look.js', 'layout.js', 'expressions.js', 'eyes.js', 'motion.js', 'reveal.js', 'character.js', 'setup-tab.js', 'page.js', 'main.js']
 const ALLOWED = ['@hermes/plugin-sdk', 'react', 'react/jsx-runtime']
 const OUT = path.join(ROOT, 'desktop', 'plugin.js')
 // hhcontent's step text (a copy of the team's content/steps-v1.json) becomes src/steps-data.js, so
