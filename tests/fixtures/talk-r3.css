@@ -1,0 +1,83 @@
+/* Helper's conversation window, version 1 (his pick, 10 Nov 2026). Styles the Builder can copy.
+   The drawings in this folder are rendered with exactly this file (build.js inlines it), in headless Chromium.
+   Not run inside Hermes. Colour variables are Hermes's own names (apps/desktop/src/styles.css).
+   Sizes that the window sets itself:
+     --hh-char  width of the character: 168px, or 132px when the window is under 420px wide OR the page is under 600px high
+     --hh-k     --hh-char / 200  (0.84 or 0.66): the character's drawing scale
+     --hh-pad   side padding of the window: 20px, or 14px under 420px wide
+   Markup, top to bottom inside .hh-win:
+     .hh-conv        the conversation so far (.hh-earlier, .hh-old, .hh-me, .hh-note) and, last, .hh-bubble
+     .hh-under       svg.hh-tail + .hh-charspace (the character sits here) + .hh-answers
+     the message box (already built) */
+
+.hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}
+.hh-win.hh-narrow{--hh-pad:14px}                 /* window under 420px wide */
+.hh-win.hh-small{--hh-char:132px;--hh-k:.66}     /* window under 420px wide, or page under 600px high */
+
+/* ---- the conversation so far ---- */
+.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}
+.hh-conv>*{flex:none}
+.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}
+.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
+.hh-old-link .codicon{font-size:12px}
+.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}
+.hh-note{align-self:flex-start;margin-top:-5px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}
+.hh-earlier{align-self:flex-start;display:flex;align-items:center;gap:5px;font-size:12px;line-height:16px;color:var(--ui-text-tertiary)}
+.hh-earlier .codicon{font-size:12px}
+.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
+.hh-link:hover{text-decoration-color:currentColor}
+
+/* ---- Helper's newest sentence: the bubble ---- */
+.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}   /* no shadow: see notes.md, light theme */
+.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}
+.hh-w0{visibility:hidden}                          /* a word not said yet: it holds its place */
+.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}
+
+/* busy: a small bubble with three dots, sitting over the tail */
+.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}
+.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}
+.hh-dots i.on{background:var(--ui-text-secondary)}
+
+/* a button that opens something, inside the bubble: square, small arrow */
+.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}
+.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}
+.hh-btn:hover,.hh-btn.is-hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}
+.hh-btn:active,.hh-btn.is-down{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}
+.hh-btn.hh-pri{padding:0 12px;background:var(--dt-primary);color:var(--dt-primary-foreground);border-color:transparent}
+.hh-btn.hh-pri:hover,.hh-btn.hh-pri.is-hover{background:var(--dt-primary);filter:brightness(1.08)}
+.hh-btn.hh-pri:active,.hh-btn.hh-pri.is-down{background:var(--dt-primary);filter:brightness(.8)}
+
+/* the "Keep this?" box inside the bubble */
+.hh-keep{font-size:13px;line-height:19px;display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--ui-text-primary)}
+.hh-keep-q{font-weight:500}
+.hh-keep-row span{color:var(--ui-text-tertiary)}
+.hh-keep-sw{display:grid}.hh-keep-sw>*{grid-area:1/1}
+.hh-keep-btns{display:flex;gap:8px;margin:4px 0 2px}
+.hh-keep-done{min-height:28px;display:flex;align-items:center;margin:4px 0 2px;color:var(--ui-text-secondary)}
+.hh-keep-small{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}
+
+/* ---- under the bubble: the tail, the character's place, the answers ---- */
+.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}
+.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}
+.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}   /* 4px more for the answers, so "What Hermes remembers" stays on one line at 360 */
+/* The tail is laid out, never measured: it hangs from the top of .hh-under (1px into the bubble, in front of it)
+   and ends 108px*k above the message box, which is the top of the character between its eyes.
+   <svg class="hh-tail" viewBox="0 0 24 10" preserveAspectRatio="none">
+     <path class="hh-tail-fill" d="M6,0 L0,10 L24,0Z"/><path class="hh-tail-edge" d="M6,0 L0,10 L24,0" vector-effect="non-scaling-stroke"/></svg> */
+.hh-tail{position:absolute;z-index:2;left:calc(var(--hh-char)*.5 - 4px);top:-1px;width:24px;height:calc(100% + 1px - 108px*var(--hh-k));overflow:visible;pointer-events:none}
+.hh-tail-fill{fill:var(--ui-bg-elevated)}
+.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}
+
+/* answers to pick: the person's side, right-aligned, drawn like the person's own messages */
+.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}
+.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}
+.hh-answer:hover,.hh-answer.is-hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}
+.hh-answer:active,.hh-answer.is-down{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}
+.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+
+/* ---- the six topics, answer 2 only (two to a row, full width, above the character's row).
+   The tail has to move left so the topics do not cross it. Not needed if he picks 1. ---- */
+.hh-under.hh-two{flex-direction:column}
+.hh-two .hh-tail{left:calc(var(--hh-char)*.12 - 4px)}
+.hh-two .hh-answers{flex:none;padding:8px 0 0 calc(var(--hh-char)*.12 + 28px)}
+.hh-two .hh-charspace{height:calc(108px*var(--hh-k) + 16px)}

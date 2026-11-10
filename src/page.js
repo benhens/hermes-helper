@@ -1,65 +1,53 @@
-// The Helper page: header with two text tabs, step list, open step, helper panel.
-// B1 = the page shell; B2 = the "Your setup" cards; B3a = the native pass (hhdesign's
-// b1-design-review.md fixes) and narrow windows (src/layout.js); B3 = Setup steps 1-4 from
-// hhcontent's data (src/steps.js) and the helper panel from Pēteris's sketch. The helper's model
-// call is B4: until then everything the helper says is fixed text chosen by code (src/helper-chat.js).
-// Look: Hermes's own UI kit components (Button, Switch, Textarea, Tip, GlyphSpinner, Codicon,
-// RowButton, CopyButton) and, where Hermes has no kit component (its text tabs and vertical strips
-// aren't in the SDK), the class strings its own screens use (src/look.js). No CSS of our own.
-import { host, Button, Codicon, GlyphSpinner, RowButton, Switch, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
+// The Helper page: header with two text tabs, step list, open step, and Helper's conversation
+// window on the right.
+// B1 = the page shell; B2 = the "Your setup" cards; B3a = the native pass and narrow windows
+// (src/layout.js); B3 = Setup steps 1-4 from hhcontent's data (src/steps.js); talk v1 = Helper's
+// conversation window (design/talk-r3, version 1 of the speech bubble): the newest sentence in a
+// bubble above the character, the conversation so far above it, answers to pick beside the
+// character. What Helper says is decided by code (src/talk.js) from hhcontent's pre-written lines.
+// Look: the left side wears Hermes's own UI kit components and the class strings its own screens
+// use (K in src/look.js). Helper's window has the one style sheet of our own (src/talk.css, the T
+// table), put into a <style> element inside our own page.
+import { host, Button, Codicon, RowButton, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
-import { K, cx } from './look.js'
-import { Character, CHARACTER_PX } from './character.js'
-import { FACE, RISE, expressionFor, asksQuestion, makeBusy } from './expressions.js'
+import { K, T, cx } from './look.js'
+import { TALK_CSS } from './talk-css.js'
+import { Character } from './character.js'
+import { RISE, expressionFor, asksQuestion, makeBusy } from './expressions.js'
 import { makeEyes } from './eyes.js'
-import { makeRevealClock, Said, wordsOf } from './reveal.js'
+import { makeRevealClock, wordsOf } from './reveal.js'
 import { prefersReducedMotion, watchReducedMotion } from './motion.js'
-import { readState, otherSide } from './state.js'
-import { checkModel, NO_MODEL_LINE, NO_MODEL_SMALL, NO_MODEL_PROGRESS, NO_MODEL_BOX, CANT_CHECK_LINE, RECHECK_AFTER_MS } from './model-status.js'
+import { readState } from './state.js'
+import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
+import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { greetingEntry, answerEntry, doneEntry, typedEntries } from './helper-chat.js'
-import { makeSetupCards, renderYourSetup, PasteBox } from './setup-tab.js'
-import { layoutFor, RAIL_PX, RAIL_NUMBERS_PX, HELPER_PX } from './layout.js'
+import { freshVisit, turn, pick, pickTopic, press, skip, sayLine, lineFor, openingLine, hintFor } from './talk.js'
+import { Conversation, Bubble, BusyDots, Under, Grip } from './talk-view.js'
+import { makeSetupCards, renderYourSetup } from './setup-tab.js'
+import { layoutFor, clampHelperWidth, RAIL_PX, RAIL_NUMBERS_PX, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
 
 // Column widths (layout only; every colour, font and line comes from Hermes's classes).
 const RAIL_WIDTH = `${RAIL_PX}px`
 const RAIL_NUMBERS_WIDTH = `${RAIL_NUMBERS_PX}px`
-const HELPER_WIDTH = `${HELPER_PX}px`
-// The character's row, directly above the message box (layout only, in px like the widths above):
-// at the box's left end, 14 px in (the form's own 12 px side padding plus 14); pulled down over
-// the form's 4 px top padding and by the part of the drawing that hangs below the edge (8 of its
-// 200 units: 5.6 px at 140 px wide), so the drawing's edge line lies on the box's top border and
-// the finger ends about 5 px over it, at any CHARACTER_PX; in front of the box; mouse presses pass
-// through it to the box.
-const BELOW_EDGE_PX = ((FACE.view.y + FACE.view.height - FACE.edge) * CHARACTER_PX) / FACE.view.width
-const CHARACTER_ROW = { position: 'relative', zIndex: 1, paddingLeft: 26, paddingRight: 12, marginBottom: -(4 + BELOW_EDGE_PX), pointerEvents: 'none' }
+// One press of an arrow key on the edge to drag moves it this far.
+const GRIP_KEY_PX = 16
 // Keys that are not typing by themselves: pressing one alone does not end the word-by-word reveal.
 const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
+// The longest conversation kept in page memory.
+const LOG_MAX = 200
 
 export const TABS = [
   { id: 'setup', label: 'Setup' },
   { id: 'yours', label: 'Your setup' }
 ]
 
-function HelperIconButton({ icon, label, onClick, tip = true }) {
-  const button = jsx(Button, {
-    'aria-label': label,
-    className: K.iconTone,
-    onClick,
-    size: 'icon-sm',
-    variant: 'ghost',
-    children: jsx(Codicon, { name: icon })
-  })
-  // Hermes tips icon buttons whose job isn't on screen, but never a close X (DESIGN.md "Buttons").
-  return tip ? jsx(Tip, { label, children: button }) : button
-}
-
-// Our own page's width, from a ResizeObserver on our own element (never Hermes's markup). The ref
+// Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
 // function is made once, so React doesn't detach and re-attach it on every render; React calls it
-// with null on unmount, which stops the observer. 0 until measured, which layoutFor() reads as wide.
-function useOwnWidth() {
-  const [width, setWidth] = useState(0)
+// with null on unmount, which stops the observer. 0 until measured, which layoutFor() reads as
+// wide and high.
+function useOwnSize() {
+  const [size, setSize] = useState({ width: 0, height: 0 })
   const holder = useRef(null)
   if (!holder.current) {
     const box = { observer: null }
@@ -69,13 +57,15 @@ function useOwnWidth() {
       if (!node || typeof ResizeObserver !== 'function') return
       box.observer = new ResizeObserver(entries => {
         const entry = entries[entries.length - 1]
-        if (entry) setWidth(Math.round(entry.contentRect.width))
+        if (!entry) return
+        const next = { width: Math.round(entry.contentRect.width), height: Math.round(entry.contentRect.height) }
+        setSize(old => (old.width === next.width && old.height === next.height ? old : next))
       })
       box.observer.observe(node)
     }
     holder.current = box
   }
-  return [width, holder.current.ref]
+  return [size, holder.current.ref]
 }
 
 export function makePage(ctx) {
@@ -89,17 +79,23 @@ export function makePage(ctx) {
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
   let lastCheck = null
-  // The chat log, kept while the plugin is loaded (leaving the page and coming back keeps it;
-  // nothing is written to disk). Each entry gets an id for React's list keys.
-  let chatMemory = null
-  let nextEntryId = 1
-  let nextTurn = 1
-  // Entries added by one action share a turn (an answer and its note, a question and its reply).
-  const withIds = entries => {
-    const turn = nextTurn++
-    return entries.filter(Boolean).map(e => ({ ...e, id: nextEntryId++, turn }))
+  // The conversation, kept while the plugin is loaded (leaving the page and coming back keeps
+  // it). Nothing of it is written anywhere: it is gone when Hermes restarts. visit = what Helper
+  // knows in this visit (src/talk.js); log = what was said, each entry with an id; typed = the
+  // message that led to "Which one do you mean?".
+  let memory = null
+  const remembered = () => {
+    if (!memory) {
+      memory = { visit: freshVisit('name'), log: [], nextId: 1, typed: '' }
+      memory.log = [helperEntry(openingLine())]
+    }
+    return memory
   }
-  const LOG_MAX = 200
+  const helperEntry = said => {
+    const id = memory.nextId++
+    return { id, key: `h${id}`, who: 'helper', opened: false, ...said }
+  }
+  const youEntry = text => ({ id: memory.nextId++, who: 'you', text })
   // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
   const openDocs = url => {
     if (!isDocsUrl(url)) return
@@ -144,13 +140,14 @@ export function makePage(ctx) {
 
   return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
-    const [side, setSide] = useState(initial.side)
-    const [helper, setHelper] = useState(initial.helper)
     const [tab, setTab] = useState(initial.tab)
     const [step, setStep] = useState(initial.step)
-    const [chatlog, setChatlog] = useState(initial.chatlog)
     const [answers, setAnswers] = useState(initial.answers)
-    const [log, setLog] = useState(() => chatMemory || (chatMemory = withIds([greetingEntry()])))
+    // The width the person dragged Helper's window to (remembered), and whether Helper is folded
+    // away to its strip (not remembered: it starts open, so the greeting is seen first).
+    const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
+    const [folded, setFolded] = useState(false)
+    const [log, setLog] = useState(() => remembered().log)
     // The person's "reduce motion" setting, watched for changes. With it on the character neither
     // moves nor rises, and every line appears whole: a new line is never "fresh" (say(), below),
     // and a line that is appearing when the setting is switched on shows its rest at once (here;
@@ -181,78 +178,71 @@ export function makePage(ctx) {
     useEffect(() => () => eyes.current.stop(), [])
     // True once the character has come up after the helper opened (see the effect below).
     const risen = useRef(false)
-    // When the model-check line (no model / can't check) appeared: the last log entry then.
-    const statusSeen = useRef({ kind: null, after: 0 })
     const [draft, setDraft] = useState('')
     const [focusAsk, setFocusAsk] = useState(false)
     const [focusStrip, setFocusStrip] = useState(false)
-    // The person opened the helper from its strip while the window is too narrow for the column:
-    // it then lies over the page. Not saved: it ends when the window is wide enough again.
-    const [peek, setPeek] = useState(false)
-    const [width, measureRef] = useOwnWidth()
+    const [size, measureRef] = useOwnSize()
+    const width = size.width
     const [modelStatus, recheck] = useModelStatus()
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
-    // The helper's scrolling area: kept at the bottom, where the newest words are.
+    // The conversation's scrolling area: kept at the bottom, where the newest words are.
     const helperScroll = useRef(null)
     const stripButton = useRef(null)
-    // One ref function per tab, made once (like useOwnWidth's), kept with the tab buttons.
+    // Where a drag of Helper's edge began: { x, width }.
+    const drag = useRef(null)
+    // One ref function per tab, made once (like useOwnSize's), kept with the tab buttons.
     const tabRefs = useRef(null)
     if (!tabRefs.current) {
       const els = {}
       tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
     }
 
-    const fit = layoutFor({ width, tab, helper, peek })
+    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded })
 
     const keep = (key, setter) => value => {
       setter(value)
       ctx.storage.set(key, value)
     }
-    const saveSide = keep('side', setSide)
-    const saveHelper = keep('helper', setHelper)
     const saveTab = keep('tab', setTab)
     const saveStep = keep('step', setStep)
-    const saveChatlog = keep('chatlog', setChatlog)
 
-    // "Ask about this step" focuses the message box once it is on screen; a request that finds no
-    // box (no model) is dropped, so it can't steal focus later.
+    // The message box takes the keyboard when asked to (a pick, "Ask about this step", Helper
+    // opened from its strip); a request that finds no box is dropped, so it can't steal focus later.
     useEffect(() => {
       if (!focusAsk) return
       if (askBox.current) askBox.current.focus()
       setFocusAsk(false)
     }, [focusAsk])
 
-    // Closing the helper that lay over the page hands the keyboard back to the strip.
+    // Folding Helper away hands the keyboard back to the strip.
     useEffect(() => {
       if (!focusStrip) return
       if (stripButton.current) stripButton.current.focus()
       setFocusStrip(false)
     }, [focusStrip])
 
-    // The window got wide enough for the column: an open "over the page" ends. Only a change of
-    // width ends it, so switching tabs in a narrow window keeps the helper the person opened.
+    // The window got wide enough for both sides: a folded Helper comes back as its column. Only a
+    // change of width does this, so the one place that folds Helper (foldHelper) stays in charge.
     useEffect(() => {
-      if (peek && !fit.narrow) setPeek(false)
+      if (folded && !fit.narrow) setFolded(false)
     }, [width])
 
     const currentStep = stepByNumber(step) || STEPS[0]
-    const noModel = modelStatus.state === 'none'
-    const helperShown = fit.helper === 'open' || fit.helper === 'over'
+    const helperShown = fit.helper !== 'strip'
 
-    function addToLog(entries) {
-      const fresh = withIds(entries)
-      if (!fresh.length) return
-      setLog(old => (chatMemory = [...old, ...fresh].slice(-LOG_MAX)))
+    // The one place that puts Helper away or brings it back. Today only the strip calls it, in a
+    // window too narrow for both sides (src/layout.js).
+    function foldHelper(away) {
+      setFolded(away)
+      if (away) setFocusStrip(true)
+      else setFocusAsk(true)
     }
 
-    // The helper comes on screen (the page opens with it, or the person opens it from the strip or
-    // "Show helper"): the character rises from behind the message box, once, and Helper's words
-    // wait until it is up. Not on a tab change that leaves the helper on screen. (In a window so
-    // narrow that the helper is folded away on Setup but has its column on Your setup, changing
-    // the tab does bring it on screen, so it rises then too.) `risen` keeps a later redraw from
-    // asking for the rising again. Declared before the effect that hands the
-    // clock its lines, so the wait is in place first.
+    // Helper comes on screen (the page opens with it, or the person opens it from the strip): the
+    // character rises from behind the message box, once, and Helper's words wait until it is up.
+    // Not on a tab change. `risen` keeps a later redraw from asking for the rising again.
+    // Declared before the effect that hands the clock its lines, so the wait is in place first.
     useEffect(() => {
       if (!helperShown) return
       if (reduced) {
@@ -273,8 +263,8 @@ export function makePage(ctx) {
       }
     }, [helperShown])
 
-    // What Helper is saying on screen right now, in reading order (filled while the words are
-    // drawn below); after every draw the clock hears it and reveals what is new, word by word.
+    // What Helper is saying on screen right now (filled while the bubble is drawn below); after
+    // every draw the clock hears it and reveals what is new, word by word.
     const saidNow = []
     useEffect(() => {
       clock.show(helperShown ? saidNow : [])
@@ -284,67 +274,114 @@ export function makePage(ctx) {
     // reduce motion. src/character.js.)
     const busyNow = calls > 0
 
-    // Something new was said, the log was switched on, or the helper came back: show the newest
-    // words, at the bottom of the helper's scrolling area.
+    // Something new was said, or Helper came back: show the newest of the conversation so far.
     useEffect(() => {
       const el = helperScroll.current
       if (el) el.scrollTop = el.scrollHeight
-    }, [log.length, chatlog, helperShown, modelStatus.state])
+    }, [log.length, helperShown])
 
-    // Picking an answer: saved, and the helper says "Your answer: …" with the fact it points to.
+    /* ---------- the conversation: what the person does, what Helper says back ---------- */
+    const visit = remembered().visit
+    function addToLog(entries) {
+      setLog(old => (memory.log = [...old, ...entries].slice(-LOG_MAX)))
+    }
+    // Helper's answer to something the person did. shown: the person's side of it, as their message.
+    function answer(result, shown, typed = '') {
+      if (!result) return
+      addToLog([shown ? youEntry(shown) : null, helperEntry(lineFor(result, visit, typed))].filter(Boolean))
+      setFocusAsk(true)
+    }
+
+    // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
+    // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
+    function send() {
+      const typed = draft
+      if (!typed.trim()) return
+      setDraft('')
+      const result = turn(typed, visit)
+      memory.typed = typed
+      const chars = Array.from(typed.trim())
+      const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
+      answer(result, result.kind === 'K1' ? null : shown, typed)
+    }
+
+    // An answer or a topic picked under Helper's line: it becomes the person's message, and Helper
+    // answers at once. The pick goes by its id, never through the key words.
+    function pickAnswer(item) {
+      const result = item.answer ? pick(item.answer[0], item.answer[1], visit) : item.which ? press(item.which, memory.typed, visit) : pickTopic(item.topic, visit)
+      answer(result, item.label)
+    }
+
+    // A button in a Helper line: text to paste opens under it (and closes again); a part opens
+    // Hermes's own screen; a line makes Helper say one more pre-written line.
+    function pressNext(entry) {
+      const next = entry.next
+      if (!next) return
+      if (next.kind === 'paste') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
+      if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
+      if (next.kind === 'part') {
+        try {
+          host.navigate(next.to)
+        } catch {}
+      }
+    }
+
+    // Skip, at "What's your name?" and "What do you do?".
+    function skipOpening() {
+      answer(skip(visit), 'Skip')
+    }
+
+    // Picking an answer on a step: saved. Helper stays silent: its lines come from the conversation only.
     function choose(option) {
       if (answers[currentStep.id] === option.id) return
       const next = { ...answers, [currentStep.id]: option.id }
       setAnswers(next)
       ctx.storage.set('answers', next)
-      addToLog([answerEntry(currentStep, option.id)])
     }
 
     // "I understand, next step": the step's next_rule picks the next step (code, not the model).
-    // After the last step the helper says so once.
+    // After the last step it opens Your setup.
     function finishStep() {
       const to = nextAfter(currentStep, answers[currentStep.id])
       if (to !== 'done') return saveStep(to)
-      if (!(chatMemory || log).some(e => e.kind === 'done')) addToLog([doneEntry()])
+      saveTab('yours')
     }
 
-    // The message box: Send or Enter (Shift+Enter makes a new line). Code checks the words in
-    // build-v1.md section 7's order (src/helper-chat.js); nothing goes to a model in B3.
-    function send() {
-      if (noModel) return
-      const entries = typedEntries(draft, { step: currentStep, answers })
-      if (!entries.length) return
-      setDraft('')
-      addToLog(entries)
-    }
-
-    // Show the helper (strip, "Show helper", "Ask about this step"). In a window too narrow for
-    // its column it opens over the page, with the keyboard in its message box. A helper the
-    // person hid stays saved as hidden then, so it doesn't come back as a column by itself later.
-    function openHelper() {
-      const narrow = layoutFor({ width, tab, helper: 'open' }).narrow
-      if (helper === 'closed' || (helper === 'hidden' && !narrow)) saveHelper('open')
-      if (narrow) {
-        setPeek(true)
-        setFocusAsk(true)
-      }
-    }
-
+    // "Ask about this step": the keyboard goes to the message box; a folded Helper opens first.
     function askAboutStep() {
-      openHelper()
+      if (folded) setFolded(false)
       setFocusAsk(true)
     }
 
-    // Hide from the panel. Over the page, only that view ends (Hide, or Escape): the saved
-    // choice stays as it was, and the keyboard goes back to the strip.
-    function hideHelper() {
-      if (fit.helper === 'over') {
-        setPeek(false)
-        setFocusStrip(true)
-      } else saveHelper('hidden')
+    /* ---------- Helper's edge to drag: between 360 and 600 px, remembered ---------- */
+    function gripDown(e) {
+      if (e.button !== undefined && e.button !== 0) return
+      e.preventDefault()
+      drag.current = { x: e.clientX, width: fit.helperPx }
+      if (e.currentTarget && e.currentTarget.setPointerCapture && e.pointerId !== undefined) e.currentTarget.setPointerCapture(e.pointerId)
+    }
+    function gripMove(e) {
+      if (!drag.current) return
+      // The edge is on the left: moving it left makes Helper wider.
+      setHelperWidth(clampHelperWidth(drag.current.width + (drag.current.x - e.clientX)))
+    }
+    function gripUp(e) {
+      if (!drag.current) return
+      const final = clampHelperWidth(drag.current.width + (drag.current.x - e.clientX))
+      drag.current = null
+      setHelperWidth(final)
+      ctx.storage.set('helperWidth', final)
+    }
+    function gripKey(e) {
+      const to = { ArrowLeft: fit.helperPx + GRIP_KEY_PX, ArrowRight: fit.helperPx - GRIP_KEY_PX, Home: HELPER_MAX_PX, End: HELPER_MIN_PX }[e.key]
+      if (to === undefined) return
+      e.preventDefault()
+      const final = clampHelperWidth(to)
+      setHelperWidth(final)
+      ctx.storage.set('helperWidth', final)
     }
 
-    /* ---------- header: the two text tabs, "Show helper" when the helper is closed ---------- */
+    /* ---------- header: the two text tabs ---------- */
     // Arrow keys move between the tabs, Home and End go to the first and last (DESIGN.md,
     // Keyboard: one entry point at the selected tab; WAI-ARIA tabs pattern).
     function onTabKey(e, index) {
@@ -386,20 +423,7 @@ export function makePage(ctx) {
       })
     })
 
-    const header = jsxs('div', {
-      className: K.head,
-      'data-hh': 'header',
-      children: [
-        tabRow,
-        jsx('div', {
-          className: K.headEnd,
-          children:
-            helper === 'closed'
-              ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: openHelper, children: 'Show helper' })
-              : null
-        })
-      ]
-    })
+    const header = jsx('div', { className: K.head, 'data-hh': 'header', children: tabRow })
 
     /* ---------- step list (numbers only when the window is narrow) ---------- */
     const numbersOnly = fit.rail === 'numbers'
@@ -494,9 +518,7 @@ export function makePage(ctx) {
         className: K.actions,
         children: [
           jsx(Button, { size: 'sm', onClick: finishStep, children: 'I understand, next step' }),
-          !noModel && helper !== 'closed'
-            ? jsx(Button, { variant: 'secondary', size: 'sm', onClick: askAboutStep, children: 'Ask about this step' })
-            : null
+          jsx(Button, { variant: 'secondary', size: 'sm', onClick: askAboutStep, children: 'Ask about this step' })
         ]
       },
       'actions'
@@ -667,243 +689,125 @@ export function makePage(ctx) {
       'main'
     )
 
-    /* ---------- helper panel (Pēteris's sketch, inputs/pb-sketch-9nov-helper-chat.png) ---------- */
-    // "Check again" is always secondary: the step's own button is the screen's one primary button.
-    const checkAgain = () =>
-      jsx(Button, { variant: 'secondary', size: 'sm', disabled: modelStatus.state === 'checking', onClick: () => recheck(), children: 'Check again' }, 'again')
-
-    // What the page itself has to say about the model check: no model (content/v1-strings.md part 1)
-    // or the check failed (its "Can't check right now"). It counts as said when it appeared, so
-    // anything the person does afterwards (an answer, a pasted key) still shows as the newest.
-    const statusEntry = noModel
-      ? { id: 'status', who: 'helper', kind: 'no-model', lines: [NO_MODEL_LINE], small: NO_MODEL_SMALL, action: 'recheck' }
-      : modelStatus.state === 'error'
-        ? { id: 'status', who: 'helper', kind: 'error', lines: [CANT_CHECK_LINE], action: 'recheck' }
-        : null
-    const statusKind = statusEntry ? statusEntry.kind : null
-    if (statusSeen.current.kind !== statusKind) statusSeen.current = { kind: statusKind, after: log.length ? log[log.length - 1].id : 0 }
-    const statusAfter = statusSeen.current.after
-
-    // One line Helper says, revealed word by word (src/reveal.js) and noted for the clock. Lines
-    // of the newest turn are fresh: they are revealed. An older line met for the first time (the
-    // Chat log switched on later) is shown whole.
-    const say = (e, part, line, className, fresh) => {
-      const key = `${e.id}${e.id === 'status' ? '-' + e.kind : ''}:${part}`
-      // Under reduce motion no line is fresh: it is whole from its first draw.
-      const appears = fresh && !reduced
-      saidNow.push({ key, words: wordsOf(line).length, fresh: appears, text: line })
-      return jsx(Said, { clock, id: key, text: line, className, fresh: appears }, part)
+    /* ---------- Helper's conversation window (design/talk-r3, version 1 of the speech bubble) ---------- */
+    // The newest thing said is Helper's: it is in the bubble, and everything before it is the
+    // conversation so far. (While Helper works on an answer the newest thing is the person's
+    // message; then the bubble is the three dots.)
+    const newest = log[log.length - 1]
+    const inBubble = newest && newest.who === 'helper' ? newest : null
+    const older = inBubble ? log.slice(0, -1) : log
+    // The line appears word by word (src/reveal.js) unless reduce motion is on: then it is whole
+    // from its first draw. said = all of it is on screen: answers and buttons wait for that.
+    const fresh = !reduced
+    let said = true
+    if (inBubble) {
+      const words = wordsOf(inBubble.text).length
+      saidNow.push({ key: inBubble.key, words, fresh, text: inBubble.text })
+      said = clock.shown(inBubble.key, words, fresh) >= words
     }
-
-    // One thing the helper (or the person) said, as plain text: no bubble, no card. Helper's texts
-    // appear in order: its lines, then its small note; the person's own words appear at once, and
-    // so do buttons, links and text to paste.
-    const entryParts = (e, fresh) => {
-      const you = e.who === 'you'
-      const parts = e.lines.map((line, i) => (you ? jsx('p', { className: K.logYou, children: line }, 'l' + i) : say(e, 'l' + i, line, K.say, fresh)))
-      if (e.small) parts.push(say(e, 'small', e.small, K.caption, fresh))
-      if (e.fact) parts.push(say(e, 'fact', e.fact.text, K.caption, fresh), jsx('div', { children: factSource(e.fact) }, 'fact-src'))
-      if (e.paste) parts.push(jsx(PasteBox, { text: e.paste, label: 'Copy' }, 'paste'))
-      if (e.after) parts.push(say(e, 'after', e.after, K.say, fresh))
-      if (e.link) parts.push(jsx('div', { children: sourceLink(e.link, e.link, 'link') }, 'link'))
-      if (e.action === 'recheck') parts.push(jsx('div', { className: K.sayActions, children: checkAgain() }, 'act'))
-      if (e.action === 'yours')
-        parts.push(jsx('div', { className: K.sayActions, children: jsx(Button, { variant: 'secondary', size: 'sm', onClick: () => saveTab('yours'), children: 'Your setup' }) }, 'act'))
-      return parts
-    }
-
-    const contextLine = (icon, text, spinning) =>
-      jsxs(
-        'div',
-        {
-          className: K.scaffold,
-          role: 'status',
-          children: [jsx('span', { className: K.scaffoldGlyph, children: spinning ? jsx(GlyphSpinner, {}) : jsx(Codicon, { name: icon, size: '0.875rem' }) }), jsx('span', { className: K.truncate, children: text })]
-        },
-        'where'
-      )
-
-    // The step list's short title, as in the sketch ("On step 2: The brain"); the full title is the
-    // open step's heading.
-    const where = tab === 'setup' ? `On step ${currentStep.number}: ${railLines(currentStep).title}` : setup.bots.length > 1 ? `On Your setup, bot ${setup.bot}` : 'On Your setup'
-    const topLine = noModel
-      ? contextLine('info', NO_MODEL_PROGRESS, false)
-      : modelStatus.state === 'checking'
-        ? contextLine('', 'Checking your model', true)
-        : modelStatus.state === 'error'
-          ? null
-          : contextLine('location', where, false)
-
-    // Chat log off: only the newest thing the helper said. On: the whole back-and-forth, newest at
-    // the bottom. Either way it sits low in the panel with empty space above it.
-    // Fresh = part of the newest thing said (the newest turn, or the model-check line while nothing
-    // was said after it): these are the lines that appear word by word.
-    const newestTurn = log.length ? log[log.length - 1].turn : null
-    const statusNewest = !!statusEntry && !log.some(e => e.id > statusAfter)
-    const isFresh = e => (e.id === 'status' ? statusNewest : e.turn === newestTurn)
-    let wordsView
-    if (chatlog) {
-      const entries = statusEntry ? [...log.filter(e => e.id <= statusAfter), statusEntry, ...log.filter(e => e.id > statusAfter)] : log
-      wordsView = jsx(
-        'ol',
-        {
-          className: K.log,
-          'data-hh': 'chatlog',
-          'aria-label': 'Chat log',
-          'aria-live': 'polite',
-          children: entries.map(e =>
-            jsxs(
-              'li',
-              {
-                className: K.logEntry,
-                'data-who': e.who,
-                'data-kind': e.kind,
-                children: [jsx('span', { className: K.logWho, children: e.who === 'you' ? 'You' : 'Helper' }, 'who'), jsx('div', { className: K.sayStack, children: entryParts(e, isFresh(e)) }, 'what')]
-              },
-              e.id
-            )
-          )
-        },
-        'log'
-      )
-    } else {
-      // The newest turn's helper lines (an answer with its note, a reply after a long message); the
-      // model-check line when nothing was said since it appeared.
-      const fromHelper = log.filter(e => e.turn === newestTurn && e.who === 'helper')
-      const shown = statusNewest ? [statusEntry] : fromHelper.length ? fromHelper : [log[log.length - 1]]
-      wordsView = jsx(
-        'div',
-        {
-          className: K.sayStack,
-          'data-hh': 'say',
-          'data-kind': shown[shown.length - 1].kind,
-          'aria-live': 'polite',
-          children: shown.map(e => jsx('div', { className: K.sayStack, children: entryParts(e, isFresh(e)) }, e.id))
-        },
-        'say'
-      )
-    }
-    const helperBody = [topLine, jsx('div', { className: K.helperNewest, 'data-hh': 'helper-newest', children: wordsView }, 'newest')]
-
-    // Which expression the character shows (src/expressions.js). Asking: the last thing Helper
-    // said ends with a question mark and all of it is on screen.
-    const lastSaid = saidNow.length ? saidNow[saidNow.length - 1] : null
-    const question = !!lastSaid && asksQuestion(lastSaid.text) && clock.shown(lastSaid.key, lastSaid.words, lastSaid.fresh) >= lastSaid.words
+    // Which expression the character shows (src/expressions.js). Asking: Helper's newest line
+    // ends with a question mark and all of it is on screen.
+    const question = !!inBubble && said && asksQuestion(inBubble.text)
     const expression = expressionFor({ revealing, busy: busyNow, question })
+    const toPick = inBubble && inBubble.answers && inBubble.answers.items.length ? inBubble.answers : null
+    // "Skip" shows only while one of the opening's two questions is the open one.
+    const openingOpen = !!inBubble && (inBubble.line === 'OPEN' || inBubble.line === 'F1')
 
-    // The character has its own row directly above the message box, at the box's left end, its
-    // finger ends over the box's top border (CHARACTER_ROW). It rises when the helper opens.
-    const characterRow = jsx(
-      'div',
-      {
-        className: K.characterRow,
-        style: CHARACTER_ROW,
-        'data-hh': 'character',
-        children: jsx(Character, { size: CHARACTER_PX, expression, rising: !risen.current, reduced, eyes: eyes.current })
-      },
-      'character'
-    )
+    // The character sits on the message box's top edge (placed by src/talk.css). It rises when
+    // Helper comes on screen.
+    const character = jsx(Character, { size: fit.characterPx, expression, rising: !risen.current, reduced, eyes: eyes.current })
 
     // A rounded box that grows as you type, and a round send button on its right, like Hermes's
-    // own composer. No model name and no microphone (no documented voice door for plugin pages).
-    // With no model the box stays, empty and greyed, with hhdesign's words.
-    const composer = jsx('form', {
-      className: K.composerForm,
-      onSubmit: e => {
-        e.preventDefault()
-        send()
+    // own composer. It works without a model: picks and key words need none.
+    const composer = jsx(
+      'form',
+      {
+        onSubmit: e => {
+          e.preventDefault()
+          send()
+        },
+        'data-hh': 'composer',
+        children: jsxs('div', {
+          className: cx(K.composerSurface, composerSurfaceRing),
+          children: [
+            jsx('div', { 'aria-hidden': true, className: composerInputBacking }, 'backing'),
+            jsxs(
+              'div',
+              {
+                className: K.composerRow,
+                children: [
+                  jsx(
+                    'div',
+                    {
+                      className: K.composerInputCell,
+                      children: jsx(Textarea, {
+                        ref: askBox,
+                        rows: 1,
+                        className: K.composerInput,
+                        value: draft,
+                        // The whole text is kept: the pasted-key check reads all of it (src/key-check.js).
+                        onChange: e => setDraft(e.target.value),
+                        onKeyDown: e => {
+                          if (e.key !== 'Enter' || e.shiftKey || (e.nativeEvent && e.nativeEvent.isComposing)) return
+                          e.preventDefault()
+                          send()
+                        },
+                        placeholder: hintFor(inBubble),
+                        'aria-label': 'Message to Helper'
+                      })
+                    },
+                    'input'
+                  ),
+                  openingOpen ? jsx('button', { type: 'button', className: T.skip, 'data-hh': 'skip', onClick: skipOpening, children: 'Skip' }, 'skip') : null,
+                  jsx(
+                    Button,
+                    {
+                      'aria-label': 'Send',
+                      className: cx(PRIMARY_ICON_BTN, K.composerSend),
+                      disabled: !draft.trim(),
+                      type: 'submit',
+                      children: jsx(Codicon, { name: 'arrow-up', size: '0.875rem' })
+                    },
+                    'send'
+                  )
+                ]
+              },
+              'row'
+            )
+          ]
+        })
       },
-      'data-hh': 'composer',
-      children: jsxs('div', {
-        className: cx(K.composerSurface, composerSurfaceRing),
-        children: [
-          jsx('div', { 'aria-hidden': true, className: composerInputBacking }),
-          jsxs('div', {
-            className: K.composerRow,
-            children: [
-              jsx('div', {
-                className: K.composerInputCell,
-                children: jsx(Textarea, {
-                  ref: askBox,
-                  rows: 1,
-                  className: K.composerInput,
-                  disabled: noModel,
-                  value: noModel ? '' : draft,
-                  // The whole text is kept: the pasted-key check reads all of it before the
-                  // 500-character cut (src/key-check.js).
-                  onChange: e => setDraft(e.target.value),
-                  onKeyDown: e => {
-                    if (e.key !== 'Enter' || e.shiftKey || (e.nativeEvent && e.nativeEvent.isComposing)) return
-                    e.preventDefault()
-                    send()
-                  },
-                  placeholder: noModel ? NO_MODEL_BOX : tab === 'setup' ? 'Ask about this step' : 'Ask about your setup',
-                  'aria-label': 'Ask the helper'
-                })
-              }),
-              jsx(Button, {
-                'aria-label': 'Send',
-                className: cx(PRIMARY_ICON_BTN, K.composerSend),
-                disabled: noModel || !draft.trim(),
-                type: 'submit',
-                children: jsx(Codicon, { name: 'arrow-up', size: '0.875rem' })
-              })
-            ]
-          })
-        ]
-      })
-    })
+      'composer'
+    )
 
     let helperArea = null
-    if (fit.helper === 'open' || fit.helper === 'over') {
+    if (helperShown) {
       const over = fit.helper === 'over'
       helperArea = jsxs(
         'div',
         {
-          className: cx(K.helper, over && K.helperOver, over && (side === 'right' ? K.helperOverRight : K.helperOverLeft)),
-          style: { width: over && width ? `${Math.min(HELPER_PX, width)}px` : HELPER_WIDTH },
+          className: cx(T.win, fit.tight && T.winTight, fit.small && T.winSmall, over && T.winOver),
+          // Over a narrow page it leaves the strip free, and keeps its fill under Hermes's
+          // see-through look (data-glass-opaque is Hermes's own switch for that).
+          style: over ? { width: `${fit.helperPx}px`, right: `${STRIP_PX}px` } : { width: `${fit.helperPx}px` },
           role: 'complementary',
           'aria-label': 'Helper',
           'data-hh': 'helper',
           'data-over': over,
-          // Escape closes the helper that lies over the page (as Hermes's own overlays do).
+          'data-glass-opaque': over ? '' : undefined,
+          // Escape folds the helper that lies over the page (as Hermes's own overlays do).
           onKeyDown: over
             ? e => {
                 if (e.key !== 'Escape') return
                 e.preventDefault()
-                hideHelper()
+                foldHelper(true)
               }
             : undefined,
           children: [
-            jsxs('div', {
-              className: K.helperTop,
-              children: [
-                jsx(Switch, { size: 'xs', checked: chatlog, onCheckedChange: v => saveChatlog(v === true), 'aria-label': 'Chat log' }),
-                jsx('span', { className: K.helperTopLabel, children: 'Chat log' }),
-                jsxs('div', {
-                  className: K.headEnd,
-                  children: [
-                    jsx(HelperIconButton, {
-                      icon: 'arrow-swap',
-                      label: side === 'right' ? 'Move to the left' : 'Move to the right',
-                      onClick: () => saveSide(otherSide(side))
-                    }),
-                    jsx(HelperIconButton, { icon: side === 'right' ? 'chevron-right' : 'chevron-left', label: 'Hide the helper', onClick: hideHelper }),
-                    jsx(HelperIconButton, {
-                      icon: 'close',
-                      label: 'Close the helper',
-                      tip: false,
-                      onClick: () => {
-                        setPeek(false)
-                        saveHelper('closed')
-                      }
-                    })
-                  ]
-                })
-              ]
-            }),
-            jsx('div', { className: K.helperBody, ref: helperScroll, 'data-hh': 'helper-body', children: helperBody }),
-            characterRow,
+            fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onKey: gripKey }, 'grip') : null,
+            jsx(Conversation, { entries: older, onNext: pressNext, scrollRef: helperScroll }, 'conversation'),
+            inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { lit: 0 }, 'bubble'),
+            jsx(Under, { character, answers: toPick, said, onPick: pickAnswer }, 'under'),
             composer
           ]
         },
@@ -911,33 +815,45 @@ export function makePage(ctx) {
       )
     }
 
-    // Hidden (by the person, or folded by the page in a narrow window): a thin full-height strip at
-    // the helper's edge with HELPER written down it; the whole strip opens the helper (fix 4).
+    // The "Helper" strip at the page's right edge, written down it, in a window too narrow for
+    // both sides: it folds Helper away and brings it back. It stays clear of Hermes's title-bar
+    // band, where Hermes's own window buttons float.
     const strip =
-      fit.helper === 'strip' || fit.helper === 'over'
+      fit.helper !== 'column'
         ? jsxs(
             'button',
             {
               type: 'button',
               className: K.strip,
-              'aria-label': 'Show the helper',
-              'data-hh': 'helper-hidden',
+              style: { paddingTop: 'calc(var(--titlebar-height) + 0.75rem)' },
+              'aria-label': folded ? 'Show the helper' : 'Hide the helper',
+              'aria-expanded': !folded,
+              'data-hh': 'helper-strip',
               ref: stripButton,
-              'data-folded': fit.folded,
-              onClick: openHelper,
-              children: [jsx(Codicon, { name: side === 'right' ? 'chevron-left' : 'chevron-right', size: '0.875rem' }), jsx('span', { className: K.stripLabel, children: 'Helper' })]
+              onClick: () => foldHelper(!folded),
+              children: [jsx(Codicon, { name: folded ? 'chevron-left' : 'chevron-right', size: '0.875rem' }, 'icon'), jsx('span', { className: K.stripLabel, children: 'Helper' }, 'label')]
             },
             'strip'
           )
         : null
 
-    const columns = tab === 'setup' ? [rail, main] : [main]
-    const edge = fit.helper === 'over' ? [strip] : [strip || helperArea]
+    // The left side: the tabs, and under them the step list and the open step (or Your setup).
+    const left = jsxs(
+      'div',
+      {
+        className: K.left,
+        'data-hh': 'left',
+        children: [header, jsx('div', { className: K.body, 'data-hh': 'body', children: tab === 'setup' ? [rail, main] : [main] }, 'body')]
+      },
+      'left'
+    )
     return jsxs('div', {
       className: K.root,
+      ref: measureRef,
       'data-hh': 'page',
-      // The measured width, for the screenshot checks (dev/checks/b3a-shots).
+      // The measured size, for the real-app checks (dev/checks/talk-v1).
       'data-width': width,
+      'data-height': size.height,
       // The eyes (src/eyes.js) hear the cursor, the keyboard's focus and scrolling from this box
       // only, never from the Hermes window: so they follow only while the cursor is over our page.
       onPointerMove: e => eyes.current.pointerMove(e.clientX, e.clientY),
@@ -952,15 +868,8 @@ export function makePage(ctx) {
         if (!LONE_KEYS.includes(e.key)) clock.finishAll()
       },
       onPointerDownCapture: () => clock.finishAll(),
-      children: [
-        header,
-        jsx('div', {
-          className: K.body,
-          ref: measureRef,
-          'data-hh': 'body',
-          children: [...(side === 'left' ? [...edge, ...columns] : [...columns, ...edge]), fit.helper === 'over' ? helperArea : null]
-        })
-      ]
+      // Our one style sheet (src/talk.css) lives inside our own page, so it leaves with the page.
+      children: [jsx('style', { 'data-hh': 'talk-css', children: TALK_CSS }, 'css'), left, strip, helperArea]
     })
   }
 }

@@ -5,7 +5,6 @@ import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, mount, settle, all, text, byData, byLabel, click } from './lib/render.mjs'
 import { rpcError } from './lib/fake-request.mjs'
-import { withPickedGreeting } from './lib/picked-greeting.mjs'
 import { DEFAULT_SOULS } from '../src/setup-cards.js'
 
 let calls
@@ -297,7 +296,8 @@ test('Hermes switches to another bot while the tab is open: the old answers go, 
   assert.equal(status(view, 'soul'), 'notset')
   globalThis.__hhHost.profile = 'work'
   // Any re-render reads the new running bot (in Hermes the atom change re-renders the page).
-  all(view.tree, n => n.type === 'sdk:Switch')[0].props.onCheckedChange(false)
+  const box = all(view.tree, n => n.type === 'sdk:Textarea')[0]
+  box.props.onChange({ target: { value: box.props.value } })
   await settle(10)
   assert.equal(status(view, 'soul'), 'works')
   assert.deepEqual(calls.filter(c => c.method === 'profiles.describe').at(-1).params, { name: 'work' })
@@ -367,17 +367,20 @@ test('card 3 after card 2 turns not-ok: the Try again button can\'t be pressed',
 
 /* ---------- the character's busy expression: the page's busy value, raised by this card's model call ---------- */
 const expression = view => all(byData(view.tree, 'helper'), n => n.props['data-hh-character'])[0].props['data-expression']
+// What the character shows when no call runs and nothing is being said: the opening is a question
+// and stays Helper's newest line in these tests, so it is the asking face.
+const NO_CALL = 'asking'
 const eyesNow = view => all(byData(view.tree, 'helper'), n => n.props['data-hh-character'])[0].props['data-eyes']
 // n ticks of the helper's word clock only (120 ms each); the card's seconds counter is left alone
 const wordTicks = (timers, n) => {
   for (let i = 0; i < n; i++) [...timers.intervals].filter(e => e.ms === 120).forEach(e => e.fn())
 }
 
-test('busy: while the model call of "The model answers" runs, the character shows busy; when the answer is in, it rests again', async () => {
+test('busy: while the model call of "The model answers" runs, the character shows busy; when the answer is in, busy ends', async () => {
   let answer
   const { view, timers } = await openYours({ oneshot: () => new Promise(r => (answer = r)) })
-  wordTicks(timers, 40) // the greeting is out, so nothing else decides the expression
-  assert.equal(expression(view), 'resting')
+  wordTicks(timers, 40) // the opening is out, so nothing else decides the expression
+  assert.equal(expression(view), NO_CALL)
   click(byLabel(card(view, 'answers'), 'Check'))
   await settle(2)
   assert.equal(status(view, 'answers'), 'checking')
@@ -388,7 +391,7 @@ test('busy: while the model call of "The model answers" runs, the character show
   answer({ text: 'OK' })
   await settle()
   assert.equal(status(view, 'answers'), 'works')
-  assert.equal(expression(view), 'resting')
+  assert.equal(expression(view), NO_CALL)
   assert.equal(eyesNow(view), 'follow')
 })
 
@@ -404,13 +407,13 @@ test('busy: the 60-second "trying again" countdown is part of the same wait', as
   assert.equal(expression(view), 'busy')
   await settle(200)
   assert.equal(status(view, 'answers'), 'works')
-  assert.equal(expression(view), 'resting')
+  assert.equal(expression(view), NO_CALL)
 })
 
 test('busy and words at once: talking while words appear, busy again when they are out; a question shows asking only once the call has ended', async () => {
   let answer
   useHost({ oneshot: () => new Promise(r => (answer = r)) })
-  const reg = await registerPlugin(fakeStorage({ tab: 'yours' }), undefined, {}, withPickedGreeting)
+  const reg = await registerPlugin(fakeStorage({ tab: 'yours' }))
   const view = mount(reg.Page)
   await settle(10)
   click(byLabel(card(view, 'answers'), 'Check'))
@@ -438,5 +441,5 @@ test('busy is not left stuck: leaving the page while the call runs, the count st
   assert.equal(expression(again), 'busy', 'the call is still running')
   answer({ text: 'OK' })
   await settle()
-  assert.equal(expression(again), 'resting')
+  assert.equal(expression(again), NO_CALL)
 })

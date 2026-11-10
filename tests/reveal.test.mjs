@@ -4,7 +4,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { mount, all, text, loadSrc } from './lib/render.mjs'
-import { K } from '../src/look.js'
+import { K, T } from '../src/look.js'
 
 const { WORD_MS, wordsOf, makeRevealClock, Said } = await loadSrc('reveal.js')
 
@@ -230,7 +230,7 @@ test('words are split at spaces; an empty line has none', () => {
 const GREETING = "Open a step and ask me about it here. I explain things; I don't change your settings."
 
 function said(clock, props = {}) {
-  const view = mount(() => Said({ clock, id: 'g', text: GREETING, className: K.say, fresh: true, ...props }))
+  const view = mount(() => Said({ clock, id: 'g', text: GREETING, className: T.line, fresh: true, ...props }))
   const p = () => view.tree
   const whole = () => all(p(), n => n.props['data-hh'] === 'said-whole')[0]
   const seen = () => all(p(), n => n.props['data-hh'] === 'said-seen')[0]
@@ -238,12 +238,13 @@ function said(clock, props = {}) {
   return { view, p, whole, seen, rest }
 }
 
-test('Said: a paragraph in the helper\'s own text class, holding the whole line once for screen readers and the word-by-word copy hidden from them', () => {
+test('Said: a paragraph in the class it is given (the bubble\'s line), holding the whole line once for screen readers and the word-by-word copy hidden from them', () => {
   const { h, clock } = clockWith()
   const s = said(clock)
   clock.show([line('g', wordsOf(GREETING).length)])
   assert.equal(s.p().type, 'p')
-  assert.equal(s.p().props.className, K.say)
+  assert.equal(s.p().props.className, T.line)
+  assert.equal(T.line, 'hh-line')
   // the screen reader's copy: Hermes's own sr-only class, the whole line, never part of a selection
   assert.equal(s.whole().props.className, K.srOnly)
   assert.match(K.srOnly, /(^|\s)sr-only(\s|$)/)

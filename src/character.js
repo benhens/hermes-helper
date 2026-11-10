@@ -21,9 +21,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { FACE, EXPRESSIONS, EXPRESSION_NAMES, GLIDE_MS, BLINK_MS, BLINK_EVERY_MS, TALK_MS, DRUM_MS, RISE, fingerRect, eyeTransform, eyeRy, pupilScale, pupilHole, talkFrames, drumHeights } from './expressions.js'
 import { makeEyes } from './eyes.js'
-
-// The character's width on the page, in px. One constant: the new beginning will set the final size.
-export const CHARACTER_PX = 140
+import { CHARACTER_PX } from './layout.js'
 
 const ACCENT = { fill: 'var(--ui-accent)' }
 const SIDES = ['left', 'right']

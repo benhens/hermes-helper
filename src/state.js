@@ -1,10 +1,16 @@
-// Page and helper-panel state, kept in ctx.storage on the person's computer (build-v1.md P5, P11).
-// Keys: side (right | left), helper (open | hidden | closed), tab (setup | yours), step (1-4),
-// chatlog (true | false), answers ({ stepId: optionId }, the person's picks on the steps).
+// What the page keeps in ctx.storage on the person's computer.
+// Keys: tab (setup | yours), step (1-4), answers ({ stepId: optionId }, the person's picks on the
+// steps), helperWidth (the width Helper's window was dragged to, 360 to 600 px).
 // Anything unexpected in storage falls back to the default.
+// Nothing about the person is stored: not the name, not what they do, nothing of the
+// conversation (row 1 of docs/build/talk-v1-plan.md). STORED_KEYS is every key the plugin may
+// write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
 import { STEPS, cleanAnswers } from './steps.js'
+import { clampHelperWidth, HELPER_PX } from './layout.js'
 
 export const STEP_COUNT = STEPS.length
+// 'remember' is the person's answer to the memory test on Your setup (src/setup-tab.js).
+export const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember']
 
 export function readState(get) {
   const pick = (key, allowed, fallback) => {
@@ -13,15 +19,9 @@ export function readState(get) {
   }
   const step = get('step', 1)
   return {
-    side: pick('side', ['right', 'left'], 'right'),
-    helper: pick('helper', ['open', 'hidden', 'closed'], 'open'),
     tab: pick('tab', ['setup', 'yours'], 'setup'),
     step: Number.isInteger(step) && step >= 1 && step <= STEP_COUNT ? step : 1,
-    chatlog: get('chatlog', false) === true,
-    answers: cleanAnswers(get('answers', {}))
+    answers: cleanAnswers(get('answers', {})),
+    helperWidth: clampHelperWidth(get('helperWidth', HELPER_PX))
   }
-}
-
-export function otherSide(side) {
-  return side === 'left' ? 'right' : 'left'
 }

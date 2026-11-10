@@ -1,0 +1,1152 @@
+{
+ "about": "Written by dev/checks/talk-v1/dump_set2.py: hhtech's set2-messages.json through hhcontent's route2.py, keeping off. Do not edit: make it again.",
+ "json_sha256": "d23871cede89a358deb887c0337f8b2cc383774e8d3479b8b0d19afcc7d5fb11",
+ "messages": [
+  {
+   "after": "",
+   "n": 1,
+   "shown": "line mem1",
+   "state": {
+    "asked": [],
+    "found": {
+     "mem": "mem1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "will it know who I am next week",
+   "want": [
+    "mem"
+   ]
+  },
+  {
+   "after": "",
+   "n": 2,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "why did it forget my dog's name",
+   "want": [
+    "mem"
+   ]
+  },
+  {
+   "after": "",
+   "n": 3,
+   "shown": "line mem1",
+   "state": {
+    "asked": [],
+    "found": {
+     "mem": "mem1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "where is the stuff it learned about me saved",
+   "want": [
+    "mem"
+   ]
+  },
+  {
+   "after": "",
+   "n": 4,
+   "shown": "line mem2",
+   "state": {
+    "asked": [],
+    "found": {
+     "mem": "mem2"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "it doesnt recall anything from yesterday",
+   "want": [
+    "mem"
+   ]
+  },
+  {
+   "after": "",
+   "n": 5,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "memroy isnt working",
+   "want": [
+    "mem"
+   ]
+  },
+  {
+   "after": "",
+   "n": 6,
+   "shown": "question mod",
+   "state": {
+    "asked": [
+     "mod"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "mod",
+    "stage": "open",
+    "work": null
+   },
+   "text": "which ai is best for writing",
+   "want": [
+    "mod"
+   ]
+  },
+  {
+   "after": "",
+   "n": 7,
+   "shown": "question mod",
+   "state": {
+    "asked": [
+     "mod"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "mod",
+    "stage": "open",
+    "work": null
+   },
+   "text": "do i have to pay for this",
+   "want": [
+    "mod"
+   ]
+  },
+  {
+   "after": "",
+   "n": 8,
+   "shown": "line mod1",
+   "state": {
+    "asked": [],
+    "found": {
+     "mod": "mod1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I already have a chatgpt subscription",
+   "want": [
+    "mod"
+   ]
+  },
+  {
+   "after": "",
+   "n": 9,
+   "shown": "W1 buttons msg+sch",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I pay my phone bill every month, can it remind me",
+   "want": [
+    "sch"
+   ]
+  },
+  {
+   "after": "",
+   "n": 10,
+   "shown": "line mod3",
+   "state": {
+    "asked": [],
+    "found": {
+     "mod": "mod3"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "can I run a modle on my own laptop",
+   "want": [
+    "mod"
+   ]
+  },
+  {
+   "after": "",
+   "n": 11,
+   "shown": "question mod",
+   "state": {
+    "asked": [
+     "mod"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "mod",
+    "stage": "open",
+    "work": null
+   },
+   "text": "whats an llm",
+   "want": [
+    "mod"
+   ]
+  },
+  {
+   "after": "",
+   "n": 12,
+   "shown": "line mod3",
+   "state": {
+    "asked": [],
+    "found": {
+     "mod": "mod3"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "i dont want to spend any money",
+   "want": [
+    "mod"
+   ]
+  },
+  {
+   "after": "",
+   "n": 13,
+   "shown": "question msg",
+   "state": {
+    "asked": [
+     "msg"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "msg",
+    "stage": "open",
+    "work": null
+   },
+   "text": "I'd like to chat with hermes on my phone",
+   "want": [
+    "msg"
+   ]
+  },
+  {
+   "after": "",
+   "n": 14,
+   "shown": "line msg1",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "get answers on telegrm",
+   "want": [
+    "msg"
+   ]
+  },
+  {
+   "after": "",
+   "n": 15,
+   "shown": "question msg",
+   "state": {
+    "asked": [
+     "msg"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "msg",
+    "stage": "open",
+    "work": null
+   },
+   "text": "can it send me a text message",
+   "want": [
+    "msg"
+   ]
+  },
+  {
+   "after": "",
+   "n": 16,
+   "shown": "question msg",
+   "state": {
+    "asked": [
+     "msg"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "msg",
+    "stage": "open",
+    "work": null
+   },
+   "text": "how do I reach it when im not at my computer",
+   "want": [
+    "msg"
+   ]
+  },
+  {
+   "after": "",
+   "n": 17,
+   "shown": "question sch",
+   "state": {
+    "asked": [
+     "sch"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "sch",
+    "stage": "open",
+    "work": null
+   },
+   "text": "can it do something every monday",
+   "want": [
+    "sch"
+   ]
+  },
+  {
+   "after": "",
+   "n": 18,
+   "shown": "line sch1",
+   "state": {
+    "asked": [],
+    "found": {
+     "sch": "sch1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I want a summary each morning at 8",
+   "want": [
+    "sch"
+   ]
+  },
+  {
+   "after": "",
+   "n": 19,
+   "shown": "line sch2",
+   "state": {
+    "asked": [],
+    "found": {
+     "sch": "sch2"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "is there a way to get reminders",
+   "want": [
+    "sch"
+   ]
+  },
+  {
+   "after": "",
+   "n": 20,
+   "shown": "question sch",
+   "state": {
+    "asked": [
+     "sch"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "sch",
+    "stage": "open",
+    "work": null
+   },
+   "text": "can it do things on a schedual",
+   "want": [
+    "sch"
+   ]
+  },
+  {
+   "after": "",
+   "n": 21,
+   "shown": "line svc1",
+   "state": {
+    "asked": [],
+    "found": {
+     "svc": "svc1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "can hermes read my gmail",
+   "want": [
+    "svc"
+   ]
+  },
+  {
+   "after": "",
+   "n": 22,
+   "shown": "question svc",
+   "state": {
+    "asked": [
+     "svc"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "svc",
+    "stage": "open",
+    "work": null
+   },
+   "text": "I use google drive a lot, can it see my files",
+   "want": [
+    "svc"
+   ]
+  },
+  {
+   "after": "",
+   "n": 23,
+   "shown": "line svc1",
+   "state": {
+    "asked": [],
+    "found": {
+     "svc": "svc1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "how do I link github",
+   "want": [
+    "svc"
+   ]
+  },
+  {
+   "after": "",
+   "n": 24,
+   "shown": "question svc",
+   "state": {
+    "asked": [
+     "svc"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "svc",
+    "stage": "open",
+    "work": null
+   },
+   "text": "can it check my email",
+   "want": [
+    "svc"
+   ]
+  },
+  {
+   "after": "",
+   "n": 25,
+   "shown": "term line mcp",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what's an mcp server",
+   "want": [
+    "word:mcp",
+    "svc"
+   ]
+  },
+  {
+   "after": "",
+   "n": 26,
+   "shown": "question bot",
+   "state": {
+    "asked": [
+     "bot"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "bot",
+    "stage": "open",
+    "work": null
+   },
+   "text": "can I have two bots",
+   "want": [
+    "bot"
+   ]
+  },
+  {
+   "after": "",
+   "n": 27,
+   "shown": "line bot1",
+   "state": {
+    "asked": [],
+    "found": {
+     "bot": "bot1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I need a separate agent for my business",
+   "want": [
+    "bot"
+   ]
+  },
+  {
+   "after": "",
+   "n": 28,
+   "shown": "term line profile",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what's a profile",
+   "want": [
+    "bot"
+   ]
+  },
+  {
+   "after": "",
+   "n": 29,
+   "shown": "W1 buttons mem+sch",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "can it remember my meetings and remind me each morning",
+   "want": [
+    "which"
+   ]
+  },
+  {
+   "after": "",
+   "n": 30,
+   "shown": "W1 buttons mod+msg",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "which model works best on telegram",
+   "want": [
+    "which"
+   ]
+  },
+  {
+   "after": "",
+   "n": 31,
+   "shown": "W1 buttons msg+bot",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I want a second bot that answers on discord",
+   "want": [
+    "which"
+   ]
+  },
+  {
+   "after": "",
+   "n": 32,
+   "shown": "line sch1",
+   "state": {
+    "asked": [],
+    "found": {
+     "sch": "sch1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "can it read my email every morning",
+   "want": [
+    "which"
+   ]
+  },
+  {
+   "after": "",
+   "n": 33,
+   "shown": "W1 buttons mem+bot",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "do bots share one memory",
+   "want": [
+    "which"
+   ]
+  },
+  {
+   "after": "",
+   "n": 34,
+   "shown": "question msg",
+   "state": {
+    "asked": [
+     "msg"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "msg",
+    "stage": "open",
+    "work": null
+   },
+   "text": "I forgot which chat app I connected",
+   "want": [
+    "msg"
+   ]
+  },
+  {
+   "after": "",
+   "n": 35,
+   "shown": "question mod",
+   "state": {
+    "asked": [
+     "mod"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": null,
+    "pending": "mod",
+    "stage": "open",
+    "work": null
+   },
+   "text": "i don't remember how to change the model",
+   "want": [
+    "mod"
+   ]
+  },
+  {
+   "after": "",
+   "n": 36,
+   "shown": "H1 (for me + install)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "install the spotify plugin for me",
+   "want": [
+    "build"
+   ]
+  },
+  {
+   "after": "",
+   "n": 37,
+   "shown": "H1 (can you set up)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "can you set up a morning briefing for me",
+   "want": [
+    "build"
+   ]
+  },
+  {
+   "after": "",
+   "n": 38,
+   "shown": "H1 (please connect)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "please connect my gmail",
+   "want": [
+    "build"
+   ]
+  },
+  {
+   "after": "",
+   "n": 39,
+   "shown": "H1 (link my)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "link my calendar to it",
+   "want": [
+    "build"
+   ]
+  },
+  {
+   "after": "",
+   "n": 40,
+   "shown": "H1 (for me + create)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "create a daily schedule for me",
+   "want": [
+    "build"
+   ]
+  },
+  {
+   "after": "",
+   "n": 41,
+   "shown": "line msg1",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "is telegram a good choice for me",
+   "want": [
+    "msg"
+   ]
+  },
+  {
+   "after": "",
+   "n": 42,
+   "shown": "line msg2",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg2"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "could you explain how to connect discord for me",
+   "want": [
+    "msg"
+   ]
+  },
+  {
+   "after": "",
+   "n": 43,
+   "shown": "line bot1",
+   "state": {
+    "asked": [],
+    "found": {
+     "bot": "bot1"
+    },
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "how would I build a bot for my mom",
+   "want": [
+    "bot"
+   ]
+  },
+  {
+   "after": "",
+   "n": 44,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what's good for me to start with",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 45,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what's the weather in riga",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 46,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "my screen is frozen",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 47,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "how do I update hermes",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 48,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "can it make pictures",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 49,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I forgot my password",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 50,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "how do I link two paragraphs in word",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 51,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "cant connect to the wifi",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 52,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I sent an email to my boss yesterday",
+   "want": [
+    "none"
+   ]
+  },
+  {
+   "after": "",
+   "n": 53,
+   "shown": "term line skill",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what is a skill",
+   "want": [
+    "word:skill"
+   ]
+  },
+  {
+   "after": "",
+   "n": 54,
+   "shown": "term line plugin",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "do I need plugins",
+   "want": [
+    "word:plugin"
+   ]
+  },
+  {
+   "after": "name",
+   "n": 55,
+   "shown": "F1 name=Anna",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": "Anna",
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "Anna",
+   "want": [
+    "name"
+   ]
+  },
+  {
+   "after": "name",
+   "n": 56,
+   "shown": "F1 name=Jānis",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": "Jānis",
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "my name is Jānis",
+   "want": [
+    "name"
+   ]
+  },
+  {
+   "after": "name",
+   "n": 57,
+   "shown": "question mem +name=Tom",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "lastq": true,
+    "name": "Tom",
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "I'm Tom, can it remember things",
+   "want": [
+    "mem"
+   ]
+  },
+  {
+   "after": "work",
+   "n": 58,
+   "shown": "F2 name=Sam work=I'm a nurse",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": "I'm a nurse"
+   },
+   "text": "I'm a nurse",
+   "want": [
+    "work"
+   ]
+  },
+  {
+   "after": "work",
+   "n": 59,
+   "shown": "F2 name=Sam work=I teach piano every day after school",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": "I teach piano every day after school"
+   },
+   "text": "I teach piano every day after school",
+   "want": [
+    "work"
+   ]
+  },
+  {
+   "after": "work",
+   "n": 60,
+   "shown": "F2 name=Sam work=I write emails and connect clients with suppliers",
+   "state": {
+    "asked": [],
+    "found": {},
+    "lastq": false,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": "I write emails and connect clients with suppliers"
+   },
+   "text": "I write emails and connect clients with suppliers",
+   "want": [
+    "work"
+   ]
+  }
+ ],
+ "route2_sha256": "88808bff917f3a89b9c17612cac3ac085b7e911cbeceebf667fc316a8a3c5efe"
+}

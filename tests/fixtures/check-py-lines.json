@@ -1,0 +1,675 @@
+{
+ "about": "Written by dev/checks/talk-v1/dump_check.py: what hhcontent's check.py finds wrong with each line. Do not edit: make it again.",
+ "check_py_sha256": "83c807fdac78a1579386e03a8006f2d3c3afcd87dd536b6f323b4d04dce2de2f",
+ "lines": [
+  {
+   "id": "OPEN",
+   "text": "Hi, I'm Helper. I can help you learn about Hermes and set it up. What's your name?",
+   "kind": "reply",
+   "words": 17,
+   "found": [
+    "an answer line ends with a question"
+   ]
+  },
+  {
+   "id": "F1",
+   "text": "Nice to meet you, {name}. What do you do?",
+   "kind": "reply",
+   "words": 9,
+   "found": [
+    "an answer line ends with a question"
+   ]
+  },
+  {
+   "id": "F1-no-name",
+   "text": "Nice to meet you. What do you do?",
+   "kind": "reply",
+   "words": 8,
+   "found": [
+    "an answer line ends with a question"
+   ]
+  },
+  {
+   "id": "F2",
+   "text": "Thanks, {name}. Ask me anything about Hermes, or pick one of these.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "F2-no-name",
+   "text": "Thanks. Ask me anything about Hermes, or pick one of these.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "F3",
+   "text": "That's fine. Ask me anything about Hermes, or pick one of these.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "N1",
+   "text": "I don't have a checked answer for that yet. Here is what I can help with.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "W1",
+   "text": "Which one do you mean?",
+   "kind": "question",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "C1",
+   "text": "Hermes can do jobs on a schedule and use services like Gmail. Pick one, or type what you want.",
+   "kind": "reply",
+   "words": 19,
+   "found": []
+  },
+  {
+   "id": "H1",
+   "text": "I can't do that, but your own Hermes can. Paste this into a new chat with it.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "K1",
+   "text": "That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat.",
+   "kind": "reply",
+   "words": 20,
+   "found": []
+  },
+  {
+   "id": "mem-q",
+   "text": "What do you want Hermes to remember?",
+   "kind": "question",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "mem0",
+   "text": "Memory is short notes Hermes keeps about you and your work.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "mem1",
+   "text": "Hermes does that by itself. It keeps short notes about you and reads them in each new chat.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "mem2",
+   "text": "Hermes saves every chat. It can search your old chats when you ask.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "mem3",
+   "text": "New notes show up in the next chat, not this one. Start a new chat and ask again.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "mem4",
+   "text": "Each bot keeps its own notes. For separate notes, use a separate bot.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "mod-q",
+   "text": "Do you already pay for ChatGPT or Claude?",
+   "kind": "question",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "mod0",
+   "text": "A model is the AI that does the thinking. Hermes needs one to answer.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "mod1",
+   "text": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "mod2",
+   "text": "A Claude Max plan works only with extra paid credits. Claude Pro does not work.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "mod3",
+   "text": "Hermes can run an AI on your own computer. No account, and nothing leaves your computer.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "mod4",
+   "text": "The quickest start is a paid Nous plan. One sign-in gives you many AIs to choose from.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "msg-q",
+   "text": "Which chat app do you use most?",
+   "kind": "question",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "msg0",
+   "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "msg1",
+   "text": "Telegram has a quick setup. In the app, open Messaging and press Create with QR.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "msg2",
+   "text": "Hermes works with that app. In the Hermes app, open Messaging to set it up.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "msg3",
+   "text": "It answers only while its computer is on. For answers at any time, that computer must stay on.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "sch-q",
+   "text": "What should Hermes do on a schedule?",
+   "kind": "question",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "sch0",
+   "text": "Hermes can do jobs on a schedule, such as a summary every morning.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "sch1",
+   "text": "Hermes can repeat a job every day or week. Ask it once, in plain words.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "sch2",
+   "text": "Hermes can remind you once, or again and again. Just ask it in plain words.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "sch3",
+   "text": "Hermes can check something on a schedule and tell you what it found.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "sch4",
+   "text": "Jobs run only while Hermes is running on a computer that is on.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "svc-q",
+   "text": "Which service should Hermes use, such as Gmail?",
+   "kind": "question",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "svc0",
+   "text": "MCP links Hermes to a service you already use, such as GitHub.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "svc1",
+   "text": "Hermes has a list of ready-made links to services. Ask your own Hermes to add yours.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "svc2",
+   "text": "Nothing is linked until you add it. You can also limit what Hermes may use there.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "bot-q",
+   "text": "What would a second Hermes do for you?",
+   "kind": "question",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "bot0",
+   "text": "Each bot is a separate Hermes with its own settings and notes.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "bot1",
+   "text": "That fits a second bot. Each bot is a separate Hermes with its own settings and notes.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "bot1-next",
+   "text": "Open \"Bots\", press \"+\", then \"New bot\". It asks for a name, a title and a description.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "bot2",
+   "text": "Each bot is a separate Hermes. They can hand work to each other with @ and a name.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "bot3",
+   "text": "You may not need a second, separate Hermes. One Hermes can hold many chats at once.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "term-tool",
+   "text": "Tools are actions Hermes can take, like searching the web or editing files.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "term-skill",
+   "text": "A skill is a set of written steps that teach Hermes one task.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "term-plugin",
+   "text": "A plugin is an add-on that gives Hermes a new feature.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "term-mcp",
+   "text": "MCP links Hermes to a service you already use, such as GitHub.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "term-soul",
+   "text": "SOUL.md is the file that says who your Hermes is.",
+   "kind": "reply",
+   "words": 10,
+   "found": []
+  },
+  {
+   "id": "term-profile",
+   "text": "That is one separate Hermes with its own settings and notes. The \"Bots\" tab lists them.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "bots-where",
+   "text": "In the Hermes app, \"Bots\" is the tab next to \"Sessions\", top left.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "broken-1",
+   "text": "one two three four five six seven eight nine ten eleven twelve thirteen. Fourteen fifteen sixteen seventeen eighteen nineteen twenty. Twenty-one twenty-two twenty-three twenty-four twenty-five twenty-six.",
+   "kind": "reply",
+   "words": 26,
+   "found": [
+    "26 words > 25"
+   ]
+  },
+  {
+   "id": "broken-2",
+   "text": "Which of the many chat apps that exist today do you happen to use the most often?",
+   "kind": "question",
+   "words": 17,
+   "found": [
+    "17 words > 12",
+    "sentence of 17 words > 14"
+   ]
+  },
+  {
+   "id": "broken-3",
+   "text": "One. Two. Three. Four.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "4 sentences > 3"
+   ]
+  },
+  {
+   "id": "broken-4",
+   "text": "This single sentence just keeps going on and on with far too many words in it to pass.",
+   "kind": "reply",
+   "words": 18,
+   "found": [
+    "sentence of 18 words > 14"
+   ]
+  },
+  {
+   "id": "broken-5",
+   "text": "Is it this? Or that?",
+   "kind": "question",
+   "words": 5,
+   "found": [
+    "more than one question"
+   ]
+  },
+  {
+   "id": "broken-6",
+   "text": "Hermes can do that. Do you want it?",
+   "kind": "reply",
+   "words": 8,
+   "found": [
+    "an answer line ends with a question"
+   ]
+  },
+  {
+   "id": "broken-7",
+   "text": "Great!",
+   "kind": "reply",
+   "words": 1,
+   "found": [
+    "has !"
+   ]
+  },
+  {
+   "id": "broken-8",
+   "text": "See http://example.com for more.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "has link",
+    "long word httpexamplecom"
+   ]
+  },
+  {
+   "id": "broken-9",
+   "text": "Go to www.example.com now.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "has link",
+    "long word wwwexamplecom"
+   ]
+  },
+  {
+   "id": "broken-10",
+   "text": "It works — mostly.",
+   "kind": "reply",
+   "words": 3,
+   "found": [
+    "has em dash"
+   ]
+  },
+  {
+   "id": "broken-11",
+   "text": "It works; mostly.",
+   "kind": "reply",
+   "words": 3,
+   "found": [
+    "has ;"
+   ]
+  },
+  {
+   "id": "broken-12",
+   "text": "It works (mostly).",
+   "kind": "reply",
+   "words": 3,
+   "found": [
+    "has bracket"
+   ]
+  },
+  {
+   "id": "broken-13",
+   "text": "That is an extraordinarily long word.",
+   "kind": "reply",
+   "words": 6,
+   "found": [
+    "long word extraordinarily"
+   ]
+  },
+  {
+   "id": "broken-14",
+   "text": "Hello {extraordinarilylongslot} there.",
+   "kind": "reply",
+   "words": 3,
+   "found": []
+  },
+  {
+   "id": "broken-15",
+   "text": "Open your profile to see it.",
+   "kind": "reply",
+   "words": 6,
+   "found": [
+    "banned term profile"
+   ]
+  },
+  {
+   "id": "broken-16",
+   "text": "Open \"Profiles\" to see it.",
+   "kind": "reply",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "broken-17",
+   "text": "Pick a model first.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "term not explained: model"
+   ]
+  },
+  {
+   "id": "broken-18",
+   "text": "A model is the AI that thinks.",
+   "kind": "reply",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "broken-19",
+   "text": "Memory is a thing.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "term not explained: Memory"
+   ]
+  },
+  {
+   "id": "broken-20",
+   "text": "A skill and a plugin are both add-on steps.",
+   "kind": "reply",
+   "words": 9,
+   "found": [
+    "2 Hermes terms in one line"
+   ]
+  },
+  {
+   "id": "broken-21",
+   "text": "mcp is small. MCP is big.",
+   "kind": "reply",
+   "words": 6,
+   "found": [
+    "term not explained: mcp"
+   ]
+  },
+  {
+   "id": "broken-22",
+   "text": "Add your key in Settings.",
+   "kind": "reply",
+   "words": 5,
+   "found": [
+    "term not explained: key"
+   ]
+  },
+  {
+   "id": "broken-23",
+   "text": "A subscription costs money.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "term not explained: subscription"
+   ]
+  },
+  {
+   "id": "broken-24",
+   "text": "SOUL.md says who it is.",
+   "kind": "reply",
+   "words": 5,
+   "found": [
+    "term not explained: SOUL.md"
+   ]
+  },
+  {
+   "id": "broken-25",
+   "text": "Each bot is good.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "term not explained: bot"
+   ]
+  },
+  {
+   "id": "broken-26",
+   "text": "Tools are handy.",
+   "kind": "reply",
+   "words": 3,
+   "found": [
+    "term not explained: Tools"
+   ]
+  },
+  {
+   "id": "broken-27",
+   "text": "This course is short.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "product word"
+   ]
+  },
+  {
+   "id": "broken-28",
+   "text": "I will install it for you.",
+   "kind": "reply",
+   "words": 6,
+   "found": [
+    "promises to do it"
+   ]
+  },
+  {
+   "id": "broken-29",
+   "text": "I'll set up the rest.",
+   "kind": "reply",
+   "words": 5,
+   "found": [
+    "promises to do it"
+   ]
+  },
+  {
+   "id": "broken-30",
+   "text": "I can connect that.",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "promises to do it"
+   ]
+  },
+  {
+   "id": "broken-31",
+   "text": "The API gives tokens to agents.",
+   "kind": "reply",
+   "words": 6,
+   "found": [
+    "banned term API"
+   ]
+  },
+  {
+   "id": "broken-32",
+   "text": "Use the command line or the terminal.",
+   "kind": "reply",
+   "words": 7,
+   "found": [
+    "banned term command line"
+   ]
+  },
+  {
+   "id": "broken-33",
+   "text": "Nothing wrong here at all.",
+   "kind": "reply",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "broken-34",
+   "text": "What do you want to do today?",
+   "kind": "question",
+   "words": 7,
+   "found": []
+  },
+  {
+   "id": "broken-35",
+   "text": "Café résumé naïve words here.",
+   "kind": "reply",
+   "words": 5,
+   "found": []
+  }
+ ]
+}
