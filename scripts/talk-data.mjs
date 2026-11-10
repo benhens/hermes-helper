@@ -199,6 +199,17 @@ export function talkProblems(d) {
     for (const x of found) problems.push(`${l.id}: ${x}`)
   }
   for (const id of FIXED_USED) if (!(d.fixed_lines || []).some(f => f.id === id)) problems.push(`fixed line ${id} is missing`)
+  // Builder: the key shapes (changes-10) are read as JavaScript patterns when the plugin loads. An
+  // empty list would turn the key check off; a Python-only pattern would stop the whole plugin.
+  const kp = (d.key_patterns && d.key_patterns.patterns) || []
+  if (!kp.length) problems.push('key_patterns.patterns is empty: the key check would be off')
+  for (const p of kp) {
+    try {
+      new RegExp(p)
+    } catch (e) {
+      problems.push(`key pattern is not a JavaScript pattern: ${p} (${e.message})`)
+    }
+  }
   for (const [name, count] of pickLists(d)) if (count > MAX_TO_PICK) problems.push(`over four to pick at once: ${name} has ${count}`)
   const topicIds = (d.topics || []).map(t => t.id)
   for (const t of d.topics || []) {

@@ -60,7 +60,8 @@ export function wantsProblems(W, talk, skillsList, docs) {
     for (const s of w.sources || []) source(w.id, s)
     if (!groupIds.includes(w.group)) fail(w.id + ': unknown group')
     if (!((w.key_words || []).length || ((w.things || []).length && (w.actions || []).length))) fail(w.id + ': no way to match')
-    if (w.kind.endsWith('_skill')) {
+    if (!['built_in', 'built_in_tool', 'built_in_tool_off', 'built_in_skill', 'optional_skill'].includes(w.kind)) fail(`${w.id}: kind ${w.kind} is not one the wants data uses`)
+    if ((w.kind || '').endsWith('_skill')) {
       const s = byName.get(w.thing)
       if (!s) fail(w.id + ': names a skill that is on neither page')
       else {
@@ -70,19 +71,24 @@ export function wantsProblems(W, talk, skillsList, docs) {
       }
       if (w.kind === 'optional_skill' && !w.text.includes('add it first')) fail(w.id + ': optional row does not say it must be added')
     }
-    if (w.text.toLowerCase().includes('plugin') || w.kind.includes('plugin')) fail(w.id + ': names a plugin; none are listed yet')
+    if ((w.text || '').toLowerCase().includes('plugin') || (w.kind || '').includes('plugin')) fail(w.id + ': names a plugin; none are listed yet')
     const n = w.next || {}
-    if (n.kind === 'steps') [...(n.steps || []), n.after].forEach((x, j) => line(`${w.id}-step${j}`, x || ''))
-    else if (n.kind !== 'paste' || !n.paste_text) fail(w.id + ': no paste box')
+    if (n.kind === 'steps') {
+      if (!(n.steps || []).length || !n.after) fail(w.id + ': clicks with no steps or no after line')
+      ;[...(n.steps || []), n.after].forEach((x, j) => line(`${w.id}-step${j}`, x || ''))
+    } else if (n.kind !== 'paste' || !n.paste_text) fail(w.id + ': no paste box')
     if (!n.label) fail(w.id + ': button with no label')
     if (w.kind === 'optional_skill' && n.kind !== 'steps') fail(w.id + ': optional skill without the app\'s steps')
     if (JSON.stringify(n).includes('hermes skills install')) fail(w.id + ': a command for the bot in an optional skill\'s box')
   }
   const fixed = W.fixed_lines || []
   for (const f of fixed) {
-    line(f.id, f.text.replace(/\{name\}/g, LONG_NAME), f.kind)
+    line(f.id, (f.text || '').replace(/\{name\}/g, LONG_NAME), f.kind)
     for (const s of f.sources || []) source(f.id, s)
-    if (f.next && f.next.kind === 'steps') [...f.next.steps, f.next.after].forEach((x, j) => line(`${f.id}-step${j}`, x.replace(/\{name\}/g, LONG_NAME)))
+    if (f.next && f.next.kind === 'steps') {
+      if (!(f.next.steps || []).length || !f.next.after) fail(f.id + ': clicks with no steps or no after line')
+      ;[...(f.next.steps || []), f.next.after].forEach((x, j) => line(`${f.id}-step${j}`, (x || '').replace(/\{name\}/g, LONG_NAME)))
+    }
   }
   const cn1 = fixed.find(f => f.id === 'CN1')
   if (cn1 && /cost|free/i.test(cn1.text)) fail('CN1 says something about cost')
@@ -147,8 +153,23 @@ export function wantsProblems(W, talk, skillsList, docs) {
     if (v.line === 'S1') {
       const s = byName.get(v.skill)
       if (!s || s.kind !== 'built_in') fail(`service line ${service}: ${v.skill} is not a built-in skill on the page`)
-    } else if (!fixed.some(f => f.id === v.line) || v.line !== 'CN1') fail(`service line ${service}: unknown line ${v.line}`)
+    } else if (v.line !== 'CN1') fail(`service line ${service}: ${v.line} is not CN1 or S1 (the code shows only these two)`)
+    else if (!fixed.some(f => f.id === 'CN1')) fail(`service line ${service}: the fixed line CN1 is missing`)
   }
+  // Builder: no {slot} shown unfilled. Helper fills only {name}, only in S1 and S2 (their line, clicks
+  // and after); the docs box's words are the docs' own and may hold braces ("{slug}").
+  const slot = /\{\w+\}/
+  const said = []
+  for (const w of rows) said.push([w.id, w.text], [w.id, w.label], ...Object.values(pickKeysShallow(w.next || {})).flat().map(x => [w.id, x]))
+  for (const f of fixed) {
+    const filled = ['S1', 'S2'].includes(f.id) ? s => String(s).replace(/\{name\}/g, '') : s => s
+    said.push([f.id, filled(f.text)], ...Object.values(pickKeysShallow(f.next || {})).flat().map(x => [f.id, filled(x)]))
+  }
+  said.push(['can-q', (T.question || {}).text || ''], ...qa.map(a => ['can-q', a.label]), ...groups.map(g => ['group ' + g.id, g.label]))
+  for (const [id, s] of said) if (typeof s === 'string' && slot.test(s)) fail(`${id}: a {slot} Helper does not fill: ${s.slice(0, 60)}`)
+  // Builder: a row id is not also a topic, a term or a held pick (a press goes by id)
+  const taken = new Set([...(talk.topics || []).map(t => t.id), ...(talk.terms || []).map(t => t.id), ...Object.keys(talk.held_picks || {})])
+  for (const w of rows) if (taken.has(w.id)) fail(`${w.id}: the same id as a topic, term or pick of helper-talk-v2.json`)
   if (docs.docs_version !== W.docs_version) fail(`the docs lines are of ${docs.docs_version}, the wants of ${W.docs_version}`)
   return fails
 }
@@ -167,6 +188,8 @@ export function serviceLines(W) {
 }
 
 const pickKeys = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undefined).map(k => [k, o[k]]))
+// The words of a button: its label, text to paste, clicks and after line.
+const pickKeysShallow = n => pickKeys(n, ['label', 'paste_text', 'steps', 'after'])
 
 // What src/talk.js reads. Each skill carries left_out from the skills list (the five marked left
 // out get N1b, as before); a skill's own words are shown only in the box "From the Hermes docs".

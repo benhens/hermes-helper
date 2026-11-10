@@ -157,10 +157,19 @@ test('the order of steps: a skill by name before the topics; a row takes svc off
   // so svc stays (and dropbox, a word of its row svc1, gives that row: the text to paste)
   assert.deepEqual((o => [o.kind, o.row])(turn('can it summarize youtube videos', freshVisit())), ['want', 'w_youtube'])
   assert.deepEqual((o => [o.kind, o.topic, o.need])(turn('can it look at my dropbox files', freshVisit())), ['row', 'svc', 'svc1'])
-  // a name never ends before a hyphen: brag-slim is not also brag (Builder's change, please check)
+  // a name never ends before a hyphen, and a name inside a longer one's match is not counted: brag-slim
+  // is not also brag (Builder's changes, please check)
   assert.deepEqual(skillOf('is there a skill called "brag-slim"'), ['brag-slim'])
   assert.deepEqual(skillOf('is there a skill for brag-slim'), ['brag-slim'])
+  assert.deepEqual(skillOf('is there a skill called brag slim'), ['brag-slim'])
   assert.deepEqual(skillOf('what does the brag skill do'), ['brag'])
+  // a group's label typed as on its button is that group (Builder's, please check); not a near miss
+  for (const [typed, group] of [['Pictures and video', 'pics'], ['voice and sound!', 'voice'], ['files and my computer', 'files']]) {
+    const st = freshVisit()
+    pickTopic('wants', st)
+    assert.deepEqual((o => [o.kind, o.group])(turn(typed, st)), ['G1', group], typed)
+  }
+  assert.equal(turn('pictures and video please make one', freshVisit()).kind !== 'G1', true)
   // while "Which service ...?" is open, a plain answer is the answer; a question still finds its row
   let st = freshVisit()
   pickTopic('svc', st)
@@ -287,4 +296,16 @@ test('the wants pick and the groups: can-q with the four groups, G1 with a group
   assert.equal(lineFor(g, st).text, 'Here is what I have checked for that. Pick one, or type your own.')
   // a topic question may follow it (lastq false)
   assert.equal(pickTopic('mem', st).kind, 'question')
+})
+
+test('nothing Helper says for the wants shows an unfilled {slot}: every row, every skill (S1, S2), every group, the near miss (the docs box may: it is the docs\' own words)', () => {
+  const slot = /\{\w+\}/
+  const words = said => [said.text, ...(said.answers ? said.answers.items.map(a => a.label) : []), ...(said.next ? [said.next.label, said.next.text, ...(said.next.steps || []), said.next.after] : [])].filter(Boolean)
+  const all = []
+  for (const r of WANTS_DATA.rows) { const st = freshVisit(); all.push(...words(lineFor(pickWant(r.id, st), st))) }
+  for (const s of WANTS_DATA.skills.filter(x => !x.left_out)) { const st = freshVisit(); all.push(...words(lineFor(turn(`is there a ${s.name} skill`, st), st))) }
+  for (const g of WANTS_DATA.groups) { const st = freshVisit(); all.push(...words(lineFor(pickGroup(g.id, st), st)), ...words(lineFor({ kind: 'N2', group: g.id }, st))) }
+  { const st = freshVisit(); all.push(...words(lineFor(pickTopic('wants', st), st))) }
+  assert.ok(all.length > 1000, `${all.length} texts`)
+  assert.deepEqual(all.filter(t => slot.test(t)), [])
 })

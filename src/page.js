@@ -253,6 +253,18 @@ export function makePage(ctx, opts = {}) {
       setFocusAsk(false)
     }, [focusAsk])
 
+    // "More" pressed: its button is gone, so the keyboard goes to the first of the next picks (in the
+    // same message box), not to the page.
+    const [focusPick, setFocusPick] = useState(false)
+    useEffect(() => {
+      if (!focusPick) return
+      const box = askBox.current && askBox.current.closest('[data-hh=composer]')
+      const first = box && box.querySelector('[data-hh=answer]')
+      if (first) first.focus()
+      else if (askBox.current) askBox.current.focus()
+      setFocusPick(false)
+    }, [focusPick])
+
     // Folding Helper away hands the keyboard back to the strip.
     useEffect(() => {
       if (!focusStrip) return
@@ -361,6 +373,7 @@ export function makePage(ctx, opts = {}) {
     function pickAnswer(item) {
       if (item.more) {
         const items = pageOf(item.more)
+        setFocusPick(true)
         return setLog(old => (memory.log = old.map((e, i) => (i === old.length - 1 && e.answers ? { ...e, answers: { ...e.answers, items } } : e))))
       }
       let result

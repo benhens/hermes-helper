@@ -59,7 +59,13 @@ const BREAKS = [
   ['the wants pick labelled differently', w => (w.topic.pick.label = 'Web and files'), /the wants pick is labelled differently/],
   ['a group answer missing under can-q', w => w.topic.question.answers.pop(), /can-q's answers are not the groups/],
   ['a fixed line the code says is missing', w => (w.fixed_lines = w.fixed_lines.filter(f => f.id !== 'G1')), /fixed line G1 is missing/],
-  ['GitHub\'s line names a skill that is not built in', w => (w.service_lines.GitHub = 'S1 with the built-in skill stocks'), /service line GitHub: stocks is not a built-in skill/]
+  ['GitHub\'s line names a skill that is not built in', w => (w.service_lines.GitHub = 'S1 with the built-in skill stocks'), /service line GitHub: stocks is not a built-in skill/],
+  ['a service line the code does not show', w => (w.service_lines.Gmail = 'N2'), /service line Gmail: N2 is not CN1 or S1/],
+  ['a {slot} in a row\'s text to paste', w => (row(w, 'w_web').next.paste_text = 'Search the web for {topic}.'), /w_web: a \{slot\} Helper does not fill/],
+  ['a {slot} other than {name} in S2\'s after line', w => (w.fixed_lines.find(f => f.id === 'S2').next.after = 'It works from your next {when}.'), /S2: a \{slot\} Helper does not fill/],
+  ['an optional row with no clicks', w => (row(w, 'w_reddit').next.steps = []), /w_reddit: clicks with no steps or no after line/],
+  ['a row with no kind (no crash, a reason)', w => delete row(w, 'w_web').kind, /w_web: kind undefined is not one the wants data uses/],
+  ['a row id that is a topic id', w => (row(w, 'w_web').id = 'mem'), /mem: the same id as a topic, term or pick/]
 ]
 for (const [what, breakIt, reason] of BREAKS) {
   test(`the build stops on ${what}`, () => {

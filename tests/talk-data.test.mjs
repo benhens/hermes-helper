@@ -119,6 +119,13 @@ test('the wants (row 5) are in this build: C1 says its full text and holds the w
   assert.ok(talkProblems(broken(x => x.topic_picks[0].holds.push('zzz'))).some(p => /holds zzz, which is not a topic/.test(p)))
 })
 
+test('the build stops on key shapes JavaScript cannot read, or none at all (the key check would be off)', () => {
+  assert.deepEqual(talkProblems(broken(d => { d.key_patterns.patterns = [] })), ['key_patterns.patterns is empty: the key check would be off'])
+  const p = talkProblems(broken(d => { d.key_patterns.patterns.push('(?P<k>sk-[a-z]+)') }))
+  assert.equal(p.length, 1)
+  assert.match(p[0], /^key pattern is not a JavaScript pattern: \(\?P<k>sk-\[a-z\]\+\)/)
+})
+
 test('the build stops on a missing fixed line, a button of an unknown kind, picks that miss a topic', () => {
   assert.ok(talkProblems(broken(d => (d.fixed_lines = d.fixed_lines.filter(f => f.id !== 'W1')))).includes('fixed line W1 is missing'))
   assert.ok(talkProblems(broken(d => (d.fixed_lines = d.fixed_lines.filter(f => f.id !== 'TP')))).includes('fixed line TP is missing'))

@@ -31,7 +31,7 @@ Status: early build (Setup steps 1-4, Helper's conversation window, Helper's pag
 2. It keeps your name, if you give it.
 3. It keeps three kinds of answers you give it: whether you pay for an AI or want a free one, which chat app you use, and one service you named, such as Gmail.
 4. It keeps up to three things you ask it to remember. It only shows them to you. It does not act on them, and they are not sent to any AI.
-5. It keeps nothing else you type. It refuses keys, passwords and long numbers.
+5. It keeps nothing else you type. It tries to refuse passwords, keys and long numbers by fixed rules, but it can miss some. Never type a password or key to Helper.
 6. It also keeps a few page settings, such as how wide its panel is, and your answers on its page.
 7. These are kept as plain text in the Hermes Desktop app's own storage, on this computer only.
 8. They are shared by all your Hermes profiles (bots) on this computer.

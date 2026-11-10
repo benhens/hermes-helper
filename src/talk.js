@@ -98,6 +98,8 @@ function needsFor(t, topic, answering) {
 const WROWS = WANTS_DATA.rows
 export const WANT_ROWS = Object.fromEntries(WROWS.map(r => [r.id, r]))
 const WGROUPS = Object.fromEntries(WANTS_DATA.groups.map(g => [g.id, g]))
+const asLabel = s => s.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim()
+const GROUP_BY_LABEL = new Map(WANTS_DATA.question.answers.map(a => [asLabel(a.label), a.gives_group]))
 const WSKILLS = new Map(WANTS_DATA.skills.map(s => [s.name, s]))
 const SERVICE_LINES = WANTS_DATA.service_lines
 // A row matches when one of its key words is in the message, or one of its things and one of its
@@ -117,7 +119,13 @@ const SKILL_RES = WANTS_DATA.skills.map(s => {
   // (skill_next.py finds both, and two names fall through to the skill line about what a skill is).
   return [s.name, new RegExp('(^|[^a-z0-9])(?:' + alts.join('|') + ')($|[^a-z0-9-])')]
 })
-export const skillOf = t => [...new Set(SKILL_RES.filter(([, re]) => re.test(t)).map(([n]) => n))].sort()
+// The skills a message names. Builder (not in skill_next.py, please check): where one name's match
+// lies inside another's ('a skill called brag slim' is brag and brag-slim), only the longer counts.
+export function skillOf(t) {
+  const found = SKILL_RES.map(([n, re]) => [n, re.exec(t)]).filter(([, m]) => m).map(([n, m]) => [n, m.index, m.index + m[0].length])
+  const inside = (a, b) => a !== b && b[1] <= a[1] && a[2] <= b[2] && b[2] - b[1] > a[2] - a[1]
+  return [...new Set(found.filter(a => !found.some(b => inside(a, b))).map(([n]) => n))].sort()
+}
 // The row a skill has, if any (a hand-written row wins over S1 and S2).
 const rowOfSkill = name => WROWS.find(r => r.thing === name)
 // Changes-6 fix 6: where svc's row for a named service would show, Gmail, Google Calendar and
@@ -512,6 +520,10 @@ export function turn(text, st) {
   // github skill" gets the skill, not the service question. A row for that skill wins; a skill
   // marked left out gets N1b; else S1 (built in) or S2 (optional, with the clicks to add it).
   if (st.wants !== false) {
+    // Builder (not in the reference, please check): a group's own label typed as it is on its
+    // button ("pictures and video") is that group, as if picked; else "I don't know that one" (N2).
+    const group = GROUP_BY_LABEL.get(asLabel(cutIgnored(talkNorm(text))))
+    if (group) return done('G1', { group, buttons: pickGroup(group, st).buttons })
     const sk = skillOf(cutIgnored(talkNorm(text)))
     if (sk.length === 1) {
       const row = rowOfSkill(sk[0])
@@ -746,7 +758,7 @@ const rowPicks = (ids, kind) => ({ kind, hint: TALK_DATA.answers.hint_under_ques
 // A row's button: "Show me what to ask" (text to paste) or, for an optional skill, "Show me how to
 // add it" (the app's clicks, then the line that it works from the next new chat).
 function wantNext(n, name) {
-  if (n.kind === 'steps') return { kind: 'steps', label: n.label, steps: n.steps.map(s => fillSlots(s, { name })), after: n.after }
+  if (n.kind === 'steps') return { kind: 'steps', label: n.label, steps: n.steps.map(s => fillSlots(s, { name })), after: fillSlots(n.after, { name }) }
   return { kind: 'paste', label: n.label, text: n.paste_text }
 }
 // A source as the talk data writes it: "file line N" (or "lines" for several of one file).
