@@ -133,6 +133,23 @@ test('hhtech\'s second set of 60 messages: the same result as route2.py (the tes
   }
 })
 
+test('fifty more messages of the Builder\'s own, for rules the sets above do not reach (a chat app beside a service, weak key words, names with more): the same as route2.py', () => {
+  const extra = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/route2-extra.json'), 'utf8'))
+  assert.equal(extra.json_sha256, sha(path.join(ROOT, 'content/helper-talk-v2.json')))
+  assert.equal(extra.route2_sha256, OFF.route2_sha256)
+  assert.equal(extra.messages.length, 50)
+  for (const m of extra.messages) {
+    const st = freshVisit({ '': 'open', name: 'name', work: 'work' }[m.after])
+    if (m.after === 'work') st.name = 'Sam'
+    const o = turn(m.text, st)
+    assert.equal(show(o), m.shown, `${m.n}: ${m.text}`)
+    assert.deepEqual(stateOf(st), expectedState(m.state), `${m.n}: ${m.text}`)
+  }
+  // the set is not all one answer: it reaches many kinds of result
+  const kinds = new Set(extra.messages.map(m => m.shown.split(' ')[0]))
+  assert.ok(kinds.size >= 7, [...kinds].join(' '))
+})
+
 test('matching: lower case, curly quotes straightened, spaces squeezed; a key word needs no letter or digit beside it', () => {
   assert.equal(talkNorm('  It\u2019s   \u201cMemory\u201d  '), 'it\'s "memory"')
   assert.equal(show(turn('how does memory work?', freshVisit())), 'question mem')

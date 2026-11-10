@@ -345,6 +345,16 @@ test('1440 px window with Hermes\'s sidebar (1180 px page): the full step list, 
   assert.equal(strip(view), null)
   // the open step is 464 px wide there: its two-column comparison stacks into one
   assert.equal(byData(view.tree, 'compare').props['data-columns'], 1)
+  // dragging Helper's window to 400 px gives the step 524 px: two columns again
+  grip(view).props.onPointerDown(pointer(720))
+  grip(view).props.onPointerMove(pointer(780))
+  grip(view).props.onPointerUp(pointer(780))
+  assert.equal(helper(view).props.style.width, '400px')
+  assert.equal(byData(view.tree, 'compare').props['data-columns'], 2)
+  grip(view).props.onKeyDown({ key: 'ArrowLeft', preventDefault() {} })
+  assert.equal(byData(view.tree, 'compare').props['data-columns'], 1, '416 px: one column again')
+  for (let i = 0; i < 3; i++) grip(view).props.onKeyDown({ key: 'ArrowLeft', preventDefault() {} })
+  assert.equal(helper(view).props.style.width, '464px')
   // with Hermes's sidebar hidden (1440 px page) it has its two columns
   resize(view, 1440)
   assert.equal(byData(view.tree, 'compare').props['data-columns'], 2)

@@ -42,8 +42,10 @@
 /* ==== part 2: ours ==== */
 /* The window is a column of the page (or lies over it): full height, never squeezed by the page
    beside it, and the place its grip and character are measured from. --hh-inset: how far the
-   character sits in from the message box's left end (0 in the drawings; see the report). */
-.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:14px}
+   character sits in from the message box's left end. 0, as hhdesign draws it: measured in the
+   running app, the box's corner is round for 4.8 px only and the leftmost finger starts 7.4 px
+   in, so no finger hangs over the corner (docs/build/talk-v1-stage1.md). */
+.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}
 /* In a window too narrow for both sides Helper lies over the page, at full height, beside its
    strip (the page sets how far in from the right). A hairline marks its left edge there, since
    it has no shadow and may lie on a fill close to its own. */
