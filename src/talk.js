@@ -1615,7 +1615,19 @@ function turnSteps(text, st) {
   // the near miss: no row, but a subject word of exactly one group: N2 with that group's rows
   if (st.wants !== false) {
     const g = nearOf(t)
-    if (g.length === 1) return done('N2', { group: g[0] })
+    if (g.length === 1) {
+      // loom-fixes-2 part B 4 (Lead's answer 3 to find-v2's questions): a full hit by a phrase of one of the wants rows
+      // wins over the near miss, as in route2.py, which has no near miss and gives that row in its last step ("can it
+      // watch youtube videos": hhcontent's YouTube line w_youtube, not the nearest rows). Only the wants rows: a fact
+      // line's phrase leaves the near miss as the wants layers have it
+      const fh = out.code && out.code.skill_unknown ? null : fullHit(text, true)
+      if (fh && fh.kind === 'want') {
+        const { kind: k, ...more } = fh
+        out.by = 'title'
+        return done(k, more)
+      }
+      return done('N2', { group: g[0] })
+    }
   }
   return st.stage === 'open' ? lastStep(dontKnow(text) || 'skill by name') : done(dontKnow(text) || 'skill by name')
 }
@@ -1834,6 +1846,11 @@ export const EXTRA_LINES = (() => {
   }
   TALK_DATA.terms.forEach(t => take(t.next))
   Object.values(FIXED).forEach(f => take(f.next)) // ask-fix-t1: PRIV-next, SAFE-next
+  // loom-fixes-2 part B 4: a correction's button names a fixed line by its id alone (FB_MAKER: HERMES)
+  for (const l of Object.values((TALK_DATA.false_belief || {}).lines || {})) {
+    const n = l.next
+    if (n && n.kind === 'line' && !n.text && FIXED[n.id]) lines[n.id] = { id: n.id, text: FIXED[n.id].text, source: FIXED[n.id].source || null }
+  }
   return lines
 })()
 

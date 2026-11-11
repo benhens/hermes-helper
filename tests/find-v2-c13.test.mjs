@@ -54,8 +54,8 @@ test('3. near needs more than one ordinary word: #13 smart home, #28 dark mode n
   assert.equal(say(visit(), 'how do i turn on dark mode').said.line, 'd_dark')
 })
 
-// "can it watch youtube videos" is left out: the plugin's wants step answers it first with N2 (the nearest rows),
-// where route2.py alone gives w_youtube by its new phrase (a known gap, in docs/build/find-v2-report.md)
+// "can it watch youtube videos" is left out here: since loom-fixes-2 it gets w_youtube as in route2.py
+// (tests/loom-fixes-2-b4.test.mjs)
 test('6. the new lines: terminal, AGENTS.md, dark mode, smart home, cost, toolsets, shorter answers (f13 "how do i find a chat from last week" stays d_find: route2.py adab5484 gives d_find too)', () => {
   for (const [m, line] of [['what is a terminal', 'd_terminal'], ['what is AGENTS.md', 'd_agents_md'], ['how do i turn on dark mode', 'd_dark'],
     ['how do i make it answer shorter', 'd_shorter'], ['what are toolsets', 'd_toolsets'], ['does it work with home assistant', 'd_home'], ['how do i see what it costs', 'd_cost']]) {

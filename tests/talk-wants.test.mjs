@@ -77,9 +77,14 @@ function ours(m) {
 // Where the plugin differs from the reference on purpose: message -> [the plugin's result, why].
 const TYPED_ABOUT_KEPT = 'keeps.typed (A2 and A4: "forget my name", "forget everything", changes-8 not_when): the plugin\'s own step from the talk v2 job, not in route2.py and switched off in the reference (SETTINGS_ON False, its word lists are older than the data); in a fresh visit nothing is kept, so Helper says there is nothing like that to forget'
 const KEEPS_WORK = 'live-v2 changes-4: what the person does is kept; the reference keeps nothing at What do you do?'
+// loom-fixes-2 part B 4 (Lead's answer 3 to find-v2's questions): a wants row's own phrase wins over the near miss
+// (N2), as route2.py has it (it has no near miss); the wants layers of the reference give the near miss there
+const WANT_PHRASE_FIRST = "loom-fixes-2 (Lead): a wants row's own phrase wins over the near miss, as in route2.py"
 const TITLES_FIRST = 'live changes-11 (near.first_step): a full hit by a phrase of a fact line comes first, before the topics and the plugin\'s wants step, as in route2.py; the wants layers of the reference are older than that step'
 const KNOWN = {
   'can I speak to it instead of typing': ['fact d_voice_app', TITLES_FIRST],
+  'turn my notes into a nice powerpoint': ['ROW w_office', WANT_PHRASE_FIRST],
+  'can it download youtube videos': ['ROW w_youtube', WANT_PHRASE_FIRST],
   'forget everything': ['A-none', TYPED_ABOUT_KEPT],
   'please forget my name': ['A-none', TYPED_ABOUT_KEPT],
   'delete everything you know about me': ['A-none', TYPED_ABOUT_KEPT],
@@ -153,7 +158,7 @@ function landed(o) {
 }
 const set = name => O.sets.find(s => s.name === name).messages
 
-test('hhtech\'s thirty wants messages (new30, wanted results fixed before the run): 24 right, as hhtech counted with the fixes; never a row for something Hermes does not do', () => {
+test('hhtech\'s thirty wants messages (new30, wanted results fixed before the run): 25 right (24 as hhtech counted with the fixes, and loom-fixes-2: "turn my notes into a nice powerpoint" gets w_office by its phrase); never a row for something Hermes does not do', () => {
   let right = 0
   const rowsForNone = []
   for (const m of set('new30')) {
@@ -161,7 +166,7 @@ test('hhtech\'s thirty wants messages (new30, wanted results fixed before the ru
     if (m.want.includes(got)) right++
     if (m.kind === 'none' && got.startsWith('w_')) rowsForNone.push(m.text)
   }
-  assert.equal(right, 24)
+  assert.equal(right, 25)
   assert.deepEqual(rowsForNone, [])
 })
 
@@ -176,11 +181,13 @@ test('skills by name, hhtech\'s twenty sentences (Q4): all ten that name a skill
   assert.deepEqual([found, quiet], [10, 10])
 })
 
-test('hhcontent\'s forty messages (test_wants.py): 39 as hhcontent expected; the one hhcontent named still differs ("a skill for knitting" is N1 now, wants fixes v1)', () => {
+test('hhcontent\'s forty messages (test_wants.py): 38 as hhcontent expected; the one hhcontent named still differs ("a skill for knitting" is N1 now, wants fixes v1), and loom-fixes-2 gives "can it download youtube videos" the YouTube row, as route2.py', () => {
   const as = e => (e.startsWith('S:') ? 'skill:' + e.slice(2) : e.startsWith('topic:') ? e.slice(6) : e)
   const off = set('test_wants40').filter(m => landed(ours(m).o) !== as(m.hhcontent_expects)).map(m => [m.text, landed(ours(m).o)])
   // find-v2: live-v2 changes-13 took "youtube" off svc's words, so the last of hhcontent's own two lands as expected too
-  assert.deepEqual(off, [])
+  // loom-fixes-2 part B 4: "can it download youtube videos" now gets the YouTube row by its phrase "youtube videos", as
+  // route2.py gives it (hhcontent expected the near miss N2:pics there; in the report, For hhcontent)
+  assert.deepEqual(off, [['can it download youtube videos', 'w_youtube']])
   assert.equal(landed(ours(set('test_wants40').find(m => m.text === 'is there a skill for knitting')).o), 'N1')
 })
 
