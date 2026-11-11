@@ -273,7 +273,7 @@ export function makePage(ctx, opts = {}) {
   // call starts until it is 0, so at most one Helper call is ever in Hermes), the model status the page checked
   // last, and the mounted page's setters (null while the page is off screen: a turn that ends then still adds its
   // line to the conversation kept in memory).
-  const live = { n: 0, waiting: null, inHermes: 0, status: { state: 'checking' }, view: null }
+  const live = { n: 0, waiting: null, inHermes: 0, calls: new Set(), status: { state: 'checking' }, view: null }
   // The values a line sent to the AI must not hold (input.never_sent, name_check): the kept name and this
   // visit's name, the kept answers in Helper's words and as stored, and what the person asked Helper to keep.
   const keptValues = () => {
@@ -935,7 +935,10 @@ export function makePage(ctx, opts = {}) {
       // last-reset (hhtech-final-run, For builder 1): a slow reply costs only its own message. One call of Helper's still
       // in Hermes past its 12 s (its message already has its written line) does not hold the next question back; two
       // or more do (the pile-up stays at most two such calls; host.request ends each after 90 s)
-      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes - (live.stuck === 1 ? 1 : 0), off: visit.aiOff === true })
+      // last-words 2 (hhtech-last-reset-run fault 2): so does a call whose message already has its line, also before that
+      // call's own 12 s (ai_writes: a quick list call, then a slow writer call): such a call holds no message back
+      const answered = [...live.calls].filter(c => c.w !== live.waiting).length
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes - (live.stuck > 0 || answered > 0 ? 1 : 0), off: visit.aiOff === true })
       // find-v1 part 3: the page knows no model: no call and no dots, and the model is looked for again for a later message
       if (why === 'model not ready') lookAgain()
       // find-v1 part 3: this message cannot be asked because an earlier call of Helper's has been in Hermes for over 12 s:
@@ -968,6 +971,9 @@ export function makePage(ctx, opts = {}) {
       // (also when the person moved on before), since a slow or thinking model is held by each abandoned call for minutes
       const request = (method, params, timeout) => {
         live.inHermes++
+        // last-words 2: the calls of typed messages still in Hermes, each with its message (see send)
+        const call = { w }
+        live.calls.add(call)
         let ended = false
         let stuck = false
         const stopWatch = ctx.setTimeout(() => {
@@ -1002,6 +1008,7 @@ export function makePage(ctx, opts = {}) {
             ended = true
             stopWatch()
             if (stuck) live.stuck--
+            live.calls.delete(call)
             live.inHermes--
           })
       }
