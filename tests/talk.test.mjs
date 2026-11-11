@@ -591,8 +591,9 @@ test('"forget everything" (A4): the delete-all question; Yes removes the whole r
   const st = laterVisit({ name: 'Peter', asked: ['a b'], told: true })
   const said = lineFor(turn('forget everything', st), st)
   assert.equal(said.text, 'Delete everything I keep about you?')
-  // changes-14 (section 1): the line after Yes says the name is not asked again (met stays)
-  assert.equal(lineFor(forgetAnswer('all', true, st), st).text, "Done. I keep nothing about you now. I won't ask your name again.")
+  // last-words (Lead, 11 Nov 16:48): the line after Yes no longer says the name is not asked again (Forget all is a
+  // full reset since last-reset)
+  assert.equal(lineFor(forgetAnswer('all', true, st), st).text, 'Done. I keep nothing about you now.')
   assert.equal(st.met, true)
   assert.deepEqual(st.kept, {})
   const nw = DATA.keeps.typed.not_when
