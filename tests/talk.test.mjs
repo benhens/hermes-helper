@@ -251,8 +251,9 @@ test('the opening: greeting, name, what the person does, then a line with nothin
   assert.equal(f2.answers, null, 'no topics after the greeting')
   // talk-live-2 (live-v2 changes-4, keeps.work step 7): what the person does is kept, with its own Kept: line (the
   // first-time line was told under F1 already) and, in a build with an AI step, the line that the AI is told it
-  assert.deepEqual(f2.note, { text: 'Kept: I run a tennis club.', link: 'See what I keep', first: null, ...(TALK.WORK_TOLD ? { also: TALK.WORK_TOLD } : {}), items: [['work', 'I run a tennis club']] })
-  assert.deepEqual(st.kept, { name: 'Peter', told: true, work: 'I run a tennis club', told_work: true })
+  assert.deepEqual(f2.note, { text: 'Kept: I run a tennis club.', link: 'See what I keep', first: null, ...(TALK.WORK_TOLD ? { workTold: TALK.WORK_TOLD } : {}), items: [['work', 'I run a tennis club']] })
+  // told_work: the mark that the AI line was shown, only in a build that shows it (review)
+  assert.deepEqual(st.kept, { name: 'Peter', told: true, work: 'I run a tennis club', ...(TALK.WORK_TOLD ? { told_work: true } : {}) })
   assert.equal(st.work, 'I run a tennis club')
 })
 
@@ -264,7 +265,7 @@ test('no name given: the lines without a name and nothing kept; Skip: the "that\
   // talk-live-2 (live-v2 changes-4): the answer to What do you do? is kept, with the first-time line (nothing was kept before)
   assert.equal(f2.note.text, 'Kept: this and that.')
   assert.equal(f2.note.first, TALK.FIRST_TIME)
-  assert.deepEqual(st.kept, { work: 'this and that', told: true, told_work: true })
+  assert.deepEqual(st.kept, { work: 'this and that', told: true, ...(TALK.WORK_TOLD ? { told_work: true } : {}) })
   const st2 = freshVisit('name')
   const f3 = lineFor(skip(st2), st2)
   assert.equal(f3.text, "That's fine. Ask me anything about Hermes.")

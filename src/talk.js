@@ -364,7 +364,8 @@ function keep(st, out, key, value) {
   out.kept = [...(out.kept || []), key]
   // live-v2 changes-4 (keeps.tell.work_told): the first time what the person does is kept, the line that the AI is
   // told goes under the Kept: line (AI builds); shown again only after it was deleted and kept anew
-  if (key === 'work' && !st.kept.told_work) {
+  // (review: only in a build that shows that line, so a record carried into an AI build still gets it once)
+  if (key === 'work' && !st.kept.told_work && LIVE_DATA.lines_by_mode.work_told[AI_MODE]) {
     st.kept.told_work = true
     out.work_first = true
   }
@@ -823,7 +824,8 @@ function workStep(text, t, st, out) {
   if ((strongTopics(t).length || anyTerm(t)) && !startsWith(t, OPENING.name_with_more.self_starts)) return null // 3
   const whole = workWhole(talkNorm(text))
   st.stage = 'open'
-  if (Object.values(ST.kinds).some(ws => ws.includes(whole)) || WORK.non_answers.includes(whole) || WORK.non_answers.includes(talkNorm(text).trim())) return { kind: 'F3' } // 4
+  // 4 (review: "change what I do" typed again at WORK_ASK is no answer either)
+  if (Object.values(ST.kinds).some(ws => ws.includes(whole)) || WORK.non_answers.includes(whole) || WORK.non_answers.includes(talkNorm(text).trim()) || WORK.typed_change.ask_again_words.includes(whole)) return { kind: 'F3' }
   if (looksSecret(text)) return { kind: 'WORK_SECRET' } // 5
   const value = workEnd(workSqueeze(text))
   if (!workOk(value, { withSecretRule: false })) {
@@ -840,7 +842,8 @@ function workStep(text, t, st, out) {
   keep(st, out, 'work', value) // 7
   st.work = value
   if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
-  return { kind: 'F2', more: { name: st.name, work: value } }
+  // (review: after WORK_ASK on a later visit the name is the kept one)
+  return { kind: 'F2', more: { name: st.name || st.kept.name || null, work: value } }
 }
 // keeps.work.typed_change: "I'm a teacher now" replaces (or keeps) what the person does; "change what I do" asks
 // WORK_ASK, and the reply goes through workStep. Returns { kind, more } or null.
@@ -857,7 +860,8 @@ function workChange(text, st, out) {
   let t = stripLead(talkNorm(raw))
   if (startsWith(t, ['actually'])) t = t.slice('actually'.length).replace(/^[ ,]+/, '')
   if (!startsWith(t, TC.starts) || !whichOf(t, TC.now_words).length) return null
-  if (t.includes('?') || questionForm(t) || whichOf(t, TC.not_with).length || strongTopics(t).length || anyTerm(t)) return null
+  // (the rule names keeps.typed_change.not_words; changes-4's own list is not_with: review, both count)
+  if (t.includes('?') || questionForm(t) || whichOf(t, TC.not_with).length || whichOf(t, KEEPS.typed_change.not_words).length || strongTopics(t).length || anyTerm(t)) return null
   // the value: the message as typed, from where t starts, with end marks and the now-word at its end cut
   let value = workEnd(Array.from(raw).slice(Array.from(raw).length - charCount(t)).join(''))
   const nowAtEnd = [...TC.now_words].sort((a, b) => b.length - a.length).find(w => value.toLowerCase().endsWith(' ' + w))
@@ -1311,8 +1315,8 @@ function keptNote(result, st) {
   // items: what this line says was kept, [key, value] each, so the page can mark the line once
   // that is no longer kept (forgotten, or replaced by a newer one)
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
-  // also: changes-4's line that the AI is told what the person does (lines_by_mode.work_told; none with no AI step)
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, ...(result.work_first && WORK_TOLD ? { also: WORK_TOLD } : {}), items }
+  // workTold: changes-4's line that the AI is told what the person does (lines_by_mode.work_told; none with no AI step)
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, ...(result.work_first && WORK_TOLD ? { workTold: WORK_TOLD } : {}), items }
 }
 // Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
 // as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
@@ -1416,7 +1420,8 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
-      return said('F2', named(FIXED.F2))
+      // talk-live-2: on a later visit (WORK_ASK, a typed change) the result carries the kept name
+      return said('F2', result.name && !st.name ? fillSlots(FIXED.F2.text, { name: result.name }) : named(FIXED.F2))
     case 'F3':
       return said('F3', FIXED.F3.text)
     case 'TP':

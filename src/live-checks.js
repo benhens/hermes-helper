@@ -30,9 +30,9 @@ const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
 const THINK_START = /^\s*thinking process\b/i
 const THINK_ANYWHERE = '**Analyze'
 export function isThinking(raw) {
-  const s = String(raw || '')
-  const open = s.lastIndexOf('<think>')
-  if (open >= 0 && s.indexOf('</think>', open) < 0) return true
+  // a closed block is cut first (Hermes cuts it too); what is left is the reply (review)
+  const s = String(raw || '').replace(/<think>[\s\S]*?<\/think>/g, '')
+  if (s.includes('<think>')) return true
   return THINK_START.test(s) || s.includes(THINK_ANYWHERE)
 }
 
@@ -166,8 +166,8 @@ export function replyFlags(reply, rows, used, talk = {}) {
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
   // c24, after c23 (changes-4: "Run c24 after c23")
-  const who = c24Fails(reply, talk.work, talk.message, hand)
-  if (who) out.push('c24 about the person ' + who)
+  const c24Word = c24Fails(reply, talk.work, talk.message, hand)
+  if (c24Word) out.push('c24 about the person ' + c24Word)
   return out
 }
 

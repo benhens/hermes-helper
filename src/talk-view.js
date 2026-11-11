@@ -14,7 +14,7 @@
 //     paste:   null | text        text to paste shown at once (the "your own Hermes can" line)
 //     rows:    null | [text]      the list of what Helper keeps (A1)
 //     hint:    null | text        a small faint line under the line (N_HINT)
-//     note:    null | { text, link, first, also }   the faint "Kept: ..." line, above the line it belongs to
+//     note:    null | { text, link, first, workTold }   the faint "Kept: ..." line, above the line it belongs to
 //     used:    null | { text, link, topic }   the faint "From what I keep: ..." line, the same place
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
@@ -91,7 +91,7 @@ function notesOf(entry, onNote, kept) {
           jsx('button', { type: 'button', className: T.link, 'data-hh': 'kept-link', onClick: () => onNote(entry, 'see'), children: entry.note.link }, 'link'),
           entry.note.first ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-first', children: entry.note.first }, 'first') : null,
           // live-v2 changes-4: below the first-time line, the line that the AI is told what the person does (once)
-          entry.note.also ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-work-told', children: entry.note.also }, 'also') : null
+          entry.note.workTold ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-work-told', children: entry.note.workTold }, 'work-told') : null
         ]
       }, `${entry.id}-kept`)
     )

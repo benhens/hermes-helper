@@ -16,7 +16,7 @@ import { LIVE_DATA } from '../src/live-data.js'
 import { AI_MODE } from '../src/ai-mode.js'
 import { cleanKept, keptToStore } from '../src/kept.js'
 import { renderKept, readBox, saveBox } from '../src/settings-file.js'
-import { writerText, pickText, firstCallText, workLine } from '../src/live-request.js'
+import { writerText, pickText, firstCallText, workLine, sendable } from '../src/live-request.js'
 import { c24Fails, replyFlags, isThinking } from '../src/live-checks.js'
 import { askLive, goesToAi, liveWhyNot } from '../src/live-turn.js'
 import { isFollowUp } from '../src/live-rows.js'
@@ -178,14 +178,15 @@ test('changes-4: F2 says Kept: under it; the first time, the line that the AI is
   const said = lineFor(o, st)
   assert.equal(said.text, 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(said.note.text, 'Kept: I run a tennis club.')
-  assert.equal(said.note.also || null, WORK_TOLD)
-  if (AI_MODE === 'no_ai_step') assert.equal('also' in said.note, false)
-  else assert.equal(said.note.also, 'I also tell your AI what you do when I ask it for help.')
-  assert.equal(st.kept.told_work, true)
+  assert.equal(said.note.workTold || null, WORK_TOLD)
+  if (AI_MODE === 'no_ai_step') assert.equal('workTold' in said.note, false)
+  else assert.equal(said.note.workTold, 'I also tell your AI what you do when I ask it for help.')
+  // the mark only where the line shows (review): a record carried into an AI build still gets the line once
+  assert.equal(st.kept.told_work, WORK_TOLD ? true : undefined)
   // kept anew after a change: no second told line
   const o2 = turn("I'm a teacher now", st)
   assert.equal(o2.kind, 'F2')
-  assert.equal(lineFor(o2, st).note.also, undefined)
+  assert.equal(lineFor(o2, st).note.workTold, undefined)
 })
 
 test('changes-4 typed change: the six examples of keeps.work.typed_change', () => {
@@ -215,14 +216,43 @@ test('changes-4 typed change: the six examples of keeps.work.typed_change', () =
   assert.equal(st.kept.work, "I'm a nurse")
 })
 
-test('changes-4: \"change what I do\" asks WORK_ASK, and the reply goes through steps 1 to 7', () => {
+test('changes-4: "change what I do" asks WORK_ASK, and the reply goes through steps 1 to 7', () => {
   const st = laterVisit({ name: 'Peter', work: 'I run a tennis club', told: true, told_work: true }, true)
   const q = turn('change what I do', st)
   assert.equal(q.kind, 'WORK_ASK')
   assert.equal(lineFor(q, st).text, 'What do you do now?')
   assert.equal(st.stage, 'work')
-  assert.equal(turn('I teach piano', st).kind, 'F2')
+  const f2 = turn('I teach piano', st)
+  assert.equal(f2.kind, 'F2')
   assert.equal(st.kept.work, 'I teach piano')
+  // review: on a later visit F2 greets by the kept name
+  assert.equal(lineFor(f2, st).text, 'Thanks, Peter. Ask me anything about Hermes.')
+  // review: the ask-again words typed again at that question are no answer, never kept as the job
+  const st2 = laterVisit({ name: 'Peter', work: 'I run a tennis club', told: true }, true)
+  turn('change what I do', st2)
+  assert.equal(turn('change what I do', st2).kind, 'F3')
+  assert.equal(st2.kept.work, 'I run a tennis club')
+})
+
+test('review: a typed change with a word of keeps.typed_change.not_words is not taken', () => {
+  const st = laterVisit({ name: 'Peter', work: 'I run a tennis club', told: true }, true)
+  turn("I'm a teacher now, I stopped nursing", st)
+  assert.equal(st.kept.work, 'I run a tennis club')
+})
+
+test('review: a work value that holds the kept name is not sent; the c23 flag comes before the c24 flag', () => {
+  assert.equal(workLine("Peter's bakery, I run it", ['Peter']), null)
+  assert.equal(workLine("Peter's bakery, I run it", ['peter']), null)
+  assert.equal(workLine('I run a bakery', ['Peter']), 'What the person does (they told Helper): I run a bakery')
+  assert.doesNotMatch(writerText(['use1'], "Peter's bakery, I run it", ['Peter']), /bakery|Peter/)
+  const rows = [{ id: 'use1', text: HAND_USE.slice(7) }]
+  const f = replyFlags('As a coach, start a new chat.', rows, ['use1'], { message: 'x', lastLine: 'As a coach, start a new chat.' })
+  assert.deepEqual(f.filter(x => /^c2[34]/.test(x)).map(x => x.slice(0, 3)), ['c23', 'c24'])
+})
+
+test('review: an answer to What do you do? that was not kept (too long, looking secret) is not sent later', () => {
+  for (const kind of ['WORK_LONG', 'WORK_LONG_2', 'WORK_SECRET']) assert.equal(sendable({ kind }).you, false, kind)
+  assert.equal(sendable({ kind: 'N1' }).you, true)
 })
 
 test('changes-4: the list shows What you do second; forget what I do asks, then deletes it (and its told mark)', () => {
@@ -330,7 +360,8 @@ test('changes-4 c24 runs after c23, with or without a kept value', () => {
 test('weak AI: an unclosed <think>, text starting \"Thinking Process\", or holding \"**Analyze\" is thinking; a closed block and a plain reply are not', () => {
   for (const s of ['<think>Okay, the user', 'ok <think> hmm', 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Task:**', '  Thinking Process: 1.', 'Sure. 1. **Analyze the request', 'mem\n**Analyze**'])
     assert.equal(isThinking(s), true, s)
-  for (const s of ['<think>hmm</think>mem', 'mem', 'Long chats use the most tokens.\nUSED: use1', 'I was thinking process steps', ''])
+  // a closed block is cut first, whatever it holds (review)
+  for (const s of ['<think>hmm</think>mem', '<think>Thinking Process: 1. **Analyze**</think>Real answer.', 'mem', 'Long chats use the most tokens.\nUSED: use1', 'I was thinking process steps', ''])
     assert.equal(isThinking(s), false, s)
 })
 

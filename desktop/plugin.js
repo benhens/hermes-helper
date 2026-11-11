@@ -15335,7 +15335,8 @@ function keep(st, out, key, value) {
   out.kept = [...(out.kept || []), key]
   // live-v2 changes-4 (keeps.tell.work_told): the first time what the person does is kept, the line that the AI is
   // told goes under the Kept: line (AI builds); shown again only after it was deleted and kept anew
-  if (key === 'work' && !st.kept.told_work) {
+  // (review: only in a build that shows that line, so a record carried into an AI build still gets it once)
+  if (key === 'work' && !st.kept.told_work && LIVE_DATA.lines_by_mode.work_told[AI_MODE]) {
     st.kept.told_work = true
     out.work_first = true
   }
@@ -15794,7 +15795,8 @@ function workStep(text, t, st, out) {
   if ((strongTopics(t).length || anyTerm(t)) && !startsWith(t, OPENING.name_with_more.self_starts)) return null // 3
   const whole = workWhole(talkNorm(text))
   st.stage = 'open'
-  if (Object.values(ST.kinds).some(ws => ws.includes(whole)) || WORK.non_answers.includes(whole) || WORK.non_answers.includes(talkNorm(text).trim())) return { kind: 'F3' } // 4
+  // 4 (review: "change what I do" typed again at WORK_ASK is no answer either)
+  if (Object.values(ST.kinds).some(ws => ws.includes(whole)) || WORK.non_answers.includes(whole) || WORK.non_answers.includes(talkNorm(text).trim()) || WORK.typed_change.ask_again_words.includes(whole)) return { kind: 'F3' }
   if (looksSecret(text)) return { kind: 'WORK_SECRET' } // 5
   const value = workEnd(workSqueeze(text))
   if (!workOk(value, { withSecretRule: false })) {
@@ -15811,7 +15813,8 @@ function workStep(text, t, st, out) {
   keep(st, out, 'work', value) // 7
   st.work = value
   if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
-  return { kind: 'F2', more: { name: st.name, work: value } }
+  // (review: after WORK_ASK on a later visit the name is the kept one)
+  return { kind: 'F2', more: { name: st.name || st.kept.name || null, work: value } }
 }
 // keeps.work.typed_change: "I'm a teacher now" replaces (or keeps) what the person does; "change what I do" asks
 // WORK_ASK, and the reply goes through workStep. Returns { kind, more } or null.
@@ -15828,7 +15831,8 @@ function workChange(text, st, out) {
   let t = stripLead(talkNorm(raw))
   if (startsWith(t, ['actually'])) t = t.slice('actually'.length).replace(/^[ ,]+/, '')
   if (!startsWith(t, TC.starts) || !whichOf(t, TC.now_words).length) return null
-  if (t.includes('?') || questionForm(t) || whichOf(t, TC.not_with).length || strongTopics(t).length || anyTerm(t)) return null
+  // (the rule names keeps.typed_change.not_words; changes-4's own list is not_with: review, both count)
+  if (t.includes('?') || questionForm(t) || whichOf(t, TC.not_with).length || whichOf(t, KEEPS.typed_change.not_words).length || strongTopics(t).length || anyTerm(t)) return null
   // the value: the message as typed, from where t starts, with end marks and the now-word at its end cut
   let value = workEnd(Array.from(raw).slice(Array.from(raw).length - charCount(t)).join(''))
   const nowAtEnd = [...TC.now_words].sort((a, b) => b.length - a.length).find(w => value.toLowerCase().endsWith(' ' + w))
@@ -16282,8 +16286,8 @@ function keptNote(result, st) {
   // items: what this line says was kept, [key, value] each, so the page can mark the line once
   // that is no longer kept (forgotten, or replaced by a newer one)
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
-  // also: changes-4's line that the AI is told what the person does (lines_by_mode.work_told; none with no AI step)
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, ...(result.work_first && WORK_TOLD ? { also: WORK_TOLD } : {}), items }
+  // workTold: changes-4's line that the AI is told what the person does (lines_by_mode.work_told; none with no AI step)
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, ...(result.work_first && WORK_TOLD ? { workTold: WORK_TOLD } : {}), items }
 }
 // Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
 // as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
@@ -16387,7 +16391,8 @@ function lineFor(result, st, typed = '', opts = {}) {
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
-      return said('F2', named(FIXED.F2))
+      // talk-live-2: on a later visit (WORK_ASK, a typed change) the result carries the kept name
+      return said('F2', result.name && !st.name ? fillSlots(FIXED.F2.text, { name: result.name }) : named(FIXED.F2))
     case 'F3':
       return said('F3', FIXED.F3.text)
     case 'TP':
@@ -16650,9 +16655,9 @@ const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
 const THINK_START = /^\s*thinking process\b/i
 const THINK_ANYWHERE = '**Analyze'
 function isThinking(raw) {
-  const s = String(raw || '')
-  const open = s.lastIndexOf('<think>')
-  if (open >= 0 && s.indexOf('</think>', open) < 0) return true
+  // a closed block is cut first (Hermes cuts it too); what is left is the reply (review)
+  const s = String(raw || '').replace(/<think>[\s\S]*?<\/think>/g, '')
+  if (s.includes('<think>')) return true
   return THINK_START.test(s) || s.includes(THINK_ANYWHERE)
 }
 
@@ -16786,8 +16791,8 @@ function replyFlags(reply, rows, used, talk = {}) {
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
   // c24, after c23 (changes-4: "Run c24 after c23")
-  const who = c24Fails(reply, talk.work, talk.message, hand)
-  if (who) out.push('c24 about the person ' + who)
+  const c24Word = c24Fails(reply, talk.work, talk.message, hand)
+  if (c24Word) out.push('c24 about the person ' + c24Word)
   return out
 }
 
@@ -16825,17 +16830,20 @@ const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects', LIVE
 const rowLines = ids => ids.filter(id => LIVE_ROW[id]).map(id => `[${id}] ${LIVE_ROW[id].text}`)
 // live-v2 changes-4 (input.work_line): what the person does, the one kept value ever sent, as one labelled line; null
 // when nothing is kept or the value fails the guard (not secret, no key, within keeps.work.limits). Never the name.
-function workLine(work) {
+// names: the kept name and this visit's name; a value that holds one of them as a whole word, in any capitals, is
+// left out (input.work_line.never: the name is never in this line; review)
+function workLine(work, names = []) {
   if (!workOk(work)) return null
+  if (names.filter(n => typeof n === 'string' && n.trim()).some(n => new RegExp('(^|[^\\p{L}\\p{N}])' + lvEsc(n.trim()) + '($|[^\\p{L}\\p{N}])', 'iu').test(work))) return null
   return LV_IN.work_line.replace('{work}', () => work.replace(/\s+/g, ' ').trim())
 }
 // the slot {work_line} on its own line: the work line, or the slot and its line break left out
-const fillWork = (text, work) => {
-  const w = workLine(work)
+const fillWork = (text, work, names) => {
+  const w = workLine(work, names)
   return w ? text.replace('{work_line}', () => w) : text.replace(/\{work_line\}\n?/, '')
 }
-const writerText = (ids, work = null) => fillList(fillWork(LIVE_DATA.writer.text, work), 'rows', rowLines(ids))
-const pickText = (ids, work = null) => fillList(fillWork(LIVE_DATA.pick_only.text, work), 'rows', rowLines(ids))
+const writerText = (ids, work = null, names = []) => fillList(fillWork(LIVE_DATA.writer.text, work, names), 'rows', rowLines(ids))
+const pickText = (ids, work = null, names = []) => fillList(fillWork(LIVE_DATA.pick_only.text, work, names), 'rows', rowLines(ids))
 
 // Which lines of the conversation may ever be sent, decided when they are said (the page notes it on the
 // log entries): { you, helper } for the person's message and Helper's answer.
@@ -16845,11 +16853,14 @@ const pickText = (ids, work = null) => fillList(fillWork(LIVE_DATA.pick_only.tex
 //   (review) and an answer Helper keeps (the AI, the chat app, the service: picked or typed) with the line that
 //   answers it, and a line said from what is kept ("From what I keep: ..."), which shows the kept answer
 const LV_NEVER = /^(?:K1|RM\d|A1|A2|A4|A-none|A-yes|A-no|NAME_AGAIN|NAME_NEW)$/
+// talk-live-2 (review): an answer to "What do you do?" that was not kept (too long, or looking secret) says about the
+// person more than the one work line; it is not sent either
+const LV_WORK_NOT_KEPT = /^(?:WORK_LONG|WORK_LONG_2|WORK_SECRET)$/
 function sendable(result) {
   const k = (result && result.kind) || ''
   if (LV_NEVER.test(k)) return { you: false, helper: false }
   if ((result.kept || []).some(x => x !== 'name') || result.used === 'kept') return { you: false, helper: false }
-  return { you: !(k === 'F1' || result.name_taken), helper: true }
+  return { you: !(k === 'F1' || result.name_taken || LV_WORK_NOT_KEPT.test(k)), helper: true }
 }
 
 // Helper's line as it may be sent: its shown text, and for a line that greets by name its text with no name
@@ -16952,7 +16963,8 @@ function isHowQuestion(text) {
 // A call that sends back thinking text (hhtech-weak-ai) ends the turn at once: { fallback, thinking: true }, so
 // the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
 // USED: line) is an ordinary fallback.
-async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null }) {
+//   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
+async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -16970,11 +16982,11 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work })
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names })
   return thinking ? { fallback: 'thinking text', thinking: true } : got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work }) {
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
   let ids = null
   if (isFollowUp(text, pre, before)) ids = followRows(before)
   if (!ids || !ids.length) {
@@ -16993,7 +17005,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
   const rows = ids.map(id => ({ id, text: LIVE_ROW[id].text }))
   if (mode === 'ai_picks_line') {
-    const raw = await call('pick', pickText(ids, work), LIVE_DATA.pick_only.max_tokens)
+    const raw = await call('pick', pickText(ids, work, names), LIVE_DATA.pick_only.max_tokens)
     if (raw === null) return { fallback: 'pick call failed' }
     const p = readPick(raw, ids)
     if (p.id) return { result: resultOfRow(p.id), rows: ids }
@@ -17001,7 +17013,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     return { fallback: 'pick: none' }
   }
-  const raw = await call('writer', writerText(ids, work), LIVE_DATA.writer.max_tokens)
+  const raw = await call('writer', writerText(ids, work, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
   const j = judgeWritten(raw, rows, { lastLine, message: text, work })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
@@ -17025,9 +17037,15 @@ function liveApply(st, got, out, before, text) {
     const k = lineKey(r)
     if (!asked && (k === before.lastKey || (st.rejected || []).includes(k))) return null
   }
-  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) r[x] = out[x]
+  for (const x of ['kept', 'first', 'name_taken', 'thing', 'work_first']) if (x in out) r[x] = out[x]
   st.pending = null
   st.lastq = false
+  // changes-3 (review): the fallback was noted as the last answer line, but it is not shown; "again" must find the
+  // one before it, unless this line is an answer line itself
+  if ('lastAnswer' in before) {
+    st.lastAnswer = before.lastAnswer
+    st.lastAnswerKey = before.lastAnswerKey
+  }
   noteLast(st, r)
   if (r.kind === 'written') {
     // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
@@ -18888,7 +18906,7 @@ function namesWhole(text) {
 //     paste:   null | text        text to paste shown at once (the "your own Hermes can" line)
 //     rows:    null | [text]      the list of what Helper keeps (A1)
 //     hint:    null | text        a small faint line under the line (N_HINT)
-//     note:    null | { text, link, first, also }   the faint "Kept: ..." line, above the line it belongs to
+//     note:    null | { text, link, first, workTold }   the faint "Kept: ..." line, above the line it belongs to
 //     used:    null | { text, link, topic }   the faint "From what I keep: ..." line, the same place
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
@@ -18956,7 +18974,7 @@ function notesOf(entry, onNote, kept) {
           jsx('button', { type: 'button', className: T.link, 'data-hh': 'kept-link', onClick: () => onNote(entry, 'see'), children: entry.note.link }, 'link'),
           entry.note.first ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-first', children: entry.note.first }, 'first') : null,
           // live-v2 changes-4: below the first-time line, the line that the AI is told what the person does (once)
-          entry.note.also ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-work-told', children: entry.note.also }, 'also') : null
+          entry.note.workTold ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-work-told', children: entry.note.workTold }, 'work-told') : null
         ]
       }, `${entry.id}-kept`)
     )
@@ -19676,7 +19694,7 @@ function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       liveClose()
-      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null }
+      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null }
       const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper')
       const lines = lastLines(memory.log, keptValues())
       const { pre, out: result } = turnParts(typed, visit)
@@ -19697,15 +19715,16 @@ function makePage(ctx, opts = {}) {
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      // 12 s: the no-AI line. A call of Helper's still in Hermes then (no answer in 12 s) turns the AI step off for the
-      // rest of this visit: a slow or thinking model is held by each abandoned call for minutes (hhtech-weak-ai)
-      w.stopTimer = ctx.setTimeout(() => {
-        if (live.waiting === w && live.inHermes > 0) visit.aiOff = true
-        liveFinish(w, null)
-      }, LIVE_SECONDS * 1000)
+      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
+      // hhtech-weak-ai: a call with no answer 12 s after it started turns the AI step off for the rest of this visit
+      // (also when the person moved on before), since a slow or thinking model is held by each abandoned call for minutes
       const request = (method, params, timeout) => {
         live.inHermes++
+        let ended = false
+        const stopWatch = ctx.setTimeout(() => {
+          if (!ended) visit.aiOff = true
+        }, LIVE_SECONDS * 1000)
         let p
         try {
           p = Promise.resolve(host.request(method, params, timeout))
@@ -19713,11 +19732,13 @@ function makePage(ctx, opts = {}) {
           p = Promise.reject(err)
         }
         return p.finally(() => {
+          ended = true
+          stopWatch()
           live.inHermes--
         })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
         .then(got => {
           // hhtech-weak-ai: thinking text from any call turns the AI step off for the rest of this visit, also when
           // it comes after the 12 s

@@ -69,7 +69,8 @@ function isHowQuestion(text) {
 // A call that sends back thinking text (hhtech-weak-ai) ends the turn at once: { fallback, thinking: true }, so
 // the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
 // USED: line) is an ordinary fallback.
-export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null }) {
+//   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
+export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -87,11 +88,11 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work })
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names })
   return thinking ? { fallback: 'thinking text', thinking: true } : got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work }) {
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
   let ids = null
   if (isFollowUp(text, pre, before)) ids = followRows(before)
   if (!ids || !ids.length) {
@@ -110,7 +111,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
   const rows = ids.map(id => ({ id, text: LIVE_ROW[id].text }))
   if (mode === 'ai_picks_line') {
-    const raw = await call('pick', pickText(ids, work), LIVE_DATA.pick_only.max_tokens)
+    const raw = await call('pick', pickText(ids, work, names), LIVE_DATA.pick_only.max_tokens)
     if (raw === null) return { fallback: 'pick call failed' }
     const p = readPick(raw, ids)
     if (p.id) return { result: resultOfRow(p.id), rows: ids }
@@ -118,7 +119,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     return { fallback: 'pick: none' }
   }
-  const raw = await call('writer', writerText(ids, work), LIVE_DATA.writer.max_tokens)
+  const raw = await call('writer', writerText(ids, work, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
   const j = judgeWritten(raw, rows, { lastLine, message: text, work })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
@@ -142,9 +143,15 @@ export function liveApply(st, got, out, before, text) {
     const k = lineKey(r)
     if (!asked && (k === before.lastKey || (st.rejected || []).includes(k))) return null
   }
-  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) r[x] = out[x]
+  for (const x of ['kept', 'first', 'name_taken', 'thing', 'work_first']) if (x in out) r[x] = out[x]
   st.pending = null
   st.lastq = false
+  // changes-3 (review): the fallback was noted as the last answer line, but it is not shown; "again" must find the
+  // one before it, unless this line is an answer line itself
+  if ('lastAnswer' in before) {
+    st.lastAnswer = before.lastAnswer
+    st.lastAnswerKey = before.lastAnswerKey
+  }
   noteLast(st, r)
   if (r.kind === 'written') {
     // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk

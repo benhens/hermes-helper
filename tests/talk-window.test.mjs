@@ -625,7 +625,7 @@ test('what is kept about the person: one stored record ("kept") by fixed rules, 
   send(view, 'what is a skill')
   assert.deepEqual([...storage.data.keys()].sort(), ['kept', 'met'], 'the record and the met mark (changes-14), nothing else')
   assert.equal(storage.data.get('met'), true)
-  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', work: 'I run a tennis club', msg: 'WhatsApp', asked: ['my club has six courts'], told: true, told_work: true })
+  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', work: 'I run a tennis club', msg: 'WhatsApp', asked: ['my club has six courts'], told: true, ...(WORK_TOLD ? { told_work: true } : {}) })
   assert.doesNotMatch(JSON.stringify([...storage.data]), /install|skill/)
   assert.deepEqual(globalThis.__hhHost.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'and nothing was sent to Hermes')
 })
@@ -662,7 +662,7 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   finish(back)
   send(back, 'I run a tennis club')
   // talk-live-2 (live-v2 changes-4): what the person does is kept, and outlives the restart below
-  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', told: true, work: 'I run a tennis club', told_work: true })
+  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', told: true, work: 'I run a tennis club', ...(WORK_TOLD ? { told_work: true } : {}) })
   // Hermes starts again: the plugin is loaded anew, with the same storage
   const second = await registerPlugin(storage, fakeTimers())
   const fresh = mount(second.Page)

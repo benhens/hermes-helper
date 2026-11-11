@@ -25,17 +25,20 @@ export const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects
 export const rowLines = ids => ids.filter(id => LIVE_ROW[id]).map(id => `[${id}] ${LIVE_ROW[id].text}`)
 // live-v2 changes-4 (input.work_line): what the person does, the one kept value ever sent, as one labelled line; null
 // when nothing is kept or the value fails the guard (not secret, no key, within keeps.work.limits). Never the name.
-export function workLine(work) {
+// names: the kept name and this visit's name; a value that holds one of them as a whole word, in any capitals, is
+// left out (input.work_line.never: the name is never in this line; review)
+export function workLine(work, names = []) {
   if (!workOk(work)) return null
+  if (names.filter(n => typeof n === 'string' && n.trim()).some(n => new RegExp('(^|[^\\p{L}\\p{N}])' + lvEsc(n.trim()) + '($|[^\\p{L}\\p{N}])', 'iu').test(work))) return null
   return LV_IN.work_line.replace('{work}', () => work.replace(/\s+/g, ' ').trim())
 }
 // the slot {work_line} on its own line: the work line, or the slot and its line break left out
-const fillWork = (text, work) => {
-  const w = workLine(work)
+const fillWork = (text, work, names) => {
+  const w = workLine(work, names)
   return w ? text.replace('{work_line}', () => w) : text.replace(/\{work_line\}\n?/, '')
 }
-export const writerText = (ids, work = null) => fillList(fillWork(LIVE_DATA.writer.text, work), 'rows', rowLines(ids))
-export const pickText = (ids, work = null) => fillList(fillWork(LIVE_DATA.pick_only.text, work), 'rows', rowLines(ids))
+export const writerText = (ids, work = null, names = []) => fillList(fillWork(LIVE_DATA.writer.text, work, names), 'rows', rowLines(ids))
+export const pickText = (ids, work = null, names = []) => fillList(fillWork(LIVE_DATA.pick_only.text, work, names), 'rows', rowLines(ids))
 
 // Which lines of the conversation may ever be sent, decided when they are said (the page notes it on the
 // log entries): { you, helper } for the person's message and Helper's answer.
@@ -45,11 +48,14 @@ export const pickText = (ids, work = null) => fillList(fillWork(LIVE_DATA.pick_o
 //   (review) and an answer Helper keeps (the AI, the chat app, the service: picked or typed) with the line that
 //   answers it, and a line said from what is kept ("From what I keep: ..."), which shows the kept answer
 const LV_NEVER = /^(?:K1|RM\d|A1|A2|A4|A-none|A-yes|A-no|NAME_AGAIN|NAME_NEW)$/
+// talk-live-2 (review): an answer to "What do you do?" that was not kept (too long, or looking secret) says about the
+// person more than the one work line; it is not sent either
+const LV_WORK_NOT_KEPT = /^(?:WORK_LONG|WORK_LONG_2|WORK_SECRET)$/
 export function sendable(result) {
   const k = (result && result.kind) || ''
   if (LV_NEVER.test(k)) return { you: false, helper: false }
   if ((result.kept || []).some(x => x !== 'name') || result.used === 'kept') return { you: false, helper: false }
-  return { you: !(k === 'F1' || result.name_taken), helper: true }
+  return { you: !(k === 'F1' || result.name_taken || LV_WORK_NOT_KEPT.test(k)), helper: true }
 }
 
 // Helper's line as it may be sent: its shown text, and for a line that greets by name its text with no name

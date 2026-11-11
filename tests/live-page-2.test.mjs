@@ -126,6 +126,36 @@ test('no answer in 12 s: the no-AI line at 12 s, and no more calls in this visit
   assert.equal(dots(view), null)
 })
 
+test('review: a call with no answer 12 s after it started turns the AI step off, also when the person moved on before', async () => {
+  const d = deferred()
+  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+  send(view, 'what should I set up first')
+  await settle()
+  assert.equal(host.asks.length, 1)
+  // a new message before the 12 s: the waiting one gets its line, the call still runs in Hermes
+  send(view, 'thanks')
+  timers.fire(12000)
+  d.resolve('mod')
+  await settle()
+  finish(view)
+  send(view, 'can it fly a plane')
+  await settle()
+  assert.equal(host.asks.length, 1, 'off for the visit')
+})
+
+test('the AI step off for a visit comes back when Hermes starts again (a new visit)', async () => {
+  const storage = fakeStorage()
+  const a = await pastOpening('ai_writes', { storage, host: { oneshot: () => THINKING } })
+  send(a.view, 'what should I set up first')
+  await settle()
+  assert.equal(a.host.asks.length, 1)
+  const b = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
+  finish(b.view)
+  send(b.view, 'what should I set up first')
+  await settle()
+  assert.ok(b.host.asks.length >= 1, 'a new visit calls again')
+})
+
 test('a reply that sits on the USED: line falls back to the no-AI line and is no such failure: the next message still asks the AI', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'msg' : 'USED: msg0, msg1. You can chat with Hermes from apps like Telegram.') } })
   send(view, 'what should I set up first')

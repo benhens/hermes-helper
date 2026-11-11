@@ -462,7 +462,7 @@ export function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       liveClose()
-      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null }
+      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null }
       const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper')
       const lines = lastLines(memory.log, keptValues())
       const { pre, out: result } = turnParts(typed, visit)
@@ -483,15 +483,16 @@ export function makePage(ctx, opts = {}) {
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      // 12 s: the no-AI line. A call of Helper's still in Hermes then (no answer in 12 s) turns the AI step off for the
-      // rest of this visit: a slow or thinking model is held by each abandoned call for minutes (hhtech-weak-ai)
-      w.stopTimer = ctx.setTimeout(() => {
-        if (live.waiting === w && live.inHermes > 0) visit.aiOff = true
-        liveFinish(w, null)
-      }, LIVE_SECONDS * 1000)
+      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
+      // hhtech-weak-ai: a call with no answer 12 s after it started turns the AI step off for the rest of this visit
+      // (also when the person moved on before), since a slow or thinking model is held by each abandoned call for minutes
       const request = (method, params, timeout) => {
         live.inHermes++
+        let ended = false
+        const stopWatch = ctx.setTimeout(() => {
+          if (!ended) visit.aiOff = true
+        }, LIVE_SECONDS * 1000)
         let p
         try {
           p = Promise.resolve(host.request(method, params, timeout))
@@ -499,11 +500,13 @@ export function makePage(ctx, opts = {}) {
           p = Promise.reject(err)
         }
         return p.finally(() => {
+          ended = true
+          stopWatch()
           live.inHermes--
         })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
         .then(got => {
           // hhtech-weak-ai: thinking text from any call turns the AI step off for the rest of this visit, also when
           // it comes after the 12 s
