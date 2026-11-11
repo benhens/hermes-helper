@@ -8,7 +8,7 @@
 export const SETUP_LINES = {
   F2: ['{name}'], F3: [], WORK_SECRET: [], WORK_LONG_2: [], Q_GOAL: [], SETUP_REASK: [], SETUP_REASK_GOAL: [],
   REC: ['{reason}', '{card}', '{why}'], STEP: ['{n}', '{total}', '{step}'], STUCK: [], STUCK_MODEL: [], DONE_SEEN: ['{seen_part}'],
-  NOT_SEEN: [], DONE_SAID: [], ALREADY_SEEABLE: [], SOMETHING_ELSE: [], NOT_NOW: [], ALL_DONE: [],
+  NOT_SEEN: [], DONE_SAID: [], SOMETHING_ELSE: [], NOT_NOW: [], ALL_DONE: [],
   BACK_DONE: ['{name}', '{seen_part}'], BACK_REC: ['{name}', '{card}', '{why}'], BACK_Q: ['{name}'], BACK: ['{name}'], RESTART: [],
   // setup-chat-2 (setup-chat changes-1): the returning line when something else is seen done and the line after it, the
   // line of "I can't see that yet" and of "Count it as done", and the line back to the step after a typed question

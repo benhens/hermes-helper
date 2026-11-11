@@ -288,25 +288,6 @@ export const SETUP_DATA = {
     "DONE_SAID": {
       "text": "Good. I'll remember that you did it."
     },
-    "ALREADY_SEEABLE": {
-      "text": "I can't see that yet. {not_part}",
-      "answers": [
-        "Show me the steps",
-        "I did it on another bot",
-        "Count it as done",
-        "Not now"
-      ],
-      "answers_second_bot": [
-        "Show me the steps",
-        "Count it as done",
-        "Not now"
-      ],
-      "not_part": {
-        "personality": "Its personality text is still the starter one.",
-        "scheduled_job": "You have no scheduled jobs yet.",
-        "second_bot": "You have one bot so far."
-      }
-    },
     "SOMETHING_ELSE": {
       "text": "Fine, here's another."
     },
@@ -362,6 +343,25 @@ export const SETUP_DATA = {
         "Something else",
         "Not now"
       ]
+    },
+    "ALREADY_SEEABLE": {
+      "text": "I can't see that yet. {not_part}",
+      "answers": [
+        "Show me the steps",
+        "I did it on another bot",
+        "Count it as done",
+        "Not now"
+      ],
+      "answers_second_bot": [
+        "Show me the steps",
+        "Count it as done",
+        "Not now"
+      ],
+      "not_part": {
+        "personality": "Its personality text is still the starter one.",
+        "scheduled_job": "You have no scheduled jobs yet.",
+        "second_bot": "You have one bot so far."
+      }
     },
     "ALREADY_COUNT": {
       "text": "Fine. I'll count it as done."

@@ -167,6 +167,7 @@ const suStepSlots = s => ({ n: s.step + 1, total: SU.items[s.item].steps.length,
 function suStepLine(st) {
   const s = suOf(st)
   s.stage = 'step'
+  s.stepHidden = false
   return suSaid('STEP', suFill(SU_L.STEP.text, suStepSlots(s)), { answers: suStepPicks(st) })
 }
 function suNotNow(st) {
@@ -287,6 +288,18 @@ function suAsk(st) {
   })
 }
 
+// The things to pick of the set-up conversation's open line, by its stage (null: none is open)
+function suOpenPicks(st) {
+  const s = suOf(st)
+  if (s.stage === 'rec') return suREC_PICKS(SU_L.REC.answers)
+  if (s.stage === 'step') return suStepPicks(st)
+  if (s.stage === 'stuck') return suPicks(['stuck:works', 'stuck:stop'].map((a, i) => [a, SU_L.STUCK.answers[i]]))
+  if (s.stage === 'notseen') return suNotSeenWords(s.item)[1].answers
+  if (s.stage === 'already') return suPicks(suAlreadyActs(s.item).map((a, i) => [a, suAlreadyLabels(s.item)[i]]))
+  if (s.stage === 'new') return suNEW_PICKS()
+  if (s.stage === 'goal') return suGOAL_PICKS()
+  return null
+}
 // A thing picked, or a button pressed: its action. Returns a move, or null when the action is not for this stage.
 export function setupPress(action, st) {
   const s = suOf(st)
@@ -295,8 +308,8 @@ export function setupPress(action, st) {
   // no sentence for above the list)
   // While a recommendation waits for its answer, its four answers stay under the list, so the person is not left
   // with nothing to pick.
-  if (action === 'lookwhat')
-    return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: s.stage === 'rec' ? suREC_PICKS(SU_L.REC.answers) : null })]) : null
+  // setup-chat-2: the same for any open line of the set-up conversation (a step, "I can't see that yet", ...)
+  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: suOpenPicks(st) })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
   if (kind === 'goal' && s.stage === 'goal') return suMove(true, seen => suAnswerGoal(st, id, null, seen))
   if (kind === 'rec' && s.stage === 'rec') {
@@ -375,7 +388,9 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
     const labels = last ? SU_L.STEP.last_step_answers : SU_L.STEP.answers
     // the answers of either kind of step count, typed at any step: "It worked" at a step before the last is Done
     const i = Math.max(suLabelOf(labels, text), suLabelOf(last ? SU_L.STEP.answers : SU_L.STEP.last_step_answers, text))
-    const act = i >= 0 ? [last ? 'step:worked' : 'step:done', 'step:stuck', 'step:stop'][i] : SU_STEP_NEXT.includes(t) ? (last ? 'step:worked' : 'step:done') : null
+    // setup-chat-2: while an answer of the ordinary talk with its own things to pick stands under the step (a delete
+    // question's Yes | No), "yes", "ok" and the like answer that, not the step: only the step's own labels count
+    const act = i >= 0 ? [last ? 'step:worked' : 'step:done', 'step:stuck', 'step:stop'][i] : SU_STEP_NEXT.includes(t) && !s.stepHidden ? (last ? 'step:worked' : 'step:done') : null
     if (act) return setupPress(act, st)
   }
   if (s.stage === 'stuck') {
@@ -389,14 +404,17 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'already') {
     const i = suLabelOf(suAlreadyLabels(s.item), text)
     if (i >= 0) return setupPress(suAlreadyActs(s.item)[i], st)
+    // as at the recommendation: yes is the steps, no is Not now
+    if (SU_REC_YES.includes(t)) return setupPress('already:steps', st)
+    if (SU_REC_NO.includes(t)) return setupPress('already:notnow', st)
   }
   if (isSetupAsk(text) && !hasTopicWord(text)) return suAsk(st)
   return null
 }
 
 // After the ordinary talk answered a question typed in place of an answer to SU_Q_NEW or Q_GOAL: the line that asks
-// again, once for each question; else null.
-export function setupAfter(st) {
+// again, once for each question; else null. picks: the answer has things of its own to pick (setup-chat-2, below).
+export function setupAfter(st, { picks = false } = {}) {
   const s = suOf(st)
   if (s.stage === 'new' && !s.reasked.new) {
     s.reasked.new = true
@@ -408,10 +426,18 @@ export function setupAfter(st) {
   }
   // setup-chat-2 (changes-1 STEP_BACK; hhtech-setup-run 1.1: the step was gone after a typed question): while a step is
   // open, after every answer, the step again with its own answers, so Done goes on to the next step. Not after I'm
-  // stuck or Stop for now (the stage is then another).
-  if (s.stage === 'step' && s.item && SU.items[s.item]) return suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
+  // stuck or Stop for now (the stage is then another). An answer with things of its own to pick (a delete question's
+  // Yes | No, "Which one do you mean?", the topics under "help") keeps them: the step comes back after the answer to
+  // that (the page calls this after picked answers too while a step is open), and meanwhile only the step's own labels
+  // typed count as its answers (stepHidden).
+  if (s.stage === 'step' && s.item && SU.items[s.item]) {
+    s.stepHidden = picks
+    return picks ? null : suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
+  }
   return null
 }
+// setup-chat-2: whether a step of the set-up conversation is the open line
+export const setupStepOpen = st => !!(st.setup && st.setup.stage === 'step')
 
 // setup-chat-2 (changes-1 BACK_SEEN): the one thing a return visit names as seen done: the goal's thing if it is, else
 // the first seen done in the order the data's BACK_SEEN gives (scheduled_job, personality, second_bot). What is there
@@ -453,6 +479,10 @@ export function setupOpening(st, seen) {
     s.asked.goal = true
     return [suSaid('BACK', suNamed(SU_L.BACK, name)), suSaid('Q_GOAL', SU_L.Q_GOAL.text, { answers: suGOAL_PICKS() })]
   }
+  // setup-chat-2 (changes-1 BACK_SEEN: "Then BACK_NEXT ..., or REC for a new item, or ALL_DONE"): with nothing kept as
+  // current (all done before, or its row deleted in Settings), a thing seen done is named in place of the plain BACK
+  const part = suBackPart(st, seen)
+  if (part) return suRecommend(st, seen, [suSaid('BACK_SEEN', suNamed(SU_L.BACK_SEEN, name, { back_part: part }))])
   const back = suSaid('BACK', suNamed(SU_L.BACK, name))
   const lines = suRecommend(st, seen, [back])
   // everything done: the old BACK alone, with its offer (the data's BACK: "Unchanged, for R5 (all done) only")

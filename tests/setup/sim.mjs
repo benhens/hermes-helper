@@ -43,12 +43,12 @@ export function person(reads = NOTHING(), { kept = null, met = false } = {}) {
       const { out } = turnParts(text, st)
       const s = lineFor(out, st, text)
       const { offer, ...line } = s
+      // as src/page.js setupAfterSaid: the set-up line after the answer (setup-chat-2: while a step is open, the step
+      // again in place of the answer's offer, unless the answer has things of its own to pick)
+      const again = ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(out.kind) ? null : setupAfter(st, { picks: !!line.answers })
       log.push(line)
-      if (offer) log.push({ line: 'offer-' + offer.set, text: offer.text, answers: offer.answers })
-      if (!['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(out.kind)) {
-        const again = setupAfter(st)
-        if (again) add(again)
-      }
+      if (offer && !(again && again.line === 'STEP_BACK')) log.push({ line: 'offer-' + offer.set, text: offer.text, answers: offer.answers })
+      if (again) add(again)
       return p
     },
     skip() {

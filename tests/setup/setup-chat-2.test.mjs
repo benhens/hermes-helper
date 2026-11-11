@@ -18,6 +18,7 @@ import { SETUP_DATA } from '../../src/setup-data.js'
 import { readmeForMode } from '../../scripts/live-data.mjs'
 import { aiModeOf, setupAiOf } from '../../scripts/build.mjs'
 import { person, NOTHING } from './sim.mjs'
+import { setupPress } from '../../src/setup-chat.js'
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..')
 const LIST = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'dash-setup-list-v2.json'), 'utf8'))
@@ -364,7 +365,7 @@ test('conversation (a) on the page with a typed question at a step and Not now; 
   assert.match(bubbleSaid(view), /^Step 2 of 5: /)
   await send(view, 'what is a skill?')
   const old = olds(view).map(n => n.props['data-line'])
-  assert.ok(old.includes('term-skill') || bubbleLine(view) === 'STEP_BACK', old.join(' '))
+  assert.equal(old.at(-1), 'term-skill', 'the question was answered, just before: ' + old.join(' '))
   assert.equal(bubbleLine(view), 'STEP_BACK')
   assert.equal(bubbleSaid(view), `Back to step 2 of 5: ${stepsOf('first_chat')[1]}`)
   assert.deepEqual(labels(view), ['Done', "I'm stuck", 'Stop for now'])
@@ -411,4 +412,140 @@ test('a question at a step that goes to the person\'s AI (ai_writes): after its 
   assert.deepEqual(labels(view), ['Done', "I'm stuck", 'Stop for now'])
   await press(view, 'Done')
   assert.equal(bubbleSaid(view), `Step 2 of 5: ${stepsOf('chat_apps')[1]}`)
+})
+
+/* ---------- after the review ---------- */
+function atStep(goal = 'Talk to it from my phone') {
+  const p = person()
+  p.skip()
+  p.press('I know it well').press(goal).press('Show me the steps')
+  p.said()
+  return p
+}
+test('at a step, an answer with things of its own to pick keeps them (no "Back to step" yet); "yes" then answers that, not the step', opt, () => {
+  for (const typed of ['forget everything', 'help']) {
+    const p = atStep()
+    p.type(typed)
+    const s = p.said()
+    assert.equal(s.some(x => x.line === 'STEP_BACK'), false, typed)
+    assert.ok(p.labels().length >= 2 && !p.labels().includes('Done'), typed + ': its own picks stay: ' + JSON.stringify(p.labels()))
+  }
+  const p = atStep()
+  p.type('forget everything')
+  p.said()
+  p.type('yes')
+  const s = p.said()
+  assert.equal(s.some(x => x.line === 'STEP'), false, '"yes" did not move the step on')
+  assert.equal(s.at(-1).line, 'STEP_BACK', 'after the answer to that, the step comes back')
+  assert.match(s.at(-1).text, /^Back to step 1 of 5: /)
+  // the step's own labels still count while the question stands
+  const q = atStep()
+  q.type('help')
+  q.type('Done')
+  assert.match(q.last().text, /^Step 2 of 5: /)
+})
+
+test('at a step, an answer that carries an offer: the step comes back in place of the offer', opt, () => {
+  const p = atStep()
+  p.type('hello')
+  const s = p.said()
+  assert.equal(s.some(x => x.line.startsWith('offer-')), false, 'no offer bubble: ' + s.map(x => x.line).join(' '))
+  assert.equal(s.at(-1).line, 'STEP_BACK')
+  // away from the steps the same answer still carries its offer
+  const q = person()
+  q.type('Peter').type('I run a tennis club')
+  q.press('I know it well').press('Not sure yet').press('Not now')
+  q.said()
+  q.type('hello')
+  assert.ok(q.said().some(x => x.line.startsWith('offer-')))
+})
+
+test('typed answers under the second-bot lines go by their own labels; yes and no under "I can\'t see that yet"', opt, () => {
+  let p = atRec(NOTHING(), 'Several bots, one per job')
+  p.press("I've done this already")
+  p.type('count it as done')
+  assert.ok(p.log.some(x => x.line === 'ALREADY_COUNT'), 'Count it as done typed is the second of three')
+  p = atRec(NOTHING(), 'Several bots, one per job')
+  p.press("I've done this already")
+  p.type('not now')
+  assert.ok(p.log.some(x => x.line === 'NOT_NOW'))
+  p = atRec(NOTHING(), 'Several bots, one per job')
+  p.press('Show me the steps')
+  for (let i = 0; i < 4; i++) p.press('Done')
+  p.press('It worked')
+  p.type('Not now')
+  assert.ok(p.log.some(x => x.line === 'NOT_NOW'), 'Not now typed under the second-bot NOT_SEEN is its second of two')
+  assert.equal(setupPress('notseen:otherbot', p.st), null, 'no other-bot answer for a bot')
+  p = atRec(NOTHING())
+  p.press("I've done this already")
+  p.type('yes')
+  assert.match(p.last().text, /^Step 1 of 5: /)
+  p = atRec(NOTHING())
+  p.press("I've done this already")
+  p.type('no')
+  assert.ok(p.log.some(x => x.line === 'NOT_NOW'))
+})
+
+test('BACK_SEEN: Scheduled jobs before the personality when the goal is neither; with nothing kept as current, it stands in place of the plain Hi again', opt, () => {
+  let p = person({ model: 'ok', soul: true, jobs: 1, bots: 1 }, { kept: { ...KEPT, setup_goal_id: 'phone', setup_goal: 'Talk to it from my phone', setup_current: 'chat_apps' }, met: true }).opening()
+  assert.equal(p.log[0].text, 'Hi again, Peter. I can see you have 1 scheduled job.')
+  // the row "Next to set up" deleted in Settings: nothing current, a job seen
+  const { setup_current, ...noCurrent } = KEPT
+  p = person({ model: 'ok', soul: false, jobs: 1, bots: 1 }, { kept: { ...noCurrent }, met: true }).opening()
+  assert.deepEqual(p.log.map(x => x.line), ['BACK_SEEN', 'REC'])
+  assert.equal(p.log[0].text, 'Hi again, Peter. I can see you have 1 scheduled job.')
+  // nothing seen done: the plain Hi again, as before
+  p = person(NOTHING(), { kept: { ...noCurrent }, met: true }).opening()
+  assert.deepEqual(p.log.map(x => x.line), ['BACK', 'REC'])
+})
+
+test('"What did you look at?" pressed while a step is open: the six lines, and the step\'s answers stay under them', opt, () => {
+  const p = atStep()
+  p.button('What did you look at?')
+  assert.equal(p.last().line, 'LOOK_LIST')
+  assert.deepEqual(p.labels(), ['Done', "I'm stuck", 'Stop for now'])
+  p.press('Done')
+  assert.match(p.last().text, /^Step 2 of 5: /)
+})
+
+test('on the page: at a step, "help" keeps its topics; picked through to an answer with nothing to pick, then the step comes back', opt, async () => {
+  const { view } = await open({ mode: 'no_ai_step' })
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, 'I know it well')
+  await press(view, 'Talk to it from my phone')
+  await press(view, 'Show me the steps')
+  await send(view, 'help')
+  assert.equal(bubbleLine(view), 'TP')
+  const seen = []
+  // each answer that asks its own question keeps its picks; the first one with none brings the step back
+  for (let i = 0; i < 5 && bubbleLine(view) !== 'STEP_BACK'; i++) {
+    assert.ok(!labels(view).includes('Done'), labels(view).join(' / '))
+    seen.push(bubbleLine(view))
+    await press(view, labels(view)[0])
+  }
+  assert.ok(seen.length >= 1, seen.join(' '))
+  assert.equal(bubbleLine(view), 'STEP_BACK', seen.join(' '))
+  assert.deepEqual(labels(view), ['Done', "I'm stuck", 'Stop for now'])
+})
+
+test('on the page: a step answer typed while the AI still works on a question gets no "Back to step" in front of it', opt, async () => {
+  let release
+  const { view, host } = await open({ mode: 'ai_writes', reply: () => 'NONE' })
+  host.request = (orig => async (m, p, ms) => (m === 'llm.oneshot' ? (host.asks.push(p), new Promise(r => (release = r))) : orig(m, p, ms)))(host.request)
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, 'I know it well')
+  await press(view, 'Talk to it from my phone')
+  await press(view, 'Show me the steps')
+  await send(view, 'can it fly a kite')
+  assert.equal(host.asks.length, 1, 'the question waits for the AI')
+  await send(view, 'stop for now')
+  const lines = olds(view).map(n => n.props['data-line']).concat(bubbleLine(view))
+  assert.equal(lines.includes('STEP_BACK'), false, lines.join(' '))
+  assert.ok(lines.includes('NOT_NOW'), lines.join(' '))
+  if (release) release({ text: 'NONE' })
+  await settle()
 })

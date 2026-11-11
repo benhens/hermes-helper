@@ -9607,25 +9607,6 @@ const SETUP_DATA = {
     "DONE_SAID": {
       "text": "Good. I'll remember that you did it."
     },
-    "ALREADY_SEEABLE": {
-      "text": "I can't see that yet. {not_part}",
-      "answers": [
-        "Show me the steps",
-        "I did it on another bot",
-        "Count it as done",
-        "Not now"
-      ],
-      "answers_second_bot": [
-        "Show me the steps",
-        "Count it as done",
-        "Not now"
-      ],
-      "not_part": {
-        "personality": "Its personality text is still the starter one.",
-        "scheduled_job": "You have no scheduled jobs yet.",
-        "second_bot": "You have one bot so far."
-      }
-    },
     "SOMETHING_ELSE": {
       "text": "Fine, here's another."
     },
@@ -9681,6 +9662,25 @@ const SETUP_DATA = {
         "Something else",
         "Not now"
       ]
+    },
+    "ALREADY_SEEABLE": {
+      "text": "I can't see that yet. {not_part}",
+      "answers": [
+        "Show me the steps",
+        "I did it on another bot",
+        "Count it as done",
+        "Not now"
+      ],
+      "answers_second_bot": [
+        "Show me the steps",
+        "Count it as done",
+        "Not now"
+      ],
+      "not_part": {
+        "personality": "Its personality text is still the starter one.",
+        "scheduled_job": "You have no scheduled jobs yet.",
+        "second_bot": "You have one bot so far."
+      }
     },
     "ALREADY_COUNT": {
       "text": "Fine. I'll count it as done."
@@ -18041,6 +18041,7 @@ const suStepSlots = s => ({ n: s.step + 1, total: SU.items[s.item].steps.length,
 function suStepLine(st) {
   const s = suOf(st)
   s.stage = 'step'
+  s.stepHidden = false
   return suSaid('STEP', suFill(SU_L.STEP.text, suStepSlots(s)), { answers: suStepPicks(st) })
 }
 function suNotNow(st) {
@@ -18161,6 +18162,18 @@ function suAsk(st) {
   })
 }
 
+// The things to pick of the set-up conversation's open line, by its stage (null: none is open)
+function suOpenPicks(st) {
+  const s = suOf(st)
+  if (s.stage === 'rec') return suREC_PICKS(SU_L.REC.answers)
+  if (s.stage === 'step') return suStepPicks(st)
+  if (s.stage === 'stuck') return suPicks(['stuck:works', 'stuck:stop'].map((a, i) => [a, SU_L.STUCK.answers[i]]))
+  if (s.stage === 'notseen') return suNotSeenWords(s.item)[1].answers
+  if (s.stage === 'already') return suPicks(suAlreadyActs(s.item).map((a, i) => [a, suAlreadyLabels(s.item)[i]]))
+  if (s.stage === 'new') return suNEW_PICKS()
+  if (s.stage === 'goal') return suGOAL_PICKS()
+  return null
+}
 // A thing picked, or a button pressed: its action. Returns a move, or null when the action is not for this stage.
 function setupPress(action, st) {
   const s = suOf(st)
@@ -18169,8 +18182,8 @@ function setupPress(action, st) {
   // no sentence for above the list)
   // While a recommendation waits for its answer, its four answers stay under the list, so the person is not left
   // with nothing to pick.
-  if (action === 'lookwhat')
-    return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: s.stage === 'rec' ? suREC_PICKS(SU_L.REC.answers) : null })]) : null
+  // setup-chat-2: the same for any open line of the set-up conversation (a step, "I can't see that yet", ...)
+  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: suOpenPicks(st) })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
   if (kind === 'goal' && s.stage === 'goal') return suMove(true, seen => suAnswerGoal(st, id, null, seen))
   if (kind === 'rec' && s.stage === 'rec') {
@@ -18249,7 +18262,9 @@ function setupTyped(text, st, hasTopicWord = () => false) {
     const labels = last ? SU_L.STEP.last_step_answers : SU_L.STEP.answers
     // the answers of either kind of step count, typed at any step: "It worked" at a step before the last is Done
     const i = Math.max(suLabelOf(labels, text), suLabelOf(last ? SU_L.STEP.answers : SU_L.STEP.last_step_answers, text))
-    const act = i >= 0 ? [last ? 'step:worked' : 'step:done', 'step:stuck', 'step:stop'][i] : SU_STEP_NEXT.includes(t) ? (last ? 'step:worked' : 'step:done') : null
+    // setup-chat-2: while an answer of the ordinary talk with its own things to pick stands under the step (a delete
+    // question's Yes | No), "yes", "ok" and the like answer that, not the step: only the step's own labels count
+    const act = i >= 0 ? [last ? 'step:worked' : 'step:done', 'step:stuck', 'step:stop'][i] : SU_STEP_NEXT.includes(t) && !s.stepHidden ? (last ? 'step:worked' : 'step:done') : null
     if (act) return setupPress(act, st)
   }
   if (s.stage === 'stuck') {
@@ -18263,14 +18278,17 @@ function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'already') {
     const i = suLabelOf(suAlreadyLabels(s.item), text)
     if (i >= 0) return setupPress(suAlreadyActs(s.item)[i], st)
+    // as at the recommendation: yes is the steps, no is Not now
+    if (SU_REC_YES.includes(t)) return setupPress('already:steps', st)
+    if (SU_REC_NO.includes(t)) return setupPress('already:notnow', st)
   }
   if (isSetupAsk(text) && !hasTopicWord(text)) return suAsk(st)
   return null
 }
 
 // After the ordinary talk answered a question typed in place of an answer to SU_Q_NEW or Q_GOAL: the line that asks
-// again, once for each question; else null.
-function setupAfter(st) {
+// again, once for each question; else null. picks: the answer has things of its own to pick (setup-chat-2, below).
+function setupAfter(st, { picks = false } = {}) {
   const s = suOf(st)
   if (s.stage === 'new' && !s.reasked.new) {
     s.reasked.new = true
@@ -18282,10 +18300,18 @@ function setupAfter(st) {
   }
   // setup-chat-2 (changes-1 STEP_BACK; hhtech-setup-run 1.1: the step was gone after a typed question): while a step is
   // open, after every answer, the step again with its own answers, so Done goes on to the next step. Not after I'm
-  // stuck or Stop for now (the stage is then another).
-  if (s.stage === 'step' && s.item && SU.items[s.item]) return suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
+  // stuck or Stop for now (the stage is then another). An answer with things of its own to pick (a delete question's
+  // Yes | No, "Which one do you mean?", the topics under "help") keeps them: the step comes back after the answer to
+  // that (the page calls this after picked answers too while a step is open), and meanwhile only the step's own labels
+  // typed count as its answers (stepHidden).
+  if (s.stage === 'step' && s.item && SU.items[s.item]) {
+    s.stepHidden = picks
+    return picks ? null : suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
+  }
   return null
 }
+// setup-chat-2: whether a step of the set-up conversation is the open line
+const setupStepOpen = st => !!(st.setup && st.setup.stage === 'step')
 
 // setup-chat-2 (changes-1 BACK_SEEN): the one thing a return visit names as seen done: the goal's thing if it is, else
 // the first seen done in the order the data's BACK_SEEN gives (scheduled_job, personality, second_bot). What is there
@@ -18327,6 +18353,10 @@ function setupOpening(st, seen) {
     s.asked.goal = true
     return [suSaid('BACK', suNamed(SU_L.BACK, name)), suSaid('Q_GOAL', SU_L.Q_GOAL.text, { answers: suGOAL_PICKS() })]
   }
+  // setup-chat-2 (changes-1 BACK_SEEN: "Then BACK_NEXT ..., or REC for a new item, or ALL_DONE"): with nothing kept as
+  // current (all done before, or its row deleted in Settings), a thing seen done is named in place of the plain BACK
+  const part = suBackPart(st, seen)
+  if (part) return suRecommend(st, seen, [suSaid('BACK_SEEN', suNamed(SU_L.BACK_SEEN, name, { back_part: part }))])
   const back = suSaid('BACK', suNamed(SU_L.BACK, name))
   const lines = suRecommend(st, seen, [back])
   // everything done: the old BACK alone, with its offer (the data's BACK: "Unchanged, for R5 (all done) only")
@@ -22672,13 +22702,23 @@ function makePage(ctx, opts = {}) {
   }
   // setup-chat: after the ordinary talk answered a message typed in place of an answer to Q_NEW or Q_GOAL, the line
   // that asks that question again, once (SETUP_REASK, SETUP_REASK_GOAL); not after the lines that ask it themselves
-  const setupReask = result => {
-    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return []
-    const again = setupAfter(memory.visit)
-    return again ? setupEntries(again) : []
+  // setup-chat-2 (changes-1 STEP_BACK): while a step is open, after every answer of the ordinary talk, typed or picked,
+  // the step again with its own answers ("Back to step 2 of 5: ..."), in place of that answer's offer; an answer with
+  // things of its own to pick keeps them, and the step comes back after the answer to those (src/setup-chat.js).
+  // Returns [the answer's line as it is to be shown, the entries after it].
+  const setupAfterSaid = (result, said, typed) => {
+    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return [said, []]
+    const step = setupStepOpen(memory.visit)
+    if (!step && !typed) return [said, []]
+    const again = setupAfter(memory.visit, { picks: !!said.answers })
+    if (!again) return [said, []]
+    return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
   }
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
-  const liveFinish = (w, final) => {
+  // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
+  // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
+  // in front of it)
+  const liveFinish = (w, final, quiet = false) => {
     if (live.waiting !== w) return
     live.waiting = null
     w.stopTimer()
@@ -22686,7 +22726,8 @@ function makePage(ctx, opts = {}) {
     const result = final || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(said, w.sendHelper), ...slowAfter(said), ...setupReask(result)].slice(-LOG_MAX)
+    const [shown, after] = quiet ? [said, []] : setupAfterSaid(result, said, w.typed)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(shown, w.sendHelper), ...slowAfter(said), ...after].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -22718,7 +22759,7 @@ function makePage(ctx, opts = {}) {
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
   const liveClose = () => {
-    if (live.waiting) liveFinish(live.waiting, null)
+    if (live.waiting) liveFinish(live.waiting, null, true)
     // setup-chat: a move of the set-up conversation that still waits for the look is answered at once from what was
     // read last (or as "couldn't check"), and a recommendation that still waits for the AI's sentence gets its
     // written one at once: every message is answered, in order, before the next thing the person does
@@ -22969,7 +23010,8 @@ function makePage(ctx, opts = {}) {
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper), ...(typed ? setupReask(result) : [])].filter(Boolean))
+      const [line, after] = setupAfterSaid(result, said, typed)
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(line, may.helper), ...after].filter(Boolean))
       setFocusAsk(true)
     }
 

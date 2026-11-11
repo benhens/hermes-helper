@@ -28,7 +28,7 @@ import { cleanKept, keptToStore } from './kept.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
 import { recInstructions, judgeRec, askRec } from './setup-rec.js'
 import { AI_MODE } from './ai-mode.js'
-import { setupTyped, setupPress, setupAfter, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
+import { setupTyped, setupPress, setupAfter, setupStepOpen, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
 import { makeLook, LOOK_UNSEEN } from './setup-look.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
@@ -220,13 +220,23 @@ export function makePage(ctx, opts = {}) {
   }
   // setup-chat: after the ordinary talk answered a message typed in place of an answer to Q_NEW or Q_GOAL, the line
   // that asks that question again, once (SETUP_REASK, SETUP_REASK_GOAL); not after the lines that ask it themselves
-  const setupReask = result => {
-    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return []
-    const again = setupAfter(memory.visit)
-    return again ? setupEntries(again) : []
+  // setup-chat-2 (changes-1 STEP_BACK): while a step is open, after every answer of the ordinary talk, typed or picked,
+  // the step again with its own answers ("Back to step 2 of 5: ..."), in place of that answer's offer; an answer with
+  // things of its own to pick keeps them, and the step comes back after the answer to those (src/setup-chat.js).
+  // Returns [the answer's line as it is to be shown, the entries after it].
+  const setupAfterSaid = (result, said, typed) => {
+    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return [said, []]
+    const step = setupStepOpen(memory.visit)
+    if (!step && !typed) return [said, []]
+    const again = setupAfter(memory.visit, { picks: !!said.answers })
+    if (!again) return [said, []]
+    return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
   }
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
-  const liveFinish = (w, final) => {
+  // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
+  // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
+  // in front of it)
+  const liveFinish = (w, final, quiet = false) => {
     if (live.waiting !== w) return
     live.waiting = null
     w.stopTimer()
@@ -234,7 +244,8 @@ export function makePage(ctx, opts = {}) {
     const result = final || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(said, w.sendHelper), ...slowAfter(said), ...setupReask(result)].slice(-LOG_MAX)
+    const [shown, after] = quiet ? [said, []] : setupAfterSaid(result, said, w.typed)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(shown, w.sendHelper), ...slowAfter(said), ...after].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -266,7 +277,7 @@ export function makePage(ctx, opts = {}) {
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
   const liveClose = () => {
-    if (live.waiting) liveFinish(live.waiting, null)
+    if (live.waiting) liveFinish(live.waiting, null, true)
     // setup-chat: a move of the set-up conversation that still waits for the look is answered at once from what was
     // read last (or as "couldn't check"), and a recommendation that still waits for the AI's sentence gets its
     // written one at once: every message is answered, in order, before the next thing the person does
@@ -517,7 +528,8 @@ export function makePage(ctx, opts = {}) {
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper), ...(typed ? setupReask(result) : [])].filter(Boolean))
+      const [line, after] = setupAfterSaid(result, said, typed)
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(line, may.helper), ...after].filter(Boolean))
       setFocusAsk(true)
     }
 

@@ -379,6 +379,11 @@ test('returning: the thing picked last time; seen done now; before the questions
   assert.deepEqual(lines(p.log), [['BACK', 'Hi again, Peter.'], ['Q_GOAL', 'Do you want jobs at set times, phone chats, or something else?']])
   // everything done: the old BACK with its offer
   p = person({ model: 'ok', soul: true, jobs: 1, bots: 2 }, { kept: { name: 'Peter', setup_new: 'well', setup_goal: 'Not much', setup_goal_id: 'unsure', setup_done_said: ['chat_apps', 'tools_apps', 'memory', 'safety', 'skills'] }, met: true }).opening()
+  // setup-chat-2 (changes-1 BACK_SEEN, "... or ALL_DONE"): a thing seen done is named first, then all done
+  assert.deepEqual(p.log.map(x => x.line), ['BACK_SEEN', 'ALL_DONE', 'offer-general_2'])
+  assert.equal(p.log[0].text, 'Hi again, Peter. I can see you have 1 scheduled job.')
+  // nothing seen done (all said done): the old BACK alone, with its offer
+  p = person({ model: 'ok', soul: false, jobs: 0, bots: 1 }, { kept: { name: 'Peter', setup_new: 'well', setup_goal: 'Not much', setup_goal_id: 'unsure', setup_done_said: ['personality', 'scheduled_job', 'second_bot', 'chat_apps', 'tools_apps', 'memory', 'safety', 'skills'] }, met: true }).opening()
   assert.deepEqual(p.log.map(x => x.line), ['BACK', 'offer-general_2'])
   assert.equal(p.log[0].text, 'Hi again, Peter.')
 })
