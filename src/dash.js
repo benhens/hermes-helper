@@ -21,7 +21,7 @@ import { K, D, cx } from './look.js'
 import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
 import { botRows, openBotName, makeReader } from './setup-reads.js'
-import { cardStates, cardColumns, panelAfter, distinctSkills, tileWord } from './dash-rules.js'
+import { cardStates, cardColumns, panelAfter, distinctSkills, tileWord, CARD_MIN_PX } from './dash-rules.js'
 import { Character } from './character.js'
 import { makeEyes } from './eyes.js'
 import { prefersReducedMotion } from './motion.js'
@@ -315,7 +315,8 @@ export function makeDashboard(ctx) {
     const cards = cardStates(said, items)
     const isDone = id => cards.states[items.findIndex(it => it.id === id)] === 'done'
     // as many columns as fit with each card at least CARD_MIN_PX wide
-    const columns = cardColumns(cardsWidth || CARDS_WIDTH_UNMEASURED)
+    // (look: the boxes are 20 px apart now, so the count is taken with that gap and a card stays 260 px or wider)
+    const columns = cardColumns(cardsWidth || CARDS_WIDTH_UNMEASURED, CARD_MIN_PX, BOX_GAP_PX)
     const openAt = open ? items.findIndex(it => it.id === open) : -1
     const openItem = openAt >= 0 ? items[openAt] : null
 
@@ -608,7 +609,7 @@ export function makeDashboard(ctx) {
                 'div',
                 {
                   className: D.bannerOpen,
-                  children: jsx(Button, { variant: 'default', size: 'xs', 'data-hh': 'banner-open', 'data-card': nextItem.id, onClick: () => state.openCard(nextItem.id), children: fill(BANNER_WORDS.open, { name: nextItem.name }) })
+                  children: jsx(Button, { variant: 'default', 'data-hh': 'banner-open', 'data-card': nextItem.id, onClick: () => state.openCard(nextItem.id), children: fill(BANNER_WORDS.open, { name: nextItem.name }) })
                 },
                 'o'
               )

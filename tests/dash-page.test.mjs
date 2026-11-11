@@ -576,12 +576,13 @@ test('as many columns as fit with each card at least 260 px wide: 1 at 400 px, 2
   const { view } = await open('half')
   byData(dash(view), 'cards').props.ref({ id: 'cards' })
   const fire = width => observers.filter(o => o.watching && o.watching.id === 'cards').forEach(o => o.cb([{ contentRect: { width, height: 500 } }]))
-  for (const [width, cols] of [[336, 1], [529, 1], [530, 2], [656, 2], [799, 2], [800, 3], [1116, 4]]) {
+  // (look: the cards are 20 px apart, so n columns need n * 260 + (n - 1) * 20 px)
+  for (const [width, cols] of [[336, 1], [539, 1], [540, 2], [656, 2], [819, 2], [820, 3], [1116, 4]]) {
     fire(width)
     await settle(2)
     assert.equal(byData(dash(view), 'cards').props['data-columns'], cols, `${width} px`)
   }
-  fire(800)
+  fire(820)
   await settle(2)
   click(stop(view, 'first_chat'))
   const order = byData(dash(view), 'cards').props.children.filter(Boolean).map(n => n.props['data-card'] || n.props['data-hh'])

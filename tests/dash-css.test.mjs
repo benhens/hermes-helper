@@ -29,7 +29,7 @@ test('every selector is one of our own hhd- classes (in the light theme, under H
   assert.deepEqual(atRules, [
     "@property --hhd-arc{syntax:'<angle>';inherits:false;initial-value:0deg}",
     '@keyframes hhd-arc-turn{to{--hhd-arc:360deg}}',
-    `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after{animation:none}}`
+    `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`
   ])
   for (const rule of rules.filter(r => !r.startsWith('@'))) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
   for (const c of classesIn(rules.map(r => r.slice(0, r.indexOf('{'))).join('\n'))) assert.ok(c.startsWith('hhd-') || c === 'dark', c)
@@ -108,17 +108,17 @@ test('look: the words as in the catalog cards: a name 1.125rem / 600 in --ui-tex
   assert.doesNotMatch(DASH_CSS, /hhd-count/)
 })
 
-test('look: the ring of catalog.css on every tile and card: a 1.5 px conic ring in --color-primary that fades in over 0.35 s on hover and focus, turned once every 4 s by a CSS animation of the registered --hhd-arc; still with reduced motion; the opened card keeps it on', () => {
-  const ring = rules.find(r => r.startsWith(`.${D.tile}::after,.${D.scard}::after{`)) || ''
+test('look: the ring of catalog.css on every tile and card and on the opened panel: a 1.5 px conic ring in --color-primary that fades in over 0.35 s on hover and focus, turned once every 4 s by a CSS animation of the registered --hhd-arc; still with reduced motion; the opened card keeps it on', () => {
+  const ring = rules.find(r => r.startsWith(`.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{`)) || ''
   assert.match(ring, /content:'';position:absolute;inset:0;padding:1\.5px;border-radius:inherit;pointer-events:none/)
   assert.match(ring, /background:conic-gradient\(from var\(--hhd-arc\),transparent 0deg,var\(--color-primary\) 60deg,transparent 130deg\)/)
   assert.match(ring, /mask-composite:exclude;opacity:0;transition:opacity \.35s ease;animation:hhd-arc-turn 4s linear infinite paused/)
   const on = rules.find(r => r.endsWith('{opacity:1;animation-play-state:running}')) || ''
-  assert.deepEqual(selectorsOf(on), [`.${D.tile}:hover::after`, `.${D.tile}:focus-within::after`, `.${D.scard}:hover::after`, `.${D.scard}:focus-within::after`, `.${D.scard}.${D.sel}::after`])
+  assert.deepEqual(selectorsOf(on), [`.${D.tile}:hover::after`, `.${D.tile}:focus-within::after`, `.${D.scard}:hover::after`, `.${D.scard}:focus-within::after`, `.${D.scard}.${D.sel}::after`, `.${D.steps}:hover::after`, `.${D.steps}:focus-within::after`])
   assert.ok(rules.includes("@property --hhd-arc{syntax:'<angle>';inherits:false;initial-value:0deg}"))
   assert.ok(rules.includes('@keyframes hhd-arc-turn{to{--hhd-arc:360deg}}'))
-  assert.ok(rules.includes(`@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after{animation:none}}`))
-  for (const box of [D.tile, D.scard]) assert.match(rules.find(r => r.startsWith(`.${box}{`)), /position:relative/, box)
+  assert.ok(rules.includes(`@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`))
+  for (const box of [D.tile, D.scard, D.steps]) assert.match(rules.find(r => r.startsWith(`.${box}{`)), /position:relative/, box)
   // no script animation on the Dashboard's own drawing
   assert.doesNotMatch(read('src/dash.js'), /\.animate\(/)
 })
