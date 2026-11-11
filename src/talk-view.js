@@ -30,6 +30,7 @@ import { curlyQuotes } from './quotes.js'
 import { mdBlocks } from './md.js'
 import { isHermesDocsUrl, CardVideo } from './dash.js'
 import { DASH_DATA } from './dash-data.js'
+import { CHAT_AGENTS, chatActionArgv, chatActionTyped } from './chat.js'
 // A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js), and
 // (talk-live-3) text to type in the paste box's code style (src/reveal.js drawnWords)
 const drawn = (text, asTyped) => drawnWords(curlyQuotes(text, asTyped))
@@ -278,10 +279,60 @@ export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef,
 // chat-fix: what the model's marks become, under its reply. A card: that card's video place exactly as the Dashboard's
 // opened card shows it (src/dash.js CardVideo) and a button that opens the card there. Quick replies: up to three
 // small buttons; a click sends that text as the person's message. An id that is no card shows nothing.
-export function ReplyExtras({ entry, onQuick, onCard }) {
+// chat-fix part 3: "Do it for me" under a reply. One line says exactly what will run (the command is written in
+// src/chat.js, never by the model), then the button. Nothing runs without a click (src/page.js runs it); the import
+// itself needs a second click, after the preview. A failed run shows Hermes's last lines and the step to do by hand.
+export function ReplyAction({ entry, onAct }) {
+  const act = entry.act
+  if (!act || !Object.hasOwn(CHAT_AGENTS, act.agent)) return null
+  const name = CHAT_AGENTS[act.agent]
+  const cmd = step => jsx('code', { className: K.mono, 'data-hh': 'typed', 'data-act-command': step, children: 'hermes ' + chatActionArgv(step, act.agent).join(' ') }, 'cmd-' + step)
+  const button = (step, label, variant = 'default') => jsx(Button, { variant, size: 'xs', 'data-hh': 'act-button', 'data-step': step, onClick: () => onAct && onAct(entry, step), children: label }, 'go')
+  const rows = Array.isArray(act.rows) && act.rows.length ? jsx('ul', { className: T.actRows, 'data-hh': 'act-rows', children: act.rows.map((r, i) => jsx('li', { children: r }, i)) }, 'rows') : null
+  let parts
+  if (act.state === 'running') parts = [jsx('p', { role: 'status', 'data-hh': 'act-line', children: 'Working on it…' }, 'l')]
+  else if (act.state === 'plugin')
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its import add-on first (the agent-importers plugin, from Nous Research). Installing it runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
+      button('plugin', 'Install it')
+    ]
+  else if (act.state === 'preview')
+    parts = rows
+      ? [
+          jsx('p', { 'data-hh': 'act-line', children: `Here is what would come over from ${name}. Nothing is changed yet.` }, 'l'),
+          rows,
+          act.skipped ? jsx('p', { 'data-hh': 'act-skipped', children: act.skipped === 1 ? '1 other thing had nothing to bring over.' : `${act.skipped} other things had nothing to bring over.` }, 's') : null,
+          jsx('p', { 'data-hh': 'act-next', children: ['“Import it” runs ', cmd('import'), '.'] }, 'n'),
+          button('import', 'Import it')
+        ]
+      : [jsx('p', { 'data-hh': 'act-line', children: `Hermes found nothing to bring over from ${name}. Nothing is changed.` }, 'l')]
+  else if (act.state === 'done')
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: `Done. Your ${name} setup is in Hermes now.` }, 'l'),
+      rows,
+      act.summary ? jsx('p', { 'data-hh': 'act-summary', children: `Hermes says: ${act.summary}.` }, 'sum') : null,
+      jsx('p', { 'data-hh': 'act-keys', children: 'API keys and passwords are never brought over.' }, 'k')
+    ]
+  else if (act.state === 'failed')
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: act.tail && act.tail.length ? 'That didn’t work. Hermes said:' : 'That didn’t work: Hermes could not run the command here.' }, 'l'),
+      act.tail && act.tail.length ? jsx('p', { className: T.actOut, 'data-hh': 'act-output', children: act.tail.join('\n') }, 'o') : null,
+      jsx('p', { 'data-hh': 'act-by-hand', children: 'You can do this step by hand: open a terminal and paste this.' }, 'h'),
+      jsx(BubblePaste, { text: chatActionTyped(act.step, act.agent) }, 'paste')
+    ]
+  else
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: ['I can do this step for you. It runs ', cmd('preview'), `: a preview of what would come over from ${name}. Nothing is changed.`] }, 'l'),
+      button('preview', 'Do it for me')
+    ]
+  return jsx('div', { className: T.act, 'data-hh': 'act', 'data-state': act.state, 'data-agent': act.agent, children: parts }, 'act')
+}
+
+export function ReplyExtras({ entry, onQuick, onCard, onAct }) {
   const it = entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
   const quick = Array.isArray(entry.quick) ? entry.quick : []
   return [
+    ReplyAction({ entry, onAct }),
     it
       ? jsxs(
           'div',
@@ -310,7 +361,7 @@ export function ReplyExtras({ entry, onQuick, onCard }) {
   ]
 }
 
-export function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard }) {
+export function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard, onAct }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
@@ -346,7 +397,7 @@ export function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard }) {
     'aria-live': 'polite',
     children: [
       entry.md ? jsx(Markdown, { text: entry.text }, entry.key) : jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
-      ...(entry.md ? ReplyExtras({ entry, onQuick, onCard }) : []),
+      ...(entry.md ? ReplyExtras({ entry, onQuick, onCard, onAct }) : []),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,

@@ -349,7 +349,11 @@ export const T = {
   mdOld: 'hh-md-old',
   // chat-fix: under a reply, the choices the model gave (buttons) and a card's video place with its Open button
   quick: 'hh-quick',
-  chatCard: 'hh-chat-card'
+  chatCard: 'hh-chat-card',
+  // chat-fix part 3: "Do it for me" under a reply: what it will do, what the preview found, what Hermes said
+  act: 'hh-act',
+  actRows: 'hh-act-rows',
+  actOut: 'hh-act-out'
 }
 
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks

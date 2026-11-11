@@ -124,12 +124,21 @@ test('the model name never comes from host.state.model or config.get', () => {
   assert.doesNotMatch(code, /config\.get/)
 })
 
-test('the page reads only through read-only calls (no set, configure, write or send); the one newChat is the Dashboard\'s "New session" button', () => {
+test('the page reads only through read-only calls (no set, configure, write or send), but for the one action the person starts with a click: cli.exec with a command written in src/chat.js; the one newChat is the Dashboard\'s "New session" button', () => {
   // dash-v1: the Dashboard adds cron.manage and plugins.manage, each only with action 'list' (and Your setup's
   // reads left the built file with it)
   const methods = [...code.matchAll(/request\('([a-z_.]+)'/g)].map(m => m[1])
   // loom-fixes: the plugins read is gone (hhtech-loom-n1 1: no read gives the number Hermes's Plugins screen shows)
-  assert.deepEqual([...new Set(methods)].sort(), ['cron.manage', 'free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
+  // chat-fix part 3 (Pēteris, 11 Nov: "Is it possible for the helper to do it and do something on his behalf?"): the
+  // one call that is not a read is cli.exec, in one place, for "Do it for me": its argv is one of the fixed commands
+  // of src/chat.js chatActionArgv (import-agent <one of four agents> --dry-run or --yes, plugins install
+  // agent-importers --enable), never text the model or the person wrote, and it runs only from a click on its button
+  // (tests/do-it.test.mjs)
+  assert.deepEqual([...new Set(methods)].sort(), ['cli.exec', 'cron.manage', 'free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
+  assert.equal([...code.matchAll(/request\(\s*'cli\.exec'/g)].length, 1)
+  assert.match(code, /host\.request\('cli\.exec', \{ argv: args, timeout: 240 \}, 250000\)/)
+  assert.equal([...code.matchAll(/\brun\((?:step|'preview'|stepNow), /g)].length >= 2, true)
+  for (const m of code.matchAll(/\brun\(([^)]*)\)/g)) if (/argv|chatActionArgv/.test(m[1])) assert.match(m[1], /^(step, argv|'preview', chatActionArgv\('preview', act\.agent)$/, m[0])
   for (const m of code.matchAll(/request\('(cron|plugins)\.manage', \{([^}]*)\}/g)) assert.match(m[2], /^\s*action: 'list',/, m[0])
   // one: the set-up conversation's look at the scheduled jobs (loom-fixes: no plugins read; loom2: the Dashboard reads
   // nothing to decide what is done)
