@@ -124,3 +124,8 @@ test('the corners sit behind one value: --hhd-round is set once (1 = the round l
   for (const sel of [`.${D.card}`, `.${D.tile}`, `.${D.steps}`]) assert.match(ruleOf(sel), /border-radius:calc\(12px\*var\(--hhd-round\)\)/, sel)
   assert.match(ruleOf(`.${D.wait}`), /border-radius:calc\(7px\*var\(--hhd-round\)\)/)
 })
+
+test('at the narrow size a tile\'s word may take a second line rather than run out of its tile (a 340 px left side leaves a tile 65 px of room)', () => {
+  assert.match(ruleOf(`.${D.tileLabel}`), /white-space:nowrap/)
+  assert.equal(ruleOf(`.${D.compact} .${D.tileLabel}`), `.${D.compact} .${D.tileLabel}{white-space:normal}`)
+})

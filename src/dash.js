@@ -266,7 +266,7 @@ export function makeDashboard(ctx) {
                     : numbers[key] === null
                       ? null
                       : jsx('b', { className: D.tileNum, 'data-hh': 'number', children: String(numbers[key]) }, 'n'),
-                  jsx('span', { className: D.tileLabel, children: tileWord(key, numbers[key]) }, 'l'),
+                  jsx('span', { className: D.tileLabel, children: tileWord(key, numbers[key], W.stats, compact) }, 'l'),
                   // for a screen reader only: the number is still being read, or could not be read
                   numbers[key] === undefined
                     ? jsx('span', { className: K.srOnly, children: W.stats.waiting }, 'sr')

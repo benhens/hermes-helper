@@ -5,6 +5,8 @@
 // no AI call, nothing stored, every word from the data file.
 import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, byData, click } from './lib/render.mjs'
 import { DASH_DATA } from '../src/dash-data.js'
 import { D, K } from '../src/look.js'
@@ -437,6 +439,31 @@ test('a source tag opens its docs page in the browser (ctx.os), never inside Her
   assert.equal(globalThis.__hhHost.navigated, undefined)
 })
 
+test('the docs door (the source tags and Helper\'s "Open the Quickstart") hands the browser only an address of the official Hermes docs; anything else, or a Hermes without that door, does nothing', async () => {
+  const src = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', 'dash.js'), 'utf8')
+  const body = src.slice(src.indexOf('export const HERMES_DOCS_BASE'), src.indexOf('export function makeDashboard'))
+  const { HERMES_DOCS_BASE, isHermesDocsUrl, openHermesDocs } = await import('data:text/javascript,' + encodeURIComponent(body))
+  assert.equal(HERMES_DOCS_BASE, 'https://hermes-agent.nousresearch.com/docs/')
+  const opened = []
+  const ctx = { os: { openExternal: u => opened.push(u) } }
+  for (const bad of ['https://example.com/docs/', 'http://hermes-agent.nousresearch.com/docs/x', 'https://hermes-agent.nousresearch.com.evil.example/docs/x', 'javascript:alert(1)', 'https://hermes-agent.nousresearch.com/docs/x" onclick="y', '', null, undefined, 42]) {
+    assert.equal(isHermesDocsUrl(bad), false, String(bad))
+    openHermesDocs(ctx, bad)
+  }
+  assert.deepEqual(opened, [])
+  openHermesDocs(ctx, 'https://hermes-agent.nousresearch.com/docs/getting-started/quickstart')
+  assert.deepEqual(opened, ['https://hermes-agent.nousresearch.com/docs/getting-started/quickstart'])
+  // no door, a door that throws, a door whose promise fails: nothing breaks
+  openHermesDocs({}, HERMES_DOCS_BASE + 'x')
+  openHermesDocs({ os: { openExternal: () => { throw new Error('no') } } }, HERMES_DOCS_BASE + 'x')
+  openHermesDocs({ os: { openExternal: () => Promise.reject(new Error('no')) } }, HERMES_DOCS_BASE + 'x')
+  await settle(2)
+  // and the built file holds that same door, used by both
+  const built = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'desktop', 'plugin.js'), 'utf8')
+  assert.equal(built.split('openExternal(').length - 1, 1, 'one place in the whole plugin hands an address to the browser')
+  assert.ok(built.includes(body.replace(/^export /gm, '').trim()))
+})
+
 test('route buttons open only the places hhtech ran: Model settings, a new chat, Messaging, Scheduled jobs; elsewhere words only', async () => {
   const { view } = await open('half')
   const routes = {}
@@ -523,6 +550,7 @@ test('the narrow sizes: under 640 px of left side the tab takes hhdesign\'s narr
   fire('road', 688)
   await settle(4)
   assert.equal(dash(view).props['data-compact'], false)
+  assert.equal(tileSaid(view, 'plugins'), '2 plugins on in this bot', 'wide: hhcontent\'s recommended word')
   assert.equal(dash(view).props.className, D.main)
   const label = id => all(stop(view, id), n => n.props.className === D.label)[0]
   assert.equal(label('personality').props.style, undefined, 'wide: a name keeps its one line')
@@ -531,6 +559,8 @@ test('the narrow sizes: under 640 px of left side the tab takes hhdesign\'s narr
   fire('road', 448)
   await settle(4)
   assert.equal(dash(view).props['data-compact'], true)
+  // narrow: the plugins tile takes hhcontent's short variant (Lead, 11 Nov), the other two keep their word
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileSaid(view, k)), ['3 bots', '45 skills', '2 plugins, this bot'])
   assert.equal(dash(view).props.className, `${D.main} ${D.compact}`)
   // the room: two gaps between stops (11 stops on 448 px less 16 px each side), less 8 px
   const room = Math.floor((2 * (448 - 32)) / 10) - 8

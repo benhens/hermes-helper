@@ -29,6 +29,8 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}
 .hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}
 .hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}
+/* at the narrow size a word may take a second line rather than run out of its tile */
+.hhd-compact .hhd-tile-label{white-space:normal}
 .hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}
 .hhd-compact .hhd-wait{margin:4px 0}
 

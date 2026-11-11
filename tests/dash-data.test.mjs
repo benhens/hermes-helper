@@ -165,3 +165,14 @@ test('the built data: "No chats with this bot yet" is not in it (Lead: not shown
   // the route buttons stay on the steps hhcontent names: model 3, first_chat 1, chat_apps 1, scheduled_job 3
   assert.deepEqual(DASH_DATA.items.flatMap(i => i.steps.map((s, k) => (s.route ? `${i.id} ${k + 1}` : null)).filter(Boolean)), ['model 3', 'first_chat 1', 'chat_apps 1', 'scheduled_job 3'])
 })
+
+test('the plugins tile\'s short word for the narrow size is hhcontent\'s variant 3 ("plugins, this bot"), taken from the words file; without it the build stops', () => {
+  assert.deepEqual([DASH_DATA.words.stats.plugins_short_one, DASH_DATA.words.stats.plugins_short], ['plugin, this bot', 'plugins, this bot'])
+  const v = read('content/dash-words-v1.json').variants.plugins_label
+  assert.deepEqual(v.find(x => x.n === 3), { n: 3, one: 'plugin, this bot', many: 'plugins, this bot', note: v.find(x => x.n === 3).note })
+  // the recommended one (variant 1) is what page_words holds
+  assert.deepEqual([v[0].one, v[0].many], [DATA.page_words.stats.plugins_one, DATA.page_words.stats.plugins])
+  const a = copy()
+  a.word_variants.plugins_label = a.word_variants.plugins_label.filter(x => x.n !== 3)
+  assert.match(dashProblems(a, DOCS).join('\n'), /no short variant \(n: 3\) of the plugins label/)
+})

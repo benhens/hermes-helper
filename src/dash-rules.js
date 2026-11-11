@@ -136,5 +136,10 @@ export function pluginCount(read) {
   return rows.filter(r => r && typeof r === 'object' && r.source !== 'bundled' && r.status === 'enabled').length + 1
 }
 // A tile's word under its number (hhcontent): the number 1 takes the _one word, every other number, and a tile with
-// no number yet, the plain one.
-export const tileWord = (key, n, words = DASH_DATA.words.stats) => (n === 1 ? words[`${key}_one`] : words[key])
+// no number yet, the plain one. narrow: at the narrow size a tile that has a short word takes it (the plugins tile:
+// "plugins on in this bot" is 126 px wide and a tile has 112 px there, measured in the app; Lead, 11 Nov: then the
+// short variant).
+export function tileWord(key, n, words = DASH_DATA.words.stats, narrow = false) {
+  const k = narrow && words[`${key}_short`] ? `${key}_short` : key
+  return n === 1 ? words[`${k}_one`] : words[k]
+}

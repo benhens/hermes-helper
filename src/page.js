@@ -13,7 +13,7 @@
 import { host, Button, Codicon, Textarea, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
-import { K, T, cx } from './look.js'
+import { K, T, cx, TAB_LOOK, TAB_LOOKS } from './look.js'
 import { TALK_CSS } from './talk-css.js'
 import { Character } from './character.js'
 import { RISE, expressionFor, asksQuestion, makeBusy } from './expressions.js'
@@ -872,6 +872,8 @@ export function makePage(ctx, opts = {}) {
       if (el) el.focus()
     }
 
+    // the tab names' look: one value in src/look.js (TAB_LOOK)
+    const tabLook = TAB_LOOKS[TAB_LOOK]
     const tabRow = jsx('div', {
       className: K.tabs,
       role: 'tablist',
@@ -889,11 +891,11 @@ export function makePage(ctx, opts = {}) {
             'aria-controls': 'hh-tabpanel',
             tabIndex: on ? 0 : -1,
             'data-active': on,
-            className: cx(K.textTab, on ? K.textTabOn : K.textTabIdle),
+            className: cx(tabLook.tab, on ? tabLook.on : tabLook.idle),
             ref: tabRefs.current.set[t.id],
             onClick: () => saveTab(t.id),
             onKeyDown: e => onTabKey(e, i),
-            children: jsx('span', { className: on ? K.textTabLabelOn : K.textTabLabel, children: t.label })
+            children: jsx('span', { className: on ? tabLook.labelOn : tabLook.label, children: t.label })
           },
           t.id
         )

@@ -29,6 +29,12 @@ export const ROUTE_TARGETS = ['/settings?tab=config:model', '/messaging', '/cron
 export const MARK_MAX = 15
 
 const isText = v => typeof v === 'string' && v.trim().length > 0
+// hhcontent's short wording of the plugins label (content/dash-words-v1.json variants.plugins_label, n: 3)
+function shortPlugins(data) {
+  const list = data.word_variants && Array.isArray(data.word_variants.plugins_label) ? data.word_variants.plugins_label : []
+  const v = list.find(x => x && x.n === 3)
+  return v && isText(v.one) && isText(v.many) ? v : null
+}
 
 // Every { file, line, quote } in the data, with where it sits, for the quote check.
 export function quotesOf(data) {
@@ -37,7 +43,7 @@ export function quotesOf(data) {
     if (Array.isArray(v)) return v.forEach((x, i) => walk(x, `${where}[${i}]`))
     if (!v || typeof v !== 'object') return
     if (typeof v.file === 'string' && Number.isInteger(v.line) && typeof v.quote === 'string') out.push({ where, s: v })
-    for (const [k, x] of Object.entries(v)) if (k !== 'builder' && k !== 'page_words') walk(x, where ? `${where}.${k}` : k)
+    for (const [k, x] of Object.entries(v)) if (k !== 'builder' && k !== 'page_words' && k !== 'word_variants') walk(x, where ? `${where}.${k}` : k)
   }
   walk(data, '')
   return out
@@ -79,6 +85,8 @@ export function dashProblems(data, docs) {
   need(w.tabs, ['dashboard', 'learn', 'my_setup'], 'tabs.')
   // dash-v2: the word for one (bots_one ...), and what a screen reader hears while a number waits or could not be read
   need(w.stats, ['bots', 'bots_one', 'skills', 'skills_one', 'plugins', 'plugins_one', 'not_known', 'waiting'], 'stats.')
+  // the plugins label's short variant, for the narrow size (hhcontent's variant 3; Lead, 11 Nov)
+  if (!shortPlugins(data)) fails.push('word_variants: no short variant (n: 3) of the plugins label with its word for one and for many')
   need(w.activity, ['title', 'last_used_today', 'last_used_one', 'last_used_n', 'less', 'more'], 'activity.')
   need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'not_counted', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_counted', 'state_not_known'], 'setup.')
   if (w.activity) {
@@ -136,7 +144,7 @@ export function slimDashData(data) {
       tabs: w.tabs,
       tabListLabel: w.tab_list_label,
       notBuilt: w.not_built,
-      stats: w.stats,
+      stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many },
       // activity.no_chats (hhcontent's optional line for an empty Activity) is not shown (Lead, 11 Nov): left out
       activity: Object.fromEntries(Object.entries(w.activity).filter(([k]) => k !== 'no_chats')),
       setup: w.setup

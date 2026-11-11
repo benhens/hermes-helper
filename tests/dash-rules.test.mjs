@@ -234,6 +234,12 @@ test('a tile\'s word follows its number: 1 takes the _one word, every other numb
   assert.deepEqual([1, 39].map(n => tileWord('skills', n)), ['skill', 'skills'])
   assert.deepEqual([1, 2].map(n => tileWord('plugins', n)), [W.plugins_one, W.plugins])
   assert.deepEqual([W.plugins_one, W.plugins], ['plugin on in this bot', 'plugins on in this bot'])
+  // at the narrow size the plugins tile takes hhcontent's short variant (the long one runs out of its tile there:
+  // measured in the app, 120 px of word in 112 px of room); bots and skills have no short word and keep theirs
+  assert.deepEqual([1, 2].map(n => tileWord('plugins', n, W, true)), ['plugin, this bot', 'plugins, this bot'])
+  assert.deepEqual([1, 2].map(n => tileWord('bots', n, W, true)), ['bot', 'bots'])
+  assert.deepEqual([1, 39].map(n => tileWord('skills', n, W, true)), ['skill', 'skills'])
+  assert.equal(tileWord('plugins', undefined, W, true), 'plugins, this bot')
   // while the number is not there (waiting, or its read failed) the plain word stands
   assert.equal(tileWord('bots', undefined), 'bots')
   assert.equal(tileWord('bots', null), 'bots')

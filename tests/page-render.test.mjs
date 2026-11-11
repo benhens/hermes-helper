@@ -5,9 +5,11 @@
 // the real app run is dev/checks/talk-v1 (Xvfb). This is the offline guard for later changes.
 import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
+import path from 'node:path'
+import fs from 'node:fs'
 import { registerPlugin, fakeStorage, mount, settle, all, text, byData, byLabel, click } from './lib/render.mjs'
 import { NO_MODEL_LINE, NO_MODEL_BOX, CANT_CHECK_LINE } from '../src/model-status.js'
-import { K, T } from '../src/look.js'
+import { K, T, TAB_LOOK, TAB_LOOKS } from '../src/look.js'
 import { TALK_CSS } from '../src/talk-css.js'
 import { DASH_CSS } from '../src/dash-css.js'
 
@@ -178,12 +180,43 @@ test('header: no page title, three text tabs in a tablist (Capabilities\' look),
   const [dashTab, learnTab, mineTab] = tabButtons(view)
   assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false, false])
   assert.deepEqual(tabButtons(view).map(t => t.props.tabIndex), [0, -1, -1])
+  // dash-v2: the tab names' look sits behind one value (src/look.js TAB_LOOK); as committed it is the look as built
+  assert.equal(TAB_LOOK, 'capabilities')
+  assert.deepEqual(TAB_LOOKS.capabilities, { tab: K.textTab, idle: K.textTabIdle, on: K.textTabOn, label: K.textTabLabel, labelOn: K.textTabLabelOn })
   assert.equal(dashTab.props.className, `${K.textTab} ${K.textTabOn}`)
   for (const t of [learnTab, mineTab]) assert.equal(t.props.className, `${K.textTab} ${K.textTabIdle}`)
   assert.equal(dashTab.props.children.props.className, K.textTabLabelOn)
+  assert.equal(learnTab.props.children.props.className, K.textTabLabel)
   assert.doesNotMatch(text(view.tree), /Your setup|\bSetup\b/)
   assert.match(K.textTabLabelOn, /(^|\s)underline(\s|$)/)
   assert.doesNotMatch(K.textTabLabel, /(^|\s)underline(\s|$)/)
+})
+
+test('the tab names as Hermes\'s own tabs (capitals, a blue line under the open one) are one line away: TAB_LOOK \'hermes\' in place of \'capabilities\', nothing else changed', async () => {
+  const line = "const TAB_LOOK = 'capabilities'"
+  const built = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'desktop', 'plugin.js'), 'utf8')
+  assert.equal(built.split(line).length - 1, 1, 'the value is on one line of the built file')
+  useHost()
+  const { Page } = await registerPlugin(fakeStorage(), undefined, {}, src => src.replace(line, "const TAB_LOOK = 'hermes'"))
+  const view = mount(Page)
+  await settle()
+  const [dashTab, learnTab, mineTab] = tabButtons(view)
+  const H = TAB_LOOKS.hermes
+  assert.equal(dashTab.props.className, `${H.tab} ${H.on}`)
+  for (const t of [learnTab, mineTab]) assert.equal(t.props.className, `${H.tab} ${H.idle}`)
+  for (const t of [dashTab, learnTab, mineTab]) assert.equal(t.props.children.props.className, H.label)
+  // Hermes's own SESSIONS | BOTS tabs (components/ui/pane-tab.tsx): 11 px capitals; under the open one a 2 px line
+  // in the theme's primary blue, drawn by Hermes's own class
+  assert.match(H.label, /(^|\s)uppercase(\s|$)/)
+  assert.match(H.tab, /text-\[0\.6875rem\]/)
+  assert.match(H.on, /shadow-\[inset_0_-2px_0_var\(--pane-tab-active-accent,var\(--theme-primary\)\)\]/)
+  assert.doesNotMatch(H.idle, /shadow/)
+  assert.doesNotMatch(`${H.label} ${H.labelOn}`, /underline/)
+  // the names, the roles and the keys are the same
+  assert.deepEqual(tabButtons(view).map(t => text(t).trim()), ['Dashboard', 'Learn', 'My setup'])
+  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false, false])
+  click(learnTab)
+  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [false, true, false])
 })
 
 test('tabs: Learn and My setup show one quiet line each and nothing else; the tab is remembered; arrow keys move between the tabs; Helper stays where it is', async () => {

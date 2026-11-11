@@ -423,7 +423,9 @@ export const DASH_DATA = {
       "plugins_one": "plugin on in this bot",
       "plugins": "plugins on in this bot",
       "not_known": "Helper could not read this number just now.",
-      "waiting": "Counting"
+      "waiting": "Counting",
+      "plugins_short_one": "plugin, this bot",
+      "plugins_short": "plugins, this bot"
     },
     "activity": {
       "title": "This bot's activity",
