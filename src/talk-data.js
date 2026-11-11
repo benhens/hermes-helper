@@ -281,8 +281,8 @@ export const TALK_DATA = {
       "pick_label": "Moving from another AI app",
       "docs_box": {
         "head": "From the Hermes docs",
-        "quote": "hermes import-agent imports your existing OpenClaw, Claude Code, OpenAI Codex CLI, Cursor, Grok Bot or OpenBot setup into Hermes with one command.",
-        "where": "user-guide/import-from-other-agents.md, line 9"
+        "quote": "hermes migrate <agent> (openclaw, claude-code, codex, cursor, grok-bot, openbot) to import from one agent",
+        "where": "user-guide/import-from-other-agents.md, line 15"
       },
       "next": {
         "kind": "paste",
@@ -600,6 +600,19 @@ export const TALK_DATA = {
       "text": "Hermes can bring your setup over from six apps.",
       "source": "user-guide/import-from-other-agents.md line 9 (the six names)",
       "offer": "mig_which"
+    },
+    "BACK_NONE": {
+      "text": "No question of mine is open, so there is nothing to go back to.",
+      "offer": "general"
+    },
+    "NAME_HELLO": {
+      "text": "Hi."
+    },
+    "ASK_NAME": {
+      "text": "What's your name?"
+    },
+    "ASK_WORK": {
+      "text": "What do you do?"
     }
   },
   "opening": {
@@ -9087,5 +9100,177 @@ export const TALK_DATA = {
     {
       "name": "yuanbao"
     }
-  ]
+  ],
+  "names": {
+    "starts": [
+      "what is",
+      "what's",
+      "whats",
+      "what are",
+      "what exactly is",
+      "tell me about",
+      "explain",
+      "what does",
+      "wat is",
+      "wats",
+      "wat's",
+      "wat",
+      "wht is",
+      "whts",
+      "whta is",
+      "waht is",
+      "what si",
+      "whats is",
+      "what's is",
+      "what is is",
+      "what r",
+      "wat r",
+      "wat are",
+      "what're",
+      "whatre",
+      "what",
+      "whats that",
+      "what's that",
+      "what is that",
+      "who is",
+      "whos",
+      "who's",
+      "tell me what",
+      "do you know",
+      "do you know what",
+      "explain what",
+      "can you explain",
+      "pls explain",
+      "i dont know what",
+      "i don't know what",
+      "what do you mean by",
+      "what does it mean",
+      "meaning of",
+      "define"
+    ],
+    "lead_ins": [
+      "so",
+      "ok",
+      "okay",
+      "and",
+      "hi",
+      "hey",
+      "helper",
+      "please",
+      "pls",
+      "plz",
+      "can you",
+      "could you",
+      "um",
+      "uh",
+      "hmm",
+      "sorry",
+      "quick question",
+      "also",
+      "but"
+    ],
+    "tails": [
+      "in hermes",
+      "in hermes agent",
+      "for hermes",
+      "on hermes",
+      "with hermes",
+      "in the docs",
+      "in this app",
+      "here",
+      "exactly",
+      "anyway",
+      "then",
+      "is",
+      "are",
+      "do",
+      "does",
+      "mean",
+      "means",
+      "is it",
+      "is that",
+      "for",
+      "about",
+      "thing",
+      "again",
+      "please",
+      "pls"
+    ],
+    "cut": [
+      "a",
+      "an",
+      "the"
+    ],
+    "wins_over_kinds": [
+      "row",
+      "question",
+      "WHERE",
+      "HERMES",
+      "AGENT"
+    ],
+    "wins_over_name_kinds": [
+      "memory",
+      "chat",
+      "provider",
+      "feature"
+    ]
+  },
+  "back_alone": {
+    "back_words": [
+      "undo",
+      "undo that",
+      "go back",
+      "back",
+      "back one",
+      "one back",
+      "go back one",
+      "previous",
+      "previous question",
+      "previous step",
+      "last question",
+      "step back",
+      "the one before",
+      "back a step"
+    ],
+    "filler": [
+      "please",
+      "pls",
+      "can we",
+      "lets",
+      "let's",
+      "just",
+      "a",
+      "one",
+      "that",
+      "to",
+      "the",
+      "and",
+      "ok",
+      "okay",
+      "no",
+      "wait",
+      "oops",
+      "sorry"
+    ]
+  },
+  "opening_talk": {
+    "kinds": [
+      "hello",
+      "thanks",
+      "how",
+      "who",
+      "ai"
+    ],
+    "line_by_kind": {
+      "hello": "NAME_HELLO",
+      "thanks": "THANKS",
+      "how": "HOW",
+      "who": "WHO",
+      "ai": "AI"
+    },
+    "ask": {
+      "name": "ASK_NAME",
+      "work": "ASK_WORK"
+    }
+  }
 }

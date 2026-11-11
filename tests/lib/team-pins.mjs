@@ -9,7 +9,8 @@
 // stand on the file's line). setup-chat-2: the live data, the set-up conversation and the set-up list at setup-chat changes-1's (Lead, 11 Nov 08:50). A test compares the plugin's copy with the pin, checks that
 // loom-fixes: the talk data, the wants, the set-up conversation, the set-up list, the Dashboard's words, route2.py and
 // the new names list at helper-loom-fixes-v1's checksums (Lead, 11 Nov 10:10). find-v2: the talk data, the wants, the
-// set-up conversation and route2.py at live-v2 changes-13's (Lead, 11 Nov 11:40).
+// set-up conversation and route2.py at live-v2 changes-13's (Lead, 11 Nov 11:40). loom-fixes-2: the talk data, the
+// set-up conversation, the names list and route2.py at helper-loom-fixes-v2's (Lead, 11 Nov 12:50).
 // the pin is a checksum the team named (in its note, or its own "before" copy), and only reports when the
 // team's file on disk has moved on since.
 import fs from 'node:fs'
@@ -21,20 +22,20 @@ const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).di
 
 // file (in the team's folder) -> [the pinned sha256, where the team names it]
 export const PINS = {
-  'content/helper-talk-v2.json': ['2804f6c36286cb0aef2ea57c45e9d729bab7884fd89a7d0b267f92157b220ab7', 'content/helper-talk-live-v2-changes-13.md'],
+  'content/helper-talk-v2.json': ['2504668129f457461c7d8caefacfae6681c3fc30dbaa9af013f9f9b8c6ef3fd4', 'content/helper-loom-fixes-v2.md'],
   'content/helper-talk-live-v2.json': ['efc691e0542cccc7aba0bb6dd5db7c4543346e810f3e979921c891022a1690ec', 'content/helper-setup-chat-v1-changes-1.md'],
   'content/helper-wants-v1.json': ['0f87cacd51e042097654d490f52f280deb3c807fa9340394efc81ffd4daea2c6', 'content/helper-talk-live-v2-changes-13.md'],
   'content/skills-list-v1.json': ['678667bfa3277f54885b530297a782b7b297c823e0ce4583e6cf5bfe656d7eb9', 'content/helper-talk-v2-changes-19.md'],
-  'dev/checks/hhcontent-talk-v2/route2.py': ['adab5484f516ccd7cdaae20859daa2f92b2ad382ee88fdd4dae601668ff5ca08', 'content/helper-talk-live-v2-changes-13.md'],
+  'dev/checks/hhcontent-talk-v2/route2.py': ['91d33e9896cb973a642a6b880fef908f211d40572f3475b9b2539f6bc719dba8', 'content/helper-loom-fixes-v2.md'],
   'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e', 'content/helper-talk-v2-changes-16.md'],
   'dev/checks/hhcontent-talk-v2/check.py': ['0eb598430d47d77857013a8017f57cffacbf69bc16d5e5aa478a77909790afac', 'content/helper-talk-live-v2-changes-1.md'],
   // setup-chat: the set-up conversation (named at changes-8, unchanged at changes-10) and the set-up list
-  'content/helper-setup-chat-v1.json': ['ef7acf34584edf31d62e04c6f6aefdc9a20e5ba9dc422d6ec943fc25405fdaca', 'content/helper-talk-live-v2-changes-13.md'],
+  'content/helper-setup-chat-v1.json': ['144ea7678b697807b0eee89a545b08c9f77bb37c82dd0e3a85021947de655631', 'content/helper-loom-fixes-v2.md'],
   'content/dash-setup-list-v2.json': ['eb3aeba8da98f286e7f847f6ec42e9343657bd463138103c0090f8c02e7f8cbb', 'content/helper-loom-fixes-v1.md'],
   // dash-v2: every other word on the Dashboard tab
   'content/dash-words-v1.json': ['034d2bd298608883ef75e158c4776000f685a629370c1984ef98275d99c27859', 'content/helper-loom-fixes-v1.md'],
   // loom-fixes: hhcontent's list of names from the Hermes docs
-  'content/hermes-names-v1.json': ['55df44fe69a0e102c06df209b7c3c18fb62329fa83c8bb6e59c1848b4bb13153', 'content/helper-loom-fixes-v1.md'],
+  'content/hermes-names-v1.json': ['9819a67dc79912d4a8404acb831895a5b0c363c7851b0aac0d30a7997f9cdf38', 'content/helper-loom-fixes-v2.md'],
   // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs)
   'content/helper-keeps-v1.md': ['0b2563a8e2772d5b918af6bef73cb53af74ce0840b359151a3689c5168a311f4', 'content/helper-talk-live-v2.md'],
   // changes-12 and -13 (the secret rule), ported in the look job: settings_read.py and tests.json at

@@ -274,7 +274,7 @@ export const SETUP_DATA = {
       "text": "I can see it now. {seen_part}"
     },
     "NOT_SEEN": {
-      "text": "I can't see it yet. I only look at your main bot.",
+      "text": "I can't see it yet. I only look at the bot that is open in Hermes now, {bot}.",
       "answers": [
         "Show me the steps",
         "I did it on another bot",
@@ -284,7 +284,8 @@ export const SETUP_DATA = {
         "Show me the steps",
         "Not now"
       ],
-      "text_second_bot": "I can't see it yet. You have one bot so far."
+      "text_second_bot": "I can't see it yet. You have one bot so far.",
+      "text_no_bot": "I can't see it yet. I only look at the bot that is open in Hermes now."
     },
     "DONE_SAID": {
       "text": "Good. I can't see that one, so I'll take your word."
@@ -388,6 +389,15 @@ export const SETUP_DATA = {
         "unsure": "you are not sure yet what you want"
       },
       "and": " and "
+    },
+    "BACK_ONE": {
+      "text": "Back one question."
+    },
+    "BACK_FIRST": {
+      "text": "This is my first set-up question, so there is nothing before it."
+    },
+    "SETUP_REASK_REC": {
+      "text": "When you're ready: do you want the steps for {card}?"
     }
   },
   "restart_phrases": [
@@ -513,6 +523,57 @@ export const SETUP_DATA = {
     "i don't know where to begin",
     "i dont know where to begin"
   ],
+  "back_rule": {
+    "back_words": [
+      "go back",
+      "back one",
+      "one back",
+      "undo that",
+      "undo",
+      "previous",
+      "previous question",
+      "previous step",
+      "last question",
+      "question before",
+      "step before",
+      "step back",
+      "back a step",
+      "the one before"
+    ],
+    "previous": {
+      "Q_NEW": [],
+      "Q_GOAL": [
+        "Q_NEW"
+      ],
+      "REC": [
+        "Q_GOAL",
+        "Q_NEW"
+      ],
+      "STEP": [
+        "REC"
+      ]
+    }
+  },
+  "one_question": {
+    "reask": {
+      "Q_NEW": "SETUP_REASK",
+      "Q_GOAL": "SETUP_REASK_GOAL",
+      "REC": "SETUP_REASK_REC",
+      "STEP": "STEP_BACK"
+    },
+    "next_after_answer": {
+      "Q_NEW": "Q_GOAL",
+      "Q_GOAL": "REC"
+    },
+    "own_question_kinds": [
+      "W1",
+      "C1",
+      "C2",
+      "can-q",
+      "MIG_WHICH",
+      "RM2"
+    ]
+  },
   "keeps": [
     {
       "key": "setup_new",

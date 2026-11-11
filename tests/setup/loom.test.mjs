@@ -81,6 +81,14 @@ function since(view, mark) {
 }
 const NEW4 = ["Yes, I'm new", "I've used it a bit", 'I know it well', 'Skip']
 const GENERAL = ['Set up Hermes', 'What Hermes can do']
+// loom-fixes-2: the opening's "Want the steps?" is open and takes no offer now; Not now closes it, then "hey" gets the
+// general offer as before
+async function toGeneral(view) {
+  if (labels(view).includes('Not now')) await press(view, 'Not now')
+  await send(view, 'hey')
+  assert.deepEqual(labels(view), GENERAL)
+}
+const REC4 = ['Show me the steps', "I've done this already", 'Something else', 'Not now']
 const youAreHere = view => {
   const s = all(view.tree, n => n.props['data-hh'] === 'stop' && n.props['data-state'] === 'here')
   return s.length ? s[0].props['data-stop'] : null
@@ -96,7 +104,7 @@ test('his Loom conversation with state updates run later, as React may: every me
     finish(view)
     const typedHere = ['hey', 'can we start from the begining', 'How can I migrate from OpenClaw?', 'what is hindsight']
     await send(view, 'hey')
-    await press(view, 'Set up Hermes')
+    await send(view, 'Set up Hermes')
     await press(view, "Yes, I'm new")
     await send(view, 'can we start from the begining')
     await send(view, 'How can I migrate from OpenClaw?')
@@ -121,14 +129,15 @@ test('his Loom conversation, message for message (hey; Set up Hermes; Yes, I\'m 
   assert.equal(bubbleSaid(view), 'Next on your list: First chat. Ask Hermes one small thing, to see that it works. Want the steps?')
   assert.equal(youAreHere(view), 'first_chat', 'the Dashboard\'s You are here is the stop Helper names')
 
-  // 1. "hey": a greeting gets a greeting and the one fixed offer, never "I'm here." (point 1)
+  // 1. "hey": a greeting gets a greeting, never "I'm here." (point 1); loom-fixes-2 (helper-loom-fixes-v2 point 5,
+  // one question at a time): "Want the steps?" is open, so no offer: the open question once more, with its buttons
   await send(view, 'hey')
-  assert.deepEqual(since(view, 'hey'), ['Hi.', 'Do you want to set up Hermes, or see what it does?'])
-  assert.deepEqual(labels(view), GENERAL)
+  assert.deepEqual(since(view, 'hey'), ['Hi.', "When you're ready: do you want the steps for First chat?"])
+  assert.deepEqual(labels(view), REC4)
   assert.doesNotMatch(text(helper(view)), /I'm here|I’m here/)
 
-  // 2. Set up Hermes: nothing is kept yet, so the first question
-  await press(view, 'Set up Hermes')
+  // 2. Set up Hermes (typed: the general offer is no longer on screen): nothing is kept yet, so the first question
+  await send(view, 'Set up Hermes')
   assert.equal(bubbleSaid(view), 'Are you new to Hermes?')
   assert.deepEqual(labels(view), NEW4)
 
@@ -174,18 +183,18 @@ test('his Loom conversation, message for message (hey; Set up Hermes; Yes, I\'m 
   assert.match(said6[0], /From the Hermes docs/)
   assert.match(said6[0], /Long-term memory with knowledge graph, entity resolution, and multi-strategy retrieval\./)
   assert.match(said6[0], /memory-providers\.md/)
-  assert.equal(said6[1], 'Do you want to know what Hermes remembers, or what it does?')
-  assert.deepEqual(labels(view), ['What Hermes remembers', 'What Hermes can do'])
+  // loom-fixes-2 (one question at a time): "Are you new to Hermes?" is still open, so no offer; the question again
+  assert.equal(said6[1], "When you're ready: are you new to Hermes?")
+  assert.deepEqual(labels(view), NEW4)
   assert.doesNotMatch(q(text(helper(view))), /I don't have checked information/)
 
-  // 7. "What Hermes is": not among the picks on screen now (the offer under the name line is its kind's), so typed, as
-  // hhcontent did; the same fixed offer as after "hey" (point 5)
+  // 7. "What Hermes is", typed, as hhcontent did; loom-fixes-2: the question again in place of the offer, every time
   await send(view, 'What Hermes is')
-  assert.deepEqual(since(view, 'What Hermes is'), ['Hermes is an AI helper made by Nous Research. It learns from experience and remembers you across chats.', 'Do you want to set up Hermes, or see what it does?'])
-  assert.deepEqual(labels(view), GENERAL)
+  assert.deepEqual(since(view, 'What Hermes is'), ['Hermes is an AI helper made by Nous Research. It learns from experience and remembers you across chats.', "When you're ready: are you new to Hermes?"])
+  assert.deepEqual(labels(view), NEW4)
 
   // 8. Set up Hermes again: nothing is kept since he started again, so the first question, never the old goal
-  await press(view, 'Set up Hermes')
+  await send(view, 'Set up Hermes')
   assert.equal(bubbleSaid(view), 'Are you new to Hermes?')
   assert.doesNotMatch(q(text(helper(view))), /Since you want to start from the beginning|your assistant/)
   // nothing of it went to an AI
@@ -196,7 +205,7 @@ test('Set up Hermes with both answers kept: one line on what Helper goes on from
   const storage = fakeStorage({ met: true, kept: { setup_new: 'new', setup_goal: 'Talk to it from my phone', setup_goal_id: 'phone' } })
   const { view, host } = await open({ storage })
   finish(view)
-  await send(view, 'hey')
+  await toGeneral(view)
   await press(view, 'Set up Hermes')
   assert.equal(bubbleLine(view), 'FROM_KEPT')
   assert.equal(bubbleSaid(view), "You told me you are new to Hermes and you want to talk to it from your phone. I'll go on from there.")
@@ -206,13 +215,13 @@ test('Set up Hermes with both answers kept: one line on what Helper goes on from
   const rec1 = bubbleSaid(view)
   assert.match(rec1, /^You're new, so first check that Hermes answers you\. Next: First chat\./)
   // again: the same words
-  await send(view, 'hey')
+  await toGeneral(view)
   await press(view, 'Set up Hermes')
   await press(view, 'Go on')
   assert.equal(bubbleSaid(view), rec1)
   // Answer again starts the questions again
   await press(view, 'Not now')
-  await send(view, 'hey')
+  await toGeneral(view)
   await press(view, 'Set up Hermes')
   await press(view, 'Answer again')
   assert.deepEqual(since(view, 'Answer again'), ["Sure, let's start again.", 'Are you new to Hermes?'])
@@ -223,7 +232,7 @@ test('a typed goal that matched none of the three is read back as "not sure yet"
   const storage = fakeStorage({ met: true, kept: { setup_new: 'some', setup_goal: 'I sell shoes online', setup_goal_id: 'unsure' } })
   const { view } = await open({ storage })
   finish(view)
-  await send(view, 'hey')
+  await toGeneral(view)
   await press(view, 'Set up Hermes')
   assert.equal(bubbleSaid(view), "You told me you have used Hermes a bit and you are not sure yet what you want. I'll go on from there.")
 })

@@ -13,7 +13,10 @@ const ROOT = path.resolve(import.meta.dirname, '..')
 // ("**Memory fit** — green (*Fits your GPU*"); it is the docs' sentence, not a colour of ours, so exactly that phrase
 // is read without its colour word
 const DOCS_QUOTE = '**Memory fit** \u2014 green (*Fits your GPU*'
-const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8').split(DOCS_QUOTE).join('**Memory fit** (*Fits your GPU*')
+// loom-fixes-2: hhcontent's names list (helper-loom-fixes-v2) holds the provider Azure OpenAI, a product name with a
+// colour word in it; exactly that name (and its alias forms) is read without it
+const AZURE = /\b(Azure OpenAI|azure openai|azureopenai)\b/g
+const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8').split(DOCS_QUOTE).join('**Memory fit** (*Fits your GPU*').replace(AZURE, 'Cloud OpenAI')
 const srcFiles = fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js')).map(f => 'src/' + f)
 const plugin = read('desktop/plugin.js')
 

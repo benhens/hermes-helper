@@ -403,12 +403,15 @@
   "SETUP_REASK": {
    "text": "When you're ready: are you new to Hermes?",
    "answers": "Q_NEW",
-   "when": "After answering a question typed in place of an answer to Q_NEW. Once only; the same form for Q_GOAL is SETUP_REASK_GOAL."
+   "when": "one_question rule 3: after the answer to a message typed while Q_NEW is open. Every time, with its buttons; the only question on screen.",
+   "when_was_v1": "After answering a question typed in place of an answer to Q_NEW. Once only; the same form for Q_GOAL is SETUP_REASK_GOAL."
   },
   "SETUP_REASK_GOAL": {
    "text": "When you're ready: do you want jobs, phone chats, or more?",
    "answers": "Q_GOAL",
-   "text_was_offer_t1": "When you're ready: what would you like Hermes to do for you?"
+   "text_was_offer_t1": "When you're ready: what would you like Hermes to do for you?",
+   "when_was_v1": "",
+   "when": "one_question rule 3: after the answer to a message typed while Q_GOAL is open. Every time, with its buttons; the only question on screen."
   },
   "REC": {
    "text": "{reason} Next: {card}. {why} Want the steps?",
@@ -455,7 +458,7 @@
    "when": "It worked (or Done, it works now) on a seeable item, and the read now says done. Then REC for the next item."
   },
   "NOT_SEEN": {
-   "text": "I can't see it yet. I only look at your main bot.",
+   "text": "I can't see it yet. I only look at the bot that is open in Hermes now, {bot}.",
    "answers": [
     "Show me the steps",
     "I did it on another bot",
@@ -467,7 +470,10 @@
     "Not now"
    ],
    "text_second_bot": "I can't see it yet. You have one bot so far.",
-   "note_c1": "changes-1: for second_bot the line and the other-bot answer were untrue (bots are counted across the whole Hermes, list v2 read profiles.list)."
+   "note_c1": "changes-1: for second_bot the line and the other-bot answer were untrue (bots are counted across the whole Hermes, list v2 read profiles.list).",
+   "text_was_v1": "I can't see it yet. I only look at your main bot.",
+   "text_no_bot": "I can't see it yet. I only look at the bot that is open in Hermes now.",
+   "bot_note": "{bot} is the open bot's name as the app shows it. When the page cannot read a name, text_no_bot. Changed: loom-fixes-v2 (11 Nov, hhtech's run docs/answers/hhtech-loom-run.md) (the look now reads the open bot, so \"your main bot\" was untrue when another bot is open)."
   },
   "DONE_SAID": {
    "text": "Good. I can't see that one, so I'll take your word.",
@@ -589,7 +595,8 @@
   "STEP_BACK": {
    "text": "Back to step {n} of {total}: {step}",
    "answers": "the step's own: STEP.answers, or STEP.last_step_answers on the last step",
-   "when": "A question typed while a STEP is the open line: the answer is shown as now, then this line as the next message with the step's answers. Needed: without it Done sits under an answer about something else and the step's words are scrolled away. Not shown after I'm stuck (STUCK has its own answers) and not after Stop for now."
+   "when": "A question typed while a STEP is the open line: the answer is shown as now, then this line as the next message with the step's answers. Needed: without it Done sits under an answer about something else and the step's words are scrolled away. Not shown after I'm stuck (STUCK has its own answers) and not after Stop for now.",
+   "when_v2": "Also one_question rule 3 while a STEP is open (the same step, n unchanged), and back_rule at step n > 1 (step n - 1)."
   },
   "FROM_KEPT": {
    "text": "You told me {new_said}{and}{goal_said}. I'll go on from there.",
@@ -613,6 +620,22 @@
    "when": "Set up Hermes picked (or typed) while Q_NEW or Q_GOAL is already answered and kept. Go on: REC for the current item (the written sentence). Answer again: RESTART.",
    "why": "His Loom 5:16: Helper skipped the questions without a word and repeated \"Since you want to start from the beginning\".",
    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+  },
+  "BACK_ONE": {
+   "text": "Back one question.",
+   "then": "the previous question as its own bubble, with its answers",
+   "added": "loom-fixes-v2 (11 Nov, hhtech's run docs/answers/hhtech-loom-run.md)"
+  },
+  "BACK_FIRST": {
+   "text": "This is my first set-up question, so there is nothing before it.",
+   "then": "the open question once more (one_question.reask), with its answers",
+   "added": "loom-fixes-v2 (11 Nov, hhtech's run docs/answers/hhtech-loom-run.md)"
+  },
+  "SETUP_REASK_REC": {
+   "text": "When you're ready: do you want the steps for {card}?",
+   "answers": "REC.answers",
+   "when": "one_question rule 3 while REC is open. {card} is REC's {card}.",
+   "added": "loom-fixes-v2 (11 Nov, hhtech's run docs/answers/hhtech-loom-run.md)"
   }
  },
  "restart_phrases": [
@@ -2413,7 +2436,66 @@
   "small_talk_note": "Small talk here means these helper-talk-v2.json small_talk kinds. Not ok: yes, ok and sure are answers at a question.",
   "answer_note": "An answer may still start with \"I\" or \"I want\": \"I want a morning summary\" is kept (schedule). \"Can it remind me every morning\" starts with can: not kept, it is answered as a question, then Q_GOAL is asked again.",
   "his_case": "\"can we start from the begining\" at Q_GOAL: restart words (from the begining), so RESTART. Before: kept as the goal (Loom 1:56).",
-  "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+  "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)",
+  "no_match_v2": "loom-fixes-v2: at Q_NEW, a typed message that matches none of well, some, new is not an answer (was: not kept and taken as Skip): it is answered, then SETUP_REASK. At Q_GOAL, a message that matches none of the goal lists but has a topic, fact or offer word (the normal routing would answer it: \"laptop or a server\", \"work while my computer is off\") is not an answer either; only other messages are kept as unsure (\"I sell shoes online\")."
  },
- "rec_rule_loom": "REC is the written sentence only, with no AI ({reason} from reasons, {card} and {why} from the list). It reads the same every time for the same person, and says Hermes, never your assistant. Its {card} is the Dashboard's You are here stop (dash-setup-list-v2.json here_rule)."
+ "rec_rule_loom": "REC is the written sentence only, with no AI ({reason} from reasons, {card} and {why} from the list). It reads the same every time for the same person, and says Hermes, never your assistant. Its {card} is the Dashboard's You are here stop (dash-setup-list-v2.json here_rule).",
+ "back_rule": {
+  "rule": "While Q_NEW, Q_GOAL, REC (Want the steps?) or a STEP is the open line, a typed message that holds one of back_words (whole words, after the restart check) means Helper's previous question or step, never Hermes's checkpoints. Helper shows: at STEP n with n > 1: STEP_BACK for step n - 1 (its own answers). Else BACK_ONE, then the first of previous[open line] that was shown in this set-up conversation, as its own bubble with its answers. If none was shown: BACK_FIRST, then the open line once more (one_question.reask). The earlier answer stays kept until a new pick replaces it.",
+  "back_words": [
+   "go back",
+   "back one",
+   "one back",
+   "undo that",
+   "undo",
+   "previous",
+   "previous question",
+   "previous step",
+   "last question",
+   "question before",
+   "step before",
+   "step back",
+   "back a step",
+   "the one before"
+  ],
+  "previous": {
+   "Q_NEW": [],
+   "Q_GOAL": [
+    "Q_NEW"
+   ],
+   "REC": [
+    "Q_GOAL",
+    "Q_NEW"
+   ],
+   "STEP": [
+    "REC"
+   ]
+  },
+  "order_note": "Restart words win first (\"lets go back to the start\" is RESTART), then back words, then the rest of typed_answer.",
+  "added": "loom-fixes-v2 (11 Nov, hhtech's run docs/answers/hhtech-loom-run.md)"
+ },
+ "one_question": {
+  "rule": "While a set-up question is open (Q_NEW, Q_GOAL, REC, or a STEP) and the person types something that is not an answer, restart words or back words: 1. Helper's answer carries NO offer: no \"Do you want ...?\" line and no picks under it (offers, near offers and name offers are all dropped). Action buttons of the answer (Open Messaging, Show me what to ask) stay: they are not questions. 2. If the answer would be a topic question (kind question, e.g. \"Do you already pay for ChatGPT or Claude?\"), Helper shows that topic's plain line instead. 3. Then the open question once more, as its own bubble with its buttons (reask[open line]). Every time, not once only. 4. Exception: if the answer is one of own_question_kinds (it cannot be answered without its own question, e.g. \"Do you mean me, or your own Hermes?\"), that question is shown with its buttons and the set-up question is NOT added; it comes back (reask) as the next bubble after the person answers that question. So after any message, exactly one question is on screen: the last bubble.",
+  "reask": {
+   "Q_NEW": "SETUP_REASK",
+   "Q_GOAL": "SETUP_REASK_GOAL",
+   "REC": "SETUP_REASK_REC",
+   "STEP": "STEP_BACK"
+  },
+  "next_after_answer": {
+   "Q_NEW": "Q_GOAL",
+   "Q_GOAL": "REC"
+  },
+  "own_question_kinds": [
+   "W1",
+   "C1",
+   "C2",
+   "can-q",
+   "MIG_WHICH",
+   "RM2"
+  ],
+  "why": "hhtech's run: in 8 of 20 messages Helper asked an offer question and then \"When you're ready: are you new to Hermes?\", two questions in a row and only the second with buttons.",
+  "added": "loom-fixes-v2 (11 Nov, hhtech's run docs/answers/hhtech-loom-run.md)"
+ },
+ "changed_loom_fixes_v2": "Points 2, 5, 7: back_rule with BACK_ONE and BACK_FIRST, one_question with SETUP_REASK_REC, NOT_SEEN. See content/helper-loom-fixes-v2.md."
 }

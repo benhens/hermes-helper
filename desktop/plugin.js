@@ -671,8 +671,8 @@ const TALK_DATA = {
       "pick_label": "Moving from another AI app",
       "docs_box": {
         "head": "From the Hermes docs",
-        "quote": "hermes import-agent imports your existing OpenClaw, Claude Code, OpenAI Codex CLI, Cursor, Grok Bot or OpenBot setup into Hermes with one command.",
-        "where": "user-guide/import-from-other-agents.md, line 9"
+        "quote": "hermes migrate <agent> (openclaw, claude-code, codex, cursor, grok-bot, openbot) to import from one agent",
+        "where": "user-guide/import-from-other-agents.md, line 15"
       },
       "next": {
         "kind": "paste",
@@ -990,6 +990,19 @@ const TALK_DATA = {
       "text": "Hermes can bring your setup over from six apps.",
       "source": "user-guide/import-from-other-agents.md line 9 (the six names)",
       "offer": "mig_which"
+    },
+    "BACK_NONE": {
+      "text": "No question of mine is open, so there is nothing to go back to.",
+      "offer": "general"
+    },
+    "NAME_HELLO": {
+      "text": "Hi."
+    },
+    "ASK_NAME": {
+      "text": "What's your name?"
+    },
+    "ASK_WORK": {
+      "text": "What do you do?"
     }
   },
   "opening": {
@@ -9477,7 +9490,179 @@ const TALK_DATA = {
     {
       "name": "yuanbao"
     }
-  ]
+  ],
+  "names": {
+    "starts": [
+      "what is",
+      "what's",
+      "whats",
+      "what are",
+      "what exactly is",
+      "tell me about",
+      "explain",
+      "what does",
+      "wat is",
+      "wats",
+      "wat's",
+      "wat",
+      "wht is",
+      "whts",
+      "whta is",
+      "waht is",
+      "what si",
+      "whats is",
+      "what's is",
+      "what is is",
+      "what r",
+      "wat r",
+      "wat are",
+      "what're",
+      "whatre",
+      "what",
+      "whats that",
+      "what's that",
+      "what is that",
+      "who is",
+      "whos",
+      "who's",
+      "tell me what",
+      "do you know",
+      "do you know what",
+      "explain what",
+      "can you explain",
+      "pls explain",
+      "i dont know what",
+      "i don't know what",
+      "what do you mean by",
+      "what does it mean",
+      "meaning of",
+      "define"
+    ],
+    "lead_ins": [
+      "so",
+      "ok",
+      "okay",
+      "and",
+      "hi",
+      "hey",
+      "helper",
+      "please",
+      "pls",
+      "plz",
+      "can you",
+      "could you",
+      "um",
+      "uh",
+      "hmm",
+      "sorry",
+      "quick question",
+      "also",
+      "but"
+    ],
+    "tails": [
+      "in hermes",
+      "in hermes agent",
+      "for hermes",
+      "on hermes",
+      "with hermes",
+      "in the docs",
+      "in this app",
+      "here",
+      "exactly",
+      "anyway",
+      "then",
+      "is",
+      "are",
+      "do",
+      "does",
+      "mean",
+      "means",
+      "is it",
+      "is that",
+      "for",
+      "about",
+      "thing",
+      "again",
+      "please",
+      "pls"
+    ],
+    "cut": [
+      "a",
+      "an",
+      "the"
+    ],
+    "wins_over_kinds": [
+      "row",
+      "question",
+      "WHERE",
+      "HERMES",
+      "AGENT"
+    ],
+    "wins_over_name_kinds": [
+      "memory",
+      "chat",
+      "provider",
+      "feature"
+    ]
+  },
+  "back_alone": {
+    "back_words": [
+      "undo",
+      "undo that",
+      "go back",
+      "back",
+      "back one",
+      "one back",
+      "go back one",
+      "previous",
+      "previous question",
+      "previous step",
+      "last question",
+      "step back",
+      "the one before",
+      "back a step"
+    ],
+    "filler": [
+      "please",
+      "pls",
+      "can we",
+      "lets",
+      "let's",
+      "just",
+      "a",
+      "one",
+      "that",
+      "to",
+      "the",
+      "and",
+      "ok",
+      "okay",
+      "no",
+      "wait",
+      "oops",
+      "sorry"
+    ]
+  },
+  "opening_talk": {
+    "kinds": [
+      "hello",
+      "thanks",
+      "how",
+      "who",
+      "ai"
+    ],
+    "line_by_kind": {
+      "hello": "NAME_HELLO",
+      "thanks": "THANKS",
+      "how": "HOW",
+      "who": "WHO",
+      "ai": "AI"
+    },
+    "ask": {
+      "name": "ASK_NAME",
+      "work": "ASK_WORK"
+    }
+  }
 }
 
 // ---- src/names-data.js ----
@@ -9640,7 +9825,7 @@ const NAMES_DATA = [
     "id": "nm_dingtalk",
     "name": "DingTalk",
     "kind": "chat",
-    "say": "DingTalk is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "DingTalk is a chat app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/dingtalk.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a DingTalk chatbot",
@@ -9653,7 +9838,7 @@ const NAMES_DATA = [
     "id": "nm_discord",
     "name": "Discord",
     "kind": "chat",
-    "say": "Discord is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Discord is a chat app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/discord.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Discord bot",
@@ -9666,7 +9851,7 @@ const NAMES_DATA = [
     "id": "nm_email",
     "name": "Email",
     "kind": "chat",
-    "say": "Email is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Email is one way to talk to Hermes: you send an email to Hermes's own address and it answers in the same thread.",
     "file": "user-guide/messaging/email.md",
     "line": 4,
     "quote": "Set up Hermes Agent as an email assistant via IMAP/SMTP",
@@ -9679,13 +9864,15 @@ const NAMES_DATA = [
     "id": "nm_feishulark",
     "name": "Feishu / Lark",
     "kind": "chat",
-    "say": "Feishu / Lark is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Feishu / Lark is a chat app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/feishu.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Feishu or Lark bot",
     "aliases": [
       "feishu / lark",
-      "feishulark"
+      "feishulark",
+      "feishu",
+      "lark"
     ],
     "offer": "name_chat"
   },
@@ -9693,7 +9880,7 @@ const NAMES_DATA = [
     "id": "nm_googlechat",
     "name": "Google Chat",
     "kind": "chat",
-    "say": "Google Chat is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Google Chat is a chat app from Google. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/google_chat.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Google Chat bot using Cloud Pub/Sub",
@@ -9707,7 +9894,7 @@ const NAMES_DATA = [
     "id": "nm_homeassistant",
     "name": "Home Assistant",
     "kind": "chat",
-    "say": "Home Assistant is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Home Assistant is a system that runs a smart home. With an add-on, Hermes can control your smart home through it.",
     "file": "user-guide/messaging/homeassistant.md",
     "line": 3,
     "quote": "Control your smart home with Hermes Agent via the Home Assistant plugin from the plugin catalog.",
@@ -9721,7 +9908,7 @@ const NAMES_DATA = [
     "id": "nm_line",
     "name": "LINE",
     "kind": "chat",
-    "say": "LINE is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "LINE is a messaging app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/line.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a LINE Messaging API bot",
@@ -9734,7 +9921,7 @@ const NAMES_DATA = [
     "id": "nm_matrix",
     "name": "Matrix",
     "kind": "chat",
-    "say": "Matrix is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Matrix is a chat system. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/matrix.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Matrix bot",
@@ -9747,7 +9934,7 @@ const NAMES_DATA = [
     "id": "nm_mattermost",
     "name": "Mattermost",
     "kind": "chat",
-    "say": "Mattermost is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Mattermost is a chat app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/mattermost.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Mattermost bot",
@@ -9760,7 +9947,7 @@ const NAMES_DATA = [
     "id": "nm_microsoftgraphwebhooklistener",
     "name": "Microsoft Graph Webhook Listener",
     "kind": "chat",
-    "say": "Microsoft Graph Webhook Listener is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Microsoft Graph Webhook Listener is a part of Hermes that receives notices from Microsoft, such as new meetings, calendar changes and chats, so Hermes can act on them.",
     "file": "user-guide/messaging/msgraph-webhook.md",
     "line": 4,
     "quote": "Receive Microsoft Graph change notifications (meetings, calendar, chat, etc.) in Hermes",
@@ -9774,7 +9961,7 @@ const NAMES_DATA = [
     "id": "nm_openwebui",
     "name": "Open WebUI",
     "kind": "chat",
-    "say": "Open WebUI is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Open WebUI is a chat program for AI that you run yourself and open in a web browser. You can use it to talk to Hermes from there.",
     "file": "user-guide/messaging/open-webui.md",
     "line": 4,
     "quote": "Connect Open WebUI to Hermes Agent via the OpenAI-compatible API server",
@@ -9788,7 +9975,7 @@ const NAMES_DATA = [
     "id": "nm_raft",
     "name": "Raft",
     "kind": "chat",
-    "say": "Raft is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Raft is a place where agents work, and Hermes can connect to it as an outside agent. An agent is an AI that does tasks, like Hermes.",
     "file": "user-guide/messaging/raft.md",
     "line": 4,
     "quote": "Connect Hermes Agent to Raft as an external agent via wake-channel bridge",
@@ -9801,7 +9988,7 @@ const NAMES_DATA = [
     "id": "nm_hermesrelay",
     "name": "Hermes Relay",
     "kind": "chat",
-    "say": "Hermes Relay is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Hermes Relay is a way to connect Hermes to chat apps through a relay, a go-between that holds the app's sign-in for Hermes. The docs mark it as experimental.",
     "file": "user-guide/messaging/relay.md",
     "line": 4,
     "quote": "Connect Hermes to messaging platforms through a relay connector that owns the platform credentials — enrollment, capabilities, config, and troubleshooting",
@@ -9815,7 +10002,7 @@ const NAMES_DATA = [
     "id": "nm_signal",
     "name": "Signal",
     "kind": "chat",
-    "say": "Signal is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Signal is a messenger app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/signal.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Signal messenger bot via signal-cli daemon",
@@ -9828,7 +10015,7 @@ const NAMES_DATA = [
     "id": "nm_slack",
     "name": "Slack",
     "kind": "chat",
-    "say": "Slack is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Slack is a chat app for work. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/slack.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Slack bot using Socket Mode",
@@ -9841,13 +10028,15 @@ const NAMES_DATA = [
     "id": "nm_smstwilio",
     "name": "SMS (Twilio)",
     "kind": "chat",
-    "say": "SMS (Twilio) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "SMS (Twilio) is a way to talk to Hermes by text message: Twilio is a service that gives Hermes a phone number for texts.",
     "file": "user-guide/messaging/sms.md",
     "line": 5,
     "quote": "Set up Hermes Agent as an SMS chatbot via Twilio",
     "aliases": [
       "sms (twilio)",
-      "smstwilio"
+      "smstwilio",
+      "sms",
+      "twilio"
     ],
     "offer": "name_chat"
   },
@@ -9855,7 +10044,7 @@ const NAMES_DATA = [
     "id": "nm_teamsmeetings",
     "name": "Teams Meetings",
     "kind": "chat",
-    "say": "Teams Meetings is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Teams Meetings is a part of Hermes that reads your Microsoft Teams meetings and sends you a summary of each one.",
     "file": "user-guide/messaging/teams-meetings.md",
     "line": 4,
     "quote": "Set up the Microsoft Teams meeting summary pipeline with Microsoft Graph webhooks",
@@ -9869,7 +10058,7 @@ const NAMES_DATA = [
     "id": "nm_microsoftteams",
     "name": "Microsoft Teams",
     "kind": "chat",
-    "say": "Microsoft Teams is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Microsoft Teams is a chat app for work. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/teams.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Microsoft Teams bot",
@@ -9883,7 +10072,7 @@ const NAMES_DATA = [
     "id": "nm_telegram",
     "name": "Telegram",
     "kind": "chat",
-    "say": "Telegram is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Telegram is a messaging app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/telegram.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a Telegram bot",
@@ -9896,7 +10085,7 @@ const NAMES_DATA = [
     "id": "nm_webhooks",
     "name": "Webhooks",
     "kind": "chat",
-    "say": "Webhooks is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Webhooks are a way for other services, such as GitHub, to tell Hermes that something happened, so Hermes starts work on it by itself.",
     "file": "user-guide/messaging/webhooks.md",
     "line": 4,
     "quote": "Receive events from GitHub, GitLab, and other services to trigger Hermes agent runs",
@@ -9909,13 +10098,15 @@ const NAMES_DATA = [
     "id": "nm_wecomenterprisewechat",
     "name": "WeCom (Enterprise WeChat)",
     "kind": "chat",
-    "say": "WeCom (Enterprise WeChat) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "WeCom (Enterprise WeChat) is a chat app for work. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/wecom.md",
     "line": 4,
     "quote": "Connect Hermes Agent to WeCom via the AI Bot WebSocket gateway",
     "aliases": [
       "wecom (enterprise wechat)",
-      "wecomenterprisewechat"
+      "wecomenterprisewechat",
+      "wecom",
+      "enterprise wechat"
     ],
     "offer": "name_chat"
   },
@@ -9923,13 +10114,15 @@ const NAMES_DATA = [
     "id": "nm_weixinwechat",
     "name": "Weixin (WeChat)",
     "kind": "chat",
-    "say": "Weixin (WeChat) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Weixin (WeChat) is a messaging app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/weixin.md",
     "line": 4,
     "quote": "Connect Hermes Agent to personal WeChat accounts via the iLink Bot API",
     "aliases": [
       "weixin (wechat)",
-      "weixinwechat"
+      "weixinwechat",
+      "weixin",
+      "wechat"
     ],
     "offer": "name_chat"
   },
@@ -9937,13 +10130,15 @@ const NAMES_DATA = [
     "id": "nm_whatsappbusinesscloudapi",
     "name": "WhatsApp Business (Cloud API)",
     "kind": "chat",
-    "say": "WhatsApp Business (Cloud API) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "WhatsApp Business (Cloud API) is a way to connect Hermes to WhatsApp through Meta's own business service, so you can talk to Hermes from WhatsApp.",
     "file": "user-guide/messaging/whatsapp-cloud.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a WhatsApp bot via Meta's official Business Cloud API",
     "aliases": [
       "whatsapp business (cloud api)",
-      "whatsappbusinesscloudapi"
+      "whatsappbusinesscloudapi",
+      "whatsapp business",
+      "cloud api"
     ],
     "offer": "name_chat"
   },
@@ -9951,7 +10146,7 @@ const NAMES_DATA = [
     "id": "nm_whatsapp",
     "name": "WhatsApp",
     "kind": "chat",
-    "say": "WhatsApp is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "WhatsApp is a messaging app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
     "file": "user-guide/messaging/whatsapp.md",
     "line": 4,
     "quote": "Set up Hermes Agent as a WhatsApp bot via the built-in Baileys bridge",
@@ -9964,7 +10159,7 @@ const NAMES_DATA = [
     "id": "nm_yuanbao",
     "name": "Yuanbao",
     "kind": "chat",
-    "say": "Yuanbao is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "say": "Yuanbao is a chat app that Hermes used to join as a bot, so you could talk to Hermes from there. That has moved out of Hermes into a separate add-on, which the docs say is not supported.",
     "file": "user-guide/messaging/yuanbao.md",
     "line": 4,
     "quote": "Yuanbao moved out of Hermes core into the yuanbao Hermes Labs plugin",
@@ -10180,7 +10375,7 @@ const NAMES_DATA = [
     "id": "nm_actualcomputer",
     "name": "Actual Computer",
     "kind": "provider",
-    "say": "Actual Computer is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "Actual Computer is a service that runs AI models on your own computers. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 585,
     "quote": "Your own hardware as a private inference cluster via Actual Computer.",
@@ -10221,7 +10416,7 @@ const NAMES_DATA = [
     "id": "nm_ollama",
     "name": "Ollama",
     "kind": "provider",
-    "say": "Ollama is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "Ollama is a program that runs AI models on your own computer. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 728,
     "quote": "Ollama runs open-weight models locally with one command.",
@@ -10235,7 +10430,7 @@ const NAMES_DATA = [
     "id": "nm_vllm",
     "name": "vLLM",
     "kind": "provider",
-    "say": "vLLM is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "vLLM is a program that runs AI models on your own computer or server, built for many users at once. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 801,
     "quote": "vLLM is the standard for production LLM serving.",
@@ -10249,7 +10444,7 @@ const NAMES_DATA = [
     "id": "nm_sglang",
     "name": "SGLang",
     "kind": "provider",
-    "say": "SGLang is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "SGLang is a program that runs AI models on your own computer or server, like vLLM. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 844,
     "quote": "SGLang is an alternative to vLLM with RadixAttention for KV cache reuse.",
@@ -10263,7 +10458,7 @@ const NAMES_DATA = [
     "id": "nm_llamacpp",
     "name": "llama.cpp",
     "kind": "provider",
-    "say": "llama.cpp is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "llama.cpp is a program that runs AI models on an ordinary computer, even without a strong graphics card. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 877,
     "quote": "llama.cpp runs quantized models on CPU, Apple Silicon (Metal), and consumer GPUs.",
@@ -10278,7 +10473,7 @@ const NAMES_DATA = [
     "id": "nm_lmstudio",
     "name": "LM Studio",
     "kind": "provider",
-    "say": "LM Studio is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "LM Studio is a desktop app for running AI models on your own computer. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 920,
     "quote": "LM Studio is a desktop app for running local models with a GUI.",
@@ -10293,7 +10488,7 @@ const NAMES_DATA = [
     "id": "nm_litellmproxy",
     "name": "LiteLLM Proxy",
     "kind": "provider",
-    "say": "LiteLLM Proxy is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "LiteLLM Proxy is a program that lets Hermes reach AI models from more than 100 companies through one address. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 1148,
     "quote": "LiteLLM is an OpenAI-compatible proxy that unifies 100+ LLM providers behind a single API.",
@@ -10308,7 +10503,7 @@ const NAMES_DATA = [
     "id": "nm_clawrouter",
     "name": "ClawRouter",
     "kind": "provider",
-    "say": "ClawRouter is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "say": "ClawRouter is a program on your computer that picks an AI model for each question, by how hard the question is. A model is the AI that thinks for Hermes.",
     "file": "integrations/providers.md",
     "line": 1180,
     "quote": "ClawRouter by BlockRunAI is a local routing proxy that auto-selects models based on query complexity.",
@@ -10322,7 +10517,7 @@ const NAMES_DATA = [
     "id": "nm_browser",
     "name": "browser",
     "kind": "toolset",
-    "say": "browser is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "browser is a group of tools Hermes can use to work a web browser. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 55,
     "quote": "Core browser automation.",
@@ -10335,7 +10530,7 @@ const NAMES_DATA = [
     "id": "nm_clarify",
     "name": "clarify",
     "kind": "toolset",
-    "say": "clarify is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "clarify is a group of tools Hermes can use to ask you a question when it needs more detail. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 56,
     "quote": "Ask the user a question when the agent needs clarification.",
@@ -10348,7 +10543,7 @@ const NAMES_DATA = [
     "id": "nm_codeexecution",
     "name": "code_execution",
     "kind": "toolset",
-    "say": "code_execution is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "code_execution is a group of tools Hermes can use to run small Python programs that use its other tools. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 57,
     "quote": "Run Python scripts that call Hermes tools programmatically.",
@@ -10363,7 +10558,7 @@ const NAMES_DATA = [
     "id": "nm_connections",
     "name": "connections",
     "kind": "toolset",
-    "say": "connections is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "connections is a group of tools Hermes can use to connect you to other apps. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 58,
     "quote": "Connect the user to apps: managed connector accounts through the Nous gateway, and local MCP servers from the catalog.",
@@ -10376,7 +10571,7 @@ const NAMES_DATA = [
     "id": "nm_coding",
     "name": "coding",
     "kind": "toolset",
-    "say": "coding is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "coding is a group of tools Hermes can use to work on software: change files, run commands and search. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 59,
     "quote": "Coding-focused bundle for software work: file editing, terminal, search, web docs, skills, browser, delegate, and code execution.",
@@ -10389,7 +10584,7 @@ const NAMES_DATA = [
     "id": "nm_cronjob",
     "name": "cronjob",
     "kind": "toolset",
-    "say": "cronjob is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "cronjob is a group of tools Hermes can use to set up and manage jobs that run at set times. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 60,
     "quote": "Schedule and manage recurring tasks.",
@@ -10402,7 +10597,7 @@ const NAMES_DATA = [
     "id": "nm_debugging",
     "name": "debugging",
     "kind": "toolset",
-    "say": "debugging is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "debugging is a group of tools Hermes can use to find faults in software: read files, run commands and search the web. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 61,
     "quote": "Debug bundle — file, process/terminal, web extract/search.",
@@ -10415,7 +10610,7 @@ const NAMES_DATA = [
     "id": "nm_delegation",
     "name": "delegation",
     "kind": "toolset",
-    "say": "delegation is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "delegation is a group of tools Hermes can use to hand parts of a job to helper copies of itself that work at the same time. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 62,
     "quote": "Spawn isolated subagent instances for parallel work.",
@@ -10428,7 +10623,7 @@ const NAMES_DATA = [
     "id": "nm_discordadmin",
     "name": "discord_admin",
     "kind": "toolset",
-    "say": "discord_admin is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "discord_admin is a group of tools Hermes can use to look after a Discord server: ban people, change roles and manage channels. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 64,
     "quote": "Discord moderation (bans, role changes, channel management).",
@@ -10443,7 +10638,7 @@ const NAMES_DATA = [
     "id": "nm_feishudoc",
     "name": "feishu_doc",
     "kind": "toolset",
-    "say": "feishu_doc is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "feishu_doc is a group of tools Hermes can use to read documents in Feishu or Lark. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 65,
     "quote": "Read Feishu/Lark document content.",
@@ -10458,7 +10653,7 @@ const NAMES_DATA = [
     "id": "nm_feishudrive",
     "name": "feishu_drive",
     "kind": "toolset",
-    "say": "feishu_drive is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "feishu_drive is a group of tools Hermes can use to work with comments in Feishu or Lark files. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 66,
     "quote": "Feishu/Lark drive comment operations.",
@@ -10473,7 +10668,7 @@ const NAMES_DATA = [
     "id": "nm_file",
     "name": "file",
     "kind": "toolset",
-    "say": "file is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "file is a group of tools Hermes can use to read, write, search and change files. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 67,
     "quote": "File reading, writing, searching, and editing.",
@@ -10486,7 +10681,7 @@ const NAMES_DATA = [
     "id": "nm_computeruse",
     "name": "computer_use",
     "kind": "toolset",
-    "say": "computer_use is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "computer_use is a group of tools Hermes can use to work your computer's desktop in the background, without taking over your mouse. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 68,
     "quote": "Background desktop control via cua-driver — does not steal cursor/focus.",
@@ -10501,7 +10696,7 @@ const NAMES_DATA = [
     "id": "nm_contextengine",
     "name": "context_engine",
     "kind": "toolset",
-    "say": "context_engine is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "context_engine is a group of tools Hermes can use to use tools that a certain kind of add-on brings. It stays empty until such an add-on is on. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 69,
     "quote": "Runtime tools exposed by the active context-engine plugin (empty until a plugin populates it).",
@@ -10516,7 +10711,7 @@ const NAMES_DATA = [
     "id": "nm_imagegen",
     "name": "image_gen",
     "kind": "toolset",
-    "say": "image_gen is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "image_gen is a group of tools Hermes can use to make pictures from a written description. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 70,
     "quote": "Text-to-image generation via FAL.ai (with opt-in OpenAI / xAI backends).",
@@ -10531,7 +10726,7 @@ const NAMES_DATA = [
     "id": "nm_videogen",
     "name": "video_gen",
     "kind": "toolset",
-    "say": "video_gen is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "video_gen is a group of tools Hermes can use to make videos from a written description or a picture. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 71,
     "quote": "Text-to-video and image-to-video via plugin-registered backends (xAI Grok-Imagine, FAL.ai Veo 3.1 / Pixverse v6 / Kling 3.0 / Kling O3).",
@@ -10546,7 +10741,7 @@ const NAMES_DATA = [
     "id": "nm_kanban",
     "name": "kanban",
     "kind": "toolset",
-    "say": "kanban is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "kanban is a group of tools Hermes can use to share out tasks between several bots. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 72,
     "quote": "Multi-agent coordination tools.",
@@ -10559,7 +10754,7 @@ const NAMES_DATA = [
     "id": "nm_memory",
     "name": "memory",
     "kind": "toolset",
-    "say": "memory is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "memory is a group of tools Hermes can use to keep and change what it remembers from one chat to the next. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 73,
     "quote": "Persistent cross-session memory management.",
@@ -10572,7 +10767,7 @@ const NAMES_DATA = [
     "id": "nm_desktopui",
     "name": "desktop_ui",
     "kind": "toolset",
-    "say": "desktop_ui is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "desktop_ui is a group of tools Hermes can use to act on the Hermes desktop app itself, such as its terminal pane. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 74,
     "quote": "Affordances that act on the Hermes desktop app itself — read/close the embedded terminal pane, open, read, close, interact with, and annotate the in-app browser, identify the OS window behind the app, reveal a pane, react to a message, run a guided tour",
@@ -10587,7 +10782,7 @@ const NAMES_DATA = [
     "id": "nm_project",
     "name": "project",
     "kind": "toolset",
-    "say": "project is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "project is a group of tools Hermes can use to make and switch Projects in the desktop app, named work areas with several folders. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 75,
     "quote": "Create and switch desktop Projects (named, multi-folder workspaces) via one create/switch/list action enum.",
@@ -10600,7 +10795,7 @@ const NAMES_DATA = [
     "id": "nm_catalog",
     "name": "catalog",
     "kind": "toolset",
-    "say": "catalog is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "catalog is a group of tools Hermes can use to search the plugin catalog, a list of add-ons, and install from it after you approve. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 76,
     "quote": "Search the plugin catalog and skills hub, and install items through the approval card into this chat's profile.",
@@ -10613,7 +10808,7 @@ const NAMES_DATA = [
     "id": "nm_safe",
     "name": "safe",
     "kind": "toolset",
-    "say": "safe is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "safe is a group of tools Hermes can use to look things up and make pictures or sound, without changing your files. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 77,
     "quote": "Read-only research + media generation.",
@@ -10626,7 +10821,7 @@ const NAMES_DATA = [
     "id": "nm_search",
     "name": "search",
     "kind": "toolset",
-    "say": "search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "search is a group of tools Hermes can use to search the web, without reading whole pages. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 78,
     "quote": "Web search only (without extract).",
@@ -10639,7 +10834,7 @@ const NAMES_DATA = [
     "id": "nm_sessionsearch",
     "name": "session_search",
     "kind": "toolset",
-    "say": "session_search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "session_search is a group of tools Hermes can use to search your past chats. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 79,
     "quote": "Search past conversation sessions.",
@@ -10654,7 +10849,7 @@ const NAMES_DATA = [
     "id": "nm_skills",
     "name": "skills",
     "kind": "toolset",
-    "say": "skills is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "skills is a group of tools Hermes can use to look at, add and change skills, the written how-tos Hermes follows. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 80,
     "quote": "Skill CRUD and browsing.",
@@ -10667,7 +10862,7 @@ const NAMES_DATA = [
     "id": "nm_terminal",
     "name": "terminal",
     "kind": "toolset",
-    "say": "terminal is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "terminal is a group of tools Hermes can use to run commands on the computer and manage programs it started. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 81,
     "quote": "Shell command execution and background process management.",
@@ -10680,7 +10875,7 @@ const NAMES_DATA = [
     "id": "nm_todo",
     "name": "todo",
     "kind": "toolset",
-    "say": "todo is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "todo is a group of tools Hermes can use to keep a to-do list during a chat. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 82,
     "quote": "Task list management within a session.",
@@ -10693,7 +10888,7 @@ const NAMES_DATA = [
     "id": "nm_tts",
     "name": "tts",
     "kind": "toolset",
-    "say": "tts is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "tts is a group of tools Hermes can use to turn text into spoken audio. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 83,
     "quote": "Text-to-speech audio generation.",
@@ -10706,7 +10901,7 @@ const NAMES_DATA = [
     "id": "nm_vision",
     "name": "vision",
     "kind": "toolset",
-    "say": "vision is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "vision is a group of tools Hermes can use to look at pictures and describe them. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 84,
     "quote": "Image analysis via vision-capable models.",
@@ -10719,7 +10914,7 @@ const NAMES_DATA = [
     "id": "nm_video",
     "name": "video",
     "kind": "toolset",
-    "say": "video is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "video is a group of tools Hermes can use to watch videos and understand them. It is off unless you add it. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 85,
     "quote": "Video analysis and understanding tools (opt-in, not in the default toolset — add explicitly via --toolsets).",
@@ -10732,7 +10927,7 @@ const NAMES_DATA = [
     "id": "nm_web",
     "name": "web",
     "kind": "toolset",
-    "say": "web is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "web is a group of tools Hermes can use to search the web and read web pages. A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 86,
     "quote": "Web search and page content extraction.",
@@ -10745,7 +10940,7 @@ const NAMES_DATA = [
     "id": "nm_xsearch",
     "name": "x_search",
     "kind": "toolset",
-    "say": "x_search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "say": "x_search is a group of tools Hermes can use to read public posts on X (Twitter). A tool is one thing Hermes can do.",
     "file": "reference/toolsets-reference.md",
     "line": 87,
     "quote": "Read-only public X discovery via xAI's built-in x_search Responses tool.",
@@ -10760,7 +10955,7 @@ const NAMES_DATA = [
     "id": "nm_acphostintegration",
     "name": "ACP Host Integration",
     "kind": "feature",
-    "say": "ACP Host Integration is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "ACP Host Integration is a part of Hermes that lets you use Hermes inside some code editors.",
     "file": "user-guide/features/acp.md",
     "line": 4,
     "quote": "Use Hermes Agent inside ACP-compatible editors and collaboration platforms",
@@ -10774,7 +10969,7 @@ const NAMES_DATA = [
     "id": "nm_apiserver",
     "name": "API Server",
     "kind": "feature",
-    "say": "API Server is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "API Server is a part of Hermes that lets other apps talk to Hermes as if it were an OpenAI model.",
     "file": "user-guide/features/api-server.md",
     "line": 4,
     "quote": "Expose hermes-agent as an OpenAI-compatible API for any frontend",
@@ -10788,7 +10983,7 @@ const NAMES_DATA = [
     "id": "nm_batchprocessing",
     "name": "Batch Processing",
     "kind": "feature",
-    "say": "Batch Processing is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Batch Processing is a part of Hermes that runs Hermes on many tasks at once and saves what it did, mostly for training AI models.",
     "file": "user-guide/features/batch-processing.md",
     "line": 4,
     "quote": "Generate agent trajectories at scale — parallel processing, checkpointing, and toolset distributions",
@@ -10802,7 +10997,7 @@ const NAMES_DATA = [
     "id": "nm_browserautomation",
     "name": "Browser Automation",
     "kind": "feature",
-    "say": "Browser Automation is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Browser Automation is a part of Hermes that lets Hermes work a real web browser: open pages, fill in forms and read what is there.",
     "file": "user-guide/features/browser.md",
     "line": 3,
     "quote": "Drive a real browser with browser_exec — Hermes-launched Chromium, cloud browsers, Lightpanda, or your own Chrome via CDP — for web interaction, form filling, scraping, and more.",
@@ -10816,7 +11011,7 @@ const NAMES_DATA = [
     "id": "nm_builtinplugins",
     "name": "Built-in Plugins",
     "kind": "feature",
-    "say": "Built-in Plugins is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Built-in Plugins is a part of Hermes that holds add-ons that come with Hermes and run by themselves, such as one that cleans up disk space.",
     "file": "user-guide/features/built-in-plugins.md",
     "line": 5,
     "quote": "Plugins shipped with Hermes Agent that run automatically via lifecycle hooks — disk-cleanup and friends",
@@ -10830,7 +11025,7 @@ const NAMES_DATA = [
     "id": "nm_contextfiles",
     "name": "Context Files",
     "kind": "feature",
-    "say": "Context Files is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Context Files is a part of Hermes that reads certain files, such as AGENTS.md and SOUL.md, into every chat, so Hermes knows your rules and project.",
     "file": "user-guide/features/context-files.md",
     "line": 4,
     "quote": "Project context files — .hermes.md, AGENTS.md, CLAUDE.md, global SOUL.md, and .cursorrules — automatically injected into every conversation",
@@ -10844,7 +11039,7 @@ const NAMES_DATA = [
     "id": "nm_contextreferences",
     "name": "Context References",
     "kind": "feature",
-    "say": "Context References is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Context References is a part of Hermes that lets you attach files, folders and web pages to a message by typing @ and their name.",
     "file": "user-guide/features/context-references.md",
     "line": 5,
     "quote": "Inline @-syntax for attaching files, folders, git diffs, and URLs directly into your messages",
@@ -10858,7 +11053,7 @@ const NAMES_DATA = [
     "id": "nm_credentialpools",
     "name": "Credential Pools",
     "kind": "feature",
-    "say": "Credential Pools is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Credential Pools is a part of Hermes that lets you give Hermes several keys for one AI service, so it can switch to another key when one hits its limit.",
     "file": "user-guide/features/credential-pools.md",
     "line": 3,
     "quote": "Pool multiple API keys or OAuth tokens per provider for automatic rotation and rate limit recovery.",
@@ -10872,13 +11067,15 @@ const NAMES_DATA = [
     "id": "nm_passwordslogins",
     "name": "Passwords & Logins",
     "kind": "feature",
-    "say": "Passwords & Logins is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Passwords & Logins is a part of Hermes that lets Hermes sign in to sites, pay and fill in addresses for you without ever seeing your password.",
     "file": "user-guide/features/credential-vault.md",
     "line": 3,
     "quote": "The agent signs into sites, pays and fills addresses for you without ever seeing a password.",
     "aliases": [
       "passwords & logins",
-      "passwordslogins"
+      "passwordslogins",
+      "passwords",
+      "logins"
     ],
     "offer": "name_feature"
   },
@@ -10886,13 +11083,15 @@ const NAMES_DATA = [
     "id": "nm_scheduledtaskscron",
     "name": "Scheduled Tasks (Cron)",
     "kind": "feature",
-    "say": "Scheduled Tasks (Cron) is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Scheduled Tasks (Cron) is a part of Hermes that runs jobs at set times, which you describe in plain words.",
     "file": "user-guide/features/cron.md",
     "line": 4,
     "quote": "Schedule automated tasks with natural language, manage them with one cron tool, and attach one or more skills",
     "aliases": [
       "scheduled tasks (cron)",
-      "scheduledtaskscron"
+      "scheduledtaskscron",
+      "scheduled tasks",
+      "cron"
     ],
     "offer": "name_feature"
   },
@@ -10900,7 +11099,7 @@ const NAMES_DATA = [
     "id": "nm_curator",
     "name": "Curator",
     "kind": "feature",
-    "say": "Curator is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Curator is a part of Hermes that looks after the skills (written how-tos) that Hermes wrote for itself: in the background it tracks which ones get used and puts old ones away.",
     "file": "user-guide/features/curator.md",
     "line": 4,
     "quote": "Background maintenance for agent-created skills — usage tracking, staleness, archival, and LLM-driven review",
@@ -10913,7 +11112,7 @@ const NAMES_DATA = [
     "id": "nm_subagentdelegation",
     "name": "Subagent Delegation",
     "kind": "feature",
-    "say": "Subagent Delegation is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Subagent Delegation is a part of Hermes that lets Hermes start helper copies of itself that work on parts of a job at the same time.",
     "file": "user-guide/features/delegation.md",
     "line": 4,
     "quote": "Spawn isolated child agents for parallel workstreams with delegate_task",
@@ -10927,13 +11126,15 @@ const NAMES_DATA = [
     "id": "nm_deliverablemodeartifactsinchat",
     "name": "Deliverable Mode (Artifacts in Chat)",
     "kind": "feature",
-    "say": "Deliverable Mode (Artifacts in Chat) is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Deliverable Mode (Artifacts in Chat) is a part of Hermes that sends files Hermes made, such as charts, PDFs and spreadsheets, as attachments in your chat apps.",
     "file": "user-guide/features/deliverable-mode.md",
     "line": 4,
     "quote": "How the agent ships generated charts, PDFs, spreadsheets, and other files as native attachments in messaging platforms.",
     "aliases": [
       "deliverable mode (artifacts in chat)",
-      "deliverablemodeartifactsinchat"
+      "deliverablemodeartifactsinchat",
+      "deliverable mode",
+      "artifacts in chat"
     ],
     "offer": "name_feature"
   },
@@ -10941,7 +11142,7 @@ const NAMES_DATA = [
     "id": "nm_documentextraction",
     "name": "Document Extraction",
     "kind": "feature",
-    "say": "Document Extraction is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Document Extraction is a part of Hermes that turns PDFs, Office documents and notebooks into text Hermes can read.",
     "file": "user-guide/features/document-extraction.md",
     "line": 4,
     "quote": "How read_file converts PDFs, Office documents, and notebooks to text — and what to do when a PDF is scanned images",
@@ -10955,7 +11156,7 @@ const NAMES_DATA = [
     "id": "nm_extendingthedashboard",
     "name": "Extending the Dashboard",
     "kind": "feature",
-    "say": "Extending the Dashboard is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Extending the Dashboard is a part of Hermes that lets people build new looks and pages for Hermes's web dashboard.",
     "file": "user-guide/features/extending-the-dashboard.md",
     "line": 4,
     "quote": "Build themes and plugins for the Hermes web dashboard — palettes, typography, layouts, custom tabs, shell slots, page-scoped slots, and backend API routes",
@@ -10969,7 +11170,7 @@ const NAMES_DATA = [
     "id": "nm_fallbackproviders",
     "name": "Fallback Providers",
     "kind": "feature",
-    "say": "Fallback Providers is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Fallback Providers is a part of Hermes that switches Hermes to a backup AI service when your main AI model is not available.",
     "file": "user-guide/features/fallback-providers.md",
     "line": 3,
     "quote": "Configure automatic failover to backup LLM providers when your primary model is unavailable.",
@@ -10983,7 +11184,7 @@ const NAMES_DATA = [
     "id": "nm_persistentgoals",
     "name": "Persistent Goals",
     "kind": "feature",
-    "say": "Persistent Goals is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Persistent Goals is a part of Hermes that lets you set a goal that Hermes keeps working on, across many turns, until it is done.",
     "file": "user-guide/features/goals.md",
     "line": 4,
     "quote": "Set a standing goal and let Hermes keep working across turns until it's done. Our take on the Ralph loop.",
@@ -10997,7 +11198,7 @@ const NAMES_DATA = [
     "id": "nm_sessionheartbeats",
     "name": "Session Heartbeats",
     "kind": "feature",
-    "say": "Session Heartbeats is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Session Heartbeats is a part of Hermes that sends a message you wrote into your chat again each time it has been quiet for a while.",
     "file": "user-guide/features/heartbeat.md",
     "line": 4,
     "quote": "A recurring prompt that re-enters your current session whenever it's idle — /heartbeat every 10m Check the deployment.",
@@ -11011,7 +11212,7 @@ const NAMES_DATA = [
     "id": "nm_honchomemory",
     "name": "Honcho Memory",
     "kind": "feature",
-    "say": "Honcho Memory is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Honcho Memory is a part of Hermes that connects Hermes to Honcho, a memory add-on that learns about you over time.",
     "file": "user-guide/features/honcho.md",
     "line": 4,
     "quote": "AI-native persistent memory via Honcho — dialectic reasoning, multi-agent user modeling, and deep personalization",
@@ -11025,7 +11226,7 @@ const NAMES_DATA = [
     "id": "nm_eventhooks",
     "name": "Event Hooks",
     "kind": "feature",
-    "say": "Event Hooks is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Event Hooks is a part of Hermes that runs your own code at set moments, for example to keep a log or send an alert.",
     "file": "user-guide/features/hooks.md",
     "line": 4,
     "quote": "Run custom code at key lifecycle points — log activity, send alerts, post to webhooks",
@@ -11039,7 +11240,7 @@ const NAMES_DATA = [
     "id": "nm_imagegeneration",
     "name": "Image Generation",
     "kind": "feature",
-    "say": "Image Generation is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Image Generation is a part of Hermes that makes pictures from a written description, through the FAL.ai service.",
     "file": "user-guide/features/image-generation.md",
     "line": 3,
     "quote": "Generate images via FAL.ai — 11 models including FLUX 2, GPT Image (1.5 & 2), Nano Banana Pro, Ideogram, Recraft V4 Pro, Krea 2, and more, selectable via hermes tools.",
@@ -11053,7 +11254,7 @@ const NAMES_DATA = [
     "id": "nm_kanbanmultigatewaydeployment",
     "name": "Kanban Multi-Gateway Deployment",
     "kind": "feature",
-    "say": "Kanban Multi-Gateway Deployment is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Kanban Multi-Gateway Deployment is a part of Hermes that lets one shared task board work across several bots, each on its own connection.",
     "file": "user-guide/features/kanban-multi-gateway.md",
     "line": 3,
     "quote": "Running one kanban board across several per-profile gateways: single dispatcher, profile-owned delivery",
@@ -11067,13 +11268,14 @@ const NAMES_DATA = [
     "id": "nm_kanbanmultiagentboard",
     "name": "Kanban (Multi-Agent Board)",
     "kind": "feature",
-    "say": "Kanban (Multi-Agent Board) is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Kanban (Multi-Agent Board) is a part of Hermes that is a task board that several bots use to share out and track work.",
     "file": "user-guide/features/kanban.md",
     "line": 4,
     "quote": "Durable SQLite-backed task board for coordinating multiple Hermes profiles",
     "aliases": [
       "kanban (multi-agent board)",
-      "kanbanmultiagentboard"
+      "kanbanmultiagentboard",
+      "multi-agent board"
     ],
     "offer": "name_feature"
   },
@@ -11081,7 +11283,7 @@ const NAMES_DATA = [
     "id": "nm_languagepacks",
     "name": "Language Packs",
     "kind": "feature",
-    "say": "Language Packs is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Language Packs is a part of Hermes that lets you add or change the language of Hermes's screens.",
     "file": "user-guide/features/language-packs.md",
     "line": 4,
     "quote": "Add or override UI languages for the CLI, gateway, TUI and Desktop with a plugin or a personal overlay",
@@ -11095,7 +11297,7 @@ const NAMES_DATA = [
     "id": "nm_recurringloops",
     "name": "Recurring Loops",
     "kind": "feature",
-    "say": "Recurring Loops is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Recurring Loops is a part of Hermes that sends the same message again and again at a set interval inside your chat.",
     "file": "user-guide/features/loops.md",
     "line": 4,
     "quote": "Re-run a prompt on a recurring interval inside your session — Hermes' take on Claude Code's /loop.",
@@ -11109,7 +11311,7 @@ const NAMES_DATA = [
     "id": "nm_lspsemanticdiagnostics",
     "name": "LSP — Semantic Diagnostics",
     "kind": "feature",
-    "say": "LSP — Semantic Diagnostics is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "LSP — Semantic Diagnostics is a part of Hermes that checks code that Hermes writes with the same tools programmers use, to catch mistakes.",
     "file": "user-guide/features/lsp.md",
     "line": 4,
     "quote": "Real language servers (pyright, gopls, rust-analyzer, …) wired into the post-write lint check used by write_file and patch.",
@@ -11123,13 +11325,15 @@ const NAMES_DATA = [
     "id": "nm_mcpmodelcontextprotocol",
     "name": "MCP (Model Context Protocol)",
     "kind": "feature",
-    "say": "MCP (Model Context Protocol) is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "MCP (Model Context Protocol) is a part of Hermes that connects Hermes to outside tool servers, programs that give Hermes more things it can do, and lets you choose which tools it loads.",
     "file": "user-guide/features/mcp.md",
     "line": 4,
     "quote": "Connect Hermes Agent to external tool servers via MCP — and control exactly which MCP tools Hermes loads",
     "aliases": [
       "mcp (model context protocol)",
-      "mcpmodelcontextprotocol"
+      "mcpmodelcontextprotocol",
+      "mcp",
+      "model context protocol"
     ],
     "offer": "name_feature"
   },
@@ -11137,7 +11341,7 @@ const NAMES_DATA = [
     "id": "nm_memoryproviders",
     "name": "Memory Providers",
     "kind": "feature",
-    "say": "Memory Providers is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Memory Providers is a part of Hermes that lets you add one memory add-on, such as Honcho or Mem0, next to Hermes's own memory.",
     "file": "user-guide/features/memory-providers.md",
     "line": 4,
     "quote": "External memory provider plugins — Honcho, OpenViking, Mem0, Hindsight, Holographic, RetainDB, ByteRover, Supermemory",
@@ -11151,7 +11355,7 @@ const NAMES_DATA = [
     "id": "nm_persistentmemory",
     "name": "Persistent Memory",
     "kind": "feature",
-    "say": "Persistent Memory is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Persistent Memory is a part of Hermes that lets Hermes remember you from one chat to the next, in two notes files and a search of past chats.",
     "file": "user-guide/features/memory.md",
     "line": 4,
     "quote": "How Hermes Agent remembers across sessions — MEMORY.md, USER.md, and session search",
@@ -11165,7 +11369,7 @@ const NAMES_DATA = [
     "id": "nm_mixtureofagents",
     "name": "Mixture of Agents",
     "kind": "feature",
-    "say": "Mixture of Agents is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Mixture of Agents is a part of Hermes that lets you make a named mix of several AI models that answer together, which you can then pick like one model.",
     "file": "user-guide/features/mixture-of-agents.md",
     "line": 4,
     "quote": "Create named MoA presets that appear as selectable models under the Mixture of Agents provider",
@@ -11179,13 +11383,15 @@ const NAMES_DATA = [
     "id": "nm_personalitysoulmd",
     "name": "Personality & SOUL.md",
     "kind": "feature",
-    "say": "Personality & SOUL.md is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Personality & SOUL.md is a part of Hermes that sets how Hermes talks and behaves, written in a file called SOUL.md.",
     "file": "user-guide/features/personality.md",
     "line": 4,
     "quote": "Customize Hermes Agent's personality with a global SOUL.md, built-in personalities, and custom persona definitions",
     "aliases": [
       "personality & soul.md",
-      "personalitysoulmd"
+      "personalitysoulmd",
+      "personality",
+      "soul.md"
     ],
     "offer": "name_feature"
   },
@@ -11193,13 +11399,15 @@ const NAMES_DATA = [
     "id": "nm_petspetdexmascots",
     "name": "Pets (Petdex Mascots)",
     "kind": "feature",
-    "say": "Pets (Petdex Mascots) is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Pets (Petdex Mascots) is a part of Hermes that gives Hermes a small moving character that reacts to what Hermes is doing.",
     "file": "user-guide/features/pets.md",
     "line": 4,
     "quote": "Adopt an animated mascot that reacts to agent activity across the CLI, TUI, and desktop app",
     "aliases": [
       "pets (petdex mascots)",
-      "petspetdexmascots"
+      "petspetdexmascots",
+      "pets",
+      "petdex mascots"
     ],
     "offer": "name_feature"
   },
@@ -11207,7 +11415,7 @@ const NAMES_DATA = [
     "id": "nm_plugincatalog",
     "name": "Plugin Catalog",
     "kind": "feature",
-    "say": "Plugin Catalog is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Plugin Catalog is a part of Hermes that lists checked add-ons for Hermes that you can install in one click.",
     "file": "user-guide/features/plugin-catalog.md",
     "line": 5,
     "quote": "Give Hermes new powers with reviewed plugins you can install in one click",
@@ -11221,7 +11429,7 @@ const NAMES_DATA = [
     "id": "nm_plugins",
     "name": "Plugins",
     "kind": "feature",
-    "say": "Plugins is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Plugins is a part of Hermes that lets add-ons give Hermes new tools and new abilities.",
     "file": "user-guide/features/plugins.md",
     "line": 5,
     "quote": "Extend Hermes with custom tools, hooks, and integrations via the plugin system",
@@ -11234,7 +11442,7 @@ const NAMES_DATA = [
     "id": "nm_providerrouting",
     "name": "Provider Routing",
     "kind": "feature",
-    "say": "Provider Routing is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Provider Routing is a part of Hermes that lets you tell OpenRouter what matters more to you: cost, speed or quality.",
     "file": "user-guide/features/provider-routing.md",
     "line": 3,
     "quote": "Configure OpenRouter provider preferences to optimize for cost, speed, or quality.",
@@ -11248,7 +11456,7 @@ const NAMES_DATA = [
     "id": "nm_skillssystem",
     "name": "Skills System",
     "kind": "feature",
-    "say": "Skills System is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Skills System is a part of Hermes that gives Hermes skills, written how-tos it reads when a job needs them.",
     "file": "user-guide/features/skills.md",
     "line": 4,
     "quote": "On-demand knowledge documents — progressive disclosure, agent-managed skills, and the Skills Hub",
@@ -11262,13 +11470,15 @@ const NAMES_DATA = [
     "id": "nm_skinsthemes",
     "name": "Skins & Themes",
     "kind": "feature",
-    "say": "Skins & Themes is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Skins & Themes is a part of Hermes that lets you change the look of Hermes in the terminal, the text window where you type commands.",
     "file": "user-guide/features/skins.md",
     "line": 4,
     "quote": "Customize the Hermes CLI with built-in and user-defined skins",
     "aliases": [
       "skins & themes",
-      "skinsthemes"
+      "skinsthemes",
+      "skins",
+      "themes"
     ],
     "offer": "name_feature"
   },
@@ -11276,7 +11486,7 @@ const NAMES_DATA = [
     "id": "nm_subscriptionproxy",
     "name": "Subscription Proxy",
     "kind": "feature",
-    "say": "Subscription Proxy is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Subscription Proxy is a part of Hermes that lets other apps use your Nous Portal subscription, as if it were an OpenAI model.",
     "file": "user-guide/features/subscription-proxy.md",
     "line": 4,
     "quote": "Use your Nous Portal subscription (or other OAuth provider) as an OpenAI-compatible endpoint for external apps",
@@ -11290,7 +11500,7 @@ const NAMES_DATA = [
     "id": "nm_noustoolgateway",
     "name": "Nous Tool Gateway",
     "kind": "feature",
-    "say": "Nous Tool Gateway is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Nous Tool Gateway is a part of Hermes that gives Hermes web search, pictures, speech and web browsers through one Nous Portal subscription, with no extra keys.",
     "file": "user-guide/features/tool-gateway.md",
     "line": 3,
     "quote": "One subscription, every tool. Web search, image generation, TTS, and cloud browsers — all routed through Nous Portal with no extra API keys.",
@@ -11304,13 +11514,15 @@ const NAMES_DATA = [
     "id": "nm_toolstoolsets",
     "name": "Tools & Toolsets",
     "kind": "feature",
-    "say": "Tools & Toolsets is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Tools & Toolsets is a part of Hermes that decides which tools Hermes has. A tool is one thing Hermes can do, and tools come in groups.",
     "file": "user-guide/features/tools.md",
     "line": 4,
     "quote": "Overview of Hermes Agent's tools — what's available, how toolsets work, and terminal backends",
     "aliases": [
       "tools & toolsets",
-      "toolstoolsets"
+      "toolstoolsets",
+      "tools",
+      "toolsets"
     ],
     "offer": "name_feature"
   },
@@ -11318,13 +11530,14 @@ const NAMES_DATA = [
     "id": "nm_voicetts",
     "name": "Voice & TTS",
     "kind": "feature",
-    "say": "Voice & TTS is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Voice & TTS is a part of Hermes that turns Hermes's answers into speech and your voice messages into text.",
     "file": "user-guide/features/tts.md",
     "line": 4,
     "quote": "Text-to-speech and voice message transcription across all platforms",
     "aliases": [
       "voice & tts",
-      "voicetts"
+      "voicetts",
+      "voice"
     ],
     "offer": "name_feature"
   },
@@ -11332,13 +11545,14 @@ const NAMES_DATA = [
     "id": "nm_visionimagepaste",
     "name": "Vision & Image Paste",
     "kind": "feature",
-    "say": "Vision & Image Paste is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Vision & Image Paste is a part of Hermes that lets you paste a picture into the terminal, the text window where you type commands, so Hermes can look at it.",
     "file": "user-guide/features/vision.md",
     "line": 3,
     "quote": "Paste images from your clipboard into the Hermes CLI for multimodal vision analysis.",
     "aliases": [
       "vision & image paste",
-      "visionimagepaste"
+      "visionimagepaste",
+      "image paste"
     ],
     "offer": "name_feature"
   },
@@ -11346,7 +11560,7 @@ const NAMES_DATA = [
     "id": "nm_voicemode",
     "name": "Voice Mode",
     "kind": "feature",
-    "say": "Voice Mode is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Voice Mode is a part of Hermes that lets you talk with Hermes out loud, in the terminal (the text window where you type commands), Telegram or Discord.",
     "file": "user-guide/features/voice-mode.md",
     "line": 4,
     "quote": "Real-time voice conversations with Hermes Agent — CLI, Telegram, Discord (DMs, text channels, and voice channels)",
@@ -11360,7 +11574,7 @@ const NAMES_DATA = [
     "id": "nm_wakeword",
     "name": "Wake Word",
     "kind": "feature",
-    "say": "Wake Word is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Wake Word is a part of Hermes that starts a voice chat when you say \"Hey Hermes\", without touching anything.",
     "file": "user-guide/features/wake-word.md",
     "line": 4,
     "quote": "Hands-free 'Hey Hermes' wake word — start a voice session by speaking, the 'Hey Siri' way",
@@ -11374,7 +11588,7 @@ const NAMES_DATA = [
     "id": "nm_hermeswebdashboard",
     "name": "Hermes Web Dashboard",
     "kind": "feature",
-    "say": "Hermes Web Dashboard is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Hermes Web Dashboard is a part of Hermes that lets you manage Hermes's settings, keys and connections from a web browser.",
     "file": "user-guide/features/web-dashboard.md",
     "line": 4,
     "quote": "Browser-based administration panel for managing configuration, API keys, MCP servers, messaging pairing, webhooks, the gateway, memory, credentials, sessions, logs, analytics, cron jobs, and skills",
@@ -11388,13 +11602,15 @@ const NAMES_DATA = [
     "id": "nm_websearchextract",
     "name": "Web Search & Extract",
     "kind": "feature",
-    "say": "Web Search & Extract is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "Web Search & Extract is a part of Hermes that lets Hermes search the web and read web pages.",
     "file": "user-guide/features/web-search.md",
     "line": 3,
     "quote": "Search the web and extract page content with multiple backend providers — including free self-hosted SearXNG.",
     "aliases": [
       "web search & extract",
-      "websearchextract"
+      "websearchextract",
+      "web search",
+      "extract"
     ],
     "offer": "name_feature"
   },
@@ -11402,15 +11618,364 @@ const NAMES_DATA = [
     "id": "nm_xtwittersearch",
     "name": "X (Twitter) Search",
     "kind": "feature",
-    "say": "X (Twitter) Search is a part of Hermes. The docs explain it on a page of its own.",
+    "say": "X (Twitter) Search is a part of Hermes that lets Hermes search posts on X (Twitter).",
     "file": "user-guide/features/x-search.md",
     "line": 3,
     "quote": "Search X (Twitter) posts and threads from within the agent using xAI's built-in x_search Responses tool — works with either a SuperGrok OAuth login or an XAI_API_KEY.",
     "aliases": [
       "x (twitter) search",
-      "xtwittersearch"
+      "xtwittersearch",
+      "twitter"
     ],
     "offer": "name_feature"
+  },
+  {
+    "id": "nm_a2aagenttoagent",
+    "name": "A2A (Agent-to-Agent)",
+    "kind": "chat",
+    "say": "A2A (Agent-to-Agent) is a shared way for AI agents to talk to each other. An agent is an AI that does tasks, like Hermes. With it, Hermes can call other agents and other agents can call Hermes.",
+    "file": "user-guide/messaging/a2a.md",
+    "line": 3,
+    "quote": "A2A is the open Agent2Agent protocol (v1.0, stewarded by the Linux Foundation) for communication between independent AI agents.",
+    "aliases": [
+      "a2a (agent-to-agent)",
+      "a2aagenttoagent",
+      "a2a",
+      "agent-to-agent"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_bluebubblesimessage",
+    "name": "BlueBubbles (iMessage)",
+    "kind": "chat",
+    "say": "BlueBubbles (iMessage) is a free program for a Mac that passes Apple's iMessage on to other devices. Hermes can use it, so you can talk to Hermes from iMessage.",
+    "file": "user-guide/messaging/bluebubbles.md",
+    "line": 3,
+    "quote": "Connect Hermes to Apple iMessage via BlueBubbles — a free, open-source macOS server that bridges iMessage to any device.",
+    "aliases": [
+      "bluebubbles (imessage)",
+      "bluebubblesimessage",
+      "bluebubbles",
+      "imessage"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_buzz",
+    "name": "Buzz",
+    "kind": "chat",
+    "say": "Buzz is a place where people and agents work together. Hermes can join a Buzz group, so you can talk to Hermes from there.",
+    "file": "user-guide/messaging/buzz.md",
+    "line": 3,
+    "quote": "The Buzz adapter connects Hermes to a Buzz community — Block's open-source human+agent collaboration platform built on the Nostr protocol — and relays messages between Buzz channels (or DMs) and the agent.",
+    "aliases": [
+      "buzz"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_irc",
+    "name": "IRC",
+    "kind": "chat",
+    "say": "IRC is an old, open chat system. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
+    "file": "user-guide/messaging/irc.md",
+    "line": 3,
+    "quote": "The IRC adapter connects Hermes to any IRC server and relays messages between an IRC channel (or direct messages) and the agent.",
+    "aliases": [
+      "irc"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_ntfy",
+    "name": "ntfy",
+    "kind": "chat",
+    "say": "ntfy is a simple service that sends notifications to phones, browsers and other devices. Hermes can use it to talk with you.",
+    "file": "user-guide/messaging/ntfy.md",
+    "line": 3,
+    "quote": "ntfy is a simple HTTP-based pub-sub notification service.",
+    "aliases": [
+      "ntfy"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_photonimessage",
+    "name": "Photon iMessage",
+    "kind": "chat",
+    "say": "Photon iMessage is a way to connect Hermes to Apple's iMessage through Photon, a service that runs the link for you, so you can talk to Hermes from iMessage.",
+    "file": "user-guide/messaging/photon.md",
+    "line": 7,
+    "quote": "Connect Hermes to iMessage through [Photon][photon], a managed",
+    "aliases": [
+      "photon imessage",
+      "photonimessage"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_qqbot",
+    "name": "QQ Bot",
+    "kind": "chat",
+    "say": "QQ Bot is a way to connect Hermes to QQ, a chat app, as a bot, so you can talk to Hermes from there.",
+    "file": "user-guide/messaging/qqbot.md",
+    "line": 7,
+    "quote": "Connect Hermes to QQ via the Official QQ Bot API (v2) — supporting private (C2C), group @-mentions, guild, and direct messages with voice transcription.",
+    "aliases": [
+      "qq bot",
+      "qqbot"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_simplexchat",
+    "name": "SimpleX Chat",
+    "kind": "chat",
+    "say": "SimpleX Chat is a private messaging app. Hermes can join it as a bot, so you can talk to Hermes from there, outside the Hermes app.",
+    "file": "user-guide/messaging/simplex.md",
+    "line": 3,
+    "quote": "SimpleX Chat is a private, decentralised messaging platform where users own their contacts and groups.",
+    "aliases": [
+      "simplex chat",
+      "simplexchat"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_wecomcallbackselfbuiltapp",
+    "name": "WeCom Callback (Self-Built App)",
+    "kind": "chat",
+    "say": "WeCom Callback (Self-Built App) is a second way to connect Hermes to WeCom, a chat app for work, as your company's own app.",
+    "file": "user-guide/messaging/wecom-callback.md",
+    "line": 7,
+    "quote": "Connect Hermes to WeCom (Enterprise WeChat) as a self-built enterprise application using the callback/webhook model.",
+    "aliases": [
+      "wecom callback (self-built app)",
+      "wecomcallbackselfbuiltapp",
+      "wecom callback",
+      "self-built app"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_botscreen",
+    "name": "Bot Screen",
+    "kind": "feature",
+    "say": "Bot Screen is a part of Hermes that shows each bot's own screen when Hermes runs on a server with no screen.",
+    "file": "user-guide/features/bot-screen.md",
+    "line": 8,
+    "quote": "On a headless Linux gateway host (a server, a cloud VM, Hermes Cloud) each bot",
+    "aliases": [
+      "bot screen",
+      "botscreen"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_codexappserverruntimeoptional",
+    "name": "Codex App-Server Runtime (optional)",
+    "kind": "feature",
+    "say": "Codex App-Server Runtime (optional) is a part of Hermes that can hand OpenAI model turns to Codex, OpenAI's own coding program, instead of doing the work itself.",
+    "file": "user-guide/features/codex-app-server-runtime.md",
+    "line": 8,
+    "quote": "Hermes can optionally hand openai/*, openai-codex/* and named custom provider turns to the Codex CLI app-server instead of running its own tool loop.",
+    "aliases": [
+      "codex app-server runtime (optional)",
+      "codexappserverruntimeoptional",
+      "codex app-server runtime",
+      "optional"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_kanbantutorial",
+    "name": "Kanban tutorial",
+    "kind": "feature",
+    "say": "Kanban tutorial is a part of Hermes that walks through the four main uses of the Kanban task board, step by step.",
+    "file": "user-guide/features/kanban-tutorial.md",
+    "line": 3,
+    "quote": "A walkthrough of the four use-cases the Hermes Kanban system was designed for, with the dashboard open in a browser.",
+    "aliases": [
+      "kanban tutorial",
+      "kanbantutorial"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_kanbanworkerlanes",
+    "name": "Kanban worker lanes",
+    "kind": "feature",
+    "say": "Kanban worker lanes is a part of Hermes that lets the Kanban task board send each task to the right kind of worker.",
+    "file": "user-guide/features/kanban-worker-lanes.md",
+    "line": 3,
+    "quote": "A worker lane is a class of process that the kanban dispatcher can route tasks to.",
+    "aliases": [
+      "kanban worker lanes",
+      "kanbanworkerlanes"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_spotify",
+    "name": "Spotify",
+    "kind": "feature",
+    "say": "Spotify is a music app. With an add-on, Hermes can play music, search and change playlists on it for you.",
+    "file": "user-guide/features/spotify.md",
+    "line": 3,
+    "quote": "Hermes can control Spotify — playback, queue, search, playlists, saved tracks/albums, and listening history — through the official spotify plugin from the plugin catalog.",
+    "aliases": [
+      "spotify"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_toolsearch",
+    "name": "Tool Search",
+    "kind": "feature",
+    "say": "Tool Search is a part of Hermes that keeps Hermes from loading every tool at once when you have many, so its memory for the chat does not fill up.",
+    "file": "user-guide/features/tool-search.md",
+    "line": 8,
+    "quote": "When you have many MCP servers or non-core plugin tools attached to a",
+    "aliases": [
+      "tool search",
+      "toolsearch"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_togetherai",
+    "name": "Together AI",
+    "kind": "provider",
+    "say": "Together AI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1210,
+    "quote": "Cloud-hosted open models",
+    "aliases": [
+      "together ai",
+      "togetherai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_groq",
+    "name": "Groq",
+    "kind": "provider",
+    "say": "Groq is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1211,
+    "quote": "Ultra-fast inference",
+    "aliases": [
+      "groq"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_deepseek",
+    "name": "DeepSeek",
+    "kind": "provider",
+    "say": "DeepSeek is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1212,
+    "quote": "DeepSeek models",
+    "aliases": [
+      "deepseek"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_fireworksai",
+    "name": "Fireworks AI",
+    "kind": "provider",
+    "say": "Fireworks AI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1213,
+    "quote": "Fast open model hosting",
+    "aliases": [
+      "fireworks ai",
+      "fireworksai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_cerebras",
+    "name": "Cerebras",
+    "kind": "provider",
+    "say": "Cerebras is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1216,
+    "quote": "Wafer-scale chip inference",
+    "aliases": [
+      "cerebras"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_mistralai",
+    "name": "Mistral AI",
+    "kind": "provider",
+    "say": "Mistral AI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1217,
+    "quote": "Mistral models",
+    "aliases": [
+      "mistral ai",
+      "mistralai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_openai",
+    "name": "OpenAI",
+    "kind": "provider",
+    "say": "OpenAI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1218,
+    "quote": "Direct OpenAI access",
+    "aliases": [
+      "openai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_azureopenai",
+    "name": "Azure OpenAI",
+    "kind": "provider",
+    "say": "Azure OpenAI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1219,
+    "quote": "Enterprise OpenAI",
+    "aliases": [
+      "azure openai",
+      "azureopenai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_localai",
+    "name": "LocalAI",
+    "kind": "provider",
+    "say": "LocalAI is a program that runs AI models on your own computer. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1220,
+    "quote": "Self-hosted, multi-model",
+    "aliases": [
+      "localai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_jan",
+    "name": "Jan",
+    "kind": "provider",
+    "say": "Jan is a desktop app for running AI models on your own computer. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1221,
+    "quote": "Desktop app with local models",
+    "aliases": [
+      "jan"
+    ],
+    "offer": "name_provider"
   }
 ]
 
@@ -14864,7 +15429,7 @@ const SETUP_DATA = {
       "text": "I can see it now. {seen_part}"
     },
     "NOT_SEEN": {
-      "text": "I can't see it yet. I only look at your main bot.",
+      "text": "I can't see it yet. I only look at the bot that is open in Hermes now, {bot}.",
       "answers": [
         "Show me the steps",
         "I did it on another bot",
@@ -14874,7 +15439,8 @@ const SETUP_DATA = {
         "Show me the steps",
         "Not now"
       ],
-      "text_second_bot": "I can't see it yet. You have one bot so far."
+      "text_second_bot": "I can't see it yet. You have one bot so far.",
+      "text_no_bot": "I can't see it yet. I only look at the bot that is open in Hermes now."
     },
     "DONE_SAID": {
       "text": "Good. I can't see that one, so I'll take your word."
@@ -14978,6 +15544,15 @@ const SETUP_DATA = {
         "unsure": "you are not sure yet what you want"
       },
       "and": " and "
+    },
+    "BACK_ONE": {
+      "text": "Back one question."
+    },
+    "BACK_FIRST": {
+      "text": "This is my first set-up question, so there is nothing before it."
+    },
+    "SETUP_REASK_REC": {
+      "text": "When you're ready: do you want the steps for {card}?"
     }
   },
   "restart_phrases": [
@@ -15103,6 +15678,57 @@ const SETUP_DATA = {
     "i don't know where to begin",
     "i dont know where to begin"
   ],
+  "back_rule": {
+    "back_words": [
+      "go back",
+      "back one",
+      "one back",
+      "undo that",
+      "undo",
+      "previous",
+      "previous question",
+      "previous step",
+      "last question",
+      "question before",
+      "step before",
+      "step back",
+      "back a step",
+      "the one before"
+    ],
+    "previous": {
+      "Q_NEW": [],
+      "Q_GOAL": [
+        "Q_NEW"
+      ],
+      "REC": [
+        "Q_GOAL",
+        "Q_NEW"
+      ],
+      "STEP": [
+        "REC"
+      ]
+    }
+  },
+  "one_question": {
+    "reask": {
+      "Q_NEW": "SETUP_REASK",
+      "Q_GOAL": "SETUP_REASK_GOAL",
+      "REC": "SETUP_REASK_REC",
+      "STEP": "STEP_BACK"
+    },
+    "next_after_answer": {
+      "Q_NEW": "Q_GOAL",
+      "Q_GOAL": "REC"
+    },
+    "own_question_kinds": [
+      "W1",
+      "C1",
+      "C2",
+      "can-q",
+      "MIG_WHICH",
+      "RM2"
+    ]
+  },
   "keeps": [
     {
       "key": "setup_new",
@@ -23697,6 +24323,8 @@ function talkKeepOne(e) {
   // an offer's question is not kept: its picks were in the message box, and without them it would ask for nothing
   // (Decided myself, in the report)
   if (typeof e.line === 'string' && e.line.startsWith('offer-')) return null
+  // loom-fixes-2 (Lead's answer): the slow-AI line belongs to its moment, not to the kept conversation
+  if (e.line === 'SLOW_A') return null
   const out = { who: 'helper', text, line: talkStr(e.line, 120) || 'kept' }
   const n = e.next
   if (n && typeof n === 'object' && typeof n.label === 'string') {
@@ -24558,7 +25186,7 @@ function oneWordName(text, st) {
 const saysWrong = t => whichOf(t, NR.wrong_anywhere).length > 0 || startsWith(t, NR.wrong_starts.filter(w => !ST.no_words.includes(w)))
 const WEAK_ALL = TALK_DATA.topics.flatMap(x => x.weak_key_words || [])
 // Step 0 b (JSON small_talk, route2.py small_talk): the kind of an ordinary message, or null. Whole messages only.
-function smallTalk(text, st) {
+function smallTalk(text, st, exact = false) {
   if (oneWordName(text, st)) return null // Ty and Will at What's your name? are names
   let t = talkNorm(text)
   let again = true
@@ -24590,6 +25218,8 @@ function smallTalk(text, st) {
       }
     }
   }
+  // loom-fixes-2 (opening_talk; route2.py small_talk exact): the kinds' own lists only
+  if (exact) return kind
   if (kind === null && !opening) kind = greetMore(t) // live changes-6: live_c6.greet_more
   if (kind === null && !opening && !st.pending && correction(t, st)) kind = 'wrong' // live changes-6: live_c6.correction_rule
   if (kind === null) {
@@ -24929,6 +25559,15 @@ function turn(text, st) {
 // talk-live: the same, with the result before no_repeat as well (pre, a copy), which decides whether the AI
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 function turnParts(text, st) {
+  // loom-fixes-2 (back_alone; route2.py turn): only back words, with nothing of Helper's open: BACK_NONE with the offer
+  if (st.stage === 'open' && backAlone(text)) {
+    const out = { kind: 'BACK_NONE' }
+    noteLast(st, out)
+    attachOffer(out, st)
+    st.lastq = false
+    st.pending = null
+    return { pre: { ...out, by: 'title' }, out }
+  }
   const wasOpening = st.stage === 'name' || st.stage === 'work'
   const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
@@ -24942,8 +25581,13 @@ function turnParts(text, st) {
   attachOffer(out, st, prevTopic)
   // loom-fixes (helper-loom-fixes-v1 points 3 and 4; route2.py turn): a name from the Hermes docs where the don't-know
   // would show (every older line wins), and the app a person wants to bring a setup over from
-  if (out.kind === 'N1' || out.kind === 'N1a' || out.kind === 'N1_AGAIN') {
-    const ne = nameLine(text)
+  // loom-fixes-2 (names.wins_over_kinds): also over a topic's line or question, the where-to-run line, What Hermes is
+  // and the agent line, which answer something near the name but do not say what it is; only for names of kind memory,
+  // chat, provider or feature (tool group names are everyday words: memory, file, web)
+  const over = NM.wins_over_kinds.includes(out.kind)
+  if (out.kind === 'N1' || out.kind === 'N1a' || out.kind === 'N1_AGAIN' || over) {
+    let ne = nameLine(text)
+    if (ne && over && !NM.wins_over_name_kinds.includes(ne.kind)) ne = null
     if (ne) {
       for (const k of Object.keys(out)) delete out[k]
       const [sid, otext, picks] = offerSet(ne.offer)
@@ -24976,15 +25620,28 @@ function turnParts(text, st) {
 const nameKey = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '')
 const NAME_BY_KEY = new Map()
 for (const e of NAMES_DATA) for (const a of e.aliases) if (!NAME_BY_KEY.has(nameKey(a))) NAME_BY_KEY.set(nameKey(a), e)
+// loom-fixes-2 (helper-loom-fixes-v2 point 1; route2.py name_line at 91d33e98): the question forms are data
+// (names.starts, lead_ins, tails, cut): lower-case; any ? at the end makes it a bare question; lead-ins cut from the
+// start; the longest start; then, twice, one tail cut from the end and a / an / the from the start
+const NM = TALK_DATA.names
+const nmEsc = w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const nmAlt = list => [...list].sort((a, b) => b.length - a.length).map(nmEsc).join('|')
+const NM_LEAD = new RegExp(`^(?:(?:${NM.lead_ins.map(nmEsc).join('|')})[ ,]+)*`)
+const NM_START = new RegExp(`^(?:${nmAlt(NM.starts)})\\s+(.+?)$`)
+const NM_TAIL = new RegExp(`\\s+(?:${nmAlt(NM.tails)})$`)
+const NM_CUT = new RegExp(`^(?:${NM.cut.map(nmEsc).join('|')})\\s+`)
 function nameLine(text) {
   let t = talkNorm(text).replace(/^[ .!]+|[ .!]+$/g, '')
-  const bare = t.endsWith('?')
+  const bare = t.includes('?')
   t = t.replace(/[ ?!.]+$/, '')
-  t = t.replace(/^(?:(?:so|ok|okay|and|hi|hey|helper|please|pls|plz|can you|could you)[ ,]+)*/, '')
-  const m = t.match(/^(?:what is|what's|whats|what are|what exactly is|tell me about|explain|what does)\s+(.+?)(?:\s+(?:is|are|do|does|mean|means))?$/)
+  t = t.replace(NM_LEAD, '')
+  const m = t.match(NM_START)
   let part = m ? m[1] : bare ? t : null
   if (!part) return null
-  part = part.replace(/^(?:a|an|the)\s+/, '')
+  for (let i = 0; i < 2; i++) {
+    part = part.replace(NM_TAIL, '').replace(/^[ ,?]+|[ ,?]+$/g, '')
+    part = part.replace(NM_CUT, '')
+  }
   return NAME_BY_KEY.get(nameKey(part)) || null
 }
 // loom-fixes (offer_words.migrate_apps; route2.py mig_app): the first of the six apps the message names, or null
@@ -24994,6 +25651,16 @@ function migApp(text) {
 }
 const MIG_APPS = Object.fromEntries((TALK_DATA.offer_words.migrate_apps || []).map(a => [a.id, a]))
 
+// loom-fixes-2 (helper-talk-v2.json back_alone; route2.py back_alone): the message, cut of , . ! ?, is only back words
+// and filler words
+const BA = TALK_DATA.back_alone
+const BA_WORDS = [...BA.back_words, ...BA.filler].sort((a, b) => b.length - a.length)
+function backAlone(text) {
+  let t = ' ' + talkNorm(text).replace(/[,.!?]+/g, ' ') + ' '
+  if (!whichOf(t.trim(), BA.back_words).length) return false
+  for (const w of BA_WORDS) t = t.replace(new RegExp(`(?<= )${nmEsc(w)}(?= )`, 'g'), ' ')
+  return !t.trim()
+}
 // find-v1 part 5: the results that are no line of their own (see turnSteps, a full typed message while a question is open)
 const FULL_NOT_FOR = ['N1', 'N1a', 'N1_AGAIN', 'N2', 'skill by name', 'CUT', 'MEAN_NONE', 'AGAIN']
 // The order of steps is route2.py's _turn(), with no model.
@@ -25051,6 +25718,13 @@ function turnSteps(text, st) {
   }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
+  // loom-fixes-2 (helper-loom-fixes-v2 point 6, opening_talk; hhtech: "hey" at What's your name? got "Nice to meet
+  // you. What do you do?"): at the opening's two questions, a message that is exactly small talk, and holds no name, is
+  // never the answer: the kind's line with no offer, then the open question once more. The stage stays; nothing kept.
+  if ((st.stage === 'name' || st.stage === 'work') && !oneWordName(text, st) && !codeName(text, true)) {
+    const kk = smallTalk(text, st, true)
+    if (TALK_DATA.opening_talk.kinds.includes(kk)) return done('OPEN_TALK', { talk: kk, ask: st.stage })
+  }
   // ask-fix-t1 (mean_rule_ask_fix_t1): the mean words themselves right after a word line with a mean field
   if (sk === 'mean' && st.last === 'term' && TERMS[st.lastParts.term].mean && ST.kinds.mean.some(w => w.length > 4 && hits(talkNorm(text), w))) {
     st.stage = 'open'
@@ -25697,6 +26371,15 @@ function lineFor(result, st, typed = '', opts = {}) {
     }
     case 'F1':
       return said('F1', named(FIXED.F1))
+    // loom-fixes-2 (helper-loom-fixes-v2 point 6, opening_talk): ordinary talk at What's your name? or What do you do?:
+    // the kind's line with no offer, then the open question once more as its own bubble (ask, shown by the page);
+    // "are you an AI" gets this build's own line for it, as everywhere else (AI, AI_PICK or AI_WRITES)
+    case 'OPEN_TALK': {
+      const id = result.talk === 'ai' ? LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE] : TALK_DATA.opening_talk.line_by_kind[result.talk]
+      const ask = TALK_DATA.opening_talk.ask[result.ask]
+      const { offer: _none, ...line } = said(id, FIXED[id].text, { ask: { line: ask, text: FIXED[ask].text } })
+      return line
+    }
     case 'F2':
       if (setupOpens('F2', st)) return said('F2', ...setupOpener('F2', st))
       // talk-live-2: on a later visit (WORK_ASK, a typed change) the result carries the kept name
@@ -26136,13 +26819,63 @@ function openQNew(kind, st) {
   return { text: kind === 'F2' ? suNamed(SU_L.F2, st.name || st.kept.name || null) : SU_L[kind].text, answers: suNEW_PICKS() }
 }
 
+/* ---------- one question at a time, and back (loom-fixes-2) ---------- */
+const SU_OPEN = { new: 'Q_NEW', goal: 'Q_GOAL', rec: 'REC', step: 'STEP' }
+const suQNew = st => {
+  const s = suOf(st)
+  s.stage = 'new'
+  s.asked.new = true
+  return suSaid('Q_NEW', SU_Q_NEW.text, { answers: suNEW_PICKS() })
+}
+const suQGoal = st => {
+  const s = suOf(st)
+  s.stage = 'goal'
+  s.asked.goal = true
+  return suSaid('Q_GOAL', SU_L.Q_GOAL.text, { answers: suGOAL_PICKS() })
+}
+// the recommendation said again as it was (its item and rule as chosen then)
+function suRecAgain(st) {
+  const s = suOf(st)
+  const isNew = st.kept.setup_new || 'skip'
+  const goal = st.kept.setup_goal_id || s.goal || 'unsure'
+  s.stage = 'rec'
+  return suSaid('REC', recText(s.item, s.rule, isNew, goal) + ' ' + SU_REC_TAIL, { answers: suREC_PICKS(SU_L.REC.answers), rec: { item: s.item, rule: s.rule, isNew, goal } })
+}
+// one_question.reask: the open question once more, as its own bubble with its answers
+function suReask(st) {
+  const s = suOf(st)
+  if (s.stage === 'new') return suSaid('SETUP_REASK', SU_L.SETUP_REASK.text, { answers: suNEW_PICKS() })
+  if (s.stage === 'goal') return suSaid('SETUP_REASK_GOAL', SU_L.SETUP_REASK_GOAL.text, { answers: suGOAL_PICKS() })
+  if (s.stage === 'rec' && s.item && SU.items[s.item]) return suSaid('SETUP_REASK_REC', suFill(SU_L.SETUP_REASK_REC.text, { card: SU.items[s.item].name }), { answers: suREC_PICKS(SU_L.REC.answers) })
+  if (s.stage === 'step' && s.item && SU.items[s.item]) {
+    s.stepHidden = false
+    return suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
+  }
+  return null
+}
+// back_rule: at step n above 1 the step before; else BACK_ONE and the first of previous[open] shown in this set-up
+// conversation; with none, BACK_FIRST and the open question once more. The earlier answer stays kept.
+function suBack(st) {
+  const s = suOf(st)
+  if (s.stage === 'step' && s.step > 0) {
+    s.step -= 1
+    return [suReask(st)]
+  }
+  const shown = { Q_NEW: s.asked.new, Q_GOAL: s.asked.goal, REC: s.asked.rec && s.item && SU.items[s.item] }
+  const prev = (SU.back_rule.previous[SU_OPEN[s.stage]] || []).find(p => shown[p])
+  if (!prev) return [suSaid('BACK_FIRST', SU_L.BACK_FIRST.text), suReask(st)]
+  const q = prev === 'Q_NEW' ? suQNew(st) : prev === 'Q_GOAL' ? suQGoal(st) : suRecAgain(st)
+  return [suSaid('BACK_ONE', SU_L.BACK_ONE.text), q]
+}
+
 /* ---------- typed answers ---------- */
 const suFlat = text => talkNorm(text).replace(/[ ?!.,]+$/, '')
 const suInList = (t, list) => whichOf(t, list).length > 0
 function suTypedNew(text) {
   const t = suFlat(text)
   for (const k of SU_Q_NEW.typed.order) if (suInList(t, SU_Q_NEW.typed.lists[k])) return k
-  return 'skip'
+  // loom-fixes-2 (typed_answer.no_match_v2): matching none of Q_NEW's short fixed set is no answer (was: Skip)
+  return null
 }
 function suTypedGoal(text) {
   const t = suFlat(text)
@@ -26188,6 +26921,7 @@ function suRecommend(st, seen, lead = []) {
   s.stage = 'rec'
   s.item = item
   s.rule = rule
+  s.asked.rec = true
   st.kept.setup_current = item
   // rec: what the AI step may reword (src/setup-rec.js): the written text stands unless a checked reply replaces it
   return [...lead, suSaid('REC', recText(item, rule, isNew, goal) + ' ' + SU_REC_TAIL, { answers: suREC_PICKS(SU_L.REC.answers), rec: { item, rule, isNew, goal } })]
@@ -26231,13 +26965,16 @@ function suWorked(st, seen) {
     return suRecommend(st, seen, [suSaid('READ_FAILED', SU_P.read_failed + ' ' + SU_L.DONE_SAID.text)])
   }
   s.stage = 'notseen'
-  return [suSaid('NOT_SEEN', ...suNotSeenWords(item))]
+  return [suSaid('NOT_SEEN', ...suNotSeenWords(item, seen))]
 }
 // setup-chat-2 (changes-1 NOT_SEEN): bots are counted across the whole Hermes, so for A second bot "I only look at your
 // main bot" and "I did it on another bot" are untrue: its own line and two answers
 const suNotSeenActs = item => (item === 'second_bot' ? ['notseen:steps', 'notseen:notnow'] : ['notseen:steps', 'notseen:otherbot', 'notseen:notnow'])
 const suNotSeenLabels = item => (item === 'second_bot' ? SU_L.NOT_SEEN.answers_second_bot : SU_L.NOT_SEEN.answers)
-const suNotSeenWords = item => [item === 'second_bot' ? SU_L.NOT_SEEN.text_second_bot : SU_L.NOT_SEEN.text, { answers: suPicks(suNotSeenActs(item).map((a, i) => [a, suNotSeenLabels(item)[i]])) }]
+// loom-fixes-2 (helper-loom-fixes-v2 point 7): the bot Helper looked at is named (the look's seen.bot, the open bot as
+// the app names it); with no name read, text_no_bot
+const suNotSeenText = seen => (seen && typeof seen.bot === 'string' && seen.bot.trim() ? suFill(SU_L.NOT_SEEN.text, { bot: seen.bot.trim() }) : SU_L.NOT_SEEN.text_no_bot)
+const suNotSeenWords = (item, seen) => [item === 'second_bot' ? SU_L.NOT_SEEN.text_second_bot : suNotSeenText(seen), { answers: suPicks(suNotSeenActs(item).map((a, i) => [a, suNotSeenLabels(item)[i]])) }]
 
 // setup-chat-2 (changes-1 ALREADY_SEEABLE): "I've done this already". Helper has just read again (the move's look). A
 // thing it cannot see: kept as said done (DONE_SAID). Seen done now: DONE_SEEN, not kept as said. The read failed:
@@ -26423,13 +27160,18 @@ function setupTyped(text, st, hasTopicWord = () => false) {
   // set-up conversation has a line open; with none open, only the restart words alone ("how do I reset my key" is a
   // question about Hermes, not a restart) (Decided myself, in the report)
   if (s.stage ? isRestart(text) : SU.restart_phrases.includes(t)) return suMove(false, () => suRestart(st))
+  // loom-fixes-2 (helper-loom-fixes-v2 point 2, back_rule): while Q_NEW, Q_GOAL, REC or a step is open, back words mean
+  // Helper's previous question or step (never Hermes's checkpoints); restart words were checked first
+  if (['new', 'goal', 'rec', 'step'].includes(s.stage) && suInList(t, SU.back_rule.back_words)) return suMove(false, () => suBack(st))
   const question = text.includes('?')
   if (s.stage === 'new') {
     const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
     if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
     if (isSetupAsk(text)) return suAsk(st)
     if (question || hasTopicWord(text) || notAnAnswer(text)) return null
-    return suMove(false, () => suAnswerNew(st, suTypedNew(text)))
+    const id = suTypedNew(text)
+    if (!id) return null
+    return suMove(false, () => suAnswerNew(st, id))
   }
   if (s.stage === 'goal') {
     const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
@@ -26438,7 +27180,12 @@ function setupTyped(text, st, hasTopicWord = () => false) {
     if (question || notAnAnswer(text)) return null
     // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
     if (SU_UNSURE.includes(t)) return suMove(true, seen => suAnswerGoal(st, 'unsure', null, seen))
-    return suMove(true, seen => suAnswerGoal(st, suTypedGoal(text), text, seen))
+    const goal = suTypedGoal(text)
+    // loom-fixes-2 (typed_answer.no_match_v2; route2.py setup_typed): a message that matches none of the goal lists
+    // but that the ordinary talk would answer (a topic word: "laptop or a server") is no answer either; only other
+    // messages are kept as unsure
+    if (goal === 'unsure' && hasTopicWord(text)) return null
+    return suMove(true, seen => suAnswerGoal(st, goal, text, seen))
   }
   if (s.stage === 'rec') {
     const i = suLabelOf(SU_L.REC.answers, text)
@@ -26482,38 +27229,24 @@ function setupTyped(text, st, hasTopicWord = () => false) {
 // again, once for each question; else null. picks: the answer has things of its own to pick (setup-chat-2, below).
 function setupAfter(st, { picks = false } = {}) {
   const s = suOf(st)
-  // find-v2 part 5 (Lead's answer 5 to find-v1's questions; fault 8): a typed question wins over the set-up question:
-  // an answer with things of its own to pick ("How can I migrate?": From another AI app | To another computer) keeps
-  // them, and the set-up question is asked again after the answer to those (the page calls this after a picked answer
-  // too while one waits, setupReaskWaits)
-  if ((s.stage === 'new' && !s.reasked.new) || (s.stage === 'goal' && !s.reasked.goal)) {
-    s.reaskWaits = picks
-    if (picks) return null
-  }
-  if (s.stage === 'new' && !s.reasked.new) {
-    s.reasked.new = true
-    return suSaid('SETUP_REASK', SU_L.SETUP_REASK.text, { answers: suNEW_PICKS() })
-  }
-  if (s.stage === 'goal' && !s.reasked.goal) {
-    s.reasked.goal = true
-    return suSaid('SETUP_REASK_GOAL', SU_L.SETUP_REASK_GOAL.text, { answers: suGOAL_PICKS() })
-  }
-  // setup-chat-2 (changes-1 STEP_BACK; hhtech-setup-run 1.1: the step was gone after a typed question): while a step is
-  // open, after every answer, the step again with its own answers, so Done goes on to the next step. Not after I'm
-  // stuck or Stop for now (the stage is then another). An answer with things of its own to pick (a delete question's
-  // Yes | No, "Which one do you mean?", the topics under "help") keeps them: the step comes back after the answer to
-  // that (the page calls this after picked answers too while a step is open), and meanwhile only the step's own labels
-  // typed count as its answers (stepHidden).
-  if (s.stage === 'step' && s.item && SU.items[s.item]) {
-    s.stepHidden = picks
-    return picks ? null : suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
-  }
-  return null
+  // loom-fixes-2 (helper-loom-fixes-v2 point 5, one_question): while Q_NEW, Q_GOAL, REC or a step is open, after every
+  // answer of the ordinary talk the open question once more, as its own bubble with its answers (no longer once only).
+  // An answer that needs its own question first (own_question_kinds: "Do you mean me, or your own Hermes?") keeps it,
+  // and the set-up question comes back after the answer to that (the page calls this again then, setupReaskWaits).
+  if (!SU_OPEN[s.stage]) return null
+  if (s.stage === 'step') s.stepHidden = picks
+  s.reaskWaits = picks
+  if (picks) return null
+  return suReask(st)
 }
 // setup-chat-2: whether a step of the set-up conversation is the open line
 const setupStepOpen = st => !!(st.setup && st.setup.stage === 'step')
 // find-v2 part 5: a set-up question waits to be asked again until the answer's own things to pick are answered
-const setupReaskWaits = st => !!(st.setup && st.setup.reaskWaits && ['new', 'goal'].includes(st.setup.stage))
+const setupReaskWaits = st => !!(st.setup && st.setup.reaskWaits && ['new', 'goal', 'rec', 'step'].includes(st.setup.stage))
+// loom-fixes-2: whether a set-up question or step is the open line (one_question applies)
+const setupQuestionOpen = st => !!(st.setup && SU_OPEN[st.setup.stage])
+// loom-fixes-2 (one_question.own_question_kinds): answers that ask their own question first
+const SETUP_OWN_QUESTION = SU.one_question.own_question_kinds
 
 // setup-chat-2 (changes-1 BACK_SEEN): the one thing a return visit names as seen done: the goal's thing if it is, else
 // the first seen done in the order the data's BACK_SEEN gives (scheduled_job, personality, second_bot). What is there
@@ -26663,7 +27396,8 @@ function makeLook(ctx, host, getProfile = () => '') {
         getStatus ? read(() => getStatus(), LOOK_READ_MS) : Promise.resolve(undefined),
         listSessions && main ? read(() => listSessions(null, { profile: main, limit: 500 }), LOOK_READ_MS) : Promise.resolve(undefined)
       ])
-      return seenFrom({ bots: rows ? bots : { ok: false }, model, soul, cron, status, sessions })
+      // loom-fixes-2 (helper-loom-fixes-v2 point 7): the bot Helper looked at, by the name the app gives it, for NOT_SEEN
+      return { ...seenFrom({ bots: rows ? bots : { ok: false }, model, soul, cron, status, sessions }), bot: main || null }
     } catch {
       return { ...LOOK_UNSEEN }
     }
@@ -30915,7 +31649,7 @@ function makePage(ctx, opts = {}) {
       // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
       // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
       const metStored = readMet()
-      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null' }
+      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null', forgotUpTo: 0 }
       // loom-fixes (Lead's point 17b): the conversation of earlier visits, the last 50 lines, shown above this visit's
       // (never sent to the AI: they are not in memory.log)
       memory.before = readTalk().map(e => ({ ...e, id: memory.nextId++, key: `r${memory.nextId}` }))
@@ -30947,7 +31681,8 @@ function makePage(ctx, opts = {}) {
   // Written after every change of the conversation: the earlier visits' lines and this visit's, the last 50 that may be
   // kept; the key goes when none is left. Not written when nothing changed.
   const writeTalk = () => {
-    const next = talkToStore([...memory.before, ...memory.log])
+    // loom-fixes-2 (hhtech-loom-run fault 2): what was said up to a Forget all is never written again
+    const next = talkToStore([...memory.before, ...memory.log.filter(e => !(e.id <= memory.forgotUpTo))])
     const text = JSON.stringify(next)
     if (text === memory.talkStored) return
     try {
@@ -30966,14 +31701,25 @@ function makePage(ctx, opts = {}) {
     memory.talkStored = 'stale'
     writeTalk()
   }
+  // loom-fixes-2 (hhtech-loom-run fault 2: after Forget all and a restart the 6 old lines came back, because this
+  // visit's lines were written back the moment Helper's page was drawn again): Forget all forgets the conversation up to
+  // now, the earlier visits' lines and this visit's, in the store; the window in this visit shows only its newest line
+  // (as Clear chat). Typed ("forget everything", Yes) the lines stay on screen in this visit but are not kept.
+  const forgetTalk = (inWindow = true) => {
+    memory.before = []
+    if (inWindow) {
+      const last = memory.log[memory.log.length - 1]
+      memory.log = last ? [last] : []
+    }
+    memory.forgotUpTo = memory.nextId
+    memory.talkStored = 'stale'
+    writeTalk()
+  }
   // The page is on screen again (Hermes draws it fresh after Settings): the record as stored now.
   const rereadKept = () => {
     const m = remembered()
     // loom-fixes: Forget all on Helper's settings page removes the kept conversation too: it goes from the window
-    if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) {
-      m.before = []
-      m.talkStored = 'null'
-    }
+    if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) forgetTalk()
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
@@ -31012,13 +31758,15 @@ function makePage(ctx, opts = {}) {
   // pick. send: whether the line may ever be sent to the AI; the offer's question never is. ask-fix-t1 (PICK_FIRST):
   // the things to pick of the line before stay under it.
   const saidEntries = (said, send) => {
-    const { offer, samePicks, ...line } = said
+    const { offer, samePicks, ask, ...line } = said
     if (samePicks) {
       const last = [...memory.log].reverse().find(e => e.who === 'helper')
       if (last && last.answers) line.answers = last.answers
     }
     const out = [{ ...helperEntry(line), send }]
     if (offer) out.push({ ...helperEntry({ line: 'offer-' + offer.set, text: offer.text, source: null, answers: offer.answers, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false, offer: true })
+    // loom-fixes-2 (opening_talk): the opening's open question once more, as its own bubble (never sent to the AI)
+    if (ask) out.push({ ...helperEntry({ line: ask.line, text: ask.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false })
     return out
   }
 
@@ -31063,17 +31811,31 @@ function makePage(ctx, opts = {}) {
   // the step again with its own answers ("Back to step 2 of 5: ..."), in place of that answer's offer; an answer with
   // things of its own to pick keeps them, and the step comes back after the answer to those (src/setup-chat.js).
   // Returns [the answer's line as it is to be shown, the entries after it].
+  // loom-fixes-2 (helper-loom-fixes-v2 point 5, one_question; hhtech-loom-run fault 1: in 8 of 20 messages an offer's
+  // question and then "When you're ready: are you new to Hermes?", two questions in a row): while Q_NEW, Q_GOAL, REC or
+  // a step is open and the ordinary talk answers a typed message, the answer carries no offer and no things to pick
+  // (its action buttons stay), a topic's question becomes that topic's plain line, and the open question comes once
+  // more as its own bubble with its answers, every time. An answer of own_question_kinds (W1, C1, C2, can-q, MIG_WHICH,
+  // RM2) keeps its own question and picks; the set-up question comes back after the answer to it.
   const setupAfterSaid = (result, said, typed) => {
-    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return [said, []]
-    const step = setupStepOpen(memory.visit)
-    if (!step && !typed && !setupReaskWaits(memory.visit)) return [said, []]
-    // find-v2 part 5: things to pick of the answer's own (its answers, or an offer that asks about the answer: two kinds
-    // of moving, which app, which plan, the near lines) keep the set-up question back until they are answered; a
-    // general offer (set up or see what it does, the four starting things) gives way to it, as before
+    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN', 'OPEN_TALK'].includes(result.kind)) return [said, []]
+    if (!setupQuestionOpen(memory.visit)) return [said, []]
+    if (!typed && !setupReaskWaits(memory.visit)) return [said, []]
+    // find-v2 part 5 wins where both jobs touched the same thing (Lead, 11 Nov 14:15): things to pick of the answer's
+    // own (its answers, or an offer that asks about the answer: two kinds of moving, which app, which plan, the near
+    // lines) keep the set-up question back until they are answered, as own_question_kinds do; only one question is on
+    // screen either way. At a step only the answer's own answers count, as before.
     const ownOffer = !!(said.offer && ['move', 'mig_which', 'mig_which_2', 'pay', 'stuck', 'words', 'near'].includes(said.offer.set))
-    const again = setupAfter(memory.visit, { picks: !!said.answers || (!setupStepOpen(memory.visit) && ownOffer) })
+    const own = SETUP_OWN_QUESTION.includes(result.kind) || SETUP_OWN_QUESTION.includes(said.line) || !!said.answers || (!setupStepOpen(memory.visit) && ownOffer)
+    const again = setupAfter(memory.visit, { picks: own })
     if (!again) return [said, []]
-    return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
+    let line = said
+    if (result.kind === 'question' && result.topic) {
+      const plain = noteLast(memory.visit, { ...result, kind: 'plain' })
+      memory.visit.lastq = false
+      line = lineFor(plain, memory.visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
+    }
+    return [{ ...line, offer: null, answers: null }, setupEntries(again)]
   }
   // find-v2 part 1: the turn closes with no line from the AI (its 12 s, or the person moved on) after the list call
   // picked a line: that line itself, as code shows it (src/live-turn.js pickedResult), not the don't-know
@@ -31752,6 +32514,7 @@ function makePage(ctx, opts = {}) {
       else if (item.near) result = pressNear(item.near, visit) // breadth-t1: a line picked under the near offer
       else result = pickTopic(item.topic, visit)
       answer(result, item.label, '', true)
+      if (result && result.kind === 'A-yes' && result.what === 'all') forgetTalk(false)
     }
 
     // Opens one of Hermes's own screens (a missing door is ignored).

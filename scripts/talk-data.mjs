@@ -80,7 +80,9 @@ export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N_HINT', 'TP'
   // find-v1 (live changes-11, breadth-t1): how / why / and then alone after a line with no next step
   'NO_MORE',
   // loom-fixes (helper-loom-fixes-v1 point 3): which app to bring a setup over from
-  'MIG_WHICH']
+  'MIG_WHICH',
+  // loom-fixes-2 (helper-loom-fixes-v2 points 2 and 6): "Hi." and the opening's two questions again; back with nothing open
+  'BACK_NONE', 'NAME_HELLO', 'ASK_NAME', 'ASK_WORK']
 // live-v2 changes-3: what no_repeat.in_place may name besides fixed lines: a topic's plain line, the "are you an
 // AI" line of this build (ai_line) and HELLO with the name (src/talk.js noRepeat)
 const IN_PLACE_ALSO = ['plain', 'ai_line']
@@ -533,6 +535,11 @@ export function slimTalkData(d, skills = { skills: [] }) {
     near: pickKeys(d.near, ['stop_words', 'filler', 'first_step_old', 'keep_caps', 'want_say', 'template', 'template_1', 'template_3', 'nothing_near_set', 'bare_follow', 'never_near', 'keep_subject']),
     false_belief: { ...pickKeys(d.false_belief, ['maker_names', 'maker_cues', 'plan_names', 'plan_words', 'need_words']), lines: Object.fromEntries(d.false_belief.lines.map(l => [l.id, { text: l.text, source: l.sources.map(x => `${x.file}:${x.line}`).join(', '), next: slimNext(l.next) }])) },
     keeps: slimKeeps(d.keeps),
-    skills: (skills.skills || []).map(s => ({ name: s.name }))
+    skills: (skills.skills || []).map(s => ({ name: s.name })),
+    // loom-fixes-2 (helper-loom-fixes-v2 points 1, 2 and 6): how a name question is read; back words with nothing
+    // open; ordinary talk at the opening's two questions
+    names: pickKeys(d.names, ['starts', 'lead_ins', 'tails', 'cut', 'wins_over_kinds', 'wins_over_name_kinds']),
+    back_alone: pickKeys(d.back_alone, ['back_words', 'filler']),
+    opening_talk: pickKeys(d.opening_talk, ['kinds', 'line_by_kind', 'ask'])
   }
 }

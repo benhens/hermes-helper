@@ -127,13 +127,63 @@ export function openQNew(kind, st) {
   return { text: kind === 'F2' ? suNamed(SU_L.F2, st.name || st.kept.name || null) : SU_L[kind].text, answers: suNEW_PICKS() }
 }
 
+/* ---------- one question at a time, and back (loom-fixes-2) ---------- */
+const SU_OPEN = { new: 'Q_NEW', goal: 'Q_GOAL', rec: 'REC', step: 'STEP' }
+const suQNew = st => {
+  const s = suOf(st)
+  s.stage = 'new'
+  s.asked.new = true
+  return suSaid('Q_NEW', SU_Q_NEW.text, { answers: suNEW_PICKS() })
+}
+const suQGoal = st => {
+  const s = suOf(st)
+  s.stage = 'goal'
+  s.asked.goal = true
+  return suSaid('Q_GOAL', SU_L.Q_GOAL.text, { answers: suGOAL_PICKS() })
+}
+// the recommendation said again as it was (its item and rule as chosen then)
+function suRecAgain(st) {
+  const s = suOf(st)
+  const isNew = st.kept.setup_new || 'skip'
+  const goal = st.kept.setup_goal_id || s.goal || 'unsure'
+  s.stage = 'rec'
+  return suSaid('REC', recText(s.item, s.rule, isNew, goal) + ' ' + SU_REC_TAIL, { answers: suREC_PICKS(SU_L.REC.answers), rec: { item: s.item, rule: s.rule, isNew, goal } })
+}
+// one_question.reask: the open question once more, as its own bubble with its answers
+function suReask(st) {
+  const s = suOf(st)
+  if (s.stage === 'new') return suSaid('SETUP_REASK', SU_L.SETUP_REASK.text, { answers: suNEW_PICKS() })
+  if (s.stage === 'goal') return suSaid('SETUP_REASK_GOAL', SU_L.SETUP_REASK_GOAL.text, { answers: suGOAL_PICKS() })
+  if (s.stage === 'rec' && s.item && SU.items[s.item]) return suSaid('SETUP_REASK_REC', suFill(SU_L.SETUP_REASK_REC.text, { card: SU.items[s.item].name }), { answers: suREC_PICKS(SU_L.REC.answers) })
+  if (s.stage === 'step' && s.item && SU.items[s.item]) {
+    s.stepHidden = false
+    return suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
+  }
+  return null
+}
+// back_rule: at step n above 1 the step before; else BACK_ONE and the first of previous[open] shown in this set-up
+// conversation; with none, BACK_FIRST and the open question once more. The earlier answer stays kept.
+function suBack(st) {
+  const s = suOf(st)
+  if (s.stage === 'step' && s.step > 0) {
+    s.step -= 1
+    return [suReask(st)]
+  }
+  const shown = { Q_NEW: s.asked.new, Q_GOAL: s.asked.goal, REC: s.asked.rec && s.item && SU.items[s.item] }
+  const prev = (SU.back_rule.previous[SU_OPEN[s.stage]] || []).find(p => shown[p])
+  if (!prev) return [suSaid('BACK_FIRST', SU_L.BACK_FIRST.text), suReask(st)]
+  const q = prev === 'Q_NEW' ? suQNew(st) : prev === 'Q_GOAL' ? suQGoal(st) : suRecAgain(st)
+  return [suSaid('BACK_ONE', SU_L.BACK_ONE.text), q]
+}
+
 /* ---------- typed answers ---------- */
 const suFlat = text => talkNorm(text).replace(/[ ?!.,]+$/, '')
 const suInList = (t, list) => whichOf(t, list).length > 0
 function suTypedNew(text) {
   const t = suFlat(text)
   for (const k of SU_Q_NEW.typed.order) if (suInList(t, SU_Q_NEW.typed.lists[k])) return k
-  return 'skip'
+  // loom-fixes-2 (typed_answer.no_match_v2): matching none of Q_NEW's short fixed set is no answer (was: Skip)
+  return null
 }
 function suTypedGoal(text) {
   const t = suFlat(text)
@@ -179,6 +229,7 @@ function suRecommend(st, seen, lead = []) {
   s.stage = 'rec'
   s.item = item
   s.rule = rule
+  s.asked.rec = true
   st.kept.setup_current = item
   // rec: what the AI step may reword (src/setup-rec.js): the written text stands unless a checked reply replaces it
   return [...lead, suSaid('REC', recText(item, rule, isNew, goal) + ' ' + SU_REC_TAIL, { answers: suREC_PICKS(SU_L.REC.answers), rec: { item, rule, isNew, goal } })]
@@ -222,13 +273,16 @@ function suWorked(st, seen) {
     return suRecommend(st, seen, [suSaid('READ_FAILED', SU_P.read_failed + ' ' + SU_L.DONE_SAID.text)])
   }
   s.stage = 'notseen'
-  return [suSaid('NOT_SEEN', ...suNotSeenWords(item))]
+  return [suSaid('NOT_SEEN', ...suNotSeenWords(item, seen))]
 }
 // setup-chat-2 (changes-1 NOT_SEEN): bots are counted across the whole Hermes, so for A second bot "I only look at your
 // main bot" and "I did it on another bot" are untrue: its own line and two answers
 const suNotSeenActs = item => (item === 'second_bot' ? ['notseen:steps', 'notseen:notnow'] : ['notseen:steps', 'notseen:otherbot', 'notseen:notnow'])
 const suNotSeenLabels = item => (item === 'second_bot' ? SU_L.NOT_SEEN.answers_second_bot : SU_L.NOT_SEEN.answers)
-const suNotSeenWords = item => [item === 'second_bot' ? SU_L.NOT_SEEN.text_second_bot : SU_L.NOT_SEEN.text, { answers: suPicks(suNotSeenActs(item).map((a, i) => [a, suNotSeenLabels(item)[i]])) }]
+// loom-fixes-2 (helper-loom-fixes-v2 point 7): the bot Helper looked at is named (the look's seen.bot, the open bot as
+// the app names it); with no name read, text_no_bot
+const suNotSeenText = seen => (seen && typeof seen.bot === 'string' && seen.bot.trim() ? suFill(SU_L.NOT_SEEN.text, { bot: seen.bot.trim() }) : SU_L.NOT_SEEN.text_no_bot)
+const suNotSeenWords = (item, seen) => [item === 'second_bot' ? SU_L.NOT_SEEN.text_second_bot : suNotSeenText(seen), { answers: suPicks(suNotSeenActs(item).map((a, i) => [a, suNotSeenLabels(item)[i]])) }]
 
 // setup-chat-2 (changes-1 ALREADY_SEEABLE): "I've done this already". Helper has just read again (the move's look). A
 // thing it cannot see: kept as said done (DONE_SAID). Seen done now: DONE_SEEN, not kept as said. The read failed:
@@ -414,13 +468,18 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   // set-up conversation has a line open; with none open, only the restart words alone ("how do I reset my key" is a
   // question about Hermes, not a restart) (Decided myself, in the report)
   if (s.stage ? isRestart(text) : SU.restart_phrases.includes(t)) return suMove(false, () => suRestart(st))
+  // loom-fixes-2 (helper-loom-fixes-v2 point 2, back_rule): while Q_NEW, Q_GOAL, REC or a step is open, back words mean
+  // Helper's previous question or step (never Hermes's checkpoints); restart words were checked first
+  if (['new', 'goal', 'rec', 'step'].includes(s.stage) && suInList(t, SU.back_rule.back_words)) return suMove(false, () => suBack(st))
   const question = text.includes('?')
   if (s.stage === 'new') {
     const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
     if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
     if (isSetupAsk(text)) return suAsk(st)
     if (question || hasTopicWord(text) || notAnAnswer(text)) return null
-    return suMove(false, () => suAnswerNew(st, suTypedNew(text)))
+    const id = suTypedNew(text)
+    if (!id) return null
+    return suMove(false, () => suAnswerNew(st, id))
   }
   if (s.stage === 'goal') {
     const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
@@ -429,7 +488,12 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
     if (question || notAnAnswer(text)) return null
     // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
     if (SU_UNSURE.includes(t)) return suMove(true, seen => suAnswerGoal(st, 'unsure', null, seen))
-    return suMove(true, seen => suAnswerGoal(st, suTypedGoal(text), text, seen))
+    const goal = suTypedGoal(text)
+    // loom-fixes-2 (typed_answer.no_match_v2; route2.py setup_typed): a message that matches none of the goal lists
+    // but that the ordinary talk would answer (a topic word: "laptop or a server") is no answer either; only other
+    // messages are kept as unsure
+    if (goal === 'unsure' && hasTopicWord(text)) return null
+    return suMove(true, seen => suAnswerGoal(st, goal, text, seen))
   }
   if (s.stage === 'rec') {
     const i = suLabelOf(SU_L.REC.answers, text)
@@ -473,38 +537,24 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
 // again, once for each question; else null. picks: the answer has things of its own to pick (setup-chat-2, below).
 export function setupAfter(st, { picks = false } = {}) {
   const s = suOf(st)
-  // find-v2 part 5 (Lead's answer 5 to find-v1's questions; fault 8): a typed question wins over the set-up question:
-  // an answer with things of its own to pick ("How can I migrate?": From another AI app | To another computer) keeps
-  // them, and the set-up question is asked again after the answer to those (the page calls this after a picked answer
-  // too while one waits, setupReaskWaits)
-  if ((s.stage === 'new' && !s.reasked.new) || (s.stage === 'goal' && !s.reasked.goal)) {
-    s.reaskWaits = picks
-    if (picks) return null
-  }
-  if (s.stage === 'new' && !s.reasked.new) {
-    s.reasked.new = true
-    return suSaid('SETUP_REASK', SU_L.SETUP_REASK.text, { answers: suNEW_PICKS() })
-  }
-  if (s.stage === 'goal' && !s.reasked.goal) {
-    s.reasked.goal = true
-    return suSaid('SETUP_REASK_GOAL', SU_L.SETUP_REASK_GOAL.text, { answers: suGOAL_PICKS() })
-  }
-  // setup-chat-2 (changes-1 STEP_BACK; hhtech-setup-run 1.1: the step was gone after a typed question): while a step is
-  // open, after every answer, the step again with its own answers, so Done goes on to the next step. Not after I'm
-  // stuck or Stop for now (the stage is then another). An answer with things of its own to pick (a delete question's
-  // Yes | No, "Which one do you mean?", the topics under "help") keeps them: the step comes back after the answer to
-  // that (the page calls this after picked answers too while a step is open), and meanwhile only the step's own labels
-  // typed count as its answers (stepHidden).
-  if (s.stage === 'step' && s.item && SU.items[s.item]) {
-    s.stepHidden = picks
-    return picks ? null : suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
-  }
-  return null
+  // loom-fixes-2 (helper-loom-fixes-v2 point 5, one_question): while Q_NEW, Q_GOAL, REC or a step is open, after every
+  // answer of the ordinary talk the open question once more, as its own bubble with its answers (no longer once only).
+  // An answer that needs its own question first (own_question_kinds: "Do you mean me, or your own Hermes?") keeps it,
+  // and the set-up question comes back after the answer to that (the page calls this again then, setupReaskWaits).
+  if (!SU_OPEN[s.stage]) return null
+  if (s.stage === 'step') s.stepHidden = picks
+  s.reaskWaits = picks
+  if (picks) return null
+  return suReask(st)
 }
 // setup-chat-2: whether a step of the set-up conversation is the open line
 export const setupStepOpen = st => !!(st.setup && st.setup.stage === 'step')
 // find-v2 part 5: a set-up question waits to be asked again until the answer's own things to pick are answered
-export const setupReaskWaits = st => !!(st.setup && st.setup.reaskWaits && ['new', 'goal'].includes(st.setup.stage))
+export const setupReaskWaits = st => !!(st.setup && st.setup.reaskWaits && ['new', 'goal', 'rec', 'step'].includes(st.setup.stage))
+// loom-fixes-2: whether a set-up question or step is the open line (one_question applies)
+export const setupQuestionOpen = st => !!(st.setup && SU_OPEN[st.setup.stage])
+// loom-fixes-2 (one_question.own_question_kinds): answers that ask their own question first
+export const SETUP_OWN_QUESTION = SU.one_question.own_question_kinds
 
 // setup-chat-2 (changes-1 BACK_SEEN): the one thing a return visit names as seen done: the goal's thing if it is, else
 // the first seen done in the order the data's BACK_SEEN gives (scheduled_job, personality, second_bot). What is there

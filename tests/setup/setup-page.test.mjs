@@ -392,7 +392,8 @@ test('the person moved on before the recommendation call\'s 12 s, and the call n
   const lines = () => [...olds(view).map(n => n.props['data-line']), bubbleLine(view)]
   await send(view, 'what do you mean?')
   assert.equal(host.asks.length, 1)
-  assert.deepEqual(lines().slice(-2), ['use0', 'SLOW_A'])
+  // loom-fixes-2 (one_question): "Want the steps?" is still open, so it comes once more as the last bubble
+  assert.deepEqual(lines().slice(-3), ['use0', 'SLOW_A', 'SETUP_REASK_REC'])
 })
 
 // find-v2 part 3 (Lead, 11 Nov 11:40; hhtech ask-run 3 point 2): "You have a model, the AI that thinks, and it answered my

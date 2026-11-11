@@ -260,7 +260,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "F1 name=None",
+   "expect": "OPEN_TALK NAME_HELLO then ASK_NAME",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -272,20 +272,21 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
       "calls": 0,
-      "kind": "F1",
-      "name": null
+      "kind": "OPEN_TALK",
+      "talk": "hello"
      },
-     "shown": "F1 name=None",
+     "shown": "OPEN_TALK NAME_HELLO then ASK_NAME",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "work",
+      "stage": "name",
       "work": null
      },
      "text": "hi"
@@ -4509,20 +4510,21 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
       "calls": 0,
-      "kind": "F1",
-      "name": null
+      "kind": "OPEN_TALK",
+      "talk": "hello"
      },
-     "shown": "F1 name=None",
+     "shown": "OPEN_TALK NAME_HELLO then ASK_NAME",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "work",
+      "stage": "name",
       "work": null
      },
      "text": "hi"
@@ -4549,7 +4551,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "F2 name=None work=None",
+   "expect": "F1 name=None",
    "failed": null,
    "kept": null,
    "kept_after": {},
@@ -4561,6 +4563,30 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
+      "calls": 0,
+      "kind": "OPEN_TALK",
+      "talk": "hello"
+     },
+     "shown": "OPEN_TALK NAME_HELLO then ASK_NAME",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "name",
+      "work": null
+     },
+     "text": "hi"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
       "calls": 0,
       "kind": "F1",
       "name": null
@@ -4577,45 +4603,13 @@
       "stage": "work",
       "work": null
      },
-     "text": "hi"
-    },
-    {
-     "do": "say",
-     "has_model": false,
-     "model": null,
-     "out": {
-      "calls": 0,
-      "kind": "F2",
-      "name": null,
-      "offer": {
-       "picks": [
-        "setup",
-        "can"
-       ],
-       "set": "general",
-       "text": "Do you want to set up Hermes, or see what it does?"
-      },
-      "work": null
-     },
-     "shown": "F2 name=None work=None",
-     "state": {
-      "asked": [],
-      "found": {},
-      "kept": {},
-      "lastq": false,
-      "met": true,
-      "name": null,
-      "pending": null,
-      "stage": "open",
-      "work": null
-     },
      "text": "well that is a long story because I do a little bit of everything these days"
     }
    ]
   },
   {
    "about_keeping": false,
-   "expect": "F2 name=None work=I run a tennis club",
+   "expect": "F1 name=None",
    "failed": null,
    "kept": null,
    "kept_after": {},
@@ -4627,6 +4621,30 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
+      "calls": 0,
+      "kind": "OPEN_TALK",
+      "talk": "hello"
+     },
+     "shown": "OPEN_TALK NAME_HELLO then ASK_NAME",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "name",
+      "work": null
+     },
+     "text": "hi"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
       "calls": 0,
       "kind": "F1",
       "name": null
@@ -4642,38 +4660,6 @@
       "pending": null,
       "stage": "work",
       "work": null
-     },
-     "text": "hi"
-    },
-    {
-     "do": "say",
-     "has_model": false,
-     "model": null,
-     "out": {
-      "calls": 0,
-      "kind": "F2",
-      "name": null,
-      "offer": {
-       "picks": [
-        "setup",
-        "can"
-       ],
-       "set": "general",
-       "text": "Do you want to set up Hermes, or see what it does?"
-      },
-      "work": "I run a tennis club"
-     },
-     "shown": "F2 name=None work=I run a tennis club",
-     "state": {
-      "asked": [],
-      "found": {},
-      "kept": {},
-      "lastq": false,
-      "met": true,
-      "name": null,
-      "pending": null,
-      "stage": "open",
-      "work": "I run a tennis club"
      },
      "text": "I run a tennis club"
     }
@@ -13166,11 +13152,11 @@
   },
   {
    "about_keeping": true,
-   "expect": "BACK name=None",
+   "expect": "OPEN",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "c14 met: small talk at the name question ends the opening",
+   "name": "c14 met: small talk at the name question no longer ends the opening",
    "stage": "name",
    "steps": [
     {
@@ -13196,27 +13182,21 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
       "calls": 0,
-      "kind": "WHO",
-      "offer": {
-       "picks": [
-        "setup",
-        "can"
-       ],
-       "set": "general",
-       "text": "Do you want to set up Hermes, or see what it does?"
-      }
+      "kind": "OPEN_TALK",
+      "talk": "who"
      },
-     "shown": "WHO",
+     "shown": "OPEN_TALK WHO then ASK_NAME",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "open",
+      "stage": "name",
       "work": null
      },
      "text": "who are you?"
@@ -13227,19 +13207,18 @@
     {
      "do": "open",
      "out": {
-      "kind": "BACK",
-      "name": null
+      "kind": "OPEN"
      },
-     "shown": "BACK name=None",
+     "shown": "OPEN",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "open",
+      "stage": "name",
       "work": null
      }
     }
@@ -15514,11 +15493,11 @@
   },
   {
    "about_keeping": false,
-   "expect": "F1 name=None",
+   "expect": "OPEN_TALK NAME_HELLO then ASK_NAME",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "c14 at the name question, hey: as before",
+   "name": "c14 at the name question, hey: Hi. and the name question again",
    "stage": "name",
    "steps": [
     {
@@ -15544,20 +15523,21 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
       "calls": 0,
-      "kind": "F1",
-      "name": null
+      "kind": "OPEN_TALK",
+      "talk": "hello"
      },
-     "shown": "F1 name=None",
+     "shown": "OPEN_TALK NAME_HELLO then ASK_NAME",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "work",
+      "stage": "name",
       "work": null
      },
      "text": "hey"
@@ -15625,7 +15605,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "WHO",
+   "expect": "OPEN_TALK WHO then ASK_NAME",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -15655,27 +15635,21 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
       "calls": 0,
-      "kind": "WHO",
-      "offer": {
-       "picks": [
-        "setup",
-        "can"
-       ],
-       "set": "general",
-       "text": "Do you want to set up Hermes, or see what it does?"
-      }
+      "kind": "OPEN_TALK",
+      "talk": "who"
      },
-     "shown": "WHO",
+     "shown": "OPEN_TALK WHO then ASK_NAME",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "open",
+      "stage": "name",
       "work": null
      },
      "text": "who are you?"
@@ -20232,11 +20206,11 @@
   },
   {
    "about_keeping": true,
-   "expect": "BACK name=None",
+   "expect": "OPEN",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "c15 met at F1 with no name: later visit BACK, no name question",
+   "name": "c15 hi at the name question: later visit asks the name again",
    "stage": "name",
    "steps": [
     {
@@ -20262,20 +20236,21 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
       "calls": 0,
-      "kind": "F1",
-      "name": null
+      "kind": "OPEN_TALK",
+      "talk": "hello"
      },
-     "shown": "F1 name=None",
+     "shown": "OPEN_TALK NAME_HELLO then ASK_NAME",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "work",
+      "stage": "name",
       "work": null
      },
      "text": "hi"
@@ -20286,19 +20261,18 @@
     {
      "do": "open",
      "out": {
-      "kind": "BACK",
-      "name": null
+      "kind": "OPEN"
      },
-     "shown": "BACK name=None",
+     "shown": "OPEN",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "open",
+      "stage": "name",
       "work": null
      }
     }
@@ -21439,11 +21413,11 @@
   },
   {
    "about_keeping": false,
-   "expect": "THANKS",
+   "expect": "OPEN_TALK THANKS then ASK_NAME",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "c17 thanks at the name question: still THANKS",
+   "name": "c17 thanks at the name question: THANKS, then the name question again",
    "stage": "name",
    "steps": [
     {
@@ -21451,27 +21425,21 @@
      "has_model": false,
      "model": null,
      "out": {
+      "ask": "name",
       "calls": 0,
-      "kind": "THANKS",
-      "offer": {
-       "picks": [
-        "setup",
-        "can"
-       ],
-       "set": "general",
-       "text": "Do you want to set up Hermes, or see what it does?"
-      }
+      "kind": "OPEN_TALK",
+      "talk": "thanks"
      },
-     "shown": "THANKS",
+     "shown": "OPEN_TALK THANKS then ASK_NAME",
      "state": {
       "asked": [],
       "found": {},
       "kept": {},
       "lastq": false,
-      "met": true,
+      "met": false,
       "name": null,
       "pending": null,
-      "stage": "open",
+      "stage": "name",
       "work": null
      },
      "text": "thanks"
@@ -29746,15 +29714,15 @@
    ]
   }
  ],
- "json_sha256": "2804f6c36286cb0aef2ea57c45e9d729bab7884fd89a7d0b267f92157b220ab7",
+ "json_sha256": "2504668129f457461c7d8caefacfae6681c3fc30dbaa9af013f9f9b8c6ef3fd4",
  "keeps_off": false,
  "last_printed_lines": [
-  "unseen-20 'Passwords & Logins?': fact d_passwords (older line)",
-  "unseen-20 \"what's Microsoft Graph Webhook Listener?\": NAME nm_microsoftgraphwebhooklistener (name line)",
-  "unseen-20: name line 12, an older line 8, don't-know 0 (of 20)"
+  "unseen2-20 typo 'explain connetions pls': N1 (dk)",
+  "unseen2-20 sloppy forms, name spelled right: name line 16, an older line 4, don't-know 0 (of 20)",
+  "unseen2-20 the same with one letter dropped from the name: name line 2, an older line 1, don't-know 17 (of 20)"
  ],
  "no_wants": false,
- "route2_sha256": "adab5484f516ccd7cdaae20859daa2f92b2ad382ee88fdd4dae601668ff5ca08",
+ "route2_sha256": "91d33e9896cb973a642a6b880fef908f211d40572f3475b9b2539f6bc719dba8",
  "singles": [
   {
    "landed": "mem",
@@ -30281,14 +30249,21 @@
    ]
   },
   {
-   "landed": "msg",
+   "landed": "NAME",
    "out": {
     "calls": 0,
-    "kind": "row",
-    "need": "msg1",
-    "topic": "msg"
+    "id": "nm_telegram",
+    "kind": "NAME",
+    "offer": {
+     "picks": [
+      "msg",
+      "can"
+     ],
+     "set": "name_chat",
+     "text": "Do you want to use your phone, or see what Hermes does?"
+    }
    },
-   "shown": "line msg1",
+   "shown": "NAME nm_telegram",
    "state": {
     "asked": [],
     "found": {

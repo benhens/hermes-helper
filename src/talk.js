@@ -833,7 +833,7 @@ function oneWordName(text, st) {
 const saysWrong = t => whichOf(t, NR.wrong_anywhere).length > 0 || startsWith(t, NR.wrong_starts.filter(w => !ST.no_words.includes(w)))
 const WEAK_ALL = TALK_DATA.topics.flatMap(x => x.weak_key_words || [])
 // Step 0 b (JSON small_talk, route2.py small_talk): the kind of an ordinary message, or null. Whole messages only.
-export function smallTalk(text, st) {
+export function smallTalk(text, st, exact = false) {
   if (oneWordName(text, st)) return null // Ty and Will at What's your name? are names
   let t = talkNorm(text)
   let again = true
@@ -865,6 +865,8 @@ export function smallTalk(text, st) {
       }
     }
   }
+  // loom-fixes-2 (opening_talk; route2.py small_talk exact): the kinds' own lists only
+  if (exact) return kind
   if (kind === null && !opening) kind = greetMore(t) // live changes-6: live_c6.greet_more
   if (kind === null && !opening && !st.pending && correction(t, st)) kind = 'wrong' // live changes-6: live_c6.correction_rule
   if (kind === null) {
@@ -1204,6 +1206,15 @@ export function turn(text, st) {
 // talk-live: the same, with the result before no_repeat as well (pre, a copy), which decides whether the AI
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 export function turnParts(text, st) {
+  // loom-fixes-2 (back_alone; route2.py turn): only back words, with nothing of Helper's open: BACK_NONE with the offer
+  if (st.stage === 'open' && backAlone(text)) {
+    const out = { kind: 'BACK_NONE' }
+    noteLast(st, out)
+    attachOffer(out, st)
+    st.lastq = false
+    st.pending = null
+    return { pre: { ...out, by: 'title' }, out }
+  }
   const wasOpening = st.stage === 'name' || st.stage === 'work'
   const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
@@ -1217,8 +1228,13 @@ export function turnParts(text, st) {
   attachOffer(out, st, prevTopic)
   // loom-fixes (helper-loom-fixes-v1 points 3 and 4; route2.py turn): a name from the Hermes docs where the don't-know
   // would show (every older line wins), and the app a person wants to bring a setup over from
-  if (out.kind === 'N1' || out.kind === 'N1a' || out.kind === 'N1_AGAIN') {
-    const ne = nameLine(text)
+  // loom-fixes-2 (names.wins_over_kinds): also over a topic's line or question, the where-to-run line, What Hermes is
+  // and the agent line, which answer something near the name but do not say what it is; only for names of kind memory,
+  // chat, provider or feature (tool group names are everyday words: memory, file, web)
+  const over = NM.wins_over_kinds.includes(out.kind)
+  if (out.kind === 'N1' || out.kind === 'N1a' || out.kind === 'N1_AGAIN' || over) {
+    let ne = nameLine(text)
+    if (ne && over && !NM.wins_over_name_kinds.includes(ne.kind)) ne = null
     if (ne) {
       for (const k of Object.keys(out)) delete out[k]
       const [sid, otext, picks] = offerSet(ne.offer)
@@ -1251,15 +1267,28 @@ export function turnParts(text, st) {
 const nameKey = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '')
 const NAME_BY_KEY = new Map()
 for (const e of NAMES_DATA) for (const a of e.aliases) if (!NAME_BY_KEY.has(nameKey(a))) NAME_BY_KEY.set(nameKey(a), e)
+// loom-fixes-2 (helper-loom-fixes-v2 point 1; route2.py name_line at 91d33e98): the question forms are data
+// (names.starts, lead_ins, tails, cut): lower-case; any ? at the end makes it a bare question; lead-ins cut from the
+// start; the longest start; then, twice, one tail cut from the end and a / an / the from the start
+const NM = TALK_DATA.names
+const nmEsc = w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const nmAlt = list => [...list].sort((a, b) => b.length - a.length).map(nmEsc).join('|')
+const NM_LEAD = new RegExp(`^(?:(?:${NM.lead_ins.map(nmEsc).join('|')})[ ,]+)*`)
+const NM_START = new RegExp(`^(?:${nmAlt(NM.starts)})\\s+(.+?)$`)
+const NM_TAIL = new RegExp(`\\s+(?:${nmAlt(NM.tails)})$`)
+const NM_CUT = new RegExp(`^(?:${NM.cut.map(nmEsc).join('|')})\\s+`)
 export function nameLine(text) {
   let t = talkNorm(text).replace(/^[ .!]+|[ .!]+$/g, '')
-  const bare = t.endsWith('?')
+  const bare = t.includes('?')
   t = t.replace(/[ ?!.]+$/, '')
-  t = t.replace(/^(?:(?:so|ok|okay|and|hi|hey|helper|please|pls|plz|can you|could you)[ ,]+)*/, '')
-  const m = t.match(/^(?:what is|what's|whats|what are|what exactly is|tell me about|explain|what does)\s+(.+?)(?:\s+(?:is|are|do|does|mean|means))?$/)
+  t = t.replace(NM_LEAD, '')
+  const m = t.match(NM_START)
   let part = m ? m[1] : bare ? t : null
   if (!part) return null
-  part = part.replace(/^(?:a|an|the)\s+/, '')
+  for (let i = 0; i < 2; i++) {
+    part = part.replace(NM_TAIL, '').replace(/^[ ,?]+|[ ,?]+$/g, '')
+    part = part.replace(NM_CUT, '')
+  }
   return NAME_BY_KEY.get(nameKey(part)) || null
 }
 // loom-fixes (offer_words.migrate_apps; route2.py mig_app): the first of the six apps the message names, or null
@@ -1269,6 +1298,16 @@ export function migApp(text) {
 }
 const MIG_APPS = Object.fromEntries((TALK_DATA.offer_words.migrate_apps || []).map(a => [a.id, a]))
 
+// loom-fixes-2 (helper-talk-v2.json back_alone; route2.py back_alone): the message, cut of , . ! ?, is only back words
+// and filler words
+const BA = TALK_DATA.back_alone
+const BA_WORDS = [...BA.back_words, ...BA.filler].sort((a, b) => b.length - a.length)
+export function backAlone(text) {
+  let t = ' ' + talkNorm(text).replace(/[,.!?]+/g, ' ') + ' '
+  if (!whichOf(t.trim(), BA.back_words).length) return false
+  for (const w of BA_WORDS) t = t.replace(new RegExp(`(?<= )${nmEsc(w)}(?= )`, 'g'), ' ')
+  return !t.trim()
+}
 // find-v1 part 5: the results that are no line of their own (see turnSteps, a full typed message while a question is open)
 const FULL_NOT_FOR = ['N1', 'N1a', 'N1_AGAIN', 'N2', 'skill by name', 'CUT', 'MEAN_NONE', 'AGAIN']
 // The order of steps is route2.py's _turn(), with no model.
@@ -1326,6 +1365,13 @@ function turnSteps(text, st) {
   }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
+  // loom-fixes-2 (helper-loom-fixes-v2 point 6, opening_talk; hhtech: "hey" at What's your name? got "Nice to meet
+  // you. What do you do?"): at the opening's two questions, a message that is exactly small talk, and holds no name, is
+  // never the answer: the kind's line with no offer, then the open question once more. The stage stays; nothing kept.
+  if ((st.stage === 'name' || st.stage === 'work') && !oneWordName(text, st) && !codeName(text, true)) {
+    const kk = smallTalk(text, st, true)
+    if (TALK_DATA.opening_talk.kinds.includes(kk)) return done('OPEN_TALK', { talk: kk, ask: st.stage })
+  }
   // ask-fix-t1 (mean_rule_ask_fix_t1): the mean words themselves right after a word line with a mean field
   if (sk === 'mean' && st.last === 'term' && TERMS[st.lastParts.term].mean && ST.kinds.mean.some(w => w.length > 4 && hits(talkNorm(text), w))) {
     st.stage = 'open'
@@ -1972,6 +2018,15 @@ export function lineFor(result, st, typed = '', opts = {}) {
     }
     case 'F1':
       return said('F1', named(FIXED.F1))
+    // loom-fixes-2 (helper-loom-fixes-v2 point 6, opening_talk): ordinary talk at What's your name? or What do you do?:
+    // the kind's line with no offer, then the open question once more as its own bubble (ask, shown by the page);
+    // "are you an AI" gets this build's own line for it, as everywhere else (AI, AI_PICK or AI_WRITES)
+    case 'OPEN_TALK': {
+      const id = result.talk === 'ai' ? LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE] : TALK_DATA.opening_talk.line_by_kind[result.talk]
+      const ask = TALK_DATA.opening_talk.ask[result.ask]
+      const { offer: _none, ...line } = said(id, FIXED[id].text, { ask: { line: ask, text: FIXED[ask].text } })
+      return line
+    }
     case 'F2':
       if (setupOpens('F2', st)) return said('F2', ...setupOpener('F2', st))
       // talk-live-2: on a later visit (WORK_ASK, a typed change) the result carries the kept name
