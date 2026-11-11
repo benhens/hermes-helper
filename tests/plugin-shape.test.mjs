@@ -250,7 +250,7 @@ test('buttons are Hermes Button components; bare <button>s only where Hermes use
   assert.equal(stops.length, 1)
   // loom-fixes (Lead's point 15): a tile that opens Hermes's own screen is the whole tile as one real <button
   // type="button"> wearing D classes (no Hermes component is a card that is a button); the bots tile stays a <div>
-  const tiles = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.tile, D\.tileBtn\)),/g)].map(m => m[1])
+  const tiles = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.tile, D\.tileBtn, accent\)),/g)].map(m => m[1])
   assert.equal(tiles.length, 1)
   assert.equal([...src('dash.js').matchAll(/jsxs?\(\s*'button'/g)].length, 2)
   assert.match(src('page.js'), /jsx\('button', \{ type: 'button', className: T\.skip,/)

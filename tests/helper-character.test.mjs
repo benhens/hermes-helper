@@ -119,12 +119,17 @@ test('where it sits: under the bubble, on the message box, 168 px wide; the piec
   assert.equal(FACE.view.y + FACE.view.height - FACE.edge, 8)
   assert.match(TALK_CSS, /\.hh-char\{position:absolute;left:var\(--hh-inset\);bottom:calc\(-8px\*var\(--hh-k\)\);z-index:1;pointer-events:none\}/)
   assert.equal(under.props.style, undefined, 'nothing about its place is set by the page')
-  // only one character on the page, and none in the folded strip
-  assert.equal(all(view.tree, n => n.props['data-hh-character']).length, 1)
+  // only one character in Helper's window, and none in the folded strip (look: the page's only other one is the
+  // Dashboard banner's own)
+  assert.equal(all(helper(view), n => n.props['data-hh-character']).length, 1)
+  assert.equal(all(view.tree, n => n.props['data-hh-character']).length, 2)
+  assert.equal(all(byData(view.tree, 'banner-character'), n => n.props['data-hh-character']).length, 1)
   resize(view, 540)
   click(strip(view))
   assert.equal(helper(view), null)
-  assert.equal(all(view.tree, n => n.props['data-hh-character']).length, 0)
+  // (look: what is left is the Dashboard banner's own)
+  assert.equal(all(view.tree, n => n.props['data-hh-character']).length, 1)
+  assert.equal(all(byData(view.tree, 'banner-character'), n => n.props['data-hh-character']).length, 1)
 })
 
 test('132 px when Helper\'s window is under 420 px wide or the page is under 600 px high; the style sheet is told the same', async () => {

@@ -1,6 +1,8 @@
 // The Dashboard (dash-v1; loom2, his second Loom of 11 Nov: the page is the Dashboard, no tabs). Two parts, top to
+// look (his words of 11 Nov, 18:20 UTC): on top a banner built as the hero of Capabilities (the count, the first card not
+// marked, a button that opens it); every box is a Capabilities card in its own accent.
 // bottom: the top box (three tiles: bots and skills for the whole Hermes with their numbers, plugins with none) and
-// Set up: a heading "SET UP {n} of {m}" over a grid of cards, one per thing to set up (content/dash-setup-list-v2.json,
+// Set up: a section heading "Set up" over a grid of cards, one per thing to set up (content/dash-setup-list-v2.json,
 // in its order, Install and Scheduled jobs left out: 9 cards). Every word comes from the team's
 // content/dash-setup-list-v2.json and content/dash-words-v1.json, or from Lead's job words where the build says so
 // (scripts/dash-data.mjs LOOM2_WORDS); every class from the K and D tables (src/look.js).
@@ -19,7 +21,23 @@ import { K, D, cx } from './look.js'
 import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
 import { botRows, openBotName, makeReader } from './setup-reads.js'
-import { cardStates, cardColumns, panelAfter, distinctSkills, tileWord, CARD_GAP_PX } from './dash-rules.js'
+import { cardStates, cardColumns, panelAfter, distinctSkills, tileWord } from './dash-rules.js'
+import { Character } from './character.js'
+import { makeEyes } from './eyes.js'
+import { prefersReducedMotion } from './motion.js'
+
+// look (his words of 11 Nov, 18:20 UTC): every box is a card of Hermes's Capabilities page. Each box has its own
+// accent, in Hermes's order (catalog-card.tsx CARD_ACCENTS), by position: tile 1 to 3, then card 1 to 9 carrying on
+// the count. The class sets the accent; the sheet paints it.
+const BOX_ACCENTS = [D.acc0, D.acc1, D.acc2, D.acc3, D.acc4, D.acc5, D.acc6]
+export const boxAccent = position => BOX_ACCENTS[position % BOX_ACCENTS.length]
+const TILE_KEYS = ['bots', 'skills', 'plugins']
+// 20 px between boxes (Hermes's catalog-bento)
+export const BOX_GAP_PX = 20
+// The banner's character: 224 px wide is 150 px tall (the drawing is 200 by 134 units); its dots keep a 5 px cell
+export const BANNER_CHARACTER_PX = 224
+// The banner's words that are not in the team's data: Lead's job words (look, part 2 b)
+export const BANNER_WORDS = { eyebrow: 'Helper', count_tail: ' set up', open: 'Open {name}' }
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -234,8 +252,14 @@ export function makeDashboard(ctx) {
       setOpen(id)
       setReveal(true)
     }
+    // look: the banner's character has eyes of its own (a tracker serves one drawing); the Dashboard's own box hands
+    // it the pointer. still: the person's "reduce motion" setting when the page was put on screen.
+    const bannerEyes = useRef(null)
+    if (!bannerEyes.current) bannerEyes.current = makeEyes({ setTimeout: (fn, ms) => ctx.setTimeout(fn, ms) })
+    useEffect(() => () => bannerEyes.current.stop(), [])
+    const [still] = useState(prefersReducedMotion)
     // given: the app's own name for the open bot (loom-fixes: Helper's look reads the same bot, src/page.js)
-    return { reads, open, setOpen, toggle, openCard, cardsWidth, cardsRef, stepsBox, given }
+    return { reads, open, setOpen, toggle, openCard, cardsWidth, cardsRef, stepsBox, given, bannerEyes: bannerEyes.current, still }
   }
 
   // The Dashboard, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
@@ -278,10 +302,11 @@ export function makeDashboard(ctx) {
           ]
     const tile = key => {
       const inner = [jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'), jsxs('span', { className: D.tileWords, children: tileWords(key) }, 'w')]
-      if (!TILE_GO[key]) return jsxs('div', { className: D.tile, 'data-hh': `tile-${key}`, children: inner }, key)
-      return jsxs('button', { type: 'button', className: cx(D.tile, D.tileBtn), 'data-hh': `tile-${key}`, 'data-to': TILE_GO[key], onClick: () => goTo(TILE_GO[key]), children: inner }, key)
+      const accent = boxAccent(TILE_KEYS.indexOf(key))
+      if (!TILE_GO[key]) return jsxs('div', { className: cx(D.tile, accent), 'data-hh': `tile-${key}`, children: inner }, key)
+      return jsxs('button', { type: 'button', className: cx(D.tile, D.tileBtn, accent), 'data-hh': `tile-${key}`, 'data-to': TILE_GO[key], onClick: () => goTo(TILE_GO[key]), children: inner }, key)
     }
-    const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
+    const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: TILE_KEYS.map(tile) }, 'stats')
 
     /* ---------- Set up: the cards (loom2) ---------- */
     const items = DASH_DATA.items
@@ -301,7 +326,7 @@ export function makeDashboard(ctx) {
         'button',
         {
           type: 'button',
-          className: cx(D.scard, done && D.done, openAt === i && D.sel),
+          className: cx(D.scard, boxAccent(TILE_KEYS.length + i), done && D.done, openAt === i && D.sel),
           'aria-expanded': openAt === i,
           'aria-controls': openAt === i ? 'helper-dash-steps' : undefined,
           'data-hh': 'card',
@@ -350,7 +375,8 @@ export function makeDashboard(ctx) {
       panel = jsxs(
         'div',
         {
-          className: D.steps,
+          // the opened panel carries its card's accent
+          className: cx(D.steps, boxAccent(TILE_KEYS.length + openAt)),
           id: 'helper-dash-steps',
           ref: stepsBox,
           role: 'region',
@@ -508,21 +534,8 @@ export function makeDashboard(ctx) {
             'div',
             {
               className: D.head,
-              children: [
-                jsx('h2', { className: D.title, children: W.setup.title }, 't'),
-                jsx(
-                  'span',
-                  {
-                    className: D.count,
-                    'data-hh': 'count',
-                    // "{n} of {total}": the number marked done in bold
-                    children: W.setup.count.split('{n}').flatMap((part, k) =>
-                      k === 0 ? fill(part, { total: cards.total }) : [jsx('b', { className: D.countN, children: String(cards.done) }, 'n'), fill(part, { total: cards.total })]
-                    )
-                  },
-                  'c'
-                )
-              ]
+              // look: a Capabilities section heading; the count is the banner's title now, not repeated here
+              children: [jsx('h2', { className: D.title, 'data-hh': 'setup-title', children: W.setup.title }, 't')]
             },
             'head'
           ),
@@ -533,7 +546,7 @@ export function makeDashboard(ctx) {
               ref: cardsRef,
               'data-hh': 'cards',
               'data-columns': columns,
-              style: { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: `${CARD_GAP_PX}px` },
+              style: { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: `${BOX_GAP_PX}px` },
               children: grid
             },
             'cards'
@@ -543,11 +556,76 @@ export function makeDashboard(ctx) {
       'setup'
     )
 
+    /* ---------- look: the banner, built as Capabilities' hero ---------- */
+    // the first card not marked (none when all are marked)
+    const nextItem = cards.start >= 0 ? items[cards.start] : null
+    const banner = jsxs(
+      'section',
+      {
+        className: D.banner,
+        'data-hh': 'banner',
+        children: [
+          // the picture, behind the words: two fields of dots, and in front of them Helper's character holding the
+          // banner's bottom edge, its eyes on the pointer
+          jsxs('div', { className: D.bannerArt, 'data-hh': 'banner-art', 'aria-hidden': true, children: [jsx('i', { className: D.bannerDots }, 'd1'), jsx('i', { className: D.bannerDots2 }, 'd2')] }, 'art'),
+          jsx(
+            'div',
+            {
+              className: D.bannerChar,
+              'data-hh': 'banner-character',
+              'aria-hidden': true,
+              children: jsx(Character, { size: BANNER_CHARACTER_PX, expression: 'resting', rising: false, reduced: !!state.still, eyes: state.bannerEyes || null, label: '' })
+            },
+            'char'
+          ),
+          jsx('span', { className: D.bannerEyebrow, 'data-hh': 'banner-eyebrow', children: BANNER_WORDS.eyebrow }, 'e'),
+          // "{n} of {total} set up": the head's own count words, as a sentence
+          jsxs(
+            'h2',
+            {
+              className: D.bannerTitle,
+              'data-hh': 'banner-title',
+              children: [
+                jsx(
+                  'span',
+                  {
+                    'data-hh': 'count',
+                    children: W.setup.count.split('{n}').flatMap((part, k) => (k === 0 ? fill(part, { total: cards.total }) : [String(cards.done), fill(part, { total: cards.total })]))
+                  },
+                  'c'
+                ),
+                BANNER_WORDS.count_tail
+              ]
+            },
+            't'
+          ),
+          // the name and the why-line of the first card not marked, and the button that opens it as a click on it does
+          nextItem
+            ? jsxs('p', { className: D.bannerLine, 'data-hh': 'banner-line', 'data-card': nextItem.id, children: [jsx('b', { className: D.bannerName, children: nextItem.name }, 'n'), ' ', nextItem.why] }, 'l')
+            : null,
+          nextItem
+            ? jsx(
+                'div',
+                {
+                  className: D.bannerOpen,
+                  children: jsx(Button, { variant: 'default', size: 'xs', 'data-hh': 'banner-open', 'data-card': nextItem.id, onClick: () => state.openCard(nextItem.id), children: fill(BANNER_WORDS.open, { name: nextItem.name }) })
+                },
+                'o'
+              )
+            : null
+        ]
+      },
+      'banner'
+    )
+
     return jsxs('div', {
       className: cx(D.main, compact && D.compact),
       'data-hh': 'dashboard',
       'data-compact': compact,
-      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, setup]
+      // the banner's eyes hear the pointer from the Dashboard's own box
+      onPointerMove: e => state.bannerEyes && state.bannerEyes.pointerMove(e.clientX, e.clientY),
+      onPointerLeave: () => state.bannerEyes && state.bannerEyes.pointerLeave(),
+      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), banner, stats, setup]
     })
   }
 

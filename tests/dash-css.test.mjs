@@ -23,8 +23,15 @@ test('the built string is the sheet with its comments and line breaks dropped, n
   assert.equal(DASH_CSS, talkCssText(sheet))
 })
 
-test('every selector is one of our own hhd- classes (in the light theme, under Hermes\'s html:not(.dark))', () => {
-  for (const rule of rules) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
+test('every selector is one of our own hhd- classes (in the light theme, under Hermes\'s html:not(.dark)); the only other lines are the ring\'s registered angle, its turn and its reduced-motion rule', () => {
+  // look: three lines are not plain rules (the ring of Hermes's Capabilities cards, turned by CSS alone)
+  const atRules = rules.filter(r => r.startsWith('@'))
+  assert.deepEqual(atRules, [
+    "@property --hhd-arc{syntax:'<angle>';inherits:false;initial-value:0deg}",
+    '@keyframes hhd-arc-turn{to{--hhd-arc:360deg}}',
+    `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after{animation:none}}`
+  ])
+  for (const rule of rules.filter(r => !r.startsWith('@'))) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
   for (const c of classesIn(rules.map(r => r.slice(0, r.indexOf('{'))).join('\n'))) assert.ok(c.startsWith('hhd-') || c === 'dark', c)
 })
 
@@ -40,9 +47,13 @@ test('the lint on the sheet bites: a colour, a font or a ring drawn as a shadow 
   assert.ok(styleFindings(DASH_CSS + '\n.hhd-x{box-shadow:0 0 0 7px var(--ui-accent)}').length)
 })
 
-test('no warning colours anywhere on the tab: no red, yellow, orange or green, in the sheet or in the classes the tab wears', () => {
+test('look: Hermes\'s seven accents are named only by the seven accent classes, in Hermes\'s order (catalog-card.tsx CARD_ACCENTS); nothing else on the tab names a warning colour', () => {
   const warn = /--ui-(red|yellow|orange|green)|destructive|warning/
-  assert.doesNotMatch(DASH_CSS, warn)
+  const ORDER = ['blue', 'orange', 'purple', 'green', 'red', 'cyan', 'yellow']
+  const accentRules = ORDER.map((name, i) => `.${D['acc' + i]}{--hhd-accent:var(--ui-${name})}`)
+  for (const r of accentRules) assert.ok(rules.includes(r), r)
+  assert.deepEqual(rules.filter(r => /--ui-(blue|orange|purple|green|red|cyan|yellow)/.test(r)), accentRules)
+  assert.doesNotMatch(rules.filter(r => !accentRules.includes(r)).join('\n'), warn)
   assert.doesNotMatch(Object.values(D).join(' '), warn)
   const dash = read('src/dash.js')
   for (const [key] of [...dash.matchAll(/\bK\.(\w+)/g)].map(m => [m[1]])) assert.doesNotMatch(K[key], warn, key)
@@ -59,16 +70,80 @@ test('every class the code names has a rule in the sheet, and the sheet has no c
   }
 })
 
-test('hhdesign\'s r7 sizes: tiles 3 across, icon square 40 px at 13% accent; loom2: a set-up card is a tile (the same surface, edge, corners, padding and icon square)', () => {
+// look: Hermes's Capabilities card (catalog.css lines 26 to 44), under our own classes
+const WASH = 'background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)'
+const BOXES = [D.tile, D.scard, D.steps]
+
+test('look: every box (tile, set-up card, opened panel) is a Capabilities card: Hermes\'s surface under the wash of its accent (dark: top left, 11%; light: bottom left, 6%), Hermes\'s corners, a transparent border, 20 px padding, no shadow', () => {
   const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
-  assert.match(rule(`.${D.stats}`), /grid-template-columns:repeat\(3,minmax\(0,1fr\)\);gap:10px/)
-  assert.match(rule(`.${D.tileIcon}`), /width:40px;height:40px;border-radius:calc\(10px\*var\(--hhd-round\)\);background:color-mix\(in srgb,var\(--ui-accent\) 13%,transparent\)/)
+  assert.match(rule(`.${D.stats}`), /grid-template-columns:repeat\(3,minmax\(0,1fr\)\);gap:20px/)
+  assert.match(rule(`.${D.main}`), /gap:20px/)
+  for (const box of BOXES) {
+    const r = rule(`.${box}`)
+    assert.ok(r.includes(WASH), box)
+    assert.match(r, /--hhd-rest-y:0%;--hhd-tint:11%/, box)
+    assert.match(r, /border:1px solid transparent;border-radius:var\(--radius-lg\);padding:20px/, box)
+    assert.ok(rules.includes(`html:not(.dark) .${box}{--hhd-rest-y:100%;--hhd-tint:6%}`), box)
+    // the old look is gone: no --ui-bg-elevated on a box, and the surface does not change on hover
+    assert.doesNotMatch(r, /--ui-bg-elevated|--ui-bg-tertiary/, box)
+    assert.equal(rule(`.${box}:hover`), '', box)
+  }
+  assert.equal(rule(`.${D.tileBtn}:hover`), '')
+  // the icon square and the icon take the box's accent
+  assert.match(rule(`.${D.tileIcon}`), /width:40px;height:40px;border-radius:var\(--radius-lg\);background:color-mix\(in srgb,var\(--hhd-accent\) 16%,transparent\);color:var\(--hhd-accent\)/)
   assert.match(rule(`.${D.tileNum}`), /font-size:28px;line-height:32px;font-weight:600/)
-  // the same surface, corners and padding as a tile, and the same hairline edge in light
-  assert.match(rule(`.${D.scard}`), /background:var\(--ui-bg-elevated\);border-radius:calc\(12px\*var\(--hhd-round\)\);padding:14px 16px/)
-  assert.match(rule(`.${D.tile}`), /background:var\(--ui-bg-elevated\);border-radius:calc\(12px\*var\(--hhd-round\)\);padding:14px 16px/)
+  // the light theme's inset hairline stays
   assert.equal(rule(`html:not(.dark) .${D.scard}`), `html:not(.dark) .${D.scard}{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}`)
   assert.equal(rule(`html:not(.dark) .${D.tile}`), `html:not(.dark) .${D.tile}{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}`)
+})
+
+test('look: the words as in the catalog cards: a name 1.125rem / 600 in --ui-text-primary; the sentence under it at Hermes\'s caption size, line-height 1.625, in --ui-text-secondary (never tertiary)', () => {
+  const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
+  for (const name of [D.scardName, D.tileName]) assert.match(rule(`.${name}`), /font-size:1\.125rem;line-height:1\.4;font-weight:600;color:var\(--ui-text-primary\)/, name)
+  for (const line of [D.scardWhy, D.tileLine, D.tileLabel, D.bannerLine]) {
+    assert.match(rule(`.${line}`), /font-size:var\(--conversation-caption-font-size\);line-height:1\.625;color:var\(--ui-text-secondary\)/, line)
+  }
+  // the head: a Capabilities section heading (catalog-discovery.css .catalog-section-heading h2), sentence case
+  assert.equal(rule(`.${D.title}`), `.${D.title}{margin:0;font-size:1.4rem;font-weight:600;letter-spacing:-.025em;color:var(--ui-text-primary)}`)
+  assert.doesNotMatch(DASH_CSS, /hhd-count/)
+})
+
+test('look: the ring of catalog.css on every tile and card: a 1.5 px conic ring in --color-primary that fades in over 0.35 s on hover and focus, turned once every 4 s by a CSS animation of the registered --hhd-arc; still with reduced motion; the opened card keeps it on', () => {
+  const ring = rules.find(r => r.startsWith(`.${D.tile}::after,.${D.scard}::after{`)) || ''
+  assert.match(ring, /content:'';position:absolute;inset:0;padding:1\.5px;border-radius:inherit;pointer-events:none/)
+  assert.match(ring, /background:conic-gradient\(from var\(--hhd-arc\),transparent 0deg,var\(--color-primary\) 60deg,transparent 130deg\)/)
+  assert.match(ring, /mask-composite:exclude;opacity:0;transition:opacity \.35s ease;animation:hhd-arc-turn 4s linear infinite paused/)
+  const on = rules.find(r => r.endsWith('{opacity:1;animation-play-state:running}')) || ''
+  assert.deepEqual(selectorsOf(on), [`.${D.tile}:hover::after`, `.${D.tile}:focus-within::after`, `.${D.scard}:hover::after`, `.${D.scard}:focus-within::after`, `.${D.scard}.${D.sel}::after`])
+  assert.ok(rules.includes("@property --hhd-arc{syntax:'<angle>';inherits:false;initial-value:0deg}"))
+  assert.ok(rules.includes('@keyframes hhd-arc-turn{to{--hhd-arc:360deg}}'))
+  assert.ok(rules.includes(`@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after{animation:none}}`))
+  for (const box of [D.tile, D.scard]) assert.match(rules.find(r => r.startsWith(`.${box}{`)), /position:relative/, box)
+  // no script animation on the Dashboard's own drawing
+  assert.doesNotMatch(read('src/dash.js'), /\.animate\(/)
+})
+
+test('look: the banner is Capabilities\' hero: 20 px padding, 12 px gap, at least 180 px tall, isolated, the editorial surface; the words in the left 58%; the picture in the right 42% behind them, fading in from the left; narrow: full-width words over a 30% wash', () => {
+  const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
+  const b = rule(`.${D.banner}`)
+  for (const part of ['isolation:isolate', 'gap:12px', 'min-height:180px', 'padding:20px', 'border-radius:var(--radius-lg)', 'background:color-mix(in srgb,var(--color-primary) 28%,var(--ui-chat-bubble-background))']) assert.ok(b.includes(part), part)
+  assert.match(rule(`.${D.bannerEyebrow}`), /font-size:\.75rem;color:var\(--ui-text-tertiary\)/)
+  assert.match(rule(`.${D.bannerTitle}`), /max-width:58%;font-size:2rem;line-height:1\.2;font-weight:600;letter-spacing:-\.025em;color:var\(--ui-text-primary\)/)
+  assert.match(rule(`.${D.bannerLine}`), /max-width:58%/)
+  assert.match(rule(`.${D.bannerOpen}`), /max-width:58%/)
+  const art = rule(`.${D.bannerArt}`)
+  for (const part of ['position:absolute', 'inset:0 0 0 auto', 'width:42%', 'height:100%', 'z-index:-1', 'mask-image:linear-gradient(to right,transparent,var(--ui-base) 45%)']) assert.ok(art.includes(part), part)
+  // the dots: the theme's colour, 2 px on a 9 px grid, and 3.5 px on an 18 px grid over the right third; both thinned by a soft mask
+  const DOT = 'color-mix(in srgb,var(--color-primary) 80%,var(--ui-text-primary))'
+  assert.ok(rule(`.${D.bannerDots}`).includes(`background:radial-gradient(circle,${DOT} 1px,transparent 1.2px) 0 0/9px 9px`))
+  assert.ok(rule(`.${D.bannerDots2}`).includes(`background:radial-gradient(circle,${DOT} 1.75px,transparent 1.95px) 0 0/18px 18px`))
+  assert.match(rule(`.${D.bannerDots2}`), /width:33\.333%/)
+  for (const d of [D.bannerDots, D.bannerDots2]) assert.match(rule(`.${d}`), /mask-image:radial-gradient\(120% 130% at 100% 0%,var\(--ui-base\) 25%,transparent 75%\)/, d)
+  // the character holds the banner's bottom edge, behind the words
+  assert.match(rule(`.${D.bannerChar}`), /position:absolute;right:5%;bottom:-9px;z-index:-1;pointer-events:none/)
+  // narrow
+  for (const w of [D.bannerTitle, D.bannerLine, D.bannerOpen]) assert.equal(rule(`.${D.compact} .${w}`), `.${D.compact} .${w}{max-width:100%}`)
+  assert.equal(rule(`.${D.compact} .${D.bannerArt}`), `.${D.compact} .${D.bannerArt}{width:100%;opacity:.3}`)
 })
 
 /* ---------- dash-v2: hhdesign's review of 65b108b (design/dash-r7/review-65b108b.md, "For builder") ---------- */
@@ -88,26 +163,24 @@ test('no path and no line: nothing in the sheet draws a stroke or a path; the ha
   assert.doesNotMatch(read('src/dash.js'), /'svg'|'path'|stroke/)
 })
 
-test('a marked card: its icon square filled with the accent and "Done" in the accent; "Start here" in the accent; the opened card ringed with an outline (no shadow)', () => {
-  assert.equal(ruleOf(`.${D.done} .${D.tileIcon}`), `.${D.done} .${D.tileIcon}{background:var(--ui-accent);color:var(--background)}`)
-  assert.match(ruleOf(`.${D.doneLine}`), /font-weight:600;color:var\(--ui-accent\)/)
+test('a marked card: its icon square filled with the card\'s accent and "Done" in the card\'s accent; "Start here" in the theme\'s accent; the opened card keeps the ring on (no outline, no shadow)', () => {
+  assert.equal(ruleOf(`.${D.done} .${D.tileIcon}`), `.${D.done} .${D.tileIcon}{background:var(--hhd-accent);color:var(--background)}`)
+  assert.match(ruleOf(`.${D.doneLine}`), /font-weight:600;color:var\(--hhd-accent\)/)
   assert.match(ruleOf(`.${D.start}`), /color:var\(--ui-accent\)/)
-  assert.equal(ruleOf(`.${D.scard}.${D.sel}`), `.${D.scard}.${D.sel}{outline:2px solid var(--ui-accent);outline-offset:-2px}`)
+  assert.equal(ruleOf(`.${D.scard}.${D.sel}`), '')
+  assert.ok(rules.some(r => selectorsOf(r).includes(`.${D.scard}.${D.sel}::after`) && r.endsWith('{opacity:1;animation-play-state:running}')))
   assert.match(ruleOf(`.${D.scard}:focus-visible`), /outline:2px solid var\(--ui-text-secondary\)/)
 })
 
-test('the corners sit behind one value: --hhd-round is set once (1 = the round look he picked in dash-r3), and every corner of a card, tile, panel, icon square and waiting block is its size times that value', () => {
-  const sets = [...DASH_CSS.matchAll(/--hhd-round:([^;}]+)/g)].map(m => m[1])
-  assert.deepEqual(sets, ['1'], 'set in one place')
-  assert.match(ruleOf(`.${D.main}`), /--hhd-round:1[;}]/)
+test('look: the corners are Hermes\'s own: --hhd-round is gone, and every corner of a banner, card, tile, panel, icon square, waiting block and video place is var(--radius-lg)', () => {
+  assert.doesNotMatch(DASH_CSS, /--hhd-round/)
+  assert.doesNotMatch(sheet, /--hhd-round/)
   const radii = [...DASH_CSS.matchAll(/border-radius:([^;}]+)/g)].map(m => m[1])
-  const scaled = radii.filter(r => r.includes('--hhd-round'))
-  // (loom2: the card's video and its quiet box, 8 px each)
-  assert.deepEqual(scaled.sort(), ['calc(10px*var(--hhd-round))', 'calc(12px*var(--hhd-round))', 'calc(12px*var(--hhd-round))', 'calc(12px*var(--hhd-round))', 'calc(7px*var(--hhd-round))', 'calc(8px*var(--hhd-round))', 'calc(8px*var(--hhd-round))'])
-  // what is left with a fixed corner is not a box: the 2 px pointer (loom2: no round stops any more)
-  assert.deepEqual([...new Set(radii.filter(r => !r.includes('--hhd-round')))].sort(), ['2px'])
-  for (const sel of [`.${D.scard}`, `.${D.tile}`, `.${D.steps}`]) assert.match(ruleOf(sel), /border-radius:calc\(12px\*var\(--hhd-round\)\)/, sel)
-  assert.match(ruleOf(`.${D.wait}`), /border-radius:calc\(7px\*var\(--hhd-round\)\)/)
+  // what is left is no box of its own: the ring follows its box, the picture follows the banner's right side, the 2 px pointer
+  assert.deepEqual([...new Set(radii)].sort(), ['0 var(--radius-lg) var(--radius-lg) 0', '2px', 'inherit', 'var(--radius-lg)'])
+  for (const sel of [`.${D.banner}`, `.${D.scard}`, `.${D.tile}`, `.${D.steps}`, `.${D.tileIcon}`, `.${D.wait}`, `.${D.video}`, `.${D.videoSoon}`]) assert.match(ruleOf(sel), /border-radius:var\(--radius-lg\)/, sel)
+  // the video place is also drawn in Helper's window: nothing in its rules is a variable of our own
+  for (const sel of [`.${D.video}`, `.${D.videoSoon}`, `.${D.videoName}`]) assert.doesNotMatch(ruleOf(sel), /--hhd-/, sel)
 })
 
 test('at the narrow size a tile\'s word may take a second line rather than run out of its tile (a 340 px left side leaves a tile 65 px of room)', () => {
