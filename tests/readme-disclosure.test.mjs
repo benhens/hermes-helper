@@ -9,6 +9,8 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { PINS, TEAM, pinned, teamSha } from './lib/team-pins.mjs'
+import { readmeForMode } from '../scripts/live-data.mjs'
+import { aiModeOf } from '../scripts/build.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const README = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8')
@@ -39,3 +41,27 @@ test('all twelve points are the team\'s section 7, word for word, as pinned (whe
   assert.equal(team.length, 12)
   assert.deepEqual(points, team)
 })
+
+// talk-live (live-v2 changes-1): README's four lines that change with the mode are the data's, for the mode the
+// commit's src/ai-mode.js holds (read from the file, so the same in every run of scripts/test-modes.mjs)
+test('README\'s lines by mode (Status, the waiting dots, the model calls, point 11) are the data\'s for the committed mode, and only those change', () => {
+  const live = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/helper-talk-live-v2.json'), 'utf8'))
+  const mode = aiModeOf()
+  const lm = live.lines_by_mode
+  assert.equal(readmeForMode(README, live, mode), README, 'README is as the build writes it')
+  assert.ok(README.includes(lm.readme_status_sentence_2[mode]))
+  assert.ok(README.includes(lm.readme_model_call_bullet[mode]))
+  assert.equal(points[10], lm.readme_point_11[mode])
+  for (const m of ['no_ai_step', 'ai_picks_line', 'ai_writes']) {
+    const other = readmeForMode(README, live, m)
+    // going there and back gives README again, and the lines that differ are the four (three with no window sentence)
+    assert.equal(readmeForMode(other, live, mode), README, m)
+    const diff = README.split('\n').filter((l, i) => l !== other.split('\n')[i]).length
+    assert.equal(diff, m === mode ? 0 : 4, m)
+    if (lm.readme_window_sentence[m]) assert.ok(other.includes(lm.readme_window_sentence[m]), m)
+  }
+  // the clause hhcontent asked about: llm.oneshot is one plain request with no tools (Hermes's agent/oneshot.py run_oneshot:
+  // messages, max_tokens, temperature, nothing else), so "no tools run" stays in the AI modes
+  assert.match(lm.readme_model_call_bullet.ai_writes, /no tools run\.$/)
+})
+

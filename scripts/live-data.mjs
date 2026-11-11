@@ -140,3 +140,32 @@ export function slimLiveData(live, talk, wants) {
     }
   }
 }
+
+// README's lines that change with the mode (live-v2 changes-1, lines_by_mode): the second sentence of the
+// Status line, a sentence in the conversation window's bullet after "see the rest at once.", the bullet about
+// the "The model answers" card, and point 11 of the disclosure. The build writes them for src/ai-mode.js's
+// mode (tests/readme-disclosure.test.mjs checks them); everything else in README is the Builder's.
+export function readmeForMode(readme, live, mode) {
+  const lm = live.lines_by_mode
+  const lines = readme.split('\n')
+  const at = (test, what) => {
+    const i = lines.findIndex(test)
+    if (i < 0) throw new Error(`README.md has no ${what}`)
+    return i
+  }
+  const s = at(l => l.startsWith('Status: '), 'Status line')
+  const first = lines[s].match(/^Status: [^.]*\([^)]*\)\.|^Status: [^.]*\./)
+  if (!first) throw new Error('README.md: the Status line has no first sentence')
+  lines[s] = `${first[0]} ${lm.readme_status_sentence_2[mode]}`
+  const w = at(l => l.startsWith("- Helper's conversation window on the right."), 'conversation window bullet')
+  const anchor = 'see the rest at once.'
+  if (!lines[w].includes(anchor)) throw new Error('README.md: the window bullet lost "see the rest at once."')
+  let bullet = lines[w]
+  for (const m of MODES) if (lm.readme_window_sentence[m]) bullet = bullet.split(' ' + lm.readme_window_sentence[m]).join('')
+  lines[w] = lm.readme_window_sentence[mode] ? bullet.replace(anchor, `${anchor} ${lm.readme_window_sentence[mode]}`) : bullet
+  const c = at(l => l.startsWith('- The "The model answers" card makes one call'), '"The model answers" bullet')
+  lines[c] = `- ${lm.readme_model_call_bullet[mode]}`
+  const p = at(l => l.startsWith('11. '), 'point 11')
+  lines[p] = lm.readme_point_11[mode]
+  return lines.join('\n')
+}

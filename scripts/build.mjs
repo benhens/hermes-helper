@@ -12,7 +12,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { talkProblems, slimTalkData } from './talk-data.mjs'
 import { wantsProblems, slimWantsData } from './wants-data.mjs'
-import { liveProblems, slimLiveData } from './live-data.mjs'
+import { liveProblems, slimLiveData, readmeForMode } from './live-data.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const ORDER = ['model-name.js', 'model-status.js', 'model-call.js', 'talk-data.js', 'wants-data.js', 'ai-mode.js', 'live-data.js', 'key-check.js', 'secret-rule.js', 'setup-cards.js', 'steps-data.js', 'steps.js', 'state.js', 'kept.js', 'talk.js', 'live-rows.js', 'live-checks.js', 'live-request.js', 'live-turn.js', 'settings-file.js', 'look.js', 'talk-css.js', 'layout.js', 'expressions.js', 'eyes.js', 'motion.js', 'reveal.js', 'character.js', 'setup-tab.js', 'bubble-link.js', 'quotes.js', 'talk-view.js', 'page.js', 'settings-page.js', 'main.js']
@@ -84,7 +84,8 @@ export function generatedSources() {
     [TALK_CSS_JS, talkCssSource(), 'src/talk.css'],
     [TALK_JS, talkDataSource(), 'content/helper-talk-v2.json'],
     [WANTS_JS, wantsDataSource(), 'content/helper-wants-v1.json'],
-    [LIVE_JS, liveDataSource(), 'content/helper-talk-live-v2.json']
+    [LIVE_JS, liveDataSource(), 'content/helper-talk-live-v2.json'],
+    [README, readmeForMode(fs.readFileSync(README, 'utf8'), readJson(LIVE_JSON), aiModeOf()), 'content/helper-talk-live-v2.json lines_by_mode and src/ai-mode.js']
   ]
 }
 
@@ -116,6 +117,7 @@ export function wantsDataSource(wants = readJson(WANTS_JSON), talk = readJson(TA
 const LIVE_JSON = path.join(ROOT, 'content', 'helper-talk-live-v2.json')
 const LIVE_JS = path.join(ROOT, 'src', 'live-data.js')
 const AI_MODE_JS = path.join(ROOT, 'src', 'ai-mode.js')
+const README = path.join(ROOT, 'README.md')
 // The switch as written in src/ai-mode.js (the one line `export const AI_MODE = '...'`).
 export function aiModeOf(text = fs.readFileSync(AI_MODE_JS, 'utf8')) {
   const m = text.match(/^export const AI_MODE = '([a-z_]+)'$/m)
