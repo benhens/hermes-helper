@@ -31856,7 +31856,9 @@ function ReplyExtras({ entry, onQuick, onCard, onAct }) {
             className: T.chatCard,
             'data-hh': 'chat-card',
             'data-card': it.id,
-            children: [jsx(CardVideo, { it }, 'video'), jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'chat-card-open', onClick: () => onCard && onCard(it.id), children: `Open ${it.name} on the Dashboard` }, 'open')]
+            // round 20:12 (his words, 18:11 UTC: "The video is not there but it should show where you should go"): the
+            // video only when the card has an address; otherwise only the button (the opened card keeps its place)
+            children: [it.video && isVideoUrl(it.video.url) ? jsx(CardVideo, { it }, 'video') : null, jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'chat-card-open', onClick: () => onCard && onCard(it.id), children: `Open ${it.name} on the Dashboard` }, 'open')]
           },
           'card'
         )
