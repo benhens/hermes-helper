@@ -24248,7 +24248,7 @@ How to answer:
 - Quick replies: you may end a reply with two or three choices, each in double square brackets, all together on the very last line of the reply, after the "Read more:" line, like this: [[Claude Code setup]] [[A Claude Code conversation]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
 - Dashboard cards: Helper's Dashboard has nine set-up cards, each with its steps and a place for a video. When the question is about one of these subjects, end your reply with [[card:ID]] on its own line, with that card's id (one card at most):
 ${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
-- Do it for me: Helper can run one kind of step for the person: bringing a setup over from another agent. When that import is the step to do now and you know which agent, end your reply with [[do:import AGENT]] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw. The person then sees a button "Do it for me": it first shows a preview and changes nothing until they press "Import it". Tell them in one line that they can press it. For every other step, give the step to do by hand, and never write [[do:...]] for anything else.
+- Do it for me: Helper can run one kind of step for the person: bringing a setup over from another agent. When that import is the step to do now and you know which agent, end your reply with [[do:import AGENT]] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw. The person then sees a button "Do it for me". If Hermes's own import add-on (agent-importers, from Nous Research) is not installed yet, Helper first offers to install it: that is the one change before the preview. Then it shows a preview, and the import itself waits until they press "Import it". Tell them in one line that they can press it. Never write "nothing changes before that". For every other step, give the step to do by hand, and never write [[do:...]] for anything else.
 - Use the doc excerpts you are given. They come from the Hermes docs. When they don't cover the question, say so in one line, give your best short answer, and point to the closest docs page.
 - Don't invent commands, settings or menu names that are not in the excerpts. If you are not sure, say so.
 - Never ask for an API key, password or token, and never repeat one. If the person needs a key, tell them where in the app to put it (Settings), not to send it in the chat.
@@ -24384,6 +24384,8 @@ function chatActionLines(output) {
 }
 // Hermes without its import add-on says so and names the install command (seen in Hermes v0.23.0, exit code 2)
 const chatNeedsPlugin = lines => /agent-importers/.test(lines.join('\n')) && /not loaded|plugins install/.test(lines.join('\n'))
+// round 20:12: the preview found no folder of the other agent on this computer (Hermes v0.23.0: "Agent directory not found")
+const chatNoAgent = lines => /agent directory not found/i.test(lines.join('\n'))
 // the last lines of a failed run, each cut short
 const chatActionTail = (lines, count = 6) => lines.slice(-count).map(l => (l.length > 200 ? l.slice(0, 200) + '…' : l.trim()))
 // The things an import names, in plain words (the importer's own ids; an id not listed here is shown as it is)
@@ -24414,6 +24416,7 @@ const CHAT_ACT_TOLD = {
   plugin: ' (Helper tried to run this step for the person: Hermes needs its import add-on first, and Helper offered to install it.)',
   preview: ' (Helper ran the preview for the person and showed what would come over; the import itself has not been run yet.)',
   done: ' (Helper ran the import for the person; it is done.)',
+  missing: ' (Helper tried the preview for the person: that program is not on this computer, so there is nothing to bring over.)',
   failed: ' (Helper tried to run this step for the person; the command failed, and Helper showed how to do it by hand.)'
 }
 
@@ -31809,9 +31812,11 @@ function ReplyAction({ entry, onAct }) {
   if (act.state === 'running') parts = [jsx('p', { role: 'status', 'data-hh': 'act-line', children: 'Working on it…' }, 'l')]
   else if (act.state === 'plugin')
     parts = [
-      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its import add-on first (the agent-importers plugin, from Nous Research). Installing it runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
+      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its own import add-on first (agent-importers, from Nous Research). Installing it adds that add-on to Hermes: this is the one change before the preview. It runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
       button('plugin', 'Install it')
     ]
+  // round 20:12: the other program is not on this computer: plain words only (no folder path, no error, no command)
+  else if (act.state === 'missing') parts = [jsx('p', { 'data-hh': 'act-line', children: `I don’t see ${name} on this computer, so there is nothing to bring over.` }, 'l')]
   else if (act.state === 'preview')
     parts = rows
       ? [
@@ -32372,6 +32377,8 @@ function makePage(ctx, opts = {}) {
           if (r.blocked) return setAct(id, { ...base, state: 'failed', tail: typeof r.hint === 'string' && r.hint.trim() ? [r.hint.trim()] : [] })
           if (r.code !== 0) {
             if (stepNow === 'preview' && chatNeedsPlugin(lines)) return setAct(id, { ...base, state: 'plugin' })
+            // round 20:12 (hhtech's points 2 and 3): the other program is not on this computer: plain words, no path
+            if (stepNow === 'preview' && chatNoAgent(lines)) return setAct(id, { ...base, state: 'missing' })
             return setAct(id, { ...base, state: 'failed', tail: chatActionTail(lines) })
           }
           // the add-on is in: now the preview the person asked for with "Do it for me"

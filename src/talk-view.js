@@ -308,9 +308,11 @@ export function ReplyAction({ entry, onAct }) {
   if (act.state === 'running') parts = [jsx('p', { role: 'status', 'data-hh': 'act-line', children: 'Working on it…' }, 'l')]
   else if (act.state === 'plugin')
     parts = [
-      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its import add-on first (the agent-importers plugin, from Nous Research). Installing it runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
+      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its own import add-on first (agent-importers, from Nous Research). Installing it adds that add-on to Hermes: this is the one change before the preview. It runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
       button('plugin', 'Install it')
     ]
+  // round 20:12: the other program is not on this computer: plain words only (no folder path, no error, no command)
+  else if (act.state === 'missing') parts = [jsx('p', { 'data-hh': 'act-line', children: `I don’t see ${name} on this computer, so there is nothing to bring over.` }, 'l')]
   else if (act.state === 'preview')
     parts = rows
       ? [

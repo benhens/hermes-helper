@@ -23,7 +23,7 @@ import { prefersReducedMotion, watchReducedMotion } from './motion.js'
 import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS, NO_MODEL_LINE } from './model-status.js'
 import { askModel, failLines, FAIL_LINES } from './model-call.js'
-import { chatCall, chatHello, chatBack, chatHoldsBack, chatParts, chatActionArgv, chatActionLines, chatNeedsPlugin, chatActionTail, chatActionRead } from './chat.js'
+import { chatCall, chatHello, chatBack, chatHoldsBack, chatParts, chatActionArgv, chatActionLines, chatNeedsPlugin, chatNoAgent, chatActionTail, chatActionRead } from './chat.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { typedAboutKept, laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor, noteLast } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
@@ -355,6 +355,8 @@ export function makePage(ctx, opts = {}) {
           if (r.blocked) return setAct(id, { ...base, state: 'failed', tail: typeof r.hint === 'string' && r.hint.trim() ? [r.hint.trim()] : [] })
           if (r.code !== 0) {
             if (stepNow === 'preview' && chatNeedsPlugin(lines)) return setAct(id, { ...base, state: 'plugin' })
+            // round 20:12 (hhtech's points 2 and 3): the other program is not on this computer: plain words, no path
+            if (stepNow === 'preview' && chatNoAgent(lines)) return setAct(id, { ...base, state: 'missing' })
             return setAct(id, { ...base, state: 'failed', tail: chatActionTail(lines) })
           }
           // the add-on is in: now the preview the person asked for with "Do it for me"
