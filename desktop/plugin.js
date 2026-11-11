@@ -30783,7 +30783,11 @@ function makePage(ctx, opts = {}) {
       // talk v2 look (hhdesign's notes-wants.md rule C point 3, settled by Lead): only the newest line keeps
       // its opened part; the line that moves up into the older lines closes its steps or text to paste, and
       // its link stays, so one click opens them again. No wall of text.
-      setLog(old => (memory.log = [...old.map(e => (e.opened ? { ...e, opened: false } : e)), ...entries].slice(-LOG_MAX)))
+      // loom-fixes (found in the app run: his typed "can we start from the begining" was not shown, and so not kept):
+      // memory.log is written here at once, not inside React's updater, which React may run later; runSetup reads
+      // memory.log straight after this call to put Helper's lines under the message
+      memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...entries].slice(-LOG_MAX)
+      setLog(memory.log)
     }
     // Helper's answer to something the person did. shown: the person's side of it, as their message.
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.

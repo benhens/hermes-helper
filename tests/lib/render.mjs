@@ -156,6 +156,7 @@ export function mount(Component) {
   // is drawn after all effects of that draw have run, not in the middle of them.
   let flushing = false
   let dirty = false
+  let scheduled = false
   const view = { tree: null }
 
   const same = (a, b) => a && b && a.length === b.length && a.every((v, k) => Object.is(v, b[k]))
@@ -164,7 +165,27 @@ export function mount(Component) {
       const k = i++
       if (!(k in slots)) slots[k] = { value: typeof init === 'function' ? init() : init }
       const slot = slots[k]
+      // loom-fixes: with globalThis.__hhLazyUpdaters on, a function given to a setter runs later, at the next draw,
+      // as React does when other updates wait (it batches them): code that reads its own copy of the state straight
+      // after the setter must not count on the function having run (the app run found such a fault)
+      if (slot.q && slot.q.length) {
+        const q = slot.q
+        slot.q = []
+        for (const f of q) slot.value = f(slot.value)
+      }
       const set = v => {
+        if (globalThis.__hhLazyUpdaters && typeof v === 'function') {
+          ;(slot.q = slot.q || []).push(v)
+          if (!scheduled) {
+            scheduled = true
+            queueMicrotask(() => {
+              scheduled = false
+              if (rendering || flushing) dirty = true
+              else render()
+            })
+          }
+          return
+        }
         slot.value = typeof v === 'function' ? v(slot.value) : v
         if (rendering || flushing) dirty = true
         else render()

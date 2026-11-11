@@ -86,6 +86,30 @@ const youAreHere = view => {
   return s.length ? s[0].props['data-stop'] : null
 }
 
+// loom-fixes: the same conversation with React's later running of state updates (tests/lib/render.mjs): in the app
+// run his typed "can we start from the begining" vanished from the conversation, which the eager stand-in did not show
+test('his Loom conversation with state updates run later, as React may: every message he typed stays in the conversation, and in the kept lines', opt, async () => {
+  globalThis.__hhLazyUpdaters = true
+  try {
+    const storage = fakeStorage({ met: true, kept: { setup_current: 'first_chat' } })
+    const { view } = await open({ storage })
+    finish(view)
+    const typedHere = ['hey', 'can we start from the begining', 'How can I migrate from OpenClaw?', 'what is hindsight']
+    await send(view, 'hey')
+    await press(view, 'Set up Hermes')
+    await press(view, "Yes, I'm new")
+    await send(view, 'can we start from the begining')
+    await send(view, 'How can I migrate from OpenClaw?')
+    await send(view, 'what is hindsight')
+    const mine = all(helper(view), n => n.props['data-hh'] === 'me').map(n => q(text(n)).replace(/^You said: /, ''))
+    for (const t of typedHere) assert.ok(mine.includes(t), `${t} is shown (${mine.join(' | ')})`)
+    const kept = (storage.data.get('talk') || []).filter(e => e.who === 'you').map(e => e.text)
+    for (const t of typedHere) assert.ok(kept.includes(t), `${t} is kept (${kept.join(' | ')})`)
+  } finally {
+    delete globalThis.__hhLazyUpdaters
+  }
+})
+
 test('his Loom conversation, message for message (hey; Set up Hermes; Yes, I\'m new; can we start from the begining; How can I migrate from OpenClaw?; what is hindsight; What Hermes is; Set up Hermes)', opt, async () => {
   // as in the Loom: he had been here before, and the thing kept as current was First chat
   const storage = fakeStorage({ met: true, kept: { setup_current: 'first_chat' } })
