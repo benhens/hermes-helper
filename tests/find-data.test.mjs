@@ -50,11 +50,12 @@ test('a fact line shows its docs source and its button: a copy box (d_uninstall)
   assert.equal(a.offer, undefined, 'no offer under a fact line')
 })
 
-test('the OpenAI-key line names Settings, "Providers", "API keys" and has no button (nothing in the plugin opens that place)', () => {
+// find-v2 (Lead's answer 4): that place has an address now (#/settings?tab=providers&pview=keys), seen in the app
+test('the OpenAI-key line names Settings, "Providers", "API keys", with the button "Open API keys" to that place', () => {
   const k = say(visit(), 'where do i put my openai key')
   assert.equal(k.line, 'KEY_WHERE')
   assert.match(k.text, /Open Settings, then "Providers", the AI companies, then "API keys"/)
-  assert.equal(k.next, null)
+  assert.deepEqual(k.next, { kind: 'part', label: 'Open API keys', to: '/settings?tab=providers&pview=keys' })
 })
 
 test('"can it make pictures for me" is a question, not a request to build: the picture row, never "I can\'t do that" (the build pair "for me" + "make" gave H1)', () => {

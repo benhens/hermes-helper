@@ -409,7 +409,7 @@ test('the service fills the text to paste: from the picked answer, from the key 
 })
 
 test('part buttons open Hermes\'s own screens; Bots has no screen a button can open: in its place the line about where the tab is', () => {
-  assert.deepEqual(Object.keys(PARTS).sort(), ['bots', 'capabilities', 'messaging', 'model'])
+  assert.deepEqual(Object.keys(PARTS).sort(), ['bots', 'capabilities', 'keys', 'messaging', 'model']) // find-v2: API keys
   assert.equal(PARTS.messaging.to, '/messaging')
   assert.equal(PARTS.model.to, '/settings?tab=config:model')
   let st = freshVisit()

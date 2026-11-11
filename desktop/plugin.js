@@ -25481,8 +25481,14 @@ const PARTS = {
   model: { name: 'Model', to: TALK_DATA.parts.model.navigate },
   messaging: { name: 'Messaging', to: TALK_DATA.parts.messaging.navigate },
   capabilities: { name: 'Capabilities', to: '/capabilities' },
-  bots: { name: 'Bots', where: TALK_DATA.parts.bots.where_line }
+  bots: { name: 'Bots', where: TALK_DATA.parts.bots.where_line },
+  // find-v2 (Lead's answer 4 to find-v1's questions): Settings, Providers, API keys, the address hhtech opened in the app
+  // (ask-run 3, "In the app"); host.navigate to it seen in dev/checks/find-v2/app-run-keys
+  keys: { name: 'API keys', to: '/settings?tab=providers&pview=keys' }
 }
+// find-v2: the key lines' button (the Builder's, not the data's: KEY_WHERE had none, KEY_WHAT had Open Model)
+const KEY_BUTTON = { kind: 'part', label: 'Open API keys', part: 'keys' }
+for (const id of ['KEY_WHERE', 'KEY_WHAT']) if (FIXED[id]) FIXED[id] = { ...FIXED[id], next: KEY_BUTTON }
 
 // The lines a button can make Helper say: [id]: { text, source }.
 const EXTRA_LINES = (() => {

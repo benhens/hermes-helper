@@ -87,3 +87,13 @@ test('on the built page: "where do i do that" after a line with no button: NO_MO
   assert.equal(answerLine(view), 'NO_MORE')
   assert.equal(host.asks.length, 0)
 })
+
+// find-v2 part 5 (4) (Lead's answer 4 to find-v1's questions): hhtech opened Settings at #/settings?tab=providers&pview=keys
+// (Providers, API keys). The key lines get a button "Open API keys" that goes there through host.navigate (seen working
+// in the app run, dev/checks/find-v2/app-run-keys).
+test('the key lines (where a key goes, what a key is) have the button "Open API keys" to Settings, Providers, API keys', () => {
+  for (const m of ['where do i put my api key', 'what is an api key']) {
+    const { said } = say(visit(), m)
+    assert.deepEqual([said.next && said.next.kind, said.next && said.next.label, said.next && said.next.to], ['part', 'Open API keys', '/settings?tab=providers&pview=keys'], m)
+  }
+})

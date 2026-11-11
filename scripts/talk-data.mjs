@@ -99,7 +99,7 @@ const LIFTED = { W2: ['2 Hermes terms in one line'], 'msg1-then': ['term not exp
   d_toolsets: ['30 words > 25', 'banned term toolset'] }
 // The parts a fixed line's "Open ..." button may name (src/talk.js PARTS has these; a test keeps
 // the two lists equal).
-export const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots']
+export const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots', 'keys']
 // Row 5 of docs/build/talk-v2-plan.md (the wants: "Web, files, pictures and voice" under C1) is in
 // this build (job talk-v2-wants): C1 says its full text and holds the wants pick first. With
 // WANTS_BUILT false, held_picks.note: the held picks that are not topics are dropped, and C1 says
