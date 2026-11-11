@@ -216,6 +216,17 @@ test('the lines that say what is sent name the three rows, as the data words the
   const whole = text(helper(view)).replace(/’/g, "'")
   assert.equal(whole.split(all3).length - 1, 1, 'once, under the first Kept: line of the three')
   assert.doesNotMatch(whole, /I also tell your AI what you do when I ask it for help\./, 'the older line, true only while one thing was sent, is not said')
-  const { SETTINGS_TOP_LINE_2 } = await import('../../src/settings-page.js').catch(() => ({}))
-  if (SETTINGS_TOP_LINE_2 !== undefined) assert.equal(SETTINGS_TOP_LINE_2, 'These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.')
+})
+
+// Helper's settings page, on the built file: the line under the title says what goes to the AI, truthfully for the build
+async function settingsLine(change) {
+  useHost(() => 'NONE')
+  const reg = await registerPlugin(fakeStorage({ kept: { name: 'Peter', work: 'I run a tennis club' } }), fakeTimers(), {}, src => change(aiModeSource(src, 'ai_writes')))
+  const view = mount(reg.settingsPages[0].render().type)
+  await settle()
+  return all(view.tree, n => n.type === 'sdk:ListRow')[0].props.description
+}
+test('the settings page\'s line about what goes to the AI: the three rows when the recommendation asks the AI; only What you do when it does not', opt, async () => {
+  assert.equal(await settingsLine(x => x), 'These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.')
+  assert.equal(await settingsLine(src => setupAiSource(src, 'false')), 'Only the What you do line is sent to your AI, when Helper asks it for help.')
 })
