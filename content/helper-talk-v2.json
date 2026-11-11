@@ -775,7 +775,8 @@
     "see_line": "This is all I keep about you.",
     "see_line_nothing": "I keep nothing about you yet.",
     "see_line_deleted": "Everything I kept about you is deleted. I only remember that we have met.",
-    "see_line_deleted_when": "Nothing is kept, and this conversation already shows at least one grey Kept: or From what I keep: line (struck through or not). That means something was kept and has since been deleted (Delete all of it, forgetting things one by one, or Forget all of this on Helper's page in Hermes). Otherwise see_line_nothing. No button in either case.",
+    "see_line_deleted_when": "Nothing is kept, and this conversation already shows at least one of these, struck through or not: a grey Kept: line; a grey From what I keep: line; the see list with at least one kept row under see_line; delete_all.after_yes (Done. I keep nothing about you now. ...); typed.forget_one.after_yes (Done. I no longer keep that.). Each can only mean something was kept, and nothing is kept now, so it was deleted (Delete all of it, forgetting things one by one, or Forget all of this on Helper's page in Hermes). Otherwise see_line_nothing. No button in either case. The same on a first or a later visit: only what this conversation shows counts, never the flag met.",
+    "see_line_deleted_when_was_qs1": "Nothing is kept, and this conversation already shows at least one grey Kept: or From what I keep: line (struck through or not). That means something was kept and has since been deleted (Delete all of it, forgetting things one by one, or Forget all of this on Helper's page in Hermes). Otherwise see_line_nothing. No button in either case.",
     "delete_all": {
      "label": "Delete all of it",
      "question": "Delete everything I keep about you?",
@@ -4529,11 +4530,14 @@
    "use_now": "no_ai_step",
    "use_now_note": "Must say the same as keeps.disclosure_point_11.use_now. A build that calls a model for typed messages must switch both. live-v2: also must equal helper-talk-live-v2.json mode.use_now."
   },
-  "cut_rule": "Kind cut, checked after the lists: (a) the message has no letter and no digit at all (?, ..., ??); (b) it is one letter; (c) stage open and nothing pending: it is one word of 2 or 3 letters, or one of cut_question_words, and it is in no list of this block, and no topic key word, misspelling or term key word matches it; (d) stage open and nothing pending: it has at most 4 words and its last word is one of cut_dangling. At stage name, (c) and (d) do not apply: Al, Bo, Eva and Max are names. Before (c): how_after_rows (how right after a line from rows is kind mean).",
+  "cut_rule": "Kind cut, checked after the lists: (a) the message has no letter and no digit at all (?, ..., ??); (b) it is one letter; (c) stage open and nothing pending: it is one word of 2 or 3 letters, or one of cut_question_words, and it is in no list of this block, and no topic key word, misspelling or term key word matches it; (d) stage open and nothing pending: it has at most 4 words and its last word is one of cut_dangling. At stage name, (c) and (d) do not apply: Al, Bo, Eva and Max are names. Before (c): how_after_rows (how, and, and then right after a line from rows are kind mean).",
   "how_after_rows": {
    "words": [
-    "how"
+    "how",
+    "and",
+    "and then"
    ],
+   "words_note": "live-v2 changes-2 (Lead's job of 11 Nov 02:58): and and and then added (so also and? and and then?). The whole message is compared, so these may be more than one word; the one-word limit of rule (c) does not apply here. and then was N1 here before, not CUT; it now gets what mean_rule gives, like how.",
    "after": [
     "row",
     "plain",
@@ -4543,7 +4547,7 @@
     "WHERE",
     "written"
    ],
-   "rule": "live-v2 changes-1 (Lead's job of 11 Nov 02:45; the Builder's talk-live-plan finding 3). Checked just before cut rule (c), under the same conditions (stage open, nothing pending, no topic key word, misspelling or term key word): when the whole message, after the usual cuts (so how? and how?? too), is one of words, and Helper's last line in this visit is one of after, the kind is mean, not cut. It then gets what mean_rule gives: after a topic's row, that topic's plain line with its next; after its plain line, a term line, COST, WHERE or a wants row, MEAN_NONE. In a build with an AI step it is a follow-up (helper-talk-live-v2.json follow_up). After any other line (BACK, OK, CUT, N1, a skill line ...), how stays cut, as before.",
+   "rule": "live-v2 changes-1 (Lead's job of 11 Nov 02:45; the Builder's talk-live-plan finding 3). Checked just before cut rule (c), under the same conditions (stage open, nothing pending, no topic key word, misspelling or term key word): when the whole message, after the usual cuts (so how? and how?? too), is one of words, and Helper's last line in this visit is one of after, the kind is mean, not cut. It then gets what mean_rule gives: after a topic's row, that topic's plain line with its next; after its plain line, a term line, COST, WHERE or a wants row, MEAN_NONE. In a build with an AI step it is a follow-up (helper-talk-live-v2.json follow_up). After any other line (BACK, OK, CUT, N1, a skill line ...), how and and stay cut and and then stays N1, as before.",
    "after_note": "The same list as helper-talk-live-v2.json follow_up.rule. wants: a row of helper-wants-v1.json (the plugin's kind want). written: a reply written by the person's AI that used rows (AI builds only)."
   },
   "cut_question_words": [

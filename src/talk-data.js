@@ -1007,7 +1007,9 @@ export const TALK_DATA = {
     ],
     "how_after_rows": {
       "words": [
-        "how"
+        "how",
+        "and",
+        "and then"
       ],
       "after": [
         "row",

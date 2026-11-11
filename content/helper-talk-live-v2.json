@@ -44,7 +44,7 @@
     "rows": "The rows handed for the person's previous message, in the same order, plus for each of them its next line when helper-talk-v2.json gives it as kind line (bot1-next, use-more, use1-next, use3-next), as a row of its own. If the previous message got a line with no rows (a code line), the row of that line and its next line. At most 5.",
     "why": "hhtech's finding: the AI can answer \"and then?\" only when the next step is inside the handed rows (docs/answers/hhtech-live-reply.md, For hhcontent).",
     "gap": "Most rows carry their next step as a button (a paste box or Open Model), not as text, so for them the AI can only say it has not checked what comes next. The paste texts are not handed: they hold <slots> and are written for the person's own Hermes.",
-    "how_note": "live-v2 changes-1: how and how? right after a line from rows are kind mean in the no-AI turn (helper-talk-v2.json small_talk.how_after_rows), no longer CUT, so step 2 does not stop them: their result is plain with why \"what do you mean\" or MEAN_NONE, both in code_answers.go_to_ai. and (also a phrase here) still gets CUT from cut rules (c) and (d); not changed, see content/helper-talk-live-v2-changes-1.md.",
+    "how_note": "live-v2 changes-1: how and how? right after a line from rows are kind mean in the no-AI turn (helper-talk-v2.json small_talk.how_after_rows), no longer CUT, so step 2 does not stop them: their result is plain with why \"what do you mean\" or MEAN_NONE, both in code_answers.go_to_ai. live-v2 changes-2: and, and? and and then, and then? join them (how_after_rows.words), so and is no longer CUT there; and then was N1 before and was already a follow-up with an AI step.",
     "status": "not_run"
   },
 

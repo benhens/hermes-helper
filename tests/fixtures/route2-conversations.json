@@ -22179,17 +22179,1087 @@
      "text": "how?"
     }
    ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 and after a row: that topic's plain line",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "things about me"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what do you mean"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 and? after a row: the same",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "things about me"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what do you mean"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 and then after a row: the same (was N1)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "things about me"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what do you mean"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 and then? after a row: the same",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "things about me"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what do you mean"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MEAN_NONE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 and? after a term line: MEAN_NONE",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MEAN_NONE"
+     },
+     "shown": "MEAN_NONE",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MEAN_NONE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 and then? after COST: MEAN_NONE",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "COST"
+     },
+     "shown": "COST",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how much does it cost"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MEAN_NONE"
+     },
+     "shown": "MEAN_NONE",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "MEAN_NONE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 and then? after a plain line: MEAN_NONE",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mod"
+     },
+     "shown": "question mod",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mod",
+      "stage": "open",
+      "work": null
+     },
+     "text": "which model?"
+    },
+    {
+     "do": "pick",
+     "i": 0,
+     "out": {
+      "first": true,
+      "kept": [
+       "mod"
+      ],
+      "kind": "row",
+      "need": "mod1",
+      "topic": "mod"
+     },
+     "shown": "line mod1 +kept=mod +first",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {
+       "mod": "mod1"
+      },
+      "kept": {
+       "mod": "mod1",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "topic": "mod"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mod",
+      "why": "what do you mean"
+     },
+     "shown": "plain line mod0",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {
+       "mod": "mod1"
+      },
+      "kept": {
+       "mod": "mod1",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "huh"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MEAN_NONE"
+     },
+     "shown": "MEAN_NONE",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {
+       "mod": "mod1"
+      },
+      "kept": {
+       "mod": "mod1",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "CUT",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 kept: and? with nothing before: CUT",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "CUT"
+     },
+     "shown": "CUT",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "CUT",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 kept: and after OK: CUT",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "OK"
+     },
+     "shown": "OK",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "ok"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "CUT"
+     },
+     "shown": "CUT",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 kept: and then? after OK: N1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "OK"
+     },
+     "shown": "OK",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "ok"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1_AGAIN +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 kept: and then? after N1: N1_AGAIN, as before (no_repeat)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can it fly a plane"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1_AGAIN",
+      "repeat_of": "N1"
+     },
+     "shown": "N1_AGAIN +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 kept: and next after a row: N1 (not in the list)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "things about me"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and next"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mod0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 kept: and? while a question is open: an answer to it, as before",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mod"
+     },
+     "shown": "question mod",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mod",
+      "stage": "open",
+      "work": null
+     },
+     "text": "which model?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mod"
+     },
+     "shown": "plain line mod0",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and?"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "CUT",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc2 kept: and? on a later visit, after BACK: CUT",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "name"
+      ],
+      "kind": "F1",
+      "name": "Peter"
+     },
+     "shown": "F1 name=Peter +kept=name +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": "Peter",
+      "pending": null,
+      "stage": "work",
+      "work": null
+     },
+     "text": "Peter"
+    },
+    {
+     "do": "skip",
+     "out": {
+      "kind": "F3"
+     },
+     "shown": "F3",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": "Peter",
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "visit"
+    },
+    {
+     "do": "open",
+     "out": {
+      "kind": "BACK",
+      "name": "Peter"
+     },
+     "shown": "BACK name=Peter",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "CUT"
+     },
+     "shown": "CUT",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and?"
+    }
+   ]
   }
  ],
- "json_sha256": "575105bec6781282d63b7f9ee681a298ffc834ca1e415601f945d16d8773aa72",
+ "json_sha256": "3440302a8171d1a09b0964c519008b9d143cc9b4730a7d76b689207240d593ce",
  "keeps_off": false,
  "last_printed_lines": [
-  "ok    lc1 kept: how? on a later visit, after BACK: CUT: F1 name=Peter +kept=name +first | F3 | BACK name=Peter | CUT",
+  "ok    lc2 kept: and? on a later visit, after BACK: CUT: F1 name=Peter +kept=name +first | F3 | BACK name=Peter | CUT",
   "",
-  "conversations: 430 of 430 as expected"
+  "conversations: 444 of 444 as expected"
  ],
  "no_wants": false,
- "route2_sha256": "55160e1e72b692d2d3dbe7f9c970eeae1eb9845e72d90b97c276eac07dc17c3c",
+ "route2_sha256": "2188b2d67f284ec7e7b4f508695c3c6a7c1bc174b4c8f5f77588e39d79a491df",
  "singles": [
   {
    "landed": "mem",

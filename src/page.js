@@ -24,7 +24,7 @@ import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { laterVisit, turnParts, keptWords, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
@@ -180,8 +180,7 @@ export function makePage(ctx, opts = {}) {
     w.stopTimer()
     w.endBusy()
     const result = final || w.out
-    const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
-    const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown })
+    const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
     const entry = { ...helperEntry(said), send: w.sendHelper }
     memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
@@ -437,9 +436,8 @@ export function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     function answer(result, shown, typed = '') {
       if (!result) return
-      // helper-builder-qs-v1.md point 3: the conversation already shows a "Kept:" or "From what I keep:" line
-      const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
-      const said = lineFor(result, visit, typed, { settingsPage, keptShown })
+      // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
+      const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)

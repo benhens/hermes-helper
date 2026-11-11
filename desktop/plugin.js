@@ -1397,7 +1397,9 @@ const TALK_DATA = {
     ],
     "how_after_rows": {
       "words": [
-        "how"
+        "how",
+        "and",
+        "and then"
       ],
       "after": [
         "row",
@@ -15298,8 +15300,9 @@ function smallTalk(text, st) {
     if (!letters || (one && t.length === 1)) kind = 'cut' // rules a and b
     else if (!opening && saysWrong(t) && !known) kind = 'wrong' // changes-17 wrong_rule_17
     else if (!opening && !st.pending && !known) {
-      // live-v2 changes-1: "how" right after a line from rows is kind mean (checked just before rule c)
-      if (one && ST.how_after_rows.words.includes(t) && HOW_AFTER.includes(st.last)) kind = 'mean'
+      // live-v2 changes-1 and -2: "how", "and", "and then" right after a line from rows is kind mean (checked just
+      // before rule c; the whole message after the usual cuts, so an entry may have two words)
+      if (ST.how_after_rows.words.includes(t) && HOW_AFTER.includes(st.last)) kind = 'mean'
       else if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
       else if (ws.length <= 4 && ST.cut_dangling.includes(ws[ws.length - 1])) kind = 'cut' // rule d
       else if (ws.length <= 3 && ws.length > 1 && OPENING.question_starts.includes(ws[0]) && ws.slice(1).every(w => ST.cut_small_words.includes(w))) kind = 'cut' // changes-17 rule e
@@ -15817,13 +15820,20 @@ function openingLine(st = null) {
 // result: what turn, pick, pickTopic, press, skip, sayLine, change, rmPick or forgetAnswer
 // returned. typed: the person's words (for the text to paste under "your own Hermes can").
 // opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it). opts.keptShown: the
-// conversation already shows a "Kept:" or "From what I keep:" line (A1 with nothing kept then says it was deleted).
+// conversation shows that something was kept (keptWasShown; A1 with nothing kept then says it was deleted).
 // Returns { line, text, source, answers, next, paste, note, used, hint, rows, docs }:
 //   docs: the box "From the Hermes docs" { head, words, source } (S1, S2), the page's own words;
 //   next may also be { kind: 'steps', label, steps, after } (the clicks to add an optional skill);
 //   an answer to pick may be { more: [the next ones] } ("More", three at a time, src/page.js).
 //   note: the faint "Kept: ..." line { text, link, first }; used: "From what I keep: ..." { text,
 //   link, topic }; hint: a small faint line (N_HINT); rows: the list of kept things (A1).
+// live-v2 changes-2 (keeps.tell.see.see_line_deleted_when): whether this conversation shows that something was kept:
+// a faint "Kept:" or "From what I keep:" line, a kept row in the list, or the "Done." line of a delete (all, or one
+// thing). Only what this conversation shows counts, never the met mark, so every visit answers alike.
+function keptWasShown(log) {
+  const done = [KEEPS.tell.see.delete_all.after_yes, KEEP_TYPED.forget_one.after_yes]
+  return log.some(e => e.who === 'helper' && !!(e.note || e.used || (e.rows && e.rows.length) || done.includes(e.text)))
+}
 function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
@@ -15956,8 +15966,8 @@ function lineFor(result, st, typed = '', opts = {}) {
       return said('RM2', RM.RM2.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: RM.RM2.answers.map(a => ({ id: `rm-${a.gives}`, label: a.label, rm: a.gives === 'RM3' ? 'helper' : 'hermes' })) } })
     case 'A1': {
       const rows = keptRows(st.kept)
-      // helper-builder-qs-v1.md point 3: nothing kept, and this conversation already shows a "Kept:" or "From
-      // what I keep:" line (opts.keptShown, from the page): it was deleted. Else nothing was kept yet.
+      // live-v2 changes-2: nothing kept, and this conversation shows something was kept (opts.keptShown, from the
+      // page's keptWasShown): it was deleted. Else nothing was kept yet.
       if (!rows.length) return opts.keptShown ? said('A1-deleted', KEEPS.tell.see.see_line_deleted) : said('A1-none', KEEPS.tell.see.see_line_nothing)
       // with Helper's settings page: its button, and under the list the way there by hand
       const next = opts.settingsPage ? { kind: 'settings', label: KEEPS.after_settings_page_exists.button_under_see } : { kind: 'forget-all', label: ALL.label }
@@ -18785,8 +18795,7 @@ function makePage(ctx, opts = {}) {
     w.stopTimer()
     w.endBusy()
     const result = final || w.out
-    const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
-    const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown })
+    const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
     const entry = { ...helperEntry(said), send: w.sendHelper }
     memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
@@ -19042,9 +19051,8 @@ function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     function answer(result, shown, typed = '') {
       if (!result) return
-      // helper-builder-qs-v1.md point 3: the conversation already shows a "Kept:" or "From what I keep:" line
-      const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
-      const said = lineFor(result, visit, typed, { settingsPage, keptShown })
+      // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
+      const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
