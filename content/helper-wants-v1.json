@@ -324,7 +324,8 @@
     "google it",
     "web search"
    ],
-   "title_was_t2": "Search the web"
+   "title_was_t2": "Search the web",
+   "pick_label": "Searching the web"
   },
   {
    "id": "w_browser",
@@ -399,7 +400,8 @@
     "use a website",
     "browser"
    ],
-   "title_was_t2": "Use a website for me"
+   "title_was_t2": "Use a website for me",
+   "pick_label": "Using websites for you"
   },
   {
    "id": "w_xpost",
@@ -454,7 +456,8 @@
     "twitter",
     "tweet"
    ],
-   "title_was_t2": "Post on X for me"
+   "title_was_t2": "Post on X for me",
+   "pick_label": "X (Twitter)"
   },
   {
    "id": "w_reddit",
@@ -604,7 +607,8 @@
     "word file",
     "excel file"
    ],
-   "title_was_t2": "Read my documents"
+   "title_was_t2": "Read my documents",
+   "pick_label": "Reading Word, Excel, PDF"
   },
   {
    "id": "w_pdf",
@@ -655,7 +659,8 @@
     "edit a pdf",
     "fill in a pdf"
    ],
-   "title_was_t2": "Make or change a PDF"
+   "title_was_t2": "Make or change a PDF",
+   "pick_label": "Editing PDF files"
   },
   {
    "id": "w_office",
@@ -712,7 +717,8 @@
     "word document",
     "make slides"
    ],
-   "title_was_t2": "Make Word or Excel files"
+   "title_was_t2": "Make Word or Excel files",
+   "pick_label": "Making Word or Excel files"
   },
   {
    "id": "w_notes",
@@ -819,7 +825,8 @@
     "action items",
     "meeting minutes"
    ],
-   "title_was_t2": "Sort out meeting notes"
+   "title_was_t2": "Sort out meeting notes",
+   "pick_label": "Meeting notes into tasks"
   },
   {
    "id": "w_code",
@@ -944,7 +951,8 @@
     "click and type",
     "use my apps"
    ],
-   "title_was_t2": "Click and type for me"
+   "title_was_t2": "Click and type for me",
+   "pick_label": "Using your computer's apps"
   },
   {
    "id": "w_image",
@@ -1017,7 +1025,8 @@
     "draw a picture",
     "generate an image"
    ],
-   "title_was_t2": "Make pictures"
+   "title_was_t2": "Make pictures",
+   "pick_label": "Making pictures"
   },
   {
    "id": "w_see",
@@ -1090,7 +1099,8 @@
     "look at my pictures",
     "read a screenshot"
    ],
-   "title_was_t2": "Look at my pictures"
+   "title_was_t2": "Look at my pictures",
+   "pick_label": "Looking at a photo"
   },
   {
    "id": "w_video",
@@ -1144,7 +1154,8 @@
     "text to video",
     "video generation"
    ],
-   "title_was_t2": "Make a video from text"
+   "title_was_t2": "Make a video from text",
+   "pick_label": "Making a video"
   },
   {
    "id": "w_anim",
@@ -1255,7 +1266,8 @@
     "talking head video",
     "ai presenter"
    ],
-   "title_was_t2": "Make a presenter video"
+   "title_was_t2": "Make a presenter video",
+   "pick_label": "Video with an AI presenter"
   },
   {
    "id": "w_youtube",
@@ -1306,9 +1318,15 @@
     "youtube",
     "summarise a video",
     "summarize a video",
-    "youtube summary"
+    "youtube summary",
+    "youtube video",
+    "youtube videos",
+    "watch youtube",
+    "watch a video",
+    "watch videos"
    ],
-   "title_was_t2": "Sum up a YouTube video"
+   "title_was_t2": "Sum up a YouTube video",
+   "changed": "live-v2-c13"
   },
   {
    "id": "w_meme",
@@ -1410,7 +1428,8 @@
     "by voice",
     "use my voice"
    ],
-   "title_was_t2": "Talk to it out loud"
+   "title_was_t2": "Talk to it out loud",
+   "pick_label": "Talking out loud"
   },
   {
    "id": "w_aloud",
@@ -1470,7 +1489,8 @@
     "tts",
     "read it out"
    ],
-   "title_was_t2": "Read answers out loud"
+   "title_was_t2": "Read answers out loud",
+   "pick_label": "Reading answers aloud"
   },
   {
    "id": "w_stt",
@@ -1585,7 +1605,8 @@
     "song lyrics",
     "suno"
    ],
-   "title_was_t2": "Write a song"
+   "title_was_t2": "Write a song",
+   "pick_label": "Songs and music AI"
   },
   {
    "id": "w_papers",
@@ -1689,7 +1710,8 @@
     "route to",
     "time zone"
    ],
-   "title_was_t2": "Find places and routes"
+   "title_was_t2": "Find places and routes",
+   "pick_label": "Places, routes, time zones"
   },
   {
    "id": "w_stocks",
@@ -1754,7 +1776,8 @@
     "crypto price",
     "bitcoin price"
    ],
-   "title_was_t2": "Check stock prices"
+   "title_was_t2": "Check stock prices",
+   "pick_label": "Stock and crypto prices"
   },
   {
    "id": "w_prices",
@@ -1810,7 +1833,8 @@
     "price drop",
     "track a price"
    ],
-   "title_was_t2": "Watch a price for me"
+   "title_was_t2": "Watch a price for me",
+   "pick_label": "Watching a product's price"
   }
  ],
  "skill_name_rule": "Changes-6, fix 3. A skill from the list below is reached by its name only when the name and the word skill or skills sit next to each other: the/a/an/this/that {name} skill(s) (changes-8: the word before the name is needed, so my sketch skills or I have no canvas skills name no skill), skill(s) called {name}, skill(s) named {name}, skill(s) for {name}, \"{name}\" skill. {name} may have spaces in place of its hyphens. Whole words. Code: dev/checks/hhcontent-changes-6/skill_next.py (PATTERNS). This step runs after the key check and the build words and BEFORE the six topics, so is there a github skill gets the github skill, not the svc question. A hand-written row for that skill wins. Otherwise line S1 or S2 with the page's own words in a box.",

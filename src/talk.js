@@ -324,7 +324,7 @@ export const TITLED = [
   ...TALK_DATA.topics.flatMap(t => [...(t.plain.title ? [[{ kind: 'plain', topic: t.id }, t.plain]] : []), ...t.needs.filter(n => n.title).map(n => [{ kind: 'row', topic: t.id, need: n.id }, n])]),
   ...TALK_DATA.terms.filter(t => t.title).map(t => [{ kind: 'term', term: t.id }, t]),
   ...WROWS.filter(w => w.title).map(w => [{ kind: 'want', row: w.id }, w])
-].map(([gives, x]) => ({ gives, title: x.title, phrases: x.phrases.map(ph => [nearWords(ph), nearContent(nearWords(ph))]), titleWords: new Set(nearContent(nearWords(x.title))), allWords: new Set([...nearContent(nearWords(x.title)), ...nearContent(nearWords(x.phrases.join(' ')))]) }))
+].map(([gives, x]) => ({ gives, title: x.title, label: x.pick_label && x.pick_label.trim() ? x.pick_label : x.title, phrases: x.phrases.map(ph => [nearWords(ph), nearContent(nearWords(ph))]), titleWords: new Set(nearContent(nearWords(x.title))), allWords: new Set([...nearContent(nearWords(x.title)), ...nearContent(nearWords(x.phrases.join(' ')))]) }))
 const runIn = (hay, run) => hay.some((_, i) => i + run.length <= hay.length && run.every((w, j) => hay[i + j] === w))
 // a line that shows the things it holds needs them on the result (C1's picks, W2's two words)
 const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds } : g.kind === 'W2' ? { ...g, buttons: TALK_DATA.w1_pairs.find(p => p.line === 'W2').terms } : { ...g })
@@ -349,8 +349,10 @@ export function fullHit(text, singleOk) {
 }
 // near.near_rule: up to three lines near the message: two or more shared content words (title and phrases), or one
 // that is in the title; most shared first, ties in the data's order; never the line Helper said last
+// find-v2 (live-v2 changes-13, near_rule): the words of near.never_near never count as shared (home, file, turn ...)
+const NEVER_NEAR = new Set([...(NEAR.never_near || []), ...nearWords((NEAR.never_near || []).join(' '))])
 export function nearLines(text, st) {
-  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))))
+  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w)))
   const sc = []
   TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
     const n = [...ms].filter(w => allWords.has(w)).length
@@ -358,18 +360,41 @@ export function nearLines(text, st) {
   })
   return sc.sort((a, b) => b[0] - a[0] || a[1] - b[1]).slice(0, 3).map(([, , gives, title]) => ({ gives: givesOf(gives), title }))
 }
+// find-v2: the sentence above near picks when a template would leave a place empty (changes-13's own words)
+const NEAR_FIXED_SENTENCE = 'Do you want one of these instead?'
+// find-v2 (live-v2 changes-13, route2.py PL): a title's short pick label, else the title
+const LABEL_OF_TITLE = new Map()
+const labelOfTitle = title => {
+  if (!LABEL_OF_TITLE.size) for (const t of TITLED) if (!LABEL_OF_TITLE.has(t.title)) LABEL_OF_TITLE.set(t.title, t.label)
+  return LABEL_OF_TITLE.get(title) || title
+}
 // near.say_rule: in the question a title starts with a small letter unless its first word is on keep_caps
 // Builder: nor when the first word is written in capitals ("YOLO mode" is not on keep_caps and came out as "yOLO mode")
 const nearSay = title => (NEAR.keep_caps.includes(title.split(/\s+/)[0]) || /^[A-Z][A-Z0-9.]+(\s|$)/.test(title) ? title : title.slice(0, 1).toLowerCase() + title.slice(1))
 // The offer under a don't-know line (route2.py turn): the near lines by title, each a thing to pick that gives its
 // line; with nothing near, the four starting things, the same every time (near.nothing_near_rule, Lead 11 Nov)
-function nearOffer(out, st) {
+// find-v2 (live-v2 changes-13, route2.py false_belief): [line id, display name] or null. Not when the message says nous.
+const FB = TALK_DATA.false_belief || null
+function falseBelief(text) {
+  const t = talkNorm(text)
+  if (hits(t, 'nous')) return null
+  const mk = Object.keys(FB.maker_names).filter(n => hits(t, n))
+  if (mk.length && whichOf(t, FB.maker_cues).length) return ['FB_MAKER', FB.maker_names[mk[0]]]
+  const pn = Object.keys(FB.plan_names).filter(n => hits(t, n))
+  if (pn.length && whichOf(t, FB.plan_words).length && whichOf(t, FB.need_words).length) return ['FB_PLAN', FB.plan_names[pn[0]]]
+  return null
+}
+export function nearOffer(out, st) {
   const nr = out.near_lines || []
   delete out.near_lines
   if (nr.length) {
     const says = nr.map(x => (x.gives.kind === 'want' ? NEAR.want_say.replace('{label}', () => nearSay(x.title)) : nearSay(x.title)))
     const tp = nr.length === 1 ? NEAR.template_1 : nr.length === 2 ? NEAR.template : NEAR.template_3
-    out.offer = { set: 'near', text: tp.replace(/\{([abc])\}/g, (m, k) => says['abc'.indexOf(k)] || ''), picks: nr.map(x => x.gives), labels: nr.map(x => x.title) }
+    // find-v2 (live-v2 changes-13, pick_label_rule): the sentence is near.template, the same for one to three picks, so
+    // it never has an empty place; should a template with places ever leave one empty, the fixed sentence is said.
+    // Each pick shows its line's pick_label, else its title
+    const text = tp.replace(/\{([abc])\}/g, (m, k) => says['abc'.indexOf(k)] || '')
+    out.offer = { set: 'near', text: /\{[abc]\}/.test(tp) && says.length < (tp.match(/\{[abc]\}/g) || []).length ? NEAR_FIXED_SENTENCE : text, picks: nr.map(x => x.gives), labels: nr.map(x => labelOfTitle(x.title)) }
     st.lastOffer = 'near'
   } else {
     const sid = NEAR.nothing_near_set
@@ -975,24 +1000,29 @@ function howThat(text, st) {
   t = t.replace(HT_CUT, '').trim() || t
   // breadth-t1 (near.bare_follow_rule): how / why / and then alone after an answer line, only where CUT would show
   const bare = NEAR.bare_follow.includes(t) && st.stage === 'open' && (BARE_AFTER.includes(st.last) || !!(FIXED[st.last] && FIXED[st.last].title)) && ['cut', null].includes(smallTalk(text, st))
+  // find-v2 (live-v2 changes-13, near.keep_subject_rule): "is that hard", "where do i do that" and the like as the whole
+  // message, right after an answer line, keep its subject: checked before any AI call, never sent to the list call
+  const keep = (NEAR.keep_subject || []).includes(t) && st.stage === 'open' && (BARE_AFTER.includes(st.last) || !!(FIXED[st.last] && FIXED[st.last].title))
   // find-v1 part 5 (Lead, 11 Nov; ask-run 2 "For builder" 3; not in route2.py, st.fullWins false only for replaying
   // it): one of those words alone while things to pick show (a question's answers, an offer, the picks under a
   // don't-know) goes to that line too: the things to pick stay, never "that looks cut off" with other picks in their place
   const picksShow = st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)
   if (st.fullWins !== false && picksShow && NEAR.bare_follow.includes(t) && st.stage === 'open' && ['cut', null].includes(smallTalk(text, st))) return { kind: 'PICK_FIRST', same_picks: true }
-  if (!HT.phrases.includes(t) && !bare) return null
+  if (!HT.phrases.includes(t) && !bare && !keep) return null
   // (1) the things to pick stay
   if (st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)) return { kind: 'PICK_FIRST', same_picks: true }
-  const [then, nx] = lastNext(st)
+  let [then, nx] = lastNext(st) // eslint-disable-line prefer-const (find-v2: nx may be dropped below)
   const p = st.lastParts || {}
   if (then) {
     st.pending = null
     return p.kind === 'row' ? { kind: 'rowthen', topic: p.topic, need: p.need } : { kind: 'then', topic: p.topic }
   }
   if (nx && nx.kind === 'line') return { kind: 'nextline', of: p.kind, topic: p.topic, need: p.need, term: p.term, text: nx.text, id: nx.id }
+  // find-v2 (live-v2 changes-13, how_that.label_empty_rule): a part or paste button with a blank label is no button
+  if (nx && (nx.kind === 'paste' || nx.kind === 'part') && !String(nx.label || '').trim()) nx = null
   if (nx && nx.kind === 'paste') return { kind: 'HOW_PASTE', label: nx.label, button: nx, topic: p.topic }
   if (nx && nx.kind === 'part') return { kind: 'HOW_PART', label: nx.label, button: nx, topic: p.topic }
-  if (bare) return { kind: 'NO_MORE' }
+  if (bare || keep) return { kind: 'NO_MORE' }
   return null
 }
 // live changes-9 (not in route2.py): a next line's second wording (use1-next-mean), by the next line's id
@@ -1340,6 +1370,12 @@ function turnSteps(text, st) {
   if (remember(text, st, out)) return out
   const about = typedAboutKept(text)
   if (about) return Object.assign(out, aboutKept(about, st))
+  // find-v2 (live-v2 changes-13, false_belief.rule): a maker named with a cue ("is hermes made by OpenAI?"), or a plan
+  // named with a plan word and a need word ("so it needs a ChatGPT subscription"): a plain correction, no AI call
+  if (st.stage === 'open' && TALK_DATA.false_belief && !buildHit(text)) {
+    const fb = falseBelief(text)
+    if (fb) return done(fb[0], { need: fb[1], name: fb[1] })
+  }
   // breadth-t1 (near.first_step): a full hit by a phrase of two or more words (the new fact lines and first_step_old);
   // while a question is open, only a message of three or more words
   // Builder: not when the message names one official skill next to the word skill (the plugin's own step below, which
@@ -2093,6 +2129,13 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('A2-' + result.what, ONE.questions[result.what], { answers: yesNo(ONE.answers, result.what) })
     case 'A4':
       return said('A4', ALL.question, { answers: yesNo(ALL.answers, 'all') })
+    // find-v2 (live-v2 changes-13): the correction of a false belief; {name} is the display name of the word that
+    // matched, never empty. A next that is a line with no label of its own (FB_MAKER's HERMES) is no button
+    case 'FB_MAKER':
+    case 'FB_PLAN': {
+      const l = TALK_DATA.false_belief.lines[result.kind]
+      return said(result.kind, fillSlots(l.text, { name: result.name }), { source: l.source || null, next: l.next && l.next.label ? nextFor(l.next, null, st) : null })
+    }
     case 'A-none':
       return said('A-none', ONE.nothing_kept)
     case 'A-yes':

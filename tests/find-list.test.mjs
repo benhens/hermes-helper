@@ -33,9 +33,9 @@ async function ask(st, text, replies, mode = 'ai_writes') {
 }
 const good = id => `${LIVE_ROW[id].text}\nUSED: ${id}`
 
-test('the list: every fact line once, as id = title with hhcontent\'s titles (182), and each of them is a row the writer can be handed', () => {
-  assert.equal(LIST_LINES.length, 182)
-  assert.equal(new Set(LIST_LINES.map(l => l.id)).size, 182)
+test('the list: every fact line once, as id = title with hhcontent\'s titles (189 with changes-13\'s seven), and each of them is a row the writer can be handed', () => {
+  assert.equal(LIST_LINES.length, 189)
+  assert.equal(new Set(LIST_LINES.map(l => l.id)).size, 189)
   assert.deepEqual(LIST_LINES.map(l => l.title).sort(), TITLED.map(t => t.title).sort())
   for (const l of LIST_LINES) assert.ok(LIVE_ROW[l.id] && LIVE_ROW[l.id].text, l.id)
   // the fixed ones too, and the new fact lines
@@ -182,7 +182,8 @@ test('a follow-up is caught by code before the call: no list call, the writer ge
   const r = await ask(st, 'what do you mean?', ['Hermes runs on Windows 10 and 11, and on Mac and Linux too.\nUSED: d_windows'])
   assert.equal(r.calls.length, 1)
   assert.notEqual(r.calls[0].instructions, listCallText())
-  assert.match(r.calls[0].instructions, /^\[d_windows\] Yes\. Hermes runs on Windows 10 and 11\./m)
+  // find-v2: changes-13's d_windows (no line opens with Yes or No)
+  assert.match(r.calls[0].instructions, /^\[d_windows\] Hermes runs on Mac, Windows and Linux\./m)
   assert.equal(r.shown.kind, 'written')
   // the rows of a written reply are the next follow-up's rows
   assert.deepEqual(followRows(beforeOf(st)), ['d_windows'])
@@ -231,18 +232,18 @@ test('on the built page: "do i need a credit card to try it": the dots, one list
   assert.ok(!allLines(view).includes('N1'))
 })
 
-test('on the built page: the list call says NONE: the don\'t-know with what is under it ("can it file my taxes": the three lines near the word file)', async () => {
+test('on the built page: the list call says NONE: the don\'t-know with what is under it (find-v2: "what about my chats history backup" has one near line, by its pick label)', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => 'NONE' } })
-  send(view, 'can it file my taxes')
+  send(view, 'what about my chats history backup')
   await settle()
   assert.equal(host.asks.length, 1)
   assert.equal(answerLine(view), 'N1')
   assert.equal(bubbleLine(view), 'offer-near')
-  assert.deepEqual(labels(view), ['Packing one Hermes into a file to share', 'Giving Hermes a file', 'Reading your Word, Excel and PDF files'])
+  assert.deepEqual(labels(view), ['Backup and export compared'])
   finish(view) // the line has appeared whole: its picks can be pressed
-  press(view, 'Giving Hermes a file')
+  press(view, 'Backup and export compared')
   await settle()
-  assert.equal(bubbleLine(view), 'd_drag')
+  assert.equal(bubbleLine(view), 'd_backup_vs')
   assert.equal(host.asks.length, 1, 'a pick is never sent')
 })
 

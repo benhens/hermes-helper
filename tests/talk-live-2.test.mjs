@@ -16,7 +16,7 @@ import { LIVE_DATA } from '../src/live-data.js'
 import { AI_MODE } from '../src/ai-mode.js'
 import { cleanKept, keptToStore } from '../src/kept.js'
 import { renderKept, readBox, saveBox } from '../src/settings-file.js'
-import { writerText, pickText, firstCallText, workLine, sendable } from '../src/live-request.js'
+import { writerText, pickText, workLine, sendable } from '../src/live-request.js'
 import { c24Fails, replyFlags, noReply } from '../src/live-checks.js'
 import { askLive, goesToAi, liveWhyNot, liveApply } from '../src/live-turn.js'
 import { isFollowUp } from '../src/live-rows.js'
@@ -305,7 +305,7 @@ test('changes-4 request: the work line sits right before Checked facts (writer) 
   for (const t of [writerText(['use1']), pickText(['use1']), writerText(['use1'], null)]) {
     assert.doesNotMatch(t, /work_line|What the person does \(|About them:|\n\n/)
   }
-  assert.doesNotMatch(firstCallText(), /What the person does|About them:|tennis/)
+  // find-v2 part 5: the first call that picked a subject word is gone (firstCallText deleted as dead code)
   // the guard: a value that fails the rule is left out
   for (const bad of ['my password is hunter2', 'sk-abcdefghijklmnopqrstuvwxyz123456', 'one two three four five six seven eight nine ten eleven twelve thirteen', 'x'.repeat(81)]) assert.equal(workLine(bad), null, bad)
   assert.equal(workLine('I run a tennis club'), W)

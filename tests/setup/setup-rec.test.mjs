@@ -56,7 +56,7 @@ test('what is handed: what you do, what they want, new or not, the look, the thi
     'About them: I run a tennis club',
     'What they want: send reminders to my members about training',
     "New to Hermes: Yes, I'm new",
-    'What I can see: You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.',
+    'What I can see: You have a model, the AI that thinks, and it answered my check. You have no scheduled jobs yet.',
     'The thing: First chat: Ask Hermes one small thing, to see that it works.',
     "The reason: You're new, so first check that Hermes answers you."
   ].join('\n'))

@@ -1,8 +1,8 @@
 {
  "about": "Written by dev/checks/talk-v2-wants/dump_oracle.py. Do not edit: make it again.",
- "route2_sha256": "1d6ea48b9655f82ebee74c683365bc508d499f03f0b5835ac026dc752597b4c6",
+ "route2_sha256": "adab5484f516ccd7cdaae20859daa2f92b2ad382ee88fdd4dae601668ff5ca08",
  "route2_run": "route2.py",
- "route2_run_sha256": "1d6ea48b9655f82ebee74c683365bc508d499f03f0b5835ac026dc752597b4c6",
+ "route2_run_sha256": "adab5484f516ccd7cdaae20859daa2f92b2ad382ee88fdd4dae601668ff5ca08",
  "wants_step_sha256": "491b7f75865c4d61219476632e5d56270081ef6146f77c5fbd5323fed420a23f",
  "fixes6_step_sha256": "cd6d53f51b1bcac27fc2436c1ac0431199a650d6cb6c5a120c47e02d02ba9142",
  "wants_fixes_step_sha256": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e",
@@ -4724,14 +4724,14 @@
       "mod"
      ],
      "route2": {
-      "shown": "line mod1",
-      "kind": "row",
+      "shown": "FB_PLAN",
+      "kind": "FB_PLAN",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mod",
-      "need": "mod1",
+      "topic": null,
+      "need": "ChatGPT",
       "why": null
      },
      "oracle": {
@@ -7623,14 +7623,14 @@
       "w_youtube"
      ],
      "route2": {
-      "shown": "line svc1",
-      "kind": "row",
+      "shown": "want w_youtube",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "svc",
-      "need": "svc1",
+      "topic": null,
+      "need": "w_youtube",
       "why": null
      },
      "oracle": {
@@ -9748,14 +9748,14 @@
       "w_youtube"
      ],
      "route2": {
-      "shown": "line svc1",
-      "kind": "row",
+      "shown": "want w_youtube",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "svc",
-      "need": "svc1",
+      "topic": null,
+      "need": "w_youtube",
       "why": null
      },
      "oracle": {
@@ -11244,14 +11244,14 @@
      "text": "can it summarize a youtube video",
      "hhcontent_expects": "w_youtube",
      "route2": {
-      "shown": "line svc1",
-      "kind": "row",
+      "shown": "want w_youtube",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "svc",
-      "need": "svc1",
+      "topic": null,
+      "need": "w_youtube",
       "why": null
      },
      "oracle": {
@@ -11751,36 +11751,36 @@
      "text": "can it download youtube videos",
      "hhcontent_expects": "N2:pics",
      "route2": {
-      "shown": "line svc1",
-      "kind": "row",
+      "shown": "want w_youtube",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "svc",
-      "need": "svc1",
+      "topic": null,
+      "need": "w_youtube",
       "why": null
      },
      "oracle": {
-      "shown": "line svc1",
-      "kind": "row",
+      "shown": "N2 group pics",
+      "kind": "N2",
       "row": null,
       "skill": null,
-      "group": null,
+      "group": "pics",
       "buttons": null,
-      "topic": "svc",
-      "need": "svc1",
+      "topic": null,
+      "need": null,
       "why": null
      },
      "oracle_f6": {
-      "shown": "line svc1",
-      "kind": "row",
+      "shown": "N2 group pics",
+      "kind": "N2",
       "row": null,
       "skill": null,
-      "group": null,
+      "group": "pics",
       "buttons": null,
-      "topic": "svc",
-      "need": "svc1",
+      "topic": null,
+      "need": null,
       "why": null
      }
     },

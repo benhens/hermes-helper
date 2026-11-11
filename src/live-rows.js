@@ -3,50 +3,20 @@
 // content/helper-talk-live-v2.json (follow_up, rows). Never more than 5 rows, never a whole list.
 // No React, no requests: tests/live-rows.test.mjs compares the ids with live.py's on the same data.
 import { LIVE_DATA } from './live-data.js'
-import { talkNorm, whichOf } from './talk.js'
+import { talkNorm } from './talk.js'
 
 export const LIVE_ROWS = LIVE_DATA.rows
 export const LIVE_ROW = Object.fromEntries(LIVE_ROWS.map(r => [r.id, r]))
-// the rows word matching and the subjects rank (the next lines have no key words of their own)
-// (find-v1: nor the rows that are there only so the list call's picks can be handed, list_only)
-const SCORED = LIVE_ROWS.filter(r => !r.next_of && !r.list_only)
 // find-v1: the list call's list, every fact line once as { id, title }
 export const LIST_LINES = LIVE_DATA.list
 // a row's next lines: its button's line, its then line (live changes-6 and -9) and, on a follow-up only, its second
 // wording (ask-fix-t1 skill-mean, plugin-mean; live changes-9 use1-next-mean); a next line may have one of its own
 const NEXT_OF = {}
 for (const r of LIVE_ROWS.filter(x => x.next_of)) (NEXT_OF[r.next_of] = NEXT_OF[r.next_of] || []).push(r)
-const STOP = new Set(LIVE_DATA.stop_words)
 export const MAX_HANDED = LIVE_DATA.max_handed
 
-// live.py words(): the words of 3 letters or more that are not stop words, lower case
-const liveWords = s => new Set((String(s).toLowerCase().match(/[a-z0-9']+/g) || []).filter(w => !STOP.has(w) && w.length > 2))
-
-// live.py score(): 2 for each key word found, 0.5 if any weak word is found, 0.5 for each word shared
-// with the row's text and title
-export function rowScore(text, row) {
-  const t = talkNorm(text)
-  let s = 2 * whichOf(t, row.kw).length + 0.5 * Math.min(1, whichOf(t, row.weak).length)
-  const mine = liveWords(text)
-  for (const w of liveWords(row.text + ' ' + row.title)) if (mine.has(w)) s += 0.5
-  return s
-}
-
-// live.py by_words(): every row scored, best first (Python sorts the (score, id) pairs from the top, so of
-// two rows with the same score the greater id comes first), the first 4, those with 2 or more
-export function byWords(text, k = 4) {
-  const scored = SCORED.map(r => [rowScore(text, r), r.id])
-  scored.sort((a, b) => b[0] - a[0] || (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0))
-  return scored.slice(0, k).filter(([s]) => s >= 2).map(([, id]) => id)
-}
-
-// live.py rank_in(): a subject's rows by the same score, best first, rows with the same score in the data's
-// order; the first 5, score 0 included
-export function rankIn(text, subject, k = MAX_HANDED) {
-  const rows = SCORED.filter(r => r.subject === subject).map(r => [rowScore(text, r), r.id])
-  rows.sort((a, b) => b[0] - a[0])
-  return rows.slice(0, k).map(([, id]) => id)
-}
+// find-v2 part 5 (Lead's answer 6 to find-v1's question 6): live.py's word scoring (rowScore, byWords, rankIn) is
+// gone: since find-v1 the list call finds the rows, and nothing called them.
 
 // rows.from item 2: a next line is handed with its row, right after it; then cut at 5
 // followUp: the message is a follow-up, so the second wordings are handed too

@@ -21,7 +21,6 @@ function fillList(text, slot, lines) {
     return lines.length ? lines.join('\n') : empty
   })
 }
-export const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects', LIVE_DATA.subjects.map(s => `${s.id} = ${s.title}`))
 // find-v1 (Lead, 11 Nov): the list call, in place of the first call that picked a subject word. The instructions are
 // hhtech's LIST_CALL (dev/checks/hhtech-find-run/find.mjs, way W1), word for word but for "as id = title" (it ran with
 // "how the line begins"; the titles are hhcontent's now), followed by the list of every fact line. It is Helper's own

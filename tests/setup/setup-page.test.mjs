@@ -102,7 +102,7 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   assert.deepEqual(lookCalls(host).find(([m]) => m === 'cron.manage')[1], { action: 'list', profile: 'default', include_disabled: true })
   const seen = olds(view).at(-1)
   assert.equal(seen.props['data-line'], 'SEEN')
-  assert.match(oldText(seen), /^I looked at your Hermes\. You have a model, the AI that thinks, and it answers\. You have no scheduled jobs yet\./)
+  assert.match(oldText(seen), /^I looked at your Hermes\. You have a model, the AI that thinks, and it answered my check\. You have no scheduled jobs yet\./)
   assert.match(text(helper(view)), /Kept: send reminders to my members about training\./)
   assert.equal(text(byData(seen, 'hint')), 'Read from your Hermes on this computer. Nothing was sent, and no AI was used.')
   assert.match(text(seen), /What did you look at\?/)
@@ -199,7 +199,7 @@ test('no model that answers: the model first (R1), whatever the answers', opt, a
   finish(view)
   await press(view, 'I know it well')
   await press(view, 'Several bots, one per job')
-  assert.match(oldText(olds(view).find(n => n.props['data-line'] === 'SEEN')), /You have no model that answers yet \(the AI that thinks\)\. You have one bot so far\./)
+  assert.match(oldText(olds(view).find(n => n.props['data-line'] === 'SEEN')), /You have no model set up yet, the AI that thinks\. You have one bot so far\./)
   assert.equal(bubbleSaid(view), 'Hermes needs a model before anything else. Next: A model. The AI that does the thinking. Your app may already have a free one. Want the steps?')
 })
 

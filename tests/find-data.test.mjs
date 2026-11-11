@@ -11,11 +11,12 @@ const visit = () => freshVisit('open', {}, true)
 const say = (st, text) => lineFor(turn(text, st), st, text)
 const answersOf = said => (said.offer ? said.offer.answers.items.map(i => i.label) : [])
 
-test('182 fact lines have a title: none missing a phrase, no two titles the same, none over eight words; 89 of them are the new lines from the docs', () => {
-  assert.equal(TITLED.length, 182)
-  assert.equal(TALK_DATA.facts.length, 89)
+// find-v2: live-v2 changes-13 adds seven fact lines (d_terminal, d_agents_md, d_dark, d_home, d_cost, d_toolsets, d_shorter)
+test('189 fact lines have a title: none missing a phrase, no two titles the same, none over eight words; 96 of them are the lines from the docs', () => {
+  assert.equal(TITLED.length, 189)
+  assert.equal(TALK_DATA.facts.length, 96)
   const titles = TITLED.map(t => t.title)
-  assert.equal(new Set(titles).size, 182)
+  assert.equal(new Set(titles).size, 189)
   assert.deepEqual(titles.filter(t => t.split(/\s+/).length > 8), [])
   assert.deepEqual(TITLED.filter(t => t.phrases.length < 3).map(t => t.title), [])
   for (const f of TALK_DATA.facts) assert.ok(f.text && f.sources.length && f.sources.every(s => s.file && s.line > 0), f.id)
@@ -79,7 +80,7 @@ test('"can it make pictures for me" on the built page, with and without an AI st
   }
 })
 
-test('a don\'t-know with something near: up to three near lines offered by title, said with a small first letter; a pick gives that line', () => {
+test('a don\'t-know with something near: up to three near lines offered by their pick labels under the fixed sentence (find-v2, changes-13); a pick gives that line', () => {
   const st = visit()
   const text = 'what about my chats history backup'
   const said = say(st, text)
@@ -87,11 +88,10 @@ test('a don\'t-know with something near: up to three near lines offered by title
   assert.equal(said.offer.set, 'near')
   const near = said.offer.answers.items
   assert.ok(near.length >= 1 && near.length <= 3)
-  assert.match(said.offer.text, /^Do you want to know about [a-z]/)
-  for (const i of near) assert.ok(TITLED.some(t => t.title === i.label), i.label)
-  assert.ok(said.offer.text.includes(near[0].label.slice(1)), 'the question names the first pick by its title')
+  assert.equal(said.offer.text, 'Do you want one of these instead?')
+  for (const i of near) assert.ok(TITLED.some(t => t.label === i.label), i.label)
   const got = lineFor(pressNear(near[0].near, st), st)
-  const want = TITLED.find(t => t.title === near[0].label).gives
+  const want = TITLED.find(t => t.label === near[0].label).gives
   assert.equal(got.line, want.kind === 'fact' ? want.need : want.kind === 'want' ? want.row : got.line)
   assert.notEqual(got.line, 'N1')
 })
@@ -156,16 +156,14 @@ test('Builder\'s two guards: an official skill named next to "skill" is that ski
   assert.equal(fullHit('is there a skill for knitting', true).kind, 'term', 'the one-word phrase alone would give the word line')
 })
 
-test('"can it file my taxes" has no line: the don\'t-know, and under it the three lines near the word file, by title', () => {
+test('"can it file my taxes" has no line: the don\'t-know; find-v2 (changes-13 never_near): "file" never counts, so the four starting things', () => {
   const said = say(visit(), 'can it file my taxes')
-  assert.deepEqual([said.line, said.offer.set], ['N1', 'near'])
-  assert.deepEqual(answersOf(said), ['Packing one Hermes into a file to share', 'Giving Hermes a file', 'Reading your Word, Excel and PDF files'])
-  assert.equal(said.offer.text, 'Do you want to know about packing one Hermes into a file to share, giving Hermes a file, or reading your Word, Excel and PDF files?')
+  assert.deepEqual([said.line, said.offer.set], ['N1', 'start_four'])
 })
 
-test('a title whose first word is in capitals keeps them in the near question (YOLO mode)', () => {
+test('find-v2 (changes-13): "does it have a dark mode" has its own line now (d_dark), no near offer with YOLO mode', () => {
   const said = say(visit(), 'does it have a dark mode')
-  assert.equal(said.offer.text, 'Do you want to know about YOLO mode: no approval questions in one chat?')
+  assert.equal(said.line, 'd_dark')
 })
 
 test('nearLines never offers the line Helper said last', () => {

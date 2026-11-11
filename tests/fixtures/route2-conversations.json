@@ -2491,8 +2491,8 @@
       "offer": {
        "labels": [
         "Connecting Telegram",
-        "Connecting WhatsApp, Discord, Slack or Signal",
-        "Is it safe to connect a service"
+        "WhatsApp, Discord, Slack, Signal",
+        "Safety of connecting services"
        ],
        "picks": [
         {
@@ -2512,7 +2512,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about connecting Telegram, connecting WhatsApp, Discord, Slack or Signal, or is it safe to connect a service?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -2549,7 +2549,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "A summary of your email every morning"
+        "Email summary every morning"
        ],
        "picks": [
         {
@@ -2559,7 +2559,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about a summary of your email every morning?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -2597,8 +2597,8 @@
       "offer": {
        "labels": [
         "Doing two things at once",
-        "Hermes compared with Siri: a wake word",
-        "The first two steps"
+        "The first two steps",
+        "Linking a service (MCP)"
        ],
        "picks": [
         {
@@ -2606,15 +2606,15 @@
          "need": "d_two"
         },
         {
-         "kind": "fact",
-         "need": "d_siri"
+         "kind": "START_2"
         },
         {
-         "kind": "START_2"
+         "kind": "plain",
+         "topic": "svc"
         }
        ],
        "set": "near",
-       "text": "Do you want to know about doing two things at once, Hermes compared with Siri: a wake word, or the first two steps?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -2953,7 +2953,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Linking a service like GitHub (MCP)"
+        "Linking a service (MCP)"
        ],
        "picks": [
         {
@@ -2962,7 +2962,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about linking a service like GitHub (MCP)?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -3097,9 +3097,9 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Using websites for you: clicking and forms",
+        "Using websites for you",
         "Writing and running code",
-        "Writing songs and briefing a music AI"
+        "Songs and music AI"
        ],
        "picks": [
         {
@@ -3116,7 +3116,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about using websites for you: clicking and forms, writing and running code, or writing songs and briefing a music AI?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -11559,7 +11559,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about bringing the app window back?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -12232,7 +12232,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about pausing or removing a job, where a job's result goes, or stopping every job at once?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -16790,8 +16790,8 @@
       "offer": {
        "labels": [
         "Why a command was blocked",
-        "Why answers are slow: three causes",
-        "OpenRouter: one service for many AIs"
+        "Why answers are slow",
+        "OpenRouter"
        ],
        "picks": [
         {
@@ -16808,7 +16808,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about why a command was blocked, why answers are slow: three causes, or openRouter: one service for many AIs?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -17293,7 +17293,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Using websites for you: clicking and forms"
+        "Using websites for you"
        ],
        "picks": [
         {
@@ -17302,7 +17302,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about using websites for you: clicking and forms?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -17375,7 +17375,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Using websites for you: clicking and forms"
+        "Using websites for you"
        ],
        "picks": [
         {
@@ -17384,7 +17384,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about using websites for you: clicking and forms?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -17610,17 +17610,14 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "labels": [
-        "Hermes writes its own skills"
-       ],
        "picks": [
-        {
-         "kind": "fact",
-         "need": "d_skill_own"
-        }
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "near",
-       "text": "Do you want to know about Hermes writes its own skills?"
+       "set": "start_four",
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -18959,7 +18956,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Finding places, routes and time zones"
+        "Places, routes, time zones"
        ],
        "picks": [
         {
@@ -18968,7 +18965,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about finding places, routes and time zones?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -20742,7 +20739,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about do separate Hermes share notes, separate notes for each Hermes, or working with your Obsidian notes?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -20835,7 +20832,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about Hermes on an Android phone, bringing the app window back, or chatting from your phone?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -20908,8 +20905,8 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Spending less money on the AI",
-        "Looking up stock and crypto prices"
+        "Spending less on the AI",
+        "Stock and crypto prices"
        ],
        "picks": [
         {
@@ -20923,7 +20920,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about spending less money on the AI, or about looking up stock and crypto prices?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -20960,7 +20957,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Paying with a plan you already have"
+        "Paying with your plan"
        ],
        "picks": [
         {
@@ -20969,7 +20966,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about paying with a plan you already have?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -21248,7 +21245,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Using websites for you: clicking and forms"
+        "Using websites for you"
        ],
        "picks": [
         {
@@ -21257,7 +21254,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about using websites for you: clicking and forms?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -21917,8 +21914,8 @@
       "offer": {
        "labels": [
         "Why a command was blocked",
-        "Why answers are slow: three causes",
-        "OpenRouter: one service for many AIs"
+        "Why answers are slow",
+        "OpenRouter"
        ],
        "picks": [
         {
@@ -21935,7 +21932,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about why a command was blocked, why answers are slow: three causes, or openRouter: one service for many AIs?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -21972,7 +21969,7 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "Paying with a plan you already have"
+        "Paying with your plan"
        ],
        "picks": [
         {
@@ -21981,7 +21978,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about paying with a plan you already have?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -22017,27 +22014,14 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "labels": [
-        "Setting up an AI on your computer",
-        "Hermes fits the AI to your computer",
-        "Computers that can run a local AI"
-       ],
        "picks": [
-        {
-         "kind": "fact",
-         "need": "d_local_how"
-        },
-        {
-         "kind": "fact",
-         "need": "d_local_fit"
-        },
-        {
-         "kind": "fact",
-         "need": "d_local_where"
-        }
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "near",
-       "text": "Do you want to know about setting up an AI on your computer, Hermes fits the AI to your computer, or computers that can run a local AI?"
+       "set": "start_four",
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -22175,17 +22159,14 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "labels": [
-        "Hermes writes its own skills"
-       ],
        "picks": [
-        {
-         "kind": "fact",
-         "need": "d_skill_own"
-        }
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "near",
-       "text": "Do you want to know about Hermes writes its own skills?"
+       "set": "start_four",
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -24582,27 +24563,17 @@
       "kind": "N1",
       "offer": {
        "labels": [
-        "A summary of your email every morning",
-        "Searching the web and reading pages",
-        "Reading and searching Reddit"
+        "Email summary every morning"
        ],
        "picks": [
         {
          "kind": "row",
          "need": "sch5",
          "topic": "sch"
-        },
-        {
-         "kind": "want",
-         "need": "w_web"
-        },
-        {
-         "kind": "want",
-         "need": "w_reddit"
         }
        ],
        "set": "near",
-       "text": "Do you want to know about a summary of your email every morning, searching the web and reading pages, or reading and searching Reddit?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -28838,7 +28809,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about Hermes on an Android phone, or about chatting from your phone?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -28894,7 +28865,7 @@
         }
        ],
        "set": "near",
-       "text": "Do you want to know about Hermes on an Android phone, pausing or removing a job, or where a job's result goes?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -29775,7 +29746,7 @@
    ]
   }
  ],
- "json_sha256": "9fc1db6a5834653cc9dbdbafe9d11bccc40a7baec8536141203dcf881fee0b45",
+ "json_sha256": "2804f6c36286cb0aef2ea57c45e9d729bab7884fd89a7d0b267f92157b220ab7",
  "keeps_off": false,
  "last_printed_lines": [
   "unseen-20 'Passwords & Logins?': fact d_passwords (older line)",
@@ -29783,7 +29754,7 @@
   "unseen-20: name line 12, an older line 8, don't-know 0 (of 20)"
  ],
  "no_wants": false,
- "route2_sha256": "1d6ea48b9655f82ebee74c683365bc508d499f03f0b5835ac026dc752597b4c6",
+ "route2_sha256": "adab5484f516ccd7cdaae20859daa2f92b2ad382ee88fdd4dae601668ff5ca08",
  "singles": [
   {
    "landed": "mem",
@@ -31078,17 +31049,14 @@
     "calls": 0,
     "kind": "N1",
     "offer": {
-     "labels": [
-      "Hermes writes its own skills"
-     ],
      "picks": [
-      {
-       "kind": "fact",
-       "need": "d_skill_own"
-      }
+      "can",
+      "mod",
+      "msg",
+      "mem"
      ],
-     "set": "near",
-     "text": "Do you want to know about Hermes writes its own skills?"
+     "set": "start_four",
+     "text": "Do you want one of these instead?"
     }
    },
    "shown": "N1",
@@ -31172,8 +31140,8 @@
     "offer": {
      "labels": [
       "Why a command was blocked",
-      "Why answers are slow: three causes",
-      "OpenRouter: one service for many AIs"
+      "Why answers are slow",
+      "OpenRouter"
      ],
      "picks": [
       {
@@ -31190,7 +31158,7 @@
       }
      ],
      "set": "near",
-     "text": "Do you want to know about why a command was blocked, why answers are slow: three causes, or openRouter: one service for many AIs?"
+     "text": "Do you want one of these instead?"
     }
    },
    "shown": "N1",

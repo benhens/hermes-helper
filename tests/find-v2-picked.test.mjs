@@ -29,7 +29,7 @@ async function ask(st, text, replies, mode = 'ai_writes') {
 const toolText = LIVE_ROW.tool.text
 
 test('the list call picked "tool", the writer says NONE: the tool line itself, word for word', async () => {
-  const r = await ask(visit(), 'what are toolsets', ['tool', 'NONE'])
+  const r = await ask(visit(), 'can it fly a kite', ['tool', 'NONE'])
   assert.equal(r.got.picked, 'tool')
   assert.deepEqual(r.got.result, resultOfRow('tool'))
   assert.equal(r.line.text, toolText)
@@ -37,15 +37,15 @@ test('the list call picked "tool", the writer says NONE: the tool line itself, w
 
 test('the same for a failed writer call, a thinking reply and a reply a check drops; in ai_picks_line for a pick call that says NONE', async () => {
   for (const replies of [['tool', new Error('boom')], ['tool', '<think>hmm'], ['tool', 'Hermes is made by Zorbo Corp.\nUSED: tool']]) {
-    const r = await ask(visit(), 'what are toolsets', replies)
+    const r = await ask(visit(), 'can it fly a kite', replies)
     assert.equal(r.line.text, toolText, String(replies[1]))
   }
-  const p = await ask(visit(), 'what are toolsets', ['tool', 'NONE'], 'ai_picks_line')
+  const p = await ask(visit(), 'can it fly a kite', ['tool', 'NONE'], 'ai_picks_line')
   assert.equal(p.line.text, toolText)
 })
 
 test('PERSONALITY picked, writer NONE: the PERSONALITY line, with its button when it has one', async () => {
-  const r = await ask(visit(), 'how do i make it answer shorter', ['PERSONALITY', 'NONE'])
+  const r = await ask(visit(), 'can it fly a plane', ['PERSONALITY', 'NONE'])
   assert.deepEqual(r.got.result, resultOfRow('PERSONALITY'))
   assert.equal(r.line.text, lineFor(resultOfRow('PERSONALITY'), visit(), '').text)
   assert.ok(!/Sorry, I don/.test(r.line.text))
@@ -59,7 +59,7 @@ test('nothing picked (the list says NONE): the don\'t-know, as before', async ()
 
 test('on the built page: list "tool", writer NONE: the tool line, no don\'t-know', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'tool' : 'NONE') } })
-  send(view, 'what are toolsets')
+  send(view, 'can it fly a kite')
   assert.ok(dots(view))
   await settle()
   assert.equal(host.asks.length, 2)
@@ -69,7 +69,7 @@ test('on the built page: list "tool", writer NONE: the tool line, no don\'t-know
 
 test('on the built page: list "tool", the writer never answers: at 12 s the tool line, not the don\'t-know', async () => {
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'tool' : never()) } })
-  send(view, 'what are toolsets')
+  send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 2)
   timers.fire(12000)
@@ -81,7 +81,7 @@ test('on the built page: list "tool", the writer never answers: at 12 s the tool
 test('on the built page: the person types on while the writer works: the picked line answers the first message', async () => {
   const d = deferred()
   const { view } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'tool' : n === 2 ? d.promise : 'NONE') } })
-  send(view, 'what are toolsets')
+  send(view, 'can it fly a kite')
   await settle()
   send(view, 'how do i stop it if it goes wrong')
   await settle()
@@ -94,7 +94,7 @@ test('on the built page: the person types on while the writer works: the picked 
 
 test('on the built page: the picked line shows with its button (tool: Open Capabilities)', async () => {
   const { view } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'tool' : 'NONE') } })
-  send(view, 'what are toolsets')
+  send(view, 'can it fly a kite')
   await settle()
   finish(view)
   assert.match(text(helper(view)), /Open Capabilities/)
