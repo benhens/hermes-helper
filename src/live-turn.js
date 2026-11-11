@@ -55,6 +55,8 @@ export function goesToAi(pre) {
   if (pre.by === 'title') return false
   // find-v1: a line given from a subject word alone goes to the list call too, with code's line as the fallback: the
   // subject's plain line (not the one "what is ..." asks for by name), the subject's own question, the nearest things
+  // (Builder, review: not at the opening's two questions, where the message is the person's name or what they do)
+  if (pre.at_opening && ['plain', 'question', 'N2'].includes(pre.kind)) return false
   if (pre.kind === 'plain') return pre.why !== 'what is'
   if (pre.kind === 'question' || pre.kind === 'N2') return true
   return LV_GO.includes(pre.kind)

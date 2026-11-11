@@ -343,7 +343,8 @@ test('a turn closed by the next message starts no second call when its first cal
 
 test('the page off screen and back during the wait: the line still lands, also when the new page was drawn before the old one let go', async () => {
   const d = deferred()
-  const o = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+  // find-v1: the list call names the line at once; the writer's answer is the one waited for
+  const o = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'sch1' : d.promise) } })
   send(o.view, 'send me a summary')
   await settle()
   // a second page drawn first, then the first one leaves (React may do it in this order)

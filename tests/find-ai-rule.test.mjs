@@ -187,3 +187,30 @@ test('thinking text twice in a row: the answer, then the slow-AI line after the 
   assert.deepEqual(allLines(view).slice(-2), ['use0', 'SLOW_A'])
   assert.equal(host.asks.length, 2)
 })
+
+// Builder (review): the list call came back, but so late that the writer is not started (under 4 s of the 12 left).
+// The person waited and got code's line: that is a slow try too, or an AI that always takes 9 s on the list would
+// show the dots for 9 s at every message of the visit
+test('a list call that leaves no time for the writer is a slow try: two in a row end the AI for the visit', async () => {
+  const real = Date.now
+  let skew = 0
+  Date.now = () => real() + skew
+  try {
+    const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => { skew += 9000; return 'use1' } } })
+    send(view, 'can it file my taxes')
+    await settle()
+    finish(view)
+    assert.equal(host.asks.length, 1, 'the list call only')
+    assert.equal(answerLine(view), 'N1')
+    send(view, 'what is the weather in Riga')
+    await settle()
+    finish(view)
+    assert.equal(host.asks.length, 2)
+    send(view, 'do goats like it')
+    assert.equal(dots(view), null, 'no dots: the AI is off for the visit')
+    await settle()
+    assert.equal(host.asks.length, 2, 'no third call')
+  } finally {
+    Date.now = real
+  }
+})

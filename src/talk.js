@@ -1171,6 +1171,8 @@ export function turnParts(text, st) {
   const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
   const pre = { ...steps }
+  // find-v1 (review): the message answered one of the opening's two questions (the name, what you do)
+  if (wasOpening) pre.at_opening = true
   if (steps.kind === 'PICK_FIRST') return { pre, out: steps } // ask-fix-t1: nothing changes, the same things to pick stay
   const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route

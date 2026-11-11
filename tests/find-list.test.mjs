@@ -71,6 +71,33 @@ test('readList: up to three known ids in the order given (any case, think blocks
   // Builder: a wordy NONE must not be read as the word line "skill"
   assert.deepEqual(readList('NONE (no skill line fits)'), { word: 'NONE' })
   assert.deepEqual(readList('BUILD: the person wants a plugin installed'), { word: 'BUILD' })
+  // Builder (review): nineteen ids are ordinary words (HERMES, skill, FREE, START ...). A sentence is not a list of
+  // ids: with more than three words that are no id, the reply is NONE (or BUILD when it says BUILD)
+  assert.deepEqual(readList('No line answers this question about Hermes.'), { word: 'NONE' })
+  assert.deepEqual(readList('Sorry, there is no skill for that'), { word: 'NONE' })
+  assert.deepEqual(readList('This is a BUILD request for Hermes'), { word: 'BUILD' })
+  assert.deepEqual(readList('The ids are: FREE, COST'), { ids: ['FREE', 'COST'] })
+  assert.deepEqual(readList('1. mem0\n2. mod1'), { ids: ['mem0', 'mod1'] })
+})
+
+test('Builder (review): at the opening\'s two questions (the name, what you do) a typed answer that holds a subject word is never sent: only what went to the AI before this job goes there', async () => {
+  for (const [stage, m] of [['name', 'Maria Lopez from the memory clinic'], ['work', 'Nurse, mostly night shifts, I worry about memory loss patients at St Mary']]) {
+    const p = turnParts(m, freshVisit(stage, {}, true)).pre
+    assert.ok(['question', 'plain', 'N2'].includes(p.kind), m + ' ' + p.kind)
+    assert.equal(goesToAi(p), false, m)
+  }
+  const { open } = await import('./lib/talk-page.mjs')
+  const a = await open('ai_writes', { host: { oneshot: () => 'NONE' } })
+  finish(a.view)
+  send(a.view, 'Maria Lopez from the memory clinic')
+  await settle()
+  assert.equal(a.host.asks.length, 0, JSON.stringify(a.host.asks.map(x => x.input)))
+  const b = await open('ai_writes', { host: { oneshot: () => 'NONE' } })
+  finish(b.view)
+  send(b.view, 'Peter')
+  send(b.view, 'Nurse, mostly night shifts, I worry about memory loss patients at St Mary')
+  await settle()
+  assert.equal(b.host.asks.length, 0, JSON.stringify(b.host.asks.map(x => x.input)))
 })
 
 test('which messages go to the list call: nothing found, a weak hit, and a line given from a subject word alone (the plain line, the subject\'s question, the nearest things); never a line code is sure of', () => {

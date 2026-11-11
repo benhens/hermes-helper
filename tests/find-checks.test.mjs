@@ -3,6 +3,7 @@
 // made by dev/checks/find-v1/make-fixture.py from dev/checks/hhtech-find-run/out-*.jsonl), judged with the lines of
 // today's data for the ids that were handed.
 import { test } from 'node:test'
+import { c24Fails as c24 } from '../src/live-checks.js'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -94,4 +95,15 @@ test('c14: an honest "the checked information doesn\'t specifically mention rule
 test('the other three of the 12 are not this job\'s: the 2B\'s made-up "the standard voice is free" is still dropped; c20 still drops its two', () => {
   assert.ok(judge(the('2b-W1-fresh', '15')).fail)
   for (const [run, n] of [['free-W1x-fresh', '6'], ['free-W1x-old', '12']]) assert.ok(judge(the(run, n)).fail, run)
+})
+
+// Builder (review): the c24 allowance is for a form of a handed word after "your" alone, and a form is the same word
+// with another ending (approval / approve), not a longer word that starts the same (accountant / account)
+test('c24 still stops a guess about the person that only starts like a handed word', () => {
+  const on = true
+  assert.equal(c24('Hermes asks for your approval first.', '', '', 'it asks you to approve it first', on), null)
+  assert.equal(c24('As a researcher, you get more out of it.', '', '', 'made by nous research', on), 'researcher')
+  assert.equal(c24('Your accountant can use the free AI too.', '', '', 'you need an account for it', on), 'accountant')
+  assert.equal(c24('Your company can use Hermes too.', '', '', 'you can compare the two', on), 'company')
+  assert.equal(c24('You run a restaurant, so this fits.', '', '', 'it can restart by itself', on), 'restaurant')
 })

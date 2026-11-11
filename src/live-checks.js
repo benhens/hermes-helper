@@ -66,11 +66,15 @@ export function readList(raw) {
   const start = (s.trim().match(/^[^A-Za-z]*(none|build)\b/i) || [])[1]
   if (start) return { word: start.toUpperCase() }
   const out = []
+  // Builder (review): some ids are ordinary words (HERMES, skill, FREE, START ...), so a sentence could be read as
+  // picks. A list of ids has few other words: with more than three words that are no id, the reply holds no ids.
+  let other = 0
   for (const w of s.match(/[A-Za-z0-9_-]+/g) || []) {
     const id = LIST_ID_OF[w.toLowerCase()]
     if (id && !out.includes(id)) out.push(id)
+    else if (!id && /[A-Za-z]/.test(w)) other++
   }
-  if (out.length) return { ids: out.slice(0, 3) }
+  if (out.length && other <= 3) return { ids: out.slice(0, 3) }
   return { word: /\bBUILD\b/i.test(s) ? 'BUILD' : 'NONE' }
 }
 
@@ -159,7 +163,7 @@ export function c24Fails(reply, work, message, hand, forms = false) {
     const part = reply.slice(m.index + m[0].length).split(/[.,;!?]/)[0]
     for (const w of (part.match(/[A-Za-z']+/g) || []).slice(0, 3)) {
       const lw = w.toLowerCase()
-      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, '')) && !(handed && c24SameForm(lw, handed))) return w
+      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, '')) && !(handed && /(^|\s)your\s+$/i.test(m[0]) && c24SameForm(lw, handed))) return w
     }
   }
   return null
@@ -171,8 +175,8 @@ export function c24Fails(reply, work, message, hand, forms = false) {
    c12  a name passes when it stands as a word in one of the person's own typed messages of this visit (talk.typed)
         AND Helper's checked data knows that word (Mac, Siri, Signal). Builder: the second half keeps today's stop for
         a name nobody checked ("Hermes works with Zorbo").
-   c24  a word after "your" that is a form of a word in the handed lines is no guess about the person ("asks for your
-        approval first" from "asks you to approve it first"): the same first five letters, both six letters or more.
+   c24  a word after "your" alone that is a form of a word in the handed lines is no guess about the person ("asks for
+        your approval first" from "asks you to approve it first"); see c24SameForm.
    c22  a Hermes word needs no plain word beside it when one handed line holds the word and its plain word.
    c14  "the checked information does not mention ..." says what Helper has not checked; it is no claim about Hermes. */
 const LC_KNOWN_WORDS = new Set(JSON.stringify([TALK_DATA.facts, TALK_DATA.fixed, TALK_DATA.topics, TALK_DATA.terms, TALK_DATA.chat_apps, WANTS_DATA.rows]).toLowerCase().match(/[a-z0-9]+/g))
@@ -182,7 +186,13 @@ export function c12Typed(name, typed) {
   const re = new RegExp('(^|[^a-z0-9])' + liveEsc(n) + '($|[^a-z0-9])')
   return (typed || []).some(m => re.test(String(m).toLowerCase()))
 }
-const c24SameForm = (w, allowed) => w.length >= 6 && [...allowed].some(a => a.length >= 6 && a.slice(0, 5) === w.slice(0, 5))
+// Builder (review): the same word with another ending: both six letters or more, at most two letters apart in length,
+// and the same up to the shorter one's last letter (approval / approve; not accountant / account, company / compare)
+const c24SameForm = (w, allowed) => w.length >= 6 && [...allowed].some(a => {
+  if (a.length < 6 || Math.abs(a.length - w.length) > 2) return false
+  const n = Math.min(a.length, w.length) - 1
+  return a.slice(0, n) === w.slice(0, n) && a !== w.slice(0, a.length)
+})
 const C14_HONEST = /\b(?:the |my |helper's )?checked (?:information|info|facts?|lines?|notes?)(?: i have| that i have)? (?:doesn't|doesnt|does not|don't|dont|do not|didn't|did not)(?: specifically| explicitly| actually| really)? (?:mention|say|cover|include|list|name|state|talk about|go into)\b/g
 
 export function replyFlags(reply, rows, used, talk = {}) {

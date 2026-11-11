@@ -23,6 +23,7 @@ function useHost(hermes = {}) {
       if (h.fail.includes(method)) throw new Error('read failed: ' + method)
       if (method === 'llm.oneshot') {
         host.asks.push(params)
+        if (h.oneshot) return { text: await h.oneshot(params, host.asks.length) }
         return { text: 'NONE' }
       }
       if (method === 'setup.runtime_check') return h.model ? { ok: true, provider: 'custom', model: 'mock-small' } : { ok: false, error: 'No usable credentials found' }
@@ -315,4 +316,24 @@ test('the person types again before the reads are back: the first message is ans
   const seen = olds(view).find(n => n.props['data-line'] === 'SEEN')
   assert.match(oldText(seen).replace(/’/g, "'"), /I couldn't check your model this time\. I couldn't read that part this time\./)
   assert.deepEqual(mine(view).slice(-2).map(x => x.replace(/’/g, "'")), ['Do things at set times', "what's a skill?"])
+})
+
+// find-v1 (review): the recommendation's call that is slow (12 s) and then fails is ONE failed try, not two
+test('a recommendation call that gives no answer in 12 s and then fails counts once: the next question still asks the AI', opt, async () => {
+  let fail = null
+  const { view, host, timers } = await open({ hermes: { oneshot: (p, n) => (n === 1 ? new Promise((_, no) => (fail = no)) : 'NONE') } })
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, labels(view)[0])
+  await send(view, 'send reminders to my members about training')
+  assert.equal(host.asks.length, 1, 'the recommendation call')
+  timers.fire(12000)
+  await settle()
+  fail(new Error('gone'))
+  await settle()
+  finish(view)
+  await press(view, 'Not now')
+  await send(view, 'what is the weather in Riga')
+  assert.equal(host.asks.length, 2, 'one failed try does not end the AI for the visit')
 })

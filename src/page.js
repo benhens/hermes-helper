@@ -579,7 +579,10 @@ export function makePage(ctx, opts = {}) {
         visit.aiTried = true
         // find-v1 part 3: a slow or failed call here is one failed try, as for a typed message (two in a row end the AI
         // for the visit). The slow-AI line may not follow a line with things to pick, so it is never owed here.
+        let counted = false // (review) once for this call: slow at 12 s and failing later is one failed try
         const off = () => {
+          if (counted) return
+          counted = true
           visit.aiFails = (visit.aiFails || 0) + 1
           if (visit.aiFails < 2) return
           visit.aiOff = true
@@ -607,7 +610,7 @@ export function makePage(ctx, opts = {}) {
             res => {
               const j = judgeRec(res && res.text, says[i].rec.item, names, instructions)
               if (j.noReply) off()
-              else if (!ended) visit.aiFails = 0
+              else if (!ended && !counted) visit.aiFails = 0
               end(j.text || null)
             },
             () => {
@@ -773,7 +776,8 @@ export function makePage(ctx, opts = {}) {
         .then(got => {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
-          if (got && got.thinking) slowFail(w)
+          // find-v1 (Builder, review): so is a list call that came back too late for the writer to start
+          if (got && (got.thinking || got.fallback === 'no time for the second call')) slowFail(w)
           else aiAnswered(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))

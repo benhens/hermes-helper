@@ -21978,6 +21978,8 @@ function turnParts(text, st) {
   const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
   const pre = { ...steps }
+  // find-v1 (review): the message answered one of the opening's two questions (the name, what you do)
+  if (wasOpening) pre.at_opening = true
   if (steps.kind === 'PICK_FIRST') return { pre, out: steps } // ask-fix-t1: nothing changes, the same things to pick stay
   const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
@@ -23586,11 +23588,15 @@ function readList(raw) {
   const start = (s.trim().match(/^[^A-Za-z]*(none|build)\b/i) || [])[1]
   if (start) return { word: start.toUpperCase() }
   const out = []
+  // Builder (review): some ids are ordinary words (HERMES, skill, FREE, START ...), so a sentence could be read as
+  // picks. A list of ids has few other words: with more than three words that are no id, the reply holds no ids.
+  let other = 0
   for (const w of s.match(/[A-Za-z0-9_-]+/g) || []) {
     const id = LIST_ID_OF[w.toLowerCase()]
     if (id && !out.includes(id)) out.push(id)
+    else if (!id && /[A-Za-z]/.test(w)) other++
   }
-  if (out.length) return { ids: out.slice(0, 3) }
+  if (out.length && other <= 3) return { ids: out.slice(0, 3) }
   return { word: /\bBUILD\b/i.test(s) ? 'BUILD' : 'NONE' }
 }
 
@@ -23679,7 +23685,7 @@ function c24Fails(reply, work, message, hand, forms = false) {
     const part = reply.slice(m.index + m[0].length).split(/[.,;!?]/)[0]
     for (const w of (part.match(/[A-Za-z']+/g) || []).slice(0, 3)) {
       const lw = w.toLowerCase()
-      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, '')) && !(handed && c24SameForm(lw, handed))) return w
+      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, '')) && !(handed && /(^|\s)your\s+$/i.test(m[0]) && c24SameForm(lw, handed))) return w
     }
   }
   return null
@@ -23691,8 +23697,8 @@ function c24Fails(reply, work, message, hand, forms = false) {
    c12  a name passes when it stands as a word in one of the person's own typed messages of this visit (talk.typed)
         AND Helper's checked data knows that word (Mac, Siri, Signal). Builder: the second half keeps today's stop for
         a name nobody checked ("Hermes works with Zorbo").
-   c24  a word after "your" that is a form of a word in the handed lines is no guess about the person ("asks for your
-        approval first" from "asks you to approve it first"): the same first five letters, both six letters or more.
+   c24  a word after "your" alone that is a form of a word in the handed lines is no guess about the person ("asks for
+        your approval first" from "asks you to approve it first"); see c24SameForm.
    c22  a Hermes word needs no plain word beside it when one handed line holds the word and its plain word.
    c14  "the checked information does not mention ..." says what Helper has not checked; it is no claim about Hermes. */
 const LC_KNOWN_WORDS = new Set(JSON.stringify([TALK_DATA.facts, TALK_DATA.fixed, TALK_DATA.topics, TALK_DATA.terms, TALK_DATA.chat_apps, WANTS_DATA.rows]).toLowerCase().match(/[a-z0-9]+/g))
@@ -23702,7 +23708,13 @@ function c12Typed(name, typed) {
   const re = new RegExp('(^|[^a-z0-9])' + liveEsc(n) + '($|[^a-z0-9])')
   return (typed || []).some(m => re.test(String(m).toLowerCase()))
 }
-const c24SameForm = (w, allowed) => w.length >= 6 && [...allowed].some(a => a.length >= 6 && a.slice(0, 5) === w.slice(0, 5))
+// Builder (review): the same word with another ending: both six letters or more, at most two letters apart in length,
+// and the same up to the shorter one's last letter (approval / approve; not accountant / account, company / compare)
+const c24SameForm = (w, allowed) => w.length >= 6 && [...allowed].some(a => {
+  if (a.length < 6 || Math.abs(a.length - w.length) > 2) return false
+  const n = Math.min(a.length, w.length) - 1
+  return a.slice(0, n) === w.slice(0, n) && a !== w.slice(0, a.length)
+})
 const C14_HONEST = /\b(?:the |my |helper's )?checked (?:information|info|facts?|lines?|notes?)(?: i have| that i have)? (?:doesn't|doesnt|does not|don't|dont|do not|didn't|did not)(?: specifically| explicitly| actually| really)? (?:mention|say|cover|include|list|name|state|talk about|go into)\b/g
 
 function replyFlags(reply, rows, used, talk = {}) {
@@ -23995,6 +24007,8 @@ function goesToAi(pre) {
   if (pre.by === 'title') return false
   // find-v1: a line given from a subject word alone goes to the list call too, with code's line as the fallback: the
   // subject's plain line (not the one "what is ..." asks for by name), the subject's own question, the nearest things
+  // (Builder, review: not at the opening's two questions, where the message is the person's name or what they do)
+  if (pre.at_opening && ['plain', 'question', 'N2'].includes(pre.kind)) return false
   if (pre.kind === 'plain') return pre.why !== 'what is'
   if (pre.kind === 'question' || pre.kind === 'N2') return true
   return LV_GO.includes(pre.kind)
@@ -28094,7 +28108,10 @@ function makePage(ctx, opts = {}) {
         visit.aiTried = true
         // find-v1 part 3: a slow or failed call here is one failed try, as for a typed message (two in a row end the AI
         // for the visit). The slow-AI line may not follow a line with things to pick, so it is never owed here.
+        let counted = false // (review) once for this call: slow at 12 s and failing later is one failed try
         const off = () => {
+          if (counted) return
+          counted = true
           visit.aiFails = (visit.aiFails || 0) + 1
           if (visit.aiFails < 2) return
           visit.aiOff = true
@@ -28122,7 +28139,7 @@ function makePage(ctx, opts = {}) {
             res => {
               const j = judgeRec(res && res.text, says[i].rec.item, names, instructions)
               if (j.noReply) off()
-              else if (!ended) visit.aiFails = 0
+              else if (!ended && !counted) visit.aiFails = 0
               end(j.text || null)
             },
             () => {
@@ -28288,7 +28305,8 @@ function makePage(ctx, opts = {}) {
         .then(got => {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
-          if (got && got.thinking) slowFail(w)
+          // find-v1 (Builder, review): so is a list call that came back too late for the writer to start
+          if (got && (got.thinking || got.fallback === 'no time for the second call')) slowFail(w)
           else aiAnswered(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))
