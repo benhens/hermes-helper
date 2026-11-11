@@ -26,7 +26,9 @@ import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
 import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
-import { SETUP_BUILT } from './setup-built.js'
+import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
+import { recInstructions, judgeRec, askRec } from './setup-rec.js'
+import { AI_MODE } from './ai-mode.js'
 import { setupTyped, setupPress, setupAfter, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
 import { makeLook, LOOK_UNSEEN } from './setup-look.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
@@ -190,7 +192,7 @@ export function makePage(ctx, opts = {}) {
   // of the set-up conversation is ever among the lines sent to the AI (send: false). A line that ends with an offer
   // (NOT_NOW, ALL_DONE, BACK) gets the offer's bubble under it.
   const setupEntries = s => {
-    const { setupOffer, rec, pasteLabel, ...line } = s
+    const { setupOffer, rec, recBy, pasteLabel, ...line } = s
     const out = [{ ...helperEntry(line), send: false }]
     if (setupOffer) {
       const offer = offerSaid(setupOffer, memory.visit)
@@ -269,6 +271,8 @@ export function makePage(ctx, opts = {}) {
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
   const liveClose = () => {
     if (live.waiting) liveFinish(live.waiting, null)
+    // setup-chat: a recommendation that still waits for the AI's sentence gets its written one at once
+    if (memory && memory.recWait) memory.recWait(null)
   }
   // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
   const openDocs = url => {
@@ -541,12 +545,63 @@ export function makePage(ctx, opts = {}) {
         if (memory.setupTurn !== n) return // the person did something else meanwhile
         const says = mv.go(seen)
         writeKept()
-        const entries = says.flatMap(setupEntries)
-        memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...entries].slice(-LOG_MAX)
-        if (live.view) {
-          live.view.setLog(memory.log)
-          live.view.setFocusAsk(true)
+        const put = list => {
+          memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...list.flatMap(setupEntries)].slice(-LOG_MAX)
+          if (live.view) {
+            live.view.setLog(memory.log)
+            live.view.setFocusAsk(true)
+          }
         }
+        // setup-chat point 6: only the recommendation's sentence may be the AI's. One call, at most 12 s (the dots
+        // show meanwhile: the person's message is still the newest line); the reply stands only when it passes
+        // no_reply, c26, the name check and s1 to s8 (src/setup-rec.js); else the written sentence, and nothing says
+        // so. No call: with no AI step, with no model ready, after a call failed in this visit, or while Hermes
+        // still works on an earlier call of Helper's.
+        // (only where the AI writes, ai_writes: with ai_picks_line the AI only ever picks one of Helper's lines)
+        const i = SETUP_AI_BUILT && AI_MODE === 'ai_writes' && shown ? says.findIndex(s => s.rec) : -1
+        if (i < 0 || visit.aiOff === true || !live.status || live.status.state !== 'ok' || live.inHermes > 0) return put(says)
+        const names = [visit.name, visit.kept.name]
+        const instructions = recInstructions(says[i].rec, visit.kept, seen, names)
+        const first = !visit.aiTried
+        visit.aiTried = true
+        const off = () => {
+          visit.aiOff = true
+          // the slow-AI line may not follow a line with things to pick, so it is dropped for this visit (as after any
+          // such answer), never hung under a later line
+          if (first && !visit.slow) visit.slow = 'dropped'
+        }
+        let ended = false
+        const endBusy = busy.begin()
+        const end = text => {
+          if (ended) return
+          ended = true
+          stop()
+          endBusy()
+          memory.recWait = null
+          put(says.map((s, k) => (k === i && text ? { ...s, text: text + s.text.slice(s.text.lastIndexOf(' Want the steps?')), recBy: 'ai' } : s)))
+        }
+        const stop = ctx.setTimeout(() => {
+          off()
+          end(null)
+        }, LIVE_SECONDS * 1000)
+        memory.recWait = end
+        live.inHermes++
+        Promise.resolve()
+          .then(() => askRec((method, params, timeout) => host.request(method, params, timeout), instructions))
+          .then(
+            res => {
+              const j = judgeRec(res && res.text, says[i].rec.item, names, instructions)
+              if (j.noReply) off()
+              end(j.text || null)
+            },
+            () => {
+              off()
+              end(null)
+            }
+          )
+          .finally(() => {
+            live.inHermes--
+          })
       }
       if (!mv.look) return finish(memory.seen || LOOK_UNSEEN)
       const end = busy.begin()

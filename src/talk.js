@@ -19,7 +19,7 @@
 import { TALK_DATA } from './talk-data.js'
 import { WANTS_DATA } from './wants-data.js'
 import { AI_MODE } from './ai-mode.js'
-import { SETUP_BUILT } from './setup-built.js'
+import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
 import { openQNew } from './setup-chat.js'
 import { LIVE_DATA } from './live-data.js'
 import { looksLikeKey } from './key-check.js'
@@ -688,7 +688,8 @@ const ST = TALK_DATA.small_talk
 // talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
 export const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
 // live-v2 changes-4: under the first Kept: of what the person does, in a build that calls an AI
-export const WORK_TOLD = LIVE_DATA.lines_by_mode.work_told[AI_MODE]
+// live changes-6: once the set-up conversation sends its two answers too, setup_told takes work_told's place
+export const WORK_TOLD = LIVE_DATA.lines_by_mode[SETUP_BUILT && SETUP_AI_BUILT ? 'setup_told' : 'work_told'][AI_MODE]
 // live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
 const HOW_AFTER = ST.how_after_rows.after.flatMap(k => (k === 'wants' ? ['want'] : k === 'then' ? ['then', 'rowthen'] : [k]))
 const NR = TALK_DATA.no_repeat

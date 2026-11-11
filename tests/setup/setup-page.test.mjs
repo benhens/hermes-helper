@@ -118,9 +118,11 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   assert.equal(oldText(olds(view).at(-1)).replace(/’/g, "'"), "That's fine. I'll keep your place.")
   assert.equal(bubbleLine(view), 'offer-general_2')
   assert.deepEqual(labels(view), ['Which AI to use', 'Phone and chat apps'])
-  // no AI was used for any of it, and nothing was written to Hermes
-  assert.equal(host.asks.length, 0, 'no llm.oneshot call in the whole conversation')
-  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'profiles.describe', 'setup.runtime_check'])
+  // the AI was asked only for the two recommendation sentences (it answered NONE here, so the written ones show);
+  // the questions, the look, the choice and the steps used no AI, and nothing was written to Hermes
+  assert.equal(host.asks.length, 2, 'one call for each recommendation, none for anything else')
+  for (const p of host.asks) assert.match(p.instructions, /^You are Helper, inside the Hermes app\. Write one short message that recommends the next thing to set up\./)
+  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check'])
   // kept between visits
   const kept = storage.data.get('kept')
   assert.deepEqual([kept.name, kept.work, kept.setup_new, kept.setup_goal, kept.setup_goal_id, kept.setup_done_said, kept.setup_current], ['Peter', 'I run a tennis club', 'new', 'send reminders to my members about training', 'schedule', ['first_chat'], 'scheduled_job'])
@@ -131,7 +133,7 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   assert.equal(bubbleSaid(again.view), 'Hi again, Peter. Last time we picked Scheduled jobs. Want to go on?')
   assert.deepEqual(labels(again.view).map(l => l.replace(/’/g, "'")), REC4)
   assert.equal(lookCalls(again.host).length, 3, 'the opening of a later visit reads Hermes once')
-  assert.equal(again.host.asks.length, 0)
+  assert.equal(again.host.asks.length, 0, 'and asks no AI')
 })
 
 test('a later visit, and the thing picked last time is now done in Hermes: Helper reads first and says "I can see it now", then the next thing', opt, async () => {

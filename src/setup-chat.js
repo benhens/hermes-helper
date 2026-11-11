@@ -13,6 +13,9 @@ import { TALK_DATA } from './talk-data.js'
 import { talkNorm, whichOf } from './talk.js'
 import { workOk, workSqueeze } from './kept.js'
 import { looksLikeKey } from './key-check.js'
+import { LIVE_DATA } from './live-data.js'
+import { AI_MODE } from './ai-mode.js'
+import { SETUP_AI_BUILT } from './setup-built.js'
 
 const SU = SETUP_DATA
 const SU_L = SU.lines
@@ -88,7 +91,14 @@ const suREC_PICKS = labels => suPicks(['rec:steps', 'rec:already', 'rec:other', 
 const suNamed = (line, name, slots = {}) => (name ? suFill(line.text, { ...slots, name }) : suFill(line.text_no_name, slots))
 const suOf = st => (st.setup = st.setup || { stage: null, item: null, step: 0, other: [], reasked: {}, asked: {} })
 // the faint "Kept: ..." line under a line (the page strikes it when the thing is no longer kept)
-const suKeptNote = (key, words, value) => ({ text: words, link: TALK_DATA.keeps.tell.link.words, first: null, items: [[key, value]] })
+// live changes-6 (lines_by_mode.first_time_grey.setup_told): under the first Kept: line of what goes to the AI (what
+// you do, new to Hermes, what you want), once: "Your AI also gets ...". Only in a build that sends them.
+const SU_TOLD = SETUP_AI_BUILT ? LIVE_DATA.lines_by_mode.setup_told[AI_MODE] : null
+const suKeptNote = (st, key, words, value) => {
+  const told = SU_TOLD && !st.kept.told_work ? { workTold: SU_TOLD } : {}
+  if (told.workTold) st.kept.told_work = true
+  return { text: words, link: TALK_DATA.keeps.tell.link.words, first: null, items: [[key, value]], ...told }
+}
 const SU_KEPT_LINE = Object.fromEntries(SU.keeps.map(k => [k.key, k.kept_line]))
 
 /* ---------- the lines that open it ---------- */
@@ -196,7 +206,7 @@ function suAnswerNew(st, id) {
   let note = null
   if (a.kept_as) {
     st.kept.setup_new = id
-    note = suKeptNote('setup_new', suFill(SU_KEPT_LINE.setup_new, { label: a.label }), id)
+    note = suKeptNote(st, 'setup_new', suFill(SU_KEPT_LINE.setup_new, { label: a.label }), id)
   } else delete st.kept.setup_new
   s.newAnswered = true
   s.stage = 'goal'
@@ -212,7 +222,7 @@ function suAnswerGoal(st, id, typed, seen) {
   if (text && (!typed || workOk(text))) {
     st.kept.setup_goal = text
     st.kept.setup_goal_id = id
-    note = suKeptNote('setup_goal', SU_KEPT_LINE.setup_goal.replace(/\{[^}]*\}/, text), text)
+    note = suKeptNote(st, 'setup_goal', SU_KEPT_LINE.setup_goal.replace(/\{[^}]*\}/, text), text)
   } else {
     delete st.kept.setup_goal
     delete st.kept.setup_goal_id
@@ -406,9 +416,6 @@ export function setupRows(kept) {
 export const SETUP_ROW_KEYS = { setup_new: ['setup_new'], setup_goal: ['setup_goal', 'setup_goal_id'], setup_done_said: ['setup_done_said'], setup_current: ['setup_current'] }
 export const SETUP_ASKED_KEYS = ['setup_new', 'setup_goal', 'setup_goal_id', 'setup_current']
 export const SETUP_ALL_KEYS = [...SETUP_ASKED_KEYS, 'setup_done_said']
-// The AI step of the recommendation (the job's point 6) is in this build: the two answers New to Hermes and What you
-// want then go to the person's AI, and the lines that say what is sent name them
-export const SETUP_AI_BUILT = false
 // The pick "Set up Hermes" under an offer (offers.things.setup): the question not answered yet, else the look and REC
 export const setupAskMove = st => suAsk(st)
 // Whether a later visit opens with the set-up conversation (always, once it is built)

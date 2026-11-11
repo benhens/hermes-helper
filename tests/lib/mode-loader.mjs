@@ -15,6 +15,12 @@ export function setupBuiltSource(src, value) {
   if (value !== 'true' && value !== 'false') throw new Error('mode hook: HELPER_SETUP_BUILT must be true or false')
   return String(src).replace(re, (m, e) => `${e || ''}const SETUP_BUILT = ${value}`)
 }
+// the second switch of src/setup-built.js: the AI step of the recommendation
+export function setupAiSource(src, value) {
+  const re = /^(export )?const SETUP_AI_BUILT = (?:true|false)$/m
+  if (!re.test(String(src))) throw new Error('mode hook: no SETUP_AI_BUILT line found')
+  return String(src).replace(re, (m, e) => `${e || ''}const SETUP_AI_BUILT = ${value}`)
+}
 export async function load(url, context, next) {
   const r = await next(url, context)
   if (SETUP && url.endsWith('/src/setup-built.js')) return { ...r, source: setupBuiltSource(r.source, SETUP) }

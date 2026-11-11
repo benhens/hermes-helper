@@ -60,7 +60,7 @@ export function cleanKept(v) {
   }
   if (KEPT_SETUP_ITEMS.includes(v.setup_current) || v.setup_current === 'model') out.setup_current = v.setup_current
   if (Object.keys(out).length && v.told === true) out.told = true
-  if (out.work && v.told_work === true) out.told_work = true
+  if ((out.work || out.setup_new || out.setup_goal) && v.told_work === true) out.told_work = true
   return out
 }
 
