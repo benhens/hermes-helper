@@ -237,3 +237,50 @@ for (const pickFirst of [false, true]) {
     assert.equal(recs, 1, 'the REC line once')
   })
 }
+
+// review findings fixed (report: "Review")
+test('review: "laptop or a server" at the goal question is answered, never kept as the goal (route2.py: the ordinary talk would answer it)', opt, async () => {
+  const storage = fakeStorage({ met: true, kept: { setup_new: 'new' } })
+  const { view } = await open({ storage })
+  finish(view)
+  await send(view, 'laptop or a server')
+  assert.equal((storage.data.get('kept') || {}).setup_goal, undefined)
+  assert.equal(bubbleLine(view), 'SETUP_REASK_GOAL')
+})
+
+test('review: "back" while a set-up question is open never says "No question of mine is open"', opt, async () => {
+  const storage = fakeStorage({ met: true })
+  const { view } = await open({ storage })
+  finish(view)
+  await send(view, 'Set up Hermes')
+  await send(view, 'back')
+  assert.ok(!screen(view).some(([, line]) => line === 'BACK_NONE'), JSON.stringify(screen(view).slice(-3)))
+  // ("back" alone is no back word of the set-up conversation's; the ordinary talk answers it, with near picks of its
+  // own, find-v2's rule; one question on screen)
+  assert.deepEqual(twoInARow(view), [])
+})
+
+test('review: after "How can I migrate?" and "go back", the first question takes a typed answer again', opt, async () => {
+  const storage = fakeStorage({ met: true })
+  const { view } = await open({ storage })
+  finish(view)
+  await send(view, 'Set up Hermes')
+  await press(view, "I've used it a bit")
+  await send(view, 'How can I migrate?')
+  await send(view, 'go back')
+  assert.equal(bubbleLine(view), 'Q_NEW')
+  await send(view, 'yes')
+  assert.equal(storage.data.get('kept').setup_new, 'new', 'the typed answer is kept')
+  assert.equal(bubbleLine(view), 'Q_GOAL')
+})
+
+test('review: on a later visit, "go back" at step 1 goes to "Want the steps?" (it was shown), not "This is my first set-up question"', opt, async () => {
+  const storage = fakeStorage({ met: true, kept: { setup_current: 'first_chat' } })
+  const { view } = await open({ storage })
+  finish(view)
+  await press(view, 'Show me the steps')
+  assert.match(bubbleSaid(view), /^Step 1 of/)
+  await send(view, 'go back')
+  const s = screen(view).slice(-2).map(x => x[1])
+  assert.deepEqual(s, ['BACK_ONE', 'REC'])
+})

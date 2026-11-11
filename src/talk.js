@@ -338,7 +338,7 @@ const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds }
 // a phrase with the word window or windows hits only where the message names Windows the system: the word "windows"
 // itself (never "window", which the word rule makes the same), not after context, contex, token or a word that makes
 // it an app's window ("two windows", "chat windows"). Builder's rule; route2.py has none.
-const APP_WINDOWS = /(^|[^a-z0-9])(?:cont[a-z]*|token|chat|app|apps|browser|terminal|new|two|three|several|multiple|many|other|second|both|separate|extra|more|these|those|its|hermes)\s+windows($|[^a-z0-9])/g
+const APP_WINDOWS = /(^|[^a-z0-9])(?:cont[a-z]*|token|chat|app|apps|browser|terminal|two|three|several|multiple|many|second|separate|extra|more|these|those)\s+windows($|[^a-z0-9])/g
 export const namesWindowsOs = text => /(^|[^a-z0-9])windows($|[^a-z0-9])/.test(talkNorm(text).replace(APP_WINDOWS, ' '))
 const aboutWindow = pw => pw.includes('window')
 export function fullHit(text, singleOk) {
@@ -1094,6 +1094,12 @@ export function offerSaid(sid, st) {
 export const offerIsSetup = thing => OF.things[thing].gives.kind === 'setup_chat'
 // the message holds a key word of a topic or a Hermes term
 export const hasTopicWord = text => knownWords(cutIgnored(talkNorm(text)))
+// loom-fixes-2 (review; route2.py setup_typed, typed_answer.no_match_v2): the ordinary talk would answer this message by a
+// fixed line, an offer's words or a known word ("laptop or a server")
+export const talkWouldAnswer = text => {
+  const tw = cutIgnored(talkNorm(text))
+  return !!(fixedByWords(tw, { wants: false, pending: null }) || offerRoute(tw) || knownWords(tw))
+}
 // Every offer question this build can show: [set id, text, pick ids] (tests; the after_topic sets by topic)
 export const offerSets = () => [...Object.keys(OF.sets).filter(k => k !== 'after_topic').map(k => offerSet(k)), ...Object.keys(OF.sets.after_topic.by_topic).map(t => offerSet('after_topic', t))]
 
@@ -1220,7 +1226,7 @@ export function turn(text, st) {
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 export function turnParts(text, st) {
   // loom-fixes-2 (back_alone; route2.py turn): only back words, with nothing of Helper's open: BACK_NONE with the offer
-  if (st.stage === 'open' && backAlone(text)) {
+  if (st.stage === 'open' && !st.pending && !(st.setup && ['new', 'goal', 'rec', 'step'].includes(st.setup.stage)) && backAlone(text)) {
     const out = { kind: 'BACK_NONE' }
     noteLast(st, out)
     attachOffer(out, st)

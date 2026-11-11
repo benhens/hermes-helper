@@ -288,7 +288,8 @@ export function makePage(ctx, opts = {}) {
   const setupAfterSaid = (result, said, typed) => {
     if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN', 'OPEN_TALK'].includes(result.kind)) return [said, []]
     if (!setupQuestionOpen(memory.visit)) return [said, []]
-    if (!typed && !setupReaskWaits(memory.visit)) return [said, []]
+    // (review) a pressed answer while a step is open gets the step back, as before (setup-chat-2)
+    if (!typed && !setupStepOpen(memory.visit) && !setupReaskWaits(memory.visit)) return [said, []]
     // find-v2 part 5 wins where both jobs touched the same thing (Lead, 11 Nov 14:15): things to pick of the answer's
     // own (its answers, or an offer that asks about the answer: two kinds of moving, which app, which plan, the near
     // lines) keep the set-up question back until they are answered, as own_question_kinds do; only one question is on
@@ -719,6 +720,12 @@ export function makePage(ctx, opts = {}) {
     function runSetup(mv, shown) {
       liveClose()
       memory.opening = null
+      // (review) a move of the set-up conversation shows its own line: nothing of an earlier typed question's own picks
+      // waits any more, and the step's own answers count again
+      if (visit.setup) {
+        visit.setup.reaskWaits = false
+        visit.setup.stepHidden = false
+      }
       if (shown) addToLog([{ ...youEntry(shown), send: false }])
       const finish = seen => {
         const says = mv.go(modelSaidOf(seen))

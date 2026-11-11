@@ -20,7 +20,7 @@ test('a context window, a typo of it, or an app\'s windows: no Windows line, and
 })
 
 test('a question about Windows the system still gets the Windows line', () => {
-  for (const m of ['does it run on windows', 'windows', 'does hermes work on windows 11', 'can i use it on a windows pc', 'Windows?']) assert.equal(said(m).need, 'd_windows', m)
+  for (const m of ['does it run on windows', 'windows', 'does hermes work on windows 11', 'can i use it on a windows pc', 'Windows?', 'does hermes run on both windows and mac', 'is there a hermes windows app']) assert.equal(said(m).need, 'd_windows', m)
   assert.equal(namesWindowsOs('is there a windows version'), true)
   assert.equal(namesWindowsOs('contex window'), false)
   assert.equal(namesWindowsOs('two windows'), false)

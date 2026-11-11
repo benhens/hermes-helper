@@ -10,7 +10,7 @@
 // (the thing last recommended). Not kept: Skip, Not sure yet, what the look saw, Something else.
 import { SETUP_DATA } from './setup-data.js'
 import { TALK_DATA } from './talk-data.js'
-import { talkNorm, whichOf, startsWith, smallTalk, freshVisit } from './talk.js'
+import { talkNorm, whichOf, startsWith, smallTalk, freshVisit, talkWouldAnswer } from './talk.js'
 import { workOk, workSqueeze } from './kept.js'
 import { looksLikeKey } from './key-check.js'
 import { LIVE_DATA } from './live-data.js'
@@ -505,7 +505,7 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
     // loom-fixes-2 (typed_answer.no_match_v2; route2.py setup_typed): a message that matches none of the goal lists
     // but that the ordinary talk would answer (a topic word: "laptop or a server") is no answer either; only other
     // messages are kept as unsure
-    if (goal === 'unsure' && hasTopicWord(text)) return null
+    if (goal === 'unsure' && (hasTopicWord(text) || talkWouldAnswer(text))) return null
     return suMove(true, seen => suAnswerGoal(st, goal, text, seen))
   }
   if (s.stage === 'rec') {
@@ -598,6 +598,7 @@ export function setupOpening(st, seen) {
     s.item = cur
     if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
     s.stage = 'rec'
+    s.asked.rec = true // (review) its "Want the steps?" was shown: go back from step 1 comes here, not BACK_FIRST
     // loom-fixes (here_rule, one rule with the Dashboard: src/setup-reads.js hereStop): the stop named is the Dashboard's
     // "You are here"; with the stop kept as current not done, that is this stop
     const done = doneSet(st, seen)

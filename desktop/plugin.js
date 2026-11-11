@@ -24692,7 +24692,7 @@ const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds }
 // a phrase with the word window or windows hits only where the message names Windows the system: the word "windows"
 // itself (never "window", which the word rule makes the same), not after context, contex, token or a word that makes
 // it an app's window ("two windows", "chat windows"). Builder's rule; route2.py has none.
-const APP_WINDOWS = /(^|[^a-z0-9])(?:cont[a-z]*|token|chat|app|apps|browser|terminal|new|two|three|several|multiple|many|other|second|both|separate|extra|more|these|those|its|hermes)\s+windows($|[^a-z0-9])/g
+const APP_WINDOWS = /(^|[^a-z0-9])(?:cont[a-z]*|token|chat|app|apps|browser|terminal|two|three|several|multiple|many|second|separate|extra|more|these|those)\s+windows($|[^a-z0-9])/g
 const namesWindowsOs = text => /(^|[^a-z0-9])windows($|[^a-z0-9])/.test(talkNorm(text).replace(APP_WINDOWS, ' '))
 const aboutWindow = pw => pw.includes('window')
 function fullHit(text, singleOk) {
@@ -25448,6 +25448,12 @@ function offerSaid(sid, st) {
 const offerIsSetup = thing => OF.things[thing].gives.kind === 'setup_chat'
 // the message holds a key word of a topic or a Hermes term
 const hasTopicWord = text => knownWords(cutIgnored(talkNorm(text)))
+// loom-fixes-2 (review; route2.py setup_typed, typed_answer.no_match_v2): the ordinary talk would answer this message by a
+// fixed line, an offer's words or a known word ("laptop or a server")
+const talkWouldAnswer = text => {
+  const tw = cutIgnored(talkNorm(text))
+  return !!(fixedByWords(tw, { wants: false, pending: null }) || offerRoute(tw) || knownWords(tw))
+}
 // Every offer question this build can show: [set id, text, pick ids] (tests; the after_topic sets by topic)
 const offerSets = () => [...Object.keys(OF.sets).filter(k => k !== 'after_topic').map(k => offerSet(k)), ...Object.keys(OF.sets.after_topic.by_topic).map(t => offerSet('after_topic', t))]
 
@@ -25574,7 +25580,7 @@ function turn(text, st) {
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 function turnParts(text, st) {
   // loom-fixes-2 (back_alone; route2.py turn): only back words, with nothing of Helper's open: BACK_NONE with the offer
-  if (st.stage === 'open' && backAlone(text)) {
+  if (st.stage === 'open' && !st.pending && !(st.setup && ['new', 'goal', 'rec', 'step'].includes(st.setup.stage)) && backAlone(text)) {
     const out = { kind: 'BACK_NONE' }
     noteLast(st, out)
     attachOffer(out, st)
@@ -27238,7 +27244,7 @@ function setupTyped(text, st, hasTopicWord = () => false) {
     // loom-fixes-2 (typed_answer.no_match_v2; route2.py setup_typed): a message that matches none of the goal lists
     // but that the ordinary talk would answer (a topic word: "laptop or a server") is no answer either; only other
     // messages are kept as unsure
-    if (goal === 'unsure' && hasTopicWord(text)) return null
+    if (goal === 'unsure' && (hasTopicWord(text) || talkWouldAnswer(text))) return null
     return suMove(true, seen => suAnswerGoal(st, goal, text, seen))
   }
   if (s.stage === 'rec') {
@@ -27331,6 +27337,7 @@ function setupOpening(st, seen) {
     s.item = cur
     if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
     s.stage = 'rec'
+    s.asked.rec = true // (review) its "Want the steps?" was shown: go back from step 1 comes here, not BACK_FIRST
     // loom-fixes (here_rule, one rule with the Dashboard: src/setup-reads.js hereStop): the stop named is the Dashboard's
     // "You are here"; with the stop kept as current not done, that is this stop
     const done = doneSet(st, seen)
@@ -31886,7 +31893,8 @@ function makePage(ctx, opts = {}) {
   const setupAfterSaid = (result, said, typed) => {
     if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN', 'OPEN_TALK'].includes(result.kind)) return [said, []]
     if (!setupQuestionOpen(memory.visit)) return [said, []]
-    if (!typed && !setupReaskWaits(memory.visit)) return [said, []]
+    // (review) a pressed answer while a step is open gets the step back, as before (setup-chat-2)
+    if (!typed && !setupStepOpen(memory.visit) && !setupReaskWaits(memory.visit)) return [said, []]
     // find-v2 part 5 wins where both jobs touched the same thing (Lead, 11 Nov 14:15): things to pick of the answer's
     // own (its answers, or an offer that asks about the answer: two kinds of moving, which app, which plan, the near
     // lines) keep the set-up question back until they are answered, as own_question_kinds do; only one question is on
@@ -32317,6 +32325,12 @@ function makePage(ctx, opts = {}) {
     function runSetup(mv, shown) {
       liveClose()
       memory.opening = null
+      // (review) a move of the set-up conversation shows its own line: nothing of an earlier typed question's own picks
+      // waits any more, and the step's own answers count again
+      if (visit.setup) {
+        visit.setup.reaskWaits = false
+        visit.setup.stepHidden = false
+      }
       if (shown) addToLog([{ ...youEntry(shown), send: false }])
       const finish = seen => {
         const says = mv.go(modelSaidOf(seen))
