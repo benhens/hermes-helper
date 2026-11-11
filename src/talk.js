@@ -18,6 +18,8 @@
 // settings_step and hhcontent's changes-8 rule, and come straight after the remember step.
 import { TALK_DATA } from './talk-data.js'
 import { WANTS_DATA } from './wants-data.js'
+import { AI_MODE } from './ai-mode.js'
+import { LIVE_DATA } from './live-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
 import { hasKept } from './kept.js'
@@ -63,10 +65,10 @@ function lonelyOk(t, p) {
   if (!r) return true
   return (!r.needs_one_of || r.needs_one_of.some(q => hits(t, q))) && !(r.not_with || []).some(q => hits(t, q))
 }
-const whichOf = (t, list) => list.filter(p => hits(t, p) && lonelyOk(t, p))
+export const whichOf = (t, list) => list.filter(p => hits(t, p) && lonelyOk(t, p))
 // A start counts when it is the whole message, or the next character is not a to z, 0 to 9 or '.
-const startsWith = (t, list) => list.some(p => t === p || (t.startsWith(p) && /[^a-z0-9']/.test(t[p.length])))
-function cutIgnored(t) {
+export const startsWith = (t, list) => list.some(p => t === p || (t.startsWith(p) && /[^a-z0-9']/.test(t[p.length])))
+export function cutIgnored(t) {
   for (const p of TALK_DATA.ignore_phrases) t = t.replace(wordRe(p, 'g'), '$1 $2')
   return talkNorm(t)
 }
@@ -322,8 +324,8 @@ export function opening(st) {
 }
 // route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
 // wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
-const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
-function noteLast(st, o) {
+export const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
+export function noteLast(st, o) {
   if (!o) return o
   st.last = o.kind
   st.lastKey = lineKey(o)
@@ -544,7 +546,7 @@ function codeNameRaw(text, strongOnly) {
 }
 
 // A reply to "What's your name?" that holds a name and a question of its own: [name, the rest], or [null, null].
-function nameWithMore(text) {
+export function nameWithMore(text) {
   const more = OPENING.name_with_more
   let m = strongMatch(text)
   if (!m) {
@@ -645,6 +647,8 @@ export function serviceIn(text, st, answered) {
 
 /* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
 const ST = TALK_DATA.small_talk
+// talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
+export const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
 // live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
 const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
 const NR = TALK_DATA.no_repeat
@@ -722,7 +726,7 @@ export function smallTalk(text, st) {
 function smallLine(kind, st) {
   const name = st.name || st.kept.name || null
   if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
-  if (kind === 'ai') return [ST.ai_line, null]
+  if (kind === 'ai') return [LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE], null] // talk-live: AI, AI_PICK or AI_WRITES
   if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
   return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG' }[kind], null]
 }
@@ -769,10 +773,17 @@ function noRepeat(out, st, text) {
 // One typed message -> a result (route2.py turn, changes-14's wrapper): the steps below, then no_repeat; met
 // is set when the opening ends here, and the line is noted as Helper's last.
 export function turn(text, st) {
+  return turnParts(text, st).out
+}
+// talk-live: the same, with the result before no_repeat as well (pre, a copy), which decides whether the AI
+// step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
+export function turnParts(text, st) {
   const wasOpening = st.stage === 'name' || st.stage === 'work'
-  const out = noRepeat(turnSteps(text, st), st, text)
+  const steps = turnSteps(text, st)
+  const pre = { ...steps }
+  const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
-  return noteLast(st, out)
+  return { pre, out: noteLast(st, out) }
 }
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
@@ -1185,7 +1196,7 @@ function keptNote(result, st) {
   // items: what this line says was kept, [key, value] each, so the page can mark the line once
   // that is no longer kept (forgotten, or replaced by a newer one)
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null, items }
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, items }
 }
 // Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
 // as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
@@ -1256,6 +1267,8 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'HOW':
     case 'WHO':
     case 'AI':
+    case 'AI_PICK':
+    case 'AI_WRITES':
     case 'BYE':
     case 'CUT':
     case 'MEAN_NONE':
@@ -1302,6 +1315,12 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('G1', WANTS_DATA.fixed.G1.text, { answers: rowPicks(result.buttons, 'rows') })
     case 'N2':
       return said('N2', WANTS_DATA.fixed.N2.text, { answers: rowPicks(WROWS.filter(r => r.group === result.group).map(r => r.id), 'rows') })
+    // talk-live: a reply the person's AI wrote (ai_writes): its words only, no source, nothing to pick
+    case 'written':
+      return said('written', result.text)
+    // talk-live: the Connectors line picked by the person's AI (ai_picks_line), as a row shows it
+    case 'CN1':
+      return said('CN1', WANTS_DATA.fixed.CN1.text, { source: sourceText(WANTS_DATA.fixed.CN1.sources) })
     case 'want': {
       const r = WANT_ROWS[result.row]
       return said(r.id, r.text, { source: sourceText(r.sources), next: wantNext(r.next, r.thing) })

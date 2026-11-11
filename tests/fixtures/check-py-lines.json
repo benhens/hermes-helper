@@ -229,6 +229,20 @@
    "found": []
   },
   {
+   "id": "AI_PICK",
+   "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits.",
+   "kind": "reply",
+   "words": 21,
+   "found": []
+  },
+  {
+   "id": "AI_WRITES",
+   "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong.",
+   "kind": "reply",
+   "words": 24,
+   "found": []
+  },
+  {
    "id": "BYE",
    "text": "Bye. Come back any time you have a question about Hermes.",
    "kind": "reply",

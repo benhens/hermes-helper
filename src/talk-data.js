@@ -112,6 +112,12 @@ export const TALK_DATA = {
     "AI": {
       "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs."
     },
+    "AI_PICK": {
+      "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits."
+    },
+    "AI_WRITES": {
+      "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong."
+    },
     "BYE": {
       "text": "Bye. Come back any time you have a question about Hermes."
     },

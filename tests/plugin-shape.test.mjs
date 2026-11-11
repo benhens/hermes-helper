@@ -84,12 +84,16 @@ test('"no model" comes from setup.runtime_check; setup.status is read only after
   assert.match(block, /request\('setup\.status'/)
 })
 
-test('the one model call: only in model-call.js, task helping_hand, 90000 ms, never a session id', () => {
+// talk-live: the conversation's AI step asks the same way (src/live-turn.js, through model-call.js's params), so
+// there are two places now; nowhere else.
+test('the model calls: only in model-call.js (the setup card) and live-turn.js (the AI step), task helping_hand, 90000 ms, never a session id', () => {
   const files = fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js'))
   for (const f of files) {
-    if (f !== 'model-call.js') assert.doesNotMatch(src(f), /'llm\.oneshot'/, f)
+    if (f !== 'model-call.js' && f !== 'live-turn.js') assert.doesNotMatch(src(f), /'llm\.oneshot'/, f)
   }
-  assert.equal((code.match(/'llm\.oneshot'/g) || []).length, 1)
+  assert.equal((code.match(/'llm\.oneshot'/g) || []).length, 2)
+  assert.match(src('live-turn.js'), /request\('llm\.oneshot', liveParams\(instructions, input, maxTokens\), ONESHOT_TIMEOUT_MS\)/)
+  assert.match(src('live-request.js'), /oneshotParams\(\{ instructions, input, temperature: LV_IN\.temperature, max_tokens: maxTokens \}\)/)
   assert.match(src('model-call.js'), /request\('llm\.oneshot', oneshotParams\(call\), ONESHOT_TIMEOUT_MS\)/)
   assert.match(src('model-call.js'), /export const ONESHOT_TASK = 'helping_hand'/)
   assert.match(src('model-call.js'), /export const ONESHOT_TIMEOUT_MS = 90000/)

@@ -69,7 +69,7 @@ const NEXT_KINDS = ['part', 'paste', 'line', 'none']
 // the kinds small_talk.how_after_rows.after may name (src/talk.js HOW_AFTER maps wants to want)
 const HOW_AFTER_KINDS = ['row', 'plain', 'term', 'wants', 'COST', 'WHERE', 'written']
 export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'H2', 'K1', 'COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW',
-  'BACK', 'HELLO', 'HELLO_SAME', 'THANKS', 'OK', 'HOW', 'WHO', 'AI', 'BYE', 'CUT', 'MEAN_NONE', 'WRONG', 'AGAIN', 'N1_AGAIN']
+  'BACK', 'HELLO', 'HELLO_SAME', 'THANKS', 'OK', 'HOW', 'WHO', 'AI', 'AI_PICK', 'AI_WRITES', 'BYE', 'CUT', 'MEAN_NONE', 'WRONG', 'AGAIN', 'N1_AGAIN']
 // changes-11 (check_json.py): W2 compares the two terms the person typed, so for W2 alone the
 // two-terms rule is lifted; each term must still be explained in the line.
 const LIFTED = { W2: ['2 Hermes terms in one line'] }
@@ -265,7 +265,6 @@ export function talkProblems(d) {
   if (!(har.after || []).length) problems.push('small_talk.how_after_rows.after is empty')
   const ab = st.ai_line_by_build || {}
   if (!(ab.use_now in ab) || !(d.fixed_lines || []).some(f => f.id === ab[ab.use_now])) problems.push(`small_talk.ai_line_by_build.use_now names no line: ${ab.use_now}`)
-  if (ab.use_now !== 'no_ai_step') problems.push(`small_talk.ai_line_by_build.use_now is ${ab.use_now}: this build has no AI step`)
   const nr = d.no_repeat || {}
   for (const k of ['exempt', 'wrong_starts', 'wrong_anywhere']) if (!(nr[k] || []).length) problems.push(`no_repeat.${k} is empty`)
   // two lines that are not 'plain' (a line with no topic has no plain one), so noRepeat in src/talk.js always has another
