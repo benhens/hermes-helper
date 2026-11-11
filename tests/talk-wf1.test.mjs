@@ -136,7 +136,10 @@ test('the extra cases were made from the pinned scripts: route2.py and wants_fix
 })
 
 test('a group\'s label at the name or work question is not a group: as the reference, F1 or F2, or N2 for a question', () => {
-  const off = X.group_label_by_stage.map(c => [c.stage, c.text, run(c.text, c.stage)[0], c.shown]).filter(([, , got, want]) => got !== want)
+  // talk-live-2: live-v2 changes-4 step 7 keeps what the person does with its end full stop cut, and says so on F2
+  // (+kept=work); the reference keeps nothing there and shows the text as typed
+  const changes4 = (stage, shown) => (stage === 'work' ? shown.replace(/^(F2 name=\S+ work=.*?)\.?$/, '$1') : shown)
+  const off = X.group_label_by_stage.map(c => [c.stage, c.text, run(c.text, c.stage)[0], c.shown]).filter(([stage, , got, want]) => got.replace(/ \+kept=work( \+first)?$/, '') !== changes4(stage, want))
   assert.deepEqual(off, [])
 })
 

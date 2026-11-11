@@ -59,7 +59,8 @@ test('the page: hhcontent\'s top line, the box drawn from the stored record with
   assert.equal(row.props.title, SF.top_line)
   assert.equal(row.props.wide, true)
   // talk-live: a second top line only in a build with an AI step (lines_by_mode.settings_top_line_2)
-  assert.equal(row.props.description, AI_MODE === 'no_ai_step' ? undefined : 'Nothing on this page is sent to any AI.')
+  // live-v2 changes-4: the What you do line is sent, so the AI builds' second top line says so
+  assert.equal(row.props.description, AI_MODE === 'no_ai_step' ? undefined : 'Only the What you do line is sent to your AI, when Helper asks it for help.')
   assert.equal(box(view).type, 'sdk:Textarea')
   assert.equal(box(view).props.value, renderKept(PETER))
   assert.match(box(view).props.value, /^Name: Peter \(Helper greets you with it\)$/m)
@@ -71,8 +72,9 @@ test('the page: hhcontent\'s top line, the box drawn from the stored record with
   assert.equal(find(view, 'save').type, 'sdk:Button')
   assert.ok(shown(view, 'facts').includes(curlyQuotes(SF.also_tell)))
   for (const f of SF.facts) assert.ok(shown(view, 'facts').includes(curlyQuotes(f)), f)
-  // no AI step: neither "Only your name goes to your AI" nor "already sent to your AI"
-  assert.doesNotMatch(text(inside(view)), /your AI/)
+  // no AI step: neither "Only your name goes to your AI" nor "already sent to your AI" (talk-live-2: apart from the AI
+  // builds' second top line of changes-4, checked above)
+  assert.doesNotMatch(text(inside(view)).split('Only the What you do line is sent to your AI, when Helper asks it for help.').join(''), /your AI/)
   // an empty record: the empty line as the box's hint, and no "Forget all of this"
   const empty = await openSettings()
   assert.equal(box(empty.view).props.value, '')

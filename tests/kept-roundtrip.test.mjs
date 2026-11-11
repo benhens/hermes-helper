@@ -42,7 +42,8 @@ function roundTrip(st, label) {
   if (!rec) return 0
   const back = readBox(renderKept(rec))
   assert.equal(back.result, 'read', `${label}: ${JSON.stringify(rec)} → ${JSON.stringify(back)}`)
-  assert.deepEqual(back.record, without(rec, 'told'), label)
+  // talk-live-2: told_work (live-v2 changes-4) is a mark like told, not a line of the box
+  assert.deepEqual(back.record, without(without(rec, 'told'), 'told_work'), label)
   return 1
 }
 

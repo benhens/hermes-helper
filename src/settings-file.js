@@ -10,6 +10,8 @@
 // Nothing here touches storage: the page writes `stored` when the result is 'saved'.
 import { TALK_DATA } from './talk-data.js'
 import { looksSecret } from './secret-rule.js'
+import { AI_MODE } from './ai-mode.js'
+import { workOk } from './kept.js'
 
 const KEEPS_DATA = TALK_DATA.keeps
 const FILE_SF = KEEPS_DATA.settings_file
@@ -27,7 +29,10 @@ function fileNamesOf(topic) {
 }
 const FILE_NAMES = { msg: fileNamesOf('msg'), svc: fileNamesOf('svc') }
 const FILE_LABEL_OF = Object.fromEntries(Object.entries(FILE_R.labels).flatMap(([key, labels]) => labels.map(l => [l, key])))
-const FILE_SINGLE = ['name', 'mod', 'msg', 'svc']
+// live-v2 changes-4: work (What you do) is a single line like the name
+const FILE_SINGLE = ['name', 'work', 'mod', 'msg', 'svc']
+// its reason by mode: with no AI step, nothing is told to any AI (box_lines.work.reason_no_ai_step)
+const fileReason = key => (key === 'work' && AI_MODE === 'no_ai_step' && FILE_BL.work.reason_without_ai ? FILE_BL.work.reason_without_ai : FILE_BL[key].reason)
 // Python's [^\W\d_]: a letter (and the few number signs that are not digits).
 const FILE_LETTER = /[\p{L}\p{Nl}\p{No}]/u
 const FILE_NAME_CHARS = /^(?:[\p{L}\p{Nl}\p{No}]|[ '.-])+$/u
@@ -46,7 +51,7 @@ export function renderKept(rec) {
   const out = []
   for (const key of FILE_SF.order) {
     if (key === 'asked') for (const t of rec.asked || []) out.push(`${FILE_BL.asked.label}: ${t} (${FILE_BL.asked.reason})`)
-    else if (rec[key]) out.push(`${FILE_BL[key].label}: ${key === 'mod' ? FILE_MOD_OUT[rec[key]] : rec[key]} (${FILE_BL[key].reason})`)
+    else if (rec[key]) out.push(`${FILE_BL[key].label}: ${key === 'mod' ? FILE_MOD_OUT[rec[key]] : rec[key]} (${fileReason(key)})`)
   }
   return out.join('\n')
 }
@@ -90,6 +95,10 @@ export function readBox(box) {
       const m = FILE_MOD_IN[val.toLowerCase().replace(/ /g, '')]
       if (!m) return fileRefuse(n, 'mod_value', line)
       rec.mod = m
+    } else if (key === 'work') {
+      // value_rules.work: 1 to 12 words, at most 80 characters, no question mark (the secret check was step 4)
+      if (!workOk(val, { withSecretRule: false })) return fileRefuse(n, 'work_value', line)
+      rec.work = val
     } else if (key === 'msg' || key === 'svc') {
       const v = FILE_NAMES[key][val.toLowerCase()]
       if (!v) return fileRefuse(n, key + '_value', line)
@@ -129,6 +138,7 @@ export function saveBox(stored, box, answer) {
   if ([...FILE_SINGLE, 'asked'].some(k => next[k])) {
     kept = { ...next }
     if (stored.told) kept.told = true
+    if (stored.told_work && kept.work) kept.told_work = true
   }
   return { result: 'saved', message: [FILE_M.saved], stored: kept, box: renderKept(kept) }
 }

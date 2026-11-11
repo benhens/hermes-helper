@@ -515,7 +515,7 @@ const TALK_DATA = {
       "text": "Sorry, that looks cut off. Tell me a bit more about what you need."
     },
     "MEAN_NONE": {
-      "text": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\"."
+      "text": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\"."
     },
     "WRONG": {
       "text": "Sorry about that. Please say it another way."
@@ -525,6 +525,30 @@ const TALK_DATA = {
     },
     "N1_AGAIN": {
       "text": "Sorry, I don't have checked information on that one either."
+    },
+    "OK_SAME": {
+      "text": "All right. I'm here when you need me."
+    },
+    "THANKS_SAME": {
+      "text": "Any time. I'm here if you have another question."
+    },
+    "HOW_SAME": {
+      "text": "Still good, thanks. Ask me anything about Hermes."
+    },
+    "BYE_SAME": {
+      "text": "Bye for now."
+    },
+    "CUT_SAME": {
+      "text": "I can't tell what you need from that. Type your whole question in one message."
+    },
+    "WRONG_SAME": {
+      "text": "Sorry again. Try other words, or ask about another part of Hermes."
+    },
+    "STUCK": {
+      "text": "Sorry it didn't work. Tell me what you tried and what you saw on the screen."
+    },
+    "STUCK_SAME": {
+      "text": "Sorry it still isn't working. Try other words, or ask about another part of Hermes."
     }
   },
   "opening": {
@@ -1323,6 +1347,56 @@ const TALK_DATA = {
         "nope, wrong",
         "i meant something else",
         "not quite"
+      ],
+      "stuck": [
+        "that didn't work",
+        "that didnt work",
+        "that did not work",
+        "it didn't work",
+        "it didnt work",
+        "it did not work",
+        "didn't work",
+        "didnt work",
+        "did not work",
+        "that doesn't work",
+        "that doesnt work",
+        "it doesn't work",
+        "it doesnt work",
+        "it does not work",
+        "doesn't work",
+        "doesnt work",
+        "not working",
+        "it's not working",
+        "its not working",
+        "it is not working",
+        "still not working",
+        "it's still not working",
+        "its still not working",
+        "it still isn't working",
+        "it still isnt working",
+        "still isn't working",
+        "it still doesn't work",
+        "it still doesnt work",
+        "that still didn't work",
+        "still didn't work",
+        "still doesn't work",
+        "still doesnt work",
+        "that didn't help",
+        "that didnt help",
+        "it didn't help",
+        "it didnt help",
+        "didn't help",
+        "that doesn't help",
+        "that doesnt help",
+        "that did nothing",
+        "nothing happened"
+      ],
+      "again": [
+        "again",
+        "once more",
+        "repeat",
+        "repeat that",
+        "one more time"
       ]
     },
     "cut_question_words": [
@@ -1395,6 +1469,17 @@ const TALK_DATA = {
       "buddy",
       "x"
     ],
+    "again_brings_back": [
+      "row",
+      "plain",
+      "term",
+      "W2",
+      "COST",
+      "WHERE",
+      "skill by name",
+      "wants",
+      "written"
+    ],
     "how_after_rows": {
       "words": [
         "how",
@@ -1410,8 +1495,7 @@ const TALK_DATA = {
         "WHERE",
         "written"
       ]
-    },
-    "ai_line": "AI"
+    }
   },
   "no_repeat": {
     "exempt": [
@@ -1436,16 +1520,40 @@ const TALK_DATA = {
       "skill by name"
     ],
     "groups": {
-      "talk": [
-        "THANKS",
-        "OK",
-        "HOW",
-        "WHO",
-        "BYE",
-        "CUT",
+      "hello": [
         "HELLO",
-        "HELLO_SAME",
-        "WRONG"
+        "HELLO_SAME"
+      ],
+      "ok": [
+        "OK",
+        "OK_SAME"
+      ],
+      "thanks": [
+        "THANKS",
+        "THANKS_SAME"
+      ],
+      "how": [
+        "HOW",
+        "HOW_SAME"
+      ],
+      "who": [
+        "WHO"
+      ],
+      "bye": [
+        "BYE",
+        "BYE_SAME"
+      ],
+      "cut": [
+        "CUT",
+        "CUT_SAME"
+      ],
+      "wrong": [
+        "WRONG",
+        "WRONG_SAME"
+      ],
+      "stuck": [
+        "STUCK",
+        "STUCK_SAME"
       ],
       "dont_know": [
         "N1",
@@ -1454,9 +1562,41 @@ const TALK_DATA = {
       ]
     },
     "in_place": {
-      "talk": [
+      "hello": [
         "HELLO_SAME",
+        "HELLO"
+      ],
+      "ok": [
+        "OK_SAME",
         "OK"
+      ],
+      "thanks": [
+        "THANKS_SAME",
+        "THANKS"
+      ],
+      "how": [
+        "HOW_SAME",
+        "HOW"
+      ],
+      "who": [
+        "ai_line",
+        "WHO"
+      ],
+      "bye": [
+        "BYE_SAME",
+        "BYE"
+      ],
+      "cut": [
+        "CUT_SAME",
+        "CUT"
+      ],
+      "wrong": [
+        "WRONG_SAME",
+        "WRONG"
+      ],
+      "stuck": [
+        "STUCK_SAME",
+        "STUCK"
       ],
       "dont_know": [
         "N1_AGAIN",
@@ -1577,7 +1717,24 @@ const TALK_DATA = {
         "contacts",
         "back up",
         "backup",
-        "storage"
+        "storage",
+        "phone my",
+        "phone the",
+        "phone a",
+        "phone an",
+        "phone him",
+        "phone her",
+        "phone them",
+        "phone me",
+        "phone us",
+        "phone someone",
+        "phone somebody",
+        "phone people",
+        "phone back",
+        "phone call",
+        "phone calls",
+        "phone number",
+        "phone numbers"
       ]
     },
     "slow": {
@@ -1909,6 +2066,29 @@ const TALK_DATA = {
       "pay for it",
       "fee",
       "fees"
+    ],
+    "amount_asks": [
+      "how much",
+      "per month",
+      "a month",
+      "each month",
+      "every month",
+      "monthly",
+      "per year",
+      "a year",
+      "per day",
+      "a day"
+    ],
+    "use_price_words": [
+      "cost",
+      "costs",
+      "costing",
+      "cost me",
+      "costs me",
+      "costing me",
+      "money",
+      "price",
+      "pay"
     ]
   },
   "where": {
@@ -3552,6 +3732,10 @@ const TALK_DATA = {
         "kept_words": "{name}"
       },
       {
+        "id": "work",
+        "kept_words": "{work}"
+      },
+      {
         "id": "mod",
         "kept_words": "{value}"
       },
@@ -3605,6 +3789,95 @@ const TALK_DATA = {
         "instead of"
       ]
     },
+    "work": {
+      "limits": {
+        "min_words": 1,
+        "max_words": 12,
+        "max_chars": 80
+      },
+      "non_answers": [
+        "nothing",
+        "not much",
+        "nothing really",
+        "none",
+        "no",
+        "nope",
+        "idk",
+        "i don't know",
+        "i dont know",
+        "dunno",
+        "not sure",
+        "skip",
+        "pass",
+        "rather not say",
+        "i'd rather not say",
+        "prefer not to say",
+        "i prefer not to say",
+        "none of your business",
+        "n/a",
+        "na",
+        "-",
+        "?",
+        "..."
+      ],
+      "lines": {
+        "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes.",
+        "WORK_LONG": "Thanks. That is too long for me to keep. In 12 words or fewer, what do you do?",
+        "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
+        "WORK_ASK": "What do you do now?"
+      },
+      "typed_change": {
+        "starts": [
+          "i'm a",
+          "i'm an",
+          "im a",
+          "i am a",
+          "i am an",
+          "i work as",
+          "i work at",
+          "i work in",
+          "i work for",
+          "i'm working as",
+          "i run",
+          "i own",
+          "i teach",
+          "i study",
+          "i'm studying",
+          "i manage",
+          "i coach",
+          "my job is",
+          "my work is",
+          "i'm retired",
+          "i am retired"
+        ],
+        "now_words": [
+          "now",
+          "nowadays",
+          "these days",
+          "instead",
+          "anymore"
+        ],
+        "not_with": [
+          "not",
+          "no longer",
+          "don't",
+          "dont",
+          "bit",
+          "little",
+          "beginner",
+          "newbie",
+          "confused",
+          "lost",
+          "stuck"
+        ],
+        "ask_again_words": [
+          "change what i do",
+          "change my job",
+          "change what you know about my job",
+          "update what i do"
+        ]
+      }
+    },
     "use": {
       "used_line": "From what I keep: {kept_words}.",
       "used_link": {
@@ -3639,6 +3912,7 @@ const TALK_DATA = {
         },
         "rows": {
           "name": "Your name: {name}",
+          "work": "What you do: {work}",
           "mod": "Paying for an AI: {value}",
           "msg": "Your chat app: {app}",
           "svc": "A service you use: {service}",
@@ -4139,6 +4413,16 @@ const TALK_DATA = {
             "forget what i asked you to remember",
             "delete what i asked you to remember",
             "forget what i told you to remember"
+          ],
+          "work": [
+            "forget what i do",
+            "delete what i do",
+            "remove what i do",
+            "forget my job",
+            "delete my job",
+            "remove my job",
+            "forget my work",
+            "delete my work"
           ]
         },
         "questions": {
@@ -4146,7 +4430,8 @@ const TALK_DATA = {
           "mod": "Delete what you told me about paying?",
           "msg": "Delete your chat app?",
           "svc": "Delete the service you named?",
-          "asked": "Delete all you asked me to remember?"
+          "asked": "Delete all you asked me to remember?",
+          "work": "Delete what you told me you do?"
         },
         "after_yes": "Done. I no longer keep that.",
         "after_no": "Fine. Nothing is changed.",
@@ -4186,39 +4471,9 @@ const TALK_DATA = {
     },
     "settings_file": {
       "top_line": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
-      "box_lines": {
-        "name": {
-          "label": "Name",
-          "reason": "Helper greets you with it"
-        },
-        "mod": {
-          "label": "Paying for an AI",
-          "reason": "so Helper does not ask again",
-          "values": {
-            "ChatGPT": "mod1",
-            "Claude": "mod2",
-            "Neither": "mod4",
-            "Free": "mod3"
-          }
-        },
-        "msg": {
-          "label": "Chat app",
-          "reason": "so Helper shows that app's setup",
-          "values": "keeps.answers.msg.names, written with the app's own spelling"
-        },
-        "svc": {
-          "label": "Service",
-          "reason": "so Helper can write the text to paste",
-          "values": "keeps.answers.svc.names, written with the service's own spelling"
-        },
-        "asked": {
-          "label": "Remember",
-          "reason": "you asked Helper to keep it",
-          "max": 3
-        }
-      },
       "order": [
         "name",
+        "work",
         "mod",
         "msg",
         "svc",
@@ -4246,7 +4501,8 @@ const TALK_DATA = {
         "remember_bracket": "Brackets at the end of a line are for Helper's reasons. Leave yours out.",
         "twice": "There is a {label} line already. Keep one of them.",
         "same_twice": "This line is there twice. Delete one.",
-        "too_many": "Helper keeps three Remember lines at most. Delete one."
+        "too_many": "Helper keeps three Remember lines at most. Delete one.",
+        "work_value": "Keep it to 12 words and 80 letters or fewer, with no question mark."
       },
       "saved": "Saved.",
       "also_tell": "You can also tell Helper. In its conversation, type: forget my name.",
@@ -4256,6 +4512,42 @@ const TALK_DATA = {
         "Removing Helper does not delete it.",
         "Do not type passwords here."
       ],
+      "box_lines": {
+        "name": {
+          "label": "Name",
+          "reason": "Helper greets you with it"
+        },
+        "work": {
+          "label": "What you do",
+          "reason": "Helper tells your AI this when it asks for help",
+          "reason_without_ai": "you told Helper this"
+        },
+        "mod": {
+          "label": "Paying for an AI",
+          "reason": "so Helper does not ask again",
+          "values": {
+            "ChatGPT": "mod1",
+            "Claude": "mod2",
+            "Neither": "mod4",
+            "Free": "mod3"
+          }
+        },
+        "msg": {
+          "label": "Chat app",
+          "reason": "so Helper shows that app's setup",
+          "values": "keeps.answers.msg.names, written with the app's own spelling"
+        },
+        "svc": {
+          "label": "Service",
+          "reason": "so Helper can write the text to paste",
+          "values": "keeps.answers.svc.names, written with the service's own spelling"
+        },
+        "asked": {
+          "label": "Remember",
+          "reason": "you asked Helper to keep it",
+          "max": 3
+        }
+      },
       "would_delete": {
         "question": "Save, and forget {n} things?",
         "question_one": "Save, and forget one thing?",
@@ -4312,6 +4604,14 @@ const TALK_DATA = {
           "asked": [
             "remember",
             "you asked helper to remember"
+          ],
+          "work": [
+            "what you do",
+            "what i do",
+            "work",
+            "my work",
+            "job",
+            "my job"
           ]
         },
         "max_box_chars": 2000,
@@ -7838,8 +8138,9 @@ const WANTS_DATA = {
 }
 
 // ---- src/ai-mode.js ----
-// The one switch for Helper's AI step (talk-live row 1). Pēteris picks the way; until then the commit holds
-// no_ai_step, which is what Helper did before: no call is ever made.
+// The one switch for Helper's AI step (talk-live row 1). talk-live-2 (Lead, 11 Nov 2026 04:40, from Pēteris's words of
+// 03:45 to 03:58: "Of course there needs to be an AI behind"): the commit holds ai_writes. Code still answers first,
+// as built; only what code is not sure of goes to the person's AI.
 //   no_ai_step     Helper answers with its pre-written lines only. Nothing is sent to any AI.
 //   ai_picks_line  when code is not sure, the person's own AI picks which of Helper's checked lines to show
 //   ai_writes      when code is not sure, the person's own AI writes the reply from Helper's checked lines,
@@ -7848,7 +8149,7 @@ const WANTS_DATA = {
 // line under the first "Kept:", the settings page's second top line, and (at build) README's lines by mode.
 // The build stops when the data's own switches (use_now) say otherwise (scripts/live-data.mjs).
 const AI_MODES = ['no_ai_step', 'ai_picks_line', 'ai_writes']
-const AI_MODE = 'no_ai_step'
+const AI_MODE = 'ai_writes'
 
 // ---- src/live-data.js ----
 // Generated by scripts/build.mjs from content/helper-talk-live-v2.json (hhcontent's data for Helper's AI step),
@@ -7892,14 +8193,23 @@ const LIVE_DATA = {
     "question",
     "plain",
     "skill",
-    "wants"
+    "wants",
+    "OK_SAME",
+    "THANKS_SAME",
+    "HOW_SAME",
+    "BYE_SAME",
+    "CUT_SAME",
+    "WRONG_SAME",
+    "anything from small_talk kind again"
   ],
   "go_to_ai": [
     "N1",
     "N1_AGAIN",
     "MEAN_NONE",
     "AGAIN",
-    "plain with why \"what do you mean\""
+    "plain with why \"what do you mean\"",
+    "STUCK",
+    "STUCK_SAME"
   ],
   "follow_up": {
     "phrases": [
@@ -12796,18 +13106,19 @@ const LIVE_DATA = {
     "text": "Conversation so far:\n{last_lines}\n\nThe person's newest message: {message}",
     "text_no_lines": "The person's newest message: {message}",
     "cut_at_chars": 1500,
-    "temperature": 0.2
+    "temperature": 0.2,
+    "work_line": "What the person does (they told Helper): {work}"
   },
   "first_call": {
     "text": "You sort messages for Helper, a part of the Hermes app that explains Hermes to newcomers.\nRead the person's newest message (and the conversation before it, if any). Reply with ONE word from this list and nothing else:\n{subjects: one per line, as id = title}",
     "max_tokens": 20
   },
   "writer": {
-    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
+    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line What the person does tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
     "max_tokens": 200
   },
   "pick_only": {
-    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{rows: one per line, as [id] text; or (no lines)}",
+    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{work_line}\nIf a line What the person does is given, use it only to choose the line that fits them best.\n{rows: one per line, as [id] text; or (no lines)}",
     "max_tokens": 20
   },
   "checks": {
@@ -13210,7 +13521,55 @@ const LIVE_DATA = {
       "publish-site",
       "scrollcraft",
       "yuanbao"
-    ]
+    ],
+    "c24": {
+      "person_pattern": "\\b(?:you are|you're|youre|you work|you run|you own|you teach|you study|you manage|you coach|you sell|you have|you've got|as an?|being an?|for your|with your|at your|in your|your)\\s+",
+      "person_ok": [
+        "welcome",
+        "right",
+        "new",
+        "here",
+        "sure",
+        "ready",
+        "able",
+        "asking",
+        "looking",
+        "trying",
+        "own",
+        "hermes",
+        "bot",
+        "bots",
+        "computer",
+        "phone",
+        "messages",
+        "message",
+        "question",
+        "questions",
+        "chats",
+        "chat",
+        "notes",
+        "files",
+        "first",
+        "next",
+        "setup",
+        "model",
+        "settings",
+        "screen",
+        "laptop",
+        "browser",
+        "time",
+        "way",
+        "choice",
+        "free",
+        "glad",
+        "happy",
+        "very",
+        "all",
+        "set",
+        "the",
+        "one"
+      ]
+    }
   },
   "lines_by_mode": {
     "are_you_an_ai": {
@@ -13220,13 +13579,18 @@ const LIVE_DATA = {
     },
     "first_time_grey": {
       "no_ai_step": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.",
-      "ai_picks_line": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords.",
-      "ai_writes": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords."
+      "ai_picks_line": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.",
+      "ai_writes": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords."
     },
     "settings_top_line_2": {
       "no_ai_step": null,
-      "ai_picks_line": "Nothing on this page is sent to any AI.",
-      "ai_writes": "Nothing on this page is sent to any AI."
+      "ai_picks_line": "Only the What you do line is sent to your AI, when Helper asks it for help.",
+      "ai_writes": "Only the What you do line is sent to your AI, when Helper asks it for help."
+    },
+    "work_told": {
+      "no_ai_step": null,
+      "ai_picks_line": "I also tell your AI what you do when I ask it for help.",
+      "ai_writes": "I also tell your AI what you do when I ask it for help."
     }
   }
 }
@@ -14557,7 +14921,8 @@ function readState(get) {
 
 // ---- src/kept.js ----
 // The one stored record of what Helper keeps about the person (JSON keeps.storage), under the
-// storage key 'kept': { name, mod, msg, svc, asked: [...], told }. Every field is optional.
+// storage key 'kept': { name, work, mod, msg, svc, asked: [...], told, told_work } (live-v2 changes-4: work, what the
+// person does, and told_work, the line that the AI is told it was shown). Every field is optional.
 // cleanKept() is how it is read back: anything unexpected is dropped, so a record edited by hand
 // or written by an older build can never put something into Helper's lines that the rules would
 // not keep. The page and the settings page do the reading and writing with their own storage
@@ -14570,12 +14935,25 @@ const KEPT_APPS = new Set(Object.values(KEPT_DATA.answers.msg.names))
 const KEPT_SERVICES = new Set([...Object.values(KEPT_DATA.answers.svc.names), ...TALK_DATA.topics.flatMap(t => t.question.answers.map(a => a.service).filter(Boolean))])
 const KEPT_LIM = KEPT_DATA.remember.limits
 const KEPT_NAME_MAX = 30
+// live-v2 changes-4 (keeps.work.limits): what the person does, as kept: 1 to 12 words, at most 80 characters, no
+// question mark, no key, and (unless the caller checked it already) nothing that looks secret. The same rule for the
+// keep in the conversation, the stored record, the settings page and the guard before it is sent (input.work_line).
+const KEPT_WORK = KEPT_DATA.work.limits
+const workSqueeze = s => String(s).replace(/\s+/g, ' ').trim()
+function workOk(v, { withSecretRule = true } = {}) {
+  if (typeof v !== 'string' || !v.trim()) return false
+  const words = v.trim().split(/\s+/).length
+  if (words < KEPT_WORK.min_words || words > KEPT_WORK.max_words || Array.from(v).length > KEPT_WORK.max_chars) return false
+  if (v.includes('?') || looksLikeKey(v)) return false
+  return !withSecretRule || !looksSecret(v)
+}
 const keptPlain = (v, max) => typeof v === 'string' && v.trim() !== '' && Array.from(v).length <= max && !looksLikeKey(v)
 
 function cleanKept(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
   const out = {}
   if (keptPlain(v.name, KEPT_NAME_MAX)) out.name = v.name
+  if (workOk(v.work)) out.work = v.work
   if (KEPT_MODS.includes(v.mod)) out.mod = v.mod
   if (KEPT_APPS.has(v.msg)) out.msg = v.msg
   if (KEPT_SERVICES.has(v.svc)) out.svc = v.svc
@@ -14584,10 +14962,11 @@ function cleanKept(v) {
     if (asked.length) out.asked = asked
   }
   if (Object.keys(out).length && v.told === true) out.told = true
+  if (out.work && v.told_work === true) out.told_work = true
   return out
 }
 
-const hasKept = kept => ['name', 'mod', 'msg', 'svc'].some(k => kept[k]) || (kept.asked || []).length > 0
+const hasKept = kept => ['name', 'work', 'mod', 'msg', 'svc'].some(k => kept[k]) || (kept.asked || []).length > 0
 
 // What goes to storage: the cleaned record, or null when nothing is left (then the key is removed,
 // told with it, as "Forget all" does).
@@ -14889,8 +15268,12 @@ function byCode(text, st) {
 // visit and no Forget removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
 // note_last), for ordinary talk and for never saying the same line twice; rejected: the lines the person
 // called wrong in this visit (no_repeat.rejected_rule), never stored.
+// live-v2 changes-3: lastAnswer, lastAnswerKey, lastByAgain: this visit's last answer line, for "again"
+// (small_talk.again_rule). changes-4: keepWork, the keep rule of keeps.work (false only for replaying route2.py,
+// which keeps nothing at "What do you do?"); workLong, WORK_LONG was said once at this question. aiOff: the AI step is
+// off for the rest of this visit (hhtech-weak-ai; set by src/page.js).
 function freshVisit(stage = 'open', kept = {}, met = false) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [] }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false }
 }
 // A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
 // earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,
@@ -14917,12 +15300,30 @@ function opening(st) {
 // route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
 // wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
 const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
+// live-v2 changes-3 (small_talk.again_brings_back): the kinds an answer line has, in this plugin's words (the
+// data's wants is this plugin's want; its "skill by name", the skills-by-name line S1 or S2, is this plugin's skill)
+const AGAIN_BACK = (TALK_DATA.small_talk.again_brings_back || []).map(k => (k === 'wants' ? 'want' : k === 'skill by name' ? 'skill' : k))
+// what a line brought back by "again" leaves out: its faint Kept: line and what only that moment had
+const AGAIN_DROP = ['kept', 'first', 'name_taken', 'thing', 'repeat_of', 'by_again', 'code', 'work_first']
 function noteLast(st, o) {
   if (!o) return o
   st.last = o.kind
   st.lastKey = lineKey(o)
   st.lastTopic = ['row', 'question', 'plain'].includes(o.kind) ? o.topic || null : null
+  st.lastByAgain = !!o.by_again
+  if (AGAIN_BACK.includes(o.kind)) {
+    st.lastAnswer = Object.fromEntries(Object.entries(o).filter(([k]) => !AGAIN_DROP.includes(k)))
+    st.lastAnswerKey = st.lastKey
+  }
   return o
+}
+// route2.py again_line: (1) the last answer line when it is not the line just before; (2) it once more when it
+// is, unless that line was itself brought back by again (then AGAIN); (3) none: MEAN_NONE, or AGAIN after MEAN_NONE
+function againLine(st) {
+  const a = st.lastAnswer
+  if (a && st.lastAnswerKey !== st.lastKey) return { ...a }
+  if (a) return st.lastByAgain ? { kind: 'AGAIN' } : { ...a }
+  return { kind: st.last === 'MEAN_NONE' ? 'AGAIN' : 'MEAN_NONE' }
 }
 
 /* ---------- what Helper keeps (route2.py: keep, keep_typed, kept_need, remember) ---------- */
@@ -14932,6 +15333,12 @@ function keep(st, out, key, value) {
   if (key === 'asked') st.kept.asked = [...(st.kept.asked || []), value]
   else st.kept[key] = value
   out.kept = [...(out.kept || []), key]
+  // live-v2 changes-4 (keeps.tell.work_told): the first time what the person does is kept, the line that the AI is
+  // told goes under the Kept: line (AI builds); shown again only after it was deleted and kept anew
+  if (key === 'work' && !st.kept.told_work) {
+    st.kept.told_work = true
+    out.work_first = true
+  }
   if (!st.kept.told) {
     st.kept.told = true
     out.first = true
@@ -15197,6 +15604,9 @@ function whatIs(t) {
 // where byCode would look at the rows: not while Helper's own question is open and the message is
 // no question (there route2.py's order stands).
 function fixedByWords(t, st) {
+  // live-v2 changes-3 (cost.amount_rule): what something costs, asked with only price words of topic use, is COST
+  const C = TALK_DATA.cost
+  if ((C.amount_asks || []).length && questionForm(t) && whichOf(t, C.amount_asks).length && strongTopics(t).join() === 'use' && !anyTerm(t) && TOPICS.use && whichOf(t, TOPICS.use.key_words.concat(TOPICS.use.misspellings || [])).every(w => C.use_price_words.includes(w))) return 'COST'
   if (strongTopics(t).length || anyTerm(t)) return null
   if (st.wants !== false && wantsOf(t).length && !(st.pending && !questionForm(t))) return null
   if (questionForm(t) && whichOf(t, TALK_DATA.cost.words).length) return 'COST'
@@ -15241,6 +15651,8 @@ function serviceIn(text, st, answered) {
 const ST = TALK_DATA.small_talk
 // talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
 const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
+// live-v2 changes-4: under the first Kept: of what the person does, in a build that calls an AI
+const WORK_TOLD = LIVE_DATA.lines_by_mode.work_told[AI_MODE]
 // live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
 const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
 const NR = TALK_DATA.no_repeat
@@ -15312,7 +15724,8 @@ function smallTalk(text, st) {
   // changes-15 no_rule: a bare no right after an answer, with nothing open, says the answer was wrong
   if (kind === 'ok' && ST.no_words.includes(t) && !st.pending && ST.no_means_wrong_after.includes(st.last)) kind = 'wrong'
   if (opening && !['thanks', 'how', 'who', 'ai', 'bye', 'cut'].includes(kind)) return null // at_opening
-  if (st.pending && (kind === 'ok' || kind === 'mean')) return null // when_pending: the answer to Helper's question
+  // when_pending: the answer to Helper's question (live-v2 changes-3: again too; stuck is taken, as wrong)
+  if (st.pending && (kind === 'ok' || kind === 'mean' || kind === 'again')) return null
   return kind
 }
 // The fixed line for a small-talk kind: [line, the name for HELLO or the topic for a plain line].
@@ -15321,7 +15734,7 @@ function smallLine(kind, st) {
   if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
   if (kind === 'ai') return [LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE], null] // talk-live: AI, AI_PICK or AI_WRITES
   if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
-  return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG' }[kind], null]
+  return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG', stuck: 'STUCK' }[kind], null] // changes-3: stuck
 }
 // Builder: the plugin's own kinds that route2.py does not have, kept out of no_repeat like the data's exempt
 // ones: a skill named by name (changes-15's own words: "a skill named by name") and what Helper keeps, asked
@@ -15333,6 +15746,11 @@ const EXEMPT_ALSO = ['skill', 'A1', 'A2', 'A4', 'A-none']
 // asks for it again in so many words gets the same line.
 function noRepeat(out, st, text) {
   const k = out.kind
+  // live-v2 changes-3: what "again" brings back is final
+  if (out.by_again) {
+    st.rejected = []
+    return out
+  }
   const t = talkNorm(text)
   const saidWrong = startsWith(t, NR.wrong_starts) || whichOf(t, NR.wrong_anywhere).length > 0
   if (saidWrong && st.lastKey) st.rejected.push(st.lastKey)
@@ -15350,17 +15768,74 @@ function noRepeat(out, st, text) {
   for (const c of NR.in_place[group]) {
     if (c === 'plain') {
       if (out.topic) cands.push({ kind: 'plain', topic: out.topic })
-    } else cands.push({ kind: c })
+    } else if (c === 'ai_line') cands.push({ kind: LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE] }) // changes-3: group who
+    else if (c === 'HELLO') cands.push({ kind: 'HELLO', name: st.name || st.kept.name || null }) // changes-3: with the name
+    else cands.push({ kind: c })
   }
   const next = cands.find(x => !avoid.includes(lineKey(x))) || cands.find(x => lineKey(x) !== st.lastKey)
   // no other line to say (not possible with today's data: every in_place group has two lines that are not
   // 'plain'): the line as chosen, rather than a crash
   if (!next) return out
-  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) next[x] = out[x]
+  for (const x of ['kept', 'first', 'name_taken', 'thing', 'work_first']) if (x in out) next[x] = out[x]
   next.repeat_of = k
   st.pending = null
   st.lastq = false
   return next
+}
+
+/* ---------- live-v2 changes-4: what the person does (keeps.work) ---------- */
+const WORK = KEEPS.work
+const workEnd = s => s.replace(/[.!\s]+$/, '')
+const workWhole = t => t.replace(/[ ?!.,]+$/, '').trim()
+// Steps 2 to 7 at "What do you do?". Returns { kind, more } for a line of this step, or null when the message is
+// to be answered as an ordinary message (a question, or a topic or term word that does not start like "I run").
+function workStep(text, t, st, out) {
+  if (questionForm(t)) return null // 2
+  if ((strongTopics(t).length || anyTerm(t)) && !startsWith(t, OPENING.name_with_more.self_starts)) return null // 3
+  const whole = workWhole(talkNorm(text))
+  st.stage = 'open'
+  if (Object.values(ST.kinds).some(ws => ws.includes(whole)) || WORK.non_answers.includes(whole) || WORK.non_answers.includes(talkNorm(text).trim())) return { kind: 'F3' } // 4
+  if (looksSecret(text)) return { kind: 'WORK_SECRET' } // 5
+  const value = workEnd(workSqueeze(text))
+  if (!workOk(value, { withSecretRule: false })) {
+    // 6: too long; the first time the question stays open
+    if (!st.workLong) {
+      st.workLong = true
+      st.stage = 'work'
+      return { kind: 'WORK_LONG' }
+    }
+    st.workLong = false
+    return { kind: 'WORK_LONG_2' }
+  }
+  st.workLong = false
+  keep(st, out, 'work', value) // 7
+  st.work = value
+  if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
+  return { kind: 'F2', more: { name: st.name, work: value } }
+}
+// keeps.work.typed_change: "I'm a teacher now" replaces (or keeps) what the person does; "change what I do" asks
+// WORK_ASK, and the reply goes through workStep. Returns { kind, more } or null.
+function workChange(text, st, out) {
+  const TC = WORK.typed_change
+  const whole = workWhole(talkNorm(text))
+  if (TC.ask_again_words.includes(whole)) {
+    st.stage = 'work'
+    st.workLong = false
+    st.pending = null
+    return { kind: 'WORK_ASK' }
+  }
+  const raw = workSqueeze(String(text).replace(/[\u2018\u2019]/g, "'"))
+  let t = stripLead(talkNorm(raw))
+  if (startsWith(t, ['actually'])) t = t.slice('actually'.length).replace(/^[ ,]+/, '')
+  if (!startsWith(t, TC.starts) || !whichOf(t, TC.now_words).length) return null
+  if (t.includes('?') || questionForm(t) || whichOf(t, TC.not_with).length || strongTopics(t).length || anyTerm(t)) return null
+  // the value: the message as typed, from where t starts, with end marks and the now-word at its end cut
+  let value = workEnd(Array.from(raw).slice(Array.from(raw).length - charCount(t)).join(''))
+  const nowAtEnd = [...TC.now_words].sort((a, b) => b.length - a.length).find(w => value.toLowerCase().endsWith(' ' + w))
+  if (nowAtEnd) value = workEnd(value.slice(0, value.length - nowAtEnd.length).replace(/[ ,]+$/, ''))
+  if (!value || looksSecret(text) || !workOk(value)) return null
+  keep(st, out, 'work', value)
+  return { kind: 'F2', more: { name: st.name || st.kept.name || null, work: value } }
 }
 
 // One typed message -> a result (route2.py turn, changes-14's wrapper): the steps below, then no_repeat; met
@@ -15395,6 +15870,12 @@ function turnSteps(text, st) {
   }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
+  // live-v2 changes-3 (small_talk.again_rule): this visit's last answer line again, or AGAIN or MEAN_NONE
+  if (sk === 'again') {
+    st.stage = 'open'
+    const { kind, ...more } = againLine(st)
+    return done(kind, { ...more, by_again: true })
+  }
   if (sk) {
     const [line, x] = smallLine(sk, st)
     st.stage = 'open'
@@ -15444,6 +15925,11 @@ function turnSteps(text, st) {
       ordinary = both || (!name && (strongTopics(t).length > 0 || anyTerm(t) || questionForm(t)) && !oneWordName(text, st))
       if (!name && !ordinary) name = codeName(text)
       if (name && oneWordName(text, st)) name = capFirst(String(text).trim().replace(/[.!]+$/, '').trim()) // "Ty!" is Ty
+    } else if (st.keepWork !== false) {
+      // live-v2 changes-4: the reply to "What do you do?" (keeps.work steps 2 to 7; step 1, a key, is above)
+      const w = workStep(text, t, st, out)
+      if (w) return done(w.kind, w.more)
+      ordinary = true
     } else ordinary = questionForm(t)
     if (!ordinary) {
       let work = null
@@ -15491,6 +15977,11 @@ function turnSteps(text, st) {
   if (dk === 'N1a') return done(dk)
   // changes-11, in route2.py's order: a name on a later visit, "what is ...", cost, where
   if (st.stage === 'open') {
+    // live-v2 changes-4 (keeps.work.typed_change and ask_again): what the person does, said again by typing
+    if (st.keepWork !== false) {
+      const wc = workChange(text, st, out)
+      if (wc) return done(wc.kind, wc.more)
+    }
     const nl = nameLater(text, st, out)
     if (nl) return done(nl.kind, { name: nl.name })
     const tw = cutIgnored(talkNorm(text))
@@ -15668,6 +16159,7 @@ function forgetAnswerSteps(what, yes, st) {
   st.pending = null
   if (!yes) return { kind: 'A-no', what }
   if (what !== 'all') delete st.kept[what]
+  if (what === 'work') delete st.kept.told_work // changes-4: told again when kept anew
   if (what === 'all' || !hasKeptValues(st.kept)) for (const k of Object.keys(st.kept)) delete st.kept[k]
   if (what === 'all' || what === 'name') st.name = null
   return { kind: 'A-yes', what }
@@ -15767,13 +16259,14 @@ function keptWords(key, value) {
     return v ? v.value : String(value)
   }
   const thing = KEEPS.things.find(x => x.id === key)
-  return fillSlots(thing ? thing.kept_words : '{value}', { name: value, app: value, service: value, thing: value, value })
+  return fillSlots(thing ? thing.kept_words : '{value}', { name: value, app: value, service: value, thing: value, work: value, value })
 }
 // The rows of the list behind "See what I keep" (keeps.tell.see.rows), in their order.
 function keptRows(kept) {
   const R = KEEPS.tell.see.rows
   const rows = []
   if (kept.name) rows.push(fillSlots(R.name, { name: kept.name }))
+  if (kept.work) rows.push(fillSlots(R.work, { work: kept.work })) // changes-4: second, after the name
   if (kept.mod) rows.push(fillSlots(R.mod, { value: keptWords('mod', kept.mod) }))
   if (kept.msg) rows.push(fillSlots(R.msg, { app: kept.msg }))
   if (kept.svc) rows.push(fillSlots(R.svc, { service: kept.svc }))
@@ -15789,7 +16282,8 @@ function keptNote(result, st) {
   // items: what this line says was kept, [key, value] each, so the page can mark the line once
   // that is no longer kept (forgotten, or replaced by a newer one)
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, items }
+  // also: changes-4's line that the AI is told what the person does (lines_by_mode.work_told; none with no AI step)
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, ...(result.work_first && WORK_TOLD ? { also: WORK_TOLD } : {}), items }
 }
 // Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
 // as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
@@ -15874,7 +16368,22 @@ function lineFor(result, st, typed = '', opts = {}) {
     case 'MEAN_NONE':
     case 'WRONG':
     case 'AGAIN':
+    // live-v2 changes-3: each kind's own line in place of a repeat, and STUCK
+    case 'OK_SAME':
+    case 'THANKS_SAME':
+    case 'HOW_SAME':
+    case 'BYE_SAME':
+    case 'CUT_SAME':
+    case 'WRONG_SAME':
+    case 'STUCK':
+    case 'STUCK_SAME':
       return said(result.kind, FIXED[result.kind].text)
+    // live-v2 changes-4: what the person does, not kept (a secret, too long) or asked again
+    case 'WORK_SECRET':
+    case 'WORK_LONG':
+    case 'WORK_LONG_2':
+    case 'WORK_ASK':
+      return said(result.kind, WORK.lines[result.kind])
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
@@ -16086,13 +16595,16 @@ function isFollowPhrase(text) {
 }
 
 // Whether a message is a follow-up (follow_up.rule): Helper's last line came from rows, and the no-AI turn
-// found ordinary talk of kind mean (plain with why "what do you mean", or MEAN_NONE) or the message is a phrase.
+// found ordinary talk of kind mean (plain with why "what do you mean", or MEAN_NONE) or kind stuck, or the message
+// is a phrase.
 // before: the visit's note of Helper's last line as it was before this message ({ last, lastKey, liveRows }).
 function isFollowUp(text, pre, before) {
   const fromRows = before.last === 'written' ? !!(before.liveRows && before.liveRows.ids.length) : FROM_ROWS.includes(before.last)
   if (!fromRows) return false
   const mean = pre.kind === 'MEAN_NONE' || (pre.kind === 'plain' && pre.why === 'what do you mean')
-  return mean || isFollowPhrase(text)
+  // live-v2 changes-3: kind stuck ("that didn't work") is a follow-up too
+  const stuck = pre.kind === 'STUCK' || pre.kind === 'STUCK_SAME'
+  return mean || stuck || isFollowPhrase(text)
 }
 
 // follow_up.rows: the rows handed for the person's previous message, in the same order, each with its next
@@ -16130,6 +16642,19 @@ const SKILL_RX = LC.skills.map(s => [s.toLowerCase(), new RegExp('(^|[^a-z0-9-])
 const NOT_RX = Object.fromEntries(Object.entries(LC.not_words).map(([cls, ws]) => [cls, ws.map(w => new RegExp("(^|[^a-z'])" + liveEsc(w) + "($|[^a-z'])", 'g'))]))
 const MONEY_RX = LC.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
 const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
+
+// hhtech-weak-ai (For builder): a reply that is the model's thinking is no reply: an unclosed <think> (Hermes cuts a
+// closed block itself), or text that starts with "Thinking Process" or holds "**Analyze" (a managed local server
+// hands back the thinking with no tag at all). Constants: live-v2 changes-5, which would hold them as data, does not
+// exist (11 Nov 04:40).
+const THINK_START = /^\s*thinking process\b/i
+const THINK_ANYWHERE = '**Analyze'
+function isThinking(raw) {
+  const s = String(raw || '')
+  const open = s.lastIndexOf('<think>')
+  if (open >= 0 && s.indexOf('</think>', open) < 0) return true
+  return THINK_START.test(s) || s.includes(THINK_ANYWHERE)
+}
 
 // <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
 // while the model still thinks)
@@ -16202,6 +16727,26 @@ const sameWords = s => talkNorm(s).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s
 // failed check is listed (the turn shows the fallback when the list is not empty).
 //   rows: the rows handed, [{ id, text }]; used: the ids after USED: (or null)
 //   talk: { lastLine: Helper's last line as shown, message: the person's newest message } for c18 and c23
+// live-v2 changes-4, c24: a claim about the person beyond what was kept (checks.list c24, apply_c4_check.py
+// c24_fails): after each "you run", "as a", "your" ... up to 3 words in the same sentence part; a word of 3 letters
+// or more that is not a stop word, not on person_ok, and (with or without a final s) not a word of what was kept, of
+// the person's newest message or of the rows handed fails. Returns the first such word, or null.
+const C24_RX = new RegExp(LC.c24.person_pattern, 'gi')
+const C24_STOP = new Set([...LIVE_DATA.stop_words, ...LC.c24.person_ok])
+const c24Words = s => new Set((String(s || '').toLowerCase().match(/[a-z']+/g) || []).map(w => w.replace(/s+$/, '')))
+function c24Fails(reply, work, message, hand) {
+  const allowed = new Set([...c24Words(work), ...c24Words(message), ...c24Words(hand)])
+  C24_RX.lastIndex = 0
+  for (const m of String(reply).matchAll(C24_RX)) {
+    const part = reply.slice(m.index + m[0].length).split(/[.,;!?]/)[0]
+    for (const w of (part.match(/[A-Za-z']+/g) || []).slice(0, 3)) {
+      const lw = w.toLowerCase()
+      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, ''))) return w
+    }
+  }
+  return null
+}
+
 function replyFlags(reply, rows, used, talk = {}) {
   const ids = rows.map(r => r.id)
   const textOf = Object.fromEntries(rows.map(r => [r.id, r.text]))
@@ -16240,6 +16785,9 @@ function replyFlags(reply, rows, used, talk = {}) {
   }
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
+  // c24, after c23 (changes-4: "Run c24 after c23")
+  const who = c24Fails(reply, talk.work, talk.message, hand)
+  if (who) out.push('c24 about the person ' + who)
   return out
 }
 
@@ -16275,8 +16823,19 @@ function fillList(text, slot, lines) {
 }
 const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects', LIVE_DATA.subjects.map(s => `${s.id} = ${s.title}`))
 const rowLines = ids => ids.filter(id => LIVE_ROW[id]).map(id => `[${id}] ${LIVE_ROW[id].text}`)
-const writerText = ids => fillList(LIVE_DATA.writer.text, 'rows', rowLines(ids))
-const pickText = ids => fillList(LIVE_DATA.pick_only.text, 'rows', rowLines(ids))
+// live-v2 changes-4 (input.work_line): what the person does, the one kept value ever sent, as one labelled line; null
+// when nothing is kept or the value fails the guard (not secret, no key, within keeps.work.limits). Never the name.
+function workLine(work) {
+  if (!workOk(work)) return null
+  return LV_IN.work_line.replace('{work}', () => work.replace(/\s+/g, ' ').trim())
+}
+// the slot {work_line} on its own line: the work line, or the slot and its line break left out
+const fillWork = (text, work) => {
+  const w = workLine(work)
+  return w ? text.replace('{work_line}', () => w) : text.replace(/\{work_line\}\n?/, '')
+}
+const writerText = (ids, work = null) => fillList(fillWork(LIVE_DATA.writer.text, work), 'rows', rowLines(ids))
+const pickText = (ids, work = null) => fillList(fillWork(LIVE_DATA.pick_only.text, work), 'rows', rowLines(ids))
 
 // Which lines of the conversation may ever be sent, decided when they are said (the page notes it on the
 // log entries): { you, helper } for the person's message and Helper's answer.
@@ -16355,16 +16914,20 @@ const LV_DONT_KNOW = ['N1', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE']
 // of an N1 or a repeat; they come only after a result this already sends.
 function goesToAi(pre) {
   if (!pre) return false
+  // live-v2 changes-3: anything from kind again is code's, AGAIN and MEAN_NONE included
+  if (pre.by_again) return false
   if (pre.kind === 'plain') return pre.why === 'what do you mean'
   return LV_GO.includes(pre.kind)
 }
 
-// Why this message makes no call (null: it may). In this order: the switch, code's own answer, the model the
+// Why this message makes no call (null: it may). In this order: the switch, code's own answer, the AI step is off
+// for this visit (hhtech-weak-ai: an earlier call gave no answer in 12 s or gave thinking text), the model the
 // page checked is not ready (still checking, none or an error), the message looks like a secret by Helper's
 // secret rule, or Hermes still works on an earlier call of Helper's (one call at a time).
-function liveWhyNot({ mode = AI_MODE, pre, text, status, inHermes = 0 }) {
+function liveWhyNot({ mode = AI_MODE, pre, text, status, inHermes = 0, off = false }) {
   if (mode === 'no_ai_step') return 'no AI step'
   if (!goesToAi(pre)) return 'code answered'
+  if (off) return 'AI off for this visit'
   if (!status || status.state !== 'ok') return 'model not ready'
   if (looksSecret(text)) return 'looks secret'
   if (inHermes > 0) return 'Hermes still works on a call'
@@ -16385,18 +16948,33 @@ function isHowQuestion(text) {
 //   lastLine: Helper's last line as shown; request: host.request; msLeft(): ms left of the 12 s
 //   onCall(name): told before each call (for the tests' log)
 //   alive(): false once the page has closed this turn (12 s, or the next message): no further call starts
-async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {} }) {
+//   work: what the person does as kept (live-v2 changes-4), for the work line of the second call and for c24
+// A call that sends back thinking text (hhtech-weak-ai) ends the turn at once: { fallback, thinking: true }, so
+// the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
+// USED: line) is an ordinary fallback.
+async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null }) {
   const input = inputText(message, lines)
+  let thinking = false
   const call = async (name, instructions, maxTokens) => {
     if (!alive()) return null
     onCall(name)
     try {
       const res = await request('llm.oneshot', liveParams(instructions, input, maxTokens), ONESHOT_TIMEOUT_MS)
-      return res && typeof res.text === 'string' ? res.text : null
+      const t = res && typeof res.text === 'string' ? res.text : null
+      if (t !== null && isThinking(t)) {
+        thinking = true
+        return null
+      }
+      return t
     } catch {
       return null
     }
   }
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work })
+  return thinking ? { fallback: 'thinking text', thinking: true } : got
+}
+
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work }) {
   let ids = null
   if (isFollowUp(text, pre, before)) ids = followRows(before)
   if (!ids || !ids.length) {
@@ -16415,7 +16993,7 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
   const rows = ids.map(id => ({ id, text: LIVE_ROW[id].text }))
   if (mode === 'ai_picks_line') {
-    const raw = await call('pick', pickText(ids), LIVE_DATA.pick_only.max_tokens)
+    const raw = await call('pick', pickText(ids, work), LIVE_DATA.pick_only.max_tokens)
     if (raw === null) return { fallback: 'pick call failed' }
     const p = readPick(raw, ids)
     if (p.id) return { result: resultOfRow(p.id), rows: ids }
@@ -16423,9 +17001,9 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     return { fallback: 'pick: none' }
   }
-  const raw = await call('writer', writerText(ids), LIVE_DATA.writer.max_tokens)
+  const raw = await call('writer', writerText(ids, work), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }
@@ -16455,6 +17033,7 @@ function liveApply(st, got, out, before, text) {
     // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
     st.last = (r.used || []).some(u => u.toLowerCase() !== 'none') ? 'written' : 'written-talk'
     st.lastKey = writtenKey(r.text)
+    st.lastAnswerKey = st.lastKey // changes-3: "again" compares it with the line just before
   }
   st.liveRows = got.rows && got.rows.length ? { key: st.lastKey, ids: got.rows } : null
   return r
@@ -16488,7 +17067,10 @@ function fileNamesOf(topic) {
 }
 const FILE_NAMES = { msg: fileNamesOf('msg'), svc: fileNamesOf('svc') }
 const FILE_LABEL_OF = Object.fromEntries(Object.entries(FILE_R.labels).flatMap(([key, labels]) => labels.map(l => [l, key])))
-const FILE_SINGLE = ['name', 'mod', 'msg', 'svc']
+// live-v2 changes-4: work (What you do) is a single line like the name
+const FILE_SINGLE = ['name', 'work', 'mod', 'msg', 'svc']
+// its reason by mode: with no AI step, nothing is told to any AI (box_lines.work.reason_no_ai_step)
+const fileReason = key => (key === 'work' && AI_MODE === 'no_ai_step' && FILE_BL.work.reason_without_ai ? FILE_BL.work.reason_without_ai : FILE_BL[key].reason)
 // Python's [^\W\d_]: a letter (and the few number signs that are not digits).
 const FILE_LETTER = /[\p{L}\p{Nl}\p{No}]/u
 const FILE_NAME_CHARS = /^(?:[\p{L}\p{Nl}\p{No}]|[ '.-])+$/u
@@ -16507,7 +17089,7 @@ function renderKept(rec) {
   const out = []
   for (const key of FILE_SF.order) {
     if (key === 'asked') for (const t of rec.asked || []) out.push(`${FILE_BL.asked.label}: ${t} (${FILE_BL.asked.reason})`)
-    else if (rec[key]) out.push(`${FILE_BL[key].label}: ${key === 'mod' ? FILE_MOD_OUT[rec[key]] : rec[key]} (${FILE_BL[key].reason})`)
+    else if (rec[key]) out.push(`${FILE_BL[key].label}: ${key === 'mod' ? FILE_MOD_OUT[rec[key]] : rec[key]} (${fileReason(key)})`)
   }
   return out.join('\n')
 }
@@ -16551,6 +17133,10 @@ function readBox(box) {
       const m = FILE_MOD_IN[val.toLowerCase().replace(/ /g, '')]
       if (!m) return fileRefuse(n, 'mod_value', line)
       rec.mod = m
+    } else if (key === 'work') {
+      // value_rules.work: 1 to 12 words, at most 80 characters, no question mark (the secret check was step 4)
+      if (!workOk(val, { withSecretRule: false })) return fileRefuse(n, 'work_value', line)
+      rec.work = val
     } else if (key === 'msg' || key === 'svc') {
       const v = FILE_NAMES[key][val.toLowerCase()]
       if (!v) return fileRefuse(n, key + '_value', line)
@@ -16590,6 +17176,7 @@ function saveBox(stored, box, answer) {
   if ([...FILE_SINGLE, 'asked'].some(k => next[k])) {
     kept = { ...next }
     if (stored.told) kept.told = true
+    if (stored.told_work && kept.work) kept.told_work = true
   }
   return { result: 'saved', message: [FILE_M.saved], stored: kept, box: renderKept(kept) }
 }
@@ -18301,7 +18888,7 @@ function namesWhole(text) {
 //     paste:   null | text        text to paste shown at once (the "your own Hermes can" line)
 //     rows:    null | [text]      the list of what Helper keeps (A1)
 //     hint:    null | text        a small faint line under the line (N_HINT)
-//     note:    null | { text, link, first }   the faint "Kept: ..." line, above the line it belongs to
+//     note:    null | { text, link, first, also }   the faint "Kept: ..." line, above the line it belongs to
 //     used:    null | { text, link, topic }   the faint "From what I keep: ..." line, the same place
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
@@ -18367,7 +18954,9 @@ function notesOf(entry, onNote, kept) {
         children: [
           words(entry.note.text, gone),
           jsx('button', { type: 'button', className: T.link, 'data-hh': 'kept-link', onClick: () => onNote(entry, 'see'), children: entry.note.link }, 'link'),
-          entry.note.first ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-first', children: entry.note.first }, 'first') : null
+          entry.note.first ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-first', children: entry.note.first }, 'first') : null,
+          // live-v2 changes-4: below the first-time line, the line that the AI is told what the person does (once)
+          entry.note.also ? jsx('span', { className: T.noteFirst, 'data-hh': 'kept-work-told', children: entry.note.also }, 'also') : null
         ]
       }, `${entry.id}-kept`)
     )
@@ -19097,7 +19686,8 @@ function makePage(ctx, opts = {}) {
       memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
-      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes })
+      // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes, off: visit.aiOff === true })
       if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
       // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
@@ -19107,7 +19697,12 @@ function makePage(ctx, opts = {}) {
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
+      // 12 s: the no-AI line. A call of Helper's still in Hermes then (no answer in 12 s) turns the AI step off for the
+      // rest of this visit: a slow or thinking model is held by each abandoned call for minutes (hhtech-weak-ai)
+      w.stopTimer = ctx.setTimeout(() => {
+        if (live.waiting === w && live.inHermes > 0) visit.aiOff = true
+        liveFinish(w, null)
+      }, LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
       const request = (method, params, timeout) => {
         live.inHermes++
@@ -19121,8 +19716,12 @@ function makePage(ctx, opts = {}) {
           live.inHermes--
         })
       }
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w })
+      // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null })
         .then(got => {
+          // hhtech-weak-ai: thinking text from any call turns the AI step off for the rest of this visit, also when
+          // it comes after the 12 s
+          if (got && got.thinking) visit.aiOff = true
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })

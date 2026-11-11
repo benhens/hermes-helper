@@ -17770,7 +17770,7 @@
   },
   {
    "about_keeping": true,
-   "expect": "HELLO_SAME +norepeat",
+   "expect": "WRONG_SAME +norepeat",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -17872,10 +17872,10 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME",
+      "kind": "WRONG_SAME",
       "repeat_of": "WRONG"
      },
-     "shown": "HELLO_SAME +norepeat",
+     "shown": "WRONG_SAME +norepeat",
      "state": {
       "asked": [
        "msg"
@@ -18303,7 +18303,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "HELLO_SAME +norepeat",
+   "expect": "THANKS_SAME +norepeat",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -18338,10 +18338,10 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME",
+      "kind": "THANKS_SAME",
       "repeat_of": "THANKS"
      },
-     "shown": "HELLO_SAME +norepeat",
+     "shown": "THANKS_SAME +norepeat",
      "state": {
       "asked": [],
       "found": {},
@@ -18359,7 +18359,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "HELLO_SAME +norepeat",
+   "expect": "CUT_SAME +norepeat",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -18394,10 +18394,10 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME",
+      "kind": "CUT_SAME",
       "repeat_of": "CUT"
      },
-     "shown": "HELLO_SAME +norepeat",
+     "shown": "CUT_SAME +norepeat",
      "state": {
       "asked": [],
       "found": {},
@@ -21107,7 +21107,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "N1",
+   "expect": "STUCK",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -21143,9 +21143,9 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "STUCK"
      },
-     "shown": "N1",
+     "shown": "STUCK",
      "state": {
       "asked": [],
       "found": {},
@@ -23249,17 +23249,2713 @@
      "text": "and?"
     }
    ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "HELLO name=None +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 hey three times: HELLO, HELLO_SAME, HELLO",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO",
+      "name": null
+     },
+     "shown": "HELLO name=None",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO_SAME"
+     },
+     "shown": "HELLO_SAME",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO",
+      "name": null,
+      "repeat_of": "HELLO_SAME"
+     },
+     "shown": "HELLO name=None +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "HELLO name=None +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 his later visit: BACK, hey, hey: the second hey gets HELLO, not OK",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "open",
+     "out": {
+      "kind": "OPEN"
+     },
+     "shown": "OPEN",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "name",
+      "work": null
+     }
+    },
+    {
+     "do": "skip",
+     "out": {
+      "kind": "F3"
+     },
+     "shown": "F3",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "visit"
+    },
+    {
+     "do": "open",
+     "out": {
+      "kind": "BACK",
+      "name": null
+     },
+     "shown": "BACK name=None",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO_SAME"
+     },
+     "shown": "HELLO_SAME",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO",
+      "name": null,
+      "repeat_of": "HELLO_SAME"
+     },
+     "shown": "HELLO name=None +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "HELLO name=Peter +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 later visit with a name: BACK, hey, hi: HELLO with the name",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "open",
+     "out": {
+      "kind": "OPEN"
+     },
+     "shown": "OPEN",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "name",
+      "work": null
+     }
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "name"
+      ],
+      "kind": "F1",
+      "name": "Peter"
+     },
+     "shown": "F1 name=Peter +kept=name +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": "Peter",
+      "pending": null,
+      "stage": "work",
+      "work": null
+     },
+     "text": "Peter"
+    },
+    {
+     "do": "skip",
+     "out": {
+      "kind": "F3"
+     },
+     "shown": "F3",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": "Peter",
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "visit"
+    },
+    {
+     "do": "open",
+     "out": {
+      "kind": "BACK",
+      "name": "Peter"
+     },
+     "shown": "BACK name=Peter",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO_SAME"
+     },
+     "shown": "HELLO_SAME",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO",
+      "name": "Peter",
+      "repeat_of": "HELLO_SAME"
+     },
+     "shown": "HELLO name=Peter +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "name": "Peter",
+       "told": true
+      },
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hi"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "HELLO name=None +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 hey, hey, hi: never OK",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO",
+      "name": null
+     },
+     "shown": "HELLO name=None",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO_SAME"
+     },
+     "shown": "HELLO_SAME",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO",
+      "name": null,
+      "repeat_of": "HELLO_SAME"
+     },
+     "shown": "HELLO name=None +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hi"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "WRONG +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 that's wrong three times: WRONG, WRONG_SAME, WRONG",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I talk to it from my phone?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "msg"
+      ],
+      "kind": "row",
+      "need": "msg2",
+      "topic": "msg"
+     },
+     "shown": "line msg2 +kept=msg +first",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "msg": "WhatsApp",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "WhatsApp"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG"
+     },
+     "shown": "WRONG",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "msg": "WhatsApp",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "that's wrong"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG_SAME",
+      "repeat_of": "WRONG"
+     },
+     "shown": "WRONG_SAME +norepeat",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "msg": "WhatsApp",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "that's wrong"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG",
+      "repeat_of": "WRONG"
+     },
+     "shown": "WRONG +norepeat",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "msg": "WhatsApp",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "that's wrong"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "WRONG_SAME +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 that's wrong twice: WRONG_SAME",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I talk to it from my phone?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "msg"
+      ],
+      "kind": "row",
+      "need": "msg2",
+      "topic": "msg"
+     },
+     "shown": "line msg2 +kept=msg +first",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "msg": "WhatsApp",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "WhatsApp"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG"
+     },
+     "shown": "WRONG",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "msg": "WhatsApp",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "that's wrong"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG_SAME",
+      "repeat_of": "WRONG"
+     },
+     "shown": "WRONG_SAME +norepeat",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {
+       "msg": "msg2"
+      },
+      "kept": {
+       "msg": "WhatsApp",
+       "told": true
+      },
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "that's wrong"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "THANKS_SAME +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 thanks twice: THANKS_SAME",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "THANKS"
+     },
+     "shown": "THANKS",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thanks"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "THANKS_SAME",
+      "repeat_of": "THANKS"
+     },
+     "shown": "THANKS_SAME +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thanks"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "THANKS",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 thanks three times: THANKS",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "THANKS"
+     },
+     "shown": "THANKS",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thanks"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "THANKS_SAME",
+      "repeat_of": "THANKS"
+     },
+     "shown": "THANKS_SAME +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thanks"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "THANKS"
+     },
+     "shown": "THANKS",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thanks"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "OK_SAME +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 ok twice: OK_SAME",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "OK"
+     },
+     "shown": "OK",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "ok"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "OK_SAME",
+      "repeat_of": "OK"
+     },
+     "shown": "OK_SAME +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "ok"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "HOW_SAME +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 how are you twice: HOW_SAME",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HOW"
+     },
+     "shown": "HOW",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how are you"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HOW_SAME",
+      "repeat_of": "HOW"
+     },
+     "shown": "HOW_SAME +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how are you?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "AI +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 who are you twice: the ai line",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WHO"
+     },
+     "shown": "WHO",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "who are you"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "AI",
+      "repeat_of": "WHO"
+     },
+     "shown": "AI +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "who are you?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "BYE_SAME +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 bye twice: BYE_SAME",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "BYE"
+     },
+     "shown": "BYE",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "bye"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "BYE_SAME",
+      "repeat_of": "BYE"
+     },
+     "shown": "BYE_SAME +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "bye"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "CUT_SAME +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 cut twice: CUT_SAME",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "CUT"
+     },
+     "shown": "CUT",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "he"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "CUT_SAME",
+      "repeat_of": "CUT"
+     },
+     "shown": "CUT_SAME +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "wh"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "term line skill +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 his case 4: what is a skill twice, again: the skill line again",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "AGAIN",
+      "repeat_of": "term"
+     },
+     "shown": "AGAIN +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "AGAIN +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 his case 4: then again once more: AGAIN, not N1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "AGAIN",
+      "repeat_of": "term"
+     },
+     "shown": "AGAIN +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "AGAIN"
+     },
+     "shown": "AGAIN +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "term line skill +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 his case 4: a fifth time: the skill line",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "AGAIN",
+      "repeat_of": "term"
+     },
+     "shown": "AGAIN +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "AGAIN"
+     },
+     "shown": "AGAIN +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "term line skill +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 again right after an answer: that answer once more (asked)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "AGAIN +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 again twice right after an answer: AGAIN",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "AGAIN"
+     },
+     "shown": "AGAIN +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "COST +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 again after small talk: the last answer",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "COST"
+     },
+     "shown": "COST",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how much does it cost"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "THANKS"
+     },
+     "shown": "THANKS",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thanks"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "COST"
+     },
+     "shown": "COST +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "repeat that"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line mem1 +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 again after a row: the same row",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "things about me"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "OK"
+     },
+     "shown": "OK",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "ok"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1 +again",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "once more"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MEAN_NONE +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 again with nothing before: MEAN_NONE",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "MEAN_NONE"
+     },
+     "shown": "MEAN_NONE +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "AGAIN +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 again twice with nothing before: AGAIN",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "MEAN_NONE"
+     },
+     "shown": "MEAN_NONE +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "AGAIN"
+     },
+     "shown": "AGAIN +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MEAN_NONE +again",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 again after N1: MEAN_NONE, never N1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can it fly a plane"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "by_again": true,
+      "calls": 0,
+      "kind": "MEAN_NONE"
+     },
+     "shown": "MEAN_NONE +again",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mod0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 kept: again while a question is open: an answer to it",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mod"
+     },
+     "shown": "question mod",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mod",
+      "stage": "open",
+      "work": null
+     },
+     "text": "which model?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mod"
+     },
+     "shown": "plain line mod0",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 kept: tell me about memory again: the asked_again rule, as before",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "I am not sure"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "tell me about memory again"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "STUCK",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 that didn't work after an answer: STUCK",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "STUCK"
+     },
+     "shown": "STUCK",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "that didn't work"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "STUCK",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 it's not working after an answer: STUCK (was N1)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "STUCK"
+     },
+     "shown": "STUCK",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "it's not working"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "STUCK_SAME +norepeat",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 that didn't work twice: STUCK_SAME",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "STUCK"
+     },
+     "shown": "STUCK",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "that didn't work"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "STUCK_SAME",
+      "repeat_of": "STUCK"
+     },
+     "shown": "STUCK_SAME +norepeat",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "it still doesn't work"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MEAN_NONE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 I'm confused after a term line: MEAN_NONE (new words)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MEAN_NONE"
+     },
+     "shown": "MEAN_NONE",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "I'm confused"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 I'm confused after a row: that topic's plain line",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how does memory work?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mem1",
+      "topic": "mem"
+     },
+     "shown": "line mem1",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "things about me"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what do you mean"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [
+       "mem"
+      ],
+      "found": {
+       "mem": "mem1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "I'm confused"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 phone my dentist: not the chat apps",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can hermes phone my dentist for me"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 can it phone me: not the chat apps",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1"
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can it phone me when a job is done"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question msg",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 kept: use it on my phone: chat apps",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use hermes on my phone?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question msg",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 kept: connect my phone: chat apps",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "how do I connect my phone"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "COST",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 how much money will the AI cost me per month: COST",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "COST"
+     },
+     "shown": "COST",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how much money will the AI cost me per month"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "COST",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 how much will hermes cost me a month: COST",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "COST"
+     },
+     "shown": "COST",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how much will hermes cost me a month?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line use2",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 kept: how much money am I wasting on tokens: use2, as before",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "use2",
+      "topic": "use"
+     },
+     "shown": "line use2",
+     "state": {
+      "asked": [],
+      "found": {
+       "use": "use2"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how much money am I wasting on tokens"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line use2",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "lc3 kept: it costs me too much, how do I spend less: use2",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "use2",
+      "topic": "use"
+     },
+     "shown": "line use2",
+     "state": {
+      "asked": [],
+      "found": {
+       "use": "use2"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "it costs me too much, how do I spend less"
+    }
+   ]
   }
  ],
- "json_sha256": "3440302a8171d1a09b0964c519008b9d143cc9b4730a7d76b689207240d593ce",
+ "json_sha256": "2b1913352ce6ad8169dc046495b9dd9e3a1723a1868c2d23804df27c28eb59d9",
  "keeps_off": false,
  "last_printed_lines": [
-  "ok    lc2 kept: and? on a later visit, after BACK: CUT: F1 name=Peter +kept=name +first | F3 | BACK name=Peter | CUT",
+  "ok    lc3 kept: it costs me too much, how do I spend less: use2: line use2",
   "",
-  "conversations: 444 of 444 as expected"
+  "conversations: 482 of 482 as expected"
  ],
  "no_wants": false,
- "route2_sha256": "2188b2d67f284ec7e7b4f508695c3c6a7c1bc174b4c8f5f77588e39d79a491df",
+ "route2_sha256": "0356dfb91c0bfde85a56280434e6886a90e5b82a91bbfb27ddce1a1387e7ffbe",
  "singles": [
   {
    "landed": "mem",

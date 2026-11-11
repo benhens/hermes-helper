@@ -182,7 +182,8 @@ test('the faint "Kept:" line carries what it kept, and is forgotten exactly when
   const st = freshVisit('name')
   // changes-15: the name is kept, and told, under F1
   const f2 = say(st, 'Anna')
-  assert.equal(say(st, 'I run a bakery').note, null)
+  // talk-live-2 (live-v2 changes-4): what the person does is kept, with its own line
+  assert.deepEqual(say(st, 'I run a bakery').note.items, [['work', 'I run a bakery']])
   assert.deepEqual(f2.note.items, [['name', 'Anna']])
   const rm = say(st, 'remember that my club has six courts')
   assert.deepEqual(rm.note.items, [['asked', 'my club has six courts']])

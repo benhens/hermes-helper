@@ -472,7 +472,8 @@ export function makePage(ctx, opts = {}) {
       memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
-      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes })
+      // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes, off: visit.aiOff === true })
       if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
       // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
@@ -482,7 +483,12 @@ export function makePage(ctx, opts = {}) {
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
+      // 12 s: the no-AI line. A call of Helper's still in Hermes then (no answer in 12 s) turns the AI step off for the
+      // rest of this visit: a slow or thinking model is held by each abandoned call for minutes (hhtech-weak-ai)
+      w.stopTimer = ctx.setTimeout(() => {
+        if (live.waiting === w && live.inHermes > 0) visit.aiOff = true
+        liveFinish(w, null)
+      }, LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
       const request = (method, params, timeout) => {
         live.inHermes++
@@ -496,8 +502,12 @@ export function makePage(ctx, opts = {}) {
           live.inHermes--
         })
       }
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w })
+      // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null })
         .then(got => {
+          // hhtech-weak-ai: thinking text from any call turns the AI step off for the rest of this visit, also when
+          // it comes after the 12 s
+          if (got && got.thinking) visit.aiOff = true
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })

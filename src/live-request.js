@@ -7,6 +7,7 @@ import { LIVE_ROW } from './live-rows.js'
 import { TALK_DATA } from './talk-data.js'
 import { oneshotParams } from './model-call.js'
 import { looksSecret } from './secret-rule.js'
+import { workOk } from './kept.js'
 
 const LV_IN = LIVE_DATA.input
 const LV_FIXED = TALK_DATA.fixed
@@ -22,8 +23,19 @@ function fillList(text, slot, lines) {
 }
 export const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects', LIVE_DATA.subjects.map(s => `${s.id} = ${s.title}`))
 export const rowLines = ids => ids.filter(id => LIVE_ROW[id]).map(id => `[${id}] ${LIVE_ROW[id].text}`)
-export const writerText = ids => fillList(LIVE_DATA.writer.text, 'rows', rowLines(ids))
-export const pickText = ids => fillList(LIVE_DATA.pick_only.text, 'rows', rowLines(ids))
+// live-v2 changes-4 (input.work_line): what the person does, the one kept value ever sent, as one labelled line; null
+// when nothing is kept or the value fails the guard (not secret, no key, within keeps.work.limits). Never the name.
+export function workLine(work) {
+  if (!workOk(work)) return null
+  return LV_IN.work_line.replace('{work}', () => work.replace(/\s+/g, ' ').trim())
+}
+// the slot {work_line} on its own line: the work line, or the slot and its line break left out
+const fillWork = (text, work) => {
+  const w = workLine(work)
+  return w ? text.replace('{work_line}', () => w) : text.replace(/\{work_line\}\n?/, '')
+}
+export const writerText = (ids, work = null) => fillList(fillWork(LIVE_DATA.writer.text, work), 'rows', rowLines(ids))
+export const pickText = (ids, work = null) => fillList(fillWork(LIVE_DATA.pick_only.text, work), 'rows', rowLines(ids))
 
 // Which lines of the conversation may ever be sent, decided when they are said (the page notes it on the
 // log entries): { you, helper } for the person's message and Helper's answer.
