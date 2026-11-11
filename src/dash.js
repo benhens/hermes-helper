@@ -364,7 +364,9 @@ export function makeDashboard(ctx) {
               },
               'top'
             ),
-            jsx('span', { className: D.scardWhy, 'data-hh': 'card-why', children: it.why }, 'w')
+            jsx('span', { className: D.scardWhy, 'data-hh': 'card-why', children: it.why }, 'w'),
+            // his pick (PICK.md, way 3): the same sign once more, large, in dots, behind the words
+            jsx('span', { className: D.scardSign, 'data-hh': 'card-sign', 'aria-hidden': true, children: jsx(DashIcon, { icon: cardIcon(it.id), size: 140 }) }, 'sign')
           ]
         },
         it.id

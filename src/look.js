@@ -242,6 +242,8 @@ export const D = {
   scardHead: 'hhd-scard-head',
   scardName: 'hhd-scard-name',
   scardWhy: 'hhd-scard-why',
+  // look-fix (his pick, PICK.md way 3): the card's own sign drawn large in dots at its right
+  scardSign: 'hhd-scard-sign',
   done: 'hhd-done',
   doneLine: 'hhd-done-line',
   start: 'hhd-start',

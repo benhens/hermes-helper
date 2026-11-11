@@ -767,3 +767,16 @@ test('look-fix: the opened card holds the video place, then the steps beside it;
   assert.equal(typeof mark.props.children[0], 'object')
   assert.equal(said(mark), DASH_DATA.words.setup.mark_done)
 })
+
+test('look-fix (PICK.md way 3): every set-up card, and no tile or panel, carries its own sign once more, hidden from screen readers', async () => {
+  const { view } = await open('half', {}, fakeStorage({ kept: { setup_done_said: ['model'] } }))
+  for (const c of stops(view)) {
+    const sign = byData(c, 'card-sign')
+    assert.ok(sign, c.props['data-stop'])
+    assert.equal(sign.props.className, D.scardSign)
+    assert.equal(sign.props['aria-hidden'], true)
+  }
+  for (const k of ['bots', 'skills', 'plugins']) assert.equal(byData(byData(dash(view), `tile-${k}`), 'card-sign'), null)
+  click(stop(view, 'first_chat'))
+  assert.equal(byData(byData(dash(view), 'steps'), 'card-sign'), null)
+})

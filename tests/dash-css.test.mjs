@@ -31,7 +31,10 @@ test('every selector is one of our own hhd- classes (in the light theme, under H
     '@keyframes hhd-arc-turn{to{--hhd-arc:360deg}}',
     // look-fix: a banner narrower than 600 px draws no character, only the dot field at 30%
     `@container (max-width:599px){.${D.bannerChar}{display:none}.${D.bannerArt}{width:100%;opacity:.3}.${D.bannerTitle},.${D.bannerLine},.${D.bannerOpen}{max-width:100%}}`,
-    `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`
+    `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`,
+    // look-fix (PICK.md way 3): the card's sign 96 px (140 x .686) at .5 under 300 px of card, gone under 240 px
+    `@container (max-width:299px){.${D.scardSign}{transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
+    `@container (max-width:239px){.${D.scardSign}{display:none}.${D.scardWhy}{max-width:none}}`
   ])
   for (const rule of rules.filter(r => !r.startsWith('@'))) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
   for (const c of classesIn(rules.map(r => r.slice(0, r.indexOf('{'))).join('\n'))) assert.ok(c.startsWith('hhd-') || c === 'dark', c)
@@ -208,4 +211,11 @@ test('look-fix: the opened card: the video place 320 px wide (16:9) at the left,
 test('look-fix: tiles keep the icon left of the words at every width; the line under the number never runs past two lines', () => {
   assert.doesNotMatch(DASH_CSS, /\.hhd-compact \.hhd-tile\{[^}]*flex-direction:column/)
   assert.match(ruleOf(`.${D.tileLine}`), /-webkit-line-clamp:2;overflow:hidden/)
+})
+
+test('look-fix (PICK.md way 3): each set-up card draws its sign large in dots at its right: 140 px, right -8px, centred, behind the words at .8 in the card\'s accent, masked by a 4 px dot grid and a fade from the left; the card clips; the why-line keeps 64%', () => {
+  const s = ruleOf(`.${D.scardSign}`)
+  for (const part of ['position:absolute', 'right:-8px', 'top:calc(50% - 70px)', 'z-index:-1', 'width:140px', 'height:140px', 'opacity:.8', 'color:var(--hhd-accent)', 'pointer-events:none', 'mask-size:4px 4px,100% 100%', 'mask-composite:intersect']) assert.ok(s.includes(part), part)
+  assert.match(ruleOf(`.${D.scard}`), /position:relative;isolation:isolate;overflow:hidden/)
+  assert.match(ruleOf(`.${D.scardWhy}`), /max-width:64%/)
 })
