@@ -25469,7 +25469,9 @@ function smallLine(kind, st) {
 // Builder: the plugin's own kinds that route2.py does not have, kept out of no_repeat like the data's exempt
 // ones: a skill named by name (changes-15's own words: "a skill named by name") and what Helper keeps, asked
 // by typing (A1, A2, A4: the person's own record, or a Yes/No question that must be asked each time).
-const EXEMPT_ALSO = ['skill', 'A1', 'A2', 'A4', 'A-none']
+// loom-fixes-2 (review): and OPEN_TALK, the opening's small talk ("hey", "hey" at What's your name? got "Sorry, I have
+// nothing more on that." and no name question); the line and the question again each time. Builder's rule.
+const EXEMPT_ALSO = ['skill', 'A1', 'A2', 'A4', 'A-none', 'OPEN_TALK']
 // changes-15 (JSON no_repeat, route2.py no_repeat): never the same line twice in a row in answer to typed
 // messages, and never a line the person just called wrong in this visit. The line in its place drops the open
 // question and keeps any "Kept:" line the original carried. live-v2 (no_repeat.asked_again): a message that
