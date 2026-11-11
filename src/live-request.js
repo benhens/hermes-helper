@@ -22,6 +22,21 @@ function fillList(text, slot, lines) {
   })
 }
 export const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects', LIVE_DATA.subjects.map(s => `${s.id} = ${s.title}`))
+// find-v1 (Lead, 11 Nov): the list call, in place of the first call that picked a subject word. The instructions are
+// hhtech's LIST_CALL (dev/checks/hhtech-find-run/find.mjs, way W1), word for word but for "as id = title" (it ran with
+// "how the line begins"; the titles are hhcontent's now), followed by the list of every fact line. It is Helper's own
+// text, the same for every person and every message; what goes with it is the usual input (the lines that may be
+// sent and the newest message).
+const LIST_CALL = `You find the right checked line for Helper, a part of the Hermes app that explains Hermes to newcomers.
+Read the person's newest message (and the conversation before it, if any). Below are Helper's checked lines, one per line, as id = title.
+Reply with the ids of the lines that answer the message: at most three, the best first, separated by commas, and nothing else.
+If no line answers the message, or it is ordinary talk (hello, thanks, ok), reply with only the word NONE.
+If the person asks Helper to make, build, install, connect or do something for them, reply with only the word BUILD.
+Lines:
+`
+export const LIST_MAX_TOKENS = 30
+const LIST_TEXT = LIST_CALL + LIVE_DATA.list.map(l => `${l.id} = ${l.title}`).join('\n')
+export const listCallText = () => LIST_TEXT
 export const rowLines = ids => ids.filter(id => LIVE_ROW[id]).map(id => `[${id}] ${LIVE_ROW[id].text}`)
 // live-v2 changes-4 (input.work_line): what the person does, the one kept value ever sent, as one labelled line; null
 // when nothing is kept or the value fails the guard (not secret, no key, within keeps.work.limits). Never the name.

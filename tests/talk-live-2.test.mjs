@@ -315,7 +315,7 @@ test('changes-4 request: with a kept name and work, the writer gets the work lin
   const asks = []
   const request = async (m, params) => {
     asks.push(params)
-    return { text: asks.length === 1 ? 'sch' : 'NONE' }
+    return { text: asks.length === 1 ? 'sch1' : 'NONE' } // find-v1: the list call names a line
   }
   const st = laterVisit({ name: 'Peter', work: 'I run a tennis club', told: true }, true)
   const { pre, out } = turnParts('can it fly a kite', st)
@@ -382,7 +382,7 @@ test('weak AI: an unclosed <think>, text starting \"Thinking Process\", or holdi
 })
 
 test('weak AI: a first call or a writer that sends thinking text gives the fallback and says so (thinking)', async () => {
-  for (const answers of [['Thinking Process:\n\n1.  **Analyze the Request:**'], ['sch', '<think>The person asks about']]) {
+  for (const answers of [['Thinking Process:\n\n1.  **Analyze the Request:**'], ['sch1', '<think>The person asks about']]) {
     let n = 0
     const request = async () => ({ text: answers[n++] })
     const st = freshVisit('open', {}, true)

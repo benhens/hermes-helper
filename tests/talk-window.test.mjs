@@ -333,7 +333,10 @@ test('every topic question shows its answers to pick (offer-t1); typing still wo
     const held = TALK_DATA.topic_picks.find(p => p.holds && p.holds.includes(topic.id))
     if (held) pickNow(view, held.label)
     // changes-14: the topic use is reached by typing only ("usage" alone asks use-q)
-    if (topic.typed_only) send(view, 'usage')
+    if (topic.typed_only) {
+      send(view, 'usage')
+      await settle() // find-v1: a line from a subject word alone goes to the list call first (it fails here): the line comes after it
+    }
     else pickNow(view, topic.pick.label)
     assert.equal(line(view), topic.question.id)
     finish(view)
@@ -355,7 +358,10 @@ test('a pick goes by its own id, never through the key words: every answer of ev
         assert.equal(line(view), held.line)
       }
       // changes-14: the topic use is reached by typing only ("usage" alone asks use-q)
-      if (topic.typed_only) send(view, 'usage')
+      if (topic.typed_only) {
+        send(view, 'usage')
+        await settle() // find-v1: a line from a subject word alone goes to the list call first (it fails here): the line comes after it
+      }
       else pickNow(view, topic.pick.label)
       assert.equal(line(view), topic.question.id)
       finish(view)
@@ -466,6 +472,7 @@ test('Bots: no button. In its place, under the thin line, Helper says where the 
   pickNow(view, 'More than one Hermes')
   assert.equal(line(view), 'bot-q')
   send(view, 'help the first one')
+  await settle() // find-v1: a line from a subject word alone goes to the list call first (it fails here): the line comes after it
   assert.equal(line(view), 'bot0')
   assert.equal(button(view), null)
   assert.equal(all(bubble(view), n => n.type === 'button').length, 0)
@@ -614,6 +621,7 @@ test('a message nobody has an answer for: the fixed line with no hint under it, 
 test('a long message is shown back cut to 500 characters; Helper still reads all of it', async () => {
   const { view } = await pastOpening()
   send(view, 'why '.repeat(140) + 'does memory forget')
+  await settle() // find-v1: a line from a subject word alone goes to the list call first (it fails here): the line comes after it
   const mine = lines(view).at(-1)
   assert.equal(mine.props['data-hh'], 'me')
   assert.equal(Array.from(words(mine)).length, 501)
@@ -998,6 +1006,7 @@ test('a skill by its name: Helper\'s fixed line, and under it a box headed "From
 test('the near miss: "can it edit my videos" gets "I don\'t know that one. These are the nearest things I have checked." with that group\'s rows to pick', async () => {
   const { view } = await pastOpening()
   send(view, 'can it edit my videos')
+  await settle() // find-v1: a line from a subject word alone goes to the list call first (it fails here): the line comes after it
   assert.equal(line(view), 'N2')
   assert.equal(said(view), 'I don’t know that one. These are the nearest things I have checked.')
   finish(view)

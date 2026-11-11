@@ -173,7 +173,7 @@ test('a written answer that asks a question with things to pick is not followed 
 
 test('one call with no answer in 12 s after a good one: no SLOW_A (find-v1: one slow try says nothing); the messages after it here are answered by code', async () => {
   const good = `${LIVE_ROW.mod1.text}\nUSED: mod1`
-  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod' : n === 2 ? good : never()) } })
+  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod1' : n === 2 ? good : never()) } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(line(view), 'written')

@@ -55,6 +55,25 @@ export function readSubject(raw) {
   return words.find(w => SUBJECT_IDS.includes(w)) || 'none'
 }
 
+// find-v1, the list call's reader (hhtech's readList, dev/checks/hhtech-find-run/find.mjs): <think> blocks cut, then
+// up to three ids of the list in the order given (any case) -> { ids }; none: { word: 'BUILD' } when the word BUILD is
+// there, else { word: 'NONE' }. Builder: a reply that starts with NONE or BUILD is that word, whatever follows (a
+// wordy "NONE, no skill line fits" must not be read as the word line skill).
+const LIST_IDS = LIVE_DATA.list.map(l => l.id)
+const LIST_ID_OF = Object.fromEntries(LIST_IDS.map(id => [id.toLowerCase(), id]))
+export function readList(raw) {
+  const s = cutThink(raw)
+  const start = (s.trim().match(/^[^A-Za-z]*(none|build)\b/i) || [])[1]
+  if (start) return { word: start.toUpperCase() }
+  const out = []
+  for (const w of s.match(/[A-Za-z0-9_-]+/g) || []) {
+    const id = LIST_ID_OF[w.toLowerCase()]
+    if (id && !out.includes(id)) out.push(id)
+  }
+  if (out.length) return { ids: out.slice(0, 3) }
+  return { word: /\bBUILD\b/i.test(s) ? 'BUILD' : 'NONE' }
+}
+
 // pick_only.read: <think> cut, then spaces, full stops, brackets, backticks and quote marks at both ends.
 // Returns { id } for a handed id, or { word: 'TALK' | 'BUILD' | 'NONE' }; anything else counts as NONE.
 export function readPick(raw, ids) {

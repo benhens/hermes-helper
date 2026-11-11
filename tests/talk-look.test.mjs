@@ -238,6 +238,7 @@ test('rule B and item 3: the steps are Hermes\'s own list, the line after them f
 test('item 7: "More" wears hh-more besides the answer\'s own class; the other picks do not', async () => {
   const { view } = await pastOpening()
   send(view, 'can it edit my videos')
+  await settle() // find-v1: a line from a subject word alone goes to the list call first (it fails here): the line comes after it
   const more = answer(view, 'More')
   assert.equal(more.props.className, `${T.answer} ${T.more}`)
   assert.equal(answer(view, 'Make pictures').props.className, T.answer)

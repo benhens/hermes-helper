@@ -79,7 +79,7 @@ const THINKING = 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **T
 
 test('the work line: kept at What do you do?, sent in the writer\'s instructions only, never the name; after Hermes starts again too', async () => {
   const storage = fakeStorage()
-  const { view, host } = await pastOpening('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
+  const { view, host } = await pastOpening('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod1' : 'NONE') } })
   assert.equal(storage.data.get('kept').work, 'I run a tennis club')
   send(view, 'can it fly a kite')
   await settle()
@@ -89,7 +89,7 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
   assert.doesNotMatch(host.asks[1].input, /tennis/)
   for (const a of host.asks) assert.doesNotMatch(JSON.stringify(a), /peter/i)
   // Hermes starts again with the same storage: the list and the next request still have it
-  const again = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
+  const again = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod1' : 'NONE') } })
   finish(again.view)
   send(again.view, 'what do you know about me')
   assert.deepEqual(all(byData(bubble(again.view), 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter', 'What you do: I run a tennis club'])
@@ -172,7 +172,7 @@ test('the AI step off for a visit comes back when Hermes starts again (a new vis
   send(a.view, 'can it fly a kite')
   await settle()
   assert.equal(a.host.asks.length, 1)
-  const b = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
+  const b = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod1' : 'NONE') } })
   finish(b.view)
   send(b.view, 'can it fly a kite')
   await settle()
@@ -180,7 +180,7 @@ test('the AI step off for a visit comes back when Hermes starts again (a new vis
 })
 
 test('a reply that sits on the USED: line falls back to the no-AI line and is no such failure: the next message still asks the AI', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'msg' : 'USED: msg0, msg1. You can chat with Hermes from apps like Telegram.') } })
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'msg0, msg1' : 'USED: msg0, msg1. You can chat with Hermes from apps like Telegram.') } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 2)
@@ -209,7 +209,7 @@ test('the first-time line and the line under Kept: of what the person does, by m
 
 test('\"again\" after a written reply: the same words, with no call', async () => {
   const good = `${LIVE_ROW.mod1.text}\nUSED: mod1`
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod' : good) } })
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod1' : good) } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(line(view), 'written')
