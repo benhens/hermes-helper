@@ -549,3 +549,18 @@ test('on the page: a step answer typed while the AI still works on a question ge
   if (release) release({ text: 'NONE' })
   await settle()
 })
+
+test('on the page: at a step, "hello" gets its line and then the step, with no offer bubble between them', opt, async () => {
+  const { view } = await open({ mode: 'no_ai_step' })
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, 'I know it well')
+  await press(view, 'Talk to it from my phone')
+  await press(view, 'Show me the steps')
+  await send(view, 'hello')
+  const lines = olds(view).map(n => n.props['data-line'])
+  assert.equal(bubbleLine(view), 'STEP_BACK')
+  assert.equal(lines.at(-1), 'HELLO', lines.join(' '))
+  assert.equal(lines.slice(lines.lastIndexOf('STEP')).some(l => l.startsWith('offer-')), false, lines.join(' '))
+})
