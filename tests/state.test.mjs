@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { readState, STORED_KEYS, TAB_IDS } from '../src/state.js'
+import { PARKED } from '../scripts/build.mjs'
 
 const store = obj => (k, d) => (k in obj ? obj[k] : d)
 
@@ -32,15 +33,16 @@ test('what the old helper header stored (side, hidden or closed, chat log) is no
 })
 
 test('every key the plugin stores is on the allowed list: about the person, only the one record of what Helper keeps', () => {
-  // The allowed list: the page's own state, the answer to the memory test on the parked Your setup, and
+  // The allowed list: the page's own state, and
   // 'kept', the record of what Helper keeps by fixed rules (src/kept.js; talk v2 row 3), and 'met'
   // (changes-14: Helper has said hello; true or nothing, never removed).
   // (dash-v1: the Dashboard stores nothing; the step list's step and answers left with it)
-  assert.deepEqual([...STORED_KEYS].sort(), ['helperWidth', 'kept', 'met', 'remember', 'tab'])
+  assert.deepEqual([...STORED_KEYS].sort(), ['helperWidth', 'kept', 'met', 'tab'])
   const dir = path.resolve(import.meta.dirname, '..', 'src')
   const found = new Set()
   let calls = 0
-  for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js'))) {
+  // (dash-v1: the parked files are not in the built plugin, so not read here; the parked Your setup stored 'remember')
+  for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js') && !PARKED.includes(x))) {
     const src = fs.readFileSync(path.join(dir, f), 'utf8')
     for (const m of src.matchAll(/storage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) {
       calls++

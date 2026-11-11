@@ -94,6 +94,16 @@ test('the five stay quiet whatever the flags say: a flag for one of them (no rul
   assert.deepEqual([p.done, p.total], [6, 6])
 })
 
+test('"You are here" only where it is known: a stop before it that could not be read places nobody', () => {
+  const p = pathStates({ install: true, model: null, personality: false, chat_apps: false, scheduled_job: true, second_bot: false })
+  assert.equal(p.here, -1)
+  assert.ok(!p.states.includes('here'))
+  assert.equal(p.states[ids.indexOf('personality')], 'todo')
+  // once that stop is read done, the next one not done is "here"
+  const q = pathStates({ install: true, model: true, personality: false, chat_apps: null, scheduled_job: true, second_bot: false })
+  assert.equal(q.states[ids.indexOf('personality')], 'here')
+})
+
 test('a read that failed is not known: never shown done, never "here", not counted; the rest still read', () => {
   const p0 = { ...PEOPLE.all, model: FAIL, status: FAIL }
   const f = doneFlags(p0)

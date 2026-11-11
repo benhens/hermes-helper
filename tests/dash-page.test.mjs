@@ -263,6 +263,11 @@ test('a source tag opens its docs page in the browser (ctx.os), never inside Her
   const tags = all(byData(dash(view), 'steps'), n => n.props['data-hh'] === 'source')
   tags[0].props.onClick({ preventDefault() {} })
   assert.deepEqual(opened, ['https://hermes-agent.nousresearch.com/docs/user-guide/features/personality'])
+  // a middle click too
+  let prevented = false
+  tags[0].props.onAuxClick({ preventDefault: () => (prevented = true) })
+  assert.equal(prevented, true)
+  assert.equal(opened.length, 2)
   assert.equal(globalThis.__hhHost.navigated, undefined)
 })
 
@@ -324,13 +329,72 @@ test('every word on the tab comes from the data file (src/dash-data.js); numbers
       assert.ok(filled === '' || words.has(s) || /^Last used \d+ days ago$/.test(s), `${who}: "${s}" is not from the data`)
     }
     // and the labels a screen reader hears
-    for (const st of stops(view)) assert.match(st.props['aria-label'], new RegExp(`^${st.props['aria-label'].split(':')[0]}: (${[W.setup.state_done, W.setup.state_not_done, W.setup.you_are_here, W.setup.state_not_counted].join('|')})$`))
+    for (const st of stops(view)) assert.match(st.props['aria-label'], new RegExp(`^${st.props['aria-label'].split(':')[0]}: (${[W.setup.state_done, W.setup.state_not_done, W.setup.state_not_known, W.setup.you_are_here, W.setup.state_not_counted].join('|')})$`))
   }
 })
 
-test('the narrow sizes: the page hands the tab "compact" when the left side is under 640 px', async () => {
+test('the narrow sizes: under 640 px of left side the tab takes hhdesign\'s narrow sizes; a stop\'s name gets the room to the next stop on its side', async () => {
+  const observers = []
+  globalThis.ResizeObserver = class {
+    constructor(cb) {
+      this.cb = cb
+      observers.push(this)
+    }
+    observe(el) {
+      this.watching = el
+    }
+    disconnect() {
+      this.watching = null
+    }
+  }
   const { view } = await open('half')
+  const fire = (id, width, height = 822) => observers.filter(o => o.watching && o.watching.id === id).forEach(o => o.cb([{ contentRect: { width, height } }]))
+  byData(view.tree, 'page').props.ref({ id: 'our-page' })
+  byData(dash(view), 'road').props.ref({ id: 'road' })
+  fire('our-page', 1180)
+  fire('road', 688)
+  await settle(4)
   assert.equal(dash(view).props['data-compact'], false)
   assert.equal(dash(view).props.className, D.main)
-  assert.ok(K.notBuilt)
+  const label = id => all(stop(view, id), n => n.props.className === D.label)[0]
+  assert.equal(label('personality').props.style, undefined, 'wide: a name keeps its one line')
+  // 940 px of page: the left side is 480 px
+  fire('our-page', 940)
+  fire('road', 448)
+  await settle(4)
+  assert.equal(dash(view).props['data-compact'], true)
+  assert.equal(dash(view).props.className, `${D.main} ${D.compact}`)
+  // the room: two gaps between stops (11 stops on 448 px less 16 px each side), less 8 px
+  const room = Math.floor((2 * (448 - 32)) / 10) - 8
+  for (const st of stops(view)) assert.deepEqual(all(st, n => n.props.className === D.label)[0].props.style, { width: `${room}px` }, st.props['data-stop'])
+})
+
+test('the bots read failed: the main bot is not known, so its three reads are not made and those stops stay unknown (never another bot\'s answer)', async () => {
+  const { view } = await open('half', { failing: ['profiles.list'], openBot: 'bot1' })
+  // (Helper's own model check on the page names no bot: only the reads that name one are the Dashboard's)
+  const methods = log.filter(e => typeof e === 'object' && e.params && (e.params.profile || e.params.name)).map(e => e.method)
+  assert.ok(methods.includes('plugins.manage'), 'the open bot is still read')
+  for (const m of ['setup.runtime_check', 'profiles.describe', 'cron.manage']) assert.ok(!methods.includes(m), m)
+  for (const id of ['model', 'personality', 'scheduled_job', 'second_bot']) {
+    assert.equal(stop(view, id).props['data-state'], 'unknown', id)
+    assert.match(stop(view, id).props['aria-label'], new RegExp(`: ${W.setup.state_not_known}$`), id)
+  }
+  assert.equal(stop(view, 'install').props['data-state'], 'done')
+  // nobody is placed "here" on a stop that was not read
+  assert.deepEqual(all(dash(view), n => n.props['data-hh'] === 'you-are-here').map(n => n), [])
+})
+
+test('leaving the tab drops what was read; opening it again reads everything again from the start', async () => {
+  const { view } = await open('half')
+  assert.equal(log.filter(e => e === 'profiles.list').length, 1)
+  const tabs = all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')
+  click(tabs[1])
+  await settle(6)
+  assert.equal(byData(view.tree, 'dashboard'), null)
+  click(all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')[0])
+  // at once: waiting blocks, not the old numbers
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileNumber(view, k)), ['waiting', 'waiting', 'waiting'])
+  await settle(12)
+  assert.equal(log.filter(e => e === 'profiles.list').length, 2, 'read again')
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileNumber(view, k)), ['3', '45', '2'])
 })

@@ -615,6 +615,8 @@ test('a long message is shown back cut to 500 characters; Helper still reads all
 
 test('what is kept about the person: one stored record ("kept") by fixed rules, what they do (live-v2 changes-4) but never the conversation; nothing is sent', async () => {
   const { view, storage } = await open()
+  // dash-v1: what the page sent while it opened (the Dashboard's read-only reads); from here on nothing may be sent
+  const opened = globalThis.__hhHost.calls.length
   finish(view)
   send(view, 'Peter')
   finish(view)
@@ -629,8 +631,9 @@ test('what is kept about the person: one stored record ("kept") by fixed rules, 
   assert.equal(storage.data.get('met'), true)
   assert.deepEqual(storage.data.get('kept'), { name: 'Peter', work: 'I run a tennis club', msg: 'WhatsApp', asked: ['my club has six courts'], told: true, ...(WORK_TOLD ? { told_work: true } : {}) })
   assert.doesNotMatch(JSON.stringify([...storage.data]), /install|skill/)
-  // (dash-v1: less the Dashboard's read-only reads when the page opens on it: profiles.describe, cron.manage, plugins.manage)
-  assert.deepEqual(globalThis.__hhHost.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status' && !['profiles.describe', 'cron.manage', 'plugins.manage'].includes(m)), [], 'and nothing was sent to Hermes')
+  assert.deepEqual(globalThis.__hhHost.calls.slice(opened).filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'and nothing was sent to Hermes')
+  // (dash-v1: while the page opened, only the Dashboard's read-only reads besides those two)
+  assert.deepEqual(globalThis.__hhHost.calls.slice(0, opened).filter(m => m !== 'setup.runtime_check' && m !== 'setup.status' && !['profiles.describe', 'cron.manage', 'plugins.manage'].includes(m)), [])
 })
 
 test('no AI step: the conversation\'s code reaches no model and no request; the built file has no model call in the conversation', () => {

@@ -197,6 +197,8 @@ export const K = {
   // ---- dash-v1: the Dashboard tab's own shapes are the D table below (src/dash.css); from Hermes it wears these ----
   // Hermes's Tabler icons at the sizes Hermes draws them (hhtech-dash-icons.md point 1: 16 px in Settings' rows,
   // 14 px in its sub-rows); 20 px on the tiles (hhdesign's r7 size)
+  // dash-v1: Hermes's own monospace type, for a command to paste
+  mono: 'font-mono',
   icon14: 'size-3.5',
   icon16: 'size-4',
   icon20: 'size-5',
@@ -276,6 +278,8 @@ export const D = {
   route: 'hhd-route',
   term: 'hhd-term',
   termWhen: 'hhd-term-when',
+  paste: 'hhd-paste',
+  pasteText: 'hhd-paste-text',
   pasteFor: 'hhd-paste-for',
   quietLine: 'hhd-quietline',
   foot: 'hhd-foot',

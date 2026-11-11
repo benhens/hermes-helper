@@ -80,7 +80,10 @@ export function pathStates(flags, items = DASH_DATA.items) {
     const f = flags[it.id]
     return f === true ? 'done' : f === false ? 'todo' : 'unknown'
   })
-  const here = states.indexOf('todo')
+  // "You are here" only where it is known: the first counted stop not done, when every counted stop before it is
+  // seen done. A stop before it that could not be read (unknown) places nobody (review, dash-v1).
+  const firstOpen = states.findIndex(s => s === 'todo' || s === 'unknown')
+  const here = firstOpen >= 0 && states[firstOpen] === 'todo' ? firstOpen : -1
   if (here >= 0) states[here] = 'here'
   const counted = items.filter(it => it.counts)
   const done = counted.filter(it => flags[it.id] === true).length

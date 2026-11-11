@@ -176,16 +176,19 @@ export function makeDashboard(ctx) {
         const bots = await read(() => host.profiles.list(), DASH_READ_MS)
         if (!alive) return
         const rows = bots.ok ? botRows(bots.value) : null
-        const main = mainBotName(rows) || openBot
+        // the main bot's three reads need its name; when the bots read failed they are not made (those stops stay
+        // unknown, never another bot's answer)
+        const main = mainBotName(rows)
+        const notRead = Promise.resolve({ ok: false })
         put({ bots: rows ? bots : { ok: false } })
         const listSessions = door(() => host.listPersistedSessions)
         const getStatus = door(() => host.status)
         const sessions = listSessions ? read(() => listSessions(null, { profile: openBot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
         const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
         const [model, soul, cron, st, ses] = await Promise.all([
-          request('setup.runtime_check', { profile: main }),
-          request('profiles.describe', { name: main }),
-          request('cron.manage', { action: 'list', profile: main, include_disabled: true }),
+          main ? request('setup.runtime_check', { profile: main }) : notRead,
+          main ? request('profiles.describe', { name: main }) : notRead,
+          main ? request('cron.manage', { action: 'list', profile: main, include_disabled: true }) : notRead,
           status,
           sessions
         ])
@@ -199,6 +202,8 @@ export function makeDashboard(ctx) {
       })().catch(() => {})
       return () => {
         alive = false
+        // the tab was left (or another bot opened): what was read goes
+        setReads({})
       }
     }, [active, openBot])
     const [open, setOpen] = useState(null)
@@ -215,7 +220,7 @@ export function makeDashboard(ctx) {
     }, [reveal])
     const toggle = id => {
       setOpen(o => (o === id ? null : id))
-      setReveal(true)
+      if (open !== id) setReveal(true)
     }
     return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox }
   }
@@ -352,7 +357,7 @@ export function makeDashboard(ctx) {
     const width = roadWidth || ROAD_WIDTH_UNMEASURED
     const shape = roadShape(width, compact, here)
     const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here, quiet: D.quiet }
-    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_done, here: W.setup.you_are_here, quiet: W.setup.state_not_counted }
+    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_known, here: W.setup.you_are_here, quiet: W.setup.state_not_counted }
     const stops = items.map((it, i) => {
       const s = states[i]
       const size = s === 'quiet' ? 14 : 16
@@ -476,7 +481,7 @@ export function makeDashboard(ctx) {
                         jsxs(
                           'div',
                           {
-                            className: D.term,
+                            className: D.paste,
                             children: [
                               jsx('span', { className: D.pasteFor, children: p.for }, 'f'),
                               jsxs(
@@ -485,7 +490,7 @@ export function makeDashboard(ctx) {
                                   className: K.bubblePaste,
                                   'data-hh': 'paste',
                                   children: [
-                                    jsx('code', { className: K.bubblePasteText, 'data-hh': 'paste-text', children: p.text }, 't'),
+                                    jsx('code', { className: `${K.mono} ${D.pasteText}`, 'data-hh': 'paste-text', children: p.text }, 't'),
                                     jsx(CopyButton, { text: p.text, label: W.setup.copy, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
                                   ]
                                 },
@@ -518,6 +523,11 @@ export function makeDashboard(ctx) {
                       title: url,
                       'data-hh': 'source',
                       onClick: e => {
+                        e.preventDefault()
+                        openDocs(url)
+                      },
+                      // a middle click too goes to the web browser, never inside Hermes (as the first build's source tags)
+                      onAuxClick: e => {
                         e.preventDefault()
                         openDocs(url)
                       },

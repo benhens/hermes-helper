@@ -452,7 +452,8 @@ export const DASH_DATA = {
       "source": "{file}, line {line}",
       "state_done": "done",
       "state_not_done": "not done yet",
-      "state_not_counted": "not counted"
+      "state_not_counted": "not counted",
+      "state_not_known": "not checked"
     }
   }
 }

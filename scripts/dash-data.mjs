@@ -61,6 +61,12 @@ export function dashProblems(data, docs) {
     if (typeof it.counts !== 'boolean') fails.push(`${it.id}: counts is not true or false`)
     if (!Array.isArray(it.sources) || !it.sources.length) fails.push(`${it.id}: no sources`)
     if (it.terminal && !(isText(it.terminal.when) && Array.isArray(it.terminal.paste) && it.terminal.paste.every(p => isText(p.for) && isText(p.text)))) fails.push(`${it.id}: terminal block incomplete`)
+    // the text to paste is what the Copy button copies: it must stand in its docs quote word for word (review, dash-v1)
+    if (it.terminal && Array.isArray(it.terminal.paste))
+      it.terminal.paste.forEach((p, k) => {
+        if (!p.src || !isText(p.src.quote)) fails.push(`${it.id}: paste ${k + 1} has no docs quote`)
+        else if (isText(p.text) && !p.src.quote.includes(p.text.trim())) fails.push(`${it.id}: paste ${k + 1} is not in its docs quote: ${p.text.slice(0, 60)}`)
+      })
   })
   const counted = items.filter(i => i.counts === true).map(i => i.id)
   if (counted.join() !== COUNTED_IDS.filter(id => ids.includes(id)).join() || counted.length !== COUNTED_IDS.length) fails.push(`counted things are ${counted.join(', ')}; the code has rules for exactly ${COUNTED_IDS.join(', ')}`)
@@ -72,7 +78,7 @@ export function dashProblems(data, docs) {
   need(w.tabs, ['dashboard', 'learn', 'my_setup'], 'tabs.')
   need(w.stats, ['bots', 'skills', 'plugins'], 'stats.')
   need(w.activity, ['title', 'last_used_today', 'last_used_one', 'last_used_n', 'less', 'more'], 'activity.')
-  need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'not_counted', 'close', 'copy', 'source', 'state_done', 'state_not_done', 'state_not_counted'], 'setup.')
+  need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'not_counted', 'close', 'copy', 'source', 'state_done', 'state_not_done', 'state_not_counted', 'state_not_known'], 'setup.')
   if (w.activity) {
     if (!Array.isArray(w.activity.months) || w.activity.months.length !== 12 || !w.activity.months.every(isText)) fails.push('page_words.activity.months: not 12 names')
     if (!Array.isArray(w.activity.days) || w.activity.days.length !== 7 || !w.activity.days.every(d => typeof d === 'string')) fails.push('page_words.activity.days: not 7 (Sunday first; empty for no label)')

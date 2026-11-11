@@ -167,7 +167,8 @@ test('model names, counts and source tags in normal letters: mono is only for te
   // review of e86b410, section 3 point 3), and text to paste inside Helper's bubble, Hermes's own
   // small code card (notes-wants.md item 4), large and small; talk-live-3 (Lead's call on question 5 of the c18 report):
   // text to type inside a Helper line (/usage), in the paste box's code style
-  assert.deepEqual(mono, ['cardPasteText', 'settingsBox', 'settingsRefusedLine', 'bubblePasteText', 'bubblePasteTextOld', 'typed'])
+  // (dash-v1: mono, Hermes's font-mono for the Dashboard's commands to paste)
+  assert.deepEqual(mono, ['cardPasteText', 'settingsBox', 'settingsRefusedLine', 'bubblePasteText', 'bubblePasteTextOld', 'typed', 'mono'])
 })
 
 test('header clears Hermes\'s title-bar band, where its window buttons float (top-right corner stays empty)', () => {

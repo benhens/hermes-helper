@@ -8,11 +8,10 @@
 // the plugin may write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
 import { clampHelperWidth, HELPER_PX } from './layout.js'
 
-// 'remember' is the person's answer to the memory test on the parked Your setup (src/setup-tab.js).
 // 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
 // 'met' (changes-14, keeps.met): true once Helper has said hello, so the name is asked only on the first
 // visit; nothing about the person, and no Forget removes it (src/page.js).
-export const STORED_KEYS = ['tab', 'helperWidth', 'remember', 'kept', 'met']
+export const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met']
 // dash-v1: the three tabs, Dashboard first (only it is built)
 export const TAB_IDS = ['dashboard', 'learn', 'my_setup']
 

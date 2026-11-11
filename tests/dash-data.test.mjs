@@ -22,11 +22,22 @@ test('the data as committed passes every check, and src/dash-data.js is made fro
   assert.deepEqual(DASH_DATA, slimDashData(DATA))
 })
 
-test('every docs quote is checked: 77 quotes from 20 docs files, each on its line (16 lines sit elsewhere in the tagged v0.23.0 docs and are followed there)', () => {
+test('every docs quote is checked: 93 quotes (90 different) from 20 docs files, each on its line (16 lines sit elsewhere in the tagged v0.23.0 docs and are followed there)', () => {
   const docsQuotes = quotesOf(DATA).filter(q => !q.s.file.startsWith('/'))
-  assert.ok(docsQuotes.length >= 70, `${docsQuotes.length} quotes`)
+  assert.equal(docsQuotes.length, 93, `${docsQuotes.length} quotes`)
+  assert.equal(new Set(docsQuotes.map(q => `${q.s.file}:${q.s.line}:${q.s.quote}`)).size, 90)
   assert.equal(Object.keys(DOCS.files).length, 20)
   assert.equal(Object.values(DOCS.files).reduce((n, f) => n + Object.keys(f.moved || {}).length, 0), 16)
+})
+
+test('a text to paste (what the Copy button copies) that is not word for word in its docs quote is refused, and one without a quote', () => {
+  const bad = JSON.parse(JSON.stringify(DATA))
+  const install = bad.items.find(i => i.id === 'install')
+  install.terminal.paste[0].text = 'curl -fsSL https://example.com/x.sh | bash'
+  assert.ok(dashProblems(bad, DOCS).some(p => /install: paste 1 is not in its docs quote/.test(p)))
+  const none = JSON.parse(JSON.stringify(DATA))
+  delete none.items.find(i => i.id === 'install').terminal.paste[1].src
+  assert.ok(dashProblems(none, DOCS).some(p => /install: paste 2 has no docs quote/.test(p)))
 })
 
 test('a changed docs quote is refused: a word changed, a line number changed, or a quote on a moved line changed', () => {
@@ -77,7 +88,6 @@ test('every word on the tab is in the file: one missing stops the build; marks f
   assert.ok(DATA.page_words.routes.every(x => ROUTE_TARGETS.includes(x.to)))
   // "not counted" is hhcontent's own pick 1 of its three
   assert.equal(DATA.page_words.setup.not_counted, DATA.cannot_tell_words[0])
-  assert.equal(DATA.page_words.stand_in, true)
 })
 
 test('the words he took out are not in the file: no "chats in 30 days", no "days with a chat", no "streak"', () => {
