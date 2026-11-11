@@ -239,7 +239,9 @@ test('a click on a stop opens it under the path: its sentence, its numbered step
   assert.deepEqual(ol.props.children.map(li => text(li).trim()), it.steps.map(s => s.text))
   assert.deepEqual(all(box, n => n.props['data-hh'] === 'source').map(n => text(n)), ['getting-started/quickstart.md, line 53', 'guides/team-telegram-assistant.md, line 27'])
   const pastes = all(box, n => n.props['data-hh'] === 'paste')
-  assert.deepEqual(pastes.map(p => text(byData(p, 'paste-text'))), it.terminal.paste.map(p => p.text))
+  assert.deepEqual(pastes.map(p => said(byData(p, 'paste-text'))), it.terminal.paste.map(p => p.text))
+  // each word of a command is kept whole (it may break only at its spaces): the words, in order, each in its own span
+  for (const [k, p] of pastes.entries()) assert.deepEqual(all(byData(p, 'paste-text'), n => n.props.className === D.word).map(n => n.props.children), it.terminal.paste[k].text.split(' '))
   assert.deepEqual(pastes.map(p => all(p, n => n.type === 'sdk:CopyButton')[0].props.text), it.terminal.paste.map(p => p.text))
   assert.equal(byData(box, 'not-counted'), null, 'Install is counted')
   click(stop(view, 'install'))
@@ -316,6 +318,8 @@ test('every word on the tab comes from the data file (src/dash-data.js); numbers
       if (Array.isArray(node)) return node.forEach(collect)
       if (typeof node !== 'object') return shown.push(String(node))
       if (node.type === 'style') return
+      // a command to paste is drawn word by word (each kept whole): it is read as its whole text
+      if (node.props['data-hh'] === 'paste-text') return shown.push(said(node))
       collect(node.props.children)
     }
     collect(dash(view))

@@ -280,6 +280,8 @@ export const D = {
   termWhen: 'hhd-term-when',
   paste: 'hhd-paste',
   pasteText: 'hhd-paste-text',
+  pasteBox: 'hhd-paste-box',
+  word: 'hhd-word',
   pasteFor: 'hhd-paste-for',
   quietLine: 'hhd-quietline',
   foot: 'hhd-foot',

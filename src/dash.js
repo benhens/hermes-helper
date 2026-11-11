@@ -487,10 +487,20 @@ export function makeDashboard(ctx) {
                               jsxs(
                                 'div',
                                 {
-                                  className: K.bubblePaste,
+                                  className: `${K.bubblePaste} ${D.pasteBox}`,
                                   'data-hh': 'paste',
                                   children: [
-                                    jsx('code', { className: `${K.mono} ${D.pasteText}`, 'data-hh': 'paste-text', children: p.text }, 't'),
+                                    // a command breaks only at its spaces, each word kept whole (a web address broke at
+                                    // its hyphen and read as two words); Copy goes under it when there is no room beside
+                                    jsx(
+                                      'code',
+                                      {
+                                        className: `${K.mono} ${D.pasteText}`,
+                                        'data-hh': 'paste-text',
+                                        children: p.text.split(' ').flatMap((word, i) => [i ? ' ' : null, jsx('span', { className: D.word, children: word }, i)])
+                                      },
+                                      't'
+                                    ),
                                     jsx(CopyButton, { text: p.text, label: W.setup.copy, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
                                   ]
                                 },
