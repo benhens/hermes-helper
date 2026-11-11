@@ -177,7 +177,7 @@ test('the scheduled job\'s steps, then "It worked": Helper reads again and says 
   p.said()
   p.press('It worked')
   let s = p.said()
-  assert.deepEqual(lines(s), [['NOT_SEEN', "I can't see it yet. I only look at your main bot."]])
+  assert.deepEqual(lines(s), [['NOT_SEEN', "I can't see it yet. I only look at the bot that is open in Hermes now."]])
   assert.deepEqual(p.labels(), ['Show me the steps', 'I did it on another bot', 'Not now'])
   p.press('Show me the steps')
   assert.match(p.last().text, /^Step 1 of 3: /)
@@ -245,7 +245,7 @@ test('conversation (c): Skip, Skip, Not sure yet: nothing kept, the usual first 
 })
 
 /* ---------- typed answers ---------- */
-test('Q_NEW typed: the lists in the order well, some, new; anything else is Skip and is not kept', opt, () => {
+test('Q_NEW typed: the lists in the order well, some, new; anything else is no answer (loom-fixes-2, typed_answer.no_match_v2): answered, then the question again, nothing kept', opt, () => {
   const ask = typed => {
     const p = person()
     p.skip()
@@ -257,7 +257,7 @@ test('Q_NEW typed: the lists in the order well, some, new; anything else is Skip
   assert.deepEqual(ask('a little'), ['Q_GOAL', 'some'])
   assert.deepEqual(ask('no, I know it'), ['Q_GOAL', 'well'])
   assert.deepEqual(ask('not new'), ['Q_GOAL', 'well'], 'well before new')
-  assert.deepEqual(ask('banana'), ['Q_GOAL', null])
+  assert.deepEqual(ask('banana'), ['SETUP_REASK', null])
   assert.deepEqual(ask("Yes, I'm new"), ['Q_GOAL', 'new'], 'an answer\'s own label typed')
 })
 
@@ -278,7 +278,7 @@ test('Q_GOAL typed: schedule, then phone, then bots; no match is Not sure yet wi
   assert.deepEqual(ask('one two three four five six seven eight nine ten eleven twelve thirteen'), [null, null, 'personality'], 'more than 12 words: used for the goal, not kept')
 })
 
-test('a question typed in place of an answer is answered by the ordinary talk, then the question is asked again, once', opt, () => {
+test('a question typed in place of an answer is answered by the ordinary talk, then the question is asked again, every time (loom-fixes-2, one_question: was once only)', opt, () => {
   const p = person()
   p.skip()
   p.said()
@@ -289,7 +289,8 @@ test('a question typed in place of an answer is answered by the ordinary talk, t
   assert.deepEqual(p.labels(), ["Yes, I'm new", "I've used it a bit", 'I know it well', 'Skip'])
   p.type('what is a plugin?')
   s = p.said()
-  assert.equal(s.some(x => x.line === 'SETUP_REASK'), false, 'once only')
+  assert.equal(s[0].line, 'term-plugin')
+  assert.deepEqual([s.at(-1).line, s.at(-1).text], ['SETUP_REASK', "When you're ready: are you new to Hermes?"], 'every time')
   p.type('yes')
   assert.equal(p.last().line, 'Q_GOAL')
   p.said()

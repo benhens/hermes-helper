@@ -564,6 +564,38 @@
    "found": []
   },
   {
+   "id": "BACK_NONE",
+   "text": "No question of mine is open, so there is nothing to go back to.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "NAME_HELLO",
+   "text": "Hi.",
+   "kind": "reply",
+   "words": 1,
+   "found": []
+  },
+  {
+   "id": "ASK_NAME",
+   "text": "What's your name?",
+   "kind": "reply",
+   "words": 3,
+   "found": [
+    "an answer line ends with a question"
+   ]
+  },
+  {
+   "id": "ASK_WORK",
+   "text": "What do you do?",
+   "kind": "reply",
+   "words": 4,
+   "found": [
+    "an answer line ends with a question"
+   ]
+  },
+  {
    "id": "offer-general",
    "text": "Do you want to set up Hermes, or see what it does?",
    "kind": "question",

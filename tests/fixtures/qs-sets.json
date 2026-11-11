@@ -1,7 +1,7 @@
 {
  "about": "Written by dev/checks/builder-qs/dump_qs_sets.py. Do not edit: make it again.",
- "route2_sha256": "adab5484f516ccd7cdaae20859daa2f92b2ad382ee88fdd4dae601668ff5ca08",
- "json_sha256": "2804f6c36286cb0aef2ea57c45e9d729bab7884fd89a7d0b267f92157b220ab7",
+ "route2_sha256": "91d33e9896cb973a642a6b880fef908f211d40572f3475b9b2539f6bc719dba8",
+ "json_sha256": "2504668129f457461c7d8caefacfae6681c3fc30dbaa9af013f9f9b8c6ef3fd4",
  "wants_json_sha256": "0f87cacd51e042097654d490f52f280deb3c807fa9340394efc81ffd4daea2c6",
  "wants_fixes_step_sha256": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e",
  "cases": [
@@ -3326,10 +3326,10 @@
     "thanks"
    ],
    "route2": {
-    "shown": "THANKS",
-    "kind": "THANKS",
+    "shown": "OPEN_TALK THANKS then ASK_NAME",
+    "kind": "OPEN_TALK",
     "all": [
-     "THANKS"
+     "OPEN_TALK THANKS then ASK_NAME"
     ],
     "name": null,
     "topic": null,

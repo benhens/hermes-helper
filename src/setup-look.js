@@ -62,7 +62,8 @@ export function makeLook(ctx, host, getProfile = () => '') {
         getStatus ? read(() => getStatus(), LOOK_READ_MS) : Promise.resolve(undefined),
         listSessions && main ? read(() => listSessions(null, { profile: main, limit: 500 }), LOOK_READ_MS) : Promise.resolve(undefined)
       ])
-      return seenFrom({ bots: rows ? bots : { ok: false }, model, soul, cron, status, sessions })
+      // loom-fixes-2 (helper-loom-fixes-v2 point 7): the bot Helper looked at, by the name the app gives it, for NOT_SEEN
+      return { ...seenFrom({ bots: rows ? bots : { ok: false }, model, soul, cron, status, sessions }), bot: main || null }
     } catch {
       return { ...LOOK_UNSEEN }
     }

@@ -13,8 +13,10 @@ import { selectorFor, missingClasses } from '../scripts/check-hermes-classes.mjs
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const plugin = fs.readFileSync(path.join(ROOT, 'desktop/plugin.js'), 'utf8')
-// Code without comments, so a rule can't pass or fail because of a comment.
-const code = plugin.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"\w])\/\/[^\n]*/g, '$1')
+// Code without comments, so a rule can't pass or fail because of a comment. loom-fixes-2: a "/*" inside a
+// double-quoted string is no comment (hhcontent's names list quotes the docs' "openai/*, openai-codex/*"), so those
+// strings are stepped over whole
+const code = plugin.replace(/"(?:[^"\\\n]|\\.)*"|\/\*[\s\S]*?\*\//g, m => (m[0] === '"' ? m : '')).replace(/(^|[^:'"\w])\/\/[^\n]*/g, '$1')
 // The program without hhcontent's Dashboard text: that text is prose for the person, so the code rules below read
 // the code only, and the text gets the pasted-key check instead. (dash-v1: the first build's step text, which this
 // set aside before, left the built file with the step list.)

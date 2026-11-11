@@ -252,7 +252,7 @@ test('"It worked" on A second bot that is not seen: "You have one bot so far." w
   q.press('Show me the steps').press('Done').press('Done')
   q.said()
   q.press('It worked')
-  assert.deepEqual(lines(q.said()), [['NOT_SEEN', "I can't see it yet. I only look at your main bot."]])
+  assert.deepEqual(lines(q.said()), [['NOT_SEEN', "I can't see it yet. I only look at the bot that is open in Hermes now."]])
   assert.deepEqual(q.labels(), ['Show me the steps', 'I did it on another bot', 'Not now'])
 })
 

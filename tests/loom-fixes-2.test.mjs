@@ -41,6 +41,19 @@ const click = node => {
   node.props.onClick({ preventDefault() {} })
 }
 const olds = view => all(helper(view), n => n.props['data-hh'] === 'old').map(n => text(n).replace(/\s+/g, ' ').trim())
+// loom-fixes-2: the earlier conversation's lines (Helper's and the person's) that must not come back. Not "no old line
+// at all": with the set-up conversation off a later visit opens with "Hi again." and its offer bubble, which makes
+// that greeting an older line of the new visit (keeps.met stays after Forget all, by the data's own rule)
+const shownLines = view => all(helper(view), n => ['old', 'me', 'bubble'].includes(n.props['data-hh'])).map(n => text(n).replace(/\s+/g, ' ').trim()).filter(Boolean)
+// of those, the ones that belong to that conversation: the person's own lines and Helper's lines with his name or work
+// (a fresh visit may say the same general lines again, such as the offer's question)
+const ownLines = view => all(helper(view), n => n.props['data-hh'] === 'me').map(n => text(n).replace(/\s+/g, ' ').trim()).concat(shownLines(view).filter(l => /Peter|tennis club/.test(l)))
+function noneBack(view, before) {
+  const now = shownLines(view)
+  const back = before.filter(l => now.includes(l))
+  assert.deepEqual(back, [], 'no line of the earlier conversation after a restart')
+  assert.ok(before.some(l => /tennis club/.test(l)), 'the earlier conversation had his line (control)')
+}
 const rowParts = r => [r.props.below, r.props.action, r.props.description].filter(Boolean)
 const inside = view => [view.tree, ...all(view.tree, n => n.type === 'sdk:ListRow').flatMap(rowParts)]
 const inAll = (view, name) => inside(view).map(t => byData(t, name)).find(Boolean) || null
@@ -53,6 +66,7 @@ test('point 1: Forget all on Helper\'s settings page, then Helper\'s page again,
   send(view, 'hey')
   await settle()
   assert.ok(storage.data.get('talk'), 'the conversation is kept before')
+  const before = ownLines(view)
   // to Settings, Helper's page: Forget all, Yes
   const settings = mount(reg.settingsPages[0].render().type)
   await settle()
@@ -65,10 +79,10 @@ test('point 1: Forget all on Helper\'s settings page, then Helper\'s page again,
   const back = mount(reg.Page)
   await settle()
   assert.equal(storage.data.get('talk'), undefined, 'coming back to Helper does not write the old lines again')
-  assert.deepEqual(olds(back), [], 'no old line in the window')
+  assert.deepEqual(shownLines(back).filter(l => before.includes(l)), [], 'no old line in the window')
   // Hermes closed and opened again
   const again = await open(storage)
-  assert.deepEqual(olds(again.view), [], 'no old line after a restart')
+  noneBack(again.view, before)
   assert.ok(!text(helper(again.view)).includes('tennis club'))
 })
 
@@ -78,6 +92,7 @@ test('point 1: Forget all typed to Helper ("forget everything", Yes), then a res
   send(view, 'Peter')
   send(view, 'I run a tennis club')
   await settle()
+  const before = ownLines(view)
   send(view, 'forget everything')
   await settle()
   click(all(view.tree, n => (n.type === 'sdk:Button' || n.props['data-hh'] === 'answer') && text(n).trim() === 'Yes, delete it' && n.props.onClick)[0])
@@ -87,7 +102,7 @@ test('point 1: Forget all typed to Helper ("forget everything", Yes), then a res
   assert.ok(!kept || !kept.name, 'the kept answers went')
   // a restart
   const again = await open(storage)
-  assert.deepEqual(olds(again.view), [], 'no old line after a restart')
+  noneBack(again.view, before)
   assert.ok(!text(helper(again.view)).includes('tennis club'))
 })
 

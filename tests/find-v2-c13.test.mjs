@@ -19,7 +19,12 @@ test('1. no fixed line opens with Yes or No (line_start_rule); answers to Helper
   const texts = [...Object.entries(TALK_DATA.fixed).map(([id, f]) => [id, f.text]), ...TALK_DATA.facts.map(f => [f.id, f.text]),
     ...TALK_DATA.topics.flatMap(t => [[t.plain.id, t.plain.text], ...t.needs.map(n => [n.id, n.text])]), ...TALK_DATA.terms.map(t => [t.id, t.text]),
     ...WANTS_DATA.rows.map(r => [r.id, r.text])]
-  const bad = texts.filter(([, t]) => /^(yes|no)\b/i.test(String(t || '').trim())).map(([id]) => id)
+  // the form is hhcontent's own check (dev/checks/hhcontent-live-v2-changes-13/yesno.py: (Yes|No)[.,!]), as the rule
+  // names it (Yes. / No. / Yes, / No,); loom-fixes-2: \b was wider than the rule and caught BACK_NONE's "No question
+  // of mine is open", which answers nothing
+  const yesNo = t => /^\s*(Yes|No)[.,!]/.test(String(t || ''))
+  assert.ok(yesNo('No. Hermes is made by Nous Research.') && yesNo('Yes, it can.') && !yesNo('No question of mine is open.'))
+  const bad = texts.filter(([, t]) => yesNo(t)).map(([id]) => id)
   assert.deepEqual(bad, [])
   assert.ok(texts.length > 200, `${texts.length} lines`)
 })

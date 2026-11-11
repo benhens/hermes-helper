@@ -64,7 +64,9 @@ function show(o) {
     HOW_PART: () => `HOW_PART (${o.label})`,
     // loom-fixes (route2.py show)
     NAME: () => 'NAME ' + o.id,
-    MIG_APP: () => (o.app ? 'MIG_APP app=' + o.app : 'MIG_APP')
+    MIG_APP: () => (o.app ? 'MIG_APP app=' + o.app : 'MIG_APP'),
+    // loom-fixes-2 (route2.py show): ordinary talk at the opening's two questions
+    OPEN_TALK: () => `OPEN_TALK ${TALK_DATA.opening_talk.line_by_kind[o.talk]} then ${TALK_DATA.opening_talk.ask[o.ask]}`
   }
   return (by[o.kind] || (() => o.kind))()
 }
@@ -197,7 +199,9 @@ test('hhtech\'s 56 messages, each as a fresh message: the same line as route2.py
     assert.deepEqual(stateOf(st), expectedState(m.state), m.text)
     if (m.want.includes(m.landed)) right++
   }
-  assert.equal(right, 52, 'route2.py counts 52 of the 56 as right')
+  // loom-fixes-2: 51 at route2.py 91d33e98 (dev/checks/hhcontent-talk-v2/route2-out-v2.txt: right 51; "hi" now gets
+  // Hi. and the name question again, helper-loom-fixes-v2 point 6)
+  assert.equal(right, 51, 'route2.py counts 51 of the 56 as right')
 })
 
 for (const [file, count, what] of [['route2-set2.json', 60, 'hhtech\'s second set of 60 messages'], ['route2-extra.json', 50, 'fifty more messages of the Builder\'s own, for rules the sets above do not reach']]) {
@@ -276,7 +280,11 @@ test('the opening: greeting, name, what the person does, then a line with nothin
 
 test('no name given: the lines without a name and nothing kept; Skip: the "that\'s fine" line with nothing to pick', () => {
   const st = freshVisit('name')
-  assert.equal(lineFor(turn('hi', st), st).text, 'Nice to meet you. What do you do?')
+  // loom-fixes-2 (helper-loom-fixes-v2 point 6): "hi" is no answer to the name question: Hi., the question stays
+  assert.equal(lineFor(turn('hi', st), st).text, 'Hi.')
+  assert.equal(st.stage, 'name')
+  // route2.py's own no-name case
+  assert.equal(lineFor(turn("i'm not sure", st), st).text, 'Nice to meet you. What do you do?')
   const f2 = lineFor(turn('this and that', st), st)
   assert.equal(f2.text, 'Thanks.')
   // talk-live-2 (live-v2 changes-4): the answer to What do you do? is kept, with the first-time line (nothing was kept before)

@@ -23,13 +23,13 @@ import { prefersReducedMotion, watchReducedMotion } from './motion.js'
 import { readState, TAB_IDS } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
-import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor, noteLast } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
 import { talkToStore, talkFromStore } from './talk-keep.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
 import { recInstructions, judgeRec, askRec } from './setup-rec.js'
 import { AI_MODE } from './ai-mode.js'
-import { setupTyped, setupPress, setupAfter, setupStepOpen, setupReaskWaits, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
+import { setupTyped, setupPress, setupAfter, setupStepOpen, setupReaskWaits, setupQuestionOpen, SETUP_OWN_QUESTION, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
 import { makeLook, LOOK_UNSEEN } from './setup-look.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowPlace, pickedResult } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
@@ -226,13 +226,15 @@ export function makePage(ctx, opts = {}) {
   // pick. send: whether the line may ever be sent to the AI; the offer's question never is. ask-fix-t1 (PICK_FIRST):
   // the things to pick of the line before stay under it.
   const saidEntries = (said, send) => {
-    const { offer, samePicks, ...line } = said
+    const { offer, samePicks, ask, ...line } = said
     if (samePicks) {
       const last = [...memory.log].reverse().find(e => e.who === 'helper')
       if (last && last.answers) line.answers = last.answers
     }
     const out = [{ ...helperEntry(line), send }]
     if (offer) out.push({ ...helperEntry({ line: 'offer-' + offer.set, text: offer.text, source: null, answers: offer.answers, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false, offer: true })
+    // loom-fixes-2 (opening_talk): the opening's open question once more, as its own bubble (never sent to the AI)
+    if (ask) out.push({ ...helperEntry({ line: ask.line, text: ask.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false })
     return out
   }
 
@@ -277,17 +279,31 @@ export function makePage(ctx, opts = {}) {
   // the step again with its own answers ("Back to step 2 of 5: ..."), in place of that answer's offer; an answer with
   // things of its own to pick keeps them, and the step comes back after the answer to those (src/setup-chat.js).
   // Returns [the answer's line as it is to be shown, the entries after it].
+  // loom-fixes-2 (helper-loom-fixes-v2 point 5, one_question; hhtech-loom-run fault 1: in 8 of 20 messages an offer's
+  // question and then "When you're ready: are you new to Hermes?", two questions in a row): while Q_NEW, Q_GOAL, REC or
+  // a step is open and the ordinary talk answers a typed message, the answer carries no offer and no things to pick
+  // (its action buttons stay), a topic's question becomes that topic's plain line, and the open question comes once
+  // more as its own bubble with its answers, every time. An answer of own_question_kinds (W1, C1, C2, can-q, MIG_WHICH,
+  // RM2) keeps its own question and picks; the set-up question comes back after the answer to it.
   const setupAfterSaid = (result, said, typed) => {
-    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return [said, []]
-    const step = setupStepOpen(memory.visit)
-    if (!step && !typed && !setupReaskWaits(memory.visit)) return [said, []]
-    // find-v2 part 5: things to pick of the answer's own (its answers, or an offer that asks about the answer: two kinds
-    // of moving, which app, which plan, the near lines) keep the set-up question back until they are answered; a
-    // general offer (set up or see what it does, the four starting things) gives way to it, as before
+    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN', 'OPEN_TALK'].includes(result.kind)) return [said, []]
+    if (!setupQuestionOpen(memory.visit)) return [said, []]
+    if (!typed && !setupReaskWaits(memory.visit)) return [said, []]
+    // find-v2 part 5 wins where both jobs touched the same thing (Lead, 11 Nov 14:15): things to pick of the answer's
+    // own (its answers, or an offer that asks about the answer: two kinds of moving, which app, which plan, the near
+    // lines) keep the set-up question back until they are answered, as own_question_kinds do; only one question is on
+    // screen either way. At a step only the answer's own answers count, as before.
     const ownOffer = !!(said.offer && ['move', 'mig_which', 'mig_which_2', 'pay', 'stuck', 'words', 'near'].includes(said.offer.set))
-    const again = setupAfter(memory.visit, { picks: !!said.answers || (!setupStepOpen(memory.visit) && ownOffer) })
+    const own = SETUP_OWN_QUESTION.includes(result.kind) || SETUP_OWN_QUESTION.includes(said.line) || !!said.answers || (!setupStepOpen(memory.visit) && ownOffer)
+    const again = setupAfter(memory.visit, { picks: own })
     if (!again) return [said, []]
-    return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
+    let line = said
+    if (result.kind === 'question' && result.topic) {
+      const plain = noteLast(memory.visit, { ...result, kind: 'plain' })
+      memory.visit.lastq = false
+      line = lineFor(plain, memory.visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
+    }
+    return [{ ...line, offer: null, answers: null }, setupEntries(again)]
   }
   // find-v2 part 1: the turn closes with no line from the AI (its 12 s, or the person moved on) after the list call
   // picked a line: that line itself, as code shows it (src/live-turn.js pickedResult), not the don't-know

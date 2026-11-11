@@ -9,6 +9,7 @@
 // changes-14 (it has no ordinary talk: "hiya" is N1 there).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { TALK_DATA } from '../src/talk-data.js'
 import fs from 'node:fs'
 import path from 'node:path'
 import { freshVisit, turn, lineFor, sayLine } from '../src/talk.js'
@@ -44,7 +45,11 @@ function show(o) {
     want: () => 'ROW ' + o.row,
     skill: () => 'SKILL ' + o.skill,
     N2: () => 'N2 group ' + o.group,
-    G1: () => 'G1 group ' + o.group
+    G1: () => 'G1 group ' + o.group,
+    // loom-fixes (route2.py show)
+    NAME: () => 'NAME ' + o.id,
+    // loom-fixes-2 (route2.py show): ordinary talk at the opening's two questions
+    OPEN_TALK: () => `OPEN_TALK ${TALK_DATA.opening_talk.line_by_kind[o.talk]} then ${TALK_DATA.opening_talk.ask[o.ask]}`
   }
   return (by[o.kind] || (() => o.kind))()
 }

@@ -200,7 +200,9 @@ test('the person presses on while the AI is still writing: the written sentence 
   await send(view, "what's a skill?")
   const lines = all(helper(view), n => n.props['data-line']).map(n => n.props['data-line'])
   assert.ok(lines.includes('REC'), 'the written recommendation was put in first')
-  assert.equal(bubble(view).props['data-line'], 'term-skill')
+  // loom-fixes-2 (one_question): the answer, then "Want the steps?" once more as the last bubble
+  assert.deepEqual(lines.slice(-2), ['term-skill', 'SETUP_REASK_REC'])
+  assert.equal(bubble(view).props['data-line'], 'SETUP_REASK_REC')
   release(AI_1)
   await settle()
   assert.equal(all(helper(view), n => n.props['data-line'] === 'REC').length, 1, 'the late reply adds nothing')
