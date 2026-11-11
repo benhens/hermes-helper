@@ -248,15 +248,16 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
   })
 }
 
-// While Helper works on an answer: a small bubble with three dots, one lit, sitting on the piece
-// below it. `lit` is which dot (0 to 2); the page moves it on.
-export function BusyDots({ lit = 0 }) {
+// While Helper works on an answer: a small bubble with three dots, sitting on the piece below it.
+// talk-live row 7: the lit dot moves on by the style sheet alone (.hh-wait, src/talk.css), so the page is
+// not drawn again for it and the label is said once; reduced: all three dots the same and still.
+export function BusyDots({ reduced = false }) {
   return jsx('div', {
-    className: cx(T.bubble, T.dots),
+    className: cx(T.bubble, T.dots, reduced ? T.dotsStill : T.dotsWait),
     'data-hh': 'busy-dots',
     role: 'status',
     'aria-label': 'Helper is working on an answer',
-    children: [0, 1, 2].map(i => jsx('i', { className: i === lit ? T.dotOn : undefined }, i))
+    children: [0, 1, 2].map(i => jsx('i', {}, i))
   })
 }
 

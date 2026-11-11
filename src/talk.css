@@ -146,3 +146,11 @@
 /* talk v2 fixes: a faint "Kept: ..." or "From what I keep: ..." line whose thing was forgotten or
    replaced since: its words stay, struck through, in the same faint colour (no new words). */
 .hh-gone{text-decoration:line-through}
+/* talk-live row 7: while Helper waits for the person's AI, the lit dot moves on every 0.4 s (0, 1, 2, again), as a
+   change of colour in steps: no script timer, no new draw of the page, no moving or fading layer. Reduce motion
+   (the page's own watch, src/motion.js): no dot lit, all three the same, nothing moves. */
+.hh-dots.hh-wait i{animation:hh-dot 1.2s step-end infinite}
+.hh-dots.hh-wait i:nth-child(2){animation-delay:.4s}
+.hh-dots.hh-wait i:nth-child(3){animation-delay:.8s}
+@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}
+.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}

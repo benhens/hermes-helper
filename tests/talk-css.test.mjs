@@ -36,7 +36,9 @@ test('every class in the sheet starts with hh- (Hermes\'s codicon class is the o
   assert.ok(names.length >= 30, `${names.length} classes`)
   for (const name of names) assert.ok(name.startsWith('hh-') || name === 'codicon', name)
   // and no rule reaches outside our window: every selector begins at one of our own classes
-  for (const rule of rulesOf(sheet)) for (const sel of rule.slice(0, rule.indexOf('{')).split(',')) assert.match(sel.trim(), /^\.hh-/, sel)
+  // (talk-live: the one named animation, the waiting dots', is ours by its name hh-dot)
+  for (const rule of rulesOf(sheet).filter(r => !r.startsWith('@keyframes hh-'))) for (const sel of rule.slice(0, rule.indexOf('{')).split(',')) assert.match(sel.trim(), /^\.hh-/, sel)
+  assert.deepEqual(rulesOf(sheet).filter(r => r.startsWith('@')).map(r => r.slice(0, r.indexOf('{'))), ['@keyframes hh-dot'])
 })
 
 test('every colour is a Hermes variable; no fonts, no shadows, no pictures', () => {
