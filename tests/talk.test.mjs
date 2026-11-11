@@ -488,10 +488,11 @@ test('the grey kept line: the values as kept, one line for one moment, the first
 test('the first-time line is the one of this build\'s AI mode (talk-live); with no AI step it says nothing is sent to any AI', () => {
   const first = TALK_DATA.keeps.tell.first_time_if_no_model_call
   assert.equal(first, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
-  assert.equal(TALK.FIRST_TIME, LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE])
-  if (AI_MODE === 'no_ai_step') assert.equal(TALK.FIRST_TIME, first)
+  // loom-fixes: the data's line, then the Builder's sentence on the kept conversation
+  assert.equal(TALK.FIRST_TIME, LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE] + ' Our last 50 lines are kept there too, and other plugins can read them.')
+  if (AI_MODE === 'no_ai_step') assert.equal(TALK.FIRST_TIME, first + ' ' + TALK.TALK_KEPT_SENTENCE)
   // live-v2 changes-4: "but not this" became false (what the person does is sent), so "but not your name"
-  else assert.equal(TALK.FIRST_TIME, 'I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.')
+  else assert.equal(TALK.FIRST_TIME, 'I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords. Our last 50 lines are kept there too, and other plugins can read them.')
   assert.doesNotMatch(JSON.stringify(TALK_DATA), /Only your name goes to your AI/)
 })
 

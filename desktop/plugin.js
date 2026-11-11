@@ -22995,14 +22995,16 @@ function looksSecret(text) {
 // to, 360 to 600 px). Anything unexpected in storage falls back to the default.
 // dash-v1: the first build's tabs (Setup, Your setup) left the page; their keys step, answers and remember are no
 // longer read or written by the page (their parked files, src/steps.js and src/setup-tab.js, still name them).
-// About the person, only the record of what Helper keeps (talk v2 row 3): never what they do, never the
-// conversation, nothing about their bots (the Dashboard reads Hermes each time it opens). STORED_KEYS is every key
+// About the person, the record of what Helper keeps (talk v2 row 3) and, since loom-fixes, the last 50 lines of the
+// conversation with Helper (his Loom 4:05, "chat logs"); nothing about their bots (the Dashboard reads Hermes each time it opens). STORED_KEYS is every key
 // the plugin may write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
 
 // 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
 // 'met' (changes-14, keeps.met): true once Helper has said hello, so the name is asked only on the first
 // visit; nothing about the person, and no Forget removes it (src/page.js).
-const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met']
+// loom-fixes (Lead's point 17): 'talk', the last 50 lines of the conversation with Helper (src/talk-keep.js), and
+// 'helperHidden', whether the person put Helper's window away with Hide Helper (true, or nothing)
+const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met', 'talk', 'helperHidden']
 // dash-v1: the three tabs, Dashboard first (only it is built)
 // loom-fixes: My setup is out (his words, Loom 3:22); a stored 'my_setup' opens the Dashboard
 const TAB_IDS = ['dashboard', 'learn']
@@ -23085,6 +23087,67 @@ const hasKept = kept => ['name', 'work', 'mod', 'msg', 'svc', 'setup_new', 'setu
 function keptToStore(kept) {
   const clean = cleanKept(kept)
   return hasKept(clean) ? clean : null
+}
+
+// ---- src/talk-keep.js ----
+// loom-fixes (Lead's point 17b, Lead's reading of his \"chat logs\"): the conversation with Helper is still there on the
+// next visit. The last TALK_KEEP_MAX lines are kept in the plugin's storage on the person's computer (ctx.storage, key
+// 'talk'), shown again above the new visit's lines. Pure code: no React, no Hermes; src/page.js does the storage calls.
+// What a kept line holds: who said it, its words, its line id, the docs box, a text to copy with its label, a list of
+// rows; never its things to pick, its faint \"Kept:\" note or anything only that moment had. Lead's rule for a line shown
+// again after a restart: its buttons are plain faint text (OldLine draws them so when restored), its text to copy
+// stays copyable.
+// Never kept: a line the secrets rule refuses (the person's message, or Helper's line or its text to copy, that looks
+// like a key or a secret: src/key-check.js, src/secret-rule.js). A pasted key is never shown in the first place (K1).
+// Kept lines are never sent to the AI: they are not in the visit's log (src/live-request.js reads only that).
+
+const TALK_KEEP_MAX = 50
+const TALK_TEXT_MAX = 2000
+const talkStr = (v, max = TALK_TEXT_MAX) => (typeof v === 'string' && v.trim() && Array.from(v).length <= max ? v : null)
+const talkUnsafe = s => typeof s === 'string' && (looksLikeKey(s) || looksSecret(s))
+
+// One line of the conversation as it is kept, or null when it may not be kept.
+function talkKeepOne(e) {
+  if (!e || (e.who !== 'you' && e.who !== 'helper')) return null
+  const text = talkStr(e.text)
+  if (!text || talkUnsafe(text)) return null
+  if (e.who === 'you') return { who: 'you', text }
+  // an offer's question is not kept: its picks were in the message box, and without them it would ask for nothing
+  // (Decided myself, in the report)
+  if (typeof e.line === 'string' && e.line.startsWith('offer-')) return null
+  const out = { who: 'helper', text, line: talkStr(e.line, 120) || 'kept' }
+  const n = e.next
+  if (n && typeof n === 'object' && typeof n.label === 'string') {
+    if (n.kind === 'paste' && talkStr(n.text) && !talkUnsafe(n.text)) out.next = { kind: 'paste', label: n.label, text: n.text }
+    else if (n.kind === 'where' && talkStr(n.text)) out.next = { kind: 'where', text: n.text, line: talkStr(n.line, 120) || '' }
+    else if (n.kind !== 'paste') out.next = { kind: talkStr(n.kind, 40) || 'line', label: n.label }
+  }
+  if (talkStr(e.paste) && !talkUnsafe(e.paste)) out.paste = e.paste
+  if (e.docs && talkStr(e.docs.words)) out.docs = { head: talkStr(e.docs.head, 120) || '', words: e.docs.words, ...(talkStr(e.docs.where, 300) ? { where: e.docs.where } : {}) }
+  if (Array.isArray(e.rows)) {
+    const rows = e.rows.filter(r => talkStr(r, 300) && !talkUnsafe(r))
+    if (rows.length) out.rows = rows
+  }
+  if (talkStr(e.hint, 300)) out.hint = e.hint
+  return out
+}
+
+// The lines to store: the last TALK_KEEP_MAX of those that may be kept, or null when none. Nothing is stored until
+// the person has said something (a page only opened stores nothing; Helper's opening line comes again anyway).
+function talkToStore(lines) {
+  const kept = (Array.isArray(lines) ? lines : []).map(talkKeepOne).filter(Boolean).slice(-TALK_KEEP_MAX)
+  return kept.some(e => e.who === 'you') ? kept : null
+}
+
+// The stored lines read back: anything unexpected is dropped (a record edited by hand or by an older build); each is
+// marked restored, so its buttons are drawn as plain faint text.
+function talkFromStore(v) {
+  if (!Array.isArray(v)) return []
+  return v
+    .map(talkKeepOne)
+    .filter(Boolean)
+    .slice(-TALK_KEEP_MAX)
+    .map(e => ({ ...e, restored: true }))
 }
 
 // ---- src/talk.js ----
@@ -23863,7 +23926,10 @@ function serviceIn(text, st, answered) {
 /* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
 const ST = TALK_DATA.small_talk
 // talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
-const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
+// loom-fixes (Lead's point 17b; hhcontent gave no words for it, so this sentence is the Builder's, marked): the kept
+// conversation is said in the same line
+const TALK_KEPT_SENTENCE = 'Our last 50 lines are kept there too, and other plugins can read them.'
+const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE] + ' ' + TALK_KEPT_SENTENCE
 // live-v2 changes-4: under the first Kept: of what the person does, in a build that calls an AI
 // live changes-6: once the set-up conversation sends its two answers too, setup_told takes work_told's place
 const WORK_TOLD = LIVE_DATA.lines_by_mode[SETUP_BUILT && SETUP_AI_BUILT ? 'setup_told' : 'work_told'][AI_MODE]
@@ -27064,6 +27130,8 @@ const K = {
   // column (plugins/kanban/board.tsx), on Helper's fill. It folds Helper away and brings it back ----
   strip:
     'flex h-full w-7 shrink-0 cursor-pointer flex-col items-center gap-2 bg-(--ui-sidebar-surface-background) py-3 text-(--ui-text-tertiary) transition-colors hover:bg-(--chrome-action-hover) hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+  // loom-fixes: the strip a hidden Helper leaves: the same strip, holding only the Show Helper button (not itself a button)
+  stripHidden: 'flex h-full w-7 shrink-0 flex-col items-center bg-(--ui-sidebar-surface-background) py-3',
   stripLabel: 'text-[0.6875rem] font-medium uppercase tracking-wide text-(--ui-text-tertiary) [writing-mode:vertical-rl]',
 
   // ---- Your setup ----
@@ -27310,6 +27378,9 @@ const T = {
   docsHead: 'hh-docs-head',
   docsWords: 'hh-docs-words',
   docsWhere: 'hh-docs-where',
+  // loom-fixes: the strip at the top of Helper's window (Hide Helper, Clear chat) and its question
+  bar: 'hh-bar',
+  barAsk: 'hh-bar-ask',
   // the numbered clicks to add an optional skill, and the faint line after them
   steps: 'hh-steps',
   after: 'hh-after',
@@ -27325,7 +27396,7 @@ const T = {
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
 // dash-v1: and the Dashboard's (src/dash.js DASH_ICONS, design/dash-r7/notes.md's table), each Hermes's own.
-const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'robot', 'edit', 'comment', 'symbol-misc', 'watch', 'close', 'check']
+const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'robot', 'edit', 'comment', 'symbol-misc', 'watch', 'close', 'check', 'clear-all', 'layout-sidebar-right-off', 'layout-sidebar-right']
 // dash-v1: the Tabler icons the Dashboard takes from Hermes through the SDK's `icons` (hhtech-dash-icons.md point 1)
 const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // Hermes's look has one primary button per screen (hhdesign fix 6); every other button of
@@ -27334,7 +27405,7 @@ const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-bar{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:4px;min-height:24px;margin:-8px -8px 2px 0}\n.hh-bar-ask{flex:1;min-width:0;font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -29844,7 +29915,9 @@ function OldLine({ entry, onNext }) {
   // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
   // line its label is plain faint text, not a link. A button that opens something under its line (text to paste,
   // steps) or a Hermes screen stays a link, so it can be used again.
-  const done = next && entry.pressed && (next.kind === 'line' || next.kind === 'forget-all' || next.kind === 'setup')
+  // loom-fixes (Lead's rule for a line kept from an earlier visit): every button but its text to copy is plain faint
+  // text there
+  const done = next && ((entry.pressed && (next.kind === 'line' || next.kind === 'forget-all' || next.kind === 'setup')) || (entry.restored && next.kind !== 'paste' && next.kind !== 'where'))
   return jsxs('div', {
     className: T.old,
     'data-hh': 'old',
@@ -29919,7 +29992,11 @@ function Conversation({ entries, newest, kept, onNext, onNote, scrollRef }) {
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,
-    onScroll: e => convFade(e.currentTarget),
+    // loom-fixes (Lead's point 16): never shown scrolled sideways (a browser may scroll a box whose overflow is hidden)
+    onScroll: e => {
+      if (e.currentTarget.scrollLeft) e.currentTarget.scrollLeft = 0
+      convFade(e.currentTarget)
+    },
     role: 'group',
     'aria-label': 'Conversation so far',
     'data-hh': 'conversation',
@@ -30188,7 +30265,11 @@ function makePage(ctx, opts = {}) {
       // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
       // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
       const metStored = readMet()
-      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
+      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null' }
+      // loom-fixes (Lead's point 17b): the conversation of earlier visits, the last 50 lines, shown above this visit's
+      // (never sent to the AI: they are not in memory.log)
+      memory.before = readTalk().map(e => ({ ...e, id: memory.nextId++, key: `r${memory.nextId}` }))
+      memory.talkStored = JSON.stringify(talkToStore(memory.before))
       memory.log = saidEntries(openingLine(memory.visit), true)
       // setup-chat: a later visit opens with the set-up conversation's returning line (BACK_REC, BACK_Q ...). It is said
       // at once from what is kept, as if nothing could be read; the page then reads Hermes (the look) and, when the
@@ -30205,9 +30286,44 @@ function makePage(ctx, opts = {}) {
     }
     return memory
   }
+  // loom-fixes: the kept conversation, read back cleaned (src/talk-keep.js); a storage that fails gives none
+  const readTalk = () => {
+    try {
+      return talkFromStore(ctx.storage.get('talk', null))
+    } catch {
+      return []
+    }
+  }
+  // Written after every change of the conversation: the earlier visits' lines and this visit's, the last 50 that may be
+  // kept; the key goes when none is left. Not written when nothing changed.
+  const writeTalk = () => {
+    const next = talkToStore([...memory.before, ...memory.log])
+    const text = JSON.stringify(next)
+    if (text === memory.talkStored) return
+    try {
+      if (next) ctx.storage.set('talk', next)
+      else ctx.storage.remove('talk')
+      memory.talkStored = text
+    } catch {}
+  }
+  // Clear chat (and Forget all on Helper's settings page): the earlier lines and this visit's go, all but what is on
+  // screen now as the newest (the bubble, and the person's message while Helper works on it), so the window is never
+  // left empty or showing the waiting dots for nothing. Kept answers and marks stay (hhcontent: what_clear_does).
+  const clearTalk = () => {
+    memory.before = []
+    const last = memory.log[memory.log.length - 1]
+    memory.log = last ? [last] : []
+    memory.talkStored = 'stale'
+    writeTalk()
+  }
   // The page is on screen again (Hermes draws it fresh after Settings): the record as stored now.
   const rereadKept = () => {
     const m = remembered()
+    // loom-fixes: Forget all on Helper's settings page removes the kept conversation too: it goes from the window
+    if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) {
+      m.before = []
+      m.talkStored = 'null'
+    }
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
@@ -30423,6 +30539,11 @@ function makePage(ctx, opts = {}) {
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
     const [folded, setFolded] = useState(false)
+    // loom-fixes (Lead's point 17a): Hide Helper, remembered: the window folds away to a thin strip at the page's right
+    // edge with one button to bring it back; the Dashboard takes the freed width. The plugin itself stays as it is.
+    const [hidden, setHidden] = useState(() => ctx.storage.get('helperHidden', false) === true)
+    // Clear chat: null, or 'ask' while "Clear this chat with Helper?" shows with Yes and No
+    const [clearing, setClearing] = useState(null)
     // Put on screen (again): the stored record may have changed on Helper's settings page.
     useState(rereadKept)
     const [log, setLog] = useState(() => remembered().log)
@@ -30491,7 +30612,7 @@ function makePage(ctx, opts = {}) {
       tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
     }
 
-    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded })
+    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded: folded || hidden })
 
     const keep = (key, setter) => value => {
       setter(value)
@@ -30539,8 +30660,31 @@ function makePage(ctx, opts = {}) {
     // unfolding by a wider window (the effect above) sets the state itself, and moves no focus.
     function foldHelper(away) {
       setFolded(away)
+      if (!away && hidden) hideHelper(false)
       if (away) setFocusStrip(true)
       else setFocusAsk(true)
+    }
+    // loom-fixes: Hide Helper and Show Helper (remembered); the keyboard follows (to the strip's button, or to the box)
+    function hideHelper(away) {
+      setHidden(away)
+      setClearing(null)
+      try {
+        if (away) ctx.storage.set('helperHidden', true)
+        else ctx.storage.remove('helperHidden')
+      } catch {}
+      if (away) setFocusStrip(true)
+      else {
+        setFolded(false)
+        setFocusAsk(true)
+      }
+    }
+    // loom-fixes: Clear chat, after its Yes
+    function clearChat() {
+      liveClose()
+      clearTalk()
+      setClearing(null)
+      setLog(memory.log)
+      setFocusAsk(true)
     }
 
     // Helper comes on screen (the page opens with it, or the person opens it from the strip): the
@@ -30587,6 +30731,17 @@ function makePage(ctx, opts = {}) {
       if (el) el.scrollTop = el.scrollHeight
     }
     useEffect(scrollToNewest, [newestId, helperShown])
+    // loom-fixes (Lead's point 17b): every change of the conversation is kept (the last 50 lines)
+    useEffect(writeTalk, [log])
+    // loom-fixes (Lead's point 16, his frame f-2m58s: every bubble lost its first letters for about a second while
+    // Hermes's terminal strip under the page grew; not reproduced here): Helper's boxes are never shown scrolled
+    // sideways. Its window, its conversation and our page are put back to their left edge at every draw and every
+    // change of our page's size, and the conversation also at each of its own scrolls (src/talk-view.js).
+    useEffect(() => {
+      const conv = helperScroll.current
+      const boxes = [conv, conv && typeof conv.closest === 'function' ? conv.closest('[data-hh=helper]') : null, conv && typeof conv.closest === 'function' ? conv.closest('[data-hh=page]') : null]
+      for (const b of boxes) if (b && b.scrollLeft) b.scrollLeft = 0
+    })
     // talk v2 look, point 9 (hhdesign's notes-wants.md item 1): the person's newest message must stay whole
     // above the bubble. When the bubble's height changes after its line is said (steps or text to paste
     // opened or closed under it), the conversation goes to its newest end, once per change: a
@@ -30935,6 +31090,12 @@ function makePage(ctx, opts = {}) {
     function pressNext(entry) {
       const next = entry.next
       if (!next) return
+      // loom-fixes: a line kept from an earlier visit: only its text to copy opens (its other buttons are plain text)
+      if (entry.restored) {
+        if (next.kind !== 'paste') return
+        memory.before = memory.before.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))
+        return setLog(old => [...old])
+      }
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
       if (next.kind === 'line' || next.kind === 'forget-all') {
         liveClose()
@@ -31094,7 +31255,8 @@ function makePage(ctx, opts = {}) {
     // message; then the bubble is the three dots.)
     const newest = log[log.length - 1]
     const inBubble = newest && newest.who === 'helper' ? newest : null
-    const older = inBubble ? log.slice(0, -1) : log
+    // loom-fixes (Lead's point 17b): the lines kept from earlier visits come first, above this visit's
+    const older = [...memory.before, ...(inBubble ? log.slice(0, -1) : log)]
     // The line appears word by word (src/reveal.js) unless reduce motion is on: then it is whole
     // from its first draw. said = all of it is on screen: answers and buttons wait for that.
     const fresh = !reduced
@@ -31182,6 +31344,29 @@ function makePage(ctx, opts = {}) {
       'composer'
     )
 
+    // loom-fixes (Lead's point 17, his Loom 4:05): a small strip at the top of Helper's window, at its right, with
+    // Hermes's own quiet icon buttons (ghost, icon size, as the Dashboard's close button): Hide Helper and Clear chat
+    // (hhcontent's words, content/dash-words-v1.json helper_window). Clear chat asks first, in the same strip.
+    const HW = DASH_DATA.words.helperWindow
+    const quietIcon = (label, icon, onClick, hh) => jsx(Button, { variant: 'ghost', size: 'icon-xs', 'aria-label': label, title: label, 'data-hh': hh, onClick, children: jsx(Codicon, { name: icon.codicon, size: 14, 'aria-hidden': true }) }, hh)
+    const clearQuestion = HW.clear_ask.replace(/\s*\S+\s*\/\s*\S+\s*$/, '').trim()
+    const winBar = jsx(
+      'div',
+      {
+        className: T.bar,
+        'data-hh': 'win-bar',
+        children:
+          clearing === 'ask'
+            ? [
+                jsx('span', { className: T.barAsk, role: 'alert', 'data-hh': 'clear-ask', children: clearQuestion }, 'q'),
+                jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'clear-yes', onClick: clearChat, children: HW.clear_yes }, 'yes'),
+                jsx(Button, { variant: 'ghost', size: 'xs', 'data-hh': 'clear-no', onClick: () => setClearing(null), children: HW.clear_no }, 'no')
+              ]
+            : [quietIcon(HW.clear, { codicon: 'clear-all' }, () => setClearing('ask'), 'clear-chat'), quietIcon(HW.hide, { codicon: 'layout-sidebar-right-off' }, () => hideHelper(true), 'hide-helper')]
+      },
+      'bar'
+    )
+
     let helperArea = null
     if (helperShown) {
       const over = fit.helper === 'over'
@@ -31207,6 +31392,7 @@ function makePage(ctx, opts = {}) {
             : undefined,
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
+            winBar,
             jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
             inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
@@ -31220,8 +31406,19 @@ function makePage(ctx, opts = {}) {
     // The "Helper" strip at the page's right edge, written down it, in a window too narrow for
     // both sides: it folds Helper away and brings it back. It stays clear of Hermes's title-bar
     // band, where Hermes's own window buttons float.
-    const strip =
-      fit.helper !== 'column'
+    // loom-fixes: Helper hidden by the person: the strip holds one quiet icon button, Show Helper, and nothing else
+    const strip = hidden
+      ? jsx(
+          'div',
+          {
+            className: K.stripHidden,
+            style: { paddingTop: 'calc(var(--titlebar-height) + 0.75rem)' },
+            'data-hh': 'helper-hidden',
+            children: jsx(Button, { variant: 'ghost', size: 'icon-xs', 'aria-label': HW.show, title: HW.show, 'data-hh': 'show-helper', ref: stripButton, onClick: () => hideHelper(false), children: jsx(Codicon, { name: 'layout-sidebar-right', size: 14, 'aria-hidden': true }) })
+          },
+          'strip'
+        )
+      : fit.helper !== 'column'
         ? jsxs(
             'button',
             {
@@ -31343,6 +31540,8 @@ function makeSettingsPage(ctx) {
     }
     function forgetAll() {
       ctx.storage.remove('kept')
+      // loom-fixes (Lead's point 17b): the kept conversation with Helper goes with it
+      ctx.storage.remove('talk')
       showStored()
       setSaid(null)
       setForget('done')

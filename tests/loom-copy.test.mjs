@@ -62,3 +62,17 @@ test('the built page: every text to copy in desktop/plugin.js has no angle brack
     assert.ok(l.next.text.includes(a.label) && l.next.text.includes('hermes migrate ' + a.agent), l.next.text)
   }
 })
+
+// Lead's point 4: the recommendation is the written sentence only. In the built page the one call that would ask an
+// AI to word it (askRec) sits behind SETUP_AI_BUILT, which the built file holds false.
+test('the built page: no path lets an AI word the recommendation (SETUP_AI_BUILT false; askRec only behind it)', () => {
+  const built = fs.readFileSync(path.join(ROOT, 'desktop', 'plugin.js'), 'utf8')
+  assert.equal((built.match(/^const SETUP_AI_BUILT = false$/gm) || []).length, 1)
+  // one call of it in the whole page (the function itself is "const askRec = (")
+  assert.equal([...built.matchAll(/askRec\(/g)].length, 1)
+  assert.match(built, /const i = SETUP_AI_BUILT && AI_MODE === 'ai_writes' && shown \? says\.findIndex\(s => s\.rec\) : -1/)
+  // and with i = -1 nothing is asked: the call is inside \"if (i >= 0)\"
+  const at = built.indexOf("const i = SETUP_AI_BUILT && AI_MODE")
+  const block = built.slice(at, built.indexOf('askRec(', at))
+  assert.match(block, /if \(i < 0 \|\| [^\n]*\) return put\(says\)/)
+})

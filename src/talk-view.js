@@ -124,7 +124,9 @@ function OldLine({ entry, onNext }) {
   // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
   // line its label is plain faint text, not a link. A button that opens something under its line (text to paste,
   // steps) or a Hermes screen stays a link, so it can be used again.
-  const done = next && entry.pressed && (next.kind === 'line' || next.kind === 'forget-all' || next.kind === 'setup')
+  // loom-fixes (Lead's rule for a line kept from an earlier visit): every button but its text to copy is plain faint
+  // text there
+  const done = next && ((entry.pressed && (next.kind === 'line' || next.kind === 'forget-all' || next.kind === 'setup')) || (entry.restored && next.kind !== 'paste' && next.kind !== 'where'))
   return jsxs('div', {
     className: T.old,
     'data-hh': 'old',
@@ -199,7 +201,11 @@ export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef 
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,
-    onScroll: e => convFade(e.currentTarget),
+    // loom-fixes (Lead's point 16): never shown scrolled sideways (a browser may scroll a box whose overflow is hidden)
+    onScroll: e => {
+      if (e.currentTarget.scrollLeft) e.currentTarget.scrollLeft = 0
+      convFade(e.currentTarget)
+    },
     role: 'group',
     'aria-label': 'Conversation so far',
     'data-hh': 'conversation',

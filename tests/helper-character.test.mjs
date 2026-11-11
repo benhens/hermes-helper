@@ -100,8 +100,9 @@ test('where it sits: under the bubble, on the message box, 168 px wide; the piec
   const { view } = await open({ measured: true })
   resize(view, 1180)
   const kids = helper(view).props.children.filter(Boolean)
-  assert.deepEqual(kids.map(k => k.props['data-hh']), ['grip', 'conversation', 'bubble', 'under', 'composer'])
-  const under = kids[3]
+  // loom-fixes: the strip with Hide Helper and Clear chat at the top (Lead's point 17)
+  assert.deepEqual(kids.map(k => k.props['data-hh']), ['grip', 'win-bar', 'conversation', 'bubble', 'under', 'composer'])
+  const under = kids[4]
   assert.equal(under.props.className, T.under)
   const parts = under.props.children.filter(Boolean)
   assert.deepEqual(parts.map(p => p.props.className), [T.linkCell, T.charSpace, T.character])

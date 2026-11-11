@@ -131,6 +131,8 @@ export const K = {
   // column (plugins/kanban/board.tsx), on Helper's fill. It folds Helper away and brings it back ----
   strip:
     'flex h-full w-7 shrink-0 cursor-pointer flex-col items-center gap-2 bg-(--ui-sidebar-surface-background) py-3 text-(--ui-text-tertiary) transition-colors hover:bg-(--chrome-action-hover) hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+  // loom-fixes: the strip a hidden Helper leaves: the same strip, holding only the Show Helper button (not itself a button)
+  stripHidden: 'flex h-full w-7 shrink-0 flex-col items-center bg-(--ui-sidebar-surface-background) py-3',
   stripLabel: 'text-[0.6875rem] font-medium uppercase tracking-wide text-(--ui-text-tertiary) [writing-mode:vertical-rl]',
 
   // ---- Your setup ----
@@ -377,6 +379,9 @@ export const T = {
   docsHead: 'hh-docs-head',
   docsWords: 'hh-docs-words',
   docsWhere: 'hh-docs-where',
+  // loom-fixes: the strip at the top of Helper's window (Hide Helper, Clear chat) and its question
+  bar: 'hh-bar',
+  barAsk: 'hh-bar-ask',
   // the numbered clicks to add an optional skill, and the faint line after them
   steps: 'hh-steps',
   after: 'hh-after',
@@ -392,7 +397,7 @@ export const T = {
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
 // dash-v1: and the Dashboard's (src/dash.js DASH_ICONS, design/dash-r7/notes.md's table), each Hermes's own.
-export const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'robot', 'edit', 'comment', 'symbol-misc', 'watch', 'close', 'check']
+export const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'robot', 'edit', 'comment', 'symbol-misc', 'watch', 'close', 'check', 'clear-all', 'layout-sidebar-right-off', 'layout-sidebar-right']
 // dash-v1: the Tabler icons the Dashboard takes from Hermes through the SDK's `icons` (hhtech-dash-icons.md point 1)
 export const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // Hermes's look has one primary button per screen (hhdesign fix 6); every other button of

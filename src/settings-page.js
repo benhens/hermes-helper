@@ -76,6 +76,8 @@ export function makeSettingsPage(ctx) {
     }
     function forgetAll() {
       ctx.storage.remove('kept')
+      // loom-fixes (Lead's point 17b): the kept conversation with Helper goes with it
+      ctx.storage.remove('talk')
       showStored()
       setSaid(null)
       setForget('done')

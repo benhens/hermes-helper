@@ -198,7 +198,8 @@ test('the first-time line and the line under Kept: of what the person does, by m
     send(view, 'Peter')
     finish(view)
     const first = text(byData(view.tree, 'kept-first'))
-    assert.equal(first, mode === 'no_ai_step' ? TALK_DATA.keeps.tell.first_time_if_no_model_call : 'I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.')
+    // loom-fixes: the Builder's sentence on the kept conversation follows the data's line
+    assert.equal(first, (mode === 'no_ai_step' ? TALK_DATA.keeps.tell.first_time_if_no_model_call : 'I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.') + ' Our last 50 lines are kept there too, and other plugins can read them.')
     send(view, 'I run a tennis club')
     finish(view)
     const told = byData(view.tree, 'kept-work-told')

@@ -783,7 +783,10 @@ export function serviceIn(text, st, answered) {
 /* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
 const ST = TALK_DATA.small_talk
 // talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
-export const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
+// loom-fixes (Lead's point 17b; hhcontent gave no words for it, so this sentence is the Builder's, marked): the kept
+// conversation is said in the same line
+export const TALK_KEPT_SENTENCE = 'Our last 50 lines are kept there too, and other plugins can read them.'
+export const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE] + ' ' + TALK_KEPT_SENTENCE
 // live-v2 changes-4: under the first Kept: of what the person does, in a build that calls an AI
 // live changes-6: once the set-up conversation sends its two answers too, setup_told takes work_told's place
 export const WORK_TOLD = LIVE_DATA.lines_by_mode[SETUP_BUILT && SETUP_AI_BUILT ? 'setup_told' : 'work_told'][AI_MODE]

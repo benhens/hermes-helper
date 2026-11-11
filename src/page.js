@@ -25,6 +25,7 @@ import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
+import { talkToStore, talkFromStore } from './talk-keep.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
 import { recInstructions, judgeRec, askRec } from './setup-rec.js'
 import { AI_MODE } from './ai-mode.js'
@@ -116,7 +117,11 @@ export function makePage(ctx, opts = {}) {
       // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
       // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
       const metStored = readMet()
-      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
+      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null' }
+      // loom-fixes (Lead's point 17b): the conversation of earlier visits, the last 50 lines, shown above this visit's
+      // (never sent to the AI: they are not in memory.log)
+      memory.before = readTalk().map(e => ({ ...e, id: memory.nextId++, key: `r${memory.nextId}` }))
+      memory.talkStored = JSON.stringify(talkToStore(memory.before))
       memory.log = saidEntries(openingLine(memory.visit), true)
       // setup-chat: a later visit opens with the set-up conversation's returning line (BACK_REC, BACK_Q ...). It is said
       // at once from what is kept, as if nothing could be read; the page then reads Hermes (the look) and, when the
@@ -133,9 +138,44 @@ export function makePage(ctx, opts = {}) {
     }
     return memory
   }
+  // loom-fixes: the kept conversation, read back cleaned (src/talk-keep.js); a storage that fails gives none
+  const readTalk = () => {
+    try {
+      return talkFromStore(ctx.storage.get('talk', null))
+    } catch {
+      return []
+    }
+  }
+  // Written after every change of the conversation: the earlier visits' lines and this visit's, the last 50 that may be
+  // kept; the key goes when none is left. Not written when nothing changed.
+  const writeTalk = () => {
+    const next = talkToStore([...memory.before, ...memory.log])
+    const text = JSON.stringify(next)
+    if (text === memory.talkStored) return
+    try {
+      if (next) ctx.storage.set('talk', next)
+      else ctx.storage.remove('talk')
+      memory.talkStored = text
+    } catch {}
+  }
+  // Clear chat (and Forget all on Helper's settings page): the earlier lines and this visit's go, all but what is on
+  // screen now as the newest (the bubble, and the person's message while Helper works on it), so the window is never
+  // left empty or showing the waiting dots for nothing. Kept answers and marks stay (hhcontent: what_clear_does).
+  const clearTalk = () => {
+    memory.before = []
+    const last = memory.log[memory.log.length - 1]
+    memory.log = last ? [last] : []
+    memory.talkStored = 'stale'
+    writeTalk()
+  }
   // The page is on screen again (Hermes draws it fresh after Settings): the record as stored now.
   const rereadKept = () => {
     const m = remembered()
+    // loom-fixes: Forget all on Helper's settings page removes the kept conversation too: it goes from the window
+    if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) {
+      m.before = []
+      m.talkStored = 'null'
+    }
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
@@ -351,6 +391,11 @@ export function makePage(ctx, opts = {}) {
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
     const [folded, setFolded] = useState(false)
+    // loom-fixes (Lead's point 17a): Hide Helper, remembered: the window folds away to a thin strip at the page's right
+    // edge with one button to bring it back; the Dashboard takes the freed width. The plugin itself stays as it is.
+    const [hidden, setHidden] = useState(() => ctx.storage.get('helperHidden', false) === true)
+    // Clear chat: null, or 'ask' while "Clear this chat with Helper?" shows with Yes and No
+    const [clearing, setClearing] = useState(null)
     // Put on screen (again): the stored record may have changed on Helper's settings page.
     useState(rereadKept)
     const [log, setLog] = useState(() => remembered().log)
@@ -419,7 +464,7 @@ export function makePage(ctx, opts = {}) {
       tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
     }
 
-    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded })
+    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded: folded || hidden })
 
     const keep = (key, setter) => value => {
       setter(value)
@@ -467,8 +512,31 @@ export function makePage(ctx, opts = {}) {
     // unfolding by a wider window (the effect above) sets the state itself, and moves no focus.
     function foldHelper(away) {
       setFolded(away)
+      if (!away && hidden) hideHelper(false)
       if (away) setFocusStrip(true)
       else setFocusAsk(true)
+    }
+    // loom-fixes: Hide Helper and Show Helper (remembered); the keyboard follows (to the strip's button, or to the box)
+    function hideHelper(away) {
+      setHidden(away)
+      setClearing(null)
+      try {
+        if (away) ctx.storage.set('helperHidden', true)
+        else ctx.storage.remove('helperHidden')
+      } catch {}
+      if (away) setFocusStrip(true)
+      else {
+        setFolded(false)
+        setFocusAsk(true)
+      }
+    }
+    // loom-fixes: Clear chat, after its Yes
+    function clearChat() {
+      liveClose()
+      clearTalk()
+      setClearing(null)
+      setLog(memory.log)
+      setFocusAsk(true)
     }
 
     // Helper comes on screen (the page opens with it, or the person opens it from the strip): the
@@ -515,6 +583,17 @@ export function makePage(ctx, opts = {}) {
       if (el) el.scrollTop = el.scrollHeight
     }
     useEffect(scrollToNewest, [newestId, helperShown])
+    // loom-fixes (Lead's point 17b): every change of the conversation is kept (the last 50 lines)
+    useEffect(writeTalk, [log])
+    // loom-fixes (Lead's point 16, his frame f-2m58s: every bubble lost its first letters for about a second while
+    // Hermes's terminal strip under the page grew; not reproduced here): Helper's boxes are never shown scrolled
+    // sideways. Its window, its conversation and our page are put back to their left edge at every draw and every
+    // change of our page's size, and the conversation also at each of its own scrolls (src/talk-view.js).
+    useEffect(() => {
+      const conv = helperScroll.current
+      const boxes = [conv, conv && typeof conv.closest === 'function' ? conv.closest('[data-hh=helper]') : null, conv && typeof conv.closest === 'function' ? conv.closest('[data-hh=page]') : null]
+      for (const b of boxes) if (b && b.scrollLeft) b.scrollLeft = 0
+    })
     // talk v2 look, point 9 (hhdesign's notes-wants.md item 1): the person's newest message must stay whole
     // above the bubble. When the bubble's height changes after its line is said (steps or text to paste
     // opened or closed under it), the conversation goes to its newest end, once per change: a
@@ -863,6 +942,12 @@ export function makePage(ctx, opts = {}) {
     function pressNext(entry) {
       const next = entry.next
       if (!next) return
+      // loom-fixes: a line kept from an earlier visit: only its text to copy opens (its other buttons are plain text)
+      if (entry.restored) {
+        if (next.kind !== 'paste') return
+        memory.before = memory.before.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))
+        return setLog(old => [...old])
+      }
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
       if (next.kind === 'line' || next.kind === 'forget-all') {
         liveClose()
@@ -1022,7 +1107,8 @@ export function makePage(ctx, opts = {}) {
     // message; then the bubble is the three dots.)
     const newest = log[log.length - 1]
     const inBubble = newest && newest.who === 'helper' ? newest : null
-    const older = inBubble ? log.slice(0, -1) : log
+    // loom-fixes (Lead's point 17b): the lines kept from earlier visits come first, above this visit's
+    const older = [...memory.before, ...(inBubble ? log.slice(0, -1) : log)]
     // The line appears word by word (src/reveal.js) unless reduce motion is on: then it is whole
     // from its first draw. said = all of it is on screen: answers and buttons wait for that.
     const fresh = !reduced
@@ -1110,6 +1196,29 @@ export function makePage(ctx, opts = {}) {
       'composer'
     )
 
+    // loom-fixes (Lead's point 17, his Loom 4:05): a small strip at the top of Helper's window, at its right, with
+    // Hermes's own quiet icon buttons (ghost, icon size, as the Dashboard's close button): Hide Helper and Clear chat
+    // (hhcontent's words, content/dash-words-v1.json helper_window). Clear chat asks first, in the same strip.
+    const HW = DASH_DATA.words.helperWindow
+    const quietIcon = (label, icon, onClick, hh) => jsx(Button, { variant: 'ghost', size: 'icon-xs', 'aria-label': label, title: label, 'data-hh': hh, onClick, children: jsx(Codicon, { name: icon.codicon, size: 14, 'aria-hidden': true }) }, hh)
+    const clearQuestion = HW.clear_ask.replace(/\s*\S+\s*\/\s*\S+\s*$/, '').trim()
+    const winBar = jsx(
+      'div',
+      {
+        className: T.bar,
+        'data-hh': 'win-bar',
+        children:
+          clearing === 'ask'
+            ? [
+                jsx('span', { className: T.barAsk, role: 'alert', 'data-hh': 'clear-ask', children: clearQuestion }, 'q'),
+                jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'clear-yes', onClick: clearChat, children: HW.clear_yes }, 'yes'),
+                jsx(Button, { variant: 'ghost', size: 'xs', 'data-hh': 'clear-no', onClick: () => setClearing(null), children: HW.clear_no }, 'no')
+              ]
+            : [quietIcon(HW.clear, { codicon: 'clear-all' }, () => setClearing('ask'), 'clear-chat'), quietIcon(HW.hide, { codicon: 'layout-sidebar-right-off' }, () => hideHelper(true), 'hide-helper')]
+      },
+      'bar'
+    )
+
     let helperArea = null
     if (helperShown) {
       const over = fit.helper === 'over'
@@ -1135,6 +1244,7 @@ export function makePage(ctx, opts = {}) {
             : undefined,
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
+            winBar,
             jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
             inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
@@ -1148,8 +1258,19 @@ export function makePage(ctx, opts = {}) {
     // The "Helper" strip at the page's right edge, written down it, in a window too narrow for
     // both sides: it folds Helper away and brings it back. It stays clear of Hermes's title-bar
     // band, where Hermes's own window buttons float.
-    const strip =
-      fit.helper !== 'column'
+    // loom-fixes: Helper hidden by the person: the strip holds one quiet icon button, Show Helper, and nothing else
+    const strip = hidden
+      ? jsx(
+          'div',
+          {
+            className: K.stripHidden,
+            style: { paddingTop: 'calc(var(--titlebar-height) + 0.75rem)' },
+            'data-hh': 'helper-hidden',
+            children: jsx(Button, { variant: 'ghost', size: 'icon-xs', 'aria-label': HW.show, title: HW.show, 'data-hh': 'show-helper', ref: stripButton, onClick: () => hideHelper(false), children: jsx(Codicon, { name: 'layout-sidebar-right', size: 14, 'aria-hidden': true }) })
+          },
+          'strip'
+        )
+      : fit.helper !== 'column'
         ? jsxs(
             'button',
             {

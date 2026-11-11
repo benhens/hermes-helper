@@ -643,10 +643,11 @@ test('what is kept about the person: one stored record ("kept") by fixed rules, 
   send(view, 'remember that my club has six courts')
   send(view, 'please install a skill')
   send(view, 'what is a skill')
-  assert.deepEqual([...storage.data.keys()].sort(), ['kept', 'met'], 'the record and the met mark (changes-14), nothing else')
+  // loom-fixes (Lead's point 17b): and the conversation's last 50 lines ('talk', src/talk-keep.js)
+  assert.deepEqual([...storage.data.keys()].sort(), ['kept', 'met', 'talk'], 'the record, the met mark (changes-14) and the kept conversation, nothing else')
   assert.equal(storage.data.get('met'), true)
   assert.deepEqual(storage.data.get('kept'), { name: 'Peter', work: 'I run a tennis club', msg: 'WhatsApp', asked: ['my club has six courts'], told: true, ...(WORK_TOLD ? { told_work: true } : {}) })
-  assert.doesNotMatch(JSON.stringify([...storage.data]), /install|skill/)
+  assert.doesNotMatch(JSON.stringify(storage.data.get('kept')), /install|skill/)
   assert.deepEqual(globalThis.__hhHost.calls.slice(opened).filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'and nothing was sent to Hermes')
   // (dash-v1: while the page opened, only the Dashboard's read-only reads besides those two)
   assert.deepEqual(globalThis.__hhHost.calls.slice(0, opened).filter(m => m !== 'setup.runtime_check' && m !== 'setup.status' && !['profiles.describe', 'cron.manage', 'plugins.manage'].includes(m)), [])
@@ -664,7 +665,9 @@ test('no AI step: the conversation\'s code reaches no model and no request; the 
   assert.doesNotMatch(built, /turnWithModel|talk\.model|model_hint/)
 })
 
-test('the conversation lives while the plugin is loaded; when Hermes starts again it is gone, but the kept name is not: a later visit opens with BACK and asks no name (changes-14/15)', async () => {
+// loom-fixes (Lead's point 17b): when Hermes starts again the conversation is no longer gone: its lines are shown
+// again above the new visit's (tests/loom-window.test.mjs has the rest)
+test('the conversation lives while the plugin is loaded; when Hermes starts again its lines come back above, and the kept name too: a later visit opens with BACK and asks no name (changes-14/15)', async () => {
   useHost()
   const storage = fakeStorage()
   const first = await registerPlugin(storage, fakeTimers())
@@ -694,9 +697,11 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   finish(fresh)
   assert.equal(said(fresh), 'Hi again, Peter.')
   assert.match(offerLine(fresh), /^offer-general/)
-  assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children.map(c => c.props['data-line']), ['BACK'])
+  const shownAgain = byData(fresh.tree, 'conversation-lines').props.children
+  assert.deepEqual(shownAgain.map(c => c.props['data-line'] || c.props['data-hh']), ['OPEN', 'me', 'F1', 'me', 'F2', 'BACK'])
   assert.equal(byData(fresh.tree, 'skip'), null, 'no question to skip')
-  assert.doesNotMatch(text(fresh.tree), /tennis|your name/, 'Helper does not say on a later visit what it remembers (not decided)')
+  // Helper's new lines do not say what it remembers (the person's own kept message above is the conversation itself)
+  assert.doesNotMatch(text(shownAgain.at(-1)) + said(fresh), /tennis|your name/, 'Helper does not say on a later visit what it remembers (not decided)')
   send(fresh, 'what do you know about me')
   assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'A1')
   assert.deepEqual(all(byData(fresh.tree, 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter', 'What you do: I run a tennis club'])

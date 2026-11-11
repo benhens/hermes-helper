@@ -34,6 +34,9 @@ test('point 11 is the committed mode\'s; the talk data\'s own no-AI point 11 is 
 // live-v2 changes-4 ("README points 2 to 4 still need what you do"; hhcontent: add "and what you do (one short
 // answer)" to point 2): the Builder's words, until section 7 of the team's file has them
 const POINT_2_C4 = ', and what you do (one short answer).'
+// loom-fixes (Lead's point 17b: the README says the conversation is kept; hhcontent gave no words for it): the
+// Builder's sentences at the end of point 6
+const POINT_6_LOOM = ' Besides, it keeps the last 50 lines of your conversation with Helper, so they are still there the next time you open Hermes: on this computer, shared by all your bots, and other plugins can read them. It does not keep a line its rules take for a password or key, and kept lines are never sent to any AI. "Clear chat" at the top of Helper\'s window removes them, and so does "Forget all of this".'
 
 test('all twelve points are the team\'s section 7, word for word, as pinned (when the team\'s folder is there)', t => {
   if (!fs.existsSync(path.join(TEAM, 'content', 'helper-keeps-v1.md'))) return t.skip('the team\'s content folder is not here')
@@ -51,7 +54,7 @@ test('all twelve points are the team\'s section 7, word for word, as pinned (whe
   assert.equal(team.length, 12)
   // talk-live-2: point 2 gains what the person does (changes-4), point 11 is the committed mode's (test above)
   const live = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/helper-talk-live-v2.json'), 'utf8'))
-  const want = team.map((l, i) => (i === 1 ? l.replace(/\.$/, POINT_2_C4) : i === 10 ? live.lines_by_mode[P11][aiModeOf()] : l))
+  const want = team.map((l, i) => (i === 1 ? l.replace(/\.$/, POINT_2_C4) : i === 5 ? l + POINT_6_LOOM : i === 10 ? live.lines_by_mode[P11][aiModeOf()] : l))
   assert.equal(want[1], '2. It keeps your name, if you give it, and what you do (one short answer).')
   assert.deepEqual(points, want)
 })
