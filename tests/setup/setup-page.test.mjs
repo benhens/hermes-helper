@@ -102,7 +102,8 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   assert.deepEqual(lookCalls(host).find(([m]) => m === 'cron.manage')[1], { action: 'list', profile: 'default', include_disabled: true })
   const seen = olds(view).at(-1)
   assert.equal(seen.props['data-line'], 'SEEN')
-  assert.match(oldText(seen), /^I looked at your Hermes\. You have a model, the AI that thinks, and it answers\. You have no scheduled jobs yet\./)
+  // find-v2 part 3: no call of Helper's has answered in this visit, so the model part is "couldn't check"
+  assert.match(oldText(seen), /^I looked at your Hermes\. I couldn[’']t check your model this time\. You have no scheduled jobs yet\./)
   assert.match(text(helper(view)), /Kept: send reminders to my members about training\./)
   assert.equal(text(byData(seen, 'hint')), 'Read from your Hermes on this computer. Nothing was sent, and no AI was used.')
   assert.match(text(seen), /What did you look at\?/)
@@ -199,7 +200,7 @@ test('no model that answers: the model first (R1), whatever the answers', opt, a
   finish(view)
   await press(view, 'I know it well')
   await press(view, 'Several bots, one per job')
-  assert.match(oldText(olds(view).find(n => n.props['data-line'] === 'SEEN')), /You have no model that answers yet \(the AI that thinks\)\. You have one bot so far\./)
+  assert.match(oldText(olds(view).find(n => n.props['data-line'] === 'SEEN')), /You have no model set up yet, the AI that thinks\. You have one bot so far\./)
   assert.equal(bubbleSaid(view), 'Hermes needs a model before anything else. Next: A model. The AI that does the thinking. Your app may already have a free one. Want the steps?')
 })
 
@@ -392,4 +393,73 @@ test('the person moved on before the recommendation call\'s 12 s, and the call n
   await send(view, 'what do you mean?')
   assert.equal(host.asks.length, 1)
   assert.deepEqual(lines().slice(-2), ['use0', 'SLOW_A'])
+})
+
+// find-v2 part 3 (Lead, 11 Nov 11:40; hhtech ask-run 3 point 2): "You have a model, the AI that thinks, and it answered my
+// check." only when Helper saw the AI answer in this visit. setup.runtime_check alone says only that a model is set (it
+// said ok in hhtech's run D, where every call failed with "No LLM provider configured"), so with nothing answered yet
+// the model part is model_unread; none set up: model_not; a call with no answer in time: model_slow (changes-13 words).
+const SEEN_OF = view => oldText(olds(view).find(n => n.props['data-line'] === 'SEEN')).replace(/’/g, "'")
+async function toSeen(view, typed = 'send reminders to my members about training') {
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, 'I know it well')
+  await send(view, typed)
+}
+test('find-v2: no AI set up (the model check says no): "You have no model set up yet", never "it answered my check"', opt, async () => {
+  const { view } = await open({ hermes: { model: false } })
+  await toSeen(view)
+  assert.match(SEEN_OF(view), /^I looked at your Hermes\. You have no model set up yet, the AI that thinks\./)
+  assert.doesNotMatch(SEEN_OF(view), /answered my check/)
+})
+test('find-v2: a model is set but nothing has answered yet (run D: the check says ok): "I couldn\'t check your model this time."', opt, async () => {
+  const { view } = await open()
+  await toSeen(view)
+  assert.match(SEEN_OF(view), /^I looked at your Hermes\. I couldn't check your model this time\./)
+})
+test('find-v2: a call failed with "No LLM provider configured": model_not; one that answered: model_ok; one with no answer in 12 s: model_slow', opt, async () => {
+  const cases = [
+    [() => { throw new Error('No LLM provider configured for task=helping_hand provider=auto. Run: hermes setup') }, /You have no model set up yet, the AI that thinks\./],
+    [() => 'Hermes can keep notes.\nUSED: mem0', /You have a model, the AI that thinks, and it answered my check\./],
+    [() => new Promise(() => {}), /You have a model, but it did not answer my check in time\./]
+  ]
+  for (const [oneshot, want] of cases) {
+    const { view, timers } = await open({ hermes: { oneshot } })
+    finish(view)
+    await send(view, 'Peter')
+    await send(view, 'I run a tennis club')
+    // a question typed at "Are you new to Hermes?" is answered (its AI call), then the set-up questions go on
+    await send(view, 'can it fly a kite')
+    timers.fire(12000)
+    await settle()
+    finish(view)
+    await press(view, 'Skip')
+    await press(view, 'Not sure yet')
+    const seen = olds(view).concat(bubble(view) ? [bubble(view)] : []).map(n => text(n).replace(/’/g, "'")).find(t => /I looked at your Hermes/.test(t))
+    assert.ok(seen, 'a SEEN line')
+    assert.match(seen, want)
+  }
+})
+
+// find-v2 part 5 (5) (Lead's answer 5 to find-v1's questions; find-v1 fault 8): a typed question wins over the set-up
+// conversation's question too, and the set-up question is offered again after the answer. "How can I migrate?" at
+// "Do you want jobs at set times, phone chats, or something else?": the two kinds of moving with their two picks (not
+// the set-up question in their place); the person's pick is answered; then the set-up question again.
+test('find-v2: "How can I migrate?" typed at the set-up conversation\'s goal question: the moving line and its picks; after the pick, the goal question again', opt, async () => {
+  const { view } = await open()
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, 'Skip')
+  assert.equal(bubbleLine(view), 'Q_GOAL')
+  await send(view, 'How can I migrate?')
+  const lines = () => [...olds(view).map(n => n.props['data-line']), bubbleLine(view)]
+  assert.ok(lines().includes('MIG'), lines().join(' '))
+  assert.deepEqual(labels(view), ['From another AI app', 'To another computer'], 'the moving picks show, not the set-up question in their place')
+  assert.ok(!mine(view).length || !mine(view).at(-1).startsWith('Kept'), 'nothing kept')
+  await press(view, 'To another computer')
+  assert.ok(lines().includes('MIG_PC'), lines().join(' '))
+  assert.ok(lines().slice(-3).some(l => /^SETUP_REASK_GOAL|^Q_GOAL/.test(l)), 'the goal question is offered again: ' + lines().join(' '))
+  assert.ok(labels(view).length >= 2, 'with its picks: ' + labels(view).join(' / '))
 })

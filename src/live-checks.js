@@ -11,7 +11,6 @@ import { talkNorm, whichOf } from './talk.js'
 import { WANTS_DATA } from './wants-data.js'
 
 const LC = LIVE_DATA.checks
-const SUBJECT_IDS = LIVE_DATA.subjects.map(s => s.id)
 const LC_R9 = pyRegExp(LC.r9_pattern, 'i')
 const LC_R6 = pyRegExp(LC.r6_pattern, 'gi')
 const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'gi')
@@ -48,12 +47,6 @@ export function noReply(raw) {
 // <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
 // while the model still thinks)
 const cutThink = s => String(s || '').replace(/<think>[\s\S]*?<\/think>/g, '').replace(/<think>[\s\S]*$/, '')
-
-// first_call.read: lower case, <think> cut, the first word that is a subject id; none found: none
-export function readSubject(raw) {
-  const words = cutThink(raw).toLowerCase().match(/[a-z_]+/g) || []
-  return words.find(w => SUBJECT_IDS.includes(w)) || 'none'
-}
 
 // find-v1, the list call's reader (hhtech's readList, dev/checks/hhtech-find-run/find.mjs): <think> blocks cut, then
 // up to three ids of the list in the order given (any case) -> { ids }; none: { word: 'BUILD' } when the word BUILD is

@@ -160,6 +160,7 @@ export const WANTS_DATA = {
         "google it",
         "web search"
       ],
+      "pick_label": "Searching the web",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -230,6 +231,7 @@ export const WANTS_DATA = {
         "use a website",
         "browser"
       ],
+      "pick_label": "Using websites for you",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -279,6 +281,7 @@ export const WANTS_DATA = {
         "twitter",
         "tweet"
       ],
+      "pick_label": "X (Twitter)",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -415,6 +418,7 @@ export const WANTS_DATA = {
         "word file",
         "excel file"
       ],
+      "pick_label": "Reading Word, Excel, PDF",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -460,6 +464,7 @@ export const WANTS_DATA = {
         "edit a pdf",
         "fill in a pdf"
       ],
+      "pick_label": "Editing PDF files",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -511,6 +516,7 @@ export const WANTS_DATA = {
         "word document",
         "make slides"
       ],
+      "pick_label": "Making Word or Excel files",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -606,6 +612,7 @@ export const WANTS_DATA = {
         "action items",
         "meeting minutes"
       ],
+      "pick_label": "Meeting notes into tasks",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -721,6 +728,7 @@ export const WANTS_DATA = {
         "click and type",
         "use my apps"
       ],
+      "pick_label": "Using your computer's apps",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -789,6 +797,7 @@ export const WANTS_DATA = {
         "draw a picture",
         "generate an image"
       ],
+      "pick_label": "Making pictures",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -857,6 +866,7 @@ export const WANTS_DATA = {
         "look at my pictures",
         "read a screenshot"
       ],
+      "pick_label": "Looking at a photo",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -908,6 +918,7 @@ export const WANTS_DATA = {
         "text to video",
         "video generation"
       ],
+      "pick_label": "Making a video",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -998,6 +1009,7 @@ export const WANTS_DATA = {
         "talking head video",
         "ai presenter"
       ],
+      "pick_label": "Video with an AI presenter",
       "next": {
         "kind": "steps",
         "label": "Show me how to add it",
@@ -1049,7 +1061,12 @@ export const WANTS_DATA = {
         "youtube",
         "summarise a video",
         "summarize a video",
-        "youtube summary"
+        "youtube summary",
+        "youtube video",
+        "youtube videos",
+        "watch youtube",
+        "watch a video",
+        "watch videos"
       ],
       "next": {
         "kind": "paste",
@@ -1141,6 +1158,7 @@ export const WANTS_DATA = {
         "by voice",
         "use my voice"
       ],
+      "pick_label": "Talking out loud",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -1198,6 +1216,7 @@ export const WANTS_DATA = {
         "tts",
         "read it out"
       ],
+      "pick_label": "Reading answers aloud",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -1302,6 +1321,7 @@ export const WANTS_DATA = {
         "song lyrics",
         "suno"
       ],
+      "pick_label": "Songs and music AI",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -1394,6 +1414,7 @@ export const WANTS_DATA = {
         "route to",
         "time zone"
       ],
+      "pick_label": "Places, routes, time zones",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -1444,6 +1465,7 @@ export const WANTS_DATA = {
         "crypto price",
         "bitcoin price"
       ],
+      "pick_label": "Stock and crypto prices",
       "next": {
         "kind": "steps",
         "label": "Show me how to add it",
@@ -1500,6 +1522,7 @@ export const WANTS_DATA = {
         "price drop",
         "track a price"
       ],
+      "pick_label": "Watching a product's price",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",

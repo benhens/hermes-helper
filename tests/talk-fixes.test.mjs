@@ -29,7 +29,7 @@ const say = (st, typed) => lineFor(turn(typed, st), st, typed, { settingsPage: t
 const TEN = [
   ['how do I connect telegram', s => [s.line, s.next.label], ['msg1', 'Open Messaging']],
   ['what is a model', s => [s.line, s.text, s.next.label, s.used], ['mod0', 'A model is the AI that does the thinking. Hermes needs one to answer.', 'Open Model', null]],
-  ['can hermes check my email every morning', s => [s.line, s.text, s.next.label, s.next.text], ['sch5', 'Yes. Connect your email to Hermes first. Then ask it once, in plain words.', 'Show me what to ask', 'Every morning at 8, check my email and send me a short summary.']],
+  ['can hermes check my email every morning', s => [s.line, s.text, s.next.label, s.next.text], ['sch5', 'Connect your email to Hermes first. Then ask it once, in plain words.' /* find-v2: changes-13, no line opens with Yes */, 'Show me what to ask', 'Every morning at 8, check my email and send me a short summary.']],
   ['which AI should I use', s => [s.line, s.used && s.used.text], ['mod1', 'From what I keep: you pay for ChatGPT.']],
   ['how much does it cost', s => [s.line, s.text, s.next.label, s.used], ['COST', 'Hermes itself is free. The AI it uses can cost money, depending on which one you choose.', 'Open Model', null]],
   ['whats the difference between a skill and a plugin', s => [s.line, s.text, s.answers.items.map(a => a.label)], ['W2', 'A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.', ['Skills', 'Plugins']]],

@@ -1353,9 +1353,9 @@
   },
   {
    "id": "sch5",
-   "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+   "text": "Connect your email to Hermes first. Then ask it once, in plain words.",
    "kind": "reply",
-   "words": 14,
+   "words": 13,
    "found": []
   },
   {
@@ -1570,23 +1570,23 @@
   },
   {
    "id": "d_windows",
-   "text": "Yes. Hermes runs on Windows 10 and 11. It also runs on Mac and Linux.",
+   "text": "Hermes runs on Mac, Windows and Linux. On Windows, the docs name Windows 10 and 11.",
    "kind": "reply",
-   "words": 15,
+   "words": 16,
    "found": []
   },
   {
    "id": "d_mac",
-   "text": "Yes. The docs list Macs with Apple chips, and the Hermes app runs there.",
+   "text": "The docs list Macs with Apple chips, and the Hermes app runs there.",
    "kind": "reply",
-   "words": 14,
+   "words": 13,
    "found": []
   },
   {
    "id": "d_linux",
-   "text": "Yes. Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
+   "text": "Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
    "kind": "reply",
-   "words": 13,
+   "words": 12,
    "found": []
   },
   {
@@ -1675,16 +1675,16 @@
   },
   {
    "id": "d_offline",
-   "text": "Yes, with an AI on your own computer. After its download, that AI needs no internet.",
+   "text": "Hermes can work without internet when its AI runs on your own computer. After its download, that AI needs no internet.",
    "kind": "reply",
-   "words": 16,
+   "words": 21,
    "found": []
   },
   {
    "id": "d_many_people",
-   "text": "Yes. Other people can talk to your Hermes from a chat app. You choose who is allowed.",
+   "text": "Other people can talk to your Hermes from a chat app. You choose who is allowed.",
    "kind": "reply",
-   "words": 17,
+   "words": 16,
    "found": []
   },
   {
@@ -1740,9 +1740,9 @@
   },
   {
    "id": "d_share_notes",
-   "text": "No. Each separate Hermes keeps its own notes and its own chats. Nothing is shared.",
+   "text": "Each separate Hermes keeps its own notes and its own chats. They do not share them.",
    "kind": "reply",
-   "words": 15,
+   "words": 16,
    "found": []
   },
   {
@@ -2146,23 +2146,23 @@
   },
   {
    "id": "d_open_source",
-   "text": "Yes. Hermes is open source, which means its code is public. Hermes itself is free.",
+   "text": "Hermes is open source, which means its code is public. Hermes itself is free.",
    "kind": "reply",
-   "words": 15,
+   "words": 14,
    "found": []
   },
   {
    "id": "d_gemini",
-   "text": "Yes. Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+   "text": "Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
    "kind": "reply",
-   "words": 22,
+   "words": 21,
    "found": []
   },
   {
    "id": "d_forget",
-   "text": "Yes. Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+   "text": "Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
    "kind": "reply",
-   "words": 19,
+   "words": 18,
    "found": []
   },
   {
@@ -2174,9 +2174,9 @@
   },
   {
    "id": "d_two",
-   "text": "Yes. Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
+   "text": "Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
    "kind": "reply",
-   "words": 18,
+   "words": 17,
    "found": []
   },
   {
@@ -2191,6 +2191,65 @@
    "text": "With one setting on, Hermes listens for a spoken phrase and answers. The docs compare that to \"Hey Siri\".",
    "kind": "reply",
    "words": 19,
+   "found": []
+  },
+  {
+   "id": "d_terminal",
+   "text": "A terminal is a window where you type commands instead of clicking. Hermes works in a terminal and in the app. Both are the same Hermes.",
+   "kind": "reply",
+   "words": 26,
+   "found": [
+    "26 words > 25",
+    "banned term terminal"
+   ]
+  },
+  {
+   "id": "d_agents_md",
+   "text": "AGENTS.md is a file of instructions for one project folder. Hermes reads it when it works in that folder.",
+   "kind": "reply",
+   "words": 19,
+   "found": [
+    "banned term AGENTS"
+   ]
+  },
+  {
+   "id": "d_dark",
+   "text": "Press Ctrl+K, or Cmd+K on a Mac. In the list that opens, you can switch the colour mode.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "d_home",
+   "text": "Hermes can work with Home Assistant, a smart home app, through an official plugin. A plugin is an add-on you install into Hermes.",
+   "kind": "reply",
+   "words": 23,
+   "found": [
+    "product word"
+   ]
+  },
+  {
+   "id": "d_cost",
+   "text": "Type /usage in a chat with Hermes. It shows an estimate of what that chat has cost.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_toolsets",
+   "text": "A toolset is a group of tools, like web search. Tools are the actions Hermes can take. Each group can be switched on or off, and a few start off.",
+   "kind": "reply",
+   "words": 30,
+   "found": [
+    "30 words > 25",
+    "banned term toolset"
+   ]
+  },
+  {
+   "id": "d_shorter",
+   "text": "Type /personality concise in a chat. Hermes then gives brief, to-the-point answers.",
+   "kind": "reply",
+   "words": 12,
    "found": []
   },
   {

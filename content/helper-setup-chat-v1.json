@@ -250,8 +250,8 @@
   "seen_line": "SEEN = LOOK_OPEN + model part + goal part. Goal part: the goal item's part if it can be seen; for goal phone the chat-app part; for goal unsure the personality part.",
   "parts": {
    "LOOK_OPEN": "I looked at your Hermes.",
-   "model_ok": "You have a model, the AI that thinks, and it answers.",
-   "model_not": "You have no model that answers yet (the AI that thinks).",
+   "model_ok": "You have a model, the AI that thinks, and it answered my check.",
+   "model_not": "You have no model set up yet, the AI that thinks.",
    "model_unread": "I couldn't check your model this time.",
    "scheduled_job_done": "You have {n} scheduled job.",
    "scheduled_job_done_plural": "You have {n} scheduled jobs.",
@@ -261,7 +261,10 @@
    "personality_done": "Your Hermes has its own personality text.",
    "personality_not": "Its personality text is still the starter one.",
    "chat_apps_cannot": "I can't see whether you use a chat app.",
-   "read_failed": "I couldn't read that part this time."
+   "read_failed": "I couldn't read that part this time.",
+   "model_ok_was_c13": "You have a model, the AI that thinks, and it answers.",
+   "model_not_was_c13": "You have no model that answers yet (the AI that thinks).",
+   "model_slow": "You have a model, but it did not answer my check in time."
   },
   "under": {
    "grey": "Read from your Hermes on this computer. Nothing was sent, and no AI was used.",
@@ -278,7 +281,8 @@
     "I can't see: first chat, chat apps, tools, memory, safety."
    ],
    "note": "Only the main bot is read. Line 6 is fixed text."
-  }
+  },
+  "model_rule": "added live-v2-c13. The model part by what setup.runtime_check found, read fresh each time SEEN is built: (1) the check answered: model_ok. (2) a model is set (provider and model named) but the check failed or timed out: model_slow. (3) no provider or model set (for example 'No LLM provider configured'): model_not. (4) the read itself failed: model_unread. model_ok is never the default: when the Builder cannot tell (2) from (3), show model_unread."
  },
  "rule": {
   "inputs": {
@@ -1162,7 +1166,7 @@
    },
    {
     "who": "Helper",
-    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. You have no scheduled jobs yet.",
     "words": 22,
     "picks": null,
     "grey": "Kept: send reminders to my members about training. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
@@ -1448,7 +1452,7 @@
    },
    {
     "who": "Helper",
-    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. You have no scheduled jobs yet.",
     "words": 22,
     "picks": null,
     "grey": "Kept: send reminders to my members about training. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
@@ -1767,7 +1771,7 @@
    },
    {
     "who": "Helper",
-    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. You have no scheduled jobs yet.",
     "words": 22,
     "picks": null,
     "grey": "Kept: a summary of my emails every morning. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
@@ -1942,7 +1946,7 @@
    },
    {
     "who": "Helper",
-    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. You have no scheduled jobs yet.",
     "words": 22,
     "picks": null,
     "grey": "Kept: a summary of my emails every morning. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
@@ -2117,7 +2121,7 @@
    },
    {
     "who": "Helper",
-    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. Its personality text is still the starter one.",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. Its personality text is still the starter one.",
     "words": 24,
     "picks": null,
     "grey": "Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
@@ -2241,7 +2245,7 @@
    },
    {
     "who": "Helper",
-    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. Its personality text is still the starter one.",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. Its personality text is still the starter one.",
     "words": 24,
     "picks": null,
     "grey": "Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",

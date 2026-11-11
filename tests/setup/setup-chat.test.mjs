@@ -20,6 +20,7 @@ import { person, NOTHING } from './sim.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..')
 const FIX = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'setup-rule.json'), 'utf8'))
+const SETUP_RAW = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'helper-setup-chat-v1.json'), 'utf8'))
 const SETUP_JSON = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'helper-setup-chat-v1.json'), 'utf8'))
 const LIST_JSON = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'dash-setup-list-v2.json'), 'utf8'))
 const sha = f => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex')
@@ -81,7 +82,11 @@ test('the rule on the data\'s own table (nothing done yet, 48 rows), and its exa
 
 test('the written recommendation and the look line: word for word as build.py makes them', opt, () => {
   for (const r of FIX.recs) assert.equal(recText(r.item, r.rule, r.new, r.goal), r.text, JSON.stringify(r))
-  for (const s of FIX.seen) assert.equal(seenLine({ model: s.model, soul: s.soul, jobs: s.jobs, bots: s.bots }, s.goal), s.line, JSON.stringify(s))
+  // find-v2: live-v2 changes-13 reworded the model parts in the data (apply_c13.py; build.py still has the old words,
+  // kept in the data as model_ok_was_c13 and model_not_was_c13), so build.py's line is read with the data's new words
+  const P = SETUP_RAW.look.parts
+  const c13 = line => line.replace(P.model_ok_was_c13, P.model_ok).replace(P.model_not_was_c13, P.model_not)
+  for (const s of FIX.seen) assert.equal(seenLine({ model: s.model, soul: s.soul, jobs: s.jobs, bots: s.bots }, s.goal), c13(s.line), JSON.stringify(s))
   assert.ok(FIX.recs.length >= 100 && FIX.seen.length >= 200)
 })
 
@@ -117,7 +122,7 @@ test('conversation (a) of the write-up: Peter, a tennis club, only installed', o
   assert.equal(p.looks.length, 1, 'Helper looks by itself at Q_GOAL\'s answer')
   let s = p.said()
   assert.deepEqual(lines(s), [
-    ['SEEN', 'I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.'],
+    ['SEEN', 'I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. You have no scheduled jobs yet.'],
     ['REC', "You're new, so first check that Hermes answers you. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?"]
   ])
   assert.equal(s[0].note.text, 'Kept: send reminders to my members about training.')
@@ -205,7 +210,7 @@ test('"I\'m stuck": the line and the text to paste with the thing and the step; 
   const m = person({ model: 'not', soul: false, jobs: 0, bots: 1 })
   m.skip()
   m.press('Skip').press('Not sure yet')
-  assert.equal(m.log.find(x => x.line === 'SEEN').text, 'I looked at your Hermes. You have no model that answers yet (the AI that thinks). Its personality text is still the starter one.')
+  assert.equal(m.log.find(x => x.line === 'SEEN').text, 'I looked at your Hermes. You have no model set up yet, the AI that thinks. Its personality text is still the starter one.')
   assert.match(m.last().text, /^Hermes needs a model before anything else\. Next: A model\./)
   m.press('Show me the steps').press("I'm stuck")
   l = m.last()
@@ -223,7 +228,7 @@ test('conversation (c): Skip, Skip, Not sure yet: nothing kept, the usual first 
   assert.equal(p.last().note, null, 'Skip is not kept')
   p.press('Not sure yet')
   const s = p.said()
-  assert.equal(s.find(x => x.line === 'SEEN').text, 'I looked at your Hermes. You have a model, the AI that thinks, and it answers. Its personality text is still the starter one.')
+  assert.equal(s.find(x => x.line === 'SEEN').text, 'I looked at your Hermes. You have a model, the AI that thinks, and it answered my check. Its personality text is still the starter one.')
   assert.equal(s.find(x => x.line === 'SEEN').note, null)
   assert.equal(p.last().text, 'The usual first step is to check that Hermes answers. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?')
   p.press("I've done this already")

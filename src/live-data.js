@@ -1429,7 +1429,7 @@ export const LIVE_DATA = {
       "id": "sch5",
       "subject": "sch",
       "title": "On a schedule: checking email on a schedule",
-      "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+      "text": "Connect your email to Hermes first. Then ask it once, in plain words.",
       "kw": [
         "email",
         "emails",
@@ -1552,7 +1552,6 @@ export const LIVE_DATA = {
         "zoom",
         "shopify",
         "airtable",
-        "youtube",
         "my mail",
         "mailbox",
         "my apps",
@@ -1601,8 +1600,7 @@ export const LIVE_DATA = {
         "obsidian",
         "zoom",
         "shopify",
-        "airtable",
-        "youtube"
+        "airtable"
       ],
       "weak": [
         "services",
@@ -1631,7 +1629,6 @@ export const LIVE_DATA = {
         "zoom",
         "shopify",
         "airtable",
-        "youtube",
         "my mail",
         "mailbox",
         "my apps",
@@ -1686,7 +1683,6 @@ export const LIVE_DATA = {
         "zoom",
         "shopify",
         "airtable",
-        "youtube",
         "my mail",
         "mailbox",
         "my apps",
@@ -5108,7 +5104,7 @@ export const LIVE_DATA = {
       "id": "d_windows",
       "subject": "fact",
       "title": "Hermes on Windows",
-      "text": "Yes. Hermes runs on Windows 10 and 11. It also runs on Mac and Linux.",
+      "text": "Hermes runs on Mac, Windows and Linux. On Windows, the docs name Windows 10 and 11.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -5121,7 +5117,7 @@ export const LIVE_DATA = {
       "id": "d_mac",
       "subject": "fact",
       "title": "Hermes on a Mac",
-      "text": "Yes. The docs list Macs with Apple chips, and the Hermes app runs there.",
+      "text": "The docs list Macs with Apple chips, and the Hermes app runs there.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -5134,7 +5130,7 @@ export const LIVE_DATA = {
       "id": "d_linux",
       "subject": "fact",
       "title": "Hermes on Linux",
-      "text": "Yes. Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
+      "text": "Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -5303,7 +5299,7 @@ export const LIVE_DATA = {
       "id": "d_offline",
       "subject": "fact",
       "title": "Using Hermes with no internet",
-      "text": "Yes, with an AI on your own computer. After its download, that AI needs no internet.",
+      "text": "Hermes can work without internet when its AI runs on your own computer. After its download, that AI needs no internet.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -5316,7 +5312,7 @@ export const LIVE_DATA = {
       "id": "d_many_people",
       "subject": "fact",
       "title": "Other people using your Hermes",
-      "text": "Yes. Other people can talk to your Hermes from a chat app. You choose who is allowed.",
+      "text": "Other people can talk to your Hermes from a chat app. You choose who is allowed.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -5420,7 +5416,7 @@ export const LIVE_DATA = {
       "id": "d_share_notes",
       "subject": "fact",
       "title": "Do separate Hermes share notes",
-      "text": "No. Each separate Hermes keeps its own notes and its own chats. Nothing is shared.",
+      "text": "Each separate Hermes keeps its own notes and its own chats. They do not share them.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -5523,7 +5519,7 @@ export const LIVE_DATA = {
     {
       "id": "d_find",
       "subject": "fact",
-      "title": "Searching inside a chat",
+      "title": "Searching inside the open chat",
       "text": "Press Ctrl+F, or Cmd+F on a Mac. A find bar searches the chat on screen.",
       "kw": [],
       "weak": [],
@@ -6174,7 +6170,7 @@ export const LIVE_DATA = {
       "id": "d_open_source",
       "subject": "fact",
       "title": "Whether Hermes is open source",
-      "text": "Yes. Hermes is open source, which means its code is public. Hermes itself is free.",
+      "text": "Hermes is open source, which means its code is public. Hermes itself is free.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -6187,7 +6183,7 @@ export const LIVE_DATA = {
       "id": "d_gemini",
       "subject": "fact",
       "title": "Using Gemini (Google's AI) with Hermes",
-      "text": "Yes. Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+      "text": "Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -6200,7 +6196,7 @@ export const LIVE_DATA = {
       "id": "d_forget",
       "subject": "fact",
       "title": "Making Hermes forget something about you",
-      "text": "Yes. Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+      "text": "Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -6226,7 +6222,7 @@ export const LIVE_DATA = {
       "id": "d_two",
       "subject": "fact",
       "title": "Doing two things at once",
-      "text": "Yes. Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
+      "text": "Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
       "kw": [],
       "weak": [],
       "list_only": true,
@@ -6259,6 +6255,97 @@ export const LIVE_DATA = {
       "shows": {
         "kind": "fact",
         "need": "d_siri"
+      }
+    },
+    {
+      "id": "d_terminal",
+      "subject": "fact",
+      "title": "The terminal and the app",
+      "text": "A terminal is a window where you type commands instead of clicking. Hermes works in a terminal and in the app. Both are the same Hermes.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_terminal"
+      }
+    },
+    {
+      "id": "d_agents_md",
+      "subject": "fact",
+      "title": "What AGENTS.md is",
+      "text": "AGENTS.md is a file of instructions for one project folder. Hermes reads it when it works in that folder.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_agents_md"
+      }
+    },
+    {
+      "id": "d_dark",
+      "subject": "fact",
+      "title": "Dark mode and colour mode",
+      "text": "Press Ctrl+K, or Cmd+K on a Mac. In the list that opens, you can switch the colour mode.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_dark"
+      }
+    },
+    {
+      "id": "d_home",
+      "subject": "fact",
+      "title": "Smart home with Home Assistant",
+      "text": "Hermes can work with Home Assistant, a smart home app, through an official plugin. A plugin is an add-on you install into Hermes.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_home"
+      }
+    },
+    {
+      "id": "d_cost",
+      "subject": "fact",
+      "title": "Seeing what it costs",
+      "text": "Type /usage in a chat with Hermes. It shows an estimate of what that chat has cost.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_cost"
+      }
+    },
+    {
+      "id": "d_toolsets",
+      "subject": "fact",
+      "title": "What toolsets are",
+      "text": "A toolset is a group of tools, like web search. Tools are the actions Hermes can take. Each group can be switched on or off, and a few start off.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_toolsets"
+      }
+    },
+    {
+      "id": "d_shorter",
+      "subject": "fact",
+      "title": "Shorter answers",
+      "text": "Type /personality concise in a chat. Hermes then gives brief, to-the-point answers.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_shorter"
       }
     },
     {
@@ -6553,7 +6640,7 @@ export const LIVE_DATA = {
     },
     {
       "id": "d_find",
-      "title": "Searching inside a chat"
+      "title": "Searching inside the open chat"
     },
     {
       "id": "d_default_ai",
@@ -6778,6 +6865,34 @@ export const LIVE_DATA = {
     {
       "id": "d_siri",
       "title": "Hermes compared with Siri: a wake word"
+    },
+    {
+      "id": "d_terminal",
+      "title": "The terminal and the app"
+    },
+    {
+      "id": "d_agents_md",
+      "title": "What AGENTS.md is"
+    },
+    {
+      "id": "d_dark",
+      "title": "Dark mode and colour mode"
+    },
+    {
+      "id": "d_home",
+      "title": "Smart home with Home Assistant"
+    },
+    {
+      "id": "d_cost",
+      "title": "Seeing what it costs"
+    },
+    {
+      "id": "d_toolsets",
+      "title": "What toolsets are"
+    },
+    {
+      "id": "d_shorter",
+      "title": "Shorter answers"
     },
     {
       "id": "C1",

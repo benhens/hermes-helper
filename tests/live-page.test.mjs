@@ -125,7 +125,9 @@ test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes s
   assert.equal(said(view), N1)
   // the next message, while Hermes still has the dropped call: no request, its own line at once
   send(view, 'tell me a joke')
-  assert.equal(line(view), 'N1_AGAIN')
+  // find-v2 part 5: this is the second slow try (the first call is still in Hermes after its 12 s), so the slow-AI line
+  // follows the don't-know, between it and its picks
+  assert.equal(line(view), 'SLOW_A')
   await settle()
   assert.equal(host.asks.length, 1, 'no second call while the first is still in Hermes')
   // the late reply is dropped: nothing changes
@@ -266,8 +268,9 @@ test('ai_picks_line: a handed id shows that row as code shows it; TALK and NONE 
   send(view, 'send me a summary')
   await settle()
   assert.notEqual(line(view), 'sch1')
-  // TALK: the no-AI line unless that is a don't-know line, then OK (pick_only.read); NONE or anything else: the no-AI line
-  for (const [r, want] of [['TALK', 'OK'], ['NONE', 'N1'], ['zzz', 'N1'], ['sch9', 'N1']]) {
+  // TALK: the no-AI line unless that is a don't-know line, then OK (pick_only.read); find-v2 part 1: NONE or anything
+  // else after the list picked sch1: the sch1 line itself, not the don't-know
+  for (const [r, want] of [['TALK', 'OK'], ['NONE', 'sch1'], ['zzz', 'sch1'], ['sch9', 'sch1']]) {
     const o = await pastOpening('ai_picks_line', { host: { oneshot: (p, n) => (n === 1 ? 'sch1' : r) } })
     send(o.view, 'send me a summary')
     await settle()

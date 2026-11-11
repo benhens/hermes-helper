@@ -41,6 +41,22 @@ const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK
 export function slowFollows(visit, said) {
   return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !said.paste && !/\?\s*$/.test(String(said.text || ''))
 }
+// find-v2 part 5 (Lead's answer 2 to find-v1's questions; hhtech ask-run 3: the line was never said, the fallback
+// being mostly a don't-know with picks): where the owed slow-AI line goes, or null (not here: it is dropped).
+//   'between': between the line and its offer bubble (a don't-know and its picks, or any line with an offer)
+//   'carry': after a line with things of its own to pick, the slow-AI line carrying those picks, so they still show
+//   'after': right after the line, as before
+// Still never after a line with its own text to paste (two boxes in a row), a STUCK or a goodbye, or a question with
+// nothing to pick.
+const SLOW_NEVER = new Set([...TALK_DATA.no_repeat.groups.stuck, ...TALK_DATA.no_repeat.groups.bye])
+const SLOW_DONT_KNOW = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know, ...LV_DONT_KNOW, 'N1-skill'])
+export function slowPlace(visit, said) {
+  if (visit.slow !== 'due' || !said || said.paste || SLOW_NEVER.has(said.line)) return null
+  if (said.offer) return 'between'
+  if (said.answers) return 'carry'
+  if (SLOW_DONT_KNOW.has(said.line)) return 'after'
+  return slowFollows(visit, said) ? 'after' : null
+}
 
 // Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a
 // plain line given for "what do you mean" keeps its why. N1_AGAIN and AGAIN are no_repeat's own lines in place
@@ -98,7 +114,9 @@ function isHowQuestion(text) {
 // USED: line) is an ordinary fallback.
 //   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
 //   typed: the person's own typed messages of this visit, this one included (find-v1, check c12: a name they typed)
-export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [], typed = [text] }) {
+//   onPick(id): told as soon as the list call has picked a line (find-v2: the page shows that line, not the don't-know,
+//   when the turn closes before the writer is back: the 12 s, or the person's next move)
+export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, onPick = () => {}, work = null, names = [], typed = [text] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -116,11 +134,27 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed })
-  return thinking ? { fallback: 'thinking text', thinking: true } : got
+  const picked = { id: null, onPick }
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed, picked })
+  if (thinking) return picked.id ? { ...pickedResult(picked.id), why: 'thinking text', thinking: true } : { fallback: 'thinking text', thinking: true }
+  return got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed }) {
+// find-v2 part 1 (Lead, 11 Nov 11:40; hhtech ask-run 3, For builder 4): once the list call has picked lines, every way
+// the second call can come to nothing (NONE, a failed call, thinking text, a check that drops the reply, no time left,
+// a pick call with no pick) shows the first picked line itself, as code shows that row, with its button. Only with
+// nothing picked does the fallback (code's line, or the don't-know with its picks) stand.
+export function pickedResult(id) {
+  const result = id ? resultOfRow(id) : null
+  return result ? { result, rows: withNext([id]), picked: id } : null
+}
+async function askSteps(args) {
+  const got = await askStepsInner(args)
+  if (got && got.fallback && args.picked.id) return { ...pickedResult(args.picked.id), why: got.fallback }
+  return got
+}
+
+async function askStepsInner({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed, picked }) {
   let ids = null
   // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
   let follow = false
@@ -136,6 +170,10 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     const p = readList(raw)
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     if (!p.ids) return { fallback: 'list: none' }
+    if (resultOfRow(p.ids[0])) {
+      picked.id = p.ids[0]
+      picked.onPick(p.ids[0])
+    }
     ids = withNext(p.ids)
   }
   const handed = follow ? null : work

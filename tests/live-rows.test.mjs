@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import { LIVE_ROWS, LIVE_ROW, byWords, rankIn, withNext, isFollowUp, isFollowPhrase, followRows, rowOfKey, resultOfRow, MAX_HANDED } from '../src/live-rows.js'
+import { LIVE_ROWS, LIVE_ROW, withNext, isFollowUp, isFollowPhrase, followRows, rowOfKey, resultOfRow, MAX_HANDED } from '../src/live-rows.js'
 import { freshVisit, turnParts, lineKey } from '../src/talk.js'
 import { LIVE_DATA } from '../src/live-data.js'
 
@@ -16,7 +16,7 @@ const O = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, 'fixtures
 // with a title and the fact lines from the docs), which word matching and the ranks never see, and their two next lines
 test('the rows that are scored are live.py\'s FACTS, in its order; plus the list-only rows, and the twelve next lines of the data (handed only with their row; a second wording only on a follow-up)', () => {
   assert.deepEqual(LIVE_ROWS.filter(r => !r.next_of && !r.list_only).map(r => r.id), O.facts)
-  assert.equal(LIVE_ROWS.filter(r => r.list_only).length, 27 + 89)
+  assert.equal(LIVE_ROWS.filter(r => r.list_only).length, 27 + 96) // find-v2: changes-13's seven new fact lines
   assert.ok(LIVE_ROWS.filter(r => r.list_only).every(r => !r.kw.length && !r.weak.length && ['fixed', 'fact'].includes(r.subject)))
   assert.deepEqual(LIVE_ROWS.filter(r => r.next_of).map(r => r.id).sort(), ['PRIV-next', 'SAFE-next', 'bot1-next', 'msg0-then', 'msg1-then', 'plugin-mean', 'skill-mean', 'use-more', 'use1-next', 'use1-next-mean', 'use3-next', 'use3-next-mean'])
   assert.deepEqual(LIVE_ROWS.filter(r => r.follow_only).map(r => r.id).sort(), ['plugin-mean', 'skill-mean', 'use1-next-mean', 'use3-next-mean'])
@@ -26,21 +26,14 @@ test('the rows that are scored are live.py\'s FACTS, in its order; plus the list
   assert.deepEqual(LIVE_DATA.subjects.map(s => s.id).filter(s => !O.subjects.includes(s)).sort(), ['build', 'none', 'talk'])
 })
 
-test(`word matching and ranking give live.py's ids for all ${O.cases.length} messages (hhtech's 24, route2.py's conversations, follow-ups)`, () => {
-  let words = 0
-  for (const c of O.cases) {
-    assert.deepEqual(byWords(c.text), c.by_words, c.text)
-    if (c.by_words.length) words++
-    for (const [g, ids] of Object.entries(c.rank_in)) assert.deepEqual(rankIn(c.text, g), ids, `${c.text} / ${g}`)
-  }
-  assert.ok(words > 50, `${words} messages found rows by words`)
-})
+// find-v2 part 5: live.py's word matching and ranking (byWords, rankIn) are deleted as dead code (no caller since
+// find-v1's list call), and their test with them.
 
 test('never more than 5 rows; a next line comes right after its row; never a whole list', () => {
   assert.equal(MAX_HANDED, 5)
   const bot1 = LIVE_ROW['bot1-next'].next_of
   assert.deepEqual(withNext([bot1]), [bot1, 'bot1-next'])
-  const five = rankIn('bots', 'bot')
+  const five = LIVE_ROWS.filter(r => r.subject === 'bot' && !r.next_of).slice(0, 5).map(r => r.id)
   assert.ok(withNext([...five, bot1]).length <= 5)
   for (const c of O.cases) for (const ids of Object.values(c.rank_in)) assert.ok(withNext(ids).length <= 5)
   for (const g of O.subjects) assert.ok(LIVE_ROWS.filter(r => r.subject === g && !r.next_of).length > 0)

@@ -6,7 +6,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import { readWritten, replyFlags, judgeWritten, readSubject, readPick, replyWord } from '../src/live-checks.js'
+import { readWritten, replyFlags, judgeWritten, readPick, replyWord } from '../src/live-checks.js'
 
 const O = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, 'fixtures', 'live-checks-oracle.json'), 'utf8'))
 // talk-live-2: c24 (live-v2 changes-4) is newer than check_live.py; its own cases are in tests/talk-live-2.test.mjs and
@@ -125,11 +125,8 @@ test('c18 and c23, which need the conversation: a second question after Helper\'
   assert.ok(!replyFlags('Hermes keeps short notes about you and your work.', rows, ['mem1'], { lastLine: last, message: 'say that again' }).some(f => f.startsWith('c23')))
 })
 
-test('the first call and the pick: the first subject id in the reply; a handed id, TALK, BUILD, anything else NONE', () => {
-  assert.equal(readSubject('<think>hmm, msg or bot</think> Bot.'), 'bot')
-  assert.equal(readSubject('The answer is: msg'), 'msg')
-  assert.equal(readSubject('weather'), 'none')
-  assert.equal(readSubject(''), 'none')
+// find-v2 part 5: readSubject (the first call's reader) is deleted as dead code with its four checks
+test('the pick: a handed id, TALK, BUILD, anything else NONE', () => {
   assert.deepEqual(readPick(' [mem1]. ', ['mem1', 'mem2']), { id: 'mem1' })
   assert.deepEqual(readPick('`"mem2"`', ['mem1', 'mem2']), { id: 'mem2' })
   assert.deepEqual(readPick('mem3', ['mem1', 'mem2']), { word: 'NONE' })

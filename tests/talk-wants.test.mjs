@@ -174,11 +174,8 @@ test('skills by name, hhtech\'s twenty sentences (Q4): all ten that name a skill
 test('hhcontent\'s forty messages (test_wants.py): 39 as hhcontent expected; the one hhcontent named still differs ("a skill for knitting" is N1 now, wants fixes v1)', () => {
   const as = e => (e.startsWith('S:') ? 'skill:' + e.slice(2) : e.startsWith('topic:') ? e.slice(6) : e)
   const off = set('test_wants40').filter(m => landed(ours(m).o) !== as(m.hhcontent_expects)).map(m => [m.text, landed(ours(m).o)])
-  assert.deepEqual(off, [
-    // hhcontent's own two (helper-wants-v1.md 6, "Ran"): youtube is svc's word. The other one, "can hermes
-    // look things up online", now lands as hhcontent expected: changes-16 gave w_web "look stuff up" words
-    ['can it download youtube videos', 'svc']
-  ])
+  // find-v2: live-v2 changes-13 took "youtube" off svc's words, so the last of hhcontent's own two lands as expected too
+  assert.deepEqual(off, [])
   assert.equal(landed(ours(set('test_wants40').find(m => m.text === 'is there a skill for knitting')).o), 'N1')
 })
 

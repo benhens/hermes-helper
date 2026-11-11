@@ -29,9 +29,9 @@ import { talkToStore, talkFromStore } from './talk-keep.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
 import { recInstructions, judgeRec, askRec } from './setup-rec.js'
 import { AI_MODE } from './ai-mode.js'
-import { setupTyped, setupPress, setupAfter, setupStepOpen, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
+import { setupTyped, setupPress, setupAfter, setupStepOpen, setupReaskWaits, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
 import { makeLook, LOOK_UNSEEN } from './setup-look.js'
-import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
+import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowPlace, pickedResult } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
 import { makeDashboard, DASH_COMPACT_UNDER_PX, openHermesDocs } from './dash.js'
@@ -268,11 +268,22 @@ export function makePage(ctx, opts = {}) {
   const setupAfterSaid = (result, said, typed) => {
     if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return [said, []]
     const step = setupStepOpen(memory.visit)
-    if (!step && !typed) return [said, []]
-    const again = setupAfter(memory.visit, { picks: !!said.answers })
+    if (!step && !typed && !setupReaskWaits(memory.visit)) return [said, []]
+    // find-v2 part 5: things to pick of the answer's own (its answers, or an offer that asks about the answer: two kinds
+    // of moving, which app, which plan, the near lines) keep the set-up question back until they are answered; a
+    // general offer (set up or see what it does, the four starting things) gives way to it, as before
+    const ownOffer = !!(said.offer && ['move', 'mig_which', 'mig_which_2', 'pay', 'stuck', 'words', 'near'].includes(said.offer.set))
+    const again = setupAfter(memory.visit, { picks: !!said.answers || (!setupStepOpen(memory.visit) && ownOffer) })
     if (!again) return [said, []]
     return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
   }
+  // find-v2 part 1: the turn closes with no line from the AI (its 12 s, or the person moved on) after the list call
+  // picked a line: that line itself, as code shows it (src/live-turn.js pickedResult), not the don't-know
+  const pickedFinal = w => (w.picked && w.before ? liveApply(memory.visit, pickedResult(w.picked), w.out, w.before, w.typed) : null)
+  // find-v2 part 3 (changes-13 look.model_rule): the look's seen with what Helper saw the AI do in this visit: a model
+  // the settings check found set is said to answer only when one of Helper's calls got an answer in time; one that got
+  // none in 12 s is model_slow, one that failed for want of a provider model_not; else "couldn't check" (seenFrom)
+  const modelSaidOf = seen => (seen && seen.model === 'ok' && memory.visit.aiSeen ? { ...seen, modelSaid: memory.visit.aiSeen } : seen)
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
   // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
   // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
@@ -282,11 +293,11 @@ export function makePage(ctx, opts = {}) {
     live.waiting = null
     w.stopTimer()
     w.endBusy()
-    const result = final || w.out
+    const result = final || pickedFinal(w) || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
     const [shown, after] = quiet ? [said, []] : setupAfterSaid(result, said, w.typed)
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(shown, w.sendHelper), ...slowAfter(said), ...after].slice(-LOG_MAX)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...withSlow(shown, saidEntries(shown, w.sendHelper)), ...after].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -305,8 +316,10 @@ export function makePage(ctx, opts = {}) {
   // one was slow SLOW_A is owed to its answer: it shows right after that answer or, when it may not follow it, not at
   // all (Lead's points 15 and 16 stand). A try that failed without being slow owes no line: Helper has no checked words
   // for "your AI gave an error".
-  const aiFailed = (w, slow) => {
+  const aiFailed = (w, slow, err) => {
     const v = memory.visit
+    // find-v2 part 3: what Helper saw the AI do, for the set-up conversation's model part (modelSaidOf)
+    v.aiSeen = err && /no (llm )?provider|no usable credentials|provider is configured/i.test(String(err.message || err)) ? 'not' : slow ? 'slow' : v.aiSeen
     if (w.failed) return
     w.failed = true
     v.aiFails = (v.aiFails || 0) + 1
@@ -317,7 +330,10 @@ export function makePage(ctx, opts = {}) {
   const slowFail = w => aiFailed(w, true)
   // a message the AI answered in time (whatever it answered): the failed tries before it no longer count
   const aiAnswered = w => {
-    if (!w.failed) memory.visit.aiFails = 0
+    if (!w.failed) {
+      memory.visit.aiFails = 0
+      memory.visit.aiSeen = 'ok'
+    }
   }
   // The model is looked for again (setup.runtime_check, no model call): right after a try that failed, so the next
   // message knows whether a model is there now (ask-run 2 run D: Hermes switched its free model on after the failed
@@ -330,14 +346,20 @@ export function makePage(ctx, opts = {}) {
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
   // Called only for the written answer of the turn that failed (liveFinish): when SLOW_A may not follow that answer (a
   // don't-know line, a question, things to pick or an offer, a paste box), it is dropped for this visit.
-  const slowAfter = said => {
-    if (memory.visit.slow !== 'due') return []
-    if (!slowFollows(memory.visit, said)) {
+  // find-v2 part 5: the entries of the line just said with SLOW_A placed by slowPlace (src/live-turn.js): between a line
+  // and its offer bubble, or after a line carrying its things to pick, or after it; else dropped for the visit
+  const withSlow = (shown, entries) => {
+    if (memory.visit.slow !== 'due') return entries
+    const where = slowPlace(memory.visit, shown)
+    if (!where) {
       memory.visit.slow = 'dropped'
-      return []
+      return entries
     }
     memory.visit.slow = 'said'
-    return [{ ...helperEntry(SLOW_LINE), send: false }]
+    const slow = { ...helperEntry(SLOW_LINE), send: false }
+    if (where === 'between' && entries.length > 1) return [entries[0], slow, ...entries.slice(1)]
+    if (where === 'carry' && entries[0].answers) return [...entries, { ...slow, answers: entries[0].answers }]
+    return [...entries, slow]
   }
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
@@ -654,7 +676,7 @@ export function makePage(ctx, opts = {}) {
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
       const [line, after] = setupAfterSaid(result, said, typed)
-      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(line, may.helper), ...(slowDue ? slowAfter(said) : []), ...after].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...(slowDue ? withSlow(line, saidEntries(line, may.helper)) : saidEntries(line, may.helper)), ...after].filter(Boolean))
       setFocusAsk(true)
     }
 
@@ -665,7 +687,7 @@ export function makePage(ctx, opts = {}) {
       memory.opening = null
       if (shown) addToLog([{ ...youEntry(shown), send: false }])
       const finish = seen => {
-        const says = mv.go(seen)
+        const says = mv.go(modelSaidOf(seen))
         writeKept()
         const put = list => {
           memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...list.flatMap(setupEntries)].slice(-LOG_MAX)
@@ -777,7 +799,7 @@ export function makePage(ctx, opts = {}) {
         Object.assign(visit.kept, JSON.parse(o.kept))
         visit.setup = undefined
         visit.lastOffer = null
-        const entries = setupOpening(visit, seen).flatMap(setupEntries)
+        const entries = setupOpening(visit, modelSaidOf(seen)).flatMap(setupEntries)
         writeKept()
         if (JSON.stringify(entries.map(e => [e.line, e.text])) === JSON.stringify(was)) return
         memory.log = entries
@@ -837,7 +859,7 @@ export function makePage(ctx, opts = {}) {
       // live-v2 changes-5: whether this is the visit's first message that goes to the AI (only its failure owes SLOW_A)
       const firstTurn = !visit.aiTried
       visit.aiTried = true
-      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, firstTurn }
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, firstTurn, before, picked: null }
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
@@ -878,7 +900,7 @@ export function makePage(ctx, opts = {}) {
         return p
           .catch(err => {
             // find-v1 part 3: a call that failed is one failed try, and the model is looked for again
-            aiFailed(w, false)
+            aiFailed(w, false, err)
             lookAgain()
             throw err
           })
@@ -890,12 +912,13 @@ export function makePage(ctx, opts = {}) {
           })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, onPick: id => (w.picked = id), work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
         .then(got => {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
           // find-v1 (Builder, review): so is a list call that came back too late for the writer to start
-          if (got && (got.thinking || got.fallback === 'no time for the second call')) slowFail(w)
+          // (find-v2: with a picked line shown in place of the fallback, the reason is in got.why)
+          if (got && (got.thinking || got.fallback === 'no time for the second call' || got.why === 'no time for the second call')) slowFail(w)
           else aiAnswered(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))

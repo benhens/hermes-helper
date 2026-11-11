@@ -89,10 +89,17 @@ const IN_PLACE_ALSO = ['plain', 'ai_line']
 // live changes-9: msg1-then is the set-up list's Chat apps steps 3 and 4 word for word ("Hermes makes the bot"); the
 // team's own check passes it, so the bot gloss is lifted for this one line (told to Lead in the report)
 // find-v1 (breadth-t1, facts_t1.duo_exempt): d_mem_vs_skill compares memory and skills, as W2 compares its two words
-const LIFTED = { W2: ['2 Hermes terms in one line'], 'msg1-then': ['term not explained: bot'], d_mem_vs_skill: ['2 Hermes terms in one line'] }
+const LIFTED = { W2: ['2 Hermes terms in one line'], 'msg1-then': ['term not explained: bot'], d_mem_vs_skill: ['2 Hermes terms in one line'],
+  // find-v2 (live-v2 changes-13's new lines; hhcontent ran check_c13.py on them, not check.py): each line explains the
+  // very word the newcomer asked about (terminal, AGENTS.md, toolsets), or names a product (Home Assistant); two are
+  // over 25 words. Lifted for these lines only and told to Lead in docs/build/find-v2-report.md, for hhcontent
+  d_terminal: ['26 words > 25', 'banned term terminal'],
+  d_agents_md: ['banned term AGENTS'],
+  d_home: ['product word'],
+  d_toolsets: ['30 words > 25', 'banned term toolset'] }
 // The parts a fixed line's "Open ..." button may name (src/talk.js PARTS has these; a test keeps
 // the two lists equal).
-export const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots']
+export const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots', 'keys']
 // Row 5 of docs/build/talk-v2-plan.md (the wants: "Web, files, pictures and voice" under C1) is in
 // this build (job talk-v2-wants): C1 says its full text and holds the wants pick first. With
 // WANTS_BUILT false, held_picks.note: the held picks that are not topics are dropped, and C1 says
@@ -446,7 +453,7 @@ function slimKeeps(K) {
 export const START_FOUR_TEXT = 'Do you want one of these instead?'
 export function slimTalkData(d, skills = { skills: [] }) {
   const fixed = {}
-  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source', 'offer', 'title', 'phrases']), ...(f.docs_box ? { docs_box: pickKeys(f.docs_box, ['head', 'quote', 'where']) } : {}), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
+  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source', 'offer', 'title', 'phrases', 'pick_label']), ...(f.docs_box ? { docs_box: pickKeys(f.docs_box, ['head', 'quote', 'where']) } : {}), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
   return {
     docs_version: d.docs_version,
     limits: pickKeys(d.limits, ['request_chars_in_paste', 'service_chars_in_paste']),
@@ -505,14 +512,14 @@ export function slimTalkData(d, skills = { skills: [] }) {
       ...pickKeys(t, ['id', 'part', 'part_if_no_memory_part', 'key_words', 'misspellings', 'weak_key_words', 'weak_only_in_question_about_hermes', 'typed_only']),
       pick: pickKeys(t.pick, ['label']),
       question: { id: t.question.id, text: t.question.text, answers: (t.question.answers || []).map(a => pickKeys(a, ['label', 'gives', 'service'])) },
-      plain: { ...pickKeys(t.plain, ['id', 'text', 'source', 'title', 'phrases']), next: slimNext(t.plain.next), ...(t.plain.then ? { then: slimLine(t.plain.then) } : {}) },
+      plain: { ...pickKeys(t.plain, ['id', 'text', 'source', 'title', 'phrases', 'pick_label']), next: slimNext(t.plain.next), ...(t.plain.then ? { then: slimLine(t.plain.then) } : {}) },
       needs: t.needs.map(n => ({
-        ...pickKeys(n, ['id', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'wins_over_other_needs', 'service_names', 'text', 'source', 'title', 'phrases']),
+        ...pickKeys(n, ['id', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'wins_over_other_needs', 'service_names', 'text', 'source', 'title', 'phrases', 'pick_label']),
         next: slimNext(n.next),
         ...(n.then ? { then: slimLine(n.then) } : {})
       }))
     })),
-    terms: d.terms.map(t => ({ ...pickKeys(t, ['id', 'label', 'key_words', 'text', 'source', 'title', 'phrases']), next: slimNext(t.next), ...(t.mean ? { mean: slimLine(t.mean) } : {}) })),
+    terms: d.terms.map(t => ({ ...pickKeys(t, ['id', 'label', 'key_words', 'text', 'source', 'title', 'phrases', 'pick_label']), next: slimNext(t.next), ...(t.mean ? { mean: slimLine(t.mean) } : {}) })),
     parts: {
       model: { navigate: d.parts.model.hermes_button.navigate },
       messaging: { navigate: d.parts.messaging.hermes_button.navigate },
@@ -520,8 +527,11 @@ export function slimTalkData(d, skills = { skills: [] }) {
     },
     // find-v1 (live changes-11 and -12, breadth-t1 and titles-t2): the fact lines from the docs (kind fact), and the
     // lists of the titles rule (near): full hits by phrase, the near offer under a don't-know, how / why alone
-    facts: d.facts_t1.lines.map(f => ({ ...pickKeys(f, ['id', 'title', 'phrases', 'text']), sources: f.sources.map(x => pickKeys(x, ['file', 'line'])), next: slimNext(f.next) })),
-    near: pickKeys(d.near, ['stop_words', 'filler', 'first_step_old', 'keep_caps', 'want_say', 'template', 'template_1', 'template_3', 'nothing_near_set', 'bare_follow']),
+    facts: d.facts_t1.lines.map(f => ({ ...pickKeys(f, ['id', 'title', 'phrases', 'text', 'pick_label']), sources: f.sources.map(x => pickKeys(x, ['file', 'line'])), next: slimNext(f.next) })),
+    // find-v2 (live-v2 changes-13): never_near (near_rule), keep_subject (keep_subject_rule), each line's pick_label, and
+    // false_belief (FB_MAKER, FB_PLAN)
+    near: pickKeys(d.near, ['stop_words', 'filler', 'first_step_old', 'keep_caps', 'want_say', 'template', 'template_1', 'template_3', 'nothing_near_set', 'bare_follow', 'never_near', 'keep_subject']),
+    false_belief: { ...pickKeys(d.false_belief, ['maker_names', 'maker_cues', 'plan_names', 'plan_words', 'need_words']), lines: Object.fromEntries(d.false_belief.lines.map(l => [l.id, { text: l.text, source: l.sources.map(x => `${x.file}:${x.line}`).join(', '), next: slimNext(l.next) }])) },
     keeps: slimKeeps(d.keeps),
     skills: (skills.skills || []).map(s => ({ name: s.name }))
   }

@@ -92,6 +92,7 @@ export const TALK_DATA = {
         "where to run it",
         "do i need a server"
       ],
+      "pick_label": "Your computer or the cloud",
       "next": {
         "kind": "part",
         "label": "Open Messaging",
@@ -240,7 +241,8 @@ export const TALK_DATA = {
         "how strong a computer",
         "graphics card",
         "8 gb"
-      ]
+      ],
+      "pick_label": "Computer for a local AI"
     },
     "HVC": {
       "text": "Hermes learns from experience and remembers you across chats. ChatGPT can be the AI inside it.",
@@ -261,7 +263,8 @@ export const TALK_DATA = {
         "migrate",
         "move over",
         "switch over"
-      ]
+      ],
+      "pick_label": "Moving to Hermes"
     },
     "MIG_APP": {
       "text": "Hermes can bring over your notes and settings from other AI apps. The docs name OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot.",
@@ -275,6 +278,7 @@ export const TALK_DATA = {
         "take my rules",
         "bring my setup"
       ],
+      "pick_label": "Moving from another AI app",
       "docs_box": {
         "head": "From the Hermes docs",
         "quote": "hermes import-agent imports your existing OpenClaw, Claude Code, OpenAI Codex CLI, Cursor, Grok Bot or OpenBot setup into Hermes with one command.",
@@ -296,7 +300,8 @@ export const TALK_DATA = {
         "move from another app",
         "other apps",
         "from windsurf"
-      ]
+      ],
+      "pick_label": "Moving from an unlisted app"
     },
     "MIG_PC": {
       "text": "Hermes can pack your settings, chats and other data into one zip file. Hermes on the new computer unpacks it. That replaces what is there.",
@@ -310,6 +315,7 @@ export const TALK_DATA = {
         "move hermes",
         "another computer"
       ],
+      "pick_label": "Moving to a new computer",
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -329,7 +335,8 @@ export const TALK_DATA = {
         "who made this",
         "who made it",
         "who makes hermes"
-      ]
+      ],
+      "pick_label": "What Hermes is"
     },
     "START": {
       "text": "Most people start by picking the AI Hermes uses. The quick setup signs you in, with no secret key.",
@@ -342,7 +349,8 @@ export const TALK_DATA = {
         "totally new",
         "new here",
         "where to begin"
-      ]
+      ],
+      "pick_label": "Where to start"
     },
     "KEY": {
       "text": "Not always. The quick setup signs you in, so you need no key. A key is a secret code some AI companies give you instead.",
@@ -353,6 +361,7 @@ export const TALK_DATA = {
         "need an api key",
         "do i need a key"
       ],
+      "pick_label": "Whether you need a key",
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -380,6 +389,7 @@ export const TALK_DATA = {
         "ask me first",
         "does it ask first"
       ],
+      "pick_label": "Approving risky commands",
       "next": {
         "kind": "line",
         "label": "And my messages?",
@@ -412,6 +422,7 @@ export const TALK_DATA = {
         "what is an api key",
         "api key"
       ],
+      "pick_label": "What a key is",
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -427,6 +438,7 @@ export const TALK_DATA = {
         "import chatgpt chats",
         "chatgpt history"
       ],
+      "pick_label": "Moving from ChatGPT",
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -453,7 +465,8 @@ export const TALK_DATA = {
         "enter my key",
         "paste my key",
         "openai key"
-      ]
+      ],
+      "pick_label": "Where to put a key"
     },
     "FREE": {
       "text": "Hermes itself is free. An AI on your own computer needs no account. Some AI companies let you start free.",
@@ -479,7 +492,8 @@ export const TALK_DATA = {
         "best model for",
         "which ai for",
         "model for writing"
-      ]
+      ],
+      "pick_label": "Which AI for which work"
     },
     "MODEL_CHANGE": {
       "text": "In a Hermes chat, click the button left of the microphone. There you choose another AI.",
@@ -491,6 +505,7 @@ export const TALK_DATA = {
         "another ai",
         "different model"
       ],
+      "pick_label": "Switching the AI",
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -551,7 +566,8 @@ export const TALK_DATA = {
         "know coding",
         "need to code",
         "programming"
-      ]
+      ],
+      "pick_label": "Whether you need coding"
     },
     "PICK_FIRST": {
       "text": "Choose one, and I will show you how.",
@@ -3401,7 +3417,13 @@ export const TALK_DATA = {
             "old chats",
             "remember yesterday",
             "search my chats",
-            "past conversations"
+            "past conversations",
+            "chat from last week",
+            "find a chat",
+            "past chat",
+            "previous chat",
+            "earlier chat",
+            "old chat"
           ],
           "next": {
             "kind": "paste",
@@ -3436,6 +3458,7 @@ export const TALK_DATA = {
             "does not remember",
             "forgot what i said"
           ],
+          "pick_label": "When Hermes forgot something",
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -3603,6 +3626,7 @@ export const TALK_DATA = {
             "pay for chatgpt",
             "use chatgpt"
           ],
+          "pick_label": "Your ChatGPT plan",
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3624,6 +3648,7 @@ export const TALK_DATA = {
             "claude plan",
             "pay for claude"
           ],
+          "pick_label": "Your Claude plan",
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3667,6 +3692,7 @@ export const TALK_DATA = {
             "on my laptop",
             "no account"
           ],
+          "pick_label": "An AI on your computer",
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3698,6 +3724,7 @@ export const TALK_DATA = {
             "nous plan",
             "easiest ai"
           ],
+          "pick_label": "Quickest way to an AI",
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3871,6 +3898,7 @@ export const TALK_DATA = {
             "slack",
             "signal"
           ],
+          "pick_label": "WhatsApp, Discord, Slack, Signal",
           "next": {
             "kind": "part",
             "label": "Open Messaging",
@@ -3900,6 +3928,7 @@ export const TALK_DATA = {
             "answer any time",
             "always on"
           ],
+          "pick_label": "Answers while your computer's off",
           "next": {
             "kind": "part",
             "label": "Open Messaging",
@@ -4063,6 +4092,7 @@ export const TALK_DATA = {
             "every day",
             "every week"
           ],
+          "pick_label": "A daily or weekly job",
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -4139,6 +4169,7 @@ export const TALK_DATA = {
             "job did not run",
             "when do jobs run"
           ],
+          "pick_label": "Scheduled job did not run",
           "next": {
             "kind": "part",
             "label": "Open Messaging",
@@ -4158,7 +4189,7 @@ export const TALK_DATA = {
             "outlook"
           ],
           "wins_over_other_needs": true,
-          "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+          "text": "Connect your email to Hermes first. Then ask it once, in plain words.",
           "source": "user-guide/features/cron.md lines 15 and 24 (jobs on a schedule, made by asking in plain language); user-guide/skills/bundled/productivity/productivity-google-workspace.md lines 11 and 34 (a built-in skill that reads Gmail)",
           "title": "A summary of your email every morning",
           "phrases": [
@@ -4166,6 +4197,7 @@ export const TALK_DATA = {
             "check my email",
             "mail summary"
           ],
+          "pick_label": "Email summary every morning",
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -4204,7 +4236,6 @@ export const TALK_DATA = {
         "zoom",
         "shopify",
         "airtable",
-        "youtube",
         "my mail",
         "mailbox",
         "my apps",
@@ -4261,6 +4292,7 @@ export const TALK_DATA = {
           "link a service",
           "link github"
         ],
+        "pick_label": "Linking a service (MCP)",
         "next": {
           "kind": "part",
           "label": "Open Capabilities"
@@ -4297,8 +4329,7 @@ export const TALK_DATA = {
             "obsidian",
             "zoom",
             "shopify",
-            "airtable",
-            "youtube"
+            "airtable"
           ],
           "service_names": {
             "google calendar": "Google Calendar",
@@ -4339,6 +4370,7 @@ export const TALK_DATA = {
             "connect notion",
             "add a service"
           ],
+          "pick_label": "Adding Gmail or Notion",
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -4364,6 +4396,7 @@ export const TALK_DATA = {
             "limit what it can use",
             "is it safe to link"
           ],
+          "pick_label": "Safety of connecting services",
           "next": {
             "kind": "part",
             "label": "Open Capabilities",
@@ -4448,6 +4481,7 @@ export const TALK_DATA = {
           "another hermes",
           "what is a bot"
         ],
+        "pick_label": "What a bot is",
         "next": {
           "kind": "part",
           "label": "Open Bots"
@@ -4482,6 +4516,7 @@ export const TALK_DATA = {
             "second hermes",
             "new bot"
           ],
+          "pick_label": "A second Hermes",
           "next": {
             "kind": "line",
             "label": "How to add one",
@@ -4772,6 +4807,7 @@ export const TALK_DATA = {
             "costs too much",
             "cheaper"
           ],
+          "pick_label": "Spending less on the AI",
           "next": {
             "kind": "part",
             "label": "Open Model"
@@ -5027,11 +5063,19 @@ export const TALK_DATA = {
         "on a pc",
         "windows 11"
       ],
-      "text": "Yes. Hermes runs on Windows 10 and 11. It also runs on Mac and Linux.",
+      "text": "Hermes runs on Mac, Windows and Linux. On Windows, the docs name Windows 10 and 11.",
       "sources": [
         {
           "file": "getting-started/platform-support.md",
           "line": 20
+        },
+        {
+          "file": "getting-started/platform-support.md",
+          "line": 19
+        },
+        {
+          "file": "getting-started/platform-support.md",
+          "line": 21
         }
       ],
       "next": {
@@ -5047,7 +5091,7 @@ export const TALK_DATA = {
         "on my mac",
         "macbook"
       ],
-      "text": "Yes. The docs list Macs with Apple chips, and the Hermes app runs there.",
+      "text": "The docs list Macs with Apple chips, and the Hermes app runs there.",
       "sources": [
         {
           "file": "getting-started/platform-support.md",
@@ -5066,7 +5110,7 @@ export const TALK_DATA = {
         "ubuntu",
         "on linux"
       ],
-      "text": "Yes. Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
+      "text": "Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
       "sources": [
         {
           "file": "getting-started/platform-support.md",
@@ -5151,6 +5195,7 @@ export const TALK_DATA = {
         "keep my chats when i uninstall"
       ],
       "text": "You can remove only the app. Then Hermes itself, your settings and your chats stay.",
+      "pick_label": "What stays after removing",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -5334,7 +5379,7 @@ export const TALK_DATA = {
         "without internet",
         "no internet"
       ],
-      "text": "Yes, with an AI on your own computer. After its download, that AI needs no internet.",
+      "text": "Hermes can work without internet when its AI runs on your own computer. After its download, that AI needs no internet.",
       "sources": [
         {
           "file": "user-guide/local-models.md",
@@ -5360,7 +5405,7 @@ export const TALK_DATA = {
         "multiple people",
         "other people use"
       ],
-      "text": "Yes. Other people can talk to your Hermes from a chat app. You choose who is allowed.",
+      "text": "Other people can talk to your Hermes from a chat app. You choose who is allowed.",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -5408,6 +5453,7 @@ export const TALK_DATA = {
         "wrong key"
       ],
       "text": "A key is a secret code. If it fails, it is missing, too old, typed wrong, or from another company.",
+      "pick_label": "A key that fails",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -5427,6 +5473,7 @@ export const TALK_DATA = {
         "too many requests"
       ],
       "text": "That means you passed the limit of your AI company. Wait a moment and try again.",
+      "pick_label": "Too many requests",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -5450,6 +5497,7 @@ export const TALK_DATA = {
         "conversation too long"
       ],
       "text": "A very long chat can grow past what the AI can read. Start a fresh chat.",
+      "pick_label": "A chat too long",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -5496,6 +5544,7 @@ export const TALK_DATA = {
         "no reply in my chat app"
       ],
       "text": "The docs give three causes. Hermes is not running, not linked, or you are not on its allowed list.",
+      "pick_label": "Chat app bot is silent",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -5517,6 +5566,7 @@ export const TALK_DATA = {
         "answers take long"
       ],
       "text": "Three causes are named. A big AI, a far-away AI company, or many actions switched on.",
+      "pick_label": "Why answers are slow",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -5535,7 +5585,7 @@ export const TALK_DATA = {
         "share notes between",
         "do they share chats"
       ],
-      "text": "No. Each separate Hermes keeps its own notes and its own chats. Nothing is shared.",
+      "text": "Each separate Hermes keeps its own notes and its own chats. They do not share them.",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -5601,6 +5651,7 @@ export const TALK_DATA = {
         "stop in whatsapp"
       ],
       "text": "In a chat app, send /stop. That stops what Hermes is doing.",
+      "pick_label": "Stopping it from chat apps",
       "sources": [
         {
           "file": "user-guide/messaging/index.md",
@@ -5622,6 +5673,7 @@ export const TALK_DATA = {
         "leave it open"
       ],
       "text": "Closing the window can hide the app while Hermes keeps running. That setting is off at first.",
+      "pick_label": "Closing the app window",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -5664,6 +5716,7 @@ export const TALK_DATA = {
         "send my setup to a friend"
       ],
       "text": "You can pack one Hermes into a single file to share. Your sign-ins are left out.",
+      "pick_label": "Packing Hermes into a file",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -5701,7 +5754,7 @@ export const TALK_DATA = {
     },
     {
       "id": "d_find",
-      "title": "Searching inside a chat",
+      "title": "Searching inside the open chat",
       "phrases": [
         "search in chat",
         "find in chat",
@@ -5728,6 +5781,7 @@ export const TALK_DATA = {
         "ai for every chat"
       ],
       "text": "Open Settings, then \"Model\". Choose the company and the AI, then click \"Apply\".",
+      "pick_label": "The AI for new chats",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -5750,6 +5804,7 @@ export const TALK_DATA = {
         "dictate"
       ],
       "text": "You can talk to Hermes and hear it answer. On a Mac, you allow the microphone once.",
+      "pick_label": "Talking in the app",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -5772,6 +5827,7 @@ export const TALK_DATA = {
         "change the language"
       ],
       "text": "The app's own text comes in English, Chinese, Japanese, Arabic and Russian.",
+      "pick_label": "The app's language",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -5810,6 +5866,7 @@ export const TALK_DATA = {
         "what has it learned"
       ],
       "text": "The docs name a \"Memory Graph\". It is a map of what Hermes has learned for you.",
+      "pick_label": "Map of what it learned",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -5875,6 +5932,7 @@ export const TALK_DATA = {
         "anyone message"
       ],
       "text": "At first, nobody else can. Hermes answers only people on its allowed list.",
+      "pick_label": "Who may talk to it",
       "sources": [
         {
           "file": "user-guide/messaging/index.md",
@@ -5914,6 +5972,7 @@ export const TALK_DATA = {
         "commands in chat"
       ],
       "text": "In a chat app, /new starts a fresh chat. /stop stops Hermes.",
+      "pick_label": "Commands in chat apps",
       "sources": [
         {
           "file": "user-guide/messaging/index.md",
@@ -5955,6 +6014,7 @@ export const TALK_DATA = {
         "telegram silent"
       ],
       "text": "For Telegram the docs say: check that its secret code is right. Then look at the log Hermes keeps.",
+      "pick_label": "Telegram gives no answer",
       "sources": [
         {
           "file": "user-guide/messaging/telegram.md",
@@ -6038,6 +6098,7 @@ export const TALK_DATA = {
         "stop asking me"
       ],
       "text": "There are three settings for how Hermes asks first: smart, manual and off.",
+      "pick_label": "How often it asks permission",
       "sources": [
         {
           "file": "user-guide/security.md",
@@ -6057,6 +6118,7 @@ export const TALK_DATA = {
         "skip approval"
       ],
       "text": "The docs name a YOLO mode. It skips every such question for the current chat.",
+      "pick_label": "YOLO mode: no approval questions",
       "sources": [
         {
           "file": "user-guide/security.md",
@@ -6096,6 +6158,7 @@ export const TALK_DATA = {
         "no response to approval"
       ],
       "text": "If you do not answer in time, Hermes does not run the command.",
+      "pick_label": "Unanswered approval questions",
       "sources": [
         {
           "file": "user-guide/security.md",
@@ -6265,6 +6328,7 @@ export const TALK_DATA = {
         "change a note"
       ],
       "text": "Hermes can add, change or remove its own notes. Ask it in plain words.",
+      "pick_label": "Changing what it remembers",
       "sources": [
         {
           "file": "user-guide/features/memory.md",
@@ -6548,6 +6612,7 @@ export const TALK_DATA = {
         "local ai setup"
       ],
       "text": "The docs say: Settings, \"Providers\", Local Models. Install, pick an AI, download it, then click Use.",
+      "pick_label": "Setting up a local AI",
       "sources": [
         {
           "file": "user-guide/local-models.md",
@@ -6571,6 +6636,7 @@ export const TALK_DATA = {
         "right version of the ai"
       ],
       "text": "Hermes picks the right build of each AI for your computer. You only pick the AI.",
+      "pick_label": "Fitting AI to your computer",
       "sources": [
         {
           "file": "user-guide/local-models.md",
@@ -6590,6 +6656,7 @@ export const TALK_DATA = {
         "local on linux"
       ],
       "text": "An AI on your own computer works on Mac, Windows and Linux.",
+      "pick_label": "Computers for a local AI",
       "sources": [
         {
           "file": "user-guide/local-models.md",
@@ -6609,6 +6676,7 @@ export const TALK_DATA = {
         "nous"
       ],
       "text": "Nous Portal is from the makers of Hermes. One sign-in covers more than 300 AIs.",
+      "pick_label": "Nous Portal",
       "sources": [
         {
           "file": "integrations/providers.md",
@@ -6630,6 +6698,7 @@ export const TALK_DATA = {
         "supergrok"
       ],
       "text": "Some AI companies let you sign in with a plan you already pay for.",
+      "pick_label": "Paying with your plan",
       "sources": [
         {
           "file": "integrations/providers.md",
@@ -6651,6 +6720,7 @@ export const TALK_DATA = {
         "open router"
       ],
       "text": "OpenRouter is one service that reaches many AIs from many companies.",
+      "pick_label": "OpenRouter",
       "sources": [
         {
           "file": "getting-started/quickstart.md",
@@ -6694,6 +6764,7 @@ export const TALK_DATA = {
         "other ai companies"
       ],
       "text": "Hermes works with many AI companies. The docs list them, and I have not checked each one.",
+      "pick_label": "Other AI companies",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -6718,6 +6789,7 @@ export const TALK_DATA = {
         "restore my files"
       ],
       "text": "Hermes can copy your work before a risky change and restore it later. This is off unless you turn it on.",
+      "pick_label": "Undoing what Hermes did",
       "sources": [
         {
           "file": "user-guide/checkpoints-and-rollback.md",
@@ -6742,7 +6814,7 @@ export const TALK_DATA = {
         "source code",
         "is the code public"
       ],
-      "text": "Yes. Hermes is open source, which means its code is public. Hermes itself is free.",
+      "text": "Hermes is open source, which means its code is public. Hermes itself is free.",
       "sources": [
         {
           "file": "reference/faq.md",
@@ -6767,7 +6839,8 @@ export const TALK_DATA = {
         "gemini key",
         "googles ai"
       ],
-      "text": "Yes. Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+      "text": "Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+      "pick_label": "Using Gemini",
       "sources": [
         {
           "file": "integrations/providers.md",
@@ -6794,7 +6867,8 @@ export const TALK_DATA = {
         "forget that",
         "delete what it knows about me"
       ],
-      "text": "Yes. Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+      "text": "Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+      "pick_label": "Making Hermes forget something",
       "sources": [
         {
           "file": "user-guide/features/memory.md",
@@ -6821,6 +6895,7 @@ export const TALK_DATA = {
         "how full"
       ],
       "text": "The docs name a \"% full\" meter in the chat. It shows how much of what the AI can read is used. Click it for details.",
+      "pick_label": "The \"% full\" meter",
       "sources": [
         {
           "file": "user-guide/desktop.md",
@@ -6848,7 +6923,7 @@ export const TALK_DATA = {
         "split a job",
         "split work"
       ],
-      "text": "Yes. Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
+      "text": "Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
       "sources": [
         {
           "file": "user-guide/features/delegation.md",
@@ -6905,6 +6980,7 @@ export const TALK_DATA = {
         "say its name"
       ],
       "text": "With one setting on, Hermes listens for a spoken phrase and answers. The docs compare that to \"Hey Siri\".",
+      "pick_label": "Hermes and Siri",
       "sources": [
         {
           "file": "user-guide/features/wake-word.md",
@@ -6913,6 +6989,178 @@ export const TALK_DATA = {
         {
           "file": "user-guide/features/wake-word.md",
           "line": 13
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_terminal",
+      "title": "The terminal and the app",
+      "phrases": [
+        "what is a terminal",
+        "what is the terminal",
+        "terminal",
+        "command line",
+        "app or terminal",
+        "app vs terminal",
+        "app or the terminal"
+      ],
+      "text": "A terminal is a window where you type commands instead of clicking. Hermes works in a terminal and in the app. Both are the same Hermes.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 9
+        },
+        {
+          "file": "user-guide/desktop.md",
+          "line": 17
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_agents_md",
+      "title": "What AGENTS.md is",
+      "phrases": [
+        "agents.md",
+        "agents md",
+        "what is agents.md",
+        "agents file"
+      ],
+      "text": "AGENTS.md is a file of instructions for one project folder. Hermes reads it when it works in that folder.",
+      "sources": [
+        {
+          "file": "user-guide/features/context-files.md",
+          "line": 17
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_dark",
+      "title": "Dark mode and colour mode",
+      "phrases": [
+        "dark mode",
+        "light mode",
+        "color mode",
+        "colour mode",
+        "dark theme",
+        "change the theme"
+      ],
+      "text": "Press Ctrl+K, or Cmd+K on a Mac. In the list that opens, you can switch the colour mode.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 548
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_home",
+      "title": "Smart home with Home Assistant",
+      "phrases": [
+        "smart home",
+        "home assistant",
+        "my lights",
+        "control my home",
+        "control devices at home"
+      ],
+      "text": "Hermes can work with Home Assistant, a smart home app, through an official plugin. A plugin is an add-on you install into Hermes.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/homeassistant.md",
+          "line": 10
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_cost",
+      "title": "Seeing what it costs",
+      "phrases": [
+        "see the cost",
+        "see what it costs",
+        "what have i spent so far",
+        "what has it cost so far",
+        "cost so far",
+        "what its costing",
+        "what it is costing",
+        "what its costing me"
+      ],
+      "text": "Type /usage in a chat with Hermes. It shows an estimate of what that chat has cost.",
+      "sources": [
+        {
+          "file": "reference/slash-commands.md",
+          "line": 266
+        },
+        {
+          "file": "user-guide/tui.md",
+          "line": 133
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_toolsets",
+      "title": "What toolsets are",
+      "phrases": [
+        "toolsets",
+        "toolset",
+        "what are toolsets",
+        "what is a toolset",
+        "turn tools on",
+        "switch tools on"
+      ],
+      "text": "A toolset is a group of tools, like web search. Tools are the actions Hermes can take. Each group can be switched on or off, and a few start off.",
+      "sources": [
+        {
+          "file": "user-guide/features/tools.md",
+          "line": 13
+        },
+        {
+          "file": "user-guide/features/tools.md",
+          "line": 28
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_shorter",
+      "title": "Shorter answers",
+      "phrases": [
+        "answer shorter",
+        "shorter answers",
+        "answers shorter",
+        "less text",
+        "too long answers",
+        "more concise",
+        "be brief",
+        "shorter replies"
+      ],
+      "text": "Type /personality concise in a chat. Hermes then gives brief, to-the-point answers.",
+      "sources": [
+        {
+          "file": "user-guide/features/personality.md",
+          "line": 180
+        },
+        {
+          "file": "user-guide/features/personality.md",
+          "line": 200
         }
       ],
       "next": {
@@ -7054,9 +7302,9 @@ export const TALK_DATA = {
       "I"
     ],
     "want_say": "{label}",
-    "template": "Do you want to know about {a}, or about {b}?",
-    "template_1": "Do you want to know about {a}?",
-    "template_3": "Do you want to know about {a}, {b}, or {c}?",
+    "template": "Do you want one of these instead?",
+    "template_1": "Do you want one of these instead?",
+    "template_3": "Do you want one of these instead?",
     "nothing_near_set": "start_four",
     "bare_follow": [
       "how",
@@ -7068,7 +7316,202 @@ export const TALK_DATA = {
       "and after that",
       "after that",
       "and"
+    ],
+    "never_near": [
+      "home",
+      "file",
+      "files",
+      "turn",
+      "turning",
+      "work",
+      "working",
+      "difference",
+      "different",
+      "thing",
+      "things",
+      "way",
+      "set",
+      "start",
+      "help",
+      "question",
+      "answer",
+      "time",
+      "day",
+      "week",
+      "mode",
+      "better",
+      "best",
+      "good",
+      "more",
+      "less",
+      "want",
+      "run",
+      "open",
+      "show",
+      "tell",
+      "find",
+      "try",
+      "put",
+      "give",
+      "take",
+      "write",
+      "read",
+      "talk",
+      "chat",
+      "chats",
+      "ask",
+      "other",
+      "another",
+      "all",
+      "every",
+      "each",
+      "own",
+      "first",
+      "second",
+      "people",
+      "person",
+      "computer",
+      "app",
+      "apps",
+      "text",
+      "word",
+      "words",
+      "off",
+      "on",
+      "while",
+      "when",
+      "where",
+      "what",
+      "which",
+      "who",
+      "why",
+      "with",
+      "without",
+      "your",
+      "you",
+      "we",
+      "will",
+      "would",
+      "same",
+      "much",
+      "many",
+      "only",
+      "still",
+      "yet",
+      "now",
+      "again",
+      "send",
+      "sent",
+      "said",
+      "say",
+      "everything",
+      "friend",
+      "something",
+      "anything"
+    ],
+    "keep_subject": [
+      "is that hard",
+      "is it hard",
+      "is that difficult",
+      "is it difficult",
+      "is that easy",
+      "is it easy",
+      "is that complicated",
+      "where do i do that",
+      "where do i do it",
+      "where is that",
+      "where do i find that",
+      "where do i find it",
+      "do i need to turn any on",
+      "do i need to turn it on",
+      "do i need to turn them on",
+      "do i have to turn it on",
+      "do i have to turn any on",
+      "do i need to switch any on",
+      "do i need to switch it on",
+      "how long does that take",
+      "is that free",
+      "does that cost money",
+      "what do i need for that",
+      "what do i need for it"
     ]
+  },
+  "false_belief": {
+    "maker_names": {
+      "google": "Google",
+      "openai": "OpenAI",
+      "open ai": "OpenAI",
+      "microsoft": "Microsoft",
+      "apple": "Apple",
+      "meta": "Meta",
+      "facebook": "Meta",
+      "anthropic": "Anthropic",
+      "amazon": "Amazon",
+      "chatgpt": "OpenAI",
+      "elon": "xAI",
+      "xai": "xAI"
+    },
+    "maker_cues": [
+      "made by",
+      "built by",
+      "owned by",
+      "a product of",
+      "part of",
+      "is this",
+      "this is",
+      "is it a",
+      "is hermes a",
+      "is hermes from",
+      "is it from"
+    ],
+    "plan_names": {
+      "chatgpt": "ChatGPT",
+      "chat gpt": "ChatGPT",
+      "openai": "OpenAI",
+      "claude": "Claude",
+      "gemini": "Gemini",
+      "grok": "Grok",
+      "copilot": "Copilot"
+    },
+    "plan_words": [
+      "subscription",
+      "plan",
+      "account",
+      "plus",
+      "pro",
+      "premium",
+      "membership"
+    ],
+    "need_words": [
+      "need",
+      "needs",
+      "require",
+      "requires",
+      "required",
+      "have to",
+      "must",
+      "only works with",
+      "only with"
+    ],
+    "lines": {
+      "FB_MAKER": {
+        "text": "Hermes is not made by {name}. It is made by Nous Research.",
+        "source": "index.mdx:5",
+        "next": {
+          "kind": "line",
+          "id": "HERMES"
+        }
+      },
+      "FB_PLAN": {
+        "text": "Hermes does not need a {name} plan. It needs an AI to think with. That AI can come from many AI companies, or run on your own computer.",
+        "source": "integrations/providers.md:9",
+        "next": {
+          "kind": "part",
+          "label": "Open Model",
+          "part": "model"
+        }
+      }
+    }
   },
   "keeps": {
     "answers": {
