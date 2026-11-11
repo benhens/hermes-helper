@@ -360,7 +360,7 @@ export const T = {
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
 // dash-v1: and the Dashboard's (src/dash.js DASH_ICONS, design/dash-r7/notes.md's table), each Hermes's own.
-export const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'robot', 'edit', 'comment', 'symbol-misc', 'watch', 'close', 'check', 'clear-all', 'layout-sidebar-right-off', 'layout-sidebar-right']
+export const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'comment-discussion', 'edit', 'comment', 'tools', 'watch', 'close', 'check', 'clear-all', 'layout-sidebar-right-off', 'layout-sidebar-right']
 // dash-v1: the Tabler icons the Dashboard takes from Hermes through the SDK's `icons` (hhtech-dash-icons.md point 1)
 export const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // Hermes's look has one primary button per screen (hhdesign fix 6); every other button of
