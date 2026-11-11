@@ -25,3 +25,15 @@ test('a question about Windows the system still gets the Windows line', () => {
   assert.equal(namesWindowsOs('contex window'), false)
   assert.equal(namesWindowsOs('two windows'), false)
 })
+
+// (review) the opening's small talk twice: the line and the question again each time, never "Sorry, I have nothing
+// more on that." with the name question gone (Builder's rule: OPEN_TALK is kept out of no_repeat)
+import { turn as turn2, lineFor as lineFor2 } from '../src/talk.js'
+test('"hey", "hey" at What\'s your name?: Hi. and the name question both times; the stage stays', () => {
+  const st = freshVisit('name')
+  for (const t of ['hey', 'hey', 'thanks']) {
+    const l = lineFor2(turn2(t, st), st)
+    assert.equal(l.ask && l.ask.text, "What's your name?", t)
+    assert.equal(st.stage, 'name')
+  }
+})
