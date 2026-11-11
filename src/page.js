@@ -593,12 +593,17 @@ export function makePage(ctx, opts = {}) {
         const end = text => {
           if (ended) return
           ended = true
-          stop()
           endBusy()
           memory.recWait = null
           put(says.map((s, k) => (k === i && text ? { ...s, text: text + s.text.slice(s.text.lastIndexOf(' Want the steps?')), recBy: 'ai' } : s)))
         }
+        // find-v1: past its 12 s and still in Hermes, this call is a stuck one, as a typed message's call is: a typed
+        // message that cannot be asked because of it is the second slow try. The watch runs on when the person
+        // moved on before the 12 s (end() no longer stops it; it is stopped when the call comes back)
+        let recStuck = false
         const stop = ctx.setTimeout(() => {
+          recStuck = true
+          live.stuck = (live.stuck || 0) + 1
           off()
           end(null)
         }, LIVE_SECONDS * 1000)
@@ -619,6 +624,8 @@ export function makePage(ctx, opts = {}) {
             }
           )
           .finally(() => {
+            stop()
+            if (recStuck) live.stuck--
             live.inHermes--
           })
       }
