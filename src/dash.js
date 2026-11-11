@@ -22,7 +22,7 @@ import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
 import { botRows, openBotName, makeReader } from './setup-reads.js'
 import { cardStates, cardColumns, panelAfter, distinctSkills, tileWord, CARD_MIN_PX } from './dash-rules.js'
-import { Character } from './character.js'
+import { BannerCharacter } from './character.js'
 import { makeEyes } from './eyes.js'
 import { prefersReducedMotion } from './motion.js'
 
@@ -578,7 +578,7 @@ export function makeDashboard(ctx) {
         className: D.banner,
         'data-hh': 'banner',
         children: [
-          // the picture, behind the words: two fields of dots, and in front of them Helper's character holding the
+          // the picture, behind the words: two fields of dots, and in front of them the banner's own figure (banner-face) holding the
           // banner's bottom edge, its eyes on the pointer
           jsxs('div', { className: D.bannerArt, 'data-hh': 'banner-art', 'aria-hidden': true, children: [jsx('i', { className: D.bannerDots }, 'd1'), jsx('i', { className: D.bannerDots2 }, 'd2')] }, 'art'),
           jsx(
@@ -587,7 +587,7 @@ export function makeDashboard(ctx) {
               className: D.bannerChar,
               'data-hh': 'banner-character',
               'aria-hidden': true,
-              children: jsx(Character, { size: BANNER_CHARACTER_PX, expression: 'resting', rising: false, reduced: !!state.still, eyes: state.bannerEyes || null, label: '' })
+              children: jsx(BannerCharacter, { size: BANNER_CHARACTER_PX, reduced: !!state.still, eyes: state.bannerEyes || null })
             },
             'char'
           ),
