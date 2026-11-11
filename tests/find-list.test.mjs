@@ -8,7 +8,7 @@ import assert from 'node:assert/strict'
 import { askLive, goesToAi, liveApply } from '../src/live-turn.js'
 import { listCallText, writerText, LIST_MAX_TOKENS } from '../src/live-request.js'
 import { readList } from '../src/live-checks.js'
-import { LIVE_ROW, LIST_LINES, followRows } from '../src/live-rows.js'
+import { LIVE_ROW, LIST_LINES, followRows, resultOfRow } from '../src/live-rows.js'
 import { LIVE_DATA } from '../src/live-data.js'
 import { TALK_DATA } from '../src/talk-data.js'
 import { turnParts, freshVisit, lineFor, TITLED, pick, pressNear, pressOffer } from '../src/talk.js'
@@ -138,12 +138,18 @@ test('up to three ids, each with its next line, at most five rows handed', async
   assert.ok(!handed.includes('d_windows'), 'the fourth id is not taken')
 })
 
-test('the fallback is code\'s line: when the list call says NONE, fails, gives thinking text, or a check drops the writer\'s reply; with nothing near, the don\'t-know and its four picks', async () => {
-  for (const replies of [['NONE'], [new Error('boom')], ['Thinking Process:\n1. **Analyze'], ['FREE', 'Hermes costs 5 dollars a month.\nUSED: FREE'], ['FREE', 'NONE'], ['FREE', new Error('boom')]]) {
+test('the fallback is code\'s line when nothing was picked (the list call says NONE, fails, gives thinking text): with nothing near, the don\'t-know and its four picks; find-v2: once the list picked FREE, a writer that fails or a check that drops it gives the FREE line itself', async () => {
+  for (const replies of [['NONE'], [new Error('boom')], ['Thinking Process:\n1. **Analyze']]) {
     const st = visit()
     const r = await ask(st, 'do i need a credit card to try it', replies)
     assert.equal(r.shown.kind, 'N1', JSON.stringify(replies).slice(0, 40))
     assert.deepEqual([r.line.line, r.line.offer.set], ['N1', 'start_four'])
+    assert.equal(r.calls.length, replies.length)
+  }
+  for (const replies of [['FREE', 'Hermes costs 5 dollars a month.\nUSED: FREE'], ['FREE', 'NONE'], ['FREE', new Error('boom')]]) {
+    const st = visit()
+    const r = await ask(st, 'do i need a credit card to try it', replies)
+    assert.equal(r.line.text, lineFor(resultOfRow('FREE'), visit(), '').text, JSON.stringify(replies).slice(0, 40))
     assert.equal(r.calls.length, replies.length)
   }
 })

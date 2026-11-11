@@ -31,7 +31,7 @@ import { recInstructions, judgeRec, askRec } from './setup-rec.js'
 import { AI_MODE } from './ai-mode.js'
 import { setupTyped, setupPress, setupAfter, setupStepOpen, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
 import { makeLook, LOOK_UNSEEN } from './setup-look.js'
-import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
+import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows, pickedResult } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
 import { makeDashboard, DASH_COMPACT_UNDER_PX, openHermesDocs } from './dash.js'
@@ -273,6 +273,9 @@ export function makePage(ctx, opts = {}) {
     if (!again) return [said, []]
     return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
   }
+  // find-v2 part 1: the turn closes with no line from the AI (its 12 s, or the person moved on) after the list call
+  // picked a line: that line itself, as code shows it (src/live-turn.js pickedResult), not the don't-know
+  const pickedFinal = w => (w.picked && w.before ? liveApply(memory.visit, pickedResult(w.picked), w.out, w.before, w.typed) : null)
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
   // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
   // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
@@ -282,7 +285,7 @@ export function makePage(ctx, opts = {}) {
     live.waiting = null
     w.stopTimer()
     w.endBusy()
-    const result = final || w.out
+    const result = final || pickedFinal(w) || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
     const [shown, after] = quiet ? [said, []] : setupAfterSaid(result, said, w.typed)
@@ -837,7 +840,7 @@ export function makePage(ctx, opts = {}) {
       // live-v2 changes-5: whether this is the visit's first message that goes to the AI (only its failure owes SLOW_A)
       const firstTurn = !visit.aiTried
       visit.aiTried = true
-      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, firstTurn }
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, firstTurn, before, picked: null }
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
@@ -890,12 +893,13 @@ export function makePage(ctx, opts = {}) {
           })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, onPick: id => (w.picked = id), work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
         .then(got => {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
           // find-v1 (Builder, review): so is a list call that came back too late for the writer to start
-          if (got && (got.thinking || got.fallback === 'no time for the second call')) slowFail(w)
+          // (find-v2: with a picked line shown in place of the fallback, the reason is in got.why)
+          if (got && (got.thinking || got.fallback === 'no time for the second call' || got.why === 'no time for the second call')) slowFail(w)
           else aiAnswered(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))

@@ -98,7 +98,9 @@ function isHowQuestion(text) {
 // USED: line) is an ordinary fallback.
 //   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
 //   typed: the person's own typed messages of this visit, this one included (find-v1, check c12: a name they typed)
-export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [], typed = [text] }) {
+//   onPick(id): told as soon as the list call has picked a line (find-v2: the page shows that line, not the don't-know,
+//   when the turn closes before the writer is back: the 12 s, or the person's next move)
+export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, onPick = () => {}, work = null, names = [], typed = [text] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -116,11 +118,27 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed })
-  return thinking ? { fallback: 'thinking text', thinking: true } : got
+  const picked = { id: null, onPick }
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed, picked })
+  if (thinking) return picked.id ? { ...pickedResult(picked.id), why: 'thinking text', thinking: true } : { fallback: 'thinking text', thinking: true }
+  return got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed }) {
+// find-v2 part 1 (Lead, 11 Nov 11:40; hhtech ask-run 3, For builder 4): once the list call has picked lines, every way
+// the second call can come to nothing (NONE, a failed call, thinking text, a check that drops the reply, no time left,
+// a pick call with no pick) shows the first picked line itself, as code shows that row, with its button. Only with
+// nothing picked does the fallback (code's line, or the don't-know with its picks) stand.
+export function pickedResult(id) {
+  const result = id ? resultOfRow(id) : null
+  return result ? { result, rows: withNext([id]), picked: id } : null
+}
+async function askSteps(args) {
+  const got = await askStepsInner(args)
+  if (got && got.fallback && args.picked.id) return { ...pickedResult(args.picked.id), why: got.fallback }
+  return got
+}
+
+async function askStepsInner({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed, picked }) {
   let ids = null
   // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
   let follow = false
@@ -136,6 +154,10 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     const p = readList(raw)
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     if (!p.ids) return { fallback: 'list: none' }
+    if (resultOfRow(p.ids[0])) {
+      picked.id = p.ids[0]
+      picked.onPick(p.ids[0])
+    }
     ids = withNext(p.ids)
   }
   const handed = follow ? null : work

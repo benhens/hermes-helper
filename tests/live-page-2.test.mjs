@@ -184,7 +184,8 @@ test('a reply that sits on the USED: line falls back to the no-AI line and is no
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 2)
-  assert.equal(line(view), 'N1')
+  // find-v2 part 1: the list picked msg0, so the dropped reply gives the msg0 line itself
+  assert.equal(line(view), 'msg0')
   finish(view)
   send(view, 'can it fly a plane')
   await settle()

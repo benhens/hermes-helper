@@ -389,7 +389,9 @@ test('weak AI: a first call or a writer that sends thinking text gives the fallb
     const { pre, out } = turnParts('can it fly a kite', st)
     const got = await askLive({ mode: 'ai_writes', text: 'can it fly a kite', pre, out, before: { last: null, lastKey: null }, request })
     assert.equal(got.thinking, true, answers.join(' / '))
-    assert.ok(got.fallback)
+    // find-v2 part 1: after the list picked sch1, the sch1 line in place of the fallback
+    if (answers.length === 2) assert.equal(got.picked, 'sch1')
+    else assert.ok(got.fallback)
     assert.equal(n, answers.length, 'no call after the thinking text')
   }
 })

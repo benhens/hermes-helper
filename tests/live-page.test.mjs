@@ -266,8 +266,9 @@ test('ai_picks_line: a handed id shows that row as code shows it; TALK and NONE 
   send(view, 'send me a summary')
   await settle()
   assert.notEqual(line(view), 'sch1')
-  // TALK: the no-AI line unless that is a don't-know line, then OK (pick_only.read); NONE or anything else: the no-AI line
-  for (const [r, want] of [['TALK', 'OK'], ['NONE', 'N1'], ['zzz', 'N1'], ['sch9', 'N1']]) {
+  // TALK: the no-AI line unless that is a don't-know line, then OK (pick_only.read); find-v2 part 1: NONE or anything
+  // else after the list picked sch1: the sch1 line itself, not the don't-know
+  for (const [r, want] of [['TALK', 'OK'], ['NONE', 'sch1'], ['zzz', 'sch1'], ['sch9', 'sch1']]) {
     const o = await pastOpening('ai_picks_line', { host: { oneshot: (p, n) => (n === 1 ? 'sch1' : r) } })
     send(o.view, 'send me a summary')
     await settle()

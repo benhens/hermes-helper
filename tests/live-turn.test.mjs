@@ -69,8 +69,9 @@ test('the second call starts only with 4 s or more left of the 12: a first call 
   const st = freshVisit()
   const r = await one('tell me a joke', st, { request: f.request, msLeft: () => left })
   assert.equal(f.asks.length, 1)
-  assert.deepEqual(r.got, { fallback: 'no time for the second call' })
-  assert.equal(r.shown, null)
+  // find-v2 part 1: the list picked mem0, so no time for the writer gives the mem0 line itself
+  assert.deepEqual(r.got, { result: { kind: 'plain', topic: 'mem' }, rows: ['mem0'], picked: 'mem0', why: 'no time for the second call' })
+  assert.equal(r.shown.kind, 'plain')
   assert.equal(SECOND_CALL_MIN_MS, 4000)
 })
 
