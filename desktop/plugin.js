@@ -29707,9 +29707,10 @@ function Said({ clock, id, text, className, fresh = false }) {
 const ACCENT = { fill: 'var(--ui-accent)' }
 // The dots (loom2): cell: the grid's step in the drawing's units (6 = 5 px at 168 px wide, 4 px at 132 px); blur: how
 // far in from an edge the squares are still shrinking; gain: how soon inside a shape they reach full size; fill: a
-// full square's side as a share of its cell (the rest is the gap between squares). area: the filter's region, all the
+// full square's side as a share of its cell (the rest is the gap between squares; at 0.75 the squares ran together at
+// 132 px in the app, where a cell is 4 px: 0.62 keeps a gap of a pixel or more). area: the filter's region, all the
 // body can reach (it rises 10 units and starts 101 units down when it comes up from behind the box).
-const DOTS = { cell: 6, blur: 4, gain: 1.5, fill: 0.75, area: { x: -30, y: -40, width: 260, height: 240 } }
+const DOTS = { cell: 6, blur: 4, gain: 1.5, fill: 0.62, area: { x: -30, y: -40, width: 260, height: 240 } }
 const SIDES = ['left', 'right']
 const FINGER_COUNT = EXPRESSIONS.resting.fingers.length
 // A blink, piece by piece: [piece, what changes, open, shut] (src/expressions.js).
