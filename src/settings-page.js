@@ -6,18 +6,22 @@
 // puts the box back as stored; "Forget all of this" deletes the record after a Yes.
 // It reads and writes the same stored record as Helper's conversation (storage key 'kept'), so
 // the conversation sees a change the next time it is put on screen. No model, nothing sent.
-// Left out: top_line_2 ("Only your name goes to your AI"), which is for a build that calls a
-// model; and a link to Hermes's own Memory & Context, whose address is not in the plugin docs.
+// talk-live: in a build with an AI step (src/ai-mode.js) the row has a second top line, "Nothing on this page is
+// sent to any AI." (lines_by_mode.settings_top_line_2); with no AI step none. Left out: a link to Hermes's own
+// Memory & Context, whose address is not in the plugin docs.
 import { Button, ListRow, Textarea } from '@hermes/plugin-sdk'
 import { useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { TALK_DATA } from './talk-data.js'
+import { AI_MODE } from './ai-mode.js'
+import { LIVE_DATA } from './live-data.js'
 import { K } from './look.js'
 import { cleanKept, hasKept, keptToStore } from './kept.js'
 import { renderKept, saveBox } from './settings-file.js'
 import { curlyQuotes } from './quotes.js'
 
 const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
+export const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode.settings_top_line_2[AI_MODE]
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')
@@ -105,6 +109,7 @@ export function makeSettingsPage(ctx) {
     const boxRow = jsx(ListRow, {
       wide: true,
       title: curlyQuotes(SETTINGS_WORDS.top_line),
+      description: SETTINGS_TOP_LINE_2 ? curlyQuotes(SETTINGS_TOP_LINE_2) : undefined,
       below: jsxs('div', {
         className: K.settingsBelow,
         children: [
