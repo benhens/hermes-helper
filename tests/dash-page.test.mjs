@@ -410,7 +410,7 @@ test('hhcontent\'s corrected steps are what an opened stop shows: Its personalit
   assert.equal(JSON.stringify(DASH_DATA).includes('docs words'), false)
 })
 
-test('a stop that was open is still open when the person comes back: after a route button took them to Hermes\'s own screen, and after another tab; a closed one stays closed; nothing is stored for it', async () => {
+test('a stop that was open is still open when the person comes back: after a route button took them to Hermes\'s own screen; a closed one stays closed; nothing is stored for it', async () => {
   const { view, Page, storage } = await open('half')
   click(stop(view, 'model'))
   const route = all(byData(dash(view), 'steps'), n => n.props['data-hh'] === 'route')[0]
@@ -427,12 +427,6 @@ test('a stop that was open is still open when the person comes back: after a rou
   assert.equal(stop(back, 'model').props['aria-expanded'], true)
   assert.equal(all(box, n => n.type === 'ol')[0].props.children.length, 5)
   assert.equal(byData(dash(back), 'next'), null, 'the Next row gives way to the opened stop, as before')
-  // another tab and back
-  click(all(byData(back.tree, 'tabs'), n => n.props.role === 'tab')[1])
-  await settle(4)
-  click(all(byData(back.tree, 'tabs'), n => n.props.role === 'tab')[0])
-  await settle(12)
-  assert.equal(byData(dash(back), 'steps').props['data-stop'], 'model')
   // closed by the person: closed when they come back
   click(byData(dash(back), 'close'))
   back.unmount()
@@ -440,9 +434,8 @@ test('a stop that was open is still open when the person comes back: after a rou
   await settle(12)
   assert.equal(byData(dash(third), 'steps'), null)
   assert.ok(byData(dash(third), 'next'))
-  // kept for the visit only, in the page's own memory: nothing written but the tab the person chose (as before)
-  assert.deepEqual([...storage.data.keys()], ['tab'])
-  assert.equal(storage.data.get('tab'), 'dashboard')
+  // kept for the visit only, in the page's own memory: nothing written (loom2: no tab either)
+  assert.deepEqual([...storage.data.keys()], [])
 })
 
 test('a source tag opens its docs page in the browser (ctx.os), never inside Hermes, and only the official docs', async () => {
@@ -593,7 +586,7 @@ test('the narrow sizes: under 640 px of left side the tab takes hhdesign\'s narr
   for (const st of stops(view)) assert.deepEqual(all(st, n => n.props.className === D.label)[0].props.style, { width: `${room}px` }, st.props['data-stop'])
 })
 
-test('a read that comes back late, after the app opened another bot or the tab was left, is dropped: it never shows under the new bot', async () => {
+test('a read that comes back late, after the app opened another bot or the page was left, is dropped: it never shows under the new bot', async () => {
   // (loom-fixes: with no plugins read any more, a path read is held: the scheduled jobs read, per bot)
   useHost('half', { openBot: 'default', byBot: { bot1: 'all' } })
   const host = globalThis.__hhHost
@@ -618,16 +611,16 @@ test('a read that comes back late, after the app opened another bot or the tab w
   held[1]()
   await settle(6)
   assert.equal(said(byData(dash(view), 'count')), '6 of 10')
-  // and after the tab is left: a late answer changes nothing, and the tab opens waiting again
+  // and after the page is left: a late answer changes nothing, and the page opens waiting again (loom2: no tabs)
   host.profile = 'default'
   click(stop(view, 'memory'))
   await settle(12)
   assert.equal(held.length, 3)
-  click(all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')[1])
+  view.unmount()
   held[2]()
   await settle(6)
-  click(all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')[0])
-  assert.equal(byData(dash(view), 'count'), null)
+  const again = mount(reg.Page)
+  assert.equal(byData(dash(again), 'count'), null)
 })
 
 test('the app gives no name for the open bot (an empty profile): the bot Hermes marks as default is read, by its own name', async () => {
@@ -666,14 +659,11 @@ test('the bots read failed: the open bot is still read by its own name (the app 
   assert.deepEqual(all(dash(half.view), n => n.props['data-hh'] === 'you-are-here'), [])
 })
 
-test('leaving the tab drops what was read; opening it again reads everything again from the start', async () => {
-  const { view } = await open('half')
+test('leaving the page drops what was read; coming back reads everything again from the start (loom2: no tabs)', async () => {
+  const first = await open('half')
   assert.equal(log.filter(e => e === 'profiles.list').length, 1)
-  const tabs = all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')
-  click(tabs[1])
-  await settle(6)
-  assert.equal(byData(view.tree, 'dashboard'), null)
-  click(all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')[0])
+  first.view.unmount()
+  const view = mount(first.Page)
   // at once: waiting blocks, not the old numbers
   assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileNumber(view, k)), ['waiting', 'waiting', 'none'])
   await settle(12)

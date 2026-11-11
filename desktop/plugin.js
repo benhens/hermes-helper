@@ -24362,8 +24362,8 @@ function chatCall(message, log, names = []) {
 
 // ---- src/state.js ----
 // What the page keeps in ctx.storage on the person's computer.
-// Keys the page reads back: tab (dashboard | learn | my_setup), helperWidth (the width Helper's window was dragged
-// to, 360 to 600 px). Anything unexpected in storage falls back to the default.
+// Keys the page reads back: helperWidth (the width Helper's window was dragged to, 360 to 600 px). loom2: no tabs
+// (his Loom of 11 Nov, 1:51: Learn is out, the page is the Dashboard), so 'tab' is no longer read or written. Anything unexpected in storage falls back to the default.
 // dash-v1: the first build's tabs (Setup, Your setup) left the page; their keys step, answers and remember are no
 // longer read or written by the page (their parked files, src/steps.js and src/setup-tab.js, still name them).
 // About the person, the record of what Helper keeps (talk v2 row 3) and, since loom-fixes, the last 50 lines of the
@@ -24375,15 +24375,9 @@ function chatCall(message, log, names = []) {
 // visit; Forget all removes it since last-reset (a full reset: the next visit asks the name again).
 // loom-fixes (Lead's point 17): 'talk', the last 50 lines of the conversation with Helper (src/talk-keep.js), and
 // 'helperHidden', whether the person put Helper's window away with Hide Helper (true, or nothing)
-const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met', 'talk', 'helperHidden']
-// dash-v1: the three tabs, Dashboard first (only it is built)
-// loom-fixes: My setup is out (his words, Loom 3:22); a stored 'my_setup' opens the Dashboard
-const TAB_IDS = ['dashboard', 'learn']
-
+const STORED_KEYS = ['helperWidth', 'kept', 'met', 'talk', 'helperHidden']
 function readState(get) {
-  const tab = get('tab', TAB_IDS[0])
   return {
-    tab: TAB_IDS.includes(tab) ? tab : TAB_IDS[0],
     helperWidth: clampHelperWidth(get('helperWidth', HELPER_PX))
   }
 }
@@ -28641,27 +28635,8 @@ const K = {
   root: 'relative flex h-full min-h-0 w-full min-w-0 overflow-hidden',
   left: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
   // The header clears Hermes's title-bar band (its window buttons float there), as Capabilities does.
-  // No page title: like Capabilities, the sidebar row names the page and the header holds the tabs.
+  // No page title: like Capabilities, the sidebar row names the page. loom2: no tabs, so the header holds nothing.
   head: 'flex shrink-0 items-center gap-3 px-6 pb-2 pt-[calc(var(--titlebar-height)+1.5rem)]',
-  // Page tabs: Capabilities' text tabs (components/ui/tab-dropdown.tsx ResponsiveTabs row,
-  // components/ui/text-tab.tsx TextTab). The colour is split off so the open tab doesn't carry two.
-  tabs: 'flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1',
-  textTab:
-    'group/text-tab inline-flex h-7 items-center gap-1 bg-transparent px-1 text-[length:var(--conversation-caption-font-size)] font-medium transition-colors hover:bg-transparent hover:text-foreground focus-visible:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
-  textTabIdle: 'text-(--ui-text-tertiary)',
-  textTabOn: 'text-foreground',
-  textTabLabel: 'underline-offset-4 decoration-current/25 group-hover/text-tab:underline',
-  textTabLabelOn: 'underline-offset-4 decoration-current/25 underline',
-  // dash-v2: the tab names as Hermes's own SESSIONS | BOTS tabs, for TAB_LOOK 'hermes' below. Every class is one
-  // Hermes's own tab wears (components/ui/pane-tab.tsx: TAB, TAB_IDLE, TAB_ACTIVE, TAB_ACTIVE_UNDERLINE, PaneTabLabel),
-  // on the same 28 px row as today's tabs: 11 px capitals, and under the open one a 2 px line in the theme's primary
-  // colour (Hermes draws that line as an inset shadow of its own class). Its hover wash and tab fills are left out: they
-  // belong to Hermes's tab strip, which our header is not.
-  paneTab:
-    'group/text-tab inline-flex h-7 items-center gap-1 bg-transparent px-2 text-[0.6875rem] font-medium transition-colors hover:bg-transparent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ui-accent)',
-  paneTabIdle: 'text-(--ui-text-tertiary) hover:text-(--ui-text-secondary)',
-  paneTabOn: 'text-foreground shadow-[inset_0_-2px_0_var(--pane-tab-active-accent,var(--theme-primary))]',
-  paneTabLabel: 'block min-w-0 truncate font-medium tracking-wide uppercase',
   body: 'flex min-h-0 flex-1',
 
   // ---- step list (app/master-detail.tsx ListColumn + CapRow; app/overlays/panel.tsx) ----
@@ -28842,21 +28817,7 @@ const K = {
   mono: 'font-mono',
   icon14: 'size-3.5',
   icon16: 'size-4',
-  icon20: 'size-5',
-  // Learn and My setup are not built: one quiet line, in the caption tone, at the open step's text edge
-  notBuilt: 'px-6 py-4 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)'
-}
-
-// ---- the tab names' look, behind ONE value (dash-v2; Lead's point 7: Pēteris's decision, not made yet) ----
-//   'capabilities'  as built and as he has seen it: Capabilities' text tabs, sentence case, a thin faint underline
-//                   under the open one
-//   'hermes'        as Hermes's own tabs (SESSIONS | BOTS): capitals, a line in the theme's primary colour under the open one. Tested, and
-//                   measured once in the app; no person has looked at it.
-// To change the look, change the word on the next line.
-const TAB_LOOK = 'capabilities'
-const TAB_LOOKS = {
-  capabilities: { tab: K.textTab, idle: K.textTabIdle, on: K.textTabOn, label: K.textTabLabel, labelOn: K.textTabLabelOn },
-  hermes: { tab: K.paneTab, idle: K.paneTabIdle, on: K.paneTabOn, label: K.paneTabLabel, labelOn: K.paneTabLabel }
+  icon20: 'size-5'
 }
 
 // dash-v1: every class of the Dashboard tab's sheet (src/dash.css, from hhdesign's design/dash-r7/build.js), in one
@@ -30364,12 +30325,6 @@ const DASH_DATA = {
   ],
   "total": 10,
   "words": {
-    "tabs": {
-      "dashboard": "Dashboard",
-      "learn": "Learn"
-    },
-    "tabListLabel": "Helper tabs",
-    "notBuilt": "Nothing here yet. What is ready is on Dashboard.",
     "stats": {
       "bots_one": "bot",
       "bots": "bots",
@@ -31748,9 +31703,8 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-// dash-v1: the tabs, their names from the Dashboard's data (content/dash-words-v1.json page_words). loom-fixes: two,
-// Dashboard and Learn (My setup is out: his words, Loom 3:22). Only Dashboard is built: Learn shows one quiet line.
-const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
+// loom2 (his Loom of 11 Nov, 1:51 "take out the learn and just have this set up"): no tabs. With only the Dashboard
+// left there is no tab row: the page is the Dashboard. A stored tab ('learn', or an older name) is not read.
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
 // function is made once, so React doesn't detach and re-attach it on every render; React calls it
@@ -32207,7 +32161,6 @@ function makePage(ctx, opts = {}) {
 
   return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
-    const [tab, setTab] = useState(initial.tab)
     // The width the person dragged Helper's window to (remembered), and whether Helper is folded
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
@@ -32257,8 +32210,8 @@ function makePage(ctx, opts = {}) {
     const width = size.width
     const [modelStatus, recheckModel] = useModelStatus()
     live.recheck = () => recheckModel(true)
-    // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
-    const dashboard = useDashboard({ active: tab === 'dashboard' })
+    // dash-v1: the Dashboard's state, read again each time the page is put on screen (src/dash.js; loom2: no tabs)
+    const dashboard = useDashboard({ active: true })
     live.profile = dashboard.given
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
@@ -32278,20 +32231,7 @@ function makePage(ctx, opts = {}) {
     const stripButton = useRef(null)
     // Where a drag of Helper's edge began: { x, width }.
     const drag = useRef(null)
-    // One ref function per tab, made once (like useOwnSize's), kept with the tab buttons.
-    const tabRefs = useRef(null)
-    if (!tabRefs.current) {
-      const els = {}
-      tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
-    }
-
-    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded: folded || hidden })
-
-    const keep = (key, setter) => value => {
-      setter(value)
-      ctx.storage.set(key, value)
-    }
-    const saveTab = keep('tab', setTab)
+    const fit = layoutFor({ width, height: size.height, tab: 'dashboard', helperWidth, folded: folded || hidden })
 
     // The message box takes the keyboard when asked to (a pick, Helper
     // opened from its strip); a request that finds no box is dropped, so it can't steal focus later.
@@ -32857,67 +32797,17 @@ function makePage(ctx, opts = {}) {
       ctx.storage.set('helperWidth', final)
     }
 
-    /* ---------- header: the two text tabs ---------- */
-    // Arrow keys move between the tabs, Home and End go to the first and last (DESIGN.md,
-    // Keyboard: one entry point at the selected tab; WAI-ARIA tabs pattern).
-    function onTabKey(e, index) {
-      const last = TABS.length - 1
-      const to = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index === 0 ? last : index - 1, Home: 0, End: last }[e.key]
-      if (to === undefined) return
-      e.preventDefault()
-      const next = TABS[to].id
-      saveTab(next)
-      const el = tabRefs.current.els[next]
-      if (el) el.focus()
-    }
+    /* ---------- header: loom2, no tabs; the header keeps the room under Hermes's title bar ---------- */
+    const header = jsx('div', { className: K.head, 'data-hh': 'header' })
 
-    // the tab names' look: one value in src/look.js (TAB_LOOK)
-    const tabLook = TAB_LOOKS[TAB_LOOK]
-    const tabRow = jsx('div', {
-      className: K.tabs,
-      role: 'tablist',
-      'aria-label': DASH_DATA.words.tabListLabel,
-      'data-hh': 'tabs',
-      children: TABS.map((t, i) => {
-        const on = tab === t.id
-        return jsx(
-          'button',
-          {
-            type: 'button',
-            role: 'tab',
-            id: `hh-tab-${t.id}`,
-            'aria-selected': on,
-            'aria-controls': 'hh-tabpanel',
-            tabIndex: on ? 0 : -1,
-            'data-active': on,
-            className: cx(tabLook.tab, on ? tabLook.on : tabLook.idle),
-            ref: tabRefs.current.set[t.id],
-            onClick: () => saveTab(t.id),
-            onKeyDown: e => onTabKey(e, i),
-            children: jsx('span', { className: on ? tabLook.labelOn : tabLook.label, children: t.label })
-          },
-          t.id
-        )
-      })
-    })
-
-    const header = jsx('div', { className: K.head, 'data-hh': 'header', children: tabRow })
-
-    /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
-    const panel =
-      tab === 'dashboard'
-        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
-        : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
+    /* ---------- the page: the Dashboard ---------- */
+    const panel = renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
 
     const main = jsx(
       'main',
       {
         className: K.detail,
         'data-hh': 'detail',
-        // The tabs' panel (the tabs point here with aria-controls).
-        role: 'tabpanel',
-        id: 'hh-tabpanel',
-        'aria-labelledby': `hh-tab-${tab}`,
         children: jsx('div', { className: K.detailScroll, 'data-hh': 'scroll', children: panel })
       },
       'main'
@@ -33110,7 +33000,7 @@ function makePage(ctx, opts = {}) {
           )
         : null
 
-    // The left side: the tabs, and under them the open tab.
+    // The left side: the room under the title bar, and under it the Dashboard.
     const left = jsxs(
       'div',
       {

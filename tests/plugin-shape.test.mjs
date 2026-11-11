@@ -231,20 +231,18 @@ test('every class comes from the two class tables (K: Hermes\'s own classes; T: 
   }
 })
 
-test('three text tabs, Dashboard, Learn and My setup (dash-v1), in Capabilities\' TextTab look (not the SegmentedControl pill)', () => {
+test('no tabs (loom2: his Loom of 11 Nov, 1:51 "just have this set up"): no tab list, no tab, no Learn; never the SegmentedControl pill', () => {
   assert.doesNotMatch(src('page.js'), /SegmentedControl/)
-  assert.match(src('page.js'), /export const TABS = TAB_IDS\.map\(id => \(\{ id, label: DASH_DATA\.words\.tabs\[id\] \}\)\)/)
+  assert.doesNotMatch(src('page.js'), /TABS|TAB_IDS|role: 'tablist'|role: 'tab'|tabpanel|notBuilt/)
   assert.doesNotMatch(src('page.js'), /'Your setup'|label: 'Setup'/)
-  assert.match(src('page.js'), /role: 'tablist'/)
-  assert.match(src('page.js'), /role: 'tab',/)
 })
 
 test('buttons are Hermes Button components; bare <button>s only where Hermes uses them too', () => {
-  // On the page: the text tabs (TextTab is a plain <button>), Helper's strip (PaneTab vertical / kanban rail are
-  // plain buttons) and "Skip" in the message box. (dash-v1: the step's choice cards left with the step.)
+  // On the page: Helper's strip (PaneTab vertical / kanban rail are plain buttons) and "Skip" in the message box.
+  // (dash-v1: the step's choice cards left with the step; loom2: the text tabs left with the tabs.)
   const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button',\s*\{\s*type: 'button',\s*(['\w-]+)/g)].map(m => m[1])
-  assert.deepEqual(bare.sort(), ['className', 'className', 'role'])
-  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 3)
+  assert.deepEqual(bare.sort(), ['className', 'className'])
+  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 2)
   // dash-v1: on the Dashboard the 11 stops of the path are our own shape from hhdesign's drawing (round marks with
   // their names), one real <button type="button"> wearing D classes; every other button there is Hermes's
   const stops = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.stop,[^\n]*\)),/g)].map(m => m[1])

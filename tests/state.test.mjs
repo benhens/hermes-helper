@@ -3,27 +3,25 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import { readState, STORED_KEYS, TAB_IDS } from '../src/state.js'
+import { readState, STORED_KEYS } from '../src/state.js'
 import { PARKED } from '../scripts/build.mjs'
 
 const store = obj => (k, d) => (k in obj ? obj[k] : d)
 
 // dash-v1: the tabs; the first build's step and answers are no longer read. loom-fixes: My setup is out (his words,
 // Loom 3:22), so a stored 'my_setup' opens the Dashboard
-test('first open: the Dashboard tab, Helper\'s window 460 px wide', () => {
-  assert.deepEqual(TAB_IDS, ['dashboard', 'learn'])
-  assert.deepEqual(readState(store({})), { tab: 'dashboard', helperWidth: 460 })
-  assert.deepEqual(readState(store({ tab: 'my_setup' })), { tab: 'dashboard', helperWidth: 460 })
+test('first open: Helper\'s window 460 px wide; no tab is read (loom2: the page is the Dashboard), a stored tab changes nothing', () => {
+  assert.deepEqual(readState(store({})), { helperWidth: 460 })
+  for (const tab of ['learn', 'my_setup', 'dashboard']) assert.deepEqual(readState(store({ tab })), { helperWidth: 460 })
 })
 
 test('remembered values come back, the dragged width too', () => {
-  for (const tab of TAB_IDS) assert.deepEqual(readState(store({ tab, helperWidth: 512 })), { tab, helperWidth: 512 })
+  assert.deepEqual(readState(store({ tab: 'learn', helperWidth: 512 })), { helperWidth: 512 })
 })
 
 test('junk in storage falls back to the defaults; a width outside 360 to 600 is brought inside; the first build\'s tabs open the Dashboard', () => {
   const s = readState(store({ tab: 'x', step: 99, answers: 'o_phone', helperWidth: 'wide' }))
-  assert.deepEqual(s, { tab: 'dashboard', helperWidth: 460 })
-  for (const tab of ['setup', 'yours']) assert.equal(readState(store({ tab })).tab, 'dashboard')
+  assert.deepEqual(s, { helperWidth: 460 })
   assert.equal(readState(store({ helperWidth: 90 })).helperWidth, 360)
   assert.equal(readState(store({ helperWidth: 4000 })).helperWidth, 600)
   assert.equal(readState(store({ helperWidth: 400.6 })).helperWidth, 401)
@@ -31,7 +29,7 @@ test('junk in storage falls back to the defaults; a width outside 360 to 600 is 
 
 test('what the old helper header stored (side, hidden or closed, chat log) is no longer read', () => {
   const s = readState(store({ side: 'left', helper: 'closed', chatlog: true }))
-  assert.deepEqual(Object.keys(s).sort(), ['helperWidth', 'tab'])
+  assert.deepEqual(Object.keys(s).sort(), ['helperWidth'])
 })
 
 test('every key the plugin stores is on the allowed list: about the person, only the one record of what Helper keeps', () => {
@@ -40,7 +38,7 @@ test('every key the plugin stores is on the allowed list: about the person, only
   // (changes-14: Helper has said hello; true or nothing; last-reset, Lead 11 Nov: removed by Forget all, a full reset).
   // (dash-v1: the Dashboard stores nothing; the step list's step and answers left with it)
   // loom-fixes (Lead's point 17): 'talk', the last 50 lines of the conversation (src/talk-keep.js), and 'helperHidden'
-  assert.deepEqual([...STORED_KEYS].sort(), ['helperHidden', 'helperWidth', 'kept', 'met', 'tab', 'talk'])
+  assert.deepEqual([...STORED_KEYS].sort(), ['helperHidden', 'helperWidth', 'kept', 'met', 'talk'])
   const dir = path.resolve(import.meta.dirname, '..', 'src')
   const found = new Set()
   let calls = 0

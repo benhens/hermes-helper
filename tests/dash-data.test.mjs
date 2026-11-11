@@ -166,6 +166,9 @@ test('the built data: "No chats with this bot yet" is not in it (Lead: not shown
   assert.doesNotMatch(built, /No chats with this bot yet|not_seen|docs words, not seen|seen_note|"note"/)
   // loom2: Activity is out (his Loom, 0:05): none of its words are built in
   assert.equal(DASH_DATA.words.activity, undefined)
+  // loom2: no tabs: neither the tab names nor Learn's line are built in
+  for (const k of ['tabs', 'tabListLabel', 'notBuilt']) assert.equal(DASH_DATA.words[k], undefined, k)
+  assert.doesNotMatch(built, /"Learn"|Nothing here yet/)
   assert.doesNotMatch(built, /This bot's activity|Last used/)
   const personality = DATA.items.find(i => i.id === 'personality')
   assert.deepEqual(personality.steps.map(s => s.src === null), [false, false, true, false, true])

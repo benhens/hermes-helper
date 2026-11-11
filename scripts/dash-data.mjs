@@ -152,9 +152,7 @@ export function slimDashData(data) {
     })),
     total: data.items.filter(i => i.on_path === true).length,
     words: {
-      tabs: w.tabs,
-      tabListLabel: w.tab_list_label,
-      notBuilt: w.not_built,
+      // loom2: no tabs (Learn is out, his Loom of 11 Nov, 1:51): the tab names and Learn's line are not built in
       stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
       helperWindow: pickWords(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no']),
       // loom2: Activity is out (his Loom of 11 Nov, 0:05 "just take it out"): its words are not built in

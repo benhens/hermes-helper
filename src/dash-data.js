@@ -358,12 +358,6 @@ export const DASH_DATA = {
   ],
   "total": 10,
   "words": {
-    "tabs": {
-      "dashboard": "Dashboard",
-      "learn": "Learn"
-    },
-    "tabListLabel": "Helper tabs",
-    "notBuilt": "Nothing here yet. What is ready is on Dashboard.",
     "stats": {
       "bots_one": "bot",
       "bots": "bots",

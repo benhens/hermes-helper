@@ -13,14 +13,14 @@
 import { host, Button, Codicon, Textarea, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
-import { K, T, cx, TAB_LOOK, TAB_LOOKS } from './look.js'
+import { K, T, cx } from './look.js'
 import { TALK_CSS } from './talk-css.js'
 import { Character } from './character.js'
 import { RISE, expressionFor, asksQuestion, makeBusy } from './expressions.js'
 import { makeEyes } from './eyes.js'
 import { makeRevealClock, wordsOf } from './reveal.js'
 import { prefersReducedMotion, watchReducedMotion } from './motion.js'
-import { readState, TAB_IDS } from './state.js'
+import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS, NO_MODEL_LINE } from './model-status.js'
 import { askModel, failLines, FAIL_LINES } from './model-call.js'
 import { chatCall, chatHello, chatBack, chatHoldsBack } from './chat.js'
@@ -47,9 +47,8 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-// dash-v1: the tabs, their names from the Dashboard's data (content/dash-words-v1.json page_words). loom-fixes: two,
-// Dashboard and Learn (My setup is out: his words, Loom 3:22). Only Dashboard is built: Learn shows one quiet line.
-export const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
+// loom2 (his Loom of 11 Nov, 1:51 "take out the learn and just have this set up"): no tabs. With only the Dashboard
+// left there is no tab row: the page is the Dashboard. A stored tab ('learn', or an older name) is not read.
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
 // function is made once, so React doesn't detach and re-attach it on every render; React calls it
@@ -506,7 +505,6 @@ export function makePage(ctx, opts = {}) {
 
   return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
-    const [tab, setTab] = useState(initial.tab)
     // The width the person dragged Helper's window to (remembered), and whether Helper is folded
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
@@ -556,8 +554,8 @@ export function makePage(ctx, opts = {}) {
     const width = size.width
     const [modelStatus, recheckModel] = useModelStatus()
     live.recheck = () => recheckModel(true)
-    // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
-    const dashboard = useDashboard({ active: tab === 'dashboard' })
+    // dash-v1: the Dashboard's state, read again each time the page is put on screen (src/dash.js; loom2: no tabs)
+    const dashboard = useDashboard({ active: true })
     live.profile = dashboard.given
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
@@ -577,20 +575,7 @@ export function makePage(ctx, opts = {}) {
     const stripButton = useRef(null)
     // Where a drag of Helper's edge began: { x, width }.
     const drag = useRef(null)
-    // One ref function per tab, made once (like useOwnSize's), kept with the tab buttons.
-    const tabRefs = useRef(null)
-    if (!tabRefs.current) {
-      const els = {}
-      tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
-    }
-
-    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded: folded || hidden })
-
-    const keep = (key, setter) => value => {
-      setter(value)
-      ctx.storage.set(key, value)
-    }
-    const saveTab = keep('tab', setTab)
+    const fit = layoutFor({ width, height: size.height, tab: 'dashboard', helperWidth, folded: folded || hidden })
 
     // The message box takes the keyboard when asked to (a pick, Helper
     // opened from its strip); a request that finds no box is dropped, so it can't steal focus later.
@@ -1156,67 +1141,17 @@ export function makePage(ctx, opts = {}) {
       ctx.storage.set('helperWidth', final)
     }
 
-    /* ---------- header: the two text tabs ---------- */
-    // Arrow keys move between the tabs, Home and End go to the first and last (DESIGN.md,
-    // Keyboard: one entry point at the selected tab; WAI-ARIA tabs pattern).
-    function onTabKey(e, index) {
-      const last = TABS.length - 1
-      const to = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index === 0 ? last : index - 1, Home: 0, End: last }[e.key]
-      if (to === undefined) return
-      e.preventDefault()
-      const next = TABS[to].id
-      saveTab(next)
-      const el = tabRefs.current.els[next]
-      if (el) el.focus()
-    }
+    /* ---------- header: loom2, no tabs; the header keeps the room under Hermes's title bar ---------- */
+    const header = jsx('div', { className: K.head, 'data-hh': 'header' })
 
-    // the tab names' look: one value in src/look.js (TAB_LOOK)
-    const tabLook = TAB_LOOKS[TAB_LOOK]
-    const tabRow = jsx('div', {
-      className: K.tabs,
-      role: 'tablist',
-      'aria-label': DASH_DATA.words.tabListLabel,
-      'data-hh': 'tabs',
-      children: TABS.map((t, i) => {
-        const on = tab === t.id
-        return jsx(
-          'button',
-          {
-            type: 'button',
-            role: 'tab',
-            id: `hh-tab-${t.id}`,
-            'aria-selected': on,
-            'aria-controls': 'hh-tabpanel',
-            tabIndex: on ? 0 : -1,
-            'data-active': on,
-            className: cx(tabLook.tab, on ? tabLook.on : tabLook.idle),
-            ref: tabRefs.current.set[t.id],
-            onClick: () => saveTab(t.id),
-            onKeyDown: e => onTabKey(e, i),
-            children: jsx('span', { className: on ? tabLook.labelOn : tabLook.label, children: t.label })
-          },
-          t.id
-        )
-      })
-    })
-
-    const header = jsx('div', { className: K.head, 'data-hh': 'header', children: tabRow })
-
-    /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
-    const panel =
-      tab === 'dashboard'
-        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
-        : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
+    /* ---------- the page: the Dashboard ---------- */
+    const panel = renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
 
     const main = jsx(
       'main',
       {
         className: K.detail,
         'data-hh': 'detail',
-        // The tabs' panel (the tabs point here with aria-controls).
-        role: 'tabpanel',
-        id: 'hh-tabpanel',
-        'aria-labelledby': `hh-tab-${tab}`,
         children: jsx('div', { className: K.detailScroll, 'data-hh': 'scroll', children: panel })
       },
       'main'
@@ -1409,7 +1344,7 @@ export function makePage(ctx, opts = {}) {
           )
         : null
 
-    // The left side: the tabs, and under them the open tab.
+    // The left side: the room under the title bar, and under it the Dashboard.
     const left = jsxs(
       'div',
       {
