@@ -21696,8 +21696,10 @@ function makePage(ctx, opts = {}) {
         }
         // setup-chat (hhtech-live-run section 6 point 1, live-run2 and ask-run: with no AI that answers Helper's calls,
         // every message still tried one, each failing at once): a call that fails makes no AI answer for this visit, so
-        // no further call is tried and no dots show. (Hermes's own check said a model was ready there: its free model
-        // answers chats, while llm.oneshot for Helper's task had no provider; only the call itself tells.)
+        // no further call is tried and no dots show. Why the model check let them through is NOT found: the page already
+        // makes no call unless setup.runtime_check said ok (liveWhyNot), so in hhtech's home D that check must have
+        // said ok while llm.oneshot had no provider; what it answered there is in no record the Builder can read.
+        // So the first call of a visit is still tried (dots once); asked of Lead in the report.
         return p
           .catch(err => {
             visit.aiOff = true
