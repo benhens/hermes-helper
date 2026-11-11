@@ -1,14 +1,15 @@
 // normal-chat (Pēteris's second Loom of 11 Nov 2026: "Have it as a normal chatbot. ... And he has a bunch of
 // resources."): every message the person types, after the name question, goes to their own model in one call. The
 // call carries Helper's instructions, the best 5 chunks of the Hermes docs for the message (simple keyword scoring,
-// no outside service), the last 6 lines of the conversation and the new message. The reply is shown as written.
+// no outside service), the last 10 lines of the conversation and the new message. The reply is shown as written
+// (chat-fix: without its marks in double square brackets, which become buttons: chatParts).
 import { DOCS_CHUNKS } from './docs-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
 
 export const CHAT_MAX_TOKENS = 900
 export const CHAT_CHUNKS = 5
-export const CHAT_LAST_LINES = 6
+export const CHAT_LAST_LINES = 10
 const CHAT_LINE_CHARS = 600
 const CHAT_MESSAGE_CHARS = 2000
 export const CHAT_TEMPERATURE = 0.3
@@ -17,20 +18,85 @@ export const CHAT_TEMPERATURE = 0.3
 export const chatHello = name => (name ? `Nice to meet you, ${name}. ` : '') + 'Ask me anything about Hermes, and I’ll tell you how.'
 export const chatBack = name => `Hi again${name ? ', ' + name : ''}. Ask me anything about Hermes.`
 
-export const CHAT_INSTRUCTIONS = `You are Helper. You live inside the Hermes Desktop app and help newcomers set up and use Hermes, an AI agent app by Nous Research.
+// chat-fix (his words on build 11f4eda, 11 Nov 2026: "The answer is not friendly at all. It should help him step by
+// step."): the nine set-up cards of the Dashboard, by id, with the subject the model is told for each. The ids are the
+// Dashboard's own (content/dash-setup-list-v2.json; tests/chat-fix.test.mjs holds the two lists together).
+export const CHAT_CARDS = [
+  ['model', 'the AI model or provider Hermes thinks with: choosing one, changing it, a free one'],
+  ['first_chat', 'the first chat with Hermes, trying it out'],
+  ['personality', 'the personality: the short text that tells Hermes who it is and how to talk'],
+  ['chat_apps', 'talking to Hermes from Telegram, Discord or another chat app on a phone'],
+  ['tools_apps', 'tools (actions Hermes can take) and outside apps such as Gmail'],
+  ['skills', 'skills: written know-how that teaches Hermes one task'],
+  ['memory', 'memory: what Hermes remembers between chats, and memory providers such as Hindsight'],
+  ['second_bot', 'a second bot (a profile): one more separate Hermes with its own name, memory and skills'],
+  ['safety', 'safety: Hermes asking first before it runs anything risky']
+]
+export const CHAT_QUICK_MAX = 3
+
+export const CHAT_INSTRUCTIONS = `You are Helper. You live inside the Hermes Desktop app and help a newcomer set up and use Hermes, an AI agent app by Nous Research. Talk like a patient friend who knows Hermes well: warm, plain words, never a manual.
 
 How to answer:
-- Answer the question the person actually asked, with the concrete how: the exact command to paste, or the exact place to click in the app (menu, page, button names).
-- When there are several steps, give them as a numbered list, one action per step. Put commands, file names and settings in \`code\`.
+- Keep every reply short: at most about 80 words. No headings, no tables, no long lists. Leave out config-file names and setting names unless the person has to type them.
+- Go one step at a time. When the answer takes several steps, first say in one line what you will do together and how many steps it takes ("This takes 3 short steps. Here's the first."). Then give ONLY the first step: exactly what to click or what to type, with anything to type in \`code\`. End with a short check such as "Tell me when that's done, or tell me what you see." Give the next step in your next reply; the conversation so far shows which step they are on. If they say it didn't work, help with that step before going on.
+- For "What is X?": say what it is in one or two plain sentences, then where it is in the app (the exact place to click), then what to do first.
+- When the question has two readings that change the answer (for example "Claude" can mean the Claude app or Claude Code), don't assume: ask which one first, and give the choices as quick replies.
+- Quick replies: you may end a reply with up to three choices on one last line, each in double square brackets, like this: [[Claude Code]] [[The Claude app]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
+- Dashboard cards: Helper's Dashboard has nine set-up cards, each with its steps and a place for a video. When the question is about one of these subjects, end your reply with [[card:ID]] on its own line, with that card's id (one card at most):
+${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
 - Use the doc excerpts you are given. They come from the Hermes docs. When they don't cover the question, say so in one line, give your best short answer, and point to the closest docs page.
-- When the question has two readings that need different answers (for example "Claude" can mean the Claude app or Claude Code), answer the more likely one, then say in one line what to do for the other.
-- Use plain words and keep it short. If you must use a technical word, explain it in a few plain words the first time.
 - Don't invent commands, settings or menu names that are not in the excerpts. If you are not sure, say so.
 - Never ask for an API key, password or token, and never repeat one. If the person needs a key, tell them where in the app to put it (Settings), not to send it in the chat.
-- Don't greet, don't ask the person's name, and don't end with a question unless you truly need one answer to help.
-- End with a line "Read more:" followed by one to three links, each taken from the URL lines of the excerpts, as markdown links [page title](URL).
+- Don't greet and don't ask the person's name.
+- Add a line "Read more:" with one or two links only on your first reply about a topic and on the last step. Take each link from the URL lines of the excerpts, as a markdown link [page title](URL).
 
-Write in markdown: short paragraphs, numbered steps, \`code\` for anything to type.`
+Write in markdown: short paragraphs, \`code\` for anything to type.`
+
+// The model's reply, taken apart: the words to show, and its marks in double square brackets, which are never shown.
+//   [[card:<id>]]            one of the nine cards (the first known one; an unknown id is dropped)
+//   [[do:...]]               an action Helper offers to run; dropped here
+//   [[A]] [[B]] at a line's end   quick replies, at most three: buttons under the reply
+// Any other pair of double brackets in the words loses its brackets and keeps its words. Text to type is left alone:
+// a code block between \`\`\` lines, and \`code\` inside a line (a shell test is written [[ -f file ]]).
+const CHAT_MARK = /\[\[([^\[\]\n]{1,80})\]\]/g
+export function chatParts(reply) {
+  let card = null
+  const quick = []
+  let fenced = false
+  const out = []
+  for (const line of String(reply || '').split('\n')) {
+    if (/^\s*```/.test(line)) {
+      fenced = !fenced
+      out.push(line)
+      continue
+    }
+    if (fenced) {
+      out.push(line)
+      continue
+    }
+    let l = line.replace(/\[\[\s*(card|do)\s*:([^\[\]\n]{0,80})\]\]/gi, (m, kind, what) => {
+      const id = what.trim().toLowerCase()
+      if (kind.toLowerCase() === 'card' && !card && CHAT_CARDS.some(c => c[0] === id)) card = id
+      return ''
+    })
+    const tail = l.match(/(?:\s*\[\[[^\[\]\n`]{1,80}\]\])+\s*$/)
+    if (tail) {
+      for (const m of tail[0].matchAll(CHAT_MARK)) {
+        const t = m[1].replace(/\s+/g, ' ').trim()
+        if (t && quick.length < CHAT_QUICK_MAX && !quick.includes(t)) quick.push(t)
+      }
+      l = l.slice(0, tail.index)
+    }
+    l = l
+      .split('`')
+      .map((part, i) => (i % 2 ? part : part.replace(CHAT_MARK, '$1')))
+      .join('`')
+    // a line that held only marks is gone with them
+    if (line.trim() && !l.trim()) continue
+    out.push(l.replace(/\s+$/, ''))
+  }
+  return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), quick, card }
+}
 
 // ---- the docs: words of each chunk, counted once on the first message ----
 const CHAT_STOP = new Set('a an and are as at be but by can do does for from how i if in into is it its me my of on or so that the then this to was we what when where which who why will with you your hermes please want need get use using able would could should there their them they about just like also any some one'.split(' '))
@@ -126,7 +192,7 @@ export function chatHoldsBack(text) {
   return CHAT_SECRET_STEPS.includes(step) || (CHAT_WEAK_STEPS.includes(step) && t.split(/\s+/).some(w => CHAT_KEYISH.test(w) && !/^https?:/.test(w)))
 }
 
-// The last 6 lines of this visit, oldest first, as "Person: ..." / "Helper: ...". Lines marked send: false (the
+// The last 10 lines of this visit, oldest first, as "Person: ..." / "Helper: ...". Lines marked send: false (the
 // name question and its answer, a key's line) and secret-looking lines are left out.
 export function chatLines(log, names = []) {
   const out = []

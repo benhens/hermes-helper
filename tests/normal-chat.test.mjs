@@ -55,7 +55,9 @@ test('one call per message: task helping_hand, no session, 900 tokens, the messa
   assert.equal(p.task, 'helping_hand')
   assert.equal(p.max_tokens, 900)
   assert.equal('session_id' in p, false)
-  assert.ok(p.instructions.length < 2500, `instructions ${p.instructions.length} characters`)
+  // (chat-fix: the instructions grew with the step-by-step rules, the quick replies and the nine cards: 3,362
+  // characters; the limit keeps them from growing unseen)
+  assert.ok(p.instructions.length < 4500, `instructions ${p.instructions.length} characters`)
   assert.match(p.input, /New message from the person:\nHow can I move from Claude to Hermes\?/)
   assert.match(p.input, /URL: https:\/\/hermes-agent\.nousresearch\.com\/docs\/user-guide\/import-from-other-agents\n/)
   assert.equal((p.input.match(/^URL: /gm) || []).length, 5, 'five chunks')
