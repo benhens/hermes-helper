@@ -156,3 +156,83 @@ test('no model set up: no call, the no-model line', async () => {
   assert.equal(calls(host).length, 0)
   assert.equal(bubbleLine(view), 'CHAT_NO_MODEL')
 })
+
+// ---- after the review (each was found by the reviewer of 9aeb488) ----
+import { click, byData } from './lib/render.mjs'
+
+test('review 2: Clear chat while a call runs and a second message waits: the cleared message gets no reply; the waiting one is answered', async () => {
+  const first = deferred()
+  const { view, host } = await named('Peter', { host: { oneshot: (p, n) => (n === 1 ? first.promise : 'Second answer.') } })
+  send(view, Q)
+  await settle()
+  send(view, 'And from ChatGPT?')
+  await settle()
+  click(byData(helper(view), 'clear-chat'))
+  await settle()
+  click(byData(helper(view), 'clear-yes'))
+  await settle()
+  first.resolve(REPLY)
+  await settle(10)
+  assert.equal(calls(host).length, 2, 'the waiting message is still sent')
+  assert.equal(bubbleLine(view), 'CHAT')
+  assert.match(shownText(bubble(view)), /^Second answer\.$/)
+  assert.ok(!olds(view).some(o => /importer/.test(shownText(o))), 'the cleared question\'s reply is not shown')
+})
+
+test('review 1: a question typed in place of the name is never among a later call\'s lines', async () => {
+  const { view, host } = await open(mode, { host: { oneshot: () => 'Answer.' } })
+  finish(view)
+  send(view, 'Zelda. how do I connect telegram?')
+  await settle()
+  send(view, 'and discord?')
+  await settle()
+  assert.equal(calls(host).length, 2)
+  assert.doesNotMatch(calls(host)[1].input, /zelda/i)
+})
+
+test('review 3: "forget everything" typed gets Helper\'s own Yes / No, no call', async () => {
+  const { view, host } = await named('Peter', { host: { oneshot: () => REPLY } })
+  send(view, 'forget everything')
+  await settle()
+  assert.equal(calls(host).length, 0)
+  assert.ok(labels(view).length >= 2, `Yes / No to pick (${labels(view).join(' / ')})`)
+})
+
+test('review 5: "api key = abcd1234efgh5678" makes no call; "How do I set my API key?" does', async () => {
+  const { view, host } = await named('Peter', { host: { oneshot: () => 'Answer.' } })
+  send(view, 'api key = abcd1234efgh5678')
+  await settle()
+  assert.equal(calls(host).length, 0)
+  send(view, 'How do I set my API key?')
+  await settle()
+  assert.equal(calls(host).length, 1)
+})
+
+test('review 4: a link to anything but the Hermes docs is shown as its words only, with no address', async () => {
+  const { view } = await named('Peter', { host: { oneshot: () => 'See [this page](https://example.com/x) and [the docs](https://hermes-agent.nousresearch.com/docs/user-guide/sessions).' } })
+  send(view, Q)
+  await settle()
+  const links = all(bubble(view), n => n.props['data-hh'] === 'md-link')
+  assert.deepEqual(links.map(l => l.props.href), ['https://hermes-agent.nousresearch.com/docs/user-guide/sessions'])
+  assert.match(shownText(bubble(view)), /See this page and the docs ?\./)
+  assert.ok(!all(bubble(view), n => n.props && n.props.href === 'https://example.com/x').length)
+})
+
+test('review 2: a waiting message that Clear chat took away is not sent', async () => {
+  const first = deferred()
+  const { view, host } = await named('Peter', { host: { oneshot: (p, n) => (n === 1 ? first.promise : 'Later answer.') } })
+  send(view, Q)
+  await settle()
+  send(view, 'And from ChatGPT?')
+  await settle()
+  send(view, 'And from Cursor?')
+  await settle()
+  click(byData(helper(view), 'clear-chat'))
+  await settle()
+  click(byData(helper(view), 'clear-yes'))
+  await settle()
+  first.resolve(REPLY)
+  await settle(10)
+  assert.equal(calls(host).length, 2, 'the first call, then only the message still on screen')
+  assert.match(calls(host)[1].input, /New message from the person:\nAnd from Cursor\?/)
+})

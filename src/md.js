@@ -84,8 +84,3 @@ export function mdBlocks(text) {
   return blocks
 }
 
-// The reply as plain words (for the screen reader's line and the kept conversation)
-export const mdPlain = text =>
-  mdBlocks(text)
-    .map(b => (b.kind === 'code' ? b.text : b.kind === 'ol' || b.kind === 'ul' ? b.items.map(p => p.map(x => x.text).join('')).join('\n') : b.parts.map(x => x.text).join('')))
-    .join('\n')

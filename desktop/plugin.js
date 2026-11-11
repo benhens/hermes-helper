@@ -24307,20 +24307,28 @@ function pickChunks(message, count = CHAT_CHUNKS, chunks = DOCS_CHUNKS) {
 // ---- what is sent ----
 const chatEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 // The name (the kept one and this visit's) is never sent: each whole-word use, in any capitals, becomes "[name]".
+// (review finding 7) each word of a name too, so "Zelda" goes when the kept name is "Zelda Smith" or "Hello! Zelda"
 function withoutNames(text, names = []) {
   let t = String(text)
-  for (const n of names) {
-    if (typeof n !== 'string' || !n.trim()) continue
-    t = t.replace(new RegExp('(^|[^\\p{L}\\p{N}])' + chatEsc(n.trim()) + '(?=$|[^\\p{L}\\p{N}])', 'giu'), '$1[name]')
-  }
+  const words = names.filter(n => typeof n === 'string' && n.trim()).flatMap(n => [n.trim(), ...n.split(/[^\p{L}\p{N}'-]+/u).filter(w => Array.from(w).length >= 2)])
+  for (const n of [...new Set(words)].sort((a, b) => b.length - a.length)) t = t.replace(new RegExp('(^|[^\\p{L}\\p{N}])' + chatEsc(n) + '(?=$|[^\\p{L}\\p{N}])', 'giu'), '$1[name]')
   return t
 }
 // A message the secret rule holds back: never sent, never in a later call's lines. A key's shape (today's K1 rule),
 // a long run of digits, or a secret word (password, token ...) with a value or with "is ..." after it. The rule's
 // weaker steps (a "maybe" word such as key with any value, a label and a value, many plain words in a row) are left
 // out here, because they hold back ordinary questions: "How do I set my API key?" is a "maybe word and a value".
+// (review finding 5) the weaker steps do hold a message back when it also has a long run of letters mixed with digits
+// (12 or more, as a key or password has), such as "api key = abcd1234efgh5678"
 const CHAT_SECRET_STEPS = ['key pattern', 'long number', 'secret word and a value', 'secret word, is, and a word']
-const chatHoldsBack = text => looksLikeKey(text) || CHAT_SECRET_STEPS.includes(looksSecret(String(text)))
+const CHAT_WEAK_STEPS = ['maybe word and a value', 'label, is, and a value']
+const CHAT_KEYISH = /^(?=\S*\p{N})(?=\S*\p{L})\S{12,}$/u
+function chatHoldsBack(text) {
+  const t = String(text)
+  if (looksLikeKey(t)) return true
+  const step = looksSecret(t)
+  return CHAT_SECRET_STEPS.includes(step) || (CHAT_WEAK_STEPS.includes(step) && t.split(/\s+/).some(w => CHAT_KEYISH.test(w) && !/^https?:/.test(w)))
+}
 
 // The last 6 lines of this visit, oldest first, as "Person: ..." / "Helper: ...". Lines marked send: false (the
 // name question and its answer, a key's line) and secret-looking lines are left out.
@@ -31510,12 +31518,6 @@ function mdBlocks(text) {
   return blocks
 }
 
-// The reply as plain words (for the screen reader's line and the kept conversation)
-const mdPlain = text =>
-  mdBlocks(text)
-    .map(b => (b.kind === 'code' ? b.text : b.kind === 'ol' || b.kind === 'ul' ? b.items.map(p => p.map(x => x.text).join('')).join('\n') : b.parts.map(x => x.text).join('')))
-    .join('\n')
-
 // ---- src/talk-view.js ----
 // The parts of Helper's conversation window (design/talk-r5: option 4, the things to pick inside the
 // message box), drawn from plain data. page.js holds the conversation and decides what is said;
@@ -31598,7 +31600,7 @@ const MdParts = parts =>
         ? jsx('strong', { children: p.text }, i)
         : p.t === 'i'
           ? jsx('em', { children: p.text }, i)
-          : p.t === 'a'
+          : p.t === 'a' && isHermesDocsUrl(p.href)
             ? jsx(
                 'a',
                 {
@@ -31608,7 +31610,7 @@ const MdParts = parts =>
                   title: p.href,
                   onClick: e => {
                     e.preventDefault()
-                    if (/^https?:\/\//.test(p.href)) mdOpen(p.href)
+                    mdOpen(p.href)
                   },
                   children: p.text
                 },
@@ -31616,6 +31618,7 @@ const MdParts = parts =>
               )
             : p.text
   )
+// (review finding 4) a link to anything but the official Hermes docs is shown as its words only: no address on the page
 function Markdown({ text, old = false }) {
   return jsx('div', {
     className: cx(T.md, old && T.mdOld),
@@ -32099,8 +32102,7 @@ function makePage(ctx, opts = {}) {
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
-    const had = k => ['setup_new', 'setup_goal', 'setup_current'].some(x => k[x])
-    void had // normal-chat: the set-up questions are not asked again (there are none)
+    // normal-chat: the set-up questions are not asked again when their answers are deleted (there are none to ask)
     for (const k of Object.keys(m.visit.kept)) delete m.visit.kept[k]
     Object.assign(m.visit.kept, kept)
     m.stored = JSON.stringify(keptToStore(kept))
@@ -32180,12 +32182,16 @@ function makePage(ctx, opts = {}) {
   setMdOpener(url => openHermesDocs(ctx, url))
   // Kept while the plugin is loaded: the messages that wait for their call (one call at a time, in the order typed), and
   // whether a call runs. A message typed while a call runs waits here and is sent after that reply; none is dropped.
-  const chat = { queue: [], running: false }
+  // names: every name seen in this plugin load (the kept one and this visit's), so a Forget all on the settings page does
+  // not let a name that is still in the conversation's lines through (review finding 6). Never stored.
+  const chat = { queue: [], running: false, names: new Set() }
   // Helper's reply goes straight after the message it answers (a message typed meanwhile stays after it)
   const chatPut = (afterId, entry) => {
     const list = memory.log.map(e => (e.opened ? { ...e, opened: false } : e))
     const i = list.findIndex(e => e.id === afterId)
-    memory.log = (i < 0 || i === list.length - 1 ? [...list, entry] : [...list.slice(0, i + 1), entry, ...list.slice(i + 1)]).slice(-LOG_MAX)
+    // (review finding 2) the message is gone (Clear chat or Forget all while its call ran): its reply is dropped too
+    if (i < 0) return
+    memory.log = (i === list.length - 1 ? [...list, entry] : [...list.slice(0, i + 1), entry, ...list.slice(i + 1)]).slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -32196,13 +32202,16 @@ function makePage(ctx, opts = {}) {
   const chatPump = () => {
     if (chat.running || !chat.queue.length) return
     const job = chat.queue.shift()
+    const at = memory.log.findIndex(e => e.id === job.id)
+    // (review finding 2) a waiting message that was cleared away is not sent
+    if (at < 0) return chatPump()
     chat.running = true
     const endBusy = busy.begin()
     const v = memory.visit
-    const names = [v.name, v.kept.name]
-    const at = memory.log.findIndex(e => e.id === job.id)
+    for (const n of [v.name, v.kept.name]) if (typeof n === 'string' && n.trim()) chat.names.add(n.trim())
+    const names = [...chat.names]
     // the lines before this message (a reply to an earlier message is among them; a message typed later is not)
-    const { chunks, ...call } = chatCall(job.text, at >= 0 ? memory.log.slice(0, at) : memory.log, names)
+    const { chunks, ...call } = chatCall(job.text, memory.log.slice(0, at), names)
     const request = (method, params, timeout) => host.request(method, params, timeout)
     Promise.resolve()
       .then(() => askModel({ request, call, recheck: () => checkModel(request, { sleep }), sleep }))
@@ -32904,7 +32913,14 @@ function makePage(ctx, opts = {}) {
         visit.met = true
         writeKept()
         memory.log = memory.log.map(e => (e.send === false ? e : { ...e, send: false }))
-        return chatAsk(shown, pre.name_taken ? nameWithMore(typed)[1] : typed, !pre.name_taken)
+        // (review finding 1) never among a later call's lines: a name the rules did not catch may be in it
+        return chatAsk(shown, pre.name_taken ? nameWithMore(typed)[1] : typed, false)
+      }
+      // "what do you know about me", "forget my name", "forget everything": Helper's own fixed lines and Yes / No, as
+      // before, never the model (review finding 3: the model could say it forgot what was never deleted)
+      if (typedAboutKept(typed)) {
+        const { out: result } = turnParts(typed, visit)
+        if (result && /^A/.test(result.kind)) return answer(result, shown, typed)
       }
       chatAsk(shown, typed, true)
     }
@@ -32979,7 +32995,10 @@ function makePage(ctx, opts = {}) {
       if (next.kind === 'docs') return openHermesDocs(ctx, next.url)
       // normal-chat: Try again under a failed call: the same message once more, as a new message
       if (next.kind === 'retry') {
-        setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true, next: null } : e))))
+        // the failed line loses its button; the message it answered leaves the lines (it is asked again now)
+        const i = memory.log.findIndex(e => e.id === entry.id)
+        const asked = i > 0 && memory.log[i - 1].who === 'you' ? memory.log[i - 1].id : null
+        setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true, next: null } : e.id === asked ? { ...e, send: false } : e))))
         return chatAsk(next.text, next.text, true)
       }
       if (next.kind === 'part') go(next.to)

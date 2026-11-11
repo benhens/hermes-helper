@@ -103,20 +103,28 @@ export function pickChunks(message, count = CHAT_CHUNKS, chunks = DOCS_CHUNKS) {
 // ---- what is sent ----
 const chatEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 // The name (the kept one and this visit's) is never sent: each whole-word use, in any capitals, becomes "[name]".
+// (review finding 7) each word of a name too, so "Zelda" goes when the kept name is "Zelda Smith" or "Hello! Zelda"
 export function withoutNames(text, names = []) {
   let t = String(text)
-  for (const n of names) {
-    if (typeof n !== 'string' || !n.trim()) continue
-    t = t.replace(new RegExp('(^|[^\\p{L}\\p{N}])' + chatEsc(n.trim()) + '(?=$|[^\\p{L}\\p{N}])', 'giu'), '$1[name]')
-  }
+  const words = names.filter(n => typeof n === 'string' && n.trim()).flatMap(n => [n.trim(), ...n.split(/[^\p{L}\p{N}'-]+/u).filter(w => Array.from(w).length >= 2)])
+  for (const n of [...new Set(words)].sort((a, b) => b.length - a.length)) t = t.replace(new RegExp('(^|[^\\p{L}\\p{N}])' + chatEsc(n) + '(?=$|[^\\p{L}\\p{N}])', 'giu'), '$1[name]')
   return t
 }
 // A message the secret rule holds back: never sent, never in a later call's lines. A key's shape (today's K1 rule),
 // a long run of digits, or a secret word (password, token ...) with a value or with "is ..." after it. The rule's
 // weaker steps (a "maybe" word such as key with any value, a label and a value, many plain words in a row) are left
 // out here, because they hold back ordinary questions: "How do I set my API key?" is a "maybe word and a value".
+// (review finding 5) the weaker steps do hold a message back when it also has a long run of letters mixed with digits
+// (12 or more, as a key or password has), such as "api key = abcd1234efgh5678"
 const CHAT_SECRET_STEPS = ['key pattern', 'long number', 'secret word and a value', 'secret word, is, and a word']
-export const chatHoldsBack = text => looksLikeKey(text) || CHAT_SECRET_STEPS.includes(looksSecret(String(text)))
+const CHAT_WEAK_STEPS = ['maybe word and a value', 'label, is, and a value']
+const CHAT_KEYISH = /^(?=\S*\p{N})(?=\S*\p{L})\S{12,}$/u
+export function chatHoldsBack(text) {
+  const t = String(text)
+  if (looksLikeKey(t)) return true
+  const step = looksSecret(t)
+  return CHAT_SECRET_STEPS.includes(step) || (CHAT_WEAK_STEPS.includes(step) && t.split(/\s+/).some(w => CHAT_KEYISH.test(w) && !/^https?:/.test(w)))
+}
 
 // The last 6 lines of this visit, oldest first, as "Person: ..." / "Helper: ...". Lines marked send: false (the
 // name question and its answer, a key's line) and secret-looking lines are left out.

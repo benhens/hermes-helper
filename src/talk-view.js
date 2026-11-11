@@ -28,6 +28,7 @@ import { columnsFor, linesAllowed } from './layout.js'
 import { noteForgotten } from './talk.js'
 import { curlyQuotes } from './quotes.js'
 import { mdBlocks } from './md.js'
+import { isHermesDocsUrl } from './dash.js'
 // A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js), and
 // (talk-live-3) text to type in the paste box's code style (src/reveal.js drawnWords)
 const drawn = (text, asTyped) => drawnWords(curlyQuotes(text, asTyped))
@@ -89,7 +90,7 @@ const MdParts = parts =>
         ? jsx('strong', { children: p.text }, i)
         : p.t === 'i'
           ? jsx('em', { children: p.text }, i)
-          : p.t === 'a'
+          : p.t === 'a' && isHermesDocsUrl(p.href)
             ? jsx(
                 'a',
                 {
@@ -99,7 +100,7 @@ const MdParts = parts =>
                   title: p.href,
                   onClick: e => {
                     e.preventDefault()
-                    if (/^https?:\/\//.test(p.href)) mdOpen(p.href)
+                    mdOpen(p.href)
                   },
                   children: p.text
                 },
@@ -107,6 +108,7 @@ const MdParts = parts =>
               )
             : p.text
   )
+// (review finding 4) a link to anything but the official Hermes docs is shown as its words only: no address on the page
 export function Markdown({ text, old = false }) {
   return jsx('div', {
     className: cx(T.md, old && T.mdOld),
