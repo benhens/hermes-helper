@@ -103,7 +103,7 @@ export function roadShape(width, compact, here, count = DASH_DATA.items.length) 
   const NAMEH = 22
   const YOUH = compact ? 18 : 19
   const RB = compact ? 22 : 26
-  const pad = compact ? 24 : 30
+  const pad = compact ? 16 : 30
   const yu = here >= 0 && here % 2 === 0
   const yd = here >= 0 && here % 2 === 1
   const top = RB + NAMEH + (yu ? YOUH : 0) + 2

@@ -87,6 +87,13 @@ test('the five Helper cannot see are never done, never "here", never counted: al
   }
 })
 
+test('the five stay quiet whatever the flags say: a flag for one of them (no rule gives one) changes nothing', () => {
+  const every = Object.fromEntries(ids.map(id => [id, true]))
+  const p = pathStates(every)
+  for (const id of QUIET) assert.equal(p.states[ids.indexOf(id)], 'quiet', id)
+  assert.deepEqual([p.done, p.total], [6, 6])
+})
+
 test('a read that failed is not known: never shown done, never "here", not counted; the rest still read', () => {
   const p0 = { ...PEOPLE.all, model: FAIL, status: FAIL }
   const f = doneFlags(p0)

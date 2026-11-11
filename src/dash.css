@@ -74,6 +74,7 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}
 .hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}
 .hhd-name{position:absolute;left:50%;transform:translateX(-50%);font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}
+.hhd-compact .hhd-name{font-size:11px;line-height:15px}
 .hhd-done .hhd-name{color:var(--ui-text-secondary)}
 .hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}
 .hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}

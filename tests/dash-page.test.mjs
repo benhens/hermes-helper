@@ -17,7 +17,7 @@ const sessionsOf = {
   // Hermes's own first-run chat only (source local): no day of use
   just_installed: [{ source: 'local', title: 'Getting started', started_at: NOW - 600, last_active: NOW - 500, message_count: 4 }],
   half: [0, 1, 2, 4].map(d => ({ source: 'gui', started_at: NOW - d * DAY, last_active: NOW - d * DAY, message_count: 2 })),
-  all: [...Array.from({ length: 12 }, (_, d) => ({ source: 'gui', started_at: NOW - d * DAY, last_active: NOW - d * DAY, message_count: 2 })), { source: 'cron', started_at: NOW, last_active: NOW, message_count: 2 }, { source: 'telegram', started_at: NOW - 9 * DAY, last_active: NOW - 9 * DAY, message_count: 2 }]
+  all: [...Array.from({ length: 12 }, (_, d) => ({ source: 'gui', started_at: NOW - d * DAY, last_active: NOW - d * DAY, message_count: 2 })), { source: 'cron', started_at: NOW - 30 * DAY, last_active: NOW - 30 * DAY, message_count: 2 }, { source: 'telegram', started_at: NOW - 9 * DAY, last_active: NOW - 9 * DAY, message_count: 2 }]
 }
 const skillsOf = { just_installed: 39, half: 39, all: 44 }
 
