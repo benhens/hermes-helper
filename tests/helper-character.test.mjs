@@ -1,15 +1,18 @@
-// The character on the page (the built plugin, rendered with the stand-ins): where it sits, which
-// expression shows when, Helper's lines appearing word by word, the rising when the helper opens,
-// and reduce motion. The drawing itself is tests/character.test.mjs, the reveal clock
-// tests/reveal.test.mjs, the eyes tests/eyes.test.mjs; the real app run is dev/checks/character-v2-shots.
+// The character on the page (the built plugin, rendered with the stand-ins): where it sits in
+// Helper's conversation window, which expression shows when, the newest sentence appearing word by
+// word in the bubble, the rising when Helper comes on screen, and reduce motion. The drawing
+// itself is tests/character.test.mjs, the reveal clock tests/reveal.test.mjs, the eyes
+// tests/eyes.test.mjs; the conversation tests/talk-window.test.mjs; the real app run is
+// dev/checks/talk-v1.
 // How time passes here: the host's interval never fires by itself; timers.tick() is 120 ms.
 import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData, byLabel, click } from './lib/render.mjs'
-import { withPickedGreeting, PICKED_GREETING } from './lib/picked-greeting.mjs'
-import { LINES } from '../src/steps.js'
-import { NO_MODEL_LINE, NO_MODEL_SMALL } from '../src/model-status.js'
-import { K } from '../src/look.js'
+import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData } from './lib/render.mjs'
+import { openingLine } from '../src/talk.js'
+import { curlyQuotes } from '../src/quotes.js'
+import { T } from '../src/look.js'
+import { TALK_CSS } from '../src/talk-css.js'
+import { CHARACTER_PX, CHARACTER_SMALL_PX } from '../src/layout.js'
 
 function useHost({ runtime = { ok: true, model: 'mock-small' } } = {}) {
   globalThis.__hhHost = {
@@ -22,19 +25,44 @@ function useHost({ runtime = { ok: true, model: 'mock-small' } } = {}) {
   }
 }
 
-async function open({ storage = fakeStorage(), host = {}, change = null, settleFirst = true } = {}) {
+let observers = []
+function fakeResizeObserver() {
+  observers = []
+  globalThis.ResizeObserver = class {
+    constructor(cb) {
+      this.cb = cb
+      this.watching = null
+      observers.push(this)
+    }
+    observe(el) {
+      this.watching = el
+    }
+    disconnect() {
+      this.watching = null
+    }
+  }
+}
+const resize = (view, width, height = 822) => observers.filter(o => o.watching)[0].cb([{ contentRect: { width, height } }])
+
+async function open({ storage = fakeStorage(), host = {}, settleFirst = true, measured = false } = {}) {
   useHost(host)
+  if (measured) fakeResizeObserver()
   const timers = fakeTimers()
-  const { Page } = await registerPlugin(storage, timers, {}, change)
+  const { Page } = await registerPlugin(storage, timers)
   const view = mount(Page)
+  if (measured) byData(view.tree, 'page').props.ref({ id: 'our-page' })
   if (settleFirst) await settle()
   return { view, timers, storage, Page }
 }
 
 const WORDS = n => n.trim().split(/\s+/).length
-const GREETING_WORDS = WORDS(LINES.greeting)
+// as drawn: curly apostrophes (d1ceddc review 3.3, src/quotes.js)
+const OPENING = curlyQuotes(openingLine().text)
+const OPENING_WORDS = WORDS(OPENING)
 const helper = view => byData(view.tree, 'helper')
 const root = view => byData(view.tree, 'page')
+const strip = view => byData(view.tree, 'helper-strip')
+const bubble = view => byData(helper(view), 'bubble')
 const face = view => all(helper(view), n => n.props['data-hh-character'])[0]
 const expression = view => face(view).props['data-expression']
 // 'follow' or 'still': whether the eyes go after the cursor (the drawing tells the eyes code)
@@ -56,43 +84,68 @@ function send(view, words) {
   box(view).props.onChange({ target: { value: words } })
   box(view).props.onKeyDown({ key: 'Enter', shiftKey: false, preventDefault() {} })
 }
+const click = node => node.props.onClick({ preventDefault() {} })
 
 beforeEach(() => {
   delete globalThis.__hhHost
   delete globalThis.matchMedia
+  delete globalThis.ResizeObserver
 })
 afterEach(() => {
   delete globalThis.matchMedia
+  delete globalThis.ResizeObserver
 })
 
-test('where it sits: its own row directly above the message box, at the box\'s left end, over the box\'s top border and in front of it; no thought dots', async () => {
-  const { view } = await open()
+test('where it sits: under the bubble, on the message box, 168 px wide; the piece between bubble and character in its own cell; the answers\' room beside it', async () => {
+  const { view } = await open({ measured: true })
+  resize(view, 1180)
   const kids = helper(view).props.children.filter(Boolean)
-  assert.deepEqual(kids.slice(1).map(k => k.props['data-hh']), ['helper-body', 'character', 'composer'])
-  const row = kids[2]
-  assert.equal(row.props.className, K.characterRow)
-  // left end: nothing pushes it to the right any more
-  assert.doesNotMatch(K.characterRow, /justify-end|items-end|ml-auto/)
-  assert.deepEqual(row.props.style, { position: 'relative', zIndex: 1, paddingLeft: 26, paddingRight: 12, marginBottom: -9.6, pointerEvents: 'none' })
-  // 26 = the message box's own 12 px side padding + 14; -9.6 = the form's 4 px top padding + 5.6 over the border
-  assert.match(K.composerForm, /(^|\s)px-3(\s|$)/)
-  assert.match(K.composerForm, /(^|\s)pt-1(\s|$)/)
-  const drawn = all(row, n => n.props['data-hh-character'])
+  assert.deepEqual(kids.map(k => k.props['data-hh']), ['grip', 'conversation', 'bubble', 'under', 'composer'])
+  const under = kids[3]
+  assert.equal(under.props.className, T.under)
+  const parts = under.props.children.filter(Boolean)
+  assert.deepEqual(parts.map(p => p.props.className), [T.linkCell, T.charSpace, T.character])
+  // the piece between bubble and character: one drawing, in its cell, hidden from screen readers
+  assert.equal(parts[0].props['aria-hidden'], true)
+  assert.equal(all(parts[0], n => n.props['data-hh'] === 'bubble-link').length, 1)
+  const drawn = all(under, n => n.props['data-hh-character'])
   assert.equal(drawn.length, 1)
   assert.equal(drawn[0].props['data-hh-character'], 'face')
-  assert.equal(drawn[0].props.width, 140)
-  assert.equal(drawn[0].props.style.maxWidth, '100%')
+  assert.equal(drawn[0].props.width, CHARACTER_PX)
+  assert.equal(CHARACTER_PX, 168)
   assert.equal(drawn[0].props.style.pointerEvents, 'none')
-  // the 9 Nov dots and the old hand are gone
-  assert.equal(byData(view.tree, 'thought-dots'), null)
-  for (const key of ['thoughtDots', 'thoughtDot1', 'thoughtDot2', 'thoughtDot3']) assert.equal(K[key], undefined, key)
-  assert.equal(all(view.tree, n => n.props['data-pose'] !== undefined).length, 0)
-  // only in the open helper: not in the folded strip
-  click(byLabel(view.tree, 'Hide the helper'))
+  // on the box's top edge, in front of it, by the style sheet alone: 8 of the drawing's 200 units hang below
+  const { FACE } = await import('../src/expressions.js')
+  assert.equal(FACE.view.y + FACE.view.height - FACE.edge, 8)
+  assert.match(TALK_CSS, /\.hh-char\{position:absolute;left:var\(--hh-inset\);bottom:calc\(-8px\*var\(--hh-k\)\);z-index:1;pointer-events:none\}/)
+  assert.equal(under.props.style, undefined, 'nothing about its place is set by the page')
+  // only one character on the page, and none in the folded strip
+  assert.equal(all(view.tree, n => n.props['data-hh-character']).length, 1)
+  resize(view, 540)
+  click(strip(view))
+  assert.equal(helper(view), null)
   assert.equal(all(view.tree, n => n.props['data-hh-character']).length, 0)
 })
 
-test('the helper opens: the character rises and the words wait for it; then they appear one per 120 ms while it talks; on the last word it rests', async () => {
+test('132 px when Helper\'s window is under 420 px wide or the page is under 600 px high; the style sheet is told the same', async () => {
+  const { view } = await open({ measured: true })
+  resize(view, 1180, 822)
+  assert.equal(face(view).props.width, 168)
+  assert.equal(helper(view).props.className, T.win)
+  resize(view, 1180, 590)
+  assert.equal(face(view).props.width, CHARACTER_SMALL_PX)
+  assert.equal(CHARACTER_SMALL_PX, 132)
+  assert.equal(helper(view).props.className, `${T.win} ${T.winSmall}`)
+  // 760 px of page: the step list is numbers only and Helper's window is 392 px
+  resize(view, 760, 822)
+  assert.equal(helper(view).props.style.width, '392px')
+  assert.equal(face(view).props.width, 132)
+  assert.equal(helper(view).props.className, `${T.win} ${T.winTight} ${T.winSmall}`)
+  resize(view, 1180, 822)
+  assert.equal(face(view).props.width, 168)
+})
+
+test('Helper comes on screen: the character rises and the words wait for it; then they appear one per 120 ms while it talks; the opening ends with a question, so it then asks', async () => {
   const { view, timers } = await open({ settleFirst: false })
   assert.equal(face(view).props['data-rising'], true)
   assert.deepEqual(shownWords(view), [0], 'no word before it is up')
@@ -105,11 +158,11 @@ test('the helper opens: the character rises and the words wait for it; then they
   timers.tick()
   assert.equal(expression(view), 'talking', 'the first word is out: it talks')
   assert.deepEqual(shownWords(view), [1])
-  for (let i = 0; i < GREETING_WORDS - 2; i++) timers.tick()
-  assert.equal(expression(view), 'talking', 'one word to go: still talking')
+  for (let i = 0; i < OPENING_WORDS - 2; i++) timers.tick()
+  assert.equal(expression(view), 'talking', 'one word to go: still talking, the question mark is not out yet')
   timers.tick()
-  assert.equal(expression(view), 'resting', 'the last word is out: the mouth stops')
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
+  assert.equal(expression(view), 'asking', 'the last word is out: the mouth stops, the asking face shows')
+  assert.deepEqual(shownWords(view), [OPENING_WORDS])
   assert.equal(wordClock(timers).length, 0, 'the timer runs only while words are appearing')
   assert.equal(face(view).props['data-rising'], undefined)
 })
@@ -120,28 +173,37 @@ test('a screen reader gets the whole line once, from the first moment; the copy 
   redraw(view)
   const [line] = lines(view)
   assert.equal(line.props['data-shown'], 3)
-  assert.equal(spoken(byData(helper(view), 'say')).trim(), LINES.greeting)
-  assert.equal(byData(helper(view), 'say').props['aria-live'], 'polite')
+  assert.equal(spoken(bubble(view)).trim(), OPENING)
+  assert.equal(bubble(view).props['aria-live'], 'polite')
   assert.equal(byData(line, 'said-seen').props['aria-hidden'], true)
-  assert.equal(line.props.className, K.say)
+  assert.equal(line.props.className, T.line)
 })
 
-test('asking: when the last thing Helper said ends with a question mark and all of it is on screen (shown with the picked greeting in a test copy)', async () => {
-  const { view, timers } = await open({ change: withPickedGreeting, settleFirst: false })
-  assert.match(text(helper(view)), /What's your name\?/)
-  assert.equal(expression(view), 'resting', 'the question is not on screen yet: not asking')
+test('the bubble has its final size from the first word: the words not said yet hold their room, unseen', async () => {
+  const { view, timers } = await open({ settleFirst: false })
+  const whole = t => text(byData(lines(t)[0], 'said-seen')).replace(/\s+/g, ' ').trim()
+  assert.equal(whole(view), OPENING, 'before the first word: every word is in the bubble already')
+  assert.equal(byData(lines(view)[0], 'said-rest').props.style.visibility, 'hidden')
   await settle()
-  for (let i = 0; i < RISE_TICKS; i++) timers.tick()
-  assert.equal(expression(view), 'talking')
-  for (let i = 0; i < WORDS(PICKED_GREETING) - 2; i++) timers.tick()
-  assert.equal(expression(view), 'talking', 'the question mark is not out yet')
-  timers.tick()
+  for (let i = 0; i < RISE_TICKS + 4; i++) timers.tick()
+  redraw(view)
+  assert.equal(lines(view)[0].props['data-shown'], 5)
+  assert.equal(whole(view), OPENING, 'half way: the same words, so the same size')
+  assert.equal(text(byData(lines(view)[0], 'said-rest')).trim(), OPENING.split(' ').slice(5).join(' '))
+  root(view).props.onPointerDownCapture({})
+  assert.equal(byData(lines(view)[0], 'said-rest'), null, 'all said: nothing is held back')
+  assert.equal(whole(view), OPENING)
+})
+
+test('asking shows only for a question that is all on screen; a line that ends with a full stop leaves it resting', async () => {
+  const { view, timers } = await open()
+  for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
   assert.equal(expression(view), 'asking')
-  // today's greeting ends with a full stop: the committed build never shows asking for it
-  const today = await open()
-  for (let i = 0; i < RISE_TICKS + GREETING_WORDS; i++) today.timers.tick()
-  assert.equal(expression(today.view), 'resting')
-  assert.doesNotMatch(text(helper(today.view)), /What's your name\?/)
+  send(view, 'please install a skill for me')
+  assert.equal(bubble(view).props['data-line'], 'H1')
+  assert.equal(expression(view), 'talking')
+  root(view).props.onPointerDownCapture({})
+  assert.equal(expression(view), 'resting', 'the line ends with a full stop')
 })
 
 test('typing or pressing the mouse while words appear shows the rest at once and the mouth stops; a lone Shift does not', async () => {
@@ -154,98 +216,71 @@ test('typing or pressing the mouse while words appear shows the rest at once and
     root(view).props.onKeyDownCapture({ key: 'Shift' })
     assert.equal(expression(view), 'talking', 'Shift alone is not typing')
     press(view)
-    assert.deepEqual(shownWords(view), [GREETING_WORDS])
-    assert.equal(expression(view), 'resting')
+    assert.deepEqual(shownWords(view), [OPENING_WORDS])
+    assert.equal(expression(view), 'asking')
     assert.equal(wordClock(timers).length, 0)
   }
 })
 
-test('the person\'s own words appear at once; Helper\'s reply appears word by word; what was said before is not replayed', async () => {
-  const { view, timers } = await open({ storage: fakeStorage({ step: 2, chatlog: true }) })
-  for (let i = 0; i < RISE_TICKS + GREETING_WORDS; i++) timers.tick()
-  assert.equal(expression(view), 'resting')
-  send(view, 'What is a provider?')
-  const items = all(byData(helper(view), 'chatlog'), n => n.type === 'li')
-  assert.deepEqual(items.map(i => i.props['data-who']), ['helper', 'you', 'helper'])
-  // the person's line: a plain paragraph, whole
-  assert.equal(all(items[1], n => n.props['data-hh'] === 'said').length, 0)
-  assert.match(text(items[1]), /What is a provider\?/)
-  assert.equal(all(items[1], n => n.type === 'p')[0].props.className, K.logYou)
-  // Helper's reply: one word at once (nothing to wait for), the rest to come; the greeting stays whole
-  assert.deepEqual(shownWords(view), [GREETING_WORDS, 1])
+test('the person\'s own words appear at once; Helper\'s reply appears word by word in the bubble; what was said before moves up whole and is not replayed', async () => {
+  const { view, timers } = await open()
+  for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
+  send(view, 'Peter')
+  const conv = byData(helper(view), 'conversation-lines').props.children
+  // changes-15: the faint "Kept: Peter." line comes with the name (under the person's message)
+  assert.deepEqual(conv.map(c => c.props['data-hh']), ['old', 'me', 'kept-note'])
+  // the older line and the person's message: plain text, whole, not word by word
+  assert.equal(all(conv, n => n.props['data-hh'] === 'said').length, 0)
+  // (each starts with the words only a screen reader hears: who said it)
+  assert.equal(text(conv[0]).replace(/^Helper said: /, '').trim(), OPENING)
+  assert.equal(text(conv[1]).replace(/^You said: /, '').trim(), 'Peter')
+  // Helper's reply: one word at once (nothing to wait for), the rest to come
+  const reply = 'Nice to meet you, Peter. What do you do?'
+  assert.equal(spoken(bubble(view)).trim(), reply)
+  assert.deepEqual(shownWords(view), [1])
   assert.equal(expression(view), 'talking')
   timers.tick()
   timers.tick()
   assert.equal(expression(view), 'talking')
-  const reply = lines(view)[1].props['data-words']
-  for (let i = 0; i < reply; i++) timers.tick()
-  assert.deepEqual(shownWords(view), [GREETING_WORDS, reply])
-  assert.equal(expression(view), 'resting')
-})
-
-test('a line and its small note: the line first, then the note, word by word (the fact under "Your answer")', async () => {
-  const { view, timers } = await open({ storage: fakeStorage({ step: 2 }) })
-  for (let i = 0; i < RISE_TICKS + GREETING_WORDS; i++) timers.tick()
-  click(all(byData(view.tree, 'detail'), n => n.props['data-option'] === 'o_key')[0])
-  const [line, note] = lines(view)
-  assert.equal(line.props.className, K.say)
-  assert.equal(note.props.className, K.caption)
-  assert.match(spoken(line), /^\s*Your answer: /)
-  assert.deepEqual(shownWords(view), [1, 0])
-  for (let i = 0; i < line.props['data-words'] - 1; i++) timers.tick()
-  assert.equal(expression(view), 'talking', 'the note is still to come')
-  timers.tick()
-  for (let i = 0; i < note.props['data-words'] - 1; i++) timers.tick()
-  assert.equal(expression(view), 'resting')
-  assert.deepEqual(shownWords(view), [line.props['data-words'], note.props['data-words']])
-  // the source tag under the note is there from the start (links and buttons are never held back)
-  assert.equal(all(byData(helper(view), 'say'), n => n.props['data-hh'] === 'source').length, 1)
-})
-
-test('no model: the model-check line and its small note are revealed too, and "Check again" is there from the start', async () => {
-  const { view, timers } = await open({ host: { runtime: { ok: false } } })
-  assert.ok(byLabel(helper(view), 'Check again'), 'the button does not wait for the words')
-  const [line, note] = lines(view)
-  assert.equal(spoken(line).trim(), NO_MODEL_LINE)
-  assert.equal(spoken(note).trim(), NO_MODEL_SMALL)
-  for (let i = 0; i < RISE_TICKS + WORDS(NO_MODEL_LINE) + WORDS(NO_MODEL_SMALL); i++) timers.tick()
-  assert.deepEqual(shownWords(view), [WORDS(NO_MODEL_LINE), WORDS(NO_MODEL_SMALL)])
-  assert.equal(expression(view), 'resting')
+  for (let i = 0; i < WORDS(reply); i++) timers.tick()
+  assert.deepEqual(shownWords(view), [WORDS(reply)])
+  assert.equal(expression(view), 'asking')
   assert.equal(wordClock(timers).length, 0)
 })
 
-test('a line is revealed once: a tab change, the Chat log switch, and hiding and showing the helper do not replay it', async () => {
-  const { view, timers } = await open()
-  for (let i = 0; i < RISE_TICKS + GREETING_WORDS; i++) timers.tick()
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
+test('a line is revealed once: a tab change, and folding Helper away and bringing it back, do not replay it', async () => {
+  const { view, timers } = await open({ measured: true })
+  resize(view, 540)
+  for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
+  assert.deepEqual(shownWords(view), [OPENING_WORDS])
   click(tabs(view)[1])
   await settle()
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
+  assert.deepEqual(shownWords(view), [OPENING_WORDS])
   click(tabs(view)[0])
-  all(helper(view), n => n.type === 'sdk:Switch')[0].props.onCheckedChange(true)
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
-  all(helper(view), n => n.type === 'sdk:Switch')[0].props.onCheckedChange(false)
-  click(byLabel(helper(view), 'Hide the helper'))
-  click(byData(view.tree, 'helper-hidden'))
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
+  click(strip(view))
+  assert.equal(helper(view), null)
+  click(strip(view))
+  assert.deepEqual(shownWords(view), [OPENING_WORDS])
   for (let i = 0; i < RISE_TICKS + 2; i++) timers.tick()
-  assert.equal(expression(view), 'resting', 'nothing is said again, so it never talks')
+  assert.equal(expression(view), 'asking', 'nothing is said again, so it never talks')
   assert.equal(wordClock(timers).length, 0)
 })
 
-test('hidden half way through a line: the line is whole when the helper comes back', async () => {
-  const { view, timers } = await open()
+test('folded away half way through a line: the line is whole when Helper comes back', async () => {
+  const { view, timers } = await open({ measured: true })
+  resize(view, 540)
   for (let i = 0; i < RISE_TICKS + 3; i++) timers.tick()
   redraw(view)
   assert.deepEqual(shownWords(view), [4])
-  click(byLabel(helper(view), 'Hide the helper'))
-  click(byData(view.tree, 'helper-hidden'))
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
-  assert.equal(expression(view), 'resting')
+  click(strip(view))
+  click(strip(view))
+  assert.deepEqual(shownWords(view), [OPENING_WORDS])
+  assert.notEqual(expression(view), 'talking')
 })
 
-test('rising happens once per opening of the helper: not on a tab change or a new line; again after Hide and Show, and after Close and Show helper', async () => {
-  const { view, timers } = await open({ settleFirst: false })
+test('rising happens once each time Helper comes on screen: not on a tab change or a new line; again after it was folded away', async () => {
+  const { view, timers } = await open({ settleFirst: false, measured: true })
+  resize(view, 540)
   assert.equal(face(view).props['data-rising'], true)
   await settle() // 0.7 s have passed (the host's timer)
   click(tabs(view)[1])
@@ -253,33 +288,29 @@ test('rising happens once per opening of the helper: not on a tab change or a ne
   assert.equal(face(view).props['data-rising'], undefined, 'a tab change: no rising')
   click(tabs(view)[0])
   assert.equal(face(view).props['data-rising'], undefined)
-  for (let i = 0; i < RISE_TICKS + GREETING_WORDS; i++) timers.tick()
-  send(view, 'hello')
+  for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
+  send(view, 'Peter')
   assert.equal(face(view).props['data-rising'], undefined, 'a new line: no rising')
-  // hide and show: a new opening
-  click(byLabel(helper(view), 'Hide the helper'))
-  click(byData(view.tree, 'helper-hidden'))
+  // folded away and brought back: it comes on screen anew
+  click(strip(view))
+  click(strip(view))
   assert.equal(face(view).props['data-rising'], true)
   assert.equal(wordClock(timers).length, 1, 'the words wait again while it comes up')
   await settle()
   click(tabs(view)[1])
   assert.equal(face(view).props['data-rising'], undefined)
-  // close and "Show helper": a new opening too
-  click(byLabel(view.tree, 'Close the helper'))
-  click(byLabel(view.tree, 'Show helper'))
-  assert.equal(face(view).props['data-rising'], true)
 })
 
-test('leaving the page and coming back: the helper opens again, so it rises again; the greeting is not said again', async () => {
+test('leaving the page and coming back: Helper comes on screen again, so it rises again; the opening is not said again', async () => {
   const first = await open()
-  for (let i = 0; i < RISE_TICKS + GREETING_WORDS; i++) first.timers.tick()
+  for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) first.timers.tick()
   first.view.unmount()
   const second = mount(first.Page)
   assert.equal(face(second).props['data-rising'], true)
-  assert.deepEqual(shownWords(second), [GREETING_WORDS])
+  assert.deepEqual(shownWords(second), [OPENING_WORDS])
   await settle()
   for (let i = 0; i < RISE_TICKS + 2; i++) first.timers.tick()
-  assert.equal(expression(second), 'resting')
+  assert.notEqual(expression(second), 'talking')
   assert.equal(wordClock(first.timers).length, 0)
 })
 
@@ -294,30 +325,25 @@ function fakeReduceMotion(on) {
 
 test('reduce motion: the character is simply there (no rising), each line appears whole, it never talks, and no timer runs', async () => {
   const motion = fakeReduceMotion(true)
-  const { view, timers } = await open({ settleFirst: false })
+  const { view, timers } = await open({ settleFirst: false, measured: true })
+  resize(view, 540)
   assert.ok(motion.asked.includes('(prefers-reduced-motion: reduce)'))
   assert.equal(face(view).props['data-rising'], undefined)
   assert.equal(face(view).props.style.visibility, undefined)
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
-  assert.equal(expression(view), 'resting')
+  assert.deepEqual(shownWords(view), [OPENING_WORDS])
+  assert.equal(expression(view), 'asking', 'the opening is a question: straight to asking')
   assert.equal(wordClock(timers).length, 0)
   assert.equal(eyesNow(view), 'still', 'the eyes stay on the person')
   // the drawing is told, so it snaps and starts no loop (tests/character.test.mjs)
   assert.equal(all(face(view), n => n.props['data-hh'] === 'mouth')[0].props.style.transition, 'none')
   await settle()
-  send(view, 'What is a provider?')
+  send(view, 'please install a skill for me')
   assert.equal(expression(view), 'resting', 'a new line: whole at once, no talking')
   assert.ok(shownWords(view).every((n, i) => n === lines(view)[i].props['data-words']))
   assert.equal(wordClock(timers).length, 0)
-  click(byLabel(helper(view), 'Hide the helper'))
-  click(byData(view.tree, 'helper-hidden'))
-  assert.equal(face(view).props['data-rising'], undefined, 'opened again: still no rising')
-})
-
-test('reduce motion with a question: straight to asking (shown with the picked greeting in a test copy)', async () => {
-  fakeReduceMotion(true)
-  const { view } = await open({ change: withPickedGreeting })
-  assert.equal(expression(view), 'asking')
+  click(strip(view))
+  click(strip(view))
+  assert.equal(face(view).props['data-rising'], undefined, 'on screen again: still no rising')
 })
 
 test('reduce motion is watched: switched on while a line appears, the rest shows at once; switched off, new lines are revealed again', async () => {
@@ -328,14 +354,14 @@ test('reduce motion is watched: switched on while a line appears, the rest shows
   assert.equal(expression(view), 'talking')
   assert.equal(eyesNow(view), 'follow')
   motion.set(true)
-  assert.deepEqual(shownWords(view), [GREETING_WORDS])
-  assert.equal(expression(view), 'resting')
+  assert.deepEqual(shownWords(view), [OPENING_WORDS])
+  assert.equal(expression(view), 'asking')
   assert.equal(eyesNow(view), 'still')
   assert.equal(wordClock(timers).length, 0)
   assert.equal(all(face(view), n => n.props['data-hh'] === 'mouth')[0].props.style.transition, 'none')
   motion.set(false)
   assert.equal(eyesNow(view), 'follow')
-  send(view, 'hello')
+  send(view, 'Peter')
   assert.equal(expression(view), 'talking')
   assert.notEqual(all(face(view), n => n.props['data-hh'] === 'mouth')[0].props.style.transition, 'none')
   view.unmount()
@@ -356,14 +382,15 @@ test('the eyes hear the cursor, the keyboard focus and scrolling from our own ou
   view.unmount()
 })
 
-test('reduce motion switched off later: the helper rises again on its next opening, not in the middle of things', async () => {
+test('reduce motion switched off later: Helper rises again the next time it comes on screen, not in the middle of things', async () => {
   const motion = fakeReduceMotion(true)
-  const { view, timers } = await open()
+  const { view, timers } = await open({ measured: true })
+  resize(view, 540)
   assert.equal(face(view).props['data-rising'], undefined)
   motion.set(false)
   assert.equal(face(view).props['data-rising'], undefined, 'switching the setting does not make it rise there and then')
-  click(byLabel(helper(view), 'Hide the helper'))
-  click(byData(view.tree, 'helper-hidden'))
+  click(strip(view))
+  click(strip(view))
   assert.equal(face(view).props['data-rising'], true)
   await settle()
   for (let i = 0; i < RISE_TICKS; i++) timers.tick()
@@ -371,8 +398,8 @@ test('reduce motion switched off later: the helper rises again on its next openi
   assert.equal(face(view).props['data-rising'], undefined)
 })
 
-test('asking shows also when a press during the rising brought the question out at once (picked greeting, test copy)', async () => {
-  const { view } = await open({ change: withPickedGreeting, settleFirst: false })
+test('asking shows also when a press during the rising brought the question out at once', async () => {
+  const { view } = await open({ settleFirst: false })
   assert.equal(expression(view), 'resting')
   assert.deepEqual(shownWords(view), [0])
   root(view).props.onPointerDownCapture({})
@@ -395,15 +422,15 @@ test('the page is not drawn again for a word: only when talking starts or stops,
   assert.equal(expression(view), 'talking')
   assert.ok(draws > waiting, 'talking starts: the page is drawn')
   const talking = draws
-  for (let i = 0; i < GREETING_WORDS - 2; i++) timers.tick()
-  assert.equal(draws, talking, `${GREETING_WORDS - 2} words appeared and the page was not drawn again`)
+  for (let i = 0; i < OPENING_WORDS - 2; i++) timers.tick()
+  assert.equal(draws, talking, `${OPENING_WORDS - 2} words appeared and the page was not drawn again`)
   timers.tick() // the last word
-  assert.equal(expression(view), 'resting')
+  assert.equal(expression(view), 'asking')
   assert.ok(draws > talking)
 })
 
-// The page's very first draw, before any effect has run: the lines as the page hands them over.
-async function firstDrawLines() {
+// The page's very first draw, before any effect has run: the bubble as the page hands it over.
+async function firstDrawBubbles() {
   useHost()
   const { Page } = await registerPlugin(fakeStorage(), fakeTimers())
   let first = null
@@ -412,32 +439,19 @@ async function firstDrawLines() {
     if (!first) first = drawn
     return drawn
   })
-  return all(first, n => typeof n.type === 'function' && n.type.name === 'Said')
+  return all(first, n => typeof n.type === 'function' && n.type.name === 'Bubble')
 }
 
 test('reduce motion: the line is whole in the very first draw, with no empty moment before it appears', async () => {
   fakeReduceMotion(true)
-  const still = await firstDrawLines()
-  assert.ok(still.length >= 1, 'the greeting is in the first draw')
-  for (const line of still) assert.equal(line.props.fresh, false, 'not fresh: drawn whole at once')
+  const still = await firstDrawBubbles()
+  assert.equal(still.length, 1, 'the opening is in the first draw')
+  assert.equal(still[0].props.fresh, false, 'not fresh: drawn whole at once')
+  assert.equal(still[0].props.said, true)
   // without reduce motion the same first draw holds the words back, to reveal them
   delete globalThis.matchMedia
-  const moving = await firstDrawLines()
-  assert.ok(moving.length >= 1)
-  for (const line of moving) assert.equal(line.props.fresh, true)
-})
-
-test('its width is one constant: the row is pulled down by the drawing\'s own part below the edge, worked out from CHARACTER_PX', async () => {
-  const { FACE } = await import('../src/expressions.js')
-  const belowEdge = FACE.view.y + FACE.view.height - FACE.edge // 8 units of the drawing hang below the box's top edge
-  assert.equal(belowEdge, 8)
-  const { view } = await open()
-  const row = byData(helper(view), 'character')
-  // 4 = the message box form's own top padding (pt-1)
-  assert.equal(row.props.style.marginBottom, -(4 + (belowEdge * 140) / 200))
-  const page = (await import('node:fs')).readFileSync(new URL('../src/page.js', import.meta.url), 'utf8')
-  const lineOf = name => page.slice(page.indexOf(`const ${name} =`), page.indexOf('\n', page.indexOf(`const ${name} =`)))
-  assert.match(lineOf('CHARACTER_ROW'), /marginBottom: -\(4 \+ BELOW_EDGE_PX\)/)
-  assert.match(lineOf('BELOW_EDGE_PX'), /CHARACTER_PX/, 'worked out from the one constant')
-  assert.doesNotMatch(lineOf('CHARACTER_ROW') + lineOf('BELOW_EDGE_PX'), /9\.6|5\.6/, 'not typed in for 140 px')
+  const moving = await firstDrawBubbles()
+  assert.equal(moving.length, 1)
+  assert.equal(moving[0].props.fresh, true)
+  assert.equal(moving[0].props.said, false)
 })

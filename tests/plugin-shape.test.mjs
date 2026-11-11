@@ -130,10 +130,11 @@ test('no keys or credentials, never reads the full config', () => {
   for (const s of STEPS) assert.equal(looksLikeKey(JSON.stringify(s)), false, s.id)
 })
 
-test('helper states: Move, Hide, Close and Show helper all exist', () => {
-  for (const label of ['Move to the left', 'Move to the right', 'Hide the helper', 'Close the helper', 'Show helper']) {
-    assert.ok(code.includes(label), label)
+test('the old helper header is gone from the built file: no Move, Close, "Show helper" or Chat log; the strip can still hide and show Helper', () => {
+  for (const label of ['Move to the left', 'Move to the right', 'Close the helper', "'Show helper'", 'Chat log', 'arrow-swap']) {
+    assert.ok(!code.includes(label), label)
   }
+  for (const label of ['Hide the helper', 'Show the helper']) assert.ok(code.includes(label), label)
 })
 
 test('model names, counts and source tags in normal letters: mono is only for text to paste', () => {
@@ -142,7 +143,12 @@ test('model names, counts and source tags in normal letters: mono is only for te
     assert.doesNotMatch(K[key], /font-mono/, key)
   }
   const mono = Object.entries(K).filter(([, v]) => /font-mono/.test(v)).map(([k]) => k)
-  assert.deepEqual(mono, ['cardPasteText'])
+  // and the text box on Helper's settings page: Hermes's own config-field.tsx draws a JSON value in
+  // mono, and hhdesign drew this box that way (design/talk-r5/settings.html, "like memory.md");
+  // talk v2 look: a line of that box that cannot be read, shown in a mono chip under it (hhdesign's
+  // review of e86b410, section 3 point 3), and text to paste inside Helper's bubble, Hermes's own
+  // small code card (notes-wants.md item 4), large and small
+  assert.deepEqual(mono, ['cardPasteText', 'settingsBox', 'settingsRefusedLine', 'bubblePasteText', 'bubblePasteTextOld'])
 })
 
 test('header clears Hermes\'s title-bar band, where its window buttons float (top-right corner stays empty)', () => {
@@ -168,10 +174,24 @@ function propsOf(text, name) {
   return out
 }
 
-test('every class comes from the Hermes class table: page code writes no class string of its own', () => {
-  for (const f of ['page.js', 'setup-tab.js', 'character.js', 'reveal.js', 'eyes.js', 'expressions.js', 'motion.js', 'main.js']) {
+test('every class comes from the two class tables (K: Hermes\'s own classes; T: our style sheet for Helper\'s window): page code writes no class string of its own', () => {
+  for (const f of ['page.js', 'setup-tab.js', 'character.js', 'reveal.js', 'eyes.js', 'expressions.js', 'motion.js', 'main.js', 'talk-view.js', 'bubble-link.js', 'talk.js', 'layout.js', 'state.js']) {
     assert.doesNotMatch(src(f), /className:\s*['"`]/, `${f} has a literal className`)
-    // cx(...) may hold K values and conditions (side === 'right'), never a class string.
+    // cx(...) may hold K and T values and conditions, never a class string.
+    // A className is a K or T value, a cx(...) of them, or a choice between them: never a class string.
+    for (const m of src(f).matchAll(/className:\s*/g)) {
+      const rest = src(f).slice(m.index + m[0].length)
+      let depth = 0
+      let end = 0
+      for (; end < rest.length; end++) {
+        const c = rest[end]
+        if (c === '(') depth++
+        else if (c === ')' && depth-- === 0) break
+        else if ((c === ',' || c === '}' || c === '\n') && depth === 0) break
+      }
+      const expr = rest.slice(0, end).replace(/[!=]==\s*'[^']*'/g, '')
+      assert.doesNotMatch(expr, /['"`]/, `${f}: className: ${rest.slice(0, end)}`)
+    }
     for (const m of src(f).matchAll(/cx\(([^)]*)\)/g)) {
       const args = m[1].replace(/[!=]==\s*'[^']*'/g, '')
       assert.doesNotMatch(args, /['"`]/, `${f}: cx(${m[1]})`)
@@ -188,18 +208,39 @@ test('two text tabs, Setup and Your setup, in Capabilities\' TextTab look (not t
 })
 
 test('buttons are Hermes Button components; bare <button>s only where Hermes uses them too', () => {
-  // The choice cards (Hermes Chip markup), the text tabs (TextTab is a plain <button>) and the
-  // hidden helper's strip (PaneTab vertical / kanban rail are plain buttons).
+  // On the page: the choice cards (Hermes Chip markup), the text tabs (TextTab is a plain <button>),
+  // Helper's strip (PaneTab vertical / kanban rail are plain buttons) and "Skip" in the message box.
   const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button',\s*\{\s*type: 'button',\s*(['\w-]+)/g)].map(m => m[1])
-  assert.deepEqual(bare.sort(), ["'aria-pressed'", 'className', 'role'])
-  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 3)
+  assert.deepEqual(bare.sort(), ["'aria-pressed'", 'className', 'className', 'role'])
+  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 4)
+  assert.match(src('page.js'), /jsx\('button', \{ type: 'button', className: T\.skip,/)
   assert.doesNotMatch(src('setup-tab.js'), /jsxs?\(\s*'button'/)
+  // In Helper's window (src/talk-view.js): the answers to pick, a button inside the bubble and an
+  // older line's small link are our own shapes from hhdesign's sheet (row 11 of the plan), each a
+  // real <button type="button"> wearing a class of the T table and nothing else.
+  const own = [...src('talk-view.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (T\.\w+|cx\(T\.\w+, a\.more && T\.more\)),/g)].map(m => m[1])
+  // (talk v2: and the links in the faint lines, "See what I keep" and "Change", wearing T.link;
+  // talk v2 look: "More" among the answers also wears T.more)
+  assert.deepEqual(own.sort(), ['T.button', 'T.link', 'T.link', 'T.oldLink', 'cx(T.answer, a.more && T.more)'])
+  assert.equal([...src('talk-view.js').matchAll(/jsxs?\(\s*'button'/g)].length, 5)
+  // Helper's settings page uses Hermes's Button only
+  assert.doesNotMatch(src('settings-page.js'), /jsxs?\(\s*'button'/)
 })
 
 test('every codicon named in the code is in the ICONS list (which hermes-checks.sh checks against Hermes)', () => {
-  const named = ['page.js', 'setup-tab.js', 'main.js'].flatMap(f => [...src(f).matchAll(/(?:name|icon|codicon):\s*'([a-z-]+)'/g)].map(m => m[1]))
-  assert.ok(named.length >= 5, named.join(' '))
+  // A name written straight (name: 'x'), picked between two (name: a ? 'x' : 'y'), or handed out
+  // by talk-view.js's nextIcon().
+  const files = ['page.js', 'setup-tab.js', 'main.js', 'talk-view.js', 'bubble-link.js']
+  const named = files.flatMap(f => [
+    ...[...src(f).matchAll(/(?:name|icon|codicon):\s*'([a-z-]+)'/g)].map(m => m[1]),
+    ...[...src(f).matchAll(/(?:name|icon|codicon):\s*[^,'{}]+\?\s*'([a-z-]+)'\s*:\s*'([a-z-]+)'/g)].flatMap(m => [m[1], m[2]]),
+    ...[...src(f).matchAll(/nextIcon = [^\n]*\?\s*'([a-z-]+)'\s*:\s*'([a-z-]+)'/g)].flatMap(m => [m[1], m[2]])
+  ])
   for (const n of named) assert.ok(ICONS.includes(n), `${n} not in ICONS`)
+  // and the list holds no name the code has stopped using
+  assert.deepEqual([...new Set(named)].sort(), [...ICONS].sort())
+  // every Codicon in these files takes its name in one of those three ways
+  for (const f of files) for (const m of src(f).matchAll(/jsx\(Codicon, \{ name: ([^,}]+)/g)) assert.match(m[1].trim(), /^'[a-z-]+'$|\?\s*'[a-z-]+'\s*:\s*'[a-z-]+'$|^nextIcon\(\w+(\.\w+)?\)$/, `${f}: ${m[0]}`)
 })
 
 test('the step count matches the step list (a mismatch would crash the open step)', () => {
@@ -208,11 +249,10 @@ test('the step count matches the step list (a mismatch would crash the open step
 })
 
 test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s own patterns', () => {
-  // Allowed: tone on a ghost icon button (RoomHeader) and the composer's own send class.
-  // Anything else would restyle Hermes's button.
-  const allowed = new Set([K.iconTone])
+  // Allowed: the composer's own send class. Anything else would restyle Hermes's button.
+  const allowed = new Set()
   const buttons = [...propsOf(src('page.js'), 'Button'), ...propsOf(src('setup-tab.js'), 'Button')]
-  assert.ok(buttons.length >= 12, `found ${buttons.length} Button calls`)
+  assert.ok(buttons.length >= 8, `found ${buttons.length} Button calls`)
   for (const props of buttons) {
     const cls = props.match(/className:\s*(cx\([^)]*\)|[^,\n]+)/)
     if (!cls) continue
@@ -221,7 +261,7 @@ test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s o
     const key = expr.match(/^K\.(\w+)$/)
     assert.ok(key && allowed.has(K[key[1]]), `Button className ${expr}`)
   }
-  for (const key of ['iconTone', 'composerSend']) assert.doesNotMatch(K[key], /(^|\s)(h|w|size|p[xytrbl]?|text-\[)/, key)
+  for (const key of ['composerSend']) assert.doesNotMatch(K[key], /(^|\s)(h|w|size|p[xytrbl]?|text-\[)/, key)
 })
 
 test('the character is one swappable component, used only through <Character>', () => {

@@ -1,0 +1,148 @@
+/* Helper's conversation window: the one style sheet of our own. The build turns this file into
+   src/talk-css.js and the page puts it in a <style> element inside our own page, so it leaves with
+   the page.
+   Rules: every class starts with hh-; every colour is a Hermes variable; no fonts, no shadows
+   (tests/colour-lint.test.mjs, tests/talk-css.test.mjs).
+   Part 1 is copied from hhdesign's design/talk-r5/talk.css (option 4, the things to pick in the
+   message box), rule for rule (the test compares each one with that file). Part 2 is ours: what the
+   design left to the build, each with its reason. */
+
+/* ==== part 1: copied from design/talk-r5/talk.css ==== */
+.hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}
+.hh-win.hh-narrow{--hh-pad:14px}
+.hh-win.hh-small{--hh-char:132px;--hh-k:.66}
+.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}
+.hh-conv>*{flex:none}
+.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}
+.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
+.hh-old-link .codicon{font-size:12px}
+.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}
+.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}
+.hh-note .hh-link{margin-left:10px;white-space:nowrap}
+.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
+.hh-link:hover{text-decoration-color:currentColor}
+.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}
+.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}
+.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}
+.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}
+.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}
+.hh-dots i.hh-on{background:var(--ui-text-secondary)}
+.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}
+.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}
+.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}
+.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}
+.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}
+.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}
+.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}
+.hh-tail-fill{fill:var(--ui-bg-elevated)}
+.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}
+.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}
+.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}
+.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}
+.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}
+.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+.hh-picks{overflow:hidden}
+
+/* ==== part 2: ours ==== */
+/* The window is a column of the page (or lies over it): full height, never squeezed by the page
+   beside it, and the place its grip and character are measured from. --hh-inset: how far the
+   character sits in from the message box's left end. 0, as hhdesign draws it: measured in the
+   running app, the box's corner is round for 4.8 px only and the leftmost finger starts 7.4 px
+   in, so no finger hangs over the corner (docs/build/talk-v1-stage1.md). */
+.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}
+/* In a window too narrow for both sides Helper lies over the page, at full height, beside its
+   strip (the page sets how far in from the right). A hairline marks its left edge there, since
+   it has no shadow and may lie on a fill close to its own. */
+.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}
+/* The conversation so far scrolls when it is full. The outer box stacks from its bottom
+   (column-reverse), so it starts at its newest, the top of a long conversation can still be
+   reached, and it stays at its newest when the bubble or the message box grows and its room
+   shrinks: nothing scrolls it frame by frame while the box grows. The lines themselves are one
+   inner column in reading order. */
+.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}
+/* talk v2 look (hhdesign's notes-wants.md rule C point 1): never a hard cut through letters. An edge with
+   something hidden behind it fades out over 20 px, as Hermes's own FadeScroll (1.25rem); the page sets
+   data-fade from the scroll position (src/talk-view.js). A mask uses only its colour's alpha: --ui-base is
+   the theme's own foreground at full strength (--ui-text-primary is 94 % of it, which would dim the whole
+   conversation to 94 %); measured opaque in both themes in the app. */
+.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}
+.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}
+.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}
+.hh-conv-in{display:flex;flex-direction:column;gap:9px}
+.hh-conv-in>*{flex:none}
+.hh-me{overflow-wrap:anywhere}
+/* The faint lines (what was kept, what is used) hold a link that is a real button: it looks like
+   the text around it. The first-time line goes on a line of its own under "Kept: ...". hhdesign's review
+   of d1ceddc, 3.2: that line is about privacy and must be readable, so it takes the secondary text colour
+   in both themes (the faint colour measured 3.5:1 in light); "Kept: ... See what I keep" stays faint. */
+.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}
+.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}
+/* talk v2 look (hhdesign's review of e86b410, point 3): no word alone on the last line of a faint line */
+.hh-note{text-wrap:pretty}
+/* The list of what Helper keeps, inside the bubble (and small in an older line). */
+.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}
+.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}
+/* The bubble sits under the scrolling part, not in it, so the piece below always hangs from it:
+   the 5 px of the drawing plus the 9 px gap; and never narrower than where that piece hangs. */
+.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}
+.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}
+/* What waits for the line's last word (a button in the bubble): its room is held. */
+.hh-wait{visibility:hidden}
+/* A button's text to paste, or the list of what is kept, opens under the line, inside the bubble; 10 px
+   apart (notes-wants.md rule B). */
+.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}
+/* In place of a button, for a screen no button can open: one line that says where it is; and the
+   small faint hint under a don't-know line. Under an older line they are as small as its link. */
+.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}
+.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}
+/* The cell between bubble and character (src/bubble-link.js draws inside it): hhdesign's .hh-tail
+   of talk-r5, as a cell, plus the character's inset. It hangs 1 px into the bubble, in front of it,
+   22 by 24 px, one fixed size: never stretched, never measured. */
+.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}
+.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}
+/* The character: its lower edge line lies on the message box's top border (8 of its 200 units
+   hang below it), in front of the box. */
+.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}
+/* The things to pick in the message box (talk-r5's .hh-box rules, on Hermes's own composer, which
+   is the message box here): a grid of even columns, the page sets --hh-cols; the box grows and
+   shrinks by an explicit height in 0.3 s. Side padding 9 px, not 11: the four topics then stay on
+   one line each at 460 px (the build's own measurement, docs/build/talk-v2-plan.md row 1). */
+.hh-picks{transition:height .3s ease-in-out}
+.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}
+.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}
+/* "Skip", a small text link at the right end of the message box. */
+.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}
+/* The edge to drag: a hairline on the window's left edge and a pill in its middle. */
+.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}
+.hh-grip::before{content:"";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}
+.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}
+.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+/* Talk v2 row 5, look by hhdesign's notes-wants.md rule A. The box "From the Hermes docs": the docs page's
+   own words, in Hermes's own quote look (markdown-text.tsx: a 2 px line on its left, 12 px in, italic),
+   directly under Helper's line, 8 px apart. Its line: hhdesign's --ui-stroke-secondary measured 1.46:1
+   against the bubble in light and in dark, under 3:1, so the line stays --ui-text-tertiary (3.54:1 light,
+   5.19:1 dark), which rule A allows in that case (dev/checks/talk-v2-look/run/look-report.txt). */
+.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}
+.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}
+.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}
+.hh-old .hh-docs{margin-top:4px}
+.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}
+/* The clicks to add an optional skill: Hermes's own numbered list (rule B), the numbers quieter than the
+   words, 6 px between steps; the faint line after them. */
+.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}
+.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}
+.hh-steps li+li{margin-top:6px}
+.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}
+.hh-old .hh-steps li+li{margin-top:4px}
+.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}
+/* talk v2 look (notes-wants.md item 3): the arrow of a button that opens something points up while its
+   part is open, as Hermes's own open/close rows do. */
+.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}
+/* talk v2 look (notes-wants.md item 7): "More" is no answer: the same size and place, quieter. Under the
+   cursor and pressed as the others. */
+.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}
+.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}
+.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}
+/* talk v2 fixes: a faint "Kept: ..." or "From what I keep: ..." line whose thing was forgotten or
+   replaced since: its words stay, struck through, in the same faint colour (no new words). */
+.hh-gone{text-decoration:line-through}

@@ -8,6 +8,8 @@ export const H = { cur: null }
 export const useState = init => H.cur.useState(init)
 export const useRef = init => H.cur.useRef(init)
 export const useEffect = (fn, deps) => H.cur.useEffect(fn, deps)
+// No screen here: a layout effect runs where an effect would.
+export const useLayoutEffect = (fn, deps) => H.cur.useEffect(fn, deps)
 export const useId = () => H.cur.useId()
 
 export function jsx(type, props, key) {

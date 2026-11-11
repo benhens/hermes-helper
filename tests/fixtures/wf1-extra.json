@@ -1,0 +1,109 @@
+{
+ "about": "Written by dev/checks/talk-v2-wf1/stage_label.py from the reference. Do not edit: make it again.",
+ "sha256": {
+  "hhcontent-talk-v2/route2.py": "3af440269b7f405d1e56136bd8b76597451b19955f41d52956cb14cf153af95c",
+  "hhtech-wants-check/wants_step.py": "491b7f75865c4d61219476632e5d56270081ef6146f77c5fbd5323fed420a23f",
+  "hhtech-fixes-6/fixes6_step.py": "cd6d53f51b1bcac27fc2436c1ac0431199a650d6cb6c5a120c47e02d02ba9142",
+  "hhcontent-wants-fixes/wants_fixes_step.py": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e"
+ },
+ "group_label_by_stage": [
+  {
+   "stage": "name",
+   "text": "pictures and video",
+   "shown": "F1 name=None"
+  },
+  {
+   "stage": "name",
+   "text": "pictures and video?",
+   "shown": "N2 group pics"
+  },
+  {
+   "stage": "name",
+   "text": "Voice and sound.",
+   "shown": "F1 name=None"
+  },
+  {
+   "stage": "name",
+   "text": "what are files and my computer",
+   "shown": "N2 group files"
+  },
+  {
+   "stage": "work",
+   "text": "pictures and video",
+   "shown": "F2 name=None work=pictures and video"
+  },
+  {
+   "stage": "work",
+   "text": "pictures and video?",
+   "shown": "N2 group pics"
+  },
+  {
+   "stage": "work",
+   "text": "Voice and sound.",
+   "shown": "F2 name=None work=Voice and sound."
+  },
+  {
+   "stage": "work",
+   "text": "what are files and my computer",
+   "shown": "N2 group files"
+  },
+  {
+   "stage": "open",
+   "text": "pictures and video",
+   "shown": "G1 group pics"
+  },
+  {
+   "stage": "open",
+   "text": "pictures and video?",
+   "shown": "G1 group pics"
+  },
+  {
+   "stage": "open",
+   "text": "Voice and sound.",
+   "shown": "G1 group voice"
+  },
+  {
+   "stage": "open",
+   "text": "what are files and my computer",
+   "shown": "N2 group files"
+  }
+ ],
+ "typed_change": [
+  {
+   "kept_before": "Gmail",
+   "text": "I use one drive now",
+   "shown": "N1",
+   "kept_after": "Gmail"
+  },
+  {
+   "kept_before": "Gmail",
+   "text": "my files are on one drive",
+   "shown": "N1",
+   "kept_after": "Gmail"
+  },
+  {
+   "kept_before": "Notion",
+   "text": "I use google drive",
+   "shown": "line svc1",
+   "kept_after": "Google Drive"
+  },
+  {
+   "kept_before": "Notion",
+   "text": "we use google mail",
+   "shown": "line svc1",
+   "kept_after": "Gmail"
+  },
+  {
+   "kept_before": "Gmail",
+   "text": "I use drive",
+   "shown": "line svc1",
+   "kept_after": "Google Drive"
+  },
+  {
+   "kept_before": "OneDrive",
+   "text": "I use google calendar",
+   "shown": "line svc1",
+   "kept_after": "Google Calendar"
+  }
+ ]
+}

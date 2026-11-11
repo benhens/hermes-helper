@@ -31,7 +31,7 @@ export async function loadPlugin(change = null) {
 
 export function fakeStorage(initial = {}) {
   const data = new Map(Object.entries(initial))
-  return { data, get: (k, d) => (data.has(k) ? data.get(k) : d), set: (k, v) => data.set(k, v) }
+  return { data, get: (k, d) => (data.has(k) ? data.get(k) : d), set: (k, v) => data.set(k, v), remove: k => data.delete(k) }
 }
 
 // The host's timers (ctx.setTimeout / ctx.setInterval), faked. A short wait (under 30 s: the 1 s
@@ -79,21 +79,24 @@ export function fakeTimers() {
 }
 
 // Registers the plugin with a fake ctx; returns its contributions and the page component.
-// extra: more ctx doors (e.g. os) for a test. change: see loadPlugin.
+// extra: more ctx doors (e.g. os) for a test; { registerSettingsPage: undefined } is a Hermes too
+// old to have plugin settings pages. change: see loadPlugin. settingsPages: what was registered there.
 export async function registerPlugin(storage = fakeStorage(), timers = fakeTimers(), extra = {}, change = null) {
   const plugin = await loadPlugin(change)
   const contributions = []
+  const settingsPages = []
   const ctx = {
     storage,
     setTimeout: timers.setTimeout,
     setInterval: timers.setInterval,
     registerMany: list => contributions.push(...list),
+    registerSettingsPage: p => settingsPages.push(p),
     register: c => contributions.push(c),
     ...extra
   }
   plugin.register(ctx)
   const page = contributions.find(c => c.area === 'routes')
-  return { plugin, contributions, storage, timers, ctx, Page: page.render().type }
+  return { plugin, contributions, settingsPages, storage, timers, ctx, Page: page.render().type }
 }
 
 // One src file that imports React, loaded with the stand-ins (its own ./ imports stay real files).
@@ -224,9 +227,13 @@ export function all(node, pred, out = []) {
   return out
 }
 
+// A name kept whole (src/reveal.js keepNamesWhole) is an inline span inside a line's words: on screen it joins
+// the text around it with no space, so it is joined that way here too.
+const inlineWhole = x => x != null && typeof x === 'object' && !Array.isArray(x) && x.props && x.props['data-hh'] === 'name-whole'
+const joinAll = (nodes, f) => nodes.reduce((out, x, i) => out + (i && !inlineWhole(x) && !inlineWhole(nodes[i - 1]) ? ' ' : '') + f(x), '')
 export function text(node) {
   if (node == null) return ''
-  if (Array.isArray(node)) return node.map(text).join(' ')
+  if (Array.isArray(node)) return joinAll(node, text)
   if (typeof node !== 'object') return String(node)
   return text(node.props.children)
 }
@@ -236,7 +243,7 @@ export function text(node) {
 // which is aria-hidden. So spoken() holds each line once.
 export function spoken(node) {
   if (node == null) return ''
-  if (Array.isArray(node)) return node.map(spoken).join(' ')
+  if (Array.isArray(node)) return joinAll(node, spoken)
   if (typeof node !== 'object') return String(node)
   if (node.props['aria-hidden'] === true) return ''
   return spoken(node.props.children)

@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K } from './look.js'
+import { namesWhole } from './quotes.js'
 
 // The pace: one word every 120 ms (a first number; Pēteris has not seen a pace yet).
 export const WORD_MS = 120
@@ -156,9 +157,18 @@ const SPOKEN_ONCE = { userSelect: 'none' }
 // Words not yet shown hold their place unseen, so the text has its final size from the first word
 // and nothing jumps as words arrive.
 const UNSEEN = { visibility: 'hidden' }
+// A name in curly marks with no space in it is kept on one line with its marks (src/quotes.js namesWhole;
+// hhdesign's review of d1ceddc, 3.1). text is already drawn by curlyQuotes.
+const NAME_WHOLE = { whiteSpace: 'nowrap' }
+export function keepNamesWhole(text) {
+  const parts = namesWhole(text)
+  if (!parts) return text
+  return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `n${i}`)))
+}
 
 // One line Helper says. A screen reader gets the whole line once (Hermes's own sr-only class);
-// the copy the eye sees, growing word by word, is hidden from it.
+// the copy the eye sees, growing word by word, is hidden from it. A name kept whole is one word, so it is
+// always wholly in the seen part or wholly in the rest.
 export function Said({ clock, id, text, className, fresh = false }) {
   const words = wordsOf(text)
   const [, redraw] = useState(0)
@@ -177,7 +187,7 @@ export function Said({ clock, id, text, className, fresh = false }) {
         {
           'aria-hidden': true,
           'data-hh': 'said-seen',
-          children: [words.slice(0, n).join(' '), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: (n ? ' ' : '') + rest }, 'rest') : null]
+          children: [keepNamesWhole(words.slice(0, n).join(' ')), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: keepNamesWhole((n ? ' ' : '') + rest) }, 'rest') : null]
         },
         'seen'
       )

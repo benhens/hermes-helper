@@ -1,0 +1,3781 @@
+{
+ "about": "Helper wants v1: what a person wants to do, and what Hermes has for it. Written by hhcontent, 10 Nov 2026. Rules: content/helper-wants-v1.md. Built and checked by dev/checks/hhcontent-wants-v1/build_wants.py; do not edit by hand, edit the script and run it. Every row's sources carry file, line and the quoted words, checked against /hermes-docs at build time.",
+ "docs_version": "v0.23.0",
+ "docs_root": "/hermes-docs",
+ "may_name": "Only what is built into Hermes, the skills on reference/skills-catalog.md and reference/optional-skills-catalog.md, and official or verified plugins. No plugin is named until hhtech lists which ones count (his words, 10 Nov 18:40).",
+ "match_rule": "As helper-talk-v2.json match_rule. A row matches when one of its key_words is in the message, or one of its things and one of its actions are both in the message. Rows are looked at only when no topic of helper-talk-v2.json matched. Changes-6, fix 2: a row takes topic svc off the list only when the service word svc matched is itself one of that row's key_words or things (youtube for w_youtube, obsidian for w_notes, excel for w_office). Otherwise svc stays: can it look at my dropbox files gets the svc question, not w_docs.",
+ "service_lines": {
+  "rule": "Where topic svc would ask its question or show its line, and the one service code found (typed, picked or kept) is one of these, Helper shows this instead. Every other service: svc as today.",
+  "Gmail": "CN1",
+  "Google Calendar": "CN2",
+  "Google Drive": "CN2",
+  "GitHub": "S1 with the built-in skill github, and its docs box (the app itself says Install the GitHub CLI (gh) and sign in, en.ts line 3688, hhtech source)",
+  "note": "The built-in skills google-workspace, himalaya and email-inbox-triage stay reachable by name (skill_name_rule)."
+ },
+ "limits": {
+  "rows_per_group": 8,
+  "groups": 4,
+  "label_words": 5,
+  "model_list_rows": 33,
+  "rows_shown": "a group of more than four rows shows three and More (helper-talk-v2.json answers.more)"
+ },
+ "changed_9": "10 Nov, 20:50 UTC job (content/helper-talk-v2-changes-9.md): one list under What Hermes can do. This file's topic is now wants, reached by the pick Web, files, pictures and voice under line C1 of helper-talk-v2.json. Four groups: Look something up joined Use the web, now Search and use the web. can0 is not shown. N1 here is not used.",
+ "topic": {
+  "id": "wants",
+  "label": "Web, files, pictures and voice",
+  "pick": {
+   "label": "Web, files, pictures and voice",
+   "gives": "wants",
+   "where": "changes-9: one of the four picks under line C1 of helper-talk-v2.json (topic_picks, What Hermes can do, holds wants). Not a top topic pick of its own. Pressing it asks can-q at once, with the four groups as answers."
+  },
+  "was": "Until changes-9 this was topic can with the pick What Hermes can do and five groups. That pick now belongs to helper-talk-v2.json and shows line C1.",
+  "model": "never (changes-6, fix 4). No id can in the model's list: hhtech ran it, it made the free model worse and fixed nothing. Reached by its pick and by code only.",
+  "question": {
+   "id": "can-q",
+   "kind": "question",
+   "text": "What do you want Hermes to do?",
+   "answers": [
+    {
+     "label": "Search and use the web",
+     "gives_group": "web"
+    },
+    {
+     "label": "Files and my computer",
+     "gives_group": "files"
+    },
+    {
+     "label": "Pictures and video",
+     "gives_group": "pics"
+    },
+    {
+     "label": "Voice and sound",
+     "gives_group": "voice"
+    }
+   ],
+   "when_shown": "case 2 of helper-talk-v2.json answers.when_shown: it is answered by choosing between groups Helper names. The person can always type instead."
+  },
+  "plain": {
+   "id": "can0",
+   "text": "Hermes can search the web, work with files, make pictures and more. Pick one to see what is checked.",
+   "shown": "never since changes-9: line C1 says this now, and the pick goes straight to can-q. Kept so it can come back.",
+   "sources": [
+    {
+     "file": "user-guide/features/tools.md",
+     "line": 17,
+     "quote": "covering web search, browser automation, terminal execution, file editing"
+    }
+   ]
+  }
+ },
+ "groups": [
+  {
+   "id": "web",
+   "label": "Search and use the web",
+   "subject_words": [
+    "web",
+    "internet",
+    "online",
+    "website",
+    "websites",
+    "twitter",
+    "tweet",
+    "reddit",
+    "post",
+    "posting",
+    "social media",
+    "papers",
+    "maps",
+    "map",
+    "stocks",
+    "stock",
+    "prices",
+    "price",
+    "flights"
+   ],
+   "was": "Use the web, and Look something up (group look, joined here in changes-9)",
+   "rows": 8
+  },
+  {
+   "id": "files",
+   "label": "Files and my computer",
+   "subject_words": [
+    "pdf",
+    "pdfs",
+    "word",
+    "excel",
+    "powerpoint",
+    "document",
+    "documents",
+    "spreadsheet",
+    "obsidian",
+    "code",
+    "coding",
+    "my computer"
+   ],
+   "rows": 7
+  },
+  {
+   "id": "pics",
+   "label": "Pictures and video",
+   "subject_words": [
+    "video",
+    "videos",
+    "picture",
+    "pictures",
+    "image",
+    "images",
+    "photo",
+    "photos",
+    "youtube",
+    "animation"
+   ],
+   "rows": 7
+  },
+  {
+   "id": "voice",
+   "label": "Voice and sound",
+   "subject_words": [
+    "voice",
+    "speak",
+    "speech",
+    "audio",
+    "song",
+    "songs",
+    "music",
+    "podcast"
+   ],
+   "rows": 4
+  }
+ ],
+ "fixed_lines": [
+  {
+   "id": "N1",
+   "kind": "reply",
+   "status": "not used. Superseded by N1, N1a and N1b in helper-talk-v2.json (changes-7). Do not build this one.",
+   "text": "I don't know that one. I only say what I have checked. Here is what I can help with.",
+   "under": "nothing (it was: the topic picks, seven with What Hermes can do)"
+  },
+  {
+   "id": "N2",
+   "kind": "reply",
+   "status": "new: the near miss",
+   "text": "I don't know that one. These are the nearest things I have checked.",
+   "under": "one pick per row of the one group whose subject word matched, text = the row's label"
+  },
+  {
+   "id": "G1",
+   "kind": "reply",
+   "status": "new: after a group is picked",
+   "text": "Here is what I have checked for that. Pick one, or type your own.",
+   "under": "one pick per row of the picked group"
+  },
+  {
+   "id": "S1",
+   "kind": "reply",
+   "status": "new: a skill on the docs pages with no hand-written row, built in. Skill lines v1 (10 Nov 23:10): {say} is the skill's say field; when say is null use text_fixed",
+   "text": "Hermes comes with a skill called \"{name}\". It teaches Hermes to {say}",
+   "under": "a box with the page's description word for word, headed: From the Hermes docs",
+   "text_fixed": "Hermes comes with a skill called \"{name}\". Skills are written steps that teach Hermes one task. The docs say this.",
+   "sources": [],
+   "say_rule": "{say} comes from skills[].say, written by hand from the docs line, checked by dev/checks/hhcontent-skill-lines/apply_sl1.py. The box under it keeps the docs' own words."
+  },
+  {
+   "id": "S2",
+   "kind": "reply",
+   "status": "new: the same, optional. Skill lines v1 (10 Nov 23:10): {say} is the skill's say field; when say is null use text_fixed",
+   "text": "The skill \"{name}\" must be added first. It teaches Hermes to {say}",
+   "under": "the same box, then the button Show me how to add it with the steps of add_steps (changes-6, fix 5)",
+   "next": {
+    "kind": "steps",
+    "label": "Show me how to add it",
+    "steps": [
+     "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+     "Click \"Source\", then pick \"Optional\".",
+     "Find the card \"{name}\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+     "Click the card, then click \"Install\"."
+    ],
+    "after": "It works from your next new chat, not this one.",
+    "seen": {
+     "seen": "hhtech ran it in Hermes Desktop v0.23.0: docs/answers/hhtech-wants-check.md section 5",
+     "shot": "dev/checks/hhtech-wants-check/app/shots/q5-8-optional-skill-detail.png",
+     "card_says": "Review the source before installing. Changes apply to new sessions."
+    }
+   },
+   "sources": [
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 9,
+     "quote": "Install them explicitly"
+    }
+   ],
+   "text_fixed": "The optional skill \"{name}\" must be added first. Skills are written steps that teach Hermes one task. The docs say this.",
+   "say_rule": "{say} comes from skills[].say, written by hand from the docs line, checked by dev/checks/hhcontent-skill-lines/apply_sl1.py. The box under it keeps the docs' own words."
+  },
+  {
+   "id": "box-head",
+   "kind": "reply",
+   "status": "new: the heading of the box with the page's words",
+   "text": "From the Hermes docs"
+  },
+  {
+   "id": "CN1",
+   "kind": "reply",
+   "status": "changes-6, fix 6: Gmail, Google Calendar, Google Drive. No word on cost: the docs (tool-gateway.md line 12) and the app (en.ts line 3947) disagree and nobody has seen it",
+   "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. Click \"Capabilities\", then the \"Connectors\" tab.",
+   "sources": [
+    {
+     "file": "user-guide/features/tool-gateway.md",
+     "line": 124,
+     "quote": "Connectors are hosted apps such as Gmail that the agent reaches through the Nous tool gateway"
+    },
+    {
+     "file": "user-guide/features/tool-gateway.md",
+     "line": 139,
+     "quote": "The desktop app's **Connectors** page."
+    }
+   ],
+   "seen": "The tab Connectors under Capabilities: hhtech ran, hhtech-wants-check.md section 6. Gmail, Google Calendar and Drive first in the app's list: app source, connector-order.ts lines 1 to 15, not seen on screen."
+  },
+  {
+   "id": "CN2",
+   "kind": "reply",
+   "status": "changes-16 (Builder's talk-v2-wants-fixes-report.md question 4): Google Calendar and Google Drive. No docs line shows either on the Connectors page, so the line does not say they are there; it says how to look.",
+   "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. To see if {service} is there, click \"Capabilities\", then the \"Connectors\" tab.",
+   "fill": "{service} = the service code found: Google Calendar or Google Drive",
+   "sources": [
+    {
+     "file": "user-guide/features/tool-gateway.md",
+     "line": 124,
+     "quote": "Connectors are hosted apps such as Gmail that the agent reaches through the Nous tool gateway"
+    },
+    {
+     "file": "user-guide/features/tool-gateway.md",
+     "line": 139,
+     "quote": "The desktop app's **Connectors** page."
+    }
+   ],
+   "not_claimed": "That Google Drive or Google Calendar is on the Connectors page. tool-gateway.md names Gmail only (line 124). deliverable-mode.md line 115 names Google Drive, but as an MCP server, not a connector. The app source order (connector-order.ts) was read by hhtech, never seen on screen."
+  }
+ ],
+ "wants": [
+  {
+   "id": "w_web",
+   "group": "web",
+   "label": "Search the web",
+   "kind": "built_in_tool",
+   "thing": "web_search, web_extract",
+   "model_hint": "search the web",
+   "things": [
+    "web",
+    "internet",
+    "online",
+    "google",
+    "news"
+   ],
+   "actions": [
+    "search",
+    "searches",
+    "searching",
+    "look up",
+    "looks up",
+    "find",
+    "research",
+    "check",
+    "browse",
+    "look stuff up",
+    "looks stuff up",
+    "look things up",
+    "looks things up"
+   ],
+   "key_words": [
+    "web search",
+    "search engine",
+    "google things",
+    "google something",
+    "google it",
+    "webpages",
+    "webpage"
+   ],
+   "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
+   "sources": [
+    {
+     "file": "user-guide/features/tools.md",
+     "line": 27,
+     "quote": "Search the web and extract page content."
+    },
+    {
+     "file": "user-guide/features/web-search.md",
+     "line": 16,
+     "quote": "search the web and return ranked results"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please search the web for <what you want to know>, and list the pages you used. If web search is not ready, tell me what it needs."
+   },
+   "words": 19
+  },
+  {
+   "id": "w_browser",
+   "group": "web",
+   "label": "Use a website for me",
+   "kind": "built_in_tool",
+   "thing": "browser_exec",
+   "model_hint": "use a website for me",
+   "things": [
+    "website",
+    "websites",
+    "web page",
+    "web pages",
+    "site",
+    "sites",
+    "form",
+    "forms",
+    "browser"
+   ],
+   "actions": [
+    "click",
+    "clicks",
+    "fill",
+    "fills",
+    "fill in",
+    "fill out",
+    "log in",
+    "sign in",
+    "open",
+    "opens",
+    "navigate",
+    "book",
+    "order",
+    "use",
+    "control"
+   ],
+   "key_words": [
+    "browser automation",
+    "use a browser",
+    "use the browser"
+   ],
+   "text": "Hermes can open a website, click, type and fill in forms. That is a built-in tool, an action it can take.",
+   "sources": [
+    {
+     "file": "user-guide/features/browser.md",
+     "line": 10,
+     "quote": "gives the agent a real web browser"
+    },
+    {
+     "file": "user-guide/features/browser.md",
+     "line": 18,
+     "quote": "Navigate, read, click, type, scrape and screenshot"
+    },
+    {
+     "file": "user-guide/features/browser.md",
+     "line": 25,
+     "quote": "No API key, no setup."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please open <website> with your browser tool and <what to do there>. Ask me before you send, buy or sign in to anything."
+   },
+   "words": 21
+  },
+  {
+   "id": "w_xpost",
+   "group": "web",
+   "label": "Post on X for me",
+   "kind": "built_in_skill",
+   "thing": "xurl",
+   "docs_words": "X/Twitter via xurl CLI: raw post search, posting, DM, media.",
+   "model_hint": "post on x for me",
+   "things": [
+    "twitter",
+    "tweet",
+    "tweets",
+    "on x",
+    "to x",
+    "x account",
+    "x.com"
+   ],
+   "actions": [
+    "post",
+    "posts",
+    "posting",
+    "tweet",
+    "reply",
+    "publish",
+    "send",
+    "write",
+    "search",
+    "read",
+    "dm"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"xurl\". Its written steps teach Hermes to search and post on X.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 98,
+     "quote": "X/Twitter via xurl CLI: raw post search, posting, DM, media."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"xurl\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 18
+  },
+  {
+   "id": "w_reddit",
+   "group": "web",
+   "label": "Read Reddit",
+   "kind": "optional_skill",
+   "thing": "reddit-reading",
+   "docs_words": "Read Reddit: subreddits, search, threads, users. No browser.",
+   "model_hint": "read reddit",
+   "things": [
+    "reddit",
+    "subreddit",
+    "subreddits"
+   ],
+   "actions": [
+    "read",
+    "reads",
+    "search",
+    "check",
+    "follow",
+    "summarize",
+    "summarise",
+    "browse",
+    "watch",
+    "look at",
+    "find"
+   ],
+   "key_words": [],
+   "text": "There is an optional skill, \"reddit-reading\". You add it first. Its written steps teach Hermes to read and search Reddit.",
+   "sources": [
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 254,
+     "quote": "Read Reddit: subreddits, search, threads, users. No browser."
+    },
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 9,
+     "quote": "Install them explicitly"
+    }
+   ],
+   "next": {
+    "kind": "steps",
+    "label": "Show me how to add it",
+    "steps": [
+     "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+     "Click \"Source\", then pick \"Optional\".",
+     "Find the card \"reddit-reading\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+     "Click the card, then click \"Install\"."
+    ],
+    "after": "It works from your next new chat, not this one.",
+    "seen": {
+     "seen": "hhtech ran it in Hermes Desktop v0.23.0: docs/answers/hhtech-wants-check.md section 5",
+     "shot": "dev/checks/hhtech-wants-check/app/shots/q5-8-optional-skill-detail.png",
+     "card_says": "Review the source before installing. Changes apply to new sessions."
+    }
+   },
+   "words": 21
+  },
+  {
+   "id": "w_docs",
+   "group": "files",
+   "label": "Read my documents",
+   "kind": "built_in_tool",
+   "thing": "read_file",
+   "model_hint": "read my documents",
+   "things": [
+    "pdf",
+    "pdfs",
+    "word file",
+    "word files",
+    "word document",
+    "word documents",
+    "docx",
+    "excel",
+    "spreadsheet",
+    "spreadsheets",
+    "document",
+    "documents",
+    "file",
+    "files",
+    "contract",
+    "contracts"
+   ],
+   "actions": [
+    "read",
+    "reads",
+    "open",
+    "summarize",
+    "summarise",
+    "summary",
+    "go through",
+    "look at",
+    "understand",
+    "extract",
+    "analyze",
+    "analyse"
+   ],
+   "key_words": [],
+   "text": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.",
+   "sources": [
+    {
+     "file": "user-guide/features/document-extraction.md",
+     "line": 9,
+     "quote": "automatically converts common document formats to readable text"
+    },
+    {
+     "file": "user-guide/features/document-extraction.md",
+     "line": 16,
+     "quote": "`.docx`"
+    },
+    {
+     "file": "user-guide/features/document-extraction.md",
+     "line": 17,
+     "quote": "`.xlsx`"
+    },
+    {
+     "file": "user-guide/features/document-extraction.md",
+     "line": 19,
+     "quote": "`.pdf`"
+    },
+    {
+     "file": "user-guide/features/document-extraction.md",
+     "line": 38,
+     "quote": "contain no text layer and silently convert to nothing"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part."
+   },
+   "words": 17
+  },
+  {
+   "id": "w_pdf",
+   "group": "files",
+   "label": "Make or change a PDF",
+   "kind": "built_in_skill",
+   "thing": "pdf",
+   "docs_words": "PDF files: create, read, merge, fill, OCR, edit text.",
+   "model_hint": "make or change a pdf",
+   "things": [
+    "pdf",
+    "pdfs"
+   ],
+   "actions": [
+    "make",
+    "create",
+    "merge",
+    "combine",
+    "fill",
+    "fill in",
+    "fill out",
+    "edit",
+    "change",
+    "split",
+    "ocr"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"pdf\". Its written steps teach Hermes to make, merge, fill in and edit PDF files.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 81,
+     "quote": "PDF files: create, read, merge, fill, OCR, edit text."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"pdf\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 21
+  },
+  {
+   "id": "w_office",
+   "group": "files",
+   "label": "Make Word or Excel files",
+   "kind": "built_in_skill",
+   "thing": "microsoft-office",
+   "docs_words": "Create, read, and edit Word, PowerPoint, and Excel files.",
+   "model_hint": "make word or excel files",
+   "things": [
+    "word",
+    "powerpoint",
+    "excel",
+    "slides",
+    "presentation",
+    "presentations",
+    "deck",
+    "spreadsheet",
+    "spreadsheets",
+    "docx",
+    "pptx",
+    "xlsx"
+   ],
+   "actions": [
+    "make",
+    "create",
+    "write",
+    "edit",
+    "change",
+    "draft",
+    "prepare"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"microsoft-office\". Its written steps teach Hermes to make and edit Word, PowerPoint and Excel files.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 80,
+     "quote": "Create, read, and edit Word, PowerPoint, and Excel files."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"microsoft-office\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 22
+  },
+  {
+   "id": "w_notes",
+   "group": "files",
+   "label": "Use my Obsidian notes",
+   "kind": "built_in_skill",
+   "thing": "obsidian",
+   "docs_words": "Read, search, create, and edit notes in the Obsidian vault.",
+   "model_hint": "use my obsidian notes",
+   "things": [
+    "obsidian"
+   ],
+   "actions": [
+    "read",
+    "search",
+    "find",
+    "write",
+    "edit",
+    "create",
+    "add",
+    "make",
+    "use",
+    "open",
+    "notes",
+    "note",
+    "vault",
+    "work with",
+    "access"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"obsidian\". Its written steps teach Hermes to read, search and edit your Obsidian notes.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 70,
+     "quote": "Read, search, create, and edit notes in the Obsidian vault."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"obsidian\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 20
+  },
+  {
+   "id": "w_meeting",
+   "group": "files",
+   "label": "Sort out meeting notes",
+   "kind": "built_in_skill",
+   "thing": "meeting-action-items",
+   "docs_words": "Turn meeting notes into cited decisions, owners, tickets.",
+   "model_hint": "sort out meeting notes",
+   "things": [
+    "meeting",
+    "meetings",
+    "meeting notes",
+    "minutes"
+   ],
+   "actions": [
+    "action items",
+    "action points",
+    "tasks",
+    "decisions",
+    "to-do",
+    "to-dos",
+    "todo",
+    "todos",
+    "owners",
+    "tickets",
+    "who does what",
+    "follow-ups",
+    "follow ups"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"meeting-action-items\". Its written steps teach Hermes to turn meeting notes into decisions and tasks.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 79,
+     "quote": "Turn meeting notes into cited decisions, owners, tickets."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"meeting-action-items\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 22
+  },
+  {
+   "id": "w_code",
+   "group": "files",
+   "label": "Write and run code",
+   "kind": "built_in_tool",
+   "thing": "terminal, read_file, patch",
+   "model_hint": "write and run code",
+   "things": [
+    "code",
+    "script",
+    "scripts",
+    "program",
+    "programs",
+    "python",
+    "javascript"
+   ],
+   "actions": [
+    "write",
+    "writes",
+    "run",
+    "runs",
+    "fix",
+    "read",
+    "edit",
+    "debug",
+    "review",
+    "change",
+    "help"
+   ],
+   "key_words": [
+    "coding",
+    "programming"
+   ],
+   "text": "Hermes can read, change and run code on your computer. This is built in.",
+   "sources": [
+    {
+     "file": "getting-started/learning-path.md",
+     "line": 49,
+     "quote": "Hermes Agent can read, edit, and run code in your projects."
+    },
+    {
+     "file": "user-guide/features/tools.md",
+     "line": 29,
+     "quote": "Execute commands and manipulate files."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please look at the code in <folder> and <what you want>. Ask me before you change or run anything."
+   },
+   "words": 14
+  },
+  {
+   "id": "w_computer",
+   "group": "files",
+   "label": "Click and type for me",
+   "kind": "built_in_tool",
+   "thing": "computer_use",
+   "model_hint": "click and type for me",
+   "things": [
+    "mouse",
+    "keyboard",
+    "my screen",
+    "my desktop",
+    "my computer",
+    "my mac",
+    "my pc",
+    "my laptop",
+    "my apps"
+   ],
+   "actions": [
+    "click",
+    "clicks",
+    "type",
+    "types",
+    "control",
+    "controls",
+    "drive",
+    "operate",
+    "take over",
+    "move"
+   ],
+   "key_words": [
+    "computer use"
+   ],
+   "text": "Hermes can click and type in the apps on your computer. It is built in, and the docs call it Computer Use.",
+   "sources": [
+    {
+     "file": "user-guide/features/computer-use.md",
+     "line": 8,
+     "quote": "Hermes Agent can drive your desktop"
+    },
+    {
+     "file": "user-guide/features/computer-use.md",
+     "line": 21,
+     "quote": "The built-in `computer_use` toolset"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "I want you to click and type in an app on my computer: <which app, and what to do>. Tell me first what Computer Use needs. Ask me before you change anything."
+   },
+   "words": 22
+  },
+  {
+   "id": "w_image",
+   "group": "pics",
+   "label": "Make pictures",
+   "kind": "built_in_tool",
+   "thing": "image_generate",
+   "model_hint": "make pictures",
+   "things": [
+    "image",
+    "images",
+    "picture",
+    "pictures",
+    "photo",
+    "photos",
+    "logo",
+    "logos",
+    "drawing",
+    "drawings",
+    "art",
+    "illustration",
+    "illustrations"
+   ],
+   "actions": [
+    "make",
+    "makes",
+    "create",
+    "creates",
+    "generate",
+    "generates",
+    "draw",
+    "draws",
+    "design",
+    "paint"
+   ],
+   "key_words": [
+    "image generation"
+   ],
+   "text": "Hermes can make pictures from your words. That is a built-in tool, an action it can take. The picture service costs money.",
+   "sources": [
+    {
+     "file": "user-guide/features/image-generation.md",
+     "line": 10,
+     "quote": "Hermes Agent generates images from text prompts via FAL.ai."
+    },
+    {
+     "file": "user-guide/features/image-generation.md",
+     "line": 14,
+     "quote": "| Price |"
+    },
+    {
+     "file": "user-guide/features/image-generation.md",
+     "line": 158,
+     "quote": "Direct FAL requires a funded `FAL_KEY`"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please make a picture of <what>. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
+   },
+   "words": 22
+  },
+  {
+   "id": "w_see",
+   "group": "pics",
+   "label": "Look at my pictures",
+   "kind": "built_in",
+   "thing": "vision",
+   "model_hint": "look at my pictures",
+   "things": [
+    "image",
+    "images",
+    "picture",
+    "pictures",
+    "photo",
+    "photos",
+    "screenshot",
+    "screenshots"
+   ],
+   "actions": [
+    "look at",
+    "looks at",
+    "see",
+    "sees",
+    "describe",
+    "read",
+    "reads",
+    "analyze",
+    "analyse",
+    "understand",
+    "explain",
+    "what is in",
+    "what's in"
+   ],
+   "key_words": [],
+   "text": "Hermes can look at a picture you give it. This is built in. If your AI reads only text, another AI describes it.",
+   "sources": [
+    {
+     "file": "user-guide/features/vision.md",
+     "line": 10,
+     "quote": "any vision-capable model can process them"
+    },
+    {
+     "file": "user-guide/features/vision.md",
+     "line": 204,
+     "quote": "an auxiliary vision model describes the image, and the text description is injected into the conversation"
+    },
+    {
+     "file": "user-guide/features/vision.md",
+     "line": 206,
+     "quote": "You don't configure this"
+    },
+    {
+     "file": "user-guide/features/tools.md",
+     "line": 31,
+     "quote": "`vision_analyze`"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "I am giving you a picture. Please tell me what you see in it. If you cannot look at pictures, tell me what is missing."
+   },
+   "words": 23,
+   "was_16": "Hermes can look at a picture you give it. This is built in. The AI you use must be able to read pictures.",
+   "note_16": "changes-16: was \"The AI you use must be able to read pictures.\", which vision.md lines 197 to 206 contradict (hhtech-wants-run.md section 3 no. 4). Not claimed: that the second AI costs nothing or needs no key; the docs page does not say."
+  },
+  {
+   "id": "w_video",
+   "group": "pics",
+   "label": "Make a video from text",
+   "kind": "built_in_tool_off",
+   "thing": "video_generate",
+   "model_hint": "make a video from text",
+   "things": [
+    "video",
+    "videos",
+    "clip",
+    "clips"
+   ],
+   "actions": [
+    "make",
+    "makes",
+    "create",
+    "creates",
+    "generate",
+    "generates",
+    "produce"
+   ],
+   "key_words": [
+    "text to video",
+    "text-to-video",
+    "video generation"
+   ],
+   "text": "Hermes can make a video from text or from a picture. That tool, an action it can take, is switched off at first.",
+   "sources": [
+    {
+     "file": "reference/tools-reference.md",
+     "line": 312,
+     "quote": "Opt-in toolset (not loaded in the default"
+    },
+    {
+     "file": "reference/tools-reference.md",
+     "line": 325,
+     "quote": "Generate a video from a text prompt (text-to-video) or animate a still image (image-to-video)"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "I want to make a video from text. Please tell me what the Video Generation tool needs and what it costs. Turn it on only if I say yes."
+   },
+   "words": 23
+  },
+  {
+   "id": "w_anim",
+   "group": "pics",
+   "label": "Make an animated explainer",
+   "kind": "built_in_skill",
+   "thing": "manim-video",
+   "docs_words": "Manim CE animations: 3Blue1Brown math/algo videos.",
+   "model_hint": "make an animated explainer",
+   "things": [
+    "animation",
+    "animations",
+    "animated",
+    "explainer",
+    "explainers",
+    "manim"
+   ],
+   "actions": [
+    "make",
+    "makes",
+    "create",
+    "creates",
+    "generate",
+    "produce",
+    "video",
+    "videos"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"manim-video\". Its written steps teach Hermes to make animated maths videos.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 42,
+     "quote": "Manim CE animations: 3Blue1Brown math/algo videos."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"manim-video\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 18
+  },
+  {
+   "id": "w_presenter",
+   "group": "pics",
+   "label": "Make a presenter video",
+   "kind": "optional_skill",
+   "thing": "ai-presenter-video",
+   "docs_words": "Make a verified AI presenter video from script + image.",
+   "model_hint": "make a presenter video",
+   "things": [
+    "presenter",
+    "talking head",
+    "avatar",
+    "spokesperson"
+   ],
+   "actions": [
+    "video",
+    "videos",
+    "make",
+    "create",
+    "generate"
+   ],
+   "key_words": [],
+   "text": "There is an optional skill, \"ai-presenter-video\". You add it first. Its written steps teach Hermes to make a video of an AI presenter.",
+   "sources": [
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 60,
+     "quote": "Make a verified AI presenter video from script + image."
+    },
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 9,
+     "quote": "Install them explicitly"
+    }
+   ],
+   "next": {
+    "kind": "steps",
+    "label": "Show me how to add it",
+    "steps": [
+     "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+     "Click \"Source\", then pick \"Optional\".",
+     "Find the card \"ai-presenter-video\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+     "Click the card, then click \"Install\"."
+    ],
+    "after": "It works from your next new chat, not this one.",
+    "seen": {
+     "seen": "hhtech ran it in Hermes Desktop v0.23.0: docs/answers/hhtech-wants-check.md section 5",
+     "shot": "dev/checks/hhtech-wants-check/app/shots/q5-8-optional-skill-detail.png",
+     "card_says": "Review the source before installing. Changes apply to new sessions."
+    }
+   },
+   "words": 25
+  },
+  {
+   "id": "w_youtube",
+   "group": "pics",
+   "label": "Sum up a YouTube video",
+   "kind": "built_in_skill",
+   "thing": "youtube-content",
+   "docs_words": "YouTube transcripts to summaries, threads, blogs.",
+   "model_hint": "sum up a youtube video",
+   "things": [
+    "youtube",
+    "yt video",
+    "yt videos"
+   ],
+   "actions": [
+    "summarize",
+    "summarise",
+    "summary",
+    "summaries",
+    "sum up",
+    "transcript",
+    "transcripts",
+    "notes",
+    "tldr",
+    "key points",
+    "blog",
+    "thread"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"youtube-content\". Its written steps teach Hermes to turn a YouTube video's words into a summary.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 64,
+     "quote": "YouTube transcripts to summaries, threads, blogs."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"youtube-content\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 22
+  },
+  {
+   "id": "w_meme",
+   "group": "pics",
+   "label": "Make memes",
+   "kind": "optional_skill",
+   "thing": "meme-generation",
+   "docs_words": "Create meme PNGs from templates with Pillow text overlay.",
+   "model_hint": "make memes",
+   "things": [],
+   "actions": [],
+   "key_words": [
+    "meme",
+    "memes"
+   ],
+   "text": "There is an optional skill, \"meme-generation\". You add it first. Its written steps teach Hermes to put text on known meme pictures.",
+   "sources": [
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 81,
+     "quote": "Create meme PNGs from templates with Pillow text overlay."
+    },
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 9,
+     "quote": "Install them explicitly"
+    }
+   ],
+   "next": {
+    "kind": "steps",
+    "label": "Show me how to add it",
+    "steps": [
+     "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+     "Click \"Source\", then pick \"Optional\".",
+     "Find the card \"meme-generation\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+     "Click the card, then click \"Install\"."
+    ],
+    "after": "It works from your next new chat, not this one.",
+    "seen": {
+     "seen": "hhtech followed these clicks for meme-generation up to Install, not clicking it: docs/answers/hhtech-wants-run.md section 5",
+     "shot": "dev/checks/hhtech-wants-run/shots/D6-card-open.png"
+    }
+   },
+   "added": "changes-16 (hhtech-wants-run.md no. 24)",
+   "words": 22
+  },
+  {
+   "id": "w_voice",
+   "group": "voice",
+   "label": "Talk to it out loud",
+   "kind": "built_in",
+   "thing": "Voice Mode",
+   "model_hint": "talk to it out loud",
+   "things": [],
+   "actions": [],
+   "key_words": [
+    "voice mode",
+    "by voice",
+    "with my voice",
+    "use my voice",
+    "talk out loud",
+    "speak out loud",
+    "voice chat",
+    "voice conversation",
+    "voice conversations",
+    "microphone",
+    "talk to it out loud"
+   ],
+   "text": "You can talk to Hermes out loud and hear it answer. It is built in, and the docs call it Voice Mode.",
+   "sources": [
+    {
+     "file": "user-guide/features/voice-mode.md",
+     "line": 9,
+     "quote": "Talk to the agent using your microphone, hear spoken replies"
+    },
+    {
+     "file": "user-guide/desktop.md",
+     "line": 350,
+     "quote": "Talk to Hermes and hear it back"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "I want to talk to you with my voice. Please tell me what Voice Mode needs here and how I start it. Ask me before you change anything."
+   },
+   "words": 22
+  },
+  {
+   "id": "w_aloud",
+   "group": "voice",
+   "label": "Read answers out loud",
+   "kind": "built_in_tool",
+   "thing": "text_to_speech",
+   "model_hint": "read answers out loud",
+   "things": [
+    "answers",
+    "answer",
+    "replies",
+    "reply",
+    "text",
+    "messages"
+   ],
+   "actions": [
+    "read aloud",
+    "read out",
+    "aloud",
+    "spoken",
+    "audio"
+   ],
+   "key_words": [
+    "text to speech",
+    "text-to-speech",
+    "tts",
+    "read aloud",
+    "read it out",
+    "voice message",
+    "voice messages"
+   ],
+   "text": "Hermes can turn its answers into speech. This is built in, and the standard voice is free.",
+   "sources": [
+    {
+     "file": "user-guide/features/tts.md",
+     "line": 13,
+     "quote": "supports both text-to-speech output and voice message transcription"
+    },
+    {
+     "file": "user-guide/features/tts.md",
+     "line": 25,
+     "quote": "| **Edge TTS** (default) | Good | Free | None needed |"
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please read your next answer out loud. If speech is not ready, tell me what it needs."
+   },
+   "words": 17
+  },
+  {
+   "id": "w_stt",
+   "group": "voice",
+   "label": "Turn voice notes into text",
+   "kind": "built_in",
+   "thing": "voice message transcription (speech-to-text)",
+   "model_hint": "turn voice notes into text",
+   "things": [
+    "voice note",
+    "voice notes",
+    "voice message",
+    "voice messages",
+    "voice memo",
+    "voice memos",
+    "recording",
+    "recordings",
+    "audio"
+   ],
+   "actions": [
+    "into text",
+    "to text",
+    "transcribe",
+    "transcribes",
+    "write out",
+    "type out",
+    "write down"
+   ],
+   "key_words": [
+    "voice note",
+    "voice notes",
+    "voice memo",
+    "voice memos",
+    "transcribe",
+    "transcription",
+    "speech to text",
+    "speech-to-text"
+   ],
+   "text": "Hermes turns voice messages from Telegram or WhatsApp into text by itself. This is built in.",
+   "sources": [
+    {
+     "file": "user-guide/features/tts.md",
+     "line": 13,
+     "quote": "supports both text-to-speech output and voice message transcription"
+    },
+    {
+     "file": "user-guide/features/tts.md",
+     "line": 496,
+     "quote": "Voice messages sent on Telegram, Discord, WhatsApp, Slack, or Signal are automatically transcribed and injected as text into the conversation."
+    }
+   ],
+   "not_claimed": "That it needs nothing: tts.md line 505 says local transcription works out of the box when faster-whisper is installed, and lines 554 to 560 list paid providers. The paste text asks the person's Hermes what it needs. Not claimed for the Desktop app's own window either: line 496 names chat apps only.",
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "I want to send you voice messages and have them turned into text. Please tell me what that needs here. Ask me before you change anything."
+   },
+   "added": "changes-16 (hhtech-wants-run.md no. 6)",
+   "words": 16
+  },
+  {
+   "id": "w_music",
+   "group": "voice",
+   "label": "Write a song",
+   "kind": "built_in_skill",
+   "thing": "songwriting-and-ai-music",
+   "docs_words": "Songwriting craft and Suno AI music prompts.",
+   "model_hint": "write a song",
+   "things": [
+    "song",
+    "songs",
+    "music",
+    "lyrics"
+   ],
+   "actions": [
+    "write",
+    "writes",
+    "make",
+    "create",
+    "compose",
+    "generate"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"songwriting-and-ai-music\". Its written steps teach Hermes songwriting, and how to brief Suno, a music AI.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 45,
+     "quote": "Songwriting craft and Suno AI music prompts."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"songwriting-and-ai-music\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 24
+  },
+  {
+   "id": "w_papers",
+   "group": "web",
+   "label": "Find research papers",
+   "kind": "built_in_skill",
+   "thing": "arxiv",
+   "docs_words": "Search arXiv papers by keyword, author, category, or ID.",
+   "model_hint": "find research papers",
+   "things": [
+    "paper",
+    "papers",
+    "arxiv",
+    "studies"
+   ],
+   "actions": [
+    "find",
+    "search",
+    "look up",
+    "read",
+    "summarize",
+    "summarise",
+    "check"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"arxiv\". Its written steps teach Hermes to search research papers on arXiv.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 90,
+     "quote": "Search arXiv papers by keyword, author, category, or ID."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"arxiv\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 18
+  },
+  {
+   "id": "w_maps",
+   "group": "web",
+   "label": "Find places and routes",
+   "kind": "built_in_skill",
+   "thing": "maps",
+   "docs_words": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.",
+   "model_hint": "find places and routes",
+   "things": [
+    "map",
+    "maps",
+    "route",
+    "routes",
+    "directions",
+    "address",
+    "addresses",
+    "nearby",
+    "time zone",
+    "time zones"
+   ],
+   "actions": [
+    "find",
+    "get",
+    "look up",
+    "plan",
+    "show",
+    "search",
+    "check",
+    "how far"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"maps\". Its written steps teach Hermes to find places, routes and time zones.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 78,
+     "quote": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"maps\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 19
+  },
+  {
+   "id": "w_stocks",
+   "group": "web",
+   "label": "Check stock prices",
+   "kind": "optional_skill",
+   "thing": "stocks",
+   "docs_words": "Stock quotes, history, search, compare, crypto via Yahoo.",
+   "model_hint": "check stock prices",
+   "things": [
+    "stock",
+    "stocks",
+    "shares",
+    "crypto",
+    "bitcoin"
+   ],
+   "actions": [
+    "check",
+    "look up",
+    "compare",
+    "follow",
+    "quote",
+    "quotes",
+    "price",
+    "prices"
+   ],
+   "key_words": [],
+   "text": "There is an optional skill, \"stocks\". You add it first. Its written steps teach Hermes to look up stock and crypto prices.",
+   "sources": [
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 134,
+     "quote": "Stock quotes, history, search, compare, crypto via Yahoo."
+    },
+    {
+     "file": "reference/optional-skills-catalog.md",
+     "line": 9,
+     "quote": "Install them explicitly"
+    }
+   ],
+   "next": {
+    "kind": "steps",
+    "label": "Show me how to add it",
+    "steps": [
+     "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+     "Click \"Source\", then pick \"Optional\".",
+     "Find the card \"stocks\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+     "Click the card, then click \"Install\"."
+    ],
+    "after": "It works from your next new chat, not this one.",
+    "seen": {
+     "seen": "hhtech ran it in Hermes Desktop v0.23.0: docs/answers/hhtech-wants-check.md section 5",
+     "shot": "dev/checks/hhtech-wants-check/app/shots/q5-8-optional-skill-detail.png",
+     "card_says": "Review the source before installing. Changes apply to new sessions."
+    }
+   },
+   "words": 22
+  },
+  {
+   "id": "w_prices",
+   "group": "web",
+   "label": "Watch a price for me",
+   "kind": "built_in_skill",
+   "thing": "product-price-monitor",
+   "docs_words": "Watch product, flight, or listing prices; alert on target.",
+   "model_hint": "watch a price for me",
+   "things": [
+    "price",
+    "prices",
+    "flight",
+    "flights",
+    "listing",
+    "listings",
+    "deal",
+    "deals"
+   ],
+   "actions": [
+    "watch",
+    "watches",
+    "track",
+    "tracks",
+    "monitor",
+    "alert",
+    "alerts",
+    "drops",
+    "tell me when",
+    "keep an eye"
+   ],
+   "key_words": [],
+   "text": "Hermes comes with a skill called \"product-price-monitor\". Its written steps teach Hermes to watch prices and alert you at your target.",
+   "sources": [
+    {
+     "file": "reference/skills-catalog.md",
+     "line": 82,
+     "quote": "Watch product, flight, or listing prices; alert on target."
+    }
+   ],
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please use your \"product-price-monitor\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+   },
+   "words": 23
+  }
+ ],
+ "skill_name_rule": "Changes-6, fix 3. A skill from the list below is reached by its name only when the name and the word skill or skills sit next to each other: the/a/an/this/that {name} skill(s) (changes-8: the word before the name is needed, so my sketch skills or I have no canvas skills name no skill), skill(s) called {name}, skill(s) named {name}, skill(s) for {name}, \"{name}\" skill. {name} may have spaces in place of its hyphens. Whole words. Code: dev/checks/hhcontent-changes-6/skill_next.py (PATTERNS). This step runs after the key check and the build words and BEFORE the six topics, so is there a github skill gets the github skill, not the svc question. A hand-written row for that skill wins. Otherwise line S1 or S2 with the page's own words in a box.",
+ "skill_name_example": "is there a github skill -> S1: Hermes comes with a skill called \"github\". It teaches Hermes to work with GitHub: issues, pull requests, reviews and code folders. Under it the box From the Hermes docs: GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
+ "skills_counts": {
+  "built_in": 44,
+  "optional": 142,
+  "descriptions_passing_r_rules": 90
+ },
+ "skills": [
+  {
+   "name": "apple-notes",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Manage Apple Notes via memo CLI: create, search, edit.",
+   "page": "reference/skills-catalog.md",
+   "line": 19,
+   "passes_r_rules": false,
+   "say": "write, find and change notes in Apple Notes."
+  },
+  {
+   "name": "apple-reminders",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Apple Reminders via remindctl: add, list, complete.",
+   "page": "reference/skills-catalog.md",
+   "line": 20,
+   "passes_r_rules": true,
+   "say": "add, list and tick off items in Apple Reminders."
+  },
+  {
+   "name": "findmy",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Track Apple devices/AirTags via FindMy.app on macOS.",
+   "page": "reference/skills-catalog.md",
+   "line": 21,
+   "passes_r_rules": false,
+   "say": "see where your Apple devices and AirTags are, using the Find My app."
+  },
+  {
+   "name": "imessage",
+   "kind": "built_in",
+   "category": "apple",
+   "docs_words": "Send and receive iMessages/SMS via the imsg CLI on macOS.",
+   "page": "reference/skills-catalog.md",
+   "line": 22,
+   "passes_r_rules": false,
+   "say": "send and read iMessages and texts from the Messages app on a Mac."
+  },
+  {
+   "name": "claude-code",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to Claude Code CLI (features, PRs).",
+   "page": "reference/skills-catalog.md",
+   "line": 28,
+   "passes_r_rules": false,
+   "say": "hand a coding job to Claude Code, a separate coding app."
+  },
+  {
+   "name": "codex",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to OpenAI Codex CLI (features, PRs).",
+   "page": "reference/skills-catalog.md",
+   "line": 29,
+   "passes_r_rules": false,
+   "say": "hand a coding job to Codex, a separate coding app by OpenAI."
+  },
+  {
+   "name": "computer-use",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Drive the desktop background-first; escalate on signal.",
+   "page": "reference/skills-catalog.md",
+   "line": 30,
+   "passes_r_rules": false,
+   "say": "use your desktop, doing things in the background first."
+  },
+  {
+   "name": "hermes-agent",
+   "kind": "built_in",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Use, configure, theme, extend, and orchestrate Hermes Agent.",
+   "page": "reference/skills-catalog.md",
+   "line": 31,
+   "passes_r_rules": false,
+   "say": "use and change its own settings and look, and add to itself."
+  },
+  {
+   "name": "architecture-diagram",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Dark-themed SVG architecture/cloud/infra diagrams as HTML.",
+   "page": "reference/skills-catalog.md",
+   "line": 37,
+   "passes_r_rules": false,
+   "say": "draw a dark-themed picture of how a software system fits together."
+  },
+  {
+   "name": "ascii-video",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "ASCII video: convert video/audio to colored ASCII MP4/GIF.",
+   "page": "reference/skills-catalog.md",
+   "line": 38,
+   "passes_r_rules": true,
+   "say": "turn a video or sound into a moving picture made of letters."
+  },
+  {
+   "name": "baoyu-infographic",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Infographics: 21 layouts x 21 styles (信息图, 可视化).",
+   "page": "reference/skills-catalog.md",
+   "line": 39,
+   "passes_r_rules": false,
+   "say": "make an infographic: one picture that sums up facts, in many layouts."
+  },
+  {
+   "name": "claude-design",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Design one-off HTML artifacts (landing, deck, prototype).",
+   "page": "reference/skills-catalog.md",
+   "line": 40,
+   "passes_r_rules": false,
+   "say": "design a one-off web page, slide deck or clickable mockup."
+  },
+  {
+   "name": "humanizer",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Humanize text: strip AI-isms and add real voice.",
+   "page": "reference/skills-catalog.md",
+   "line": 41,
+   "passes_r_rules": true,
+   "say": "rewrite text so it sounds less like an AI wrote it."
+  },
+  {
+   "name": "manim-video",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Manim CE animations: 3Blue1Brown math/algo videos.",
+   "page": "reference/skills-catalog.md",
+   "line": 42,
+   "passes_r_rules": true,
+   "say": "make animated videos that explain maths."
+  },
+  {
+   "name": "p5js",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "p5.js sketches: gen art, shaders, interactive, 3D.",
+   "page": "reference/skills-catalog.md",
+   "line": 43,
+   "passes_r_rules": true,
+   "say": "make art with code, also moving and 3D art."
+  },
+  {
+   "name": "popular-web-designs",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.",
+   "page": "reference/skills-catalog.md",
+   "line": 44,
+   "passes_r_rules": false,
+   "say": "make web pages in the style of 54 well-known sites, such as Stripe."
+  },
+  {
+   "name": "songwriting-and-ai-music",
+   "kind": "built_in",
+   "category": "creative",
+   "docs_words": "Songwriting craft and Suno AI music prompts.",
+   "page": "reference/skills-catalog.md",
+   "line": 45,
+   "passes_r_rules": false,
+   "say": "help write songs, and write the text you give Suno, a music AI."
+  },
+  {
+   "name": "sdlc-review",
+   "kind": "built_in",
+   "category": "devops",
+   "docs_words": "Review Kanban handoffs and route verified outcomes.",
+   "page": "reference/skills-catalog.md",
+   "line": 51,
+   "passes_r_rules": true,
+   "say": null
+  },
+  {
+   "name": "email-inbox-triage",
+   "kind": "built_in",
+   "category": "email",
+   "docs_words": "Triage an inbox: prioritize threads, draft replies safely.",
+   "page": "reference/skills-catalog.md",
+   "line": 57,
+   "passes_r_rules": true,
+   "say": "sort your inbox by what matters most, and draft replies for you to check."
+  },
+  {
+   "name": "himalaya",
+   "kind": "built_in",
+   "category": "email",
+   "docs_words": "Himalaya CLI: IMAP/SMTP email from terminal.",
+   "page": "reference/skills-catalog.md",
+   "line": 58,
+   "passes_r_rules": false,
+   "say": "read and send email from your own mailbox."
+  },
+  {
+   "name": "youtube-content",
+   "kind": "built_in",
+   "category": "media",
+   "docs_words": "YouTube transcripts to summaries, threads, blogs.",
+   "page": "reference/skills-catalog.md",
+   "line": 64,
+   "passes_r_rules": true,
+   "say": "turn a YouTube video's spoken words into a summary, thread or blog post."
+  },
+  {
+   "name": "obsidian",
+   "kind": "built_in",
+   "category": "note-taking",
+   "docs_words": "Read, search, create, and edit notes in the Obsidian vault.",
+   "page": "reference/skills-catalog.md",
+   "line": 70,
+   "passes_r_rules": true,
+   "say": "read, search, write and change notes in your Obsidian notes folder."
+  },
+  {
+   "name": "document-to-action-items",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Extract cited obligations, deadlines, tasks from documents.",
+   "page": "reference/skills-catalog.md",
+   "line": 76,
+   "passes_r_rules": true,
+   "say": "pull deadlines, duties and tasks out of a document, with where each was found."
+  },
+  {
+   "name": "google-workspace",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Gmail, Calendar, Drive, Docs, Sheets via gws CLI or Python.",
+   "page": "reference/skills-catalog.md",
+   "line": 77,
+   "passes_r_rules": false,
+   "say": "use your Gmail, Google Calendar, Drive, Docs and Sheets."
+  },
+  {
+   "name": "maps",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.",
+   "page": "reference/skills-catalog.md",
+   "line": 78,
+   "passes_r_rules": false,
+   "say": "find places, addresses, routes and time zones from open map data."
+  },
+  {
+   "name": "meeting-action-items",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Turn meeting notes into cited decisions, owners, tickets.",
+   "page": "reference/skills-catalog.md",
+   "line": 79,
+   "passes_r_rules": true,
+   "say": "turn meeting notes into decisions, who does what, and follow-up tasks."
+  },
+  {
+   "name": "microsoft-office",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Create, read, and edit Word, PowerPoint, and Excel files.",
+   "page": "reference/skills-catalog.md",
+   "line": 80,
+   "passes_r_rules": true,
+   "say": "make, read and change Word, PowerPoint and Excel files."
+  },
+  {
+   "name": "pdf",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "PDF files: create, read, merge, fill, OCR, edit text.",
+   "page": "reference/skills-catalog.md",
+   "line": 81,
+   "passes_r_rules": true,
+   "say": "make, read, merge and fill in PDF files, also scanned ones."
+  },
+  {
+   "name": "product-price-monitor",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Watch product, flight, or listing prices; alert on target.",
+   "page": "reference/skills-catalog.md",
+   "line": 82,
+   "passes_r_rules": false,
+   "say": "watch a product, flight or listing price and tell you at your target."
+  },
+  {
+   "name": "teams-meeting-pipeline",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Teams meeting summaries, job replay, Graph subscriptions.",
+   "page": "reference/skills-catalog.md",
+   "line": 83,
+   "passes_r_rules": false,
+   "say": "get summaries of Teams meetings."
+  },
+  {
+   "name": "weekly-review-planning",
+   "kind": "built_in",
+   "category": "productivity",
+   "docs_words": "Weekly reset: commitments, stalled work, next-week plan.",
+   "page": "reference/skills-catalog.md",
+   "line": 84,
+   "passes_r_rules": true,
+   "say": "look back at your week, see what got stuck, and plan the next."
+  },
+  {
+   "name": "arxiv",
+   "kind": "built_in",
+   "category": "research",
+   "docs_words": "Search arXiv papers by keyword, author, category, or ID.",
+   "page": "reference/skills-catalog.md",
+   "line": 90,
+   "passes_r_rules": true,
+   "say": "search and read science papers on arXiv."
+  },
+  {
+   "name": "competitor-news-monitor",
+   "kind": "built_in",
+   "category": "research",
+   "docs_words": "Watch named companies for material news; cited digests.",
+   "page": "reference/skills-catalog.md",
+   "line": 91,
+   "passes_r_rules": false,
+   "say": "watch companies you name and report only important news about them."
+  },
+  {
+   "name": "grounded-citations",
+   "kind": "built_in",
+   "category": "research",
+   "docs_words": "Ground answers and documents in cited, verifiable sources.",
+   "page": "reference/skills-catalog.md",
+   "line": 92,
+   "passes_r_rules": true,
+   "say": "give answers where every fact shows where it came from."
+  },
+  {
+   "name": "xurl",
+   "kind": "built_in",
+   "category": "social-media",
+   "docs_words": "X/Twitter via xurl CLI: raw post search, posting, DM, media.",
+   "page": "reference/skills-catalog.md",
+   "line": 98,
+   "passes_r_rules": false,
+   "say": "post, search and send messages on X, the site that was Twitter."
+  },
+  {
+   "name": "codebase-inspection",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Inspect codebases w/ pygount: LOC, languages, ratios.",
+   "page": "reference/skills-catalog.md",
+   "line": 104,
+   "passes_r_rules": true,
+   "say": "count how much code a project has, and in which languages."
+  },
+  {
+   "name": "dogfood",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Exploratory QA of web apps: find bugs, evidence, reports.",
+   "page": "reference/skills-catalog.md",
+   "line": 105,
+   "passes_r_rules": true,
+   "say": "test a web app like a user would, and write up the bugs found."
+  },
+  {
+   "name": "github",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
+   "page": "reference/skills-catalog.md",
+   "line": 106,
+   "passes_r_rules": false,
+   "say": "work with GitHub: issues, pull requests, reviews and code folders."
+  },
+  {
+   "name": "requesting-code-review",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Pre-commit review: security scan, quality gates, auto-fix.",
+   "page": "reference/skills-catalog.md",
+   "line": 107,
+   "passes_r_rules": true,
+   "say": "check new code for safety and quality before it is saved for good."
+  },
+  {
+   "name": "simplify-code",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Parallel 4-agent cleanup of recent code changes.",
+   "page": "reference/skills-catalog.md",
+   "line": 108,
+   "passes_r_rules": false,
+   "say": "tidy up code you changed lately."
+  },
+  {
+   "name": "spike",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "Throwaway experiments to validate an idea before build.",
+   "page": "reference/skills-catalog.md",
+   "line": 109,
+   "passes_r_rules": true,
+   "say": "try out an idea with quick throwaway code before building it for real."
+  },
+  {
+   "name": "systematic-debugging",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "4-phase root cause debugging: understand bugs before fixing.",
+   "page": "reference/skills-catalog.md",
+   "line": 110,
+   "passes_r_rules": true,
+   "say": "find the real cause of a bug before trying to fix it."
+  },
+  {
+   "name": "test-driven-development",
+   "kind": "built_in",
+   "category": "software-development",
+   "docs_words": "TDD: enforce RED-GREEN-REFACTOR, tests before code.",
+   "page": "reference/skills-catalog.md",
+   "line": 111,
+   "passes_r_rules": false,
+   "say": "write code by writing a test first, then the code that passes it."
+  },
+  {
+   "name": "blocked-page-recovery",
+   "kind": "built_in",
+   "category": "web",
+   "docs_words": "Use when a fetch fails: 403/429, paywall, WAF, bot wall.",
+   "page": "reference/skills-catalog.md",
+   "line": 117,
+   "passes_r_rules": false,
+   "say": "get a web page that will not open, such as one behind a paywall."
+  },
+  {
+   "name": "agent-merge-conflict-arbiter",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Neutral arbiter for merge conflicts between two agents.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 34,
+   "add_id": "official/autonomous-ai-agents/agent-merge-conflict-arbiter",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "settle a clash when two AI helpers changed the same code."
+  },
+  {
+   "name": "antigravity-cli",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Operate the Antigravity CLI (agy): plugins, auth, sandbox.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 35,
+   "add_id": "official/autonomous-ai-agents/antigravity-cli",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "use the separate Antigravity app."
+  },
+  {
+   "name": "blackbox",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding tasks to the Blackbox AI multi-model CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 36,
+   "add_id": "official/autonomous-ai-agents/blackbox",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "hand a coding job to Blackbox AI, a separate coding app."
+  },
+  {
+   "name": "dynamic-workflow",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Plan-in-code fan-outs, adversarial verification, waves.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 37,
+   "add_id": "official/autonomous-ai-agents/dynamic-workflow",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": null
+  },
+  {
+   "name": "grok",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to xAI Grok Build CLI (features, PRs).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 38,
+   "add_id": "official/autonomous-ai-agents/grok",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "hand a coding job to Grok Build, a separate coding app by xAI."
+  },
+  {
+   "name": "opencode",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to OpenCode CLI (features, PR review).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 39,
+   "add_id": "official/autonomous-ai-agents/opencode",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "hand a coding job to OpenCode, a separate coding app."
+  },
+  {
+   "name": "openhands",
+   "kind": "optional",
+   "category": "autonomous-ai-agents",
+   "docs_words": "Delegate coding to OpenHands CLI (model-agnostic, LiteLLM).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 40,
+   "add_id": "official/autonomous-ai-agents/openhands",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "hand a coding job to OpenHands, a coding app that works with many AIs."
+  },
+  {
+   "name": "evm",
+   "kind": "optional",
+   "category": "blockchain",
+   "docs_words": "Read-only EVM client: wallets, tokens, gas across 8 chains.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 46,
+   "add_id": "official/blockchain/evm",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "look up wallets, coins and fees on eight blockchains. Read only."
+  },
+  {
+   "name": "hyperliquid",
+   "kind": "optional",
+   "category": "blockchain",
+   "docs_words": "Hyperliquid market data, account history, trade review.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 47,
+   "add_id": "official/blockchain/hyperliquid",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "look up prices and your past trades on Hyperliquid."
+  },
+  {
+   "name": "solana",
+   "kind": "optional",
+   "category": "blockchain",
+   "docs_words": "Query Solana wallets, tokens, txs, and NFTs in USD.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 48,
+   "add_id": "official/blockchain/solana",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "look up Solana wallets, coins and NFTs, with prices in dollars."
+  },
+  {
+   "name": "one-three-one-rule",
+   "kind": "optional",
+   "category": "communication",
+   "docs_words": "1-3-1 decision briefs: problem, three options, one pick.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 54,
+   "add_id": "official/communication/one-three-one-rule",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "answer a hard choice as one problem, three options and one pick."
+  },
+  {
+   "name": "ai-presenter-video",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Make a verified AI presenter video from script + image.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 60,
+   "add_id": "official/creative/ai-presenter-video",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make a video of a talking presenter from a script and one photo."
+  },
+  {
+   "name": "anatomy",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Explain an idea as an interactive isometric machine figure.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 61,
+   "add_id": "official/creative/anatomy",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "explain an idea with a machine drawing you can click on."
+  },
+  {
+   "name": "archify",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Validated interactive HTML diagrams, upstream-maintained.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 62,
+   "add_id": "official/creative/archify",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make clickable diagrams as web pages."
+  },
+  {
+   "name": "ascii-art",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 63,
+   "add_id": "official/creative/ascii-art",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make pictures and big banner text out of letters."
+  },
+  {
+   "name": "auteur",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Design and build cinematic, award-level web pages.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 64,
+   "add_id": "official/creative/auteur",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "design and build web pages with a film-like, cinematic feel."
+  },
+  {
+   "name": "baoyu-article-illustrator",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Article illustrations: type × style × palette consistency.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 65,
+   "add_id": "official/creative/baoyu-article-illustrator",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make matching pictures to illustrate an article you wrote."
+  },
+  {
+   "name": "baoyu-comic",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Knowledge comics (知识漫画): educational, biography, tutorial.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 66,
+   "add_id": "official/creative/baoyu-comic",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make comics that teach a topic or tell someone's life story."
+  },
+  {
+   "name": "brag",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Project launch video via Hyperframes, upstream-maintained.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 67,
+   "add_id": "official/creative/brag",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make a launch video for a project you built."
+  },
+  {
+   "name": "brag-slim",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Launch video from a project or URL, upstream-maintained.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 68,
+   "add_id": "official/creative/brag-slim",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make a launch video for a project or web address."
+  },
+  {
+   "name": "comfyui",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate images, video, and audio via diffusion workflows.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 69,
+   "add_id": "official/creative/comfyui",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make pictures, video and sound with AI."
+  },
+  {
+   "name": "concept-diagrams",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate flat, minimal educational SVG visuals as HTML.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 70,
+   "add_id": "official/creative/concept-diagrams",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make simple, flat diagrams for teaching."
+  },
+  {
+   "name": "creative-ideation",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate ideas via named methods from creative practice.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 71,
+   "add_id": "official/creative/creative-ideation",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "come up with ideas, using named methods from creative work."
+  },
+  {
+   "name": "design-md",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Author/validate/export Google's DESIGN.md token spec files.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 72,
+   "add_id": "official/creative/design-md",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "write and check a DESIGN.md file that describes how a design looks."
+  },
+  {
+   "name": "draw-your-font",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Turn a handwriting photo into an installable TTF font.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 73,
+   "add_id": "official/creative/draw-your-font",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "turn a photo of your handwriting into a font you can install."
+  },
+  {
+   "name": "dream-loop",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Build stunning 3D scenes via a concept-art fidelity loop.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 74,
+   "add_id": "official/creative/dream-loop",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "build 3D scenes, checking each against a drawing of the goal."
+  },
+  {
+   "name": "excalidraw",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 75,
+   "add_id": "official/creative/excalidraw",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make hand-drawn style diagrams for Excalidraw."
+  },
+  {
+   "name": "heartmula",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "HeartMuLa: Suno-like song generation from lyrics + tags.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 76,
+   "add_id": "official/creative/heartmula",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make whole songs from lyrics, like Suno does."
+  },
+  {
+   "name": "hyperframes",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Render MP4/WebM videos from HTML compositions.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 77,
+   "add_id": "official/creative/hyperframes",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make MP4 videos from web pages."
+  },
+  {
+   "name": "impeccable",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Frontend design guidance, upstream-maintained (impeccable).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 78,
+   "add_id": "official/creative/impeccable",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "design the look of web pages well."
+  },
+  {
+   "name": "ip-as-logo",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Design minimal cute IP mascot marks readable at 32px.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 79,
+   "add_id": "official/creative/ip-as-logo",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "design a tiny, cute mascot logo that still reads when very small."
+  },
+  {
+   "name": "kanban-video-orchestrator",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Plan and run multi-agent video production pipelines.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 80,
+   "add_id": "official/creative/kanban-video-orchestrator",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "split a big video job among several Hermes helpers and run it."
+  },
+  {
+   "name": "meme-generation",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Create meme PNGs from templates with Pillow text overlay.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 81,
+   "add_id": "official/creative/meme-generation",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make meme pictures from a topic, with text on a known template."
+  },
+  {
+   "name": "mono-color",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Generate one- or two-ink editorial print poster images.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 82,
+   "add_id": "official/creative/mono-color",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make poster pictures in one or two ink colours, like printed art."
+  },
+  {
+   "name": "pixel-art",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Pixel art w/ era palettes (NES, Game Boy, PICO-8).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 83,
+   "add_id": "official/creative/pixel-art",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make pixel art in the colours of old game consoles."
+  },
+  {
+   "name": "pretext",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Build creative browser demos with DOM-free text layout.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 84,
+   "add_id": "official/creative/pretext",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "build playful web demos where text flows around moving things."
+  },
+  {
+   "name": "simple-english",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Rewrite text to ASD-STE100 Simplified Technical English.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 85,
+   "add_id": "official/creative/simple-english",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "rewrite text in very simple, strict English."
+  },
+  {
+   "name": "sketch",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Throwaway HTML mockups: 2-3 design variants to compare.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 86,
+   "add_id": "official/creative/sketch",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make two or three quick throwaway designs of a screen to compare."
+  },
+  {
+   "name": "social-media-content-calendar",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Plan multi-platform social campaigns: briefs to posting.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 87,
+   "add_id": "official/creative/social-media-content-calendar",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "plan posts for several social media sites, from first idea to posting."
+  },
+  {
+   "name": "system-atlas",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Build explorable isometric architecture atlases as HTML.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 88,
+   "add_id": "official/creative/system-atlas",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "build a clickable map of how a software system works."
+  },
+  {
+   "name": "tldraw-offline",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Drive and script tldraw offline canvases with an agent.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 89,
+   "add_id": "official/creative/tldraw-offline",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "read and change drawings in the tldraw offline app."
+  },
+  {
+   "name": "unreal-mcp",
+   "kind": "optional",
+   "category": "creative",
+   "docs_words": "Automate Unreal Engine editor scenes, actors, and renders.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 90,
+   "add_id": "official/creative/unreal-mcp",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "control scenes and objects in Unreal Engine, a game-making app."
+  },
+  {
+   "name": "jupyter-notebook",
+   "kind": "optional",
+   "category": "data-science",
+   "docs_words": "Iterative Python via live Jupyter kernel (hamelnb).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 96,
+   "add_id": "official/data-science/jupyter-notebook",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "run Python step by step in a Jupyter notebook that keeps its results."
+  },
+  {
+   "name": "actual-setup",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Set up Actual Computer (actual.inc) inference in Hermes.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 102,
+   "add_id": "official/devops/actual-setup",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "set up Actual Computer to run AI for Hermes."
+  },
+  {
+   "name": "docker-management",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Manage Docker containers, images, volumes, and Compose.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 103,
+   "add_id": "official/devops/docker-management",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "start, stop and tidy Docker containers, a way to run apps boxed in."
+  },
+  {
+   "name": "hermes-s6-container-supervision",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Modify or debug s6 services in the Hermes Docker image.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 104,
+   "add_id": "official/devops/hermes-s6-container-supervision",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": null
+  },
+  {
+   "name": "inference-sh-cli",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Run 150+ AI apps (image, video, LLM) via inference.sh CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 105,
+   "add_id": "official/devops/inference-sh-cli",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make pictures and video with over 150 AI apps run on inference.sh."
+  },
+  {
+   "name": "pinggy-tunnel",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Zero-install localhost tunnels over SSH via Pinggy.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 106,
+   "add_id": "official/devops/pinggy-tunnel",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "give something running on your computer a public web address for a while."
+  },
+  {
+   "name": "setup-wizard-generator",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Generate a bash wizard guiding a human through manual setup.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 107,
+   "add_id": "official/devops/setup-wizard-generator",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "make a step-by-step script that walks a person through a manual setup."
+  },
+  {
+   "name": "watchers",
+   "kind": "optional",
+   "category": "devops",
+   "docs_words": "Poll RSS, JSON APIs, and GitHub with watermark dedup.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 108,
+   "add_id": "official/devops/watchers",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "check news feeds, GitHub or data links on a timer and report new items."
+  },
+  {
+   "name": "adversarial-ux-test",
+   "kind": "optional",
+   "category": "dogfood",
+   "docs_words": "Roleplay a hostile user to find and triage UX pain points.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 114,
+   "add_id": "official/dogfood/adversarial-ux-test",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "play an angry, impatient user to find what is confusing in your app."
+  },
+  {
+   "name": "agentmail",
+   "kind": "optional",
+   "category": "email",
+   "docs_words": "Use when an agent needs AgentMail CLI email inboxes.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 120,
+   "add_id": "official/email/agentmail",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "use its own email inbox, through AgentMail."
+  },
+  {
+   "name": "3-statement-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build integrated IS/BS/CF financial workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 126,
+   "add_id": "official/finance/3-statement-model",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "fill in a company's linked money statements in an Excel file."
+  },
+  {
+   "name": "comps-analysis",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build comparable-company valuation workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 127,
+   "add_id": "official/finance/comps-analysis",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "value a company against similar companies, in an Excel file."
+  },
+  {
+   "name": "dcf-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build discounted cash flow valuation workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 128,
+   "add_id": "official/finance/dcf-model",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "value a company from its future cash, in an Excel file."
+  },
+  {
+   "name": "excel-author",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build auditable financial workbooks headless via openpyxl.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 129,
+   "add_id": "official/finance/excel-author",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "build careful financial Excel files that others can check."
+  },
+  {
+   "name": "lbo-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build leveraged buyout workbooks with IRR/MOIC in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 130,
+   "add_id": "official/finance/lbo-model",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "plan the numbers for buying a company with borrowed money, in Excel."
+  },
+  {
+   "name": "merger-model",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build M&A accretion/dilution workbooks in Excel.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 131,
+   "add_id": "official/finance/merger-model",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "work out what a merger does to earnings per share, in Excel."
+  },
+  {
+   "name": "polymarket",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Query Polymarket: markets, prices, orderbooks, history.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 132,
+   "add_id": "official/finance/polymarket",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "look up prediction market odds and prices on Polymarket."
+  },
+  {
+   "name": "pptx-author",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Build PowerPoint decks headless with python-pptx.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 133,
+   "add_id": "official/finance/pptx-author",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make PowerPoint files."
+  },
+  {
+   "name": "stocks",
+   "kind": "optional",
+   "category": "finance",
+   "docs_words": "Stock quotes, history, search, compare, crypto via Yahoo.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 134,
+   "add_id": "official/finance/stocks",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "look up stock and crypto prices, history and comparisons, from Yahoo."
+  },
+  {
+   "name": "minecraft-modpack-server",
+   "kind": "optional",
+   "category": "gaming",
+   "docs_words": "Host modded Minecraft servers (CurseForge, Modrinth).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 140,
+   "add_id": "official/gaming/minecraft-modpack-server",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "set up and run a Minecraft game world with mods."
+  },
+  {
+   "name": "pokemon-player",
+   "kind": "optional",
+   "category": "gaming",
+   "docs_words": "Play Pokemon via headless emulator + RAM reads.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 141,
+   "add_id": "official/gaming/pokemon-player",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "play Pokemon games."
+  },
+  {
+   "name": "fitness-nutrition",
+   "kind": "optional",
+   "category": "health",
+   "docs_words": "Workout planning, macros, and body metrics via wger/USDA.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 147,
+   "add_id": "official/health/fitness-nutrition",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "plan workouts and look up food values and exercises."
+  },
+  {
+   "name": "neuroskill-bci",
+   "kind": "optional",
+   "category": "health",
+   "docs_words": "Use live BCI cognitive and mood state from NeuroSkill.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 148,
+   "add_id": "official/health/neuroskill-bci",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "read your mood and focus from a NeuroSkill brain sensor."
+  },
+  {
+   "name": "fastmcp",
+   "kind": "optional",
+   "category": "mcp",
+   "docs_words": "Build, test, and deploy Python MCP servers.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 154,
+   "add_id": "official/mcp/fastmcp",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  },
+  {
+   "name": "mcp-oauth-remote-gateway",
+   "kind": "optional",
+   "category": "mcp",
+   "docs_words": "Manual OAuth for remote MCP servers on headless gateways.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 155,
+   "add_id": "official/mcp/mcp-oauth-remote-gateway",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  },
+  {
+   "name": "mcporter",
+   "kind": "optional",
+   "category": "mcp",
+   "docs_words": "List, auth, and call MCP servers/tools from the terminal.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 156,
+   "add_id": "official/mcp/mcporter",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  },
+  {
+   "name": "gif-search",
+   "kind": "optional",
+   "category": "media",
+   "docs_words": "Search/download GIFs from Tenor via curl + jq.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 162,
+   "add_id": "official/media/gif-search",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "find and save GIFs from Tenor."
+  },
+  {
+   "name": "songsee",
+   "kind": "optional",
+   "category": "media",
+   "docs_words": "Audio spectrograms/features (mel, chroma, MFCC) via CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 163,
+   "add_id": "official/media/songsee",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "draw pictures of a sound file, such as its pitch over time."
+  },
+  {
+   "name": "accelerate",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Run PyTorch training across GPUs with minimal changes.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 169,
+   "add_id": "official/mlops/accelerate",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "train AIs on several graphics cards with few code changes."
+  },
+  {
+   "name": "axolotl",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Axolotl: YAML LLM fine-tuning (LoRA, DPO, GRPO).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 170,
+   "add_id": "official/mlops/training/axolotl",
+   "add_id_certain": true,
+   "add_id_seen": "seen in the app after Install by hhtech, Desktop v0.23.0: docs/answers/hhtech-fixes-6.md section 2",
+   "passes_r_rules": false,
+   "say": "train your own version of an AI from a settings file."
+  },
+  {
+   "name": "chroma",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Embedding database for RAG and semantic search.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 171,
+   "add_id": "official/mlops/chroma",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "keep text in a search store so an AI can find it by meaning."
+  },
+  {
+   "name": "dspy",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "DSPy: declarative LM programs, auto-optimize prompts, RAG.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 172,
+   "add_id": "official/mlops/dspy",
+   "add_id_certain": false,
+   "passes_r_rules": false,
+   "say": "build AI programs that improve their own instructions by themselves."
+  },
+  {
+   "name": "evaluating-llms-harness",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 173,
+   "add_id": "official/mlops/evaluating-llms-harness",
+   "add_id_certain": false,
+   "passes_r_rules": false,
+   "say": "test AIs on standard exams to compare how good they are."
+  },
+  {
+   "name": "faiss",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Fast vector similarity search at billion scale.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 174,
+   "add_id": "official/mlops/faiss",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "search huge collections of numbers for the closest matches, very fast."
+  },
+  {
+   "name": "flash-attention",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Speed up long-sequence transformer training and inference.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 175,
+   "add_id": "official/mlops/flash-attention",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "make training and running AIs faster."
+  },
+  {
+   "name": "lambda-labs",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "On-demand GPU cloud instances for ML training.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 176,
+   "add_id": "official/mlops/lambda-labs",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "rent strong graphics cards from Lambda Labs to train AIs."
+  },
+  {
+   "name": "llama-cpp",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "llama.cpp local GGUF inference + HF Hub model discovery.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 177,
+   "add_id": "official/mlops/llama-cpp",
+   "add_id_certain": false,
+   "passes_r_rules": false,
+   "say": "run an AI on your own computer with llama.cpp."
+  },
+  {
+   "name": "modal",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Serverless GPU cloud for ML jobs and model APIs.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 178,
+   "add_id": "official/mlops/modal",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "run AI jobs on Modal's rented graphics cards."
+  },
+  {
+   "name": "nemo-curator",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Curate LLM training data: dedupe, filter, PII redaction.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 179,
+   "add_id": "official/mlops/nemo-curator",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "clean up large piles of text before training an AI on it."
+  },
+  {
+   "name": "obliteratus",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "OBLITERATUS: abliterate LLM refusals (diff-in-means).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 180,
+   "add_id": "official/mlops/obliteratus",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "remove the safety refusals built into open AIs."
+  },
+  {
+   "name": "peft",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Fine-tune large LLMs with LoRA on limited GPU memory.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 181,
+   "add_id": "official/mlops/peft",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "train your own version of a big AI on a small graphics card."
+  },
+  {
+   "name": "pytorch-fsdp",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Fully sharded data-parallel training for large models.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 182,
+   "add_id": "official/mlops/pytorch-fsdp",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  },
+  {
+   "name": "pytorch-lightning",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Clean training loops with built-in distributed support.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 183,
+   "add_id": "official/mlops/pytorch-lightning",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": null
+  },
+  {
+   "name": "saelens",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Train sparse autoencoders to interpret model features.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 184,
+   "add_id": "official/mlops/saelens",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  },
+  {
+   "name": "segment-anything-model",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "SAM: zero-shot image segmentation via points, boxes, masks.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 185,
+   "add_id": "official/mlops/segment-anything-model",
+   "add_id_certain": false,
+   "passes_r_rules": true,
+   "say": "cut out any object in a picture, by pointing at it."
+  },
+  {
+   "name": "serving-llms-vllm",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "vLLM: high-throughput LLM serving, OpenAI API, quantization.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 186,
+   "add_id": "official/mlops/serving-llms-vllm",
+   "add_id_certain": false,
+   "passes_r_rules": false,
+   "say": "run an AI fast for many users at once, with vLLM."
+  },
+  {
+   "name": "simpo",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Reference-free preference alignment, simpler than DPO.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 187,
+   "add_id": "official/mlops/simpo",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  },
+  {
+   "name": "slime",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "RL post-training for LLMs with Megatron and SGLang.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 188,
+   "add_id": "official/mlops/slime",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  },
+  {
+   "name": "tensorrt-llm",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "High-throughput LLM inference on NVIDIA GPUs.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 189,
+   "add_id": "official/mlops/tensorrt-llm",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "run AIs as fast as possible on NVIDIA graphics cards."
+  },
+  {
+   "name": "torchtitan",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Pretrain LLMs at scale with PyTorch 4D parallelism.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 190,
+   "add_id": "official/mlops/torchtitan",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "train a new AI from scratch on many graphics cards."
+  },
+  {
+   "name": "unsloth",
+   "kind": "optional",
+   "category": "mlops",
+   "docs_words": "Unsloth: 2-5x faster LoRA/QLoRA fine-tuning, less VRAM.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 191,
+   "add_id": "official/mlops/unsloth",
+   "add_id_certain": false,
+   "passes_r_rules": true,
+   "say": "train your own version of an AI faster, on a smaller graphics card."
+  },
+  {
+   "name": "stripe-link-cli",
+   "kind": "optional",
+   "category": "payments",
+   "docs_words": "Agent payments via Stripe Link — cards, SPT, approvals.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 197,
+   "add_id": "official/payments/stripe-link-cli",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "buy things for you, with each payment approved in Link."
+  },
+  {
+   "name": "stripe-projects",
+   "kind": "optional",
+   "category": "payments",
+   "docs_words": "Provision SaaS services + sync creds via Stripe Projects.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 198,
+   "add_id": "official/payments/stripe-projects",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "sign you up for web services and keep their logins in one place."
+  },
+  {
+   "name": "box",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Box manages cloud files, sharing, search, and metadata.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 204,
+   "add_id": "official/productivity/box",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "organise, share and search your files on Box, a cloud file store."
+  },
+  {
+   "name": "canvas",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Fetch Canvas LMS courses and assignments via API token.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 205,
+   "add_id": "official/productivity/canvas",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "see your courses and assignments in Canvas, a school website."
+  },
+  {
+   "name": "decision-questionnaire",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Turn an unanswerable decision into a questionnaire doc.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 206,
+   "add_id": "official/productivity/decision-questionnaire",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "turn a decision you cannot make alone into questions for someone else."
+  },
+  {
+   "name": "here-now",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Publish sites to {slug}.here.now and store files in Drives.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 207,
+   "add_id": "official/productivity/here-now",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "put a web page online at here.now and keep files there."
+  },
+  {
+   "name": "live-dashboard",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Build self-updating dashboards from live sources.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 208,
+   "add_id": "official/productivity/live-dashboard",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "build a page that shows live facts and refreshes itself."
+  },
+  {
+   "name": "memento-flashcards",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Spaced-repetition flashcards: create, review, quiz, export.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 209,
+   "add_id": "official/productivity/memento-flashcards",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "help you learn facts with flashcards that come back at the right time."
+  },
+  {
+   "name": "property-listings",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Present property and rental listings as desktop cards.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 210,
+   "add_id": "official/productivity/property-listings",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "show homes or rentals you found as cards to compare, in the Hermes app."
+  },
+  {
+   "name": "shop",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Shop catalog search, checkout, order tracking, returns.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 211,
+   "add_id": "official/productivity/shop",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "search shops, buy, and track orders and returns."
+  },
+  {
+   "name": "siyuan",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Query and edit a SiYuan knowledge base via its API.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 212,
+   "add_id": "official/productivity/siyuan",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "search and change notes in SiYuan, a notes app."
+  },
+  {
+   "name": "telephony",
+   "kind": "optional",
+   "category": "productivity",
+   "docs_words": "Provision Twilio numbers, SMS/MMS, and AI outbound calls.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 213,
+   "add_id": "official/productivity/telephony",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "get a phone number, send texts and make AI phone calls, through Twilio."
+  },
+  {
+   "name": "bioinformatics",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Gateway to 400+ genomics and computational biology skills.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 219,
+   "add_id": "official/research/bioinformatics",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "find the right method for gene and biology data work."
+  },
+  {
+   "name": "blogwatcher",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 220,
+   "add_id": "official/research/blogwatcher",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "follow blogs and news feeds and see what is new."
+  },
+  {
+   "name": "darwinian-evolver",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Evolve prompts/regex/SQL/code with Imbue's evolution loop.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 221,
+   "add_id": "official/research/darwinian-evolver",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "improve a short text or code by trying many versions and keeping the best."
+  },
+  {
+   "name": "domain-intel",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Passive recon of subdomains, SSL certs, WHOIS, and DNS.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 222,
+   "add_id": "official/research/domain-intel",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "look up public facts about a website's address: owner, certificates, subdomains."
+  },
+  {
+   "name": "drug-discovery",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Drug discovery: ChEMBL search, drug-likeness, interactions.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 223,
+   "add_id": "official/research/drug-discovery",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "look up medicines and how they act, for drug research."
+  },
+  {
+   "name": "gitnexus-explorer",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Serve an interactive codebase knowledge graph web UI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 224,
+   "add_id": "official/research/gitnexus-explorer",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "show a code project as a clickable map of its parts."
+  },
+  {
+   "name": "llm-wiki",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Karpathy's LLM Wiki: build/query interlinked markdown KB.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 225,
+   "add_id": "official/research/llm-wiki",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "build a growing set of linked notes that an AI keeps up to date."
+  },
+  {
+   "name": "osint-investigation",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Follow the money via public records and sanctions data.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 226,
+   "add_id": "official/research/osint-investigation",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "dig through public records to trace money, companies and links between them."
+  },
+  {
+   "name": "parallel-cli",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Agent-native web search, deep research, and enrichment.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 227,
+   "add_id": "official/research/parallel-cli",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "search the web and do deep research with Parallel."
+  },
+  {
+   "name": "qmd",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Hybrid local search over notes, docs, and transcripts.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 228,
+   "add_id": "official/research/qmd",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "search your own notes and documents on your computer, by words and meaning."
+  },
+  {
+   "name": "research-paper-writing",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Write ML papers for NeurIPS/ICML/ICLR: design→submit.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 229,
+   "add_id": "official/research/research-paper-writing",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "plan, run and write up AI research for big science meetings."
+  },
+  {
+   "name": "rss-feeds",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Read RSS, Atom, JSON feeds; discover feeds behind a page.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 230,
+   "add_id": "official/research/rss-feeds",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "read news feeds from a website and list the newest entries."
+  },
+  {
+   "name": "scrapling",
+   "kind": "optional",
+   "category": "research",
+   "docs_words": "Scrape sites with stealth browsing and Cloudflare bypass.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 231,
+   "add_id": "official/research/scrapling",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "copy data from websites, also ones that try to block robots."
+  },
+  {
+   "name": "1password",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Set up op CLI, sign in, and read or inject secrets.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 237,
+   "add_id": "official/security/1password",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "read your secrets from 1Password and use them."
+  },
+  {
+   "name": "godmode",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 238,
+   "add_id": "official/security/godmode",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "get around the safety rules of AIs."
+  },
+  {
+   "name": "oss-forensics",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "GitHub supply-chain forensics: recovery, IOCs, reporting.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 239,
+   "add_id": "official/security/oss-forensics",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "investigate an attack on open-source code on GitHub and write a report."
+  },
+  {
+   "name": "sherlock",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Find accounts for a username across 400+ platforms.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 240,
+   "add_id": "official/security/sherlock",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "find which websites have an account with a given username."
+  },
+  {
+   "name": "unbroker",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Remove your info from data-broker sites, by name or phone.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 241,
+   "add_id": "official/security/unbroker",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "find and remove your personal details from people-search websites."
+  },
+  {
+   "name": "web-pentest",
+   "kind": "optional",
+   "category": "security",
+   "docs_words": "Authorized web pentest: recon, proof-based exploits, report.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 242,
+   "add_id": "official/security/web-pentest",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "attack a website you are allowed to test, to find its security holes."
+  },
+  {
+   "name": "openhue",
+   "kind": "optional",
+   "category": "smart-home",
+   "docs_words": "Control Philips Hue lights, scenes, rooms via OpenHue CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 248,
+   "add_id": "official/smart-home/openhue",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "turn Philips Hue lights and scenes on and off."
+  },
+  {
+   "name": "reddit-reading",
+   "kind": "optional",
+   "category": "social-media",
+   "docs_words": "Read Reddit: subreddits, search, threads, users. No browser.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 254,
+   "add_id": "official/social-media/reddit-reading",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "read and search Reddit posts and comments."
+  },
+  {
+   "name": "ast-grep",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "AST-aware structural code search and rewrite via ast-grep.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 260,
+   "add_id": "official/software-development/ast-grep",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "search and change code by its structure, not only its letters."
+  },
+  {
+   "name": "code-wiki",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Generate wiki docs + Mermaid diagrams for any codebase.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 261,
+   "add_id": "official/software-development/code-wiki",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "write a wiki with diagrams that explains a code project."
+  },
+  {
+   "name": "grill-me",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Adversarial plan interview before implementation.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 262,
+   "add_id": "official/software-development/grill-me",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "question your plan hard, step by step, before you build it."
+  },
+  {
+   "name": "hermes-agent-skill-authoring",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Author in-repo SKILL.md files: frontmatter and structure.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 263,
+   "add_id": "official/software-development/hermes-agent-skill-authoring",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "write new skills, the steps that teach Hermes a task, for the Hermes project."
+  },
+  {
+   "name": "inspecting-hermes-desktop-dom",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Read the live Hermes desktop DOM/CSS over CDP.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 264,
+   "add_id": "official/software-development/inspecting-hermes-desktop-dom",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "look inside the running Hermes app's page, for people changing the app."
+  },
+  {
+   "name": "node-inspect-debugger",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Debug Node.js via --inspect + Chrome DevTools Protocol CLI.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 265,
+   "add_id": "official/software-development/node-inspect-debugger",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "find bugs in Node.js programs by pausing them step by step."
+  },
+  {
+   "name": "pr-lens",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Draw code changes as animated architecture/data-flow SVGs.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 266,
+   "add_id": "official/software-development/pr-lens",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "draw a code change as a moving diagram that shows how it works."
+  },
+  {
+   "name": "python-debugpy",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Debug Python: pdb REPL + debugpy remote (DAP).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 267,
+   "add_id": "official/software-development/python-debugpy",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "find bugs in Python programs by pausing them step by step."
+  },
+  {
+   "name": "rest-graphql-debug",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Debug REST/GraphQL APIs: status codes, auth, schemas, repro.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 268,
+   "add_id": "official/software-development/rest-graphql-debug",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "find out why a web service answers with an error."
+  },
+  {
+   "name": "subagent-driven-development",
+   "kind": "optional",
+   "category": "software-development",
+   "docs_words": "Execute plans via delegate_task subagents (2-stage review).",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 269,
+   "add_id": "official/software-development/subagent-driven-development",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "carry out a coding plan by handing each task to a fresh AI helper."
+  },
+  {
+   "name": "cloudflare-temporary-deploy",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Deploy a Worker live, no account, via wrangler --temporary.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 275,
+   "add_id": "official/web-development/cloudflare-temporary-deploy",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "put a small web app online for an hour, with no account."
+  },
+  {
+   "name": "har-derived-api-client",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Record a site's XHR into a HAR, derive an HTTP client.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 276,
+   "add_id": "official/web-development/har-derived-api-client",
+   "add_id_certain": true,
+   "passes_r_rules": true,
+   "say": "record what a website sends, then make a program that fetches the same data."
+  },
+  {
+   "name": "page-agent",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Embed an in-page natural-language GUI copilot in web apps.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 277,
+   "add_id": "official/web-development/page-agent",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "add an AI helper inside your own web app that clicks for its users."
+  },
+  {
+   "name": "publish-site",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Versioned site deploys to GitHub/Cloudflare/Netlify Pages.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 278,
+   "add_id": "official/web-development/publish-site",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "put a website you built online on GitHub, Cloudflare or Netlify Pages."
+  },
+  {
+   "name": "scrollcraft",
+   "kind": "optional",
+   "category": "web-development",
+   "docs_words": "Premium scroll-driven landing pages; scroll = timeline.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 279,
+   "add_id": "official/web-development/scrollcraft",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": "build landing pages where scrolling plays like a film."
+  },
+  {
+   "name": "yuanbao",
+   "kind": "optional",
+   "category": "yuanbao",
+   "docs_words": "Yuanbao (元宝) groups: @mention users, query info/members.",
+   "page": "reference/optional-skills-catalog.md",
+   "line": 285,
+   "add_id": "official/yuanbao/yuanbao",
+   "add_id_certain": true,
+   "passes_r_rules": false,
+   "say": null
+  }
+ ],
+ "skill_name_rule_wf1": {
+  "about": "wants-fixes-v1 (content/helper-wants-fixes-v1.md). Four rules on top of skill_name_rule. Reference: dev/checks/hhcontent-wants-fixes/wants_fixes_step.py.",
+  "no_name_before_hyphen": "A skill name never ends right before a hyphen: in a skill called \"brag-slim\" only brag-slim is named, not brag. (Builder's change in 9434be1, kept by Lead.)",
+  "longer_name_wins": "When one skill name's match lies inside another's, only the longer counts: a skill called brag slim names brag-slim only. (Builder's change in 9434be1, kept by Lead.)",
+  "group_label_typed": "A group's own label typed exactly (letters and digits only, any case: pictures and video) opens that group, as if picked. Only once the conversation is open (after the name and work questions). (Builder's change in 9434be1, kept by Lead.)",
+  "ordinary_names_rule": "These skill names are ordinary words. After skill(s) for, such a name counts only when it is the last word of the message (is there a skill for maps). Followed by more words (skills for shop owners) it names no skill. The other patterns (the shop skill, a skill called shop) still count.",
+  "ordinary_names": [
+   "accelerate",
+   "anatomy",
+   "auteur",
+   "blackbox",
+   "box",
+   "brag",
+   "canvas",
+   "chroma",
+   "dogfood",
+   "impeccable",
+   "maps",
+   "modal",
+   "pretext",
+   "shop",
+   "sketch",
+   "slime",
+   "spike",
+   "stocks",
+   "watchers"
+  ],
+  "ordinary_names_judgement": "hhcontent's judgement of which names a person would use as a plain word. Read from the 186 names: every name with no hyphen that is a common English word.",
+  "skill_for_unknown": "Only in a question (route2 question_form). When the term step would explain the word skill, but the message asks for a skill for something (skill(s) for, or skill(s) that can / which can, then a word not in skill_for_not_after), and no row, skill or topic matched, the term line is not shown: the nearest group's N2 if one matches (I don't know that one, then its rows), else N1. is there a skill for knitting -> N1; is there a skill for editing photos -> N2 pics; what is a skill, what are skills for, is there a skill for me -> the term line. His words: if Helper doesn't know, it says so and doesn't make it up.",
+  "skill_for_pattern": "skills? (?:for|that can|which can) (?:a |an |the |my )?([a-z][a-z0-9'-]*)",
+  "skill_for_not_after": [
+   "me",
+   "it",
+   "hermes",
+   "bot",
+   "bots",
+   "beginners",
+   "beginner",
+   "newcomers",
+   "newcomer",
+   "starters",
+   "agents",
+   "agent"
+  ]
+ }
+}

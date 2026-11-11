@@ -1,0 +1,88 @@
+/* Helper's conversation window, talk-r5: option 4 as he picked it (10 Nov 2026, 20:05). Styles the Builder can copy.
+   Changed from talk-r4: answers 2 and 3 (round bubbles) and the reaching hand are removed; the things to pick sit in the
+   message box (.hh-box > .hh-picks > .hh-answers) in even rows: 4 = two rows of two, 3 = one row of three, 2 = one row of two.
+   The drawings in this folder are rendered with exactly this file (build.js inlines it), in headless Chromium.
+   Not run inside Hermes. Colour variables are Hermes's own names (apps/desktop/src/styles.css).
+   Sizes that the window sets itself:
+     --hh-char  width of the character: 168px, or 132px when the window is under 420px wide OR the page is under 600px high
+     --hh-k     --hh-char / 200  (0.84 or 0.66): the character's drawing scale
+     --hh-pad   side padding of the window: 20px, or 14px under 420px wide
+   Markup, top to bottom inside .hh-win:
+     .hh-conv        the conversation so far (.hh-earlier, .hh-old, .hh-me, .hh-note) and, last, .hh-bubble
+     .hh-under       svg.hh-tail + .hh-charspace (the character sits here) + .hh-answers
+     .hh-box        the message box (already built), with .hh-picks above the line where the person types */
+
+.hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}
+.hh-win.hh-narrow{--hh-pad:14px}                 /* window under 420px wide */
+.hh-win.hh-small{--hh-char:132px;--hh-k:.66}     /* window under 420px wide, or page under 600px high */
+
+/* ---- the conversation so far ---- */
+.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}
+.hh-conv>*{flex:none}
+.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}
+.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
+.hh-old-link .codicon{font-size:12px}
+.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}
+/* what Helper kept: small grey text on Helper's side, never a question, nothing to press but the link */
+.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}
+.hh-note .hh-link{margin-left:10px;white-space:nowrap}
+.hh-earlier{align-self:flex-start;display:flex;align-items:center;gap:5px;font-size:12px;line-height:16px;color:var(--ui-text-tertiary)}
+.hh-earlier .codicon{font-size:12px}
+.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
+.hh-link:hover{text-decoration-color:currentColor}
+
+/* ---- Helper's newest sentence: the bubble ---- */
+.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}   /* no shadow: see notes.md, light theme */
+.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}
+.hh-w0{visibility:hidden}                          /* a word not said yet: it holds its place */
+.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}
+
+/* busy: a small bubble with three dots, sitting over the tail */
+.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}
+.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}
+.hh-dots i.on{background:var(--ui-text-secondary)}
+
+/* a button that opens something, inside the bubble: square, small arrow */
+.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}
+.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}
+.hh-btn:hover,.hh-btn.is-hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}
+.hh-btn:active,.hh-btn.is-down{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}
+.hh-btn.hh-pri{padding:0 12px;background:var(--dt-primary);color:var(--dt-primary-foreground);border-color:transparent}
+.hh-btn.hh-pri:hover,.hh-btn.hh-pri.is-hover{background:var(--dt-primary);filter:brightness(1.08)}
+.hh-btn.hh-pri:active,.hh-btn.hh-pri.is-down{background:var(--dt-primary);filter:brightness(.8)}
+
+/* (the "Keep this?" box and its rules are gone, 10 Nov 19:00: Helper tells, it does not ask) */
+
+/* ---- under the bubble: the tail, the character's place, the answers ---- */
+.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}
+.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}
+.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}   /* 4px more for the answers, so "What Hermes remembers" stays on one line at 360 */
+/* ANSWER 1 (and 4): a short curved tail of ONE FIXED SIZE, 22 x 24px. It hangs from the top of .hh-under
+   (1px into the bubble, in front of it), leans toward the middle of the face and stops. It is never stretched and
+   never measured: when the bubble sits higher, there is more air under the tail, the tail stays the same.
+   <svg class="hh-tail" viewBox="0 0 22 24">
+     <path class="hh-tail-fill" d="M3,0 C6,9 4,17 0,24 C9,20 18,11 21,0Z"/><path class="hh-tail-edge" d="M3,0 C6,9 4,17 0,24 C9,20 18,11 21,0"/></svg> */
+.hh-tail{position:absolute;z-index:2;left:calc(var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}
+.hh-tail-fill{fill:var(--ui-bg-elevated)}
+.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}
+
+/* answers to pick: the person's side, right-aligned, drawn like the person's own messages */
+.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}
+.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}
+.hh-answer:hover,.hh-answer.is-hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}
+.hh-answer:active,.hh-answer.is-down{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}
+.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
+
+
+
+/* ---- talk-r5: the things to pick live in the message box (option 4) ----
+   Never more than four. Columns = the count, except four = 2 (so every row is full and every option is the same width):
+     <div class="hh-box"><div class="hh-picks" style="height:..."><div class="hh-answers" style="--hh-cols:2"> 4 x .hh-answer </div></div> <composer/> </div>
+   Opening and closing: .hh-picks grows from 0 to the height of its rows in 0.3s (ease in-out) only AFTER Helper's line is
+   fully said, and shrinks back to 0 in 0.3s right after a pick or after the person sends their own message. The window is a
+   column, so the conversation, the bubble and the character (which stands on the box's top edge) ride up and down with it.
+   With nothing to pick, .hh-picks is not there and the box is the plain message box. Reduced motion: no animation, it just changes. */
+.hh-box{flex:none;position:relative;z-index:2;border-radius:19px;background:var(--dt-card);border:1px solid color-mix(in srgb,var(--dt-composer-ring) 22%,transparent);box-shadow:var(--shadow-composer)}
+.hh-picks{overflow:hidden}
+.hh-box .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}
+.hh-box .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 11px;justify-content:flex-start;border-radius:12px}

@@ -7,7 +7,10 @@
 
 export const K = {
   // ---- page frame (app/page-search-shell.tsx: Capabilities' page shell, header with tabs) ----
-  root: 'flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden',
+  // A row: the left side (tabs, step list, open step), then Helper's strip or window. relative:
+  // Helper over a narrow page (layout.js 'over') is placed inside it.
+  root: 'relative flex h-full min-h-0 w-full min-w-0 overflow-hidden',
+  left: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
   // The header clears Hermes's title-bar band (its window buttons float there), as Capabilities does.
   // No page title: like Capabilities, the sidebar row names the page and the header holds the tabs.
   head: 'flex shrink-0 items-center gap-3 px-6 pb-2 pt-[calc(var(--titlebar-height)+1.5rem)]',
@@ -20,9 +23,7 @@ export const K = {
   textTabOn: 'text-foreground',
   textTabLabel: 'underline-offset-4 decoration-current/25 group-hover/text-tab:underline',
   textTabLabelOn: 'underline-offset-4 decoration-current/25 underline',
-  headEnd: 'ml-auto flex shrink-0 items-center gap-0.5',
-  // relative: the helper opened over a narrow page (layout.js 'over') is placed inside it.
-  body: 'relative flex min-h-0 flex-1',
+  body: 'flex min-h-0 flex-1',
 
   // ---- step list (app/master-detail.tsx ListColumn + CapRow; app/overlays/panel.tsx) ----
   rail: 'flex min-h-0 shrink-0 flex-col p-2',
@@ -99,46 +100,13 @@ export const K = {
   scaffoldGlyph: 'grid size-3.5 shrink-0 place-items-center',
   actions: 'flex flex-wrap items-center gap-2',
 
-  // ---- helper panel (a page column, like Hermes's right sidebar; master-detail.tsx DetailPane header) ----
-  // No line on its edge: Hermes's own sidebar has none, only the step from its fill to the page's
-  // (hhdesign fix 5; the Nous theme tints --ui-stroke-tertiary with its accent, so a line read as one).
-  helper: 'flex min-h-0 shrink-0 flex-col bg-(--ui-sidebar-surface-background)',
-  // Opened from the strip while the window is too narrow for a column: it lies over the page, on
-  // its side, at full height (layout.js 'over').
-  helperOver: 'absolute inset-y-0 z-20 shadow-lg',
-  helperOverRight: 'right-0',
-  helperOverLeft: 'left-0',
-  helperTop: 'flex h-9 shrink-0 items-center gap-2 px-3',
-  helperTopLabel: 'min-w-0 truncate text-xs font-medium text-foreground',
-  // RoomHeader's ghost icon buttons (plugins/hermes-bots/group-room-ui.tsx)
-  iconTone: 'text-(--ui-text-tertiary)',
-  helperBody: 'flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pb-1 pt-1',
-  // Pēteris's sketch (inputs/pb-sketch-9nov-helper-chat.png): the helper's words sit low, as plain
-  // text with no bubble or card, and the space opens above them. mt-auto, not justify-end, so a
-  // long chat log can still be scrolled to its top.
-  helperNewest: 'mt-auto flex flex-col gap-3',
-  // The helper's words: the chat's own message text (plugins/hermes-bots/group-room-ui.tsx RoomMessage body)
-  say: 'text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-foreground',
-  sayStack: 'flex min-w-0 flex-col gap-1.5',
-  sayActions: 'mt-1 flex flex-wrap items-center gap-2',
-  // Chat log on: the whole back-and-forth as a plain list, newest at the bottom. Each entry has
-  // its speaker in RoomMessage's small time-stamp tone, then the words.
-  log: 'flex min-w-0 flex-col gap-3',
-  logEntry: 'flex min-w-0 flex-col gap-0.5',
-  logWho: 'text-[0.6875rem] font-medium text-(--ui-text-tertiary)',
-  // The person's own words in the log: the same text, one tone quieter than the helper's
-  logYou: 'wrap-anywhere text-pretty text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) text-(--ui-text-secondary)',
-  // The character (variation 2 of design/face-r2) has its own row directly above the message box,
-  // at the box's left end. The row's exact place (pulled down over the box's top border, in front
-  // of it) is in px and set inline by page.js, like the column widths.
-  characterRow: 'flex shrink-0',
+  // ---- Helper's conversation window: its own classes are the T table below (src/talk.css).
+  // From Hermes it wears only these ----
   // The whole line for screen readers while the eye sees it word by word (src/reveal.js): Hermes's
   // own visually-hidden class (components/ui/dialog.tsx and others).
   srOnly: 'sr-only',
   // Composer: plugins/hermes-bots/group-room-ui.tsx RoomComposer (rounded surface, round send
-  // button), on one row like Hermes's chat composer. No model name (the sketch drops it; it stays
-  // on the Your setup card).
-  composerForm: 'px-3 pb-3 pt-1',
+  // button), on one row like Hermes's chat composer.
   composerSurface: 'relative isolate rounded-2xl',
   composerRow: 'flex items-end gap-x-(--composer-control-gap) px-(--composer-surface-pad-x) py-(--composer-surface-pad-y)',
   composerInputCell: 'min-w-0 flex-1',
@@ -148,9 +116,9 @@ export const K = {
     'field-sizing-content max-h-40 min-h-0 resize-none !border-transparent !bg-transparent !shadow-none px-1 py-1 text-[length:var(--conversation-text-font-size)] leading-(--dt-line-height) placeholder:text-(--ui-text-tertiary)',
   composerSend: 'shrink-0',
 
-  // ---- hidden helper: a thin full-height strip at the page edge, its label written vertically
-  // (hhdesign fix 4): components/ui/pane-tab.tsx TAB_VERTICAL and the collapsed kanban column
-  // (plugins/kanban/board.tsx), on the open helper's fill ----
+  // ---- Helper's strip: a thin full-height strip at the page's right edge in a narrow window, its
+  // label written vertically: components/ui/pane-tab.tsx TAB_VERTICAL and the collapsed kanban
+  // column (plugins/kanban/board.tsx), on Helper's fill. It folds Helper away and brings it back ----
   strip:
     'flex h-full w-7 shrink-0 cursor-pointer flex-col items-center gap-2 bg-(--ui-sidebar-surface-background) py-3 text-(--ui-text-tertiary) transition-colors hover:bg-(--chrome-action-hover) hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
   stripLabel: 'text-[0.6875rem] font-medium uppercase tracking-wide text-(--ui-text-tertiary) [writing-mode:vertical-rl]',
@@ -189,16 +157,111 @@ export const K = {
   cardPaste: 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5',
   cardPasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)',
   cardList: 'list-decimal space-y-1 pl-4 text-[0.72rem] leading-snug text-(--ui-text-secondary)',
-  pageActions: 'flex flex-wrap items-center gap-2 pt-1'
+  pageActions: 'flex flex-wrap items-center gap-2 pt-1',
+
+  // ---- Helper's page in Hermes's Settings (src/settings-page.js): Hermes's settings rows (ListRow
+  // in app/settings/primitives.tsx), the text box as config-field.tsx draws a JSON value (mono,
+  // min-h-28, resize-y) and ListRow's own description tone for every small line ----
+  settingsPage: 'flex min-w-0 flex-col gap-2',
+  settingsBelow: 'mt-3 flex min-w-0 flex-col gap-2',
+  settingsBox: 'min-h-28 resize-y bg-background font-mono text-xs',
+  settingsHint: 'text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)',
+  settingsText: 'text-[length:var(--conversation-text-font-size)] font-medium text-foreground',
+  settingsMessage: 'text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-secondary)',
+  settingsAsk: 'flex flex-wrap items-center gap-2',
+  settingsButtons: 'flex flex-wrap items-center gap-2',
+  settingsFacts: 'flex flex-col gap-1 py-3 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)',
+  // talk v2 look (hhdesign's review of e86b410): the bottom of the page under a thin divider, as Hermes's own
+  // settings rows; the Forget question under its row
+  settingsRule: 'mt-3 border-t border-(--ui-stroke-tertiary) pt-3',
+  settingsForgetAsk: 'flex flex-wrap items-center gap-2 pb-3',
+  // the message after Save and the buttons under it, 4 px apart
+  settingsSaveGroup: 'flex min-w-0 flex-col items-start gap-1',
+  // a line that cannot be read: three rows, 4 px apart; row 2 is the line in a mono chip that wraps anywhere
+  // (Hermes's own code chip: --ui-bg-quinary, 2.5 px corners), row 3 the fix in the caption size
+  settingsRefused: 'flex min-w-0 flex-col items-start gap-1',
+  settingsRefusedLine: 'w-fit max-w-full wrap-anywhere rounded-[2.5px] bg-(--ui-bg-quinary) px-1.5 py-0.5 font-mono text-xs',
+  settingsRefusedFix: 'text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-secondary)',
+
+  // ---- Helper's conversation window: text to paste inside the bubble (hhdesign's notes-wants.md item 4),
+  // Hermes's own small code card (components/chat/compact-markdown.tsx): an edge, readable 12 px mono, Copy at
+  // the top right. The setup card's text to paste (cardPaste) stays as it is ----
+  bubblePaste: 'flex w-full min-w-0 items-start gap-2 rounded-md border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) py-1.5 pl-2.5 pr-1.5',
+  bubblePasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
+  // builder-qs (Lead, 11 Nov 00:55: the text to paste at least 12 px): the older line's too, as the bubble's
+  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)'
 }
 
-// Joins class names, skipping empty ones. Only K values go in.
+// Joins class names, skipping empty ones. Only K and T values go in.
 export function cx(...names) {
   return names.filter(Boolean).join(' ')
 }
 
+// Helper's conversation window is the one part with a style sheet of our own (src/talk.css, from
+// hhdesign's design/talk-r3/talk.css): its answers need hover, pressed and keyboard-ring looks
+// that Hermes's classes do not have for these shapes. Every class of that sheet, in one table;
+// each starts with hh-. tests/talk-css.test.mjs checks that every name here has a rule in the
+// sheet and that the sheet has no rule nothing uses.
+export const T = {
+  win: 'hh-win',
+  winTight: 'hh-narrow',
+  winSmall: 'hh-small',
+  // over a narrow page instead of beside it
+  winOver: 'hh-over',
+  // the conversation so far: Helper's older lines as small bubbles, the person's messages
+  conv: 'hh-conv',
+  convIn: 'hh-conv-in',
+  old: 'hh-old',
+  oldLink: 'hh-old-link',
+  me: 'hh-me',
+  // Helper's newest sentence
+  bubble: 'hh-bubble',
+  line: 'hh-line',
+  inBubble: 'hh-in',
+  inBubbleColumn: 'hh-col',
+  button: 'hh-btn',
+  // in place of a button: where to find a screen that no button can open
+  where: 'hh-where',
+  dots: 'hh-dots',
+  dotOn: 'hh-on',
+  // under the bubble: the piece between bubble and character, the character, the answers to pick
+  under: 'hh-under',
+  linkCell: 'hh-linkcell',
+  tail: 'hh-tail-short',
+  tailFill: 'hh-tail-fill',
+  tailEdge: 'hh-tail-edge',
+  charSpace: 'hh-charspace',
+  character: 'hh-char',
+  answers: 'hh-answers',
+  answer: 'hh-answer',
+  // the things to pick inside the message box (talk-r5), growing and shrinking
+  picks: 'hh-picks',
+  // the faint lines: what was kept, what is used; the first-time line on a line of its own
+  note: 'hh-note',
+  noteFirst: 'hh-note-first',
+  // talk v2 fixes: the words of a faint line that is no longer true (forgotten), struck through
+  gone: 'hh-gone',
+  link: 'hh-link',
+  // the list of what Helper keeps (A1)
+  rows: 'hh-rows',
+  // the box "From the Hermes docs" (S1, S2): the docs' own words, not Helper's voice
+  docs: 'hh-docs',
+  docsHead: 'hh-docs-head',
+  docsWords: 'hh-docs-words',
+  // the numbered clicks to add an optional skill, and the faint line after them
+  steps: 'hh-steps',
+  after: 'hh-after',
+  // "More" among the things to pick: quieter than an answer (talk v2 look)
+  more: 'hh-more',
+  // held room: there, not seen yet
+  wait: 'hh-wait',
+  skip: 'hh-link hh-skip',
+  grip: 'hh-grip',
+  gripPill: 'hh-grip-pill'
+}
+
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
-export const ICONS = ['compass', 'arrow-swap', 'chevron-left', 'chevron-right', 'close', 'arrow-up', 'play-circle', 'location', 'info']
+export const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'play-circle']
 // Hermes's look has one primary button per screen (hhdesign fix 6); every other button of
 // ours is secondary or ghost. tests/page-render.test.mjs counts them per screen.

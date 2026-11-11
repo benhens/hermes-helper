@@ -4,7 +4,8 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { colourFindings, styleFindings, paletteClassFindings } from './lib/colour-lint.mjs'
-import { K } from '../src/look.js'
+import { K, T } from '../src/look.js'
+import { TALK_CSS } from '../src/talk-css.js'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8')
@@ -38,6 +39,7 @@ test('the palette lint catches Tailwind colours that are not the theme (it bites
 
 test('class table: only theme colours (no Tailwind palette colours, no white/black)', () => {
   assert.deepEqual(paletteClassFindings(Object.values(K).join(' ')), [])
+  assert.deepEqual(paletteClassFindings(Object.values(T).join(' ')), [])
 })
 
 test('the style lint catches fonts and shadows of our own (it bites)', () => {
@@ -48,10 +50,20 @@ test('the style lint catches fonts and shadows of our own (it bites)', () => {
   assert.deepEqual(styleFindings('.a{font:400 14px/20px var(--font-sans);box-shadow:var(--shadow-sm)}'), [])
 })
 
-test('no stylesheet of our own: no <style> element, no fonts, no font or shadow styles inline', () => {
-  assert.doesNotMatch(plugin, /['"]style['"]\s*,/)
+test('one style sheet of our own, for Helper\'s window only (row 11 of the talk v1 plan): one <style> element, made in one place from the built sheet; no fonts, no font or shadow styles inline', () => {
+  // The sheet's own rules (hh- classes, Hermes variables only, no fonts, no shadows) are
+  // tests/talk-css.test.mjs. Here: the built file makes exactly one style element, and its text
+  // is the built sheet, never text put together at run time.
+  const made = [...plugin.matchAll(/jsxs?\(\s*['"]style['"]\s*,\s*\{([^}]*)\}/g)]
+  assert.equal(made.length, 1)
+  assert.match(made[0][1], /children:\s*TALK_CSS\b/)
+  assert.doesNotMatch(plugin, /dangerouslySetInnerHTML|createElement\(\s*['"]style|insertRule|adoptedStyleSheets|\.styleSheets|document\.head/)
+  assert.equal(srcFiles.filter(f => /['"]style['"]\s*,/.test(read(f))).join(), 'src/page.js')
   assert.doesNotMatch(plugin, /@font-face|\.woff|\.ttf/)
   assert.doesNotMatch(plugin, /fontFamily|boxShadow|textShadow/)
+  // and the sheet inside the built file passes the same lints as every source file
+  assert.deepEqual(colourFindings(TALK_CSS), [])
+  assert.deepEqual(styleFindings(TALK_CSS), [])
 })
 
 test('the page paints no background of its own (the root and page columns carry no bg-*)', () => {

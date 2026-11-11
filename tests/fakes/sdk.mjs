@@ -6,6 +6,13 @@ const atom = read => ({ get: read })
 
 export const host = {
   request: (method, params, timeout) => live().request(method, params, timeout),
+  // host.navigate opens one of Hermes's own screens; the test reads where the page asked to go.
+  // h.navigateThrows makes it throw, as a door that is missing would.
+  navigate: to => {
+    const h = live()
+    if (h.navigateThrows) throw new Error('host.navigate threw')
+    ;(h.navigated ||= []).push(to)
+  },
   state: {
     // host.state.model exists in Hermes; the page must not read it (tests check modelRead stays unset).
     model: atom(() => {
@@ -50,4 +57,5 @@ export const SelectTrigger = 'sdk:SelectTrigger'
 export const SelectValue = 'sdk:SelectValue'
 export const Switch = 'sdk:Switch'
 export const Textarea = 'sdk:Textarea'
+export const ListRow = 'sdk:ListRow'
 export const Tip = 'sdk:Tip'

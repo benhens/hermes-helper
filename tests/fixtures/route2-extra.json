@@ -1,0 +1,981 @@
+{
+ "about": "Written by dev/checks/talk-v2/dump_set2.py: single messages through hhcontent's route2.py, keeping on. Do not edit: make it again.",
+ "json_sha256": "4899a0ae3643d9efc67308e5dde65c77c0be04506ef067344597650107e45f57",
+ "messages": [
+  {
+   "after": "",
+   "n": 1,
+   "shown": "line msg1",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg1"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "gmail on telegram",
+   "want": "a chat app keeps the services topic out"
+  },
+  {
+   "after": "",
+   "n": 2,
+   "shown": "line msg2",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg2"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "can my slack bot read notion",
+   "want": "a chat app keeps the services topic out"
+  },
+  {
+   "after": "",
+   "n": 3,
+   "shown": "line msg2",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg2"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "use gmail from whatsapp",
+   "want": "a chat app keeps the services topic out"
+  },
+  {
+   "after": "",
+   "n": 4,
+   "shown": "line msg1",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg1"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "connect telegram",
+   "want": "build words before topics"
+  },
+  {
+   "after": "",
+   "n": 5,
+   "shown": "line msg1",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg1"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "how do I connect telegram",
+   "want": "a how question is not a request"
+  },
+  {
+   "after": "",
+   "n": 6,
+   "shown": "line msg2",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg2"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "does it work with discord and google calendar",
+   "want": "chat app and service"
+  },
+  {
+   "after": "",
+   "n": 7,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "will it forget things",
+   "want": "weak key word in a question that names Hermes"
+  },
+  {
+   "after": "",
+   "n": 8,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I forget things",
+   "want": "weak key word without Hermes"
+  },
+  {
+   "after": "",
+   "n": 9,
+   "shown": "COST",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "does hermes cost money",
+   "want": "weak key words"
+  },
+  {
+   "after": "",
+   "n": 10,
+   "shown": "line use2",
+   "state": {
+    "asked": [],
+    "found": {
+     "use": "use2"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "it costs too much",
+   "want": "weak key words, no question"
+  },
+  {
+   "after": "",
+   "n": 11,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "not sure about memory",
+   "want": "unsure words"
+  },
+  {
+   "after": "",
+   "n": 12,
+   "shown": "question mod",
+   "state": {
+    "asked": [
+     "mod"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mod",
+    "stage": "open",
+    "work": null
+   },
+   "text": "I don't know which model",
+   "want": "unsure words"
+  },
+  {
+   "after": "",
+   "n": 13,
+   "shown": "term line skill",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "by the way, what is a skill",
+   "want": "a term"
+  },
+  {
+   "after": "",
+   "n": 14,
+   "shown": "W2 buttons skill+plugin",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "skills and plugins",
+   "want": "two terms"
+  },
+  {
+   "after": "",
+   "n": 15,
+   "shown": "W1 buttons tool+mcp",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what is mcp and what is a tool",
+   "want": "two terms"
+  },
+  {
+   "after": "",
+   "n": 16,
+   "shown": "line msg1",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg1"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "skill for telegram",
+   "want": "a term and a topic"
+  },
+  {
+   "after": "",
+   "n": 17,
+   "shown": "W1 buttons msg+bot",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "second bot on telegram with gmail",
+   "want": "several topics with a chat app"
+  },
+  {
+   "after": "",
+   "n": 18,
+   "shown": "H1 (can you set up)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "Can you set up a reminder for me",
+   "want": "request or schedule"
+  },
+  {
+   "after": "",
+   "n": 19,
+   "shown": "question sch",
+   "state": {
+    "asked": [
+     "sch"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "sch",
+    "stage": "open",
+    "work": null
+   },
+   "text": "set a reminder every morning",
+   "want": "request or schedule"
+  },
+  {
+   "after": "",
+   "n": 20,
+   "shown": "line sch2",
+   "state": {
+    "asked": [],
+    "found": {
+     "sch": "sch2"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "remind me every monday",
+   "want": "schedule"
+  },
+  {
+   "after": "",
+   "n": 21,
+   "shown": "H1 (make me)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "make me a bot",
+   "want": "build pair"
+  },
+  {
+   "after": "",
+   "n": 22,
+   "shown": "question bot",
+   "state": {
+    "asked": [
+     "bot"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "bot",
+    "stage": "open",
+    "work": null
+   },
+   "text": "can I make a second bot",
+   "want": "build pair in a question"
+  },
+  {
+   "after": "",
+   "n": 23,
+   "shown": "TP",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what can you do",
+   "want": "nothing or can"
+  },
+  {
+   "after": "",
+   "n": 24,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "MEMORY",
+   "want": "upper case"
+  },
+  {
+   "after": "",
+   "n": 25,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "memory?",
+   "want": "one word question"
+  },
+  {
+   "after": "",
+   "n": 26,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "the “memory” thing",
+   "want": "curly quotes"
+  },
+  {
+   "after": "",
+   "n": 27,
+   "shown": "line mod3",
+   "state": {
+    "asked": [],
+    "found": {
+     "mod": "mod3"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "ollama",
+   "want": "a need's key word alone"
+  },
+  {
+   "after": "",
+   "n": 28,
+   "shown": "question mod",
+   "state": {
+    "asked": [
+     "mod"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mod",
+    "stage": "open",
+    "work": null
+   },
+   "text": "claude or chatgpt",
+   "want": "two needs of one topic"
+  },
+  {
+   "after": "",
+   "n": 29,
+   "shown": "line mod3",
+   "state": {
+    "asked": [],
+    "found": {
+     "mod": "mod3"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "free and local",
+   "want": "needs without a topic word"
+  },
+  {
+   "after": "",
+   "n": 30,
+   "shown": "question svc",
+   "state": {
+    "asked": [
+     "svc"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "svc",
+    "stage": "open",
+    "work": null
+   },
+   "text": "is my gmail safe",
+   "want": "service safety"
+  },
+  {
+   "after": "name",
+   "n": 31,
+   "shown": "term line skill",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "Anna, and what is a skill",
+   "want": "name with more"
+  },
+  {
+   "after": "name",
+   "n": 32,
+   "shown": "F1 name=Tom +kept=name +first",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {
+     "name": "Tom",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Tom",
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "my name is Tom and I use telegram",
+   "want": "name with more, not a question"
+  },
+  {
+   "after": "name",
+   "n": 33,
+   "shown": "line svc1 +kept=name +first +name=Li",
+   "state": {
+    "asked": [],
+    "found": {
+     "svc": "svc1"
+    },
+    "kept": {
+     "name": "Li",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Li",
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "I'm Li. Can it read my gmail?",
+   "want": "name with a question"
+  },
+  {
+   "after": "name",
+   "n": 34,
+   "shown": "line msg1",
+   "state": {
+    "asked": [],
+    "found": {
+     "msg": "msg1"
+    },
+    "kept": {},
+    "lastq": false,
+    "met": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "telegram",
+   "want": "a topic word at the name question"
+  },
+  {
+   "after": "name",
+   "n": 35,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": true,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "why do you ask",
+   "want": "a question at the name question"
+  },
+  {
+   "after": "name",
+   "n": 36,
+   "shown": "F1 name=Jean-Luc +kept=name +first",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {
+     "name": "Jean-Luc",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Jean-Luc",
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "Jean-Luc",
+   "want": "a name with a hyphen"
+  },
+  {
+   "after": "name",
+   "n": 37,
+   "shown": "F1 name=None",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": true,
+    "name": null,
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "ok",
+   "want": "not a name"
+  },
+  {
+   "after": "name",
+   "n": 38,
+   "shown": "F1 name=Māra +kept=name +first",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {
+     "name": "Māra",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Māra",
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "it's Māra",
+   "want": "a name with other letters"
+  },
+  {
+   "after": "name",
+   "n": 39,
+   "shown": "F1 name=Bob +kept=name +first",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {
+     "name": "Bob",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Bob",
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "call me Bob please",
+   "want": "a strong name pattern"
+  },
+  {
+   "after": "name",
+   "n": 40,
+   "shown": "F1 name=None",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": true,
+    "name": null,
+    "pending": null,
+    "stage": "work",
+    "work": null
+   },
+   "text": "Peter 2",
+   "want": "a digit"
+  },
+  {
+   "after": "work",
+   "n": 41,
+   "shown": "F2 name=Sam work=I teach tennis to kids +kept=name +first",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {
+     "name": "Sam",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": "I teach tennis to kids"
+   },
+   "text": "I teach tennis to kids",
+   "want": "work"
+  },
+  {
+   "after": "work",
+   "n": 42,
+   "shown": "N1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": true,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "what do you mean?",
+   "want": "a question at the work question"
+  },
+  {
+   "after": "work",
+   "n": 43,
+   "shown": "F2 name=Sam work=None +kept=name +first",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {
+     "name": "Sam",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "one two three four five six seven eight nine ten eleven twelve thirteen fourteen",
+   "want": "work too long"
+  },
+  {
+   "after": "work",
+   "n": 44,
+   "shown": "F2 name=Sam work=I connect people with gmail +kept=name +first",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {
+     "name": "Sam",
+     "told": true
+    },
+    "lastq": false,
+    "met": true,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": "I connect people with gmail"
+   },
+   "text": "I connect people with gmail",
+   "want": "work that holds topic words"
+  },
+  {
+   "after": "work",
+   "n": 45,
+   "shown": "H1 (please install)",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": true,
+    "name": "Sam",
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "please install slack",
+   "want": "a request at the work question"
+  },
+  {
+   "after": "",
+   "n": 46,
+   "shown": "K1",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "sk-proj-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa what is memory",
+   "want": "a key"
+  },
+  {
+   "after": "",
+   "n": 47,
+   "shown": "CUT",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "",
+   "want": "empty"
+  },
+  {
+   "after": "",
+   "n": 48,
+   "shown": "CUT",
+   "state": {
+    "asked": [],
+    "found": {},
+    "kept": {},
+    "lastq": false,
+    "met": false,
+    "name": null,
+    "pending": null,
+    "stage": "open",
+    "work": null
+   },
+   "text": "   ",
+   "want": "spaces"
+  },
+  {
+   "after": "",
+   "n": 49,
+   "shown": "question mem",
+   "state": {
+    "asked": [
+     "mem"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mem",
+    "stage": "open",
+    "work": null
+   },
+   "text": "thanks, please tell me about memory",
+   "want": "ignore phrases"
+  },
+  {
+   "after": "",
+   "n": 50,
+   "shown": "question mod",
+   "state": {
+    "asked": [
+     "mod"
+    ],
+    "found": {},
+    "kept": {},
+    "lastq": true,
+    "met": false,
+    "name": null,
+    "pending": "mod",
+    "stage": "open",
+    "work": null
+   },
+   "text": "could you please explain the model thing",
+   "want": "ignore phrases"
+  }
+ ],
+ "route2_sha256": "3af440269b7f405d1e56136bd8b76597451b19955f41d52956cb14cf153af95c"
+}

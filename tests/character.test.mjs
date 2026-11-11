@@ -11,7 +11,8 @@ import { mount, all, loadSrc } from './lib/render.mjs'
 import { useState } from './fakes/react.mjs'
 import { FACE, EXPRESSIONS, EXPRESSION_NAMES, RISE, eyeTransform, pupilScale, pupilHole, fingerRect, talkFrames, drumHeights } from '../src/expressions.js'
 
-const { Character, CHARACTER_PX } = await loadSrc('character.js')
+const { Character } = await loadSrc('character.js')
+const { CHARACTER_PX } = await import('../src/layout.js')
 
 const ACCENT = 'var(--ui-accent)'
 const named = (tree, name) => all(tree, n => n.props['data-hh'] === name)[0] || null
@@ -53,15 +54,18 @@ function stage(initial) {
   return { view, els, log, live, loops, animated, set: p => setProps(old => ({ ...old, ...p })), tree: () => view.tree }
 }
 
-test('the drawing: an inline SVG of variation 2, 140 px wide, every shape filled with the accent colour, no picture and no data URL', () => {
-  assert.equal(CHARACTER_PX, 140)
+test('the drawing: an inline SVG of variation 2, 168 px wide, every shape filled with the accent colour, no picture and no data URL', () => {
+  assert.equal(CHARACTER_PX, 168)
   const tree = draw({})
   assert.equal(tree.type, 'svg')
   assert.equal(tree.props['data-hh-character'], 'face')
   assert.equal(tree.props.role, 'img')
   assert.equal(tree.props['aria-label'], 'Helper')
   assert.equal(tree.props.viewBox, '0 14 200 134')
-  assert.deepEqual([tree.props.width, tree.props.height], [140, 93.8])
+  assert.deepEqual([tree.props.width, tree.props.height], [168, 112.56])
+  // and at the small size the page asks for in a narrow or low window
+  const small = draw({ size: 132 })
+  assert.deepEqual([small.props.width, small.props.height], [132, 88.44])
   const shapes = all(tree, n => ['ellipse', 'rect', 'path', 'circle'].includes(n.type) && n.props['data-hh'])
   assert.equal(shapes.length, 2 + 2 + 1 + 8, 'two eyes, two pupil holes, a mouth, eight fingers')
   for (const s of shapes) assert.equal(s.props.style.fill, ACCENT, s.props['data-hh'])
@@ -172,7 +176,7 @@ test('in the way of nothing: mouse presses pass through it, it is never wider th
   const s = draw({}).props.style
   assert.equal(s.pointerEvents, 'none')
   assert.equal(s.maxWidth, '100%')
-  assert.equal(s.width, 140)
+  assert.equal(s.width, 168)
   assert.equal(s.height, 'auto')
   assert.equal(s.overflow, 'visible')
 })

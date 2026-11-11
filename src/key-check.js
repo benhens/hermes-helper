@@ -4,12 +4,11 @@
 // 500-character cut. A key that starts at character 491 is caught on the full text and missed
 // after the cut (hhtech, ran), so the key check must come first.
 
-// hhtech's three patterns, exactly. A match on any one counts as a key.
-export const KEY_PATTERNS = [
-  /(?<![A-Za-z0-9])(?:sk-|sk_|xai-|AIza|ghp_|gho_|github_pat_|hf_|gsk_|pplx-|r8_|fw_)[A-Za-z0-9_-]{16,}/,
-  /(?<![A-Za-z0-9])eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/,
-  /(?<![A-Za-z0-9])(?=[A-Za-z]*[0-9])(?=[0-9]*[A-Za-z])[A-Za-z0-9]{32,}(?![A-Za-z0-9])/
-]
+// hhcontent's key shapes (content/helper-talk-v2.json key_patterns, changes-10: one list, read
+// the same by route2.py and settings_read.py), exactly. A match on any one counts as a key. No
+// flags: case matters.
+import { TALK_DATA } from './talk-data.js'
+export const KEY_PATTERNS = TALK_DATA.key_patterns.map(p => new RegExp(p))
 
 export const MAX_INPUT_CHARS = 500
 
