@@ -35,9 +35,9 @@ test('every selector is one of our own hhd- classes (in the light theme, under H
     `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`,
     // look-fix (PICK.md way 3): the card's sign 96 px (140 x .686) at .5 under 300 px of card, gone under 240 px
     // (content box: 300 and 240 less 2 x 20 px padding and 2 x 1 px border; the compact card's padding is 2 x 12 px)
-    `@container (max-width:257px){.${D.scardSign}{transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
+    `@container (max-width:257px){.${D.scardSign}{right:-4px;transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
     `@container (max-width:197px){.${D.scardSign}{display:none}.${D.scardWhy}{max-width:none}}`,
-    `@container (max-width:273px){.${D.compact} .${D.scardSign}{transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
+    `@container (max-width:273px){.${D.compact} .${D.scardSign}{right:-4px;transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
     `@container (max-width:213px){.${D.compact} .${D.scardSign}{display:none}.${D.compact} .${D.scardWhy}{max-width:none}}`
   ])
   for (const rule of rules.filter(r => !r.startsWith('@'))) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
