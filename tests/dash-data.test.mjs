@@ -103,11 +103,12 @@ test('every word on the tab is in the file: one missing stops the build; marks f
   assert.match(dashProblems(t, DOCS).join('\n'), /not exactly Dashboard and Learn/)
 })
 
-test('loom2: content/videos.json has every card and only https:// addresses; all empty now; a bad one stops the build; an address becomes the card\'s video', () => {
+test('loom2: content/videos.json has every card and only https:// addresses (all empty now); a bad one stops the build; an address becomes the card\'s video', () => {
   const file = read('content/videos.json')
   assert.deepEqual(Object.keys(file.videos), DASH_DATA.items.map(i => i.id))
-  for (const v of Object.values(file.videos)) assert.deepEqual(v, { url: '', poster: '', captions: '' })
-  assert.ok(DASH_DATA.items.every(i => i.video === null))
+  // (empty now; once Lead adds an address, the built data has it exactly where the file has one)
+  for (const v of Object.values(file.videos)) assert.deepEqual(Object.keys(v), ['url', 'poster', 'captions'])
+  for (const it of DASH_DATA.items) assert.deepEqual(it.video, file.videos[it.id].url ? { ...file.videos[it.id] } : null, it.id)
   for (const [k, bad] of [['url', 'http://example.com/a.mp4'], ['url', 'javascript:alert(1)'], ['poster', 'https://example.com/a b.jpg'], ['captions', 'data:text/vtt,x'], ['url', 'https://example.com/"a.mp4']]) {
     const d = copy()
     d.videos.model = { url: 'https://example.com/a.mp4', poster: '', captions: '', [k]: bad }
