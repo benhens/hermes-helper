@@ -153,6 +153,13 @@ export const WANTS_DATA = {
           "quote": "search the web and return ranked results"
         }
       ],
+      "title": "Searching the web and reading pages",
+      "phrases": [
+        "search the web",
+        "look it up online",
+        "google it",
+        "web search"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -216,6 +223,13 @@ export const WANTS_DATA = {
           "quote": "No API key, no setup."
         }
       ],
+      "title": "Using websites for you: clicking and forms",
+      "phrases": [
+        "click around websites",
+        "fill in a form",
+        "use a website",
+        "browser"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -258,6 +272,12 @@ export const WANTS_DATA = {
           "line": 98,
           "quote": "X/Twitter via xurl CLI: raw post search, posting, DM, media."
         }
+      ],
+      "title": "Posting and searching on X (Twitter)",
+      "phrases": [
+        "post on x",
+        "twitter",
+        "tweet"
       ],
       "next": {
         "kind": "paste",
@@ -302,6 +322,12 @@ export const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Reading and searching Reddit",
+      "phrases": [
+        "reddit",
+        "read reddit",
+        "search reddit"
       ],
       "next": {
         "kind": "steps",
@@ -382,6 +408,13 @@ export const WANTS_DATA = {
           "quote": "contain no text layer and silently convert to nothing"
         }
       ],
+      "title": "Reading your Word, Excel and PDF files",
+      "phrases": [
+        "read a pdf",
+        "read my documents",
+        "word file",
+        "excel file"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -419,6 +452,13 @@ export const WANTS_DATA = {
           "line": 81,
           "quote": "PDF files: create, read, merge, fill, OCR, edit text."
         }
+      ],
+      "title": "Making, merging or editing PDF files",
+      "phrases": [
+        "make a pdf",
+        "merge pdfs",
+        "edit a pdf",
+        "fill in a pdf"
       ],
       "next": {
         "kind": "paste",
@@ -464,6 +504,13 @@ export const WANTS_DATA = {
           "quote": "Create, read, and edit Word, PowerPoint, and Excel files."
         }
       ],
+      "title": "Making Word, PowerPoint or Excel files",
+      "phrases": [
+        "make a spreadsheet",
+        "powerpoint",
+        "word document",
+        "make slides"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -504,6 +551,12 @@ export const WANTS_DATA = {
           "line": 70,
           "quote": "Read, search, create, and edit notes in the Obsidian vault."
         }
+      ],
+      "title": "Working with your Obsidian notes",
+      "phrases": [
+        "obsidian",
+        "obsidian notes",
+        "obsidian vault"
       ],
       "next": {
         "kind": "paste",
@@ -546,6 +599,12 @@ export const WANTS_DATA = {
           "line": 79,
           "quote": "Turn meeting notes into cited decisions, owners, tickets."
         }
+      ],
+      "title": "Turning meeting notes into decisions and tasks",
+      "phrases": [
+        "meeting notes",
+        "action items",
+        "meeting minutes"
       ],
       "next": {
         "kind": "paste",
@@ -598,6 +657,12 @@ export const WANTS_DATA = {
           "quote": "Execute commands and manipulate files."
         }
       ],
+      "title": "Writing and running code",
+      "phrases": [
+        "write code",
+        "coding",
+        "run code"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -648,6 +713,13 @@ export const WANTS_DATA = {
           "line": 21,
           "quote": "The built-in `computer_use` toolset"
         }
+      ],
+      "title": "Clicking and typing in your computer's apps",
+      "phrases": [
+        "computer use",
+        "control my computer",
+        "click and type",
+        "use my apps"
       ],
       "next": {
         "kind": "paste",
@@ -708,6 +780,14 @@ export const WANTS_DATA = {
           "line": 158,
           "quote": "Direct FAL requires a funded `FAL_KEY`"
         }
+      ],
+      "title": "Making pictures (images) from your words",
+      "phrases": [
+        "make pictures",
+        "make images",
+        "image generation",
+        "draw a picture",
+        "generate an image"
       ],
       "next": {
         "kind": "paste",
@@ -770,6 +850,13 @@ export const WANTS_DATA = {
           "quote": "`vision_analyze`"
         }
       ],
+      "title": "Looking at a photo or picture you send",
+      "phrases": [
+        "send it a photo",
+        "send a picture",
+        "look at my pictures",
+        "read a screenshot"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -815,6 +902,12 @@ export const WANTS_DATA = {
           "quote": "Generate a video from a text prompt (text-to-video) or animate a still image (image-to-video)"
         }
       ],
+      "title": "Making a video from text or a picture",
+      "phrases": [
+        "make a video",
+        "text to video",
+        "video generation"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -854,6 +947,12 @@ export const WANTS_DATA = {
           "quote": "Manim CE animations: 3Blue1Brown math/algo videos."
         }
       ],
+      "title": "Making animated maths explainer videos",
+      "phrases": [
+        "animated explainer",
+        "animation",
+        "manim"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -892,6 +991,12 @@ export const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Making a video with an AI presenter",
+      "phrases": [
+        "presenter video",
+        "talking head video",
+        "ai presenter"
       ],
       "next": {
         "kind": "steps",
@@ -939,6 +1044,13 @@ export const WANTS_DATA = {
           "quote": "YouTube transcripts to summaries, threads, blogs."
         }
       ],
+      "title": "Summarising a YouTube video",
+      "phrases": [
+        "youtube",
+        "summarise a video",
+        "summarize a video",
+        "youtube summary"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -969,6 +1081,12 @@ export const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Making memes",
+      "phrases": [
+        "meme",
+        "memes",
+        "make a meme"
       ],
       "next": {
         "kind": "steps",
@@ -1015,6 +1133,13 @@ export const WANTS_DATA = {
           "line": 350,
           "quote": "Talk to Hermes and hear it back"
         }
+      ],
+      "title": "Talking to Hermes out loud (voice)",
+      "phrases": [
+        "voice mode",
+        "talk out loud",
+        "by voice",
+        "use my voice"
       ],
       "next": {
         "kind": "paste",
@@ -1064,6 +1189,14 @@ export const WANTS_DATA = {
           "line": 25,
           "quote": "| **Edge TTS** (default) | Good | Free | None needed |"
         }
+      ],
+      "title": "Hermes reading its answers aloud to you",
+      "phrases": [
+        "read its answers to me",
+        "read aloud",
+        "text to speech",
+        "tts",
+        "read it out"
       ],
       "next": {
         "kind": "paste",
@@ -1120,6 +1253,14 @@ export const WANTS_DATA = {
           "quote": "Voice messages sent on Telegram, Discord, WhatsApp, Slack, or Signal are automatically transcribed and injected as text into the conversation."
         }
       ],
+      "title": "Turning voice messages into text",
+      "phrases": [
+        "voice note",
+        "voice notes",
+        "voice memo",
+        "transcribe",
+        "voice message"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -1154,6 +1295,12 @@ export const WANTS_DATA = {
           "line": 45,
           "quote": "Songwriting craft and Suno AI music prompts."
         }
+      ],
+      "title": "Writing songs and briefing a music AI",
+      "phrases": [
+        "write a song",
+        "song lyrics",
+        "suno"
       ],
       "next": {
         "kind": "paste",
@@ -1190,6 +1337,12 @@ export const WANTS_DATA = {
           "line": 90,
           "quote": "Search arXiv papers by keyword, author, category, or ID."
         }
+      ],
+      "title": "Finding research papers on arXiv",
+      "phrases": [
+        "research papers",
+        "arxiv",
+        "scientific papers"
       ],
       "next": {
         "kind": "paste",
@@ -1234,6 +1387,13 @@ export const WANTS_DATA = {
           "quote": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM."
         }
       ],
+      "title": "Finding places, routes and time zones",
+      "phrases": [
+        "directions",
+        "find a place",
+        "route to",
+        "time zone"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -1276,6 +1436,13 @@ export const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Looking up stock and crypto prices",
+      "phrases": [
+        "stock price",
+        "stock prices",
+        "crypto price",
+        "bitcoin price"
       ],
       "next": {
         "kind": "steps",
@@ -1325,6 +1492,13 @@ export const WANTS_DATA = {
           "line": 82,
           "quote": "Watch product, flight, or listing prices; alert on target."
         }
+      ],
+      "title": "Watching a product's price for you",
+      "phrases": [
+        "price alert",
+        "watch a price",
+        "price drop",
+        "track a price"
       ],
       "next": {
         "kind": "paste",

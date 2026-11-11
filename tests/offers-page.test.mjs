@@ -101,8 +101,8 @@ test('the opening of a later visit carries the offer; the don\'t-know line carri
   send(view, 'can it fly a plane')
   await settle()
   assert.equal(olds(view).at(-1).props['data-line'], 'N1')
-  assert.equal(bubbleLine(view), 'offer-dont_know')
-  assert.deepEqual(labels(view), ['What Hermes is', 'What Hermes can do'])
+  assert.equal(bubbleLine(view), 'offer-start_four') // find-v1: nothing near, the four starting things
+  assert.deepEqual(labels(view), ['What Hermes can do', 'Which AI to use', 'Phone and chat apps', 'What Hermes remembers'])
 })
 
 test('"ok and how do I do that" while things to pick show: "Choose one, and I will show you how." and the same things to pick stay', async () => {
@@ -167,19 +167,24 @@ test('point 11, the cause pinned: his first message looks like a secret by the s
 })
 
 /* ---------- 7 and 16: no AI that answers ---------- */
-test('points 7 and 16: the model check says ok but the first call fails at once: the written line, then no further call and no dots in that visit', async () => {
+// find-v1 part 3 (Lead, 11 Nov): one slow or failed try no longer ends the AI for the visit; two in a row do, and SLOW_A
+// follows the second one's answer (tests/find-ai-rule.test.mjs). The tests below are brought to that rule.
+test('points 7 and 16: the model check says ok but the calls fail at once: the written line each time; after two failed tries in a row no further call and no dots in that visit', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => new Error('No LLM provider configured for task=helping_hand provider=auto. Run: hermes setup') } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 1, 'the first call of the visit is tried (the model check said ok)')
   assert.equal(dots(view), null)
   assert.equal(olds(view).at(-1).props['data-line'], 'N1')
-  for (const typed of ['tell me about goats', 'what do you mean?', 'does it juggle']) {
+  send(view, 'tell me about goats')
+  await settle()
+  assert.equal(host.asks.length, 2, 'one failed try: the next message is tried once more')
+  for (const typed of ['do goats like it', 'what do you mean?', 'does it juggle']) {
     send(view, typed)
     assert.equal(dots(view), null, typed + ': no dots')
     await settle()
   }
-  assert.equal(host.asks.length, 1, 'no further call')
+  assert.equal(host.asks.length, 2, 'no further call')
 })
 
 test('points 7 and 16: the model check says no model: no call and no dots at all', async () => {

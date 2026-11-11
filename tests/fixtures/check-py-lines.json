@@ -460,9 +460,9 @@
   },
   {
    "id": "KEY_WHERE",
-   "text": "A key is a secret code. In the Hermes app it goes in Settings, never in a chat.",
+   "text": "A key is a secret code. Open Settings, then \"Providers\", the AI companies, then \"API keys\". Find your row, such as \"OpenAI API\".",
    "kind": "reply",
-   "words": 18,
+   "words": 23,
    "found": []
   },
   {
@@ -481,7 +481,7 @@
   },
   {
    "id": "MODEL_CHANGE",
-   "text": "In a Hermes chat, the message box shows the AI's name. Click it to choose another.",
+   "text": "In a Hermes chat, click the button left of the microphone. There you choose another AI.",
    "kind": "reply",
    "words": 16,
    "found": []
@@ -540,6 +540,13 @@
    "text": "First choose the AI Hermes uses. Then send Hermes one message to see that it answers.",
    "kind": "reply",
    "words": 16,
+   "found": []
+  },
+  {
+   "id": "NO_MORE",
+   "text": "That is all I have checked on that.",
+   "kind": "reply",
+   "words": 8,
    "found": []
   },
   {
@@ -652,6 +659,13 @@
    "text": "Do you already pay for ChatGPT or Claude?",
    "kind": "question",
    "words": 8,
+   "found": []
+  },
+  {
+   "id": "offer-start_four",
+   "text": "I can explain these four. Pick one.",
+   "kind": "question",
+   "words": 7,
    "found": []
   },
   {
@@ -1482,6 +1496,631 @@
    "text": "In the Hermes app, \"Bots\" is the tab next to \"Sessions\", top left.",
    "kind": "reply",
    "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_windows",
+   "text": "Yes. Hermes runs on Windows 10 and 11. It also runs on Mac and Linux.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_mac",
+   "text": "Yes. The docs list Macs with Apple chips, and the Hermes app runs there.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_linux",
+   "text": "Yes. Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_android",
+   "text": "Hermes can run on Android phones, inside an app called Termux.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "d_download",
+   "text": "You download the Hermes app from the Hermes website. Pick the one for your computer.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_uninstall",
+   "text": "The docs name a place in the Hermes app: Settings, About, Danger zone. There you pick how much to remove.",
+   "kind": "reply",
+   "words": 20,
+   "found": []
+  },
+  {
+   "id": "d_uninstall_keep",
+   "text": "You can remove only the app. Then Hermes itself, your settings and your chats stay.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_update_chat",
+   "text": "You can update Hermes from Telegram, Discord, Slack, WhatsApp or Teams. Send it /update.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_version",
+   "text": "Your own Hermes can tell you which version it is.",
+   "kind": "reply",
+   "words": 10,
+   "found": []
+  },
+  {
+   "id": "d_provider",
+   "text": "\"Provider\" is the app's word for the company that runs the AI. OpenAI and Anthropic are two.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_first_chat",
+   "text": "After you pick an AI, send Hermes one message. Make it something easy to check.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_does",
+   "text": "You talk to it like other AIs. Hermes also works by itself, and the docs say it gets better over time.",
+   "kind": "reply",
+   "words": 21,
+   "found": []
+  },
+  {
+   "id": "d_not_laptop",
+   "text": "Hermes need not run on your laptop. You can talk to it from Telegram while it works elsewhere.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "d_data_sent",
+   "text": "Your messages go only to the AI company you choose. Hermes itself collects no usage data.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_stored_local",
+   "text": "Your chats and its notes stay on your own computer, in the Hermes folder.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_offline",
+   "text": "Yes, with an AI on your own computer. After its download, that AI needs no internet.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_many_people",
+   "text": "Yes. Other people can talk to your Hermes from a chat app. You choose who is allowed.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_mem_vs_skill",
+   "text": "Memory is short notes with facts about you. A skill is written steps for one task. Hermes keeps both.",
+   "kind": "reply",
+   "words": 19,
+   "found": [
+    "2 Hermes terms in one line"
+   ]
+  },
+  {
+   "id": "d_key_bad",
+   "text": "A key is a secret code. If it fails, it is missing, too old, typed wrong, or from another company.",
+   "kind": "reply",
+   "words": 20,
+   "found": []
+  },
+  {
+   "id": "d_rate",
+   "text": "That means you passed the limit of your AI company. Wait a moment and try again.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_too_long",
+   "text": "A very long chat can grow past what the AI can read. Start a fresh chat.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_blocked",
+   "text": "Hermes stops commands that could destroy things. It shows you the command, and you approve or refuse.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_bot_silent",
+   "text": "The docs give three causes. Hermes is not running, not linked, or you are not on its allowed list.",
+   "kind": "reply",
+   "words": 19,
+   "found": []
+  },
+  {
+   "id": "d_slow",
+   "text": "Three causes are named. A big AI, a far-away AI company, or many actions switched on.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_share_notes",
+   "text": "No. Each separate Hermes keeps its own notes and its own chats. Nothing is shared.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_backup_vs",
+   "text": "A full backup packs everything, your sign-ins too. An export packs one Hermes and leaves those out.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_stop",
+   "text": "The docs say: press Stop in the chat, or Esc on your keyboard.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_stop_chat",
+   "text": "In a chat app, send /stop. That stops what Hermes is doing.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "d_keep_open",
+   "text": "Closing the window can hide the app while Hermes keeps running. That setting is off at first.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_tray",
+   "text": "The docs say: use Show Hermes in the tray, the small icons by the clock.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_export",
+   "text": "You can pack one Hermes into a single file to share. Your sign-ins are left out.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_drag",
+   "text": "Drag a file into the chat. It is attached to your next message.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_find",
+   "text": "Press Ctrl+F, or Cmd+F on a Mac. A find bar searches the chat on screen.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_default_ai",
+   "text": "Open Settings, then \"Model\". Choose the company and the AI, then click \"Apply\".",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_voice_app",
+   "text": "You can talk to Hermes and hear it answer. On a Mac, you allow the microphone once.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_lang",
+   "text": "The app's own text comes in English, Chinese, Japanese, Arabic and Russian.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "d_shortcuts",
+   "text": "Press Ctrl+K, or Cmd+K on a Mac. A box opens where you type where to go.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_mem_graph",
+   "text": "The docs name a \"Memory Graph\". It is a map of what Hermes has learned for you.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_restart_note",
+   "text": "The app starts Hermes again by itself and shows a notice. The chat comes back after that.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_gateway",
+   "text": "\"Gateway\" is the docs' word for one part of Hermes. It links Hermes to your chat apps.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_allowed",
+   "text": "At first, nobody else can. Hermes answers only people on its allowed list.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_pairing",
+   "text": "A new person who writes to it gets a one-time code. You approve that code.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_chat_cmds",
+   "text": "In a chat app, /new starts a fresh chat. /stop stops Hermes.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "d_redirect",
+   "text": "Send a message while Hermes works. It takes your correction into the same job.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_tg_silent",
+   "text": "For Telegram the docs say: check that its secret code is right. Then look at the log Hermes keeps.",
+   "kind": "reply",
+   "words": 19,
+   "found": []
+  },
+  {
+   "id": "d_tg_unauth",
+   "text": "That means your Telegram user number is not on the allowed list.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "d_tg_group",
+   "text": "The docs say privacy mode is likely on. Turn it off, or make Hermes a group admin.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_passwords",
+   "text": "Hermes is blocked from changing the places where secret codes are kept. I have nothing checked on passwords in other files.",
+   "kind": "reply",
+   "words": 21,
+   "found": []
+  },
+  {
+   "id": "d_modes",
+   "text": "There are three settings for how Hermes asks first: smart, manual and off.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_yolo",
+   "text": "The docs name a YOLO mode. It skips every such question for the current chat.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_never",
+   "text": "Some commands Hermes never runs, whatever the settings. Wiping a whole disk is one.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_timeout",
+   "text": "If you do not answer in time, Hermes does not run the command.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_chats_where",
+   "text": "Every chat is saved on the computer Hermes runs on. It is one file in its folder.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_titles",
+   "text": "Hermes names each chat by itself after the first answer. You can change the name.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_delete_chat",
+   "text": "Your own Hermes can delete a chat for you. It asks you to confirm first.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_chats_kept",
+   "text": "Hermes keeps old chats. Clearing them out by itself is off unless you turn it on.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_copy_hermes",
+   "text": "A copy takes the settings, personality and notes along. Old chats are not copied.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_delete_hermes",
+   "text": "Your own Hermes can delete one of your separate Hermes. Ask it to check with you first.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_mem_size",
+   "text": "Its notes are kept short on purpose. About 2,200 letters of its own, and 1,375 about you.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_mem_change",
+   "text": "Hermes can add, change or remove its own notes. Ask it in plain words.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_mem_approve",
+   "text": "Hermes saves notes freely at first. A setting makes it ask you before each save.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_skill_use",
+   "text": "A skill is written steps for one task. Type / and its name in a chat to use it.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "d_skill_own",
+   "text": "A skill is written steps for one task. Hermes can write new ones itself after it solves something.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "d_skill_learn",
+   "text": "The docs name /learn. It turns what you know into a skill, written steps for one task.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_plugin_off",
+   "text": "A plugin is an add-on. One you add yourself stays off until you switch it on.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_plugin_find",
+   "text": "A plugin is an add-on. Your own Hermes can search the official list for you.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_job_change",
+   "text": "You can pause, change or remove a job by asking Hermes in plain words.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_job_where",
+   "text": "A job's result comes back to the chat where you made the job.",
+   "kind": "reply",
+   "words": 13,
+   "found": []
+  },
+  {
+   "id": "d_job_all_stop",
+   "text": "The docs name one stop for every job at once. It is called hermes pause.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_pers_ready",
+   "text": "Hermes comes with ready-made ways of talking, such as helpful and concise. /personality switches for one chat.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_soul_where",
+   "text": "SOUL.md is the file that says who your Hermes is. It sits in the folder Hermes keeps.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_tools_list",
+   "text": "Tools are actions Hermes can take. Built in are web search, browsing, files, notes and jobs on a schedule.",
+   "kind": "reply",
+   "words": 19,
+   "found": []
+  },
+  {
+   "id": "d_voice_tg",
+   "text": "In Telegram and Discord, Hermes can send its answer as sound with the text.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_local_how",
+   "text": "The docs say: Settings, \"Providers\", Local Models. Install, pick an AI, download it, then click Use.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_local_fit",
+   "text": "Hermes picks the right build of each AI for your computer. You only pick the AI.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "d_local_where",
+   "text": "An AI on your own computer works on Mac, Windows and Linux.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "d_nous",
+   "text": "Nous Portal is from the makers of Hermes. One sign-in covers more than 300 AIs.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_plans",
+   "text": "Some AI companies let you sign in with a plan you already pay for.",
+   "kind": "reply",
+   "words": 14,
+   "found": []
+  },
+  {
+   "id": "d_openrouter",
+   "text": "OpenRouter is one service that reaches many AIs from many companies.",
+   "kind": "reply",
+   "words": 11,
+   "found": []
+  },
+  {
+   "id": "d_ollama",
+   "text": "Both run AIs on your own computer, and Hermes can use them.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "d_any_ai",
+   "text": "Hermes works with many AI companies. The docs list them, and I have not checked each one.",
+   "kind": "reply",
+   "words": 17,
+   "found": []
+  },
+  {
+   "id": "d_undo",
+   "text": "Hermes can copy your work before a risky change and restore it later. This is off unless you turn it on.",
+   "kind": "reply",
+   "words": 21,
+   "found": []
+  },
+  {
+   "id": "d_open_source",
+   "text": "Yes. Hermes is open source, which means its code is public. Hermes itself is free.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "d_gemini",
+   "text": "Yes. Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+   "kind": "reply",
+   "words": 22,
+   "found": []
+  },
+  {
+   "id": "d_forget",
+   "text": "Yes. Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+   "kind": "reply",
+   "words": 19,
+   "found": []
+  },
+  {
+   "id": "d_meter",
+   "text": "The docs name a \"% full\" meter in the chat. It shows how much of what the AI can read is used. Click it for details.",
+   "kind": "reply",
+   "words": 25,
+   "found": []
+  },
+  {
+   "id": "d_two",
+   "text": "Yes. Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
+   "kind": "reply",
+   "words": 18,
+   "found": []
+  },
+  {
+   "id": "d_approve_off",
+   "text": "You can set how Hermes asks to off. The docs warn that this removes every safety question. Then risky commands run unasked.",
+   "kind": "reply",
+   "words": 22,
+   "found": []
+  },
+  {
+   "id": "d_siri",
+   "text": "With one setting on, Hermes listens for a spoken phrase and answers. The docs compare that to \"Hey Siri\".",
+   "kind": "reply",
+   "words": 19,
    "found": []
   },
   {

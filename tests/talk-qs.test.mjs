@@ -34,6 +34,7 @@ function show(o) {
     BACK: () => `BACK name=${py(o.name)}`,
     HELLO: () => `HELLO name=${py(o.name)}`,
     term: () => 'term line ' + o.term,
+    fact: () => 'fact ' + o.need, // find-v1 (breadth-t1): a fact line
     W1: () => 'W1 buttons ' + o.buttons.slice(0, 4).join('+'),
     W2: () => 'W2 buttons ' + o.buttons.join('+'),
     NAME_AGAIN: () => 'NAME_AGAIN name=' + o.name,
@@ -70,7 +71,8 @@ test('the sets file was made from the team\'s scripts at the pins: route2.py, th
 
 test('every case: the plugin gives the reference\'s result (the wants layers\' where it is a wants result, route2.py\'s elsewhere)', () => {
   const off = Q.cases.map(c => [c.set, c.texts.join(' / '), ours(c), expected(c)]).filter(([, , got, want]) => got !== want)
-  assert.deepEqual(off, [], off.map(x => x.join(' | ')).join('\n'))
+  // find-v1, the one difference, on purpose: live changes-11 (near.first_step): a full hit by a phrase of a fact line comes first, before the topics and the plugin's wants step, as in route2.py; the wants layers of the reference are older than that step (route2.py alone gives fact d_siri too)
+  assert.deepEqual(off, [['hhtech30', 'can it talk out loud to me like siri', 'fact d_siri', 'ROW w_voice']], off.map(x => x.join(' | ')).join('\n'))
   assert.ok(Q.cases.filter(c => isWants(c.oracle)).length >= 15, 'the wants layers decide some of them')
 })
 

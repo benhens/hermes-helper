@@ -6,7 +6,7 @@ import path from 'node:path'
 import { freshVisit, turnParts } from '../src/talk.js'
 import { askLive, goesToAi, liveWhyNot, liveApply, SECOND_CALL_MIN_MS } from '../src/live-turn.js'
 import { LIVE_ROW } from '../src/live-rows.js'
-import { lastLines, sendable } from '../src/live-request.js'
+import { lastLines, sendable, listCallText } from '../src/live-request.js'
 
 const fixture = f => JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, 'fixtures', f), 'utf8'))
 const M24 = fixture('live-rows-oracle.json').cases.slice(0, 24).map(c => c.text)
@@ -33,10 +33,14 @@ async function one(text, st, opts = {}) {
 
 // setup-chat: "hi there, I'm new to all this" is a greeting with more words (live changes-6 greet_more) and "how do I
 // update hermes ..." has the line UPDATE (offer-t1), so code answers 20 and the AI step is asked for 4
-test('hhtech\'s 24 messages, each on its own: code answers 20, the AI step is asked for 4', () => {
+// find-v1 part 4: the list call (max_tokens 30, ids of fact lines) took the place of word matching and the first call
+// (and a line from a subject word alone goes to it too): three more of the 24 are asked
+test('hhtech\'s 24 messages, each on its own: code answers 17, the AI step is asked for 7', () => {
   assert.equal(M24.length, 24)
   const toAi = M24.filter(t => goesToAi(turnParts(t, freshVisit()).pre))
-  assert.deepEqual(toAi, ['what do you mean?', 'ok and then?', "sorry I don't get it", "what's the weather in Riga tomorrow"])
+  assert.deepEqual(toAi, ['what do you mean?', 'ok and then?', "sorry I don't get it", 'can I talk to my hermes from my phone?', "what's the best AI model to pick if I'm a total beginner", "what's the weather in Riga tomorrow", 'how do I export all my chats to a pdf'])
+  // the three new ones are lines from a subject word alone: the subject's question, or the nearest things
+  assert.deepEqual(['can I talk to my hermes from my phone?', "what's the best AI model to pick if I'm a total beginner", 'how do I export all my chats to a pdf'].map(t => turnParts(t, freshVisit()).pre.kind), ['question', 'question', 'N2'])
 })
 
 test('his three messages never reach the AI (code answers each); "what do you mean?" after the tokens line is a follow-up with the tokens rows', async () => {
@@ -60,7 +64,7 @@ test('the second call starts only with 4 s or more left of the 12: a first call 
   let left = 12000
   const f = fake(() => {
     left -= 11000
-    return 'mem'
+    return 'mem0'
   }, 'not asked')
   const st = freshVisit()
   const r = await one('tell me a joke', st, { request: f.request, msLeft: () => left })
@@ -70,7 +74,7 @@ test('the second call starts only with 4 s or more left of the 12: a first call 
   assert.equal(SECOND_CALL_MIN_MS, 4000)
 })
 
-test(`every message of route2.py's conversations, in ai_writes with a fake model: never more than 5 rows, never a whole list, never a second request beyond two, host.request's 90 s kept`, async () => {
+test(`every message of route2.py's conversations, in ai_writes with a fake model: never more than 5 lines' texts (the list call hands only ids and titles), never a second request beyond two, host.request's 90 s kept`, async () => {
   const conv = fixture('route2-conversations.json').conversations
   let calls = 0
   let asked = 0
@@ -88,6 +92,9 @@ test(`every message of route2.py's conversations, in ai_writes with a fake model
         assert.equal(a.timeout, 90000)
         const rows = (a.params.instructions.match(/^\[[\w-]+\] /gm) || []).length
         assert.ok(rows <= 5, `${rows} rows for ${s.text}`)
+        // find-v1 part 4: a call is the list call (the one fixed text, max_tokens 30) or hands rows
+        if (a.params.max_tokens === 30) assert.equal(a.params.instructions, listCallText())
+        else assert.doesNotMatch(a.params.instructions, /^MIG_APP = /m)
         assert.ok(a.params.input.length <= 1500)
       }
     }

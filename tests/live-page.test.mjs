@@ -87,7 +87,7 @@ const N1 = curlyQuotes(TALK_DATA.fixed.N1.text) // as drawn
 
 test('ai_writes: a message code is not sure of shows at once, with the three dots and the busy face; the written reply replaces the dots', async () => {
   const d = deferred()
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'sch1' : d.promise) } })
   send(view, 'send me a summary')
   assert.equal(line(view), null, 'no Helper line yet')
   assert.ok(dots(view), 'the three dots in the bubble')
@@ -96,9 +96,10 @@ test('ai_writes: a message code is not sure of shows at once, with the three dot
   assert.equal(mine(view).at(-1), 'send me a summary')
   assert.equal(expression(view), 'busy')
   await settle()
-  // word matching found sch1, so the writer is the first and only call
-  assert.equal(host.asks.length, 1)
-  const p = host.asks[0]
+  // find-v1 part 4: the list call named sch1 (max_tokens 30), then the writer
+  assert.equal(host.asks.length, 2)
+  assert.equal(host.asks[0].max_tokens, 30)
+  const p = host.asks[1]
   assert.deepEqual([p.task, p.temperature, p.max_tokens, 'session_id' in p, 'profile' in p], ['helping_hand', 0.2, 200, false, false])
   assert.match(p.instructions, /\[sch1\] /)
   assert.match(p.input, /The person's newest message: send me a summary$/)
@@ -129,9 +130,9 @@ test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes s
   d.resolve(goodReply('sch1'))
   await settle()
   assert.equal(JSON.stringify(view.tree), before)
-  // talk-live-2 (hhtech-weak-ai): a call that gave no answer in 12 s turns the AI step off for the rest of this
-  // visit, so even with Hermes free again the next message makes no call (tests/live-page-2.test.mjs)
-  send(view, 'is it safe')
+  // find-v1 part 3: that second message met the first call still in Hermes after its 12 s, so it was the second slow
+  // try in a row: the AI step is off for the rest of this visit, also with Hermes free again
+  send(view, 'do goats like it')
   await settle()
   assert.equal(host.asks.length, 1)
 })
@@ -171,7 +172,7 @@ test('no call when: code is sure, the model check is not ok, the message looks l
     send(view, 'my password is hunter2, now what')
     await settle()
     assert.equal(host.asks.length, 0)
-    assert.equal(line(view), 'N1')
+    assert.equal(line(view), 'd_passwords') // find-v1: code's own fact line about passwords (it was N1), still no call
   }
   {
     const { view, host } = await pastOpening('ai_writes', { host: { runtime: { ok: false } } })
@@ -200,16 +201,22 @@ test('nothing Helper keeps is ever sent, not even the name: a kept name, answers
   const storage = fakeStorage({ met: true, kept: { name: 'Peter', mod: 'mod1', msg: 'WhatsApp', svc: 'Gmail', asked: ['my club has six courts'], told: true } })
   const { view, host } = await open('ai_writes', { storage, host: { oneshot: () => 'NONE' } })
   finish(view)
-  for (const m of ['Hi, I\'m Peter', 'what do you know about me', 'remember that my coach is called Zanda', 'I use WhatsApp now', 'send me a summary', 'tell me a joke', 'is it safe', 'ok and then?']) {
+  for (const m of ['Hi, I\'m Peter', 'what do you know about me', 'remember that my coach is called Zanda', 'I use WhatsApp now', 'send me a summary', 'tell me a joke', 'do goats like it', 'is it safe', 'ok and then?']) {
     send(view, m)
     await settle()
     finish(view)
   }
   assert.ok(host.asks.length >= 3, `${host.asks.length} calls`)
+  // find-v1 part 4: the list call's instructions are Helper's own list of its lines by title, the same text for every
+  // person (it names WhatsApp, Gmail and ChatGPT as every person's list does); nothing kept is in it or with it
+  const LIST = host.asks.find(p => p.max_tokens === 30).instructions
+  assert.match(LIST, /^MIG_APP = /m)
   for (const p of host.asks) {
-    const all = p.instructions + '\n' + p.input
+    if (p.max_tokens === 30) assert.equal(p.instructions, LIST)
+    const all = (p.max_tokens === 30 ? '' : p.instructions) + '\n' + p.input
     for (const v of [/peter/i, /whatsapp/i, /gmail/i, /six courts/i, /zanda/i, /chatgpt/i, /you pay/i]) assert.doesNotMatch(all, v, p.input)
   }
+  for (const v of [/peter/i, /six courts/i, /zanda/i, /you pay/i]) assert.doesNotMatch(LIST, v)
   // Helper's own greeting is sent without the name, or not at all
   assert.ok(host.asks.some(p => /Helper: /.test(p.input)), 'some of Helper\'s lines are sent')
 })
@@ -225,13 +232,14 @@ test('a name given with a question at "What\'s your name?": only the part after 
   assert.doesNotMatch(host.asks[0].instructions + host.asks[0].input, /peter/i)
 })
 
-test('the first call when word matching finds nothing; build gives the hand-over line; a subject gives its rows; two calls, one after the other', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mem' : goodReply('mem0')) } })
+// find-v1 part 4: the list call (max_tokens 30, ids of fact lines) took the place of word matching and the first call
+test('the list call when code is not sure; BUILD gives the hand-over line; an id gives its row; two calls, one after the other', async () => {
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mem0' : goodReply('mem0')) } })
   send(view, 'tell me a joke')
   await settle()
   assert.equal(host.asks.length, 2)
-  assert.equal(host.asks[0].max_tokens, 20)
-  assert.match(host.asks[0].instructions, /^mem = Memory$/m)
+  assert.equal(host.asks[0].max_tokens, 30)
+  assert.match(host.asks[0].instructions, /^mem0 = /m)
   assert.match(host.asks[1].instructions, /\[mem0\] /)
   assert.equal(line(view), 'written')
   const b = await pastOpening('ai_writes', { host: { oneshot: () => 'build' } })
@@ -245,8 +253,10 @@ test('ai_picks_line: a handed id shows that row as code shows it; TALK and NONE 
   const { view, host } = await pastOpening('ai_picks_line', { host: { oneshot: () => ' [sch1].' } })
   send(view, 'send me a summary')
   await settle()
-  assert.equal(host.asks[0].max_tokens, 20)
-  assert.match(host.asks[0].instructions, /^\[sch1\] /m)
+  // find-v1 part 4: the list call first (the stand-in's " [sch1]." is read as sch1), then the pick among those rows
+  assert.equal(host.asks[0].max_tokens, 30)
+  assert.equal(host.asks[1].max_tokens, 20)
+  assert.match(host.asks[1].instructions, /^\[sch1\] /m)
   assert.equal(line(view), 'sch1')
   assert.equal(said(view), LIVE_ROW.sch1.text.replace(/"([^"]*)"/g, '\u201c$1\u201d'))
   // the same message again: the same row would be Helper's last line again, so the no-AI line instead
@@ -255,7 +265,7 @@ test('ai_picks_line: a handed id shows that row as code shows it; TALK and NONE 
   assert.notEqual(line(view), 'sch1')
   // TALK: the no-AI line unless that is a don't-know line, then OK (pick_only.read); NONE or anything else: the no-AI line
   for (const [r, want] of [['TALK', 'OK'], ['NONE', 'N1'], ['zzz', 'N1'], ['sch9', 'N1']]) {
-    const o = await pastOpening('ai_picks_line', { host: { oneshot: () => r } })
+    const o = await pastOpening('ai_picks_line', { host: { oneshot: (p, n) => (n === 1 ? 'sch1' : r) } })
     send(o.view, 'send me a summary')
     await settle()
     assert.equal(line(o.view), want, r)
@@ -314,7 +324,8 @@ test('a message that looked secret is never sent later as one of the last lines'
   send(view, 'tell me a joke')
   await settle()
   assert.equal(host.asks.length, 1)
-  assert.doesNotMatch(host.asks[0].input, /hunter2|password/i)
+  // find-v1: Helper's own answer is now its fact line about passwords, which may be sent; the person's message never
+  assert.doesNotMatch(host.asks[0].input, /hunter2|my password|now what/i)
 })
 
 test('a turn closed by the next message starts no second call when its first call comes back', async () => {
@@ -332,7 +343,8 @@ test('a turn closed by the next message starts no second call when its first cal
 
 test('the page off screen and back during the wait: the line still lands, also when the new page was drawn before the old one let go', async () => {
   const d = deferred()
-  const o = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+  // find-v1: the list call names the line at once; the writer's answer is the one waited for
+  const o = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'sch1' : d.promise) } })
   send(o.view, 'send me a summary')
   await settle()
   // a second page drawn first, then the first one leaves (React may do it in this order)

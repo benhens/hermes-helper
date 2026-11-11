@@ -438,7 +438,13 @@ const TALK_DATA = {
     },
     "C1": {
       "text": "Hermes can work with the web, files and pictures. It can do jobs on a schedule and use services like Gmail. Pick one.",
-      "source": "user-guide/features/tools.md line 17 (web search, file editing); user-guide/features/image-generation.md line 10 (pictures); user-guide/features/cron.md line 15; user-guide/features/mcp.md line 13 (the sources of can0, w_image, sch0, svc0). More than one Hermes is not in the line, only in the picks: user-guide/profiles.md lines 7 and 11 (bot0)."
+      "source": "user-guide/features/tools.md line 17 (web search, file editing); user-guide/features/image-generation.md line 10 (pictures); user-guide/features/cron.md line 15; user-guide/features/mcp.md line 13 (the sources of can0, w_image, sch0, svc0). More than one Hermes is not in the line, only in the picks: user-guide/profiles.md lines 7 and 11 (bot0).",
+      "title": "What Hermes can do",
+      "phrases": [
+        "what can it do",
+        "what can hermes do",
+        "abilities"
+      ]
     },
     "H1": {
       "text": "I can't do that, but your own Hermes can. Paste this into a new chat with it.",
@@ -454,6 +460,13 @@ const TALK_DATA = {
     "COST": {
       "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose.",
       "source": "getting-started/official-domains.md line 61 (Hermes Agent is MIT-licensed and free to self-host); user-guide/configuring-models.md lines 13 to 15 (a subscription, token-billed providers); integrations/providers.md rows Claude Max + OAuth (extra paid credits); user-guide/local-models.md lines 9 to 15 (an AI on your own computer, no account)",
+      "title": "What Hermes costs",
+      "phrases": [
+        "cost",
+        "price",
+        "how much",
+        "per month"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -463,6 +476,12 @@ const TALK_DATA = {
     "WHERE": {
       "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on.",
       "source": "index.mdx line 115 (it lives wherever you put it: a $5 VPS, a GPU cluster or serverless; not tied to your laptop) and line 144 (runs anywhere, not just your laptop); user-guide/features/cron.md lines 313 to 315 and 423 (jobs run inside the gateway, which must be running); start-v1.md g2 and g3 with user-guide/desktop.md line 668 (it answers only while its computer is on; the line of msg3). R6: server and VPS are said as a computer that stays on (r6_say_instead).",
+      "title": "Running Hermes on your computer or the cloud",
+      "phrases": [
+        "my computer or the cloud",
+        "where to run it",
+        "do i need a server"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Messaging",
@@ -471,7 +490,13 @@ const TALK_DATA = {
     },
     "W2": {
       "text": "A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.",
-      "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin"
+      "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin",
+      "title": "Skills and plugins compared",
+      "phrases": [
+        "skill and a plugin",
+        "skill vs plugin",
+        "difference between a skill and a plugin"
+      ]
     },
     "NAME_AGAIN": {
       "text": "Hi again, {name}.",
@@ -581,6 +606,13 @@ const TALK_DATA = {
     "PRIV": {
       "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
       "source": "user-guide/local-models.md line 14: \"Nothing leaves your computer: no account, no API key, and no network access after a model is downloaded.\" Second sentence: user-guide/features/provider-routing.md line 98: \"Controls whether providers can use your prompts for training.\" and user-guide/configuring-models.md line 79: \"the vendor may train on your prompts and completions\" (both show prompts reach the provider; no docs line says it in general words or names the free model)",
+      "title": "Privacy: who sees your messages",
+      "phrases": [
+        "privacy",
+        "private",
+        "is my data safe",
+        "who can read"
+      ],
       "next": {
         "kind": "line",
         "label": "And my files?",
@@ -591,20 +623,47 @@ const TALK_DATA = {
     },
     "POWER": {
       "text": "On your own computer, small AIs run well with an 8 GB graphics card. Hermes shows which ones fit.",
-      "source": "user-guide/local-models.md line 202: \"A GPU with 8 GB+ of memory runs the small catalog models comfortably;\" and line 65: \"**Memory fit** — green (*Fits your GPU*: runs entirely in GPU memory),\". No docs line says an AI from a company needs no strong computer, so the line does not say it."
+      "source": "user-guide/local-models.md line 202: \"A GPU with 8 GB+ of memory runs the small catalog models comfortably;\" and line 65: \"**Memory fit** — green (*Fits your GPU*: runs entirely in GPU memory),\". No docs line says an AI from a company needs no strong computer, so the line does not say it.",
+      "title": "What computer a local AI needs",
+      "phrases": [
+        "how strong a computer",
+        "graphics card",
+        "8 gb"
+      ]
     },
     "HVC": {
       "text": "Hermes learns from experience and remembers you across chats. ChatGPT can be the AI inside it.",
-      "source": "index.mdx line 19: \"The self-improving AI agent built by Nous Research. ... it creates skills from experience, improves them during use, ... and builds a deepening model of who you are across sessions.\" Third sentence: mod1's source, integrations/providers.md (OpenAI Codex row): sign in with a ChatGPT plan."
+      "source": "index.mdx line 19: \"The self-improving AI agent built by Nous Research. ... it creates skills from experience, improves them during use, ... and builds a deepening model of who you are across sessions.\" Third sentence: mod1's source, integrations/providers.md (OpenAI Codex row): sign in with a ChatGPT plan.",
+      "title": "Hermes compared with ChatGPT",
+      "phrases": [
+        "instead of chatgpt",
+        "better than chatgpt",
+        "hermes vs chatgpt"
+      ]
     },
     "MIG": {
       "text": "There are two kinds of moving.",
       "source": "Helper's own lead-in; the two kinds are the offer move",
-      "offer": "move"
+      "offer": "move",
+      "title": "Moving to Hermes or to a new computer",
+      "phrases": [
+        "migrate",
+        "move over",
+        "switch over"
+      ]
     },
     "MIG_APP": {
       "text": "Hermes can bring over your notes and settings from other AI apps. The docs name OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot.",
       "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (\"imports your existing **OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot** setup into Hermes with one command\") and line 4 (\"instructions, rules, allowlists, MCP servers, skills, memories\")",
+      "title": "Moving from Cursor, Claude Code, Codex or OpenClaw",
+      "phrases": [
+        "moving from cursor",
+        "from claude code",
+        "from openclaw",
+        "from codex",
+        "take my rules",
+        "bring my setup"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -615,31 +674,69 @@ const TALK_DATA = {
     "MIG_NOT_LISTED": {
       "text": "The docs name only OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot. I have nothing checked on other apps.",
       "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (the list of six); no other app is named on that page",
-      "offer": "general"
+      "offer": "general",
+      "title": "Moving from an app the docs don't name",
+      "phrases": [
+        "move from another app",
+        "other apps",
+        "from windsurf"
+      ]
     },
     "MIG_PC": {
       "text": "Hermes can pack your settings, chats and other data into one zip file. Hermes on the new computer unpacks it. That replaces what is there.",
       "source": "dev/hermes-src/website/docs/reference/cli-commands.md line 1116 (\"Create a zip archive of your Hermes configuration, skills, sessions, and data.\") and line 1192 (\"Restore a previously created Hermes backup into your Hermes home directory. All files in the archive overwrite existing files\")",
+      "title": "Moving Hermes to a new computer or Mac",
+      "phrases": [
+        "new mac",
+        "new computer",
+        "new laptop",
+        "take hermes with me",
+        "move hermes",
+        "another computer"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is.",
+        "paste_text": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is. Then tell me how to restore it on my new computer with hermes import.",
         "source": "dev/hermes-src/website/docs/reference/cli-commands.md lines 1110 to 1123 (hermes backup, default ~/hermes-backup-<timestamp>.zip) and 1186 to 1192 (hermes import <zipfile>)"
       }
     },
     "HERMES": {
       "text": "Hermes is an AI helper made by Nous Research. It learns from experience and remembers you across chats.",
       "source": "dev/hermes-src/website/docs/index.mdx line 19 (\"The self-improving AI agent built by [Nous Research]... it creates skills from experience, improves them during use, ... builds a deepening model of who you are across sessions.\")",
-      "offer": "general"
+      "offer": "general",
+      "title": "What Hermes is and who made it",
+      "phrases": [
+        "what is hermes",
+        "what is this app",
+        "who made hermes",
+        "who made this",
+        "who made it",
+        "who makes hermes"
+      ]
     },
     "START": {
       "text": "Most people start by picking the AI Hermes uses. The quick setup signs you in, with no secret key.",
       "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** — OAuth login, no API keys to manage ... The recommended fast path.\")",
-      "offer": "general"
+      "offer": "general",
+      "title": "Where to start as a newcomer",
+      "phrases": [
+        "where do i start",
+        "get started",
+        "totally new",
+        "new here",
+        "where to begin"
+      ]
     },
     "KEY": {
       "text": "Not always. The quick setup signs you in, so you need no key. A key is a secret code some AI companies give you instead.",
       "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"OAuth login, no API keys to manage\") and line 119 (\"**OpenRouter** ... Enter your API key\"). 'secret code': K1's own wording; the docs keep keys in .env, 'secrets only' (dev/hermes-src/AGENTS.md, User state).",
+      "title": "Whether you need a key (API key)",
+      "phrases": [
+        "need a key",
+        "need an api key",
+        "do i need a key"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -648,11 +745,25 @@ const TALK_DATA = {
     },
     "UPDATE": {
       "text": "The Hermes app checks for updates by itself. When one is ready, it offers a one-click update.",
-      "source": "dev/hermes-src/website/docs/user-guide/desktop.md line 526 (\"The app checks for updates in the background and offers a one-click update when one is ready.\")"
+      "source": "dev/hermes-src/website/docs/user-guide/desktop.md line 526 (\"The app checks for updates in the background and offers a one-click update when one is ready.\")",
+      "title": "Updating Hermes",
+      "phrases": [
+        "update",
+        "new version",
+        "upgrade"
+      ]
     },
     "SAFE": {
       "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
       "source": "dev/hermes-src/website/docs/user-guide/security.md line 26 (\"Before executing any command, Hermes checks it against a curated list of dangerous patterns. If a match is found, the user must explicitly approve it.\") and line 16 (\"human-in-the-loop for destructive operations\")",
+      "title": "Permission: Hermes asks you to approve risky commands",
+      "phrases": [
+        "without asking",
+        "asking me first",
+        "ask before it acts",
+        "ask me first",
+        "does it ask first"
+      ],
       "next": {
         "kind": "line",
         "label": "And my messages?",
@@ -664,6 +775,12 @@ const TALK_DATA = {
     "PERSONALITY": {
       "text": "You change its personality in SOUL.md, the file that says who your Hermes is.",
       "source": "dev/hermes-src/website/docs/user-guide/features/personality.md line 9 (\"Hermes Agent's personality is fully customizable. `SOUL.md` is the **primary identity**\") and line 50 (\"Edit `~/.hermes/SOUL.md` to change Hermes' default personality.\")",
+      "title": "Changing its personality and tone",
+      "phrases": [
+        "personality",
+        "how it talks",
+        "change its tone"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -673,6 +790,12 @@ const TALK_DATA = {
     "KEY_WHAT": {
       "text": "A key is a secret code from an AI company. It lets Hermes use that company's AI. Keys go in Settings, never in a chat.",
       "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 118 (\"Anthropic ... or API key for pay-per-token\") and line 119 (\"OpenRouter ... Enter your API key\"); 'Keys go in Settings, never in a chat': line K1, word for word. 'secret': dev/hermes-src/AGENTS.md, User state (\".env (secrets only)\").",
+      "title": "What a key (API key) is",
+      "phrases": [
+        "what is a key",
+        "what is an api key",
+        "api key"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -682,6 +805,12 @@ const TALK_DATA = {
     "MIG_CHATGPT": {
       "text": "The docs name no way to move chats or settings from ChatGPT. ChatGPT can still be the AI inside Hermes.",
       "source": "/hermes-docs/user-guide/import-from-other-agents.md line 9 (the six apps: \"**OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot**\"; ChatGPT is not among them) and line 4 (what comes over: \"instructions, rules, allowlists, MCP servers, skills, memories\"; no chats). Second sentence: mod1's source (integrations/providers.md, OpenAI Codex row: sign in with a ChatGPT plan).",
+      "title": "Moving chats or settings from ChatGPT",
+      "phrases": [
+        "from chatgpt",
+        "import chatgpt chats",
+        "chatgpt history"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -691,20 +820,34 @@ const TALK_DATA = {
     "AGENT": {
       "text": "That is an AI that works by itself. The docs say Hermes gets better the longer it runs.",
       "source": "/hermes-docs/index.mdx line 115 (\"It's an **autonomous agent** that gets more capable the longer it runs.\")",
-      "offer": "general"
+      "offer": "general",
+      "title": "What an agent is",
+      "phrases": [
+        "agent",
+        "what is an agent",
+        "ai agent"
+      ]
     },
     "KEY_WHERE": {
-      "text": "A key is a secret code. In the Hermes app it goes in Settings, never in a chat.",
+      "text": "A key is a secret code. Open Settings, then \"Providers\", the AI companies, then \"API keys\". Find your row, such as \"OpenAI API\".",
       "source": "/hermes-docs/user-guide/desktop.md line 447 (\"**Providers settings pane** — a dedicated place to manage inference providers, with an Accounts / API-keys UX for signing in and storing credentials per provider\"). First sentence: line K1, word for word. Seen: the Settings list has a row Providers (docs/answers/hhtech-helper-settings.md line 15, hhtech ran the app v0.23.0).",
-      "next": {
-        "kind": "part",
-        "label": "Open Model",
-        "part": "model"
-      }
+      "title": "Where to put your API key",
+      "phrases": [
+        "where do i put my key",
+        "enter my key",
+        "paste my key",
+        "openai key"
+      ]
     },
     "FREE": {
       "text": "Hermes itself is free. An AI on your own computer needs no account. Some AI companies let you start free.",
       "source": "/hermes-docs/getting-started/official-domains.md line 61 (\"Hermes Agent is MIT-licensed and free to self-host.\"); user-guide/local-models.md line 14 (\"Nothing leaves your computer: no account, no API key\"); integrations/providers.md line 653 (\"Free tier included\") and line 521 (\"Create an account and a free API key\")",
+      "title": "Using Hermes for free",
+      "phrases": [
+        "free",
+        "without paying",
+        "no money"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -714,11 +857,24 @@ const TALK_DATA = {
     "MODEL_FOR": {
       "text": "I have nothing checked on which AI suits which kind of work.",
       "source": "No docs page was found that matches an AI to a kind of work (not a full search of the docs: checked user-guide/configuring-models.md and integrations/providers.md headings only).",
-      "offer": "pay"
+      "offer": "pay",
+      "title": "Which AI is best for which work",
+      "phrases": [
+        "best model for",
+        "which ai for",
+        "model for writing"
+      ]
     },
     "MODEL_CHANGE": {
-      "text": "In a Hermes chat, the message box shows the AI's name. Click it to choose another.",
+      "text": "In a Hermes chat, click the button left of the microphone. There you choose another AI.",
       "source": "/hermes-docs/user-guide/desktop.md line 283 (\"The model picker lives in the **composer**, just left of the microphone. Click it to switch the model\")",
+      "title": "Switching to another AI (model) in a chat",
+      "phrases": [
+        "change the model",
+        "switch model",
+        "another ai",
+        "different model"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Model",
@@ -728,6 +884,12 @@ const TALK_DATA = {
     "SKILL_ADD": {
       "text": "A skill is written steps for one task. To add one, click \"Capabilities\", then \"Skills\", then a card, then \"Install\".",
       "source": "Seen run by hhtech in Hermes Desktop v0.23.0 (docs/answers/hhtech-wants-check.md section 5; the same clicks as the steps in helper-wants-v1.json, w_reddit next). Docs: /hermes-docs/user-guide/desktop.md line 483 (\"The Skills tab lists your installed skills ... each entry has a one-click **Install** button\")",
+      "title": "Adding a skill",
+      "phrases": [
+        "add a skill",
+        "install a skill",
+        "get a skill"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Capabilities",
@@ -737,6 +899,12 @@ const TALK_DATA = {
     "PLUGIN_WHICH": {
       "text": "A plugin is an add-on. You need none to start. Hermes loads its built-in ones by itself.",
       "source": "/hermes-docs/user-guide/features/plugins.md line 290 (\"bundled \\\"always-works\\\" infrastructure loads automatically; third-party general plugins are opt-in\")",
+      "title": "Which plugins you need",
+      "phrases": [
+        "which plugins",
+        "plugins should i install",
+        "need plugins"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Capabilities",
@@ -746,6 +914,12 @@ const TALK_DATA = {
     "PLUGIN_ADD": {
       "text": "A plugin is an add-on. Your own Hermes can add one when you give it the name.",
       "source": "/hermes-docs/user-guide/features/plugins.md line 429 (\"hermes plugins install <name>                # install a catalog entry\") and line 222 (\"you're asked `Enable 'name' now? [y/N]`\")",
+      "title": "Adding a plugin (an add-on)",
+      "phrases": [
+        "install a plugin",
+        "add a plugin",
+        "get a plugin"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -755,7 +929,13 @@ const TALK_DATA = {
     "CODING": {
       "text": "The docs do not say it in general. For jobs on a schedule they say you just ask in plain words.",
       "source": "/hermes-docs/user-guide/features/cron.md line 24 (\"you can create, pause, edit, and remove jobs by asking in plain language — no CLI required\"). user-guide/desktop.md line 9 does not say whether coding is needed.",
-      "offer": "general"
+      "offer": "general",
+      "title": "Whether you need to know coding",
+      "phrases": [
+        "know coding",
+        "need to code",
+        "programming"
+      ]
     },
     "PICK_FIRST": {
       "text": "Choose one, and I will show you how.",
@@ -772,7 +952,17 @@ const TALK_DATA = {
     "START_2": {
       "text": "First choose the AI Hermes uses. Then send Hermes one message to see that it answers.",
       "source": "/hermes-docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** ... The recommended fast path.\") and line 182 (\"## 3. Run Your First Chat\")",
-      "offer": "general_2"
+      "offer": "general_2",
+      "title": "The first two steps",
+      "phrases": [
+        "what first",
+        "first step",
+        "set up first"
+      ]
+    },
+    "NO_MORE": {
+      "text": "That is all I have checked on that.",
+      "offer": "general"
     }
   },
   "opening": {
@@ -1324,6 +1514,24 @@ const TALK_DATA = {
       "other",
       "extra",
       "hermes"
+    ],
+    "can_question_starts": [
+      "can it",
+      "could it",
+      "will it",
+      "would it",
+      "does it",
+      "is it able",
+      "can hermes",
+      "could hermes",
+      "will hermes",
+      "would hermes",
+      "does hermes",
+      "is hermes able",
+      "can i",
+      "could i",
+      "can my hermes",
+      "can the bot"
     ]
   },
   "model_pick_not_when_starts": [
@@ -2152,6 +2360,16 @@ const TALK_DATA = {
           "pay_mod2",
           "pay_mod4",
           "pay_mod3"
+        ],
+        "instead": "general"
+      },
+      "start_four": {
+        "text": "Do you want one of these instead?",
+        "picks": [
+          "can",
+          "mod",
+          "msg",
+          "mem"
         ],
         "instead": "general"
       }
@@ -3313,6 +3531,12 @@ const TALK_DATA = {
         "id": "mem0",
         "text": "Memory is short notes Hermes keeps about you and your work.",
         "source": "user-guide/features/memory.md lines 9, 17 to 18",
+        "title": "What memory is",
+        "phrases": [
+          "what is memory",
+          "memory",
+          "how does memory work"
+        ],
         "next": {
           "kind": "paste",
           "label": "Try it",
@@ -3336,6 +3560,13 @@ const TALK_DATA = {
           ],
           "text": "Hermes does that by itself. It keeps short notes about you and reads them in each new chat.",
           "source": "user-guide/features/memory.md line 159, line 20",
+          "title": "Hermes remembering things about you",
+          "phrases": [
+            "remember me",
+            "remember things about me",
+            "know my name",
+            "my preferences"
+          ],
           "next": {
             "kind": "paste",
             "label": "Try it",
@@ -3363,6 +3594,13 @@ const TALK_DATA = {
           ],
           "text": "Hermes saves every chat. It can search your old chats when you ask.",
           "source": "user-guide/features/memory.md, Session Search, lines 237 to 241",
+          "title": "Finding and searching old chats",
+          "phrases": [
+            "old chats",
+            "remember yesterday",
+            "search my chats",
+            "past conversations"
+          ],
           "next": {
             "kind": "paste",
             "label": "Try it",
@@ -3390,6 +3628,12 @@ const TALK_DATA = {
           ],
           "text": "New notes show up in the next chat, not this one. Start a new chat and ask again.",
           "source": "user-guide/features/memory.md lines 57 and 86",
+          "title": "When Hermes forgot something you told it",
+          "phrases": [
+            "it forgot",
+            "does not remember",
+            "forgot what i said"
+          ],
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -3407,6 +3651,12 @@ const TALK_DATA = {
           ],
           "text": "Each bot keeps its own notes. For separate notes, use a separate bot.",
           "source": "user-guide/features/memory.md line 23",
+          "title": "Separate notes for each Hermes",
+          "phrases": [
+            "separate memory",
+            "separate notes",
+            "notes per bot"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Bots",
@@ -3520,6 +3770,12 @@ const TALK_DATA = {
         "id": "mod0",
         "text": "A model is the AI that does the thinking. Hermes needs one to answer.",
         "source": "user-guide/configuring-models.md line 9",
+        "title": "What a model is",
+        "phrases": [
+          "what is a model",
+          "model",
+          "which ai"
+        ],
         "next": {
           "kind": "part",
           "label": "Open Model"
@@ -3538,6 +3794,13 @@ const TALK_DATA = {
           ],
           "text": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.",
           "source": "integrations/providers.md, table row OpenAI Codex and the paragraph under it",
+          "title": "Using your ChatGPT plan with Hermes",
+          "phrases": [
+            "chatgpt plan",
+            "chatgpt plus",
+            "pay for chatgpt",
+            "use chatgpt"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3552,6 +3815,13 @@ const TALK_DATA = {
           ],
           "text": "A Claude Max plan works only with extra paid credits. Claude Pro does not work.",
           "source": "integrations/providers.md, table rows Claude Max + OAuth and Claude Pro",
+          "title": "Using your Claude plan with Hermes",
+          "phrases": [
+            "claude pro",
+            "claude max",
+            "claude plan",
+            "pay for claude"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3588,6 +3858,13 @@ const TALK_DATA = {
           ],
           "text": "Hermes can run an AI on your own computer. No account, and nothing leaves your computer.",
           "source": "user-guide/local-models.md lines 9 to 15",
+          "title": "An AI on your own computer (local)",
+          "phrases": [
+            "own computer",
+            "local ai",
+            "on my laptop",
+            "no account"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3613,6 +3890,12 @@ const TALK_DATA = {
           "only_if_no_other_need": true,
           "text": "The quickest start is a paid Nous plan. One sign-in gives you many AIs to choose from.",
           "source": "user-guide/configuring-models.md line 14",
+          "title": "The quickest way to get an AI",
+          "phrases": [
+            "quickest start",
+            "nous plan",
+            "easiest ai"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Model",
@@ -3710,6 +3993,12 @@ const TALK_DATA = {
         "id": "msg0",
         "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
         "source": "user-guide/messaging/index.md line 9",
+        "title": "Chatting from your phone",
+        "phrases": [
+          "chat apps",
+          "from my phone",
+          "which chat apps"
+        ],
         "next": {
           "kind": "part",
           "label": "Open Messaging"
@@ -3733,6 +4022,12 @@ const TALK_DATA = {
           ],
           "text": "Telegram has a quick setup. In the app, open Messaging and press Create with QR.",
           "source": "user-guide/desktop.md line 451",
+          "title": "Connecting Telegram",
+          "phrases": [
+            "connect telegram",
+            "set up telegram",
+            "telegram setup"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Messaging",
@@ -3767,6 +4062,13 @@ const TALK_DATA = {
           ],
           "text": "Hermes works with that app. In the Hermes app, open Messaging to set it up.",
           "source": "user-guide/messaging/index.md line 9; user-guide/desktop.md line 451",
+          "title": "Connecting WhatsApp, Discord, Slack or Signal",
+          "phrases": [
+            "whatsapp",
+            "discord",
+            "slack",
+            "signal"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Messaging",
@@ -3789,6 +4091,13 @@ const TALK_DATA = {
           ],
           "text": "It answers only while its computer is on. For answers at any time, that computer must stay on.",
           "source": "start-v1.md g2 and g3 (9 Nov, not reopened); user-guide/desktop.md line 668",
+          "title": "Answers while your computer is off or closed",
+          "phrases": [
+            "laptop closed",
+            "computer off",
+            "answer any time",
+            "always on"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Messaging",
@@ -3911,6 +4220,12 @@ const TALK_DATA = {
         "id": "sch0",
         "text": "Hermes can do jobs on a schedule, such as a summary every morning.",
         "source": "steps-v1.json s1f4 (9 Nov); user-guide/features/cron.md line 15",
+        "title": "Jobs on a schedule",
+        "phrases": [
+          "schedule",
+          "scheduled jobs",
+          "every morning"
+        ],
         "next": {
           "kind": "part",
           "label": "Open Capabilities"
@@ -3940,6 +4255,12 @@ const TALK_DATA = {
           ],
           "text": "Hermes can repeat a job every day or week. Ask it once, in plain words.",
           "source": "user-guide/features/cron.md lines 15 and 24",
+          "title": "A job every day or week",
+          "phrases": [
+            "daily job",
+            "every day",
+            "every week"
+          ],
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -3958,6 +4279,12 @@ const TALK_DATA = {
           ],
           "text": "Hermes can remind you once, or again and again. Just ask it in plain words.",
           "source": "user-guide/features/cron.md lines 15 and 64",
+          "title": "Reminders",
+          "phrases": [
+            "remind me",
+            "reminder",
+            "set a reminder"
+          ],
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -3978,6 +4305,12 @@ const TALK_DATA = {
           ],
           "text": "Hermes can check something on a schedule and tell you what it found.",
           "source": "user-guide/features/cron.md lines 65 and 19",
+          "title": "Checking or watching something regularly",
+          "phrases": [
+            "check regularly",
+            "watch something",
+            "monitor"
+          ],
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -3998,6 +4331,12 @@ const TALK_DATA = {
           ],
           "text": "Jobs run only while Hermes is running on a computer that is on.",
           "source": "user-guide/features/cron.md line 423, lines 313 to 315",
+          "title": "Why a scheduled job did not run",
+          "phrases": [
+            "jobs not running",
+            "job did not run",
+            "when do jobs run"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Messaging",
@@ -4019,6 +4358,12 @@ const TALK_DATA = {
           "wins_over_other_needs": true,
           "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
           "source": "user-guide/features/cron.md lines 15 and 24 (jobs on a schedule, made by asking in plain language); user-guide/skills/bundled/productivity/productivity-google-workspace.md lines 11 and 34 (a built-in skill that reads Gmail)",
+          "title": "A summary of your email every morning",
+          "phrases": [
+            "email every morning",
+            "check my email",
+            "mail summary"
+          ],
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -4108,6 +4453,12 @@ const TALK_DATA = {
         "id": "svc0",
         "text": "MCP links Hermes to a service you already use, such as GitHub.",
         "source": "user-guide/features/mcp.md line 13",
+        "title": "Linking a service like GitHub (MCP)",
+        "phrases": [
+          "connect a service",
+          "link a service",
+          "link github"
+        ],
         "next": {
           "kind": "part",
           "label": "Open Capabilities"
@@ -4180,6 +4531,12 @@ const TALK_DATA = {
           },
           "text": "Hermes has a list of ready-made links to services. Ask your own Hermes to add yours.",
           "source": "user-guide/features/mcp.md lines 60 to 66",
+          "title": "Adding Gmail, Notion or another service",
+          "phrases": [
+            "connect gmail",
+            "connect notion",
+            "add a service"
+          ],
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
@@ -4199,6 +4556,12 @@ const TALK_DATA = {
           ],
           "text": "Nothing is linked until you add it. You can also limit what Hermes may use there.",
           "source": "user-guide/features/mcp.md lines 60 to 62, line 27",
+          "title": "Is it safe to connect a service",
+          "phrases": [
+            "safe to connect",
+            "limit what it can use",
+            "is it safe to link"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Capabilities",
@@ -4277,6 +4640,12 @@ const TALK_DATA = {
         "id": "bot0",
         "text": "Each bot is a separate Hermes with its own settings and notes.",
         "source": "user-guide/profiles.md lines 7 and 11; user-guide/bot-mode.md",
+        "title": "What a bot (a separate Hermes) is",
+        "phrases": [
+          "second bot",
+          "another hermes",
+          "what is a bot"
+        ],
         "next": {
           "kind": "part",
           "label": "Open Bots"
@@ -4305,6 +4674,12 @@ const TALK_DATA = {
           ],
           "text": "That fits a second bot. Each bot is a separate Hermes with its own settings and notes.",
           "source": "user-guide/profiles.md line 11",
+          "title": "A second Hermes for work or home",
+          "phrases": [
+            "one for work and one for home",
+            "second hermes",
+            "new bot"
+          ],
           "next": {
             "kind": "line",
             "label": "How to add one",
@@ -4325,6 +4700,12 @@ const TALK_DATA = {
           ],
           "text": "Each bot is a separate Hermes. They can hand work to each other with @ and a name.",
           "source": "user-guide/bot-mode.md lines 181 to 183",
+          "title": "Two Hermes working together",
+          "phrases": [
+            "work together",
+            "hand work over",
+            "team of bots"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Bots",
@@ -4342,6 +4723,12 @@ const TALK_DATA = {
           ],
           "text": "You may not need a second, separate Hermes. One Hermes can hold many chats at once.",
           "source": "user-guide/desktop.md line 182",
+          "title": "Many chats in one Hermes",
+          "phrases": [
+            "many chats",
+            "several chats at once",
+            "more than one chat"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Bots",
@@ -4478,6 +4865,12 @@ const TALK_DATA = {
         "id": "use0",
         "text": "Tokens are small pieces of words. Your AI counts them, and long chats use the most.",
         "source": "token: Anthropic glossary, https://platform.claude.com/docs/en/about-claude/glossary (\"Tokens are the smallest individual units of a language model, and can correspond to words, subwords, characters\"); counted and paid: getting-started/quickstart.md line 118 (\"API key for pay-per-token\"); long chats: reference/faq.md line 547 (\"Cause: Long conversations, verbose system prompts, or many tool calls accumulating context.\")",
+        "title": "What tokens are",
+        "phrases": [
+          "tokens",
+          "what are tokens",
+          "what is a token"
+        ],
         "next": {
           "kind": "line",
           "label": "What helps",
@@ -4524,6 +4917,12 @@ const TALK_DATA = {
           "only_if_no_other_need": true,
           "text": "Long chats use the most tokens, small pieces of words. For a fresh chat, click \"New session\" at the top left.",
           "source": "token: Anthropic glossary (as use0); reference/faq.md line 547 (\"Cause: Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)",
+          "title": "Using fewer tokens",
+          "phrases": [
+            "use less",
+            "save tokens",
+            "fewer tokens"
+          ],
           "next": {
             "kind": "line",
             "label": "See what uses them",
@@ -4565,6 +4964,12 @@ const TALK_DATA = {
           ],
           "text": "Long chats cost the most. For a fresh chat, click \"New session\" at the top left. A cheaper AI also helps.",
           "source": "reference/faq.md line 547 (\"Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run); integrations/providers.md line 1562 (\"Cost optimization\")",
+          "title": "Spending less money on the AI",
+          "phrases": [
+            "too expensive",
+            "costs too much",
+            "cheaper"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Model"
@@ -4591,6 +4996,12 @@ const TALK_DATA = {
           ],
           "text": "Each message uses part of your limit, and long chats use more. For a fresh chat, click \"New session\" at the top left.",
           "source": "user-guide/features/credential-pools.md line 29 (\"Plan/usage limit reached\"); reference/faq.md line 547 (\"Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)",
+          "title": "Hitting your usage limit",
+          "phrases": [
+            "limit reached",
+            "out of messages",
+            "usage limit"
+          ],
           "next": {
             "kind": "line",
             "label": "See what uses them",
@@ -4634,6 +5045,12 @@ const TALK_DATA = {
           ],
           "text": "Big AIs and long chats can make answers slow. A smaller, faster AI can help.",
           "source": "reference/faq.md lines 538 to 541 (\"Slow responses ... Cause: Large model, distant API server, or heavy system prompt with many tools ... Try a faster/smaller model\"); guides/troubleshooting-agent-quality.md line 27 (\"responses are slowing down\" in a long session)",
+          "title": "Slow answers and what helps",
+          "phrases": [
+            "too slow",
+            "slow answers",
+            "make it faster"
+          ],
           "next": {
             "kind": "part",
             "label": "Open Model"
@@ -4652,6 +5069,12 @@ const TALK_DATA = {
       ],
       "text": "Tools are actions Hermes can take, like searching the web or editing files.",
       "source": "user-guide/features/tools.md line 13; start-v1.md c1 (9 Nov)",
+      "title": "What tools are",
+      "phrases": [
+        "tools",
+        "what is a tool",
+        "what are tools"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Capabilities",
@@ -4667,6 +5090,12 @@ const TALK_DATA = {
       ],
       "text": "A skill is a set of written steps that teach Hermes one task.",
       "source": "getting-started/quickstart.md line 295",
+      "title": "What a skill is",
+      "phrases": [
+        "skill",
+        "what is a skill",
+        "what are skills"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Capabilities",
@@ -4691,6 +5120,12 @@ const TALK_DATA = {
       ],
       "text": "A plugin is an add-on that gives Hermes a new feature.",
       "source": "user-guide/features/plugins.md line 10",
+      "title": "What a plugin is",
+      "phrases": [
+        "plugin",
+        "what is a plugin",
+        "what are plugins"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Capabilities",
@@ -4711,6 +5146,12 @@ const TALK_DATA = {
       ],
       "text": "MCP links Hermes to a service you already use, such as GitHub.",
       "source": "user-guide/features/mcp.md line 13",
+      "title": "What MCP is",
+      "phrases": [
+        "mcp",
+        "what is mcp",
+        "model context protocol"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Capabilities",
@@ -4728,6 +5169,12 @@ const TALK_DATA = {
       ],
       "text": "SOUL.md is the file that says who your Hermes is.",
       "source": "user-guide/features/personality.md line 10",
+      "title": "What SOUL.md is",
+      "phrases": [
+        "soul.md",
+        "soul file",
+        "what is soul.md"
+      ],
       "next": {
         "kind": "none"
       }
@@ -4741,6 +5188,12 @@ const TALK_DATA = {
       ],
       "text": "That is one separate Hermes with its own settings and notes. The \"Bots\" tab lists them.",
       "source": "user-guide/bot-mode.md line 12 (A Bot is a profile); user-guide/profiles.md lines 7 and 11. The Bots tab listing them: hhtech ran, dev/checks/hhtech-real-model/nav2/shots/nav2-4-bots-tab-by-hand.txt (one bot on a fresh install, and the screen Profiles shows 1 profile).",
+      "title": "What a profile is",
+      "phrases": [
+        "profile",
+        "profiles",
+        "what is a profile"
+      ],
       "next": {
         "kind": "part",
         "label": "Open Bots",
@@ -4762,6 +5215,2058 @@ const TALK_DATA = {
         "source": "hhtech ran, Desktop v0.23.0: dev/checks/hhtech-real-model/nav2/shots/nav2-4-bots-tab-by-hand.txt"
       }
     }
+  },
+  "facts": [
+    {
+      "id": "d_windows",
+      "title": "Hermes on Windows",
+      "phrases": [
+        "windows",
+        "on a pc",
+        "windows 11"
+      ],
+      "text": "Yes. Hermes runs on Windows 10 and 11. It also runs on Mac and Linux.",
+      "sources": [
+        {
+          "file": "getting-started/platform-support.md",
+          "line": 20
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_mac",
+      "title": "Hermes on a Mac",
+      "phrases": [
+        "work on mac",
+        "on a mac",
+        "on my mac",
+        "macbook"
+      ],
+      "text": "Yes. The docs list Macs with Apple chips, and the Hermes app runs there.",
+      "sources": [
+        {
+          "file": "getting-started/platform-support.md",
+          "line": 19
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_linux",
+      "title": "Hermes on Linux",
+      "phrases": [
+        "linux",
+        "ubuntu",
+        "on linux"
+      ],
+      "text": "Yes. Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
+      "sources": [
+        {
+          "file": "getting-started/platform-support.md",
+          "line": 21
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_android",
+      "title": "Hermes on an Android phone",
+      "phrases": [
+        "android",
+        "termux",
+        "install on my phone"
+      ],
+      "text": "Hermes can run on Android phones, inside an app called Termux.",
+      "sources": [
+        {
+          "file": "getting-started/installation.md",
+          "line": 71
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_download",
+      "title": "Getting the Hermes app",
+      "phrases": [
+        "download",
+        "where do i get hermes",
+        "install hermes",
+        "how do i install it"
+      ],
+      "text": "You download the Hermes app from the Hermes website. Pick the one for your computer.",
+      "sources": [
+        {
+          "file": "getting-started/installation.md",
+          "line": 24
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_uninstall",
+      "title": "Uninstalling (removing) Hermes",
+      "phrases": [
+        "uninstall",
+        "remove hermes",
+        "delete hermes",
+        "get rid of hermes"
+      ],
+      "text": "The docs name a place in the Hermes app: Settings, About, Danger zone. There you pick how much to remove.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 587
+        },
+        {
+          "file": "getting-started/updating.md",
+          "line": 627
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please show me what hermes uninstall would remove. Change nothing until I say yes."
+      }
+    },
+    {
+      "id": "d_uninstall_keep",
+      "title": "What stays after removing the app",
+      "phrases": [
+        "after uninstall",
+        "uninstall only the app",
+        "keep my chats when i uninstall"
+      ],
+      "text": "You can remove only the app. Then Hermes itself, your settings and your chats stay.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 589
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_update_chat",
+      "title": "Updating from a chat app",
+      "phrases": [
+        "update from telegram",
+        "update from my phone",
+        "/update"
+      ],
+      "text": "You can update Hermes from Telegram, Discord, Slack, WhatsApp or Teams. Send it /update.",
+      "sources": [
+        {
+          "file": "getting-started/updating.md",
+          "line": 546
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_version",
+      "title": "Which version you have",
+      "phrases": [
+        "version",
+        "which version",
+        "what version"
+      ],
+      "text": "Your own Hermes can tell you which version it is.",
+      "sources": [
+        {
+          "file": "getting-started/updating.md",
+          "line": 539
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please run hermes --version and tell me which version I have."
+      }
+    },
+    {
+      "id": "d_provider",
+      "title": "What a provider is",
+      "phrases": [
+        "provider",
+        "providers",
+        "what is a provider",
+        "ai provider"
+      ],
+      "text": "\"Provider\" is the app's word for the company that runs the AI. OpenAI and Anthropic are two.",
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 13
+        },
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 118
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_first_chat",
+      "title": "Checking that Hermes answers",
+      "phrases": [
+        "first message",
+        "test that it works",
+        "check it works"
+      ],
+      "text": "After you pick an AI, send Hermes one message. Make it something easy to check.",
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 189
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_does",
+      "title": "What Hermes does, in short",
+      "phrases": [
+        "what does hermes do",
+        "what does it do",
+        "like alexa",
+        "what is it for",
+        "what is hermes for"
+      ],
+      "text": "You talk to it like other AIs. Hermes also works by itself, and the docs say it gets better over time.",
+      "sources": [
+        {
+          "file": "index.mdx",
+          "line": 115
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_not_laptop",
+      "title": "Hermes away from your laptop",
+      "phrases": [
+        "tied to my laptop",
+        "run it somewhere else",
+        "cloud computer"
+      ],
+      "text": "Hermes need not run on your laptop. You can talk to it from Telegram while it works elsewhere.",
+      "sources": [
+        {
+          "file": "index.mdx",
+          "line": 115
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_data_sent",
+      "title": "Where your messages go",
+      "phrases": [
+        "is my data sent",
+        "send my data",
+        "who sees my chats",
+        "telemetry",
+        "tracking me"
+      ],
+      "text": "Your messages go only to the AI company you choose. Hermes itself collects no usage data.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 58
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_stored_local",
+      "title": "Where Hermes keeps your things",
+      "phrases": [
+        "where is my data stored",
+        "stored on my computer",
+        "where are my files kept"
+      ],
+      "text": "Your chats and its notes stay on your own computer, in the Hermes folder.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 58
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_offline",
+      "title": "Using Hermes with no internet",
+      "phrases": [
+        "offline",
+        "without internet",
+        "no internet"
+      ],
+      "text": "Yes, with an AI on your own computer. After its download, that AI needs no internet.",
+      "sources": [
+        {
+          "file": "user-guide/local-models.md",
+          "line": 14
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_many_people",
+      "title": "Other people using your Hermes",
+      "phrases": [
+        "wife use",
+        "husband use",
+        "someone else use",
+        "family use",
+        "share it with",
+        "friend use",
+        "multiple people",
+        "other people use"
+      ],
+      "text": "Yes. Other people can talk to your Hermes from a chat app. You choose who is allowed.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 100
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Messaging",
+        "part": "messaging"
+      }
+    },
+    {
+      "id": "d_mem_vs_skill",
+      "title": "Memory and skills compared",
+      "phrases": [
+        "difference between memory and skill",
+        "diffrence between memory and skill",
+        "memory vs skill",
+        "memory or a skill"
+      ],
+      "text": "Memory is short notes with facts about you. A skill is written steps for one task. Hermes keeps both.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 104
+        },
+        {
+          "file": "reference/faq.md",
+          "line": 105
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_key_bad",
+      "title": "When a key does not work",
+      "phrases": [
+        "key not working",
+        "key doesnt work",
+        "invalid key",
+        "key rejected",
+        "wrong key"
+      ],
+      "text": "A key is a secret code. If it fails, it is missing, too old, typed wrong, or from another company.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 286
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_rate",
+      "title": "Rate limit: too many requests at once",
+      "phrases": [
+        "rate limit",
+        "429",
+        "too many requests"
+      ],
+      "text": "That means you passed the limit of your AI company. Wait a moment and try again.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 322
+        },
+        {
+          "file": "reference/faq.md",
+          "line": 324
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_too_long",
+      "title": "When a chat gets too long",
+      "phrases": [
+        "chat too long",
+        "context length",
+        "conversation too long"
+      ],
+      "text": "A very long chat can grow past what the AI can read. Start a fresh chat.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 331
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_blocked",
+      "title": "Why a command was blocked",
+      "phrases": [
+        "command blocked",
+        "blocked as dangerous",
+        "why did it block"
+      ],
+      "text": "Hermes stops commands that could destroy things. It shows you the command, and you approve or refuse.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 383
+        },
+        {
+          "file": "reference/faq.md",
+          "line": 385
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_bot_silent",
+      "title": "When your chat app bot does not reply",
+      "phrases": [
+        "bot not responding",
+        "bot doesnt reply",
+        "bot not replying",
+        "bot doesnt answer",
+        "whatsapp not replying",
+        "discord not replying",
+        "no reply in my chat app"
+      ],
+      "text": "The docs give three causes. Hermes is not running, not linked, or you are not on its allowed list.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 425
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Messaging",
+        "part": "messaging"
+      }
+    },
+    {
+      "id": "d_slow",
+      "title": "Why answers are slow: three causes",
+      "phrases": [
+        "so slow",
+        "why is it slow",
+        "answers take long"
+      ],
+      "text": "Three causes are named. A big AI, a far-away AI company, or many actions switched on.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 537
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_share_notes",
+      "title": "Do separate Hermes share notes",
+      "phrases": [
+        "share memory between",
+        "share notes between",
+        "do they share chats"
+      ],
+      "text": "No. Each separate Hermes keeps its own notes and its own chats. Nothing is shared.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 674
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_backup_vs",
+      "title": "Backup and export compared",
+      "phrases": [
+        "backup or export",
+        "difference between backup and export",
+        "full backup"
+      ],
+      "text": "A full backup packs everything, your sign-ins too. An export packs one Hermes and leaves those out.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 848
+        },
+        {
+          "file": "reference/faq.md",
+          "line": 848
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_stop",
+      "title": "Stopping Hermes while it works",
+      "phrases": [
+        "stop it",
+        "how do i stop",
+        "make it stop",
+        "stop hermes",
+        "cancel what it is doing",
+        "stuck thinking",
+        "thinking forever"
+      ],
+      "text": "The docs say: press Stop in the chat, or Esc on your keyboard.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 236
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_stop_chat",
+      "title": "Stopping Hermes from a chat app",
+      "phrases": [
+        "stop it from telegram",
+        "stop from my phone",
+        "stop in whatsapp"
+      ],
+      "text": "In a chat app, send /stop. That stops what Hermes is doing.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/index.md",
+          "line": 252
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_keep_open",
+      "title": "Closing the app window while Hermes runs",
+      "phrases": [
+        "keep the app open",
+        "close the app",
+        "close the window",
+        "app stay open",
+        "leave it open"
+      ],
+      "text": "Closing the window can hide the app while Hermes keeps running. That setting is off at first.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 342
+        },
+        {
+          "file": "user-guide/desktop.md",
+          "line": 340
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_tray",
+      "title": "Bringing the app window back",
+      "phrases": [
+        "bring the window back",
+        "app disappeared",
+        "where did the window go"
+      ],
+      "text": "The docs say: use Show Hermes in the tray, the small icons by the clock.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 342
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_export",
+      "title": "Packing one Hermes into a file to share",
+      "phrases": [
+        "export profile",
+        "share my setup",
+        "send my setup to a friend"
+      ],
+      "text": "You can pack one Hermes into a single file to share. Your sign-ins are left out.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 558
+        },
+        {
+          "file": "user-guide/desktop.md",
+          "line": 558
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_drag",
+      "title": "Giving Hermes a file",
+      "phrases": [
+        "attach a file",
+        "send it a file",
+        "upload a file",
+        "give it a file",
+        "drag a file"
+      ],
+      "text": "Drag a file into the chat. It is attached to your next message.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 229
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_find",
+      "title": "Searching inside a chat",
+      "phrases": [
+        "search in chat",
+        "find in chat",
+        "find a word"
+      ],
+      "text": "Press Ctrl+F, or Cmd+F on a Mac. A find bar searches the chat on screen.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 240
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_default_ai",
+      "title": "Setting the AI for new chats",
+      "phrases": [
+        "default model",
+        "default ai",
+        "main model",
+        "ai for every chat"
+      ],
+      "text": "Open Settings, then \"Model\". Choose the company and the AI, then click \"Apply\".",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 288
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_voice_app",
+      "title": "Talking to Hermes in the app",
+      "phrases": [
+        "voice",
+        "speak to it",
+        "microphone",
+        "dictate"
+      ],
+      "text": "You can talk to Hermes and hear it answer. On a Mac, you allow the microphone once.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 386
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_lang",
+      "title": "Changing the language of the app",
+      "phrases": [
+        "language",
+        "change language",
+        "in german",
+        "in spanish",
+        "language of the app",
+        "change the language"
+      ],
+      "text": "The app's own text comes in English, Chinese, Japanese, Arabic and Russian.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 551
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_shortcuts",
+      "title": "Jumping around with the keyboard",
+      "phrases": [
+        "keyboard shortcuts",
+        "shortcut",
+        "command palette"
+      ],
+      "text": "Press Ctrl+K, or Cmd+K on a Mac. A box opens where you type where to go.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 548
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_mem_graph",
+      "title": "A map of what Hermes learned",
+      "phrases": [
+        "see what it learned",
+        "memory graph",
+        "what has it learned"
+      ],
+      "text": "The docs name a \"Memory Graph\". It is a map of what Hermes has learned for you.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 378
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_restart_note",
+      "title": "Hermes stopped in the background",
+      "phrases": [
+        "stopped working in the background",
+        "hermes stopped working",
+        "hermes restarted",
+        "started again by itself"
+      ],
+      "text": "The app starts Hermes again by itself and shows a notice. The chat comes back after that.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 864
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_gateway",
+      "title": "What a gateway is",
+      "phrases": [
+        "gateway",
+        "what is a gateway",
+        "the gateway"
+      ],
+      "text": "\"Gateway\" is the docs' word for one part of Hermes. It links Hermes to your chat apps.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/index.md",
+          "line": 7
+        },
+        {
+          "file": "user-guide/messaging/index.md",
+          "line": 9
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Messaging",
+        "part": "messaging"
+      }
+    },
+    {
+      "id": "d_allowed",
+      "title": "Who may talk to your Hermes",
+      "phrases": [
+        "who can talk to",
+        "allowed users",
+        "strangers message",
+        "anyone message"
+      ],
+      "text": "At first, nobody else can. Hermes answers only people on its allowed list.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/index.md",
+          "line": 392
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_pairing",
+      "title": "Letting a new person in",
+      "phrases": [
+        "pairing",
+        "pairing code",
+        "let someone in",
+        "add a person"
+      ],
+      "text": "A new person who writes to it gets a one-time code. You approve that code.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/index.md",
+          "line": 418
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_chat_cmds",
+      "title": "Short commands in a chat app",
+      "phrases": [
+        "commands in telegram",
+        "slash commands",
+        "commands in chat"
+      ],
+      "text": "In a chat app, /new starts a fresh chat. /stop stops Hermes.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/index.md",
+          "line": 245
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_redirect",
+      "title": "Correcting Hermes while it works",
+      "phrases": [
+        "correct it while",
+        "tell it something while it works",
+        "change the job midway"
+      ],
+      "text": "Send a message while Hermes works. It takes your correction into the same job.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/index.md",
+          "line": 481
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_tg_silent",
+      "title": "Telegram gives no answer at all",
+      "phrases": [
+        "telegram doesnt reply",
+        "telegram not replying",
+        "telegram not answering",
+        "telegram bot doesnt reply",
+        "no reply on telegram",
+        "telegram silent"
+      ],
+      "text": "For Telegram the docs say: check that its secret code is right. Then look at the log Hermes keeps.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/telegram.md",
+          "line": 1477
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Messaging",
+        "part": "messaging"
+      }
+    },
+    {
+      "id": "d_tg_unauth",
+      "title": "Telegram says unauthorized",
+      "phrases": [
+        "unauthorized",
+        "not authorized",
+        "telegram unauthorized"
+      ],
+      "text": "That means your Telegram user number is not on the allowed list.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/telegram.md",
+          "line": 1478
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_tg_group",
+      "title": "Telegram group messages ignored",
+      "phrases": [
+        "ignores group",
+        "group messages",
+        "telegram group"
+      ],
+      "text": "The docs say privacy mode is likely on. Turn it off, or make Hermes a group admin.",
+      "sources": [
+        {
+          "file": "user-guide/messaging/telegram.md",
+          "line": 1479
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_passwords",
+      "title": "Hermes and your passwords",
+      "phrases": [
+        "passwords",
+        "password",
+        "read my secrets"
+      ],
+      "text": "Hermes is blocked from changing the places where secret codes are kept. I have nothing checked on passwords in other files.",
+      "sources": [
+        {
+          "file": "user-guide/security.md",
+          "line": 400
+        },
+        {
+          "file": "user-guide/security.md",
+          "line": 405
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_modes",
+      "title": "How often Hermes asks for permission",
+      "phrases": [
+        "approval mode",
+        "ask less",
+        "ask every time",
+        "stop asking me"
+      ],
+      "text": "There are three settings for how Hermes asks first: smart, manual and off.",
+      "sources": [
+        {
+          "file": "user-guide/security.md",
+          "line": 34
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_yolo",
+      "title": "YOLO mode: no approval questions in one chat",
+      "phrases": [
+        "yolo",
+        "never ask",
+        "skip approval"
+      ],
+      "text": "The docs name a YOLO mode. It skips every such question for the current chat.",
+      "sources": [
+        {
+          "file": "user-guide/security.md",
+          "line": 69
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_never",
+      "title": "Commands Hermes always refuses",
+      "phrases": [
+        "always refuse",
+        "never run",
+        "wipe my disk",
+        "destroy my computer"
+      ],
+      "text": "Some commands Hermes never runs, whatever the settings. Wiping a whole disk is one.",
+      "sources": [
+        {
+          "file": "user-guide/security.md",
+          "line": 143
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_timeout",
+      "title": "When you do not answer its approval question",
+      "phrases": [
+        "dont answer in time",
+        "if i dont approve",
+        "no response to approval"
+      ],
+      "text": "If you do not answer in time, Hermes does not run the command.",
+      "sources": [
+        {
+          "file": "user-guide/security.md",
+          "line": 196
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_chats_where",
+      "title": "Where your chats are saved",
+      "phrases": [
+        "where are my chats",
+        "chats saved",
+        "chat history stored",
+        "where is my history"
+      ],
+      "text": "Every chat is saved on the computer Hermes runs on. It is one file in its folder.",
+      "sources": [
+        {
+          "file": "user-guide/sessions.md",
+          "line": 17
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_titles",
+      "title": "Names for your chats",
+      "phrases": [
+        "rename a chat",
+        "name a chat",
+        "chat title"
+      ],
+      "text": "Hermes names each chat by itself after the first answer. You can change the name.",
+      "sources": [
+        {
+          "file": "user-guide/sessions.md",
+          "line": 310
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_delete_chat",
+      "title": "Deleting a chat",
+      "phrases": [
+        "delete a chat",
+        "delete my chats",
+        "remove a chat",
+        "erase history",
+        "clear history"
+      ],
+      "text": "Your own Hermes can delete a chat for you. It asks you to confirm first.",
+      "sources": [
+        {
+          "file": "user-guide/sessions.md",
+          "line": 505
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please list my recent chats and help me delete one. Ask me before you delete anything."
+      }
+    },
+    {
+      "id": "d_chats_kept",
+      "title": "How long chats are kept",
+      "phrases": [
+        "how long are chats kept",
+        "do chats expire",
+        "old chats deleted"
+      ],
+      "text": "Hermes keeps old chats. Clearing them out by itself is off unless you turn it on.",
+      "sources": [
+        {
+          "file": "user-guide/sessions.md",
+          "line": 1195
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_copy_hermes",
+      "title": "Copying a Hermes",
+      "phrases": [
+        "copy my bot",
+        "clone",
+        "duplicate hermes"
+      ],
+      "text": "A copy takes the settings, personality and notes along. Old chats are not copied.",
+      "sources": [
+        {
+          "file": "user-guide/profiles.md",
+          "line": 102
+        },
+        {
+          "file": "user-guide/profiles.md",
+          "line": 102
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_delete_hermes",
+      "title": "Deleting one separate Hermes",
+      "phrases": [
+        "delete a bot",
+        "delete a profile",
+        "remove a bot"
+      ],
+      "text": "Your own Hermes can delete one of your separate Hermes. Ask it to check with you first.",
+      "sources": [
+        {
+          "file": "user-guide/profiles.md",
+          "line": 378
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please list my profiles and help me delete one. Ask me before you delete anything."
+      }
+    },
+    {
+      "id": "d_mem_size",
+      "title": "How much Hermes remembers",
+      "phrases": [
+        "memory limit",
+        "how much can it remember",
+        "memory full"
+      ],
+      "text": "Its notes are kept short on purpose. About 2,200 letters of its own, and 1,375 about you.",
+      "sources": [
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 17
+        },
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 18
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_mem_change",
+      "title": "Changing or removing what Hermes remembers",
+      "phrases": [
+        "remove a memory",
+        "change what it remembers",
+        "edit memory",
+        "wrong memory",
+        "change a note"
+      ],
+      "text": "Hermes can add, change or remove its own notes. Ask it in plain words.",
+      "sources": [
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 20
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Try it",
+        "paste_text": "Please show me what you have saved about me, and remove the parts I tell you."
+      }
+    },
+    {
+      "id": "d_mem_approve",
+      "title": "Approving what Hermes saves",
+      "phrases": [
+        "approve memory",
+        "ask before saving",
+        "stop it saving"
+      ],
+      "text": "Hermes saves notes freely at first. A setting makes it ask you before each save.",
+      "sources": [
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 331
+        },
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 333
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_skill_use",
+      "title": "Using a skill",
+      "phrases": [
+        "use a skill",
+        "run a skill",
+        "how do i use skills"
+      ],
+      "text": "A skill is written steps for one task. Type / and its name in a chat to use it.",
+      "sources": [
+        {
+          "file": "user-guide/features/skills.md",
+          "line": 75
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_skill_own",
+      "title": "Hermes writes its own skills",
+      "phrases": [
+        "does it learn",
+        "make its own skills",
+        "create skills itself",
+        "self improving"
+      ],
+      "text": "A skill is written steps for one task. Hermes can write new ones itself after it solves something.",
+      "sources": [
+        {
+          "file": "user-guide/features/skills.md",
+          "line": 608
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_skill_learn",
+      "title": "Teaching Hermes from your material",
+      "phrases": [
+        "/learn",
+        "teach it",
+        "learn from my documents"
+      ],
+      "text": "The docs name /learn. It turns what you know into a skill, written steps for one task.",
+      "sources": [
+        {
+          "file": "user-guide/features/skills.md",
+          "line": 119
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_plugin_off",
+      "title": "Add-ons start switched off",
+      "phrases": [
+        "plugin not working",
+        "enable a plugin",
+        "turn on a plugin",
+        "plugin disabled"
+      ],
+      "text": "A plugin is an add-on. One you add yourself stays off until you switch it on.",
+      "sources": [
+        {
+          "file": "user-guide/features/plugins.md",
+          "line": 175
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_plugin_find",
+      "title": "Finding add-ons",
+      "phrases": [
+        "find plugins",
+        "search plugins",
+        "plugin list",
+        "what plugins are there"
+      ],
+      "text": "A plugin is an add-on. Your own Hermes can search the official list for you.",
+      "sources": [
+        {
+          "file": "user-guide/features/plugins.md",
+          "line": 428
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please search the Hermes plugin catalog for <what you want> and show me what you find. Install nothing yet."
+      }
+    },
+    {
+      "id": "d_job_change",
+      "title": "Pausing or removing a job",
+      "phrases": [
+        "pause a job",
+        "remove a job",
+        "delete a job",
+        "stop a job",
+        "cancel a reminder",
+        "edit a job"
+      ],
+      "text": "You can pause, change or remove a job by asking Hermes in plain words.",
+      "sources": [
+        {
+          "file": "user-guide/features/cron.md",
+          "line": 24
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_job_where",
+      "title": "Where a job's result goes",
+      "phrases": [
+        "where do results go",
+        "where does it send",
+        "job output"
+      ],
+      "text": "A job's result comes back to the chat where you made the job.",
+      "sources": [
+        {
+          "file": "user-guide/features/cron.md",
+          "line": 651
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_job_all_stop",
+      "title": "Stopping every job at once",
+      "phrases": [
+        "stop all jobs",
+        "pause everything",
+        "emergency stop"
+      ],
+      "text": "The docs name one stop for every job at once. It is called hermes pause.",
+      "sources": [
+        {
+          "file": "user-guide/features/cron.md",
+          "line": 322
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please pause all my scheduled jobs with hermes pause and tell me when it is done."
+      }
+    },
+    {
+      "id": "d_pers_ready",
+      "title": "Ready-made ways of talking",
+      "phrases": [
+        "personalities",
+        "ready made personality",
+        "make it brief"
+      ],
+      "text": "Hermes comes with ready-made ways of talking, such as helpful and concise. /personality switches for one chat.",
+      "sources": [
+        {
+          "file": "user-guide/features/personality.md",
+          "line": 175
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_soul_where",
+      "title": "Where SOUL.md lives",
+      "phrases": [
+        "where is soul.md",
+        "find soul.md",
+        "where is the soul file"
+      ],
+      "text": "SOUL.md is the file that says who your Hermes is. It sits in the folder Hermes keeps.",
+      "sources": [
+        {
+          "file": "user-guide/features/personality.md",
+          "line": 57
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_tools_list",
+      "title": "Actions Hermes has built in",
+      "phrases": [
+        "built in tools",
+        "what tools",
+        "out of the box"
+      ],
+      "text": "Tools are actions Hermes can take. Built in are web search, browsing, files, notes and jobs on a schedule.",
+      "sources": [
+        {
+          "file": "user-guide/features/tools.md",
+          "line": 17
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_voice_tg",
+      "title": "Spoken answers in Telegram",
+      "phrases": [
+        "voice reply",
+        "voice message back",
+        "speak in telegram"
+      ],
+      "text": "In Telegram and Discord, Hermes can send its answer as sound with the text.",
+      "sources": [
+        {
+          "file": "user-guide/features/voice-mode.md",
+          "line": 36
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_local_how",
+      "title": "Setting up an AI on your computer",
+      "phrases": [
+        "local model",
+        "run locally",
+        "run it locally",
+        "local ai setup"
+      ],
+      "text": "The docs say: Settings, \"Providers\", Local Models. Install, pick an AI, download it, then click Use.",
+      "sources": [
+        {
+          "file": "user-guide/local-models.md",
+          "line": 42
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_local_fit",
+      "title": "Hermes fits the AI to your computer",
+      "phrases": [
+        "which local ai fits",
+        "do i need a gpu",
+        "which build",
+        "fits my computer",
+        "right version of the ai"
+      ],
+      "text": "Hermes picks the right build of each AI for your computer. You only pick the AI.",
+      "sources": [
+        {
+          "file": "user-guide/local-models.md",
+          "line": 12
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_local_where",
+      "title": "Computers that can run a local AI",
+      "phrases": [
+        "local on windows",
+        "local on mac",
+        "local on linux"
+      ],
+      "text": "An AI on your own computer works on Mac, Windows and Linux.",
+      "sources": [
+        {
+          "file": "user-guide/local-models.md",
+          "line": 19
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_nous",
+      "title": "Nous Portal: one sign-in for many AIs",
+      "phrases": [
+        "nous portal",
+        "what is nous",
+        "nous"
+      ],
+      "text": "Nous Portal is from the makers of Hermes. One sign-in covers more than 300 AIs.",
+      "sources": [
+        {
+          "file": "integrations/providers.md",
+          "line": 74
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_plans",
+      "title": "Paying with a plan you already have",
+      "phrases": [
+        "use my plan",
+        "sign in with my plan",
+        "supergrok"
+      ],
+      "text": "Some AI companies let you sign in with a plan you already pay for.",
+      "sources": [
+        {
+          "file": "integrations/providers.md",
+          "line": 134
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_openrouter",
+      "title": "OpenRouter: one service for many AIs",
+      "phrases": [
+        "openrouter",
+        "what is openrouter",
+        "open router"
+      ],
+      "text": "OpenRouter is one service that reaches many AIs from many companies.",
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 119
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_ollama",
+      "title": "Ollama and LM Studio",
+      "phrases": [
+        "ollama",
+        "lm studio",
+        "use ollama"
+      ],
+      "text": "Both run AIs on your own computer, and Hermes can use them.",
+      "sources": [
+        {
+          "file": "integrations/providers.md",
+          "line": 728
+        },
+        {
+          "file": "integrations/providers.md",
+          "line": 920
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_any_ai",
+      "title": "Other AI companies that work with Hermes",
+      "phrases": [
+        "which ai companies",
+        "which ai work with",
+        "supported ai",
+        "other ai companies"
+      ],
+      "text": "Hermes works with many AI companies. The docs list them, and I have not checked each one.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 21
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_undo",
+      "title": "Undoing something Hermes did or deleted",
+      "phrases": [
+        "undo",
+        "get it back",
+        "deleted something",
+        "roll back",
+        "rollback",
+        "restore my files"
+      ],
+      "text": "Hermes can copy your work before a risky change and restore it later. This is off unless you turn it on.",
+      "sources": [
+        {
+          "file": "user-guide/checkpoints-and-rollback.md",
+          "line": 10
+        },
+        {
+          "file": "user-guide/checkpoints-and-rollback.md",
+          "line": 10
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_open_source",
+      "title": "Whether Hermes is open source",
+      "phrases": [
+        "open source",
+        "opensource",
+        "mit license",
+        "source code",
+        "is the code public"
+      ],
+      "text": "Yes. Hermes is open source, which means its code is public. Hermes itself is free.",
+      "sources": [
+        {
+          "file": "reference/faq.md",
+          "line": 96
+        },
+        {
+          "file": "getting-started/official-domains.md",
+          "line": 61
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_gemini",
+      "title": "Using Gemini (Google's AI) with Hermes",
+      "phrases": [
+        "use gemini",
+        "gemini",
+        "google gemini",
+        "gemini key",
+        "googles ai"
+      ],
+      "text": "Yes. Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+      "sources": [
+        {
+          "file": "integrations/providers.md",
+          "line": 48
+        },
+        {
+          "file": "integrations/providers.md",
+          "line": 152
+        }
+      ],
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    {
+      "id": "d_forget",
+      "title": "Making Hermes forget something about you",
+      "phrases": [
+        "forget something about me",
+        "forget something",
+        "make it forget",
+        "forget that",
+        "delete what it knows about me"
+      ],
+      "text": "Yes. Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+      "sources": [
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 20
+        },
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 96
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Try it",
+        "paste_text": "Please show me what you have saved about me, and remove the parts I tell you."
+      }
+    },
+    {
+      "id": "d_meter",
+      "title": "What the \"% full\" meter shows",
+      "phrases": [
+        "percent full",
+        "full meter",
+        "context usage",
+        "how full"
+      ],
+      "text": "The docs name a \"% full\" meter in the chat. It shows how much of what the AI can read is used. Click it for details.",
+      "sources": [
+        {
+          "file": "user-guide/desktop.md",
+          "line": 249
+        },
+        {
+          "file": "user-guide/desktop.md",
+          "line": 249
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_two",
+      "title": "Doing two things at once",
+      "phrases": [
+        "two things at once",
+        "several things at once",
+        "multitask",
+        "in parallel",
+        "two jobs at the same time",
+        "split work between helpers",
+        "split a job",
+        "split work"
+      ],
+      "text": "Yes. Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
+      "sources": [
+        {
+          "file": "user-guide/features/delegation.md",
+          "line": 4
+        },
+        {
+          "file": "user-guide/features/delegation.md",
+          "line": 11
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_approve_off",
+      "title": "Turning approvals (permission questions) off",
+      "phrases": [
+        "turn off the asking",
+        "turn off approvals",
+        "turn off asking for permission",
+        "stop asking for permission",
+        "disable approvals",
+        "turn off permission"
+      ],
+      "text": "You can set how Hermes asks to off. The docs warn that this removes every safety question. Then risky commands run unasked.",
+      "sources": [
+        {
+          "file": "user-guide/security.md",
+          "line": 34
+        },
+        {
+          "file": "user-guide/security.md",
+          "line": 61
+        },
+        {
+          "file": "user-guide/security.md",
+          "line": 64
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "d_siri",
+      "title": "Hermes compared with Siri: a wake word",
+      "phrases": [
+        "like siri",
+        "siri",
+        "alexa",
+        "wake word",
+        "hey hermes",
+        "say its name"
+      ],
+      "text": "With one setting on, Hermes listens for a spoken phrase and answers. The docs compare that to \"Hey Siri\".",
+      "sources": [
+        {
+          "file": "user-guide/features/wake-word.md",
+          "line": 10
+        },
+        {
+          "file": "user-guide/features/wake-word.md",
+          "line": 13
+        }
+      ],
+      "next": {
+        "kind": "none"
+      }
+    }
+  ],
+  "near": {
+    "stop_words": [
+      "a",
+      "about",
+      "am",
+      "an",
+      "and",
+      "any",
+      "app",
+      "are",
+      "as",
+      "at",
+      "be",
+      "by",
+      "can",
+      "change",
+      "could",
+      "did",
+      "do",
+      "does",
+      "doesnt",
+      "doing",
+      "dont",
+      "for",
+      "from",
+      "get",
+      "go",
+      "got",
+      "had",
+      "has",
+      "have",
+      "he",
+      "here",
+      "hermes",
+      "how",
+      "i",
+      "if",
+      "im",
+      "in",
+      "into",
+      "is",
+      "it",
+      "its",
+      "just",
+      "keep",
+      "know",
+      "like",
+      "look",
+      "make",
+      "me",
+      "my",
+      "name",
+      "need",
+      "new",
+      "no",
+      "not",
+      "of",
+      "on",
+      "one",
+      "or",
+      "our",
+      "out",
+      "say",
+      "see",
+      "she",
+      "should",
+      "so",
+      "some",
+      "stuff",
+      "that",
+      "the",
+      "them",
+      "then",
+      "there",
+      "these",
+      "they",
+      "thing",
+      "this",
+      "those",
+      "to",
+      "too",
+      "up",
+      "us",
+      "use",
+      "using",
+      "want",
+      "we",
+      "what",
+      "whats",
+      "when",
+      "which",
+      "who",
+      "why",
+      "will",
+      "with",
+      "work",
+      "would",
+      "yes",
+      "you",
+      "your"
+    ],
+    "filler": [
+      "actually",
+      "really",
+      "even",
+      "exactly",
+      "just",
+      "well",
+      "ok",
+      "okay",
+      "so",
+      "please",
+      "totally"
+    ],
+    "first_step_old": [
+      "SAFE",
+      "MIG_APP",
+      "MIG_PC",
+      "START"
+    ],
+    "keep_caps": [
+      "Hermes",
+      "Telegram",
+      "SOUL.md",
+      "MCP",
+      "Nous",
+      "OpenRouter",
+      "Ollama",
+      "AI",
+      "ChatGPT",
+      "Claude",
+      "I"
+    ],
+    "want_say": "{label}",
+    "template": "Do you want to know about {a}, or about {b}?",
+    "template_1": "Do you want to know about {a}?",
+    "template_3": "Do you want to know about {a}, {b}, or {c}?",
+    "nothing_near_set": "start_four",
+    "bare_follow": [
+      "how",
+      "why",
+      "and then",
+      "then",
+      "then what",
+      "what then",
+      "and after that",
+      "after that",
+      "and"
+    ]
   },
   "keeps": {
     "answers": {
@@ -6496,6 +9001,13 @@ const WANTS_DATA = {
           "quote": "search the web and return ranked results"
         }
       ],
+      "title": "Searching the web and reading pages",
+      "phrases": [
+        "search the web",
+        "look it up online",
+        "google it",
+        "web search"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -6559,6 +9071,13 @@ const WANTS_DATA = {
           "quote": "No API key, no setup."
         }
       ],
+      "title": "Using websites for you: clicking and forms",
+      "phrases": [
+        "click around websites",
+        "fill in a form",
+        "use a website",
+        "browser"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -6601,6 +9120,12 @@ const WANTS_DATA = {
           "line": 98,
           "quote": "X/Twitter via xurl CLI: raw post search, posting, DM, media."
         }
+      ],
+      "title": "Posting and searching on X (Twitter)",
+      "phrases": [
+        "post on x",
+        "twitter",
+        "tweet"
       ],
       "next": {
         "kind": "paste",
@@ -6645,6 +9170,12 @@ const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Reading and searching Reddit",
+      "phrases": [
+        "reddit",
+        "read reddit",
+        "search reddit"
       ],
       "next": {
         "kind": "steps",
@@ -6725,6 +9256,13 @@ const WANTS_DATA = {
           "quote": "contain no text layer and silently convert to nothing"
         }
       ],
+      "title": "Reading your Word, Excel and PDF files",
+      "phrases": [
+        "read a pdf",
+        "read my documents",
+        "word file",
+        "excel file"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -6762,6 +9300,13 @@ const WANTS_DATA = {
           "line": 81,
           "quote": "PDF files: create, read, merge, fill, OCR, edit text."
         }
+      ],
+      "title": "Making, merging or editing PDF files",
+      "phrases": [
+        "make a pdf",
+        "merge pdfs",
+        "edit a pdf",
+        "fill in a pdf"
       ],
       "next": {
         "kind": "paste",
@@ -6807,6 +9352,13 @@ const WANTS_DATA = {
           "quote": "Create, read, and edit Word, PowerPoint, and Excel files."
         }
       ],
+      "title": "Making Word, PowerPoint or Excel files",
+      "phrases": [
+        "make a spreadsheet",
+        "powerpoint",
+        "word document",
+        "make slides"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -6847,6 +9399,12 @@ const WANTS_DATA = {
           "line": 70,
           "quote": "Read, search, create, and edit notes in the Obsidian vault."
         }
+      ],
+      "title": "Working with your Obsidian notes",
+      "phrases": [
+        "obsidian",
+        "obsidian notes",
+        "obsidian vault"
       ],
       "next": {
         "kind": "paste",
@@ -6889,6 +9447,12 @@ const WANTS_DATA = {
           "line": 79,
           "quote": "Turn meeting notes into cited decisions, owners, tickets."
         }
+      ],
+      "title": "Turning meeting notes into decisions and tasks",
+      "phrases": [
+        "meeting notes",
+        "action items",
+        "meeting minutes"
       ],
       "next": {
         "kind": "paste",
@@ -6941,6 +9505,12 @@ const WANTS_DATA = {
           "quote": "Execute commands and manipulate files."
         }
       ],
+      "title": "Writing and running code",
+      "phrases": [
+        "write code",
+        "coding",
+        "run code"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -6991,6 +9561,13 @@ const WANTS_DATA = {
           "line": 21,
           "quote": "The built-in `computer_use` toolset"
         }
+      ],
+      "title": "Clicking and typing in your computer's apps",
+      "phrases": [
+        "computer use",
+        "control my computer",
+        "click and type",
+        "use my apps"
       ],
       "next": {
         "kind": "paste",
@@ -7051,6 +9628,14 @@ const WANTS_DATA = {
           "line": 158,
           "quote": "Direct FAL requires a funded `FAL_KEY`"
         }
+      ],
+      "title": "Making pictures (images) from your words",
+      "phrases": [
+        "make pictures",
+        "make images",
+        "image generation",
+        "draw a picture",
+        "generate an image"
       ],
       "next": {
         "kind": "paste",
@@ -7113,6 +9698,13 @@ const WANTS_DATA = {
           "quote": "`vision_analyze`"
         }
       ],
+      "title": "Looking at a photo or picture you send",
+      "phrases": [
+        "send it a photo",
+        "send a picture",
+        "look at my pictures",
+        "read a screenshot"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -7158,6 +9750,12 @@ const WANTS_DATA = {
           "quote": "Generate a video from a text prompt (text-to-video) or animate a still image (image-to-video)"
         }
       ],
+      "title": "Making a video from text or a picture",
+      "phrases": [
+        "make a video",
+        "text to video",
+        "video generation"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -7197,6 +9795,12 @@ const WANTS_DATA = {
           "quote": "Manim CE animations: 3Blue1Brown math/algo videos."
         }
       ],
+      "title": "Making animated maths explainer videos",
+      "phrases": [
+        "animated explainer",
+        "animation",
+        "manim"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -7235,6 +9839,12 @@ const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Making a video with an AI presenter",
+      "phrases": [
+        "presenter video",
+        "talking head video",
+        "ai presenter"
       ],
       "next": {
         "kind": "steps",
@@ -7282,6 +9892,13 @@ const WANTS_DATA = {
           "quote": "YouTube transcripts to summaries, threads, blogs."
         }
       ],
+      "title": "Summarising a YouTube video",
+      "phrases": [
+        "youtube",
+        "summarise a video",
+        "summarize a video",
+        "youtube summary"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -7312,6 +9929,12 @@ const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Making memes",
+      "phrases": [
+        "meme",
+        "memes",
+        "make a meme"
       ],
       "next": {
         "kind": "steps",
@@ -7358,6 +9981,13 @@ const WANTS_DATA = {
           "line": 350,
           "quote": "Talk to Hermes and hear it back"
         }
+      ],
+      "title": "Talking to Hermes out loud (voice)",
+      "phrases": [
+        "voice mode",
+        "talk out loud",
+        "by voice",
+        "use my voice"
       ],
       "next": {
         "kind": "paste",
@@ -7407,6 +10037,14 @@ const WANTS_DATA = {
           "line": 25,
           "quote": "| **Edge TTS** (default) | Good | Free | None needed |"
         }
+      ],
+      "title": "Hermes reading its answers aloud to you",
+      "phrases": [
+        "read its answers to me",
+        "read aloud",
+        "text to speech",
+        "tts",
+        "read it out"
       ],
       "next": {
         "kind": "paste",
@@ -7463,6 +10101,14 @@ const WANTS_DATA = {
           "quote": "Voice messages sent on Telegram, Discord, WhatsApp, Slack, or Signal are automatically transcribed and injected as text into the conversation."
         }
       ],
+      "title": "Turning voice messages into text",
+      "phrases": [
+        "voice note",
+        "voice notes",
+        "voice memo",
+        "transcribe",
+        "voice message"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -7497,6 +10143,12 @@ const WANTS_DATA = {
           "line": 45,
           "quote": "Songwriting craft and Suno AI music prompts."
         }
+      ],
+      "title": "Writing songs and briefing a music AI",
+      "phrases": [
+        "write a song",
+        "song lyrics",
+        "suno"
       ],
       "next": {
         "kind": "paste",
@@ -7533,6 +10185,12 @@ const WANTS_DATA = {
           "line": 90,
           "quote": "Search arXiv papers by keyword, author, category, or ID."
         }
+      ],
+      "title": "Finding research papers on arXiv",
+      "phrases": [
+        "research papers",
+        "arxiv",
+        "scientific papers"
       ],
       "next": {
         "kind": "paste",
@@ -7577,6 +10235,13 @@ const WANTS_DATA = {
           "quote": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM."
         }
       ],
+      "title": "Finding places, routes and time zones",
+      "phrases": [
+        "directions",
+        "find a place",
+        "route to",
+        "time zone"
+      ],
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
@@ -7619,6 +10284,13 @@ const WANTS_DATA = {
           "line": 9,
           "quote": "Install them explicitly"
         }
+      ],
+      "title": "Looking up stock and crypto prices",
+      "phrases": [
+        "stock price",
+        "stock prices",
+        "crypto price",
+        "bitcoin price"
       ],
       "next": {
         "kind": "steps",
@@ -7668,6 +10340,13 @@ const WANTS_DATA = {
           "line": 82,
           "quote": "Watch product, flight, or listing prices; alert on target."
         }
+      ],
+      "title": "Watching a product's price for you",
+      "phrases": [
+        "price alert",
+        "watch a price",
+        "price drop",
+        "track a price"
       ],
       "next": {
         "kind": "paste",
@@ -14695,6 +17374,1487 @@ const LIVE_DATA = {
       }
     },
     {
+      "id": "C1",
+      "subject": "fixed",
+      "title": "What Hermes can do",
+      "text": "Hermes can work with the web, files and pictures. It can do jobs on a schedule and use services like Gmail. Pick one.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "C1"
+      }
+    },
+    {
+      "id": "W2",
+      "subject": "fixed",
+      "title": "Skills and plugins compared",
+      "text": "A skill is written steps that teach Hermes one task. A plugin is an add-on that gives Hermes a new feature. Pick one.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "W2"
+      }
+    },
+    {
+      "id": "PRIV",
+      "subject": "fixed",
+      "title": "Privacy: who sees your messages",
+      "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "PRIV"
+      }
+    },
+    {
+      "id": "POWER",
+      "subject": "fixed",
+      "title": "What computer a local AI needs",
+      "text": "On your own computer, small AIs run well with an 8 GB graphics card. Hermes shows which ones fit.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "POWER"
+      }
+    },
+    {
+      "id": "HVC",
+      "subject": "fixed",
+      "title": "Hermes compared with ChatGPT",
+      "text": "Hermes learns from experience and remembers you across chats. ChatGPT can be the AI inside it.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "HVC"
+      }
+    },
+    {
+      "id": "MIG",
+      "subject": "fixed",
+      "title": "Moving to Hermes or to a new computer",
+      "text": "There are two kinds of moving.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "MIG"
+      }
+    },
+    {
+      "id": "MIG_APP",
+      "subject": "fixed",
+      "title": "Moving from Cursor, Claude Code, Codex or OpenClaw",
+      "text": "Hermes can bring over your notes and settings from other AI apps. The docs name OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "MIG_APP"
+      }
+    },
+    {
+      "id": "MIG_NOT_LISTED",
+      "subject": "fixed",
+      "title": "Moving from an app the docs don't name",
+      "text": "The docs name only OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot. I have nothing checked on other apps.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "MIG_NOT_LISTED"
+      }
+    },
+    {
+      "id": "MIG_PC",
+      "subject": "fixed",
+      "title": "Moving Hermes to a new computer or Mac",
+      "text": "Hermes can pack your settings, chats and other data into one zip file. Hermes on the new computer unpacks it. That replaces what is there.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "MIG_PC"
+      }
+    },
+    {
+      "id": "HERMES",
+      "subject": "fixed",
+      "title": "What Hermes is and who made it",
+      "text": "Hermes is an AI helper made by Nous Research. It learns from experience and remembers you across chats.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "HERMES"
+      }
+    },
+    {
+      "id": "START",
+      "subject": "fixed",
+      "title": "Where to start as a newcomer",
+      "text": "Most people start by picking the AI Hermes uses. The quick setup signs you in, with no secret key.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "START"
+      }
+    },
+    {
+      "id": "KEY",
+      "subject": "fixed",
+      "title": "Whether you need a key (API key)",
+      "text": "Not always. The quick setup signs you in, so you need no key. A key is a secret code some AI companies give you instead.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "KEY"
+      }
+    },
+    {
+      "id": "UPDATE",
+      "subject": "fixed",
+      "title": "Updating Hermes",
+      "text": "The Hermes app checks for updates by itself. When one is ready, it offers a one-click update.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "UPDATE"
+      }
+    },
+    {
+      "id": "SAFE",
+      "subject": "fixed",
+      "title": "Permission: Hermes asks you to approve risky commands",
+      "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "SAFE"
+      }
+    },
+    {
+      "id": "PERSONALITY",
+      "subject": "fixed",
+      "title": "Changing its personality and tone",
+      "text": "You change its personality in SOUL.md, the file that says who your Hermes is.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "PERSONALITY"
+      }
+    },
+    {
+      "id": "KEY_WHAT",
+      "subject": "fixed",
+      "title": "What a key (API key) is",
+      "text": "A key is a secret code from an AI company. It lets Hermes use that company's AI. Keys go in Settings, never in a chat.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "KEY_WHAT"
+      }
+    },
+    {
+      "id": "MIG_CHATGPT",
+      "subject": "fixed",
+      "title": "Moving chats or settings from ChatGPT",
+      "text": "The docs name no way to move chats or settings from ChatGPT. ChatGPT can still be the AI inside Hermes.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "MIG_CHATGPT"
+      }
+    },
+    {
+      "id": "AGENT",
+      "subject": "fixed",
+      "title": "What an agent is",
+      "text": "That is an AI that works by itself. The docs say Hermes gets better the longer it runs.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "AGENT"
+      }
+    },
+    {
+      "id": "KEY_WHERE",
+      "subject": "fixed",
+      "title": "Where to put your API key",
+      "text": "A key is a secret code. Open Settings, then \"Providers\", the AI companies, then \"API keys\". Find your row, such as \"OpenAI API\".",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "KEY_WHERE"
+      }
+    },
+    {
+      "id": "FREE",
+      "subject": "fixed",
+      "title": "Using Hermes for free",
+      "text": "Hermes itself is free. An AI on your own computer needs no account. Some AI companies let you start free.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "FREE"
+      }
+    },
+    {
+      "id": "MODEL_FOR",
+      "subject": "fixed",
+      "title": "Which AI is best for which work",
+      "text": "I have nothing checked on which AI suits which kind of work.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "MODEL_FOR"
+      }
+    },
+    {
+      "id": "MODEL_CHANGE",
+      "subject": "fixed",
+      "title": "Switching to another AI (model) in a chat",
+      "text": "In a Hermes chat, click the button left of the microphone. There you choose another AI.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "MODEL_CHANGE"
+      }
+    },
+    {
+      "id": "SKILL_ADD",
+      "subject": "fixed",
+      "title": "Adding a skill",
+      "text": "A skill is written steps for one task. To add one, click \"Capabilities\", then \"Skills\", then a card, then \"Install\".",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "SKILL_ADD"
+      }
+    },
+    {
+      "id": "PLUGIN_WHICH",
+      "subject": "fixed",
+      "title": "Which plugins you need",
+      "text": "A plugin is an add-on. You need none to start. Hermes loads its built-in ones by itself.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "PLUGIN_WHICH"
+      }
+    },
+    {
+      "id": "PLUGIN_ADD",
+      "subject": "fixed",
+      "title": "Adding a plugin (an add-on)",
+      "text": "A plugin is an add-on. Your own Hermes can add one when you give it the name.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "PLUGIN_ADD"
+      }
+    },
+    {
+      "id": "CODING",
+      "subject": "fixed",
+      "title": "Whether you need to know coding",
+      "text": "The docs do not say it in general. For jobs on a schedule they say you just ask in plain words.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "CODING"
+      }
+    },
+    {
+      "id": "START_2",
+      "subject": "fixed",
+      "title": "The first two steps",
+      "text": "First choose the AI Hermes uses. Then send Hermes one message to see that it answers.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "START_2"
+      }
+    },
+    {
+      "id": "d_windows",
+      "subject": "fact",
+      "title": "Hermes on Windows",
+      "text": "Yes. Hermes runs on Windows 10 and 11. It also runs on Mac and Linux.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_windows"
+      }
+    },
+    {
+      "id": "d_mac",
+      "subject": "fact",
+      "title": "Hermes on a Mac",
+      "text": "Yes. The docs list Macs with Apple chips, and the Hermes app runs there.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_mac"
+      }
+    },
+    {
+      "id": "d_linux",
+      "subject": "fact",
+      "title": "Hermes on Linux",
+      "text": "Yes. Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_linux"
+      }
+    },
+    {
+      "id": "d_android",
+      "subject": "fact",
+      "title": "Hermes on an Android phone",
+      "text": "Hermes can run on Android phones, inside an app called Termux.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_android"
+      }
+    },
+    {
+      "id": "d_download",
+      "subject": "fact",
+      "title": "Getting the Hermes app",
+      "text": "You download the Hermes app from the Hermes website. Pick the one for your computer.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_download"
+      }
+    },
+    {
+      "id": "d_uninstall",
+      "subject": "fact",
+      "title": "Uninstalling (removing) Hermes",
+      "text": "The docs name a place in the Hermes app: Settings, About, Danger zone. There you pick how much to remove.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_uninstall"
+      }
+    },
+    {
+      "id": "d_uninstall_keep",
+      "subject": "fact",
+      "title": "What stays after removing the app",
+      "text": "You can remove only the app. Then Hermes itself, your settings and your chats stay.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_uninstall_keep"
+      }
+    },
+    {
+      "id": "d_update_chat",
+      "subject": "fact",
+      "title": "Updating from a chat app",
+      "text": "You can update Hermes from Telegram, Discord, Slack, WhatsApp or Teams. Send it /update.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_update_chat"
+      }
+    },
+    {
+      "id": "d_version",
+      "subject": "fact",
+      "title": "Which version you have",
+      "text": "Your own Hermes can tell you which version it is.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_version"
+      }
+    },
+    {
+      "id": "d_provider",
+      "subject": "fact",
+      "title": "What a provider is",
+      "text": "\"Provider\" is the app's word for the company that runs the AI. OpenAI and Anthropic are two.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_provider"
+      }
+    },
+    {
+      "id": "d_first_chat",
+      "subject": "fact",
+      "title": "Checking that Hermes answers",
+      "text": "After you pick an AI, send Hermes one message. Make it something easy to check.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_first_chat"
+      }
+    },
+    {
+      "id": "d_does",
+      "subject": "fact",
+      "title": "What Hermes does, in short",
+      "text": "You talk to it like other AIs. Hermes also works by itself, and the docs say it gets better over time.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_does"
+      }
+    },
+    {
+      "id": "d_not_laptop",
+      "subject": "fact",
+      "title": "Hermes away from your laptop",
+      "text": "Hermes need not run on your laptop. You can talk to it from Telegram while it works elsewhere.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_not_laptop"
+      }
+    },
+    {
+      "id": "d_data_sent",
+      "subject": "fact",
+      "title": "Where your messages go",
+      "text": "Your messages go only to the AI company you choose. Hermes itself collects no usage data.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_data_sent"
+      }
+    },
+    {
+      "id": "d_stored_local",
+      "subject": "fact",
+      "title": "Where Hermes keeps your things",
+      "text": "Your chats and its notes stay on your own computer, in the Hermes folder.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_stored_local"
+      }
+    },
+    {
+      "id": "d_offline",
+      "subject": "fact",
+      "title": "Using Hermes with no internet",
+      "text": "Yes, with an AI on your own computer. After its download, that AI needs no internet.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_offline"
+      }
+    },
+    {
+      "id": "d_many_people",
+      "subject": "fact",
+      "title": "Other people using your Hermes",
+      "text": "Yes. Other people can talk to your Hermes from a chat app. You choose who is allowed.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_many_people"
+      }
+    },
+    {
+      "id": "d_mem_vs_skill",
+      "subject": "fact",
+      "title": "Memory and skills compared",
+      "text": "Memory is short notes with facts about you. A skill is written steps for one task. Hermes keeps both.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_mem_vs_skill"
+      }
+    },
+    {
+      "id": "d_key_bad",
+      "subject": "fact",
+      "title": "When a key does not work",
+      "text": "A key is a secret code. If it fails, it is missing, too old, typed wrong, or from another company.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_key_bad"
+      }
+    },
+    {
+      "id": "d_rate",
+      "subject": "fact",
+      "title": "Rate limit: too many requests at once",
+      "text": "That means you passed the limit of your AI company. Wait a moment and try again.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_rate"
+      }
+    },
+    {
+      "id": "d_too_long",
+      "subject": "fact",
+      "title": "When a chat gets too long",
+      "text": "A very long chat can grow past what the AI can read. Start a fresh chat.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_too_long"
+      }
+    },
+    {
+      "id": "d_blocked",
+      "subject": "fact",
+      "title": "Why a command was blocked",
+      "text": "Hermes stops commands that could destroy things. It shows you the command, and you approve or refuse.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_blocked"
+      }
+    },
+    {
+      "id": "d_bot_silent",
+      "subject": "fact",
+      "title": "When your chat app bot does not reply",
+      "text": "The docs give three causes. Hermes is not running, not linked, or you are not on its allowed list.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_bot_silent"
+      }
+    },
+    {
+      "id": "d_slow",
+      "subject": "fact",
+      "title": "Why answers are slow: three causes",
+      "text": "Three causes are named. A big AI, a far-away AI company, or many actions switched on.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_slow"
+      }
+    },
+    {
+      "id": "d_share_notes",
+      "subject": "fact",
+      "title": "Do separate Hermes share notes",
+      "text": "No. Each separate Hermes keeps its own notes and its own chats. Nothing is shared.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_share_notes"
+      }
+    },
+    {
+      "id": "d_backup_vs",
+      "subject": "fact",
+      "title": "Backup and export compared",
+      "text": "A full backup packs everything, your sign-ins too. An export packs one Hermes and leaves those out.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_backup_vs"
+      }
+    },
+    {
+      "id": "d_stop",
+      "subject": "fact",
+      "title": "Stopping Hermes while it works",
+      "text": "The docs say: press Stop in the chat, or Esc on your keyboard.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_stop"
+      }
+    },
+    {
+      "id": "d_stop_chat",
+      "subject": "fact",
+      "title": "Stopping Hermes from a chat app",
+      "text": "In a chat app, send /stop. That stops what Hermes is doing.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_stop_chat"
+      }
+    },
+    {
+      "id": "d_keep_open",
+      "subject": "fact",
+      "title": "Closing the app window while Hermes runs",
+      "text": "Closing the window can hide the app while Hermes keeps running. That setting is off at first.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_keep_open"
+      }
+    },
+    {
+      "id": "d_tray",
+      "subject": "fact",
+      "title": "Bringing the app window back",
+      "text": "The docs say: use Show Hermes in the tray, the small icons by the clock.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_tray"
+      }
+    },
+    {
+      "id": "d_export",
+      "subject": "fact",
+      "title": "Packing one Hermes into a file to share",
+      "text": "You can pack one Hermes into a single file to share. Your sign-ins are left out.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_export"
+      }
+    },
+    {
+      "id": "d_drag",
+      "subject": "fact",
+      "title": "Giving Hermes a file",
+      "text": "Drag a file into the chat. It is attached to your next message.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_drag"
+      }
+    },
+    {
+      "id": "d_find",
+      "subject": "fact",
+      "title": "Searching inside a chat",
+      "text": "Press Ctrl+F, or Cmd+F on a Mac. A find bar searches the chat on screen.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_find"
+      }
+    },
+    {
+      "id": "d_default_ai",
+      "subject": "fact",
+      "title": "Setting the AI for new chats",
+      "text": "Open Settings, then \"Model\". Choose the company and the AI, then click \"Apply\".",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_default_ai"
+      }
+    },
+    {
+      "id": "d_voice_app",
+      "subject": "fact",
+      "title": "Talking to Hermes in the app",
+      "text": "You can talk to Hermes and hear it answer. On a Mac, you allow the microphone once.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_voice_app"
+      }
+    },
+    {
+      "id": "d_lang",
+      "subject": "fact",
+      "title": "Changing the language of the app",
+      "text": "The app's own text comes in English, Chinese, Japanese, Arabic and Russian.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_lang"
+      }
+    },
+    {
+      "id": "d_shortcuts",
+      "subject": "fact",
+      "title": "Jumping around with the keyboard",
+      "text": "Press Ctrl+K, or Cmd+K on a Mac. A box opens where you type where to go.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_shortcuts"
+      }
+    },
+    {
+      "id": "d_mem_graph",
+      "subject": "fact",
+      "title": "A map of what Hermes learned",
+      "text": "The docs name a \"Memory Graph\". It is a map of what Hermes has learned for you.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_mem_graph"
+      }
+    },
+    {
+      "id": "d_restart_note",
+      "subject": "fact",
+      "title": "Hermes stopped in the background",
+      "text": "The app starts Hermes again by itself and shows a notice. The chat comes back after that.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_restart_note"
+      }
+    },
+    {
+      "id": "d_gateway",
+      "subject": "fact",
+      "title": "What a gateway is",
+      "text": "\"Gateway\" is the docs' word for one part of Hermes. It links Hermes to your chat apps.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_gateway"
+      }
+    },
+    {
+      "id": "d_allowed",
+      "subject": "fact",
+      "title": "Who may talk to your Hermes",
+      "text": "At first, nobody else can. Hermes answers only people on its allowed list.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_allowed"
+      }
+    },
+    {
+      "id": "d_pairing",
+      "subject": "fact",
+      "title": "Letting a new person in",
+      "text": "A new person who writes to it gets a one-time code. You approve that code.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_pairing"
+      }
+    },
+    {
+      "id": "d_chat_cmds",
+      "subject": "fact",
+      "title": "Short commands in a chat app",
+      "text": "In a chat app, /new starts a fresh chat. /stop stops Hermes.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_chat_cmds"
+      }
+    },
+    {
+      "id": "d_redirect",
+      "subject": "fact",
+      "title": "Correcting Hermes while it works",
+      "text": "Send a message while Hermes works. It takes your correction into the same job.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_redirect"
+      }
+    },
+    {
+      "id": "d_tg_silent",
+      "subject": "fact",
+      "title": "Telegram gives no answer at all",
+      "text": "For Telegram the docs say: check that its secret code is right. Then look at the log Hermes keeps.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_tg_silent"
+      }
+    },
+    {
+      "id": "d_tg_unauth",
+      "subject": "fact",
+      "title": "Telegram says unauthorized",
+      "text": "That means your Telegram user number is not on the allowed list.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_tg_unauth"
+      }
+    },
+    {
+      "id": "d_tg_group",
+      "subject": "fact",
+      "title": "Telegram group messages ignored",
+      "text": "The docs say privacy mode is likely on. Turn it off, or make Hermes a group admin.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_tg_group"
+      }
+    },
+    {
+      "id": "d_passwords",
+      "subject": "fact",
+      "title": "Hermes and your passwords",
+      "text": "Hermes is blocked from changing the places where secret codes are kept. I have nothing checked on passwords in other files.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_passwords"
+      }
+    },
+    {
+      "id": "d_modes",
+      "subject": "fact",
+      "title": "How often Hermes asks for permission",
+      "text": "There are three settings for how Hermes asks first: smart, manual and off.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_modes"
+      }
+    },
+    {
+      "id": "d_yolo",
+      "subject": "fact",
+      "title": "YOLO mode: no approval questions in one chat",
+      "text": "The docs name a YOLO mode. It skips every such question for the current chat.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_yolo"
+      }
+    },
+    {
+      "id": "d_never",
+      "subject": "fact",
+      "title": "Commands Hermes always refuses",
+      "text": "Some commands Hermes never runs, whatever the settings. Wiping a whole disk is one.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_never"
+      }
+    },
+    {
+      "id": "d_timeout",
+      "subject": "fact",
+      "title": "When you do not answer its approval question",
+      "text": "If you do not answer in time, Hermes does not run the command.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_timeout"
+      }
+    },
+    {
+      "id": "d_chats_where",
+      "subject": "fact",
+      "title": "Where your chats are saved",
+      "text": "Every chat is saved on the computer Hermes runs on. It is one file in its folder.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_chats_where"
+      }
+    },
+    {
+      "id": "d_titles",
+      "subject": "fact",
+      "title": "Names for your chats",
+      "text": "Hermes names each chat by itself after the first answer. You can change the name.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_titles"
+      }
+    },
+    {
+      "id": "d_delete_chat",
+      "subject": "fact",
+      "title": "Deleting a chat",
+      "text": "Your own Hermes can delete a chat for you. It asks you to confirm first.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_delete_chat"
+      }
+    },
+    {
+      "id": "d_chats_kept",
+      "subject": "fact",
+      "title": "How long chats are kept",
+      "text": "Hermes keeps old chats. Clearing them out by itself is off unless you turn it on.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_chats_kept"
+      }
+    },
+    {
+      "id": "d_copy_hermes",
+      "subject": "fact",
+      "title": "Copying a Hermes",
+      "text": "A copy takes the settings, personality and notes along. Old chats are not copied.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_copy_hermes"
+      }
+    },
+    {
+      "id": "d_delete_hermes",
+      "subject": "fact",
+      "title": "Deleting one separate Hermes",
+      "text": "Your own Hermes can delete one of your separate Hermes. Ask it to check with you first.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_delete_hermes"
+      }
+    },
+    {
+      "id": "d_mem_size",
+      "subject": "fact",
+      "title": "How much Hermes remembers",
+      "text": "Its notes are kept short on purpose. About 2,200 letters of its own, and 1,375 about you.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_mem_size"
+      }
+    },
+    {
+      "id": "d_mem_change",
+      "subject": "fact",
+      "title": "Changing or removing what Hermes remembers",
+      "text": "Hermes can add, change or remove its own notes. Ask it in plain words.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_mem_change"
+      }
+    },
+    {
+      "id": "d_mem_approve",
+      "subject": "fact",
+      "title": "Approving what Hermes saves",
+      "text": "Hermes saves notes freely at first. A setting makes it ask you before each save.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_mem_approve"
+      }
+    },
+    {
+      "id": "d_skill_use",
+      "subject": "fact",
+      "title": "Using a skill",
+      "text": "A skill is written steps for one task. Type / and its name in a chat to use it.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_skill_use"
+      }
+    },
+    {
+      "id": "d_skill_own",
+      "subject": "fact",
+      "title": "Hermes writes its own skills",
+      "text": "A skill is written steps for one task. Hermes can write new ones itself after it solves something.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_skill_own"
+      }
+    },
+    {
+      "id": "d_skill_learn",
+      "subject": "fact",
+      "title": "Teaching Hermes from your material",
+      "text": "The docs name /learn. It turns what you know into a skill, written steps for one task.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_skill_learn"
+      }
+    },
+    {
+      "id": "d_plugin_off",
+      "subject": "fact",
+      "title": "Add-ons start switched off",
+      "text": "A plugin is an add-on. One you add yourself stays off until you switch it on.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_plugin_off"
+      }
+    },
+    {
+      "id": "d_plugin_find",
+      "subject": "fact",
+      "title": "Finding add-ons",
+      "text": "A plugin is an add-on. Your own Hermes can search the official list for you.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_plugin_find"
+      }
+    },
+    {
+      "id": "d_job_change",
+      "subject": "fact",
+      "title": "Pausing or removing a job",
+      "text": "You can pause, change or remove a job by asking Hermes in plain words.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_job_change"
+      }
+    },
+    {
+      "id": "d_job_where",
+      "subject": "fact",
+      "title": "Where a job's result goes",
+      "text": "A job's result comes back to the chat where you made the job.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_job_where"
+      }
+    },
+    {
+      "id": "d_job_all_stop",
+      "subject": "fact",
+      "title": "Stopping every job at once",
+      "text": "The docs name one stop for every job at once. It is called hermes pause.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_job_all_stop"
+      }
+    },
+    {
+      "id": "d_pers_ready",
+      "subject": "fact",
+      "title": "Ready-made ways of talking",
+      "text": "Hermes comes with ready-made ways of talking, such as helpful and concise. /personality switches for one chat.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_pers_ready"
+      }
+    },
+    {
+      "id": "d_soul_where",
+      "subject": "fact",
+      "title": "Where SOUL.md lives",
+      "text": "SOUL.md is the file that says who your Hermes is. It sits in the folder Hermes keeps.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_soul_where"
+      }
+    },
+    {
+      "id": "d_tools_list",
+      "subject": "fact",
+      "title": "Actions Hermes has built in",
+      "text": "Tools are actions Hermes can take. Built in are web search, browsing, files, notes and jobs on a schedule.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_tools_list"
+      }
+    },
+    {
+      "id": "d_voice_tg",
+      "subject": "fact",
+      "title": "Spoken answers in Telegram",
+      "text": "In Telegram and Discord, Hermes can send its answer as sound with the text.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_voice_tg"
+      }
+    },
+    {
+      "id": "d_local_how",
+      "subject": "fact",
+      "title": "Setting up an AI on your computer",
+      "text": "The docs say: Settings, \"Providers\", Local Models. Install, pick an AI, download it, then click Use.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_local_how"
+      }
+    },
+    {
+      "id": "d_local_fit",
+      "subject": "fact",
+      "title": "Hermes fits the AI to your computer",
+      "text": "Hermes picks the right build of each AI for your computer. You only pick the AI.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_local_fit"
+      }
+    },
+    {
+      "id": "d_local_where",
+      "subject": "fact",
+      "title": "Computers that can run a local AI",
+      "text": "An AI on your own computer works on Mac, Windows and Linux.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_local_where"
+      }
+    },
+    {
+      "id": "d_nous",
+      "subject": "fact",
+      "title": "Nous Portal: one sign-in for many AIs",
+      "text": "Nous Portal is from the makers of Hermes. One sign-in covers more than 300 AIs.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_nous"
+      }
+    },
+    {
+      "id": "d_plans",
+      "subject": "fact",
+      "title": "Paying with a plan you already have",
+      "text": "Some AI companies let you sign in with a plan you already pay for.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_plans"
+      }
+    },
+    {
+      "id": "d_openrouter",
+      "subject": "fact",
+      "title": "OpenRouter: one service for many AIs",
+      "text": "OpenRouter is one service that reaches many AIs from many companies.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_openrouter"
+      }
+    },
+    {
+      "id": "d_ollama",
+      "subject": "fact",
+      "title": "Ollama and LM Studio",
+      "text": "Both run AIs on your own computer, and Hermes can use them.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_ollama"
+      }
+    },
+    {
+      "id": "d_any_ai",
+      "subject": "fact",
+      "title": "Other AI companies that work with Hermes",
+      "text": "Hermes works with many AI companies. The docs list them, and I have not checked each one.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_any_ai"
+      }
+    },
+    {
+      "id": "d_undo",
+      "subject": "fact",
+      "title": "Undoing something Hermes did or deleted",
+      "text": "Hermes can copy your work before a risky change and restore it later. This is off unless you turn it on.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_undo"
+      }
+    },
+    {
+      "id": "d_open_source",
+      "subject": "fact",
+      "title": "Whether Hermes is open source",
+      "text": "Yes. Hermes is open source, which means its code is public. Hermes itself is free.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_open_source"
+      }
+    },
+    {
+      "id": "d_gemini",
+      "subject": "fact",
+      "title": "Using Gemini (Google's AI) with Hermes",
+      "text": "Yes. Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_gemini"
+      }
+    },
+    {
+      "id": "d_forget",
+      "subject": "fact",
+      "title": "Making Hermes forget something about you",
+      "text": "Yes. Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_forget"
+      }
+    },
+    {
+      "id": "d_meter",
+      "subject": "fact",
+      "title": "What the \"% full\" meter shows",
+      "text": "The docs name a \"% full\" meter in the chat. It shows how much of what the AI can read is used. Click it for details.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_meter"
+      }
+    },
+    {
+      "id": "d_two",
+      "subject": "fact",
+      "title": "Doing two things at once",
+      "text": "Yes. Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_two"
+      }
+    },
+    {
+      "id": "d_approve_off",
+      "subject": "fact",
+      "title": "Turning approvals (permission questions) off",
+      "text": "You can set how Hermes asks to off. The docs warn that this removes every safety question. Then risky commands run unasked.",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_approve_off"
+      }
+    },
+    {
+      "id": "d_siri",
+      "subject": "fact",
+      "title": "Hermes compared with Siri: a wake word",
+      "text": "With one setting on, Hermes listens for a spoken phrase and answers. The docs compare that to \"Hey Siri\".",
+      "kw": [],
+      "weak": [],
+      "list_only": true,
+      "shows": {
+        "kind": "fact",
+        "need": "d_siri"
+      }
+    },
+    {
       "id": "msg0-then",
       "subject": "msg",
       "title": "",
@@ -14827,6 +18987,762 @@ const LIVE_DATA = {
         "kind": "extra",
         "line": "plugin-mean"
       }
+    },
+    {
+      "id": "PRIV-next",
+      "subject": "fixed",
+      "title": "",
+      "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+      "kw": [],
+      "weak": [],
+      "next_of": "PRIV",
+      "shows": {
+        "kind": "extra",
+        "line": "PRIV-next"
+      }
+    },
+    {
+      "id": "SAFE-next",
+      "subject": "fixed",
+      "title": "",
+      "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+      "kw": [],
+      "weak": [],
+      "next_of": "SAFE",
+      "shows": {
+        "kind": "extra",
+        "line": "SAFE-next"
+      }
+    }
+  ],
+  "list": [
+    {
+      "id": "d_windows",
+      "title": "Hermes on Windows"
+    },
+    {
+      "id": "d_mac",
+      "title": "Hermes on a Mac"
+    },
+    {
+      "id": "d_linux",
+      "title": "Hermes on Linux"
+    },
+    {
+      "id": "d_android",
+      "title": "Hermes on an Android phone"
+    },
+    {
+      "id": "d_download",
+      "title": "Getting the Hermes app"
+    },
+    {
+      "id": "d_uninstall",
+      "title": "Uninstalling (removing) Hermes"
+    },
+    {
+      "id": "d_uninstall_keep",
+      "title": "What stays after removing the app"
+    },
+    {
+      "id": "d_update_chat",
+      "title": "Updating from a chat app"
+    },
+    {
+      "id": "d_version",
+      "title": "Which version you have"
+    },
+    {
+      "id": "d_provider",
+      "title": "What a provider is"
+    },
+    {
+      "id": "d_first_chat",
+      "title": "Checking that Hermes answers"
+    },
+    {
+      "id": "d_does",
+      "title": "What Hermes does, in short"
+    },
+    {
+      "id": "d_not_laptop",
+      "title": "Hermes away from your laptop"
+    },
+    {
+      "id": "d_data_sent",
+      "title": "Where your messages go"
+    },
+    {
+      "id": "d_stored_local",
+      "title": "Where Hermes keeps your things"
+    },
+    {
+      "id": "d_offline",
+      "title": "Using Hermes with no internet"
+    },
+    {
+      "id": "d_many_people",
+      "title": "Other people using your Hermes"
+    },
+    {
+      "id": "d_mem_vs_skill",
+      "title": "Memory and skills compared"
+    },
+    {
+      "id": "d_key_bad",
+      "title": "When a key does not work"
+    },
+    {
+      "id": "d_rate",
+      "title": "Rate limit: too many requests at once"
+    },
+    {
+      "id": "d_too_long",
+      "title": "When a chat gets too long"
+    },
+    {
+      "id": "d_blocked",
+      "title": "Why a command was blocked"
+    },
+    {
+      "id": "d_bot_silent",
+      "title": "When your chat app bot does not reply"
+    },
+    {
+      "id": "d_slow",
+      "title": "Why answers are slow: three causes"
+    },
+    {
+      "id": "d_share_notes",
+      "title": "Do separate Hermes share notes"
+    },
+    {
+      "id": "d_backup_vs",
+      "title": "Backup and export compared"
+    },
+    {
+      "id": "d_stop",
+      "title": "Stopping Hermes while it works"
+    },
+    {
+      "id": "d_stop_chat",
+      "title": "Stopping Hermes from a chat app"
+    },
+    {
+      "id": "d_keep_open",
+      "title": "Closing the app window while Hermes runs"
+    },
+    {
+      "id": "d_tray",
+      "title": "Bringing the app window back"
+    },
+    {
+      "id": "d_export",
+      "title": "Packing one Hermes into a file to share"
+    },
+    {
+      "id": "d_drag",
+      "title": "Giving Hermes a file"
+    },
+    {
+      "id": "d_find",
+      "title": "Searching inside a chat"
+    },
+    {
+      "id": "d_default_ai",
+      "title": "Setting the AI for new chats"
+    },
+    {
+      "id": "d_voice_app",
+      "title": "Talking to Hermes in the app"
+    },
+    {
+      "id": "d_lang",
+      "title": "Changing the language of the app"
+    },
+    {
+      "id": "d_shortcuts",
+      "title": "Jumping around with the keyboard"
+    },
+    {
+      "id": "d_mem_graph",
+      "title": "A map of what Hermes learned"
+    },
+    {
+      "id": "d_restart_note",
+      "title": "Hermes stopped in the background"
+    },
+    {
+      "id": "d_gateway",
+      "title": "What a gateway is"
+    },
+    {
+      "id": "d_allowed",
+      "title": "Who may talk to your Hermes"
+    },
+    {
+      "id": "d_pairing",
+      "title": "Letting a new person in"
+    },
+    {
+      "id": "d_chat_cmds",
+      "title": "Short commands in a chat app"
+    },
+    {
+      "id": "d_redirect",
+      "title": "Correcting Hermes while it works"
+    },
+    {
+      "id": "d_tg_silent",
+      "title": "Telegram gives no answer at all"
+    },
+    {
+      "id": "d_tg_unauth",
+      "title": "Telegram says unauthorized"
+    },
+    {
+      "id": "d_tg_group",
+      "title": "Telegram group messages ignored"
+    },
+    {
+      "id": "d_passwords",
+      "title": "Hermes and your passwords"
+    },
+    {
+      "id": "d_modes",
+      "title": "How often Hermes asks for permission"
+    },
+    {
+      "id": "d_yolo",
+      "title": "YOLO mode: no approval questions in one chat"
+    },
+    {
+      "id": "d_never",
+      "title": "Commands Hermes always refuses"
+    },
+    {
+      "id": "d_timeout",
+      "title": "When you do not answer its approval question"
+    },
+    {
+      "id": "d_chats_where",
+      "title": "Where your chats are saved"
+    },
+    {
+      "id": "d_titles",
+      "title": "Names for your chats"
+    },
+    {
+      "id": "d_delete_chat",
+      "title": "Deleting a chat"
+    },
+    {
+      "id": "d_chats_kept",
+      "title": "How long chats are kept"
+    },
+    {
+      "id": "d_copy_hermes",
+      "title": "Copying a Hermes"
+    },
+    {
+      "id": "d_delete_hermes",
+      "title": "Deleting one separate Hermes"
+    },
+    {
+      "id": "d_mem_size",
+      "title": "How much Hermes remembers"
+    },
+    {
+      "id": "d_mem_change",
+      "title": "Changing or removing what Hermes remembers"
+    },
+    {
+      "id": "d_mem_approve",
+      "title": "Approving what Hermes saves"
+    },
+    {
+      "id": "d_skill_use",
+      "title": "Using a skill"
+    },
+    {
+      "id": "d_skill_own",
+      "title": "Hermes writes its own skills"
+    },
+    {
+      "id": "d_skill_learn",
+      "title": "Teaching Hermes from your material"
+    },
+    {
+      "id": "d_plugin_off",
+      "title": "Add-ons start switched off"
+    },
+    {
+      "id": "d_plugin_find",
+      "title": "Finding add-ons"
+    },
+    {
+      "id": "d_job_change",
+      "title": "Pausing or removing a job"
+    },
+    {
+      "id": "d_job_where",
+      "title": "Where a job's result goes"
+    },
+    {
+      "id": "d_job_all_stop",
+      "title": "Stopping every job at once"
+    },
+    {
+      "id": "d_pers_ready",
+      "title": "Ready-made ways of talking"
+    },
+    {
+      "id": "d_soul_where",
+      "title": "Where SOUL.md lives"
+    },
+    {
+      "id": "d_tools_list",
+      "title": "Actions Hermes has built in"
+    },
+    {
+      "id": "d_voice_tg",
+      "title": "Spoken answers in Telegram"
+    },
+    {
+      "id": "d_local_how",
+      "title": "Setting up an AI on your computer"
+    },
+    {
+      "id": "d_local_fit",
+      "title": "Hermes fits the AI to your computer"
+    },
+    {
+      "id": "d_local_where",
+      "title": "Computers that can run a local AI"
+    },
+    {
+      "id": "d_nous",
+      "title": "Nous Portal: one sign-in for many AIs"
+    },
+    {
+      "id": "d_plans",
+      "title": "Paying with a plan you already have"
+    },
+    {
+      "id": "d_openrouter",
+      "title": "OpenRouter: one service for many AIs"
+    },
+    {
+      "id": "d_ollama",
+      "title": "Ollama and LM Studio"
+    },
+    {
+      "id": "d_any_ai",
+      "title": "Other AI companies that work with Hermes"
+    },
+    {
+      "id": "d_undo",
+      "title": "Undoing something Hermes did or deleted"
+    },
+    {
+      "id": "d_open_source",
+      "title": "Whether Hermes is open source"
+    },
+    {
+      "id": "d_gemini",
+      "title": "Using Gemini (Google's AI) with Hermes"
+    },
+    {
+      "id": "d_forget",
+      "title": "Making Hermes forget something about you"
+    },
+    {
+      "id": "d_meter",
+      "title": "What the \"% full\" meter shows"
+    },
+    {
+      "id": "d_two",
+      "title": "Doing two things at once"
+    },
+    {
+      "id": "d_approve_off",
+      "title": "Turning approvals (permission questions) off"
+    },
+    {
+      "id": "d_siri",
+      "title": "Hermes compared with Siri: a wake word"
+    },
+    {
+      "id": "C1",
+      "title": "What Hermes can do"
+    },
+    {
+      "id": "COST",
+      "title": "What Hermes costs"
+    },
+    {
+      "id": "WHERE",
+      "title": "Running Hermes on your computer or the cloud"
+    },
+    {
+      "id": "W2",
+      "title": "Skills and plugins compared"
+    },
+    {
+      "id": "PRIV",
+      "title": "Privacy: who sees your messages"
+    },
+    {
+      "id": "POWER",
+      "title": "What computer a local AI needs"
+    },
+    {
+      "id": "HVC",
+      "title": "Hermes compared with ChatGPT"
+    },
+    {
+      "id": "MIG",
+      "title": "Moving to Hermes or to a new computer"
+    },
+    {
+      "id": "MIG_APP",
+      "title": "Moving from Cursor, Claude Code, Codex or OpenClaw"
+    },
+    {
+      "id": "MIG_NOT_LISTED",
+      "title": "Moving from an app the docs don't name"
+    },
+    {
+      "id": "MIG_PC",
+      "title": "Moving Hermes to a new computer or Mac"
+    },
+    {
+      "id": "HERMES",
+      "title": "What Hermes is and who made it"
+    },
+    {
+      "id": "START",
+      "title": "Where to start as a newcomer"
+    },
+    {
+      "id": "KEY",
+      "title": "Whether you need a key (API key)"
+    },
+    {
+      "id": "UPDATE",
+      "title": "Updating Hermes"
+    },
+    {
+      "id": "SAFE",
+      "title": "Permission: Hermes asks you to approve risky commands"
+    },
+    {
+      "id": "PERSONALITY",
+      "title": "Changing its personality and tone"
+    },
+    {
+      "id": "KEY_WHAT",
+      "title": "What a key (API key) is"
+    },
+    {
+      "id": "MIG_CHATGPT",
+      "title": "Moving chats or settings from ChatGPT"
+    },
+    {
+      "id": "AGENT",
+      "title": "What an agent is"
+    },
+    {
+      "id": "KEY_WHERE",
+      "title": "Where to put your API key"
+    },
+    {
+      "id": "FREE",
+      "title": "Using Hermes for free"
+    },
+    {
+      "id": "MODEL_FOR",
+      "title": "Which AI is best for which work"
+    },
+    {
+      "id": "MODEL_CHANGE",
+      "title": "Switching to another AI (model) in a chat"
+    },
+    {
+      "id": "SKILL_ADD",
+      "title": "Adding a skill"
+    },
+    {
+      "id": "PLUGIN_WHICH",
+      "title": "Which plugins you need"
+    },
+    {
+      "id": "PLUGIN_ADD",
+      "title": "Adding a plugin (an add-on)"
+    },
+    {
+      "id": "CODING",
+      "title": "Whether you need to know coding"
+    },
+    {
+      "id": "START_2",
+      "title": "The first two steps"
+    },
+    {
+      "id": "mem0",
+      "title": "What memory is"
+    },
+    {
+      "id": "mem1",
+      "title": "Hermes remembering things about you"
+    },
+    {
+      "id": "mem2",
+      "title": "Finding and searching old chats"
+    },
+    {
+      "id": "mem3",
+      "title": "When Hermes forgot something you told it"
+    },
+    {
+      "id": "mem4",
+      "title": "Separate notes for each Hermes"
+    },
+    {
+      "id": "mod0",
+      "title": "What a model is"
+    },
+    {
+      "id": "mod1",
+      "title": "Using your ChatGPT plan with Hermes"
+    },
+    {
+      "id": "mod2",
+      "title": "Using your Claude plan with Hermes"
+    },
+    {
+      "id": "mod3",
+      "title": "An AI on your own computer (local)"
+    },
+    {
+      "id": "mod4",
+      "title": "The quickest way to get an AI"
+    },
+    {
+      "id": "msg0",
+      "title": "Chatting from your phone"
+    },
+    {
+      "id": "msg1",
+      "title": "Connecting Telegram"
+    },
+    {
+      "id": "msg2",
+      "title": "Connecting WhatsApp, Discord, Slack or Signal"
+    },
+    {
+      "id": "msg3",
+      "title": "Answers while your computer is off or closed"
+    },
+    {
+      "id": "sch0",
+      "title": "Jobs on a schedule"
+    },
+    {
+      "id": "sch1",
+      "title": "A job every day or week"
+    },
+    {
+      "id": "sch2",
+      "title": "Reminders"
+    },
+    {
+      "id": "sch3",
+      "title": "Checking or watching something regularly"
+    },
+    {
+      "id": "sch4",
+      "title": "Why a scheduled job did not run"
+    },
+    {
+      "id": "sch5",
+      "title": "A summary of your email every morning"
+    },
+    {
+      "id": "svc0",
+      "title": "Linking a service like GitHub (MCP)"
+    },
+    {
+      "id": "svc1",
+      "title": "Adding Gmail, Notion or another service"
+    },
+    {
+      "id": "svc2",
+      "title": "Is it safe to connect a service"
+    },
+    {
+      "id": "bot0",
+      "title": "What a bot (a separate Hermes) is"
+    },
+    {
+      "id": "bot1",
+      "title": "A second Hermes for work or home"
+    },
+    {
+      "id": "bot2",
+      "title": "Two Hermes working together"
+    },
+    {
+      "id": "bot3",
+      "title": "Many chats in one Hermes"
+    },
+    {
+      "id": "use0",
+      "title": "What tokens are"
+    },
+    {
+      "id": "use1",
+      "title": "Using fewer tokens"
+    },
+    {
+      "id": "use2",
+      "title": "Spending less money on the AI"
+    },
+    {
+      "id": "use3",
+      "title": "Hitting your usage limit"
+    },
+    {
+      "id": "use4",
+      "title": "Slow answers and what helps"
+    },
+    {
+      "id": "tool",
+      "title": "What tools are"
+    },
+    {
+      "id": "skill",
+      "title": "What a skill is"
+    },
+    {
+      "id": "plugin",
+      "title": "What a plugin is"
+    },
+    {
+      "id": "mcp",
+      "title": "What MCP is"
+    },
+    {
+      "id": "soul",
+      "title": "What SOUL.md is"
+    },
+    {
+      "id": "profile",
+      "title": "What a profile is"
+    },
+    {
+      "id": "w_web",
+      "title": "Searching the web and reading pages"
+    },
+    {
+      "id": "w_browser",
+      "title": "Using websites for you: clicking and forms"
+    },
+    {
+      "id": "w_xpost",
+      "title": "Posting and searching on X (Twitter)"
+    },
+    {
+      "id": "w_reddit",
+      "title": "Reading and searching Reddit"
+    },
+    {
+      "id": "w_docs",
+      "title": "Reading your Word, Excel and PDF files"
+    },
+    {
+      "id": "w_pdf",
+      "title": "Making, merging or editing PDF files"
+    },
+    {
+      "id": "w_office",
+      "title": "Making Word, PowerPoint or Excel files"
+    },
+    {
+      "id": "w_notes",
+      "title": "Working with your Obsidian notes"
+    },
+    {
+      "id": "w_meeting",
+      "title": "Turning meeting notes into decisions and tasks"
+    },
+    {
+      "id": "w_code",
+      "title": "Writing and running code"
+    },
+    {
+      "id": "w_computer",
+      "title": "Clicking and typing in your computer's apps"
+    },
+    {
+      "id": "w_image",
+      "title": "Making pictures (images) from your words"
+    },
+    {
+      "id": "w_see",
+      "title": "Looking at a photo or picture you send"
+    },
+    {
+      "id": "w_video",
+      "title": "Making a video from text or a picture"
+    },
+    {
+      "id": "w_anim",
+      "title": "Making animated maths explainer videos"
+    },
+    {
+      "id": "w_presenter",
+      "title": "Making a video with an AI presenter"
+    },
+    {
+      "id": "w_youtube",
+      "title": "Summarising a YouTube video"
+    },
+    {
+      "id": "w_meme",
+      "title": "Making memes"
+    },
+    {
+      "id": "w_voice",
+      "title": "Talking to Hermes out loud (voice)"
+    },
+    {
+      "id": "w_aloud",
+      "title": "Hermes reading its answers aloud to you"
+    },
+    {
+      "id": "w_stt",
+      "title": "Turning voice messages into text"
+    },
+    {
+      "id": "w_music",
+      "title": "Writing songs and briefing a music AI"
+    },
+    {
+      "id": "w_papers",
+      "title": "Finding research papers on arXiv"
+    },
+    {
+      "id": "w_maps",
+      "title": "Finding places, routes and time zones"
+    },
+    {
+      "id": "w_stocks",
+      "title": "Looking up stock and crypto prices"
+    },
+    {
+      "id": "w_prices",
+      "title": "Watching a product's price for you"
     }
   ],
   "stop_words": [
@@ -16019,6 +20935,8 @@ function buildHit(text) {
   // changes-16 (build.build_question_rule): "can it build ...?" is a question about Hermes
   const q = whichOf(t, BUILD.build_question_words)
   if (startsWith(t, BUILD.make_not_when_starts) && q.length) return { h2: q[0] }
+  // live changes-12 (titles-t2, build.can_question_rule): a question about what Hermes can do is never a request to build
+  if (startsWith(t, BUILD.can_question_starts)) return null
   const w = whichOf(t, BUILD.build_words)
   if (w.length) return w[0]
   const pair = BUILD.build_pair
@@ -16185,7 +21103,10 @@ function byCode(text, st) {
       if (terms.length === 1) {
         // wants fixes v1 (skill_for_unknown): in a question, "skill(s) for / that can ..." and a word that is
         // not on skill_for_not_after is not the line about what a skill is: turn() goes on to N2 or N1
-        if (st.wants !== false && TERMS[terms[0]].key_words.includes('skill') && questionForm(t) && skillForUnknown(t)) return r
+        if (st.wants !== false && TERMS[terms[0]].key_words.includes('skill') && questionForm(t) && skillForUnknown(t)) {
+          r.skill_unknown = true // find-v1: the last step must not bring the word line back by its one-word phrase
+          return r
+        }
         r.term = terms[0]
         return r
       }
@@ -16215,6 +21136,97 @@ function byCode(text, st) {
     }
   }
   return r
+}
+
+/* ---------- breadth-t1 and titles-t2 (live changes-11 and -12; JSON facts_t1, near; route2.py b_words, titled, full_hit, near) ---------- */
+const FACTS = Object.fromEntries(TALK_DATA.facts.map(f => [f.id, f]))
+const NEAR = TALK_DATA.near
+const NEAR_STOP = new Set(NEAR.stop_words)
+const NEAR_FILLER = new Set(NEAR.filler)
+// near.words_rule: lower case, apostrophes dropped, letters digits / . + kept; a word that is no stop word or filler
+// loses a final ing (over 4 letters), else a final s (over 3 letters, not ss)
+function nearWords(s) {
+  const out = []
+  for (let w of talkNorm(s).replace(/'/g, '').match(/[a-z0-9/.+]+/g) || []) {
+    w = w.replace(/^\.+|\.+$/g, '')
+    if (NEAR_STOP.has(w) || NEAR_FILLER.has(w)) {
+      out.push(w)
+      continue
+    }
+    if (w.length > 4 && w.endsWith('ing')) w = w.slice(0, -3)
+    else if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) w = w.slice(0, -1)
+    if (w) out.push(w)
+  }
+  return out
+}
+const nearContent = ws => ws.filter(w => !NEAR_STOP.has(w))
+// Every line with a title, in the data's order (route2.py titled()): what it gives, its title, its phrases. A row of
+// the wants is this plugin's { kind: 'want', row }.
+const TITLED = [
+  ...TALK_DATA.facts.map(f => [{ kind: 'fact', need: f.id }, f]),
+  ...Object.entries(FIXED).filter(([, f]) => f.title).map(([id, f]) => [{ kind: id }, f]),
+  ...TALK_DATA.topics.flatMap(t => [...(t.plain.title ? [[{ kind: 'plain', topic: t.id }, t.plain]] : []), ...t.needs.filter(n => n.title).map(n => [{ kind: 'row', topic: t.id, need: n.id }, n])]),
+  ...TALK_DATA.terms.filter(t => t.title).map(t => [{ kind: 'term', term: t.id }, t]),
+  ...WROWS.filter(w => w.title).map(w => [{ kind: 'want', row: w.id }, w])
+].map(([gives, x]) => ({ gives, title: x.title, phrases: x.phrases.map(ph => [nearWords(ph), nearContent(nearWords(ph))]), titleWords: new Set(nearContent(nearWords(x.title))), allWords: new Set([...nearContent(nearWords(x.title)), ...nearContent(nearWords(x.phrases.join(' ')))]) }))
+const runIn = (hay, run) => hay.some((_, i) => i + run.length <= hay.length && run.every((w, j) => hay[i + j] === w))
+// a line that shows the things it holds needs them on the result (C1's picks, W2's two words)
+const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds } : g.kind === 'W2' ? { ...g, buttons: TALK_DATA.w1_pairs.find(p => p.line === 'W2').terms } : { ...g })
+// near.full_hit_rule: a phrase hits when its words stand side by side in the message, or its content words (two or
+// more) stand side by side among the message's content words. The longest hit phrase wins (content words, then
+// words); a tie goes to the line first in the data. singleOk false is the first step: phrases of two or more words,
+// of the new fact lines and the older lines on first_step_old only.
+function fullHit(text, singleOk) {
+  const mw = nearWords(text).filter(w => !NEAR_FILLER.has(w))
+  const mc = nearContent(mw)
+  let best = null
+  for (const { gives, phrases } of TITLED) {
+    if (!singleOk && gives.kind !== 'fact' && !NEAR.first_step_old.includes(gives.kind)) continue
+    for (const [pw, cw] of phrases) {
+      if (!pw.length || (pw.length === 1 && !singleOk)) continue
+      if (runIn(mw, pw) || (cw.length >= 2 && runIn(mc, cw))) {
+        if (!best || cw.length > best[0] || (cw.length === best[0] && pw.length > best[1])) best = [cw.length, pw.length, gives]
+      }
+    }
+  }
+  return best ? givesOf(best[2]) : null
+}
+// near.near_rule: up to three lines near the message: two or more shared content words (title and phrases), or one
+// that is in the title; most shared first, ties in the data's order; never the line Helper said last
+function nearLines(text, st) {
+  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))))
+  const sc = []
+  TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
+    const n = [...ms].filter(w => allWords.has(w)).length
+    if ((n >= 2 || [...ms].some(w => titleWords.has(w))) && lineKey(givesOf(gives)) !== st.lastKey) sc.push([n, i, gives, title])
+  })
+  return sc.sort((a, b) => b[0] - a[0] || a[1] - b[1]).slice(0, 3).map(([, , gives, title]) => ({ gives: givesOf(gives), title }))
+}
+// near.say_rule: in the question a title starts with a small letter unless its first word is on keep_caps
+// Builder: nor when the first word is written in capitals ("YOLO mode" is not on keep_caps and came out as "yOLO mode")
+const nearSay = title => (NEAR.keep_caps.includes(title.split(/\s+/)[0]) || /^[A-Z][A-Z0-9.]+(\s|$)/.test(title) ? title : title.slice(0, 1).toLowerCase() + title.slice(1))
+// The offer under a don't-know line (route2.py turn): the near lines by title, each a thing to pick that gives its
+// line; with nothing near, the four starting things, the same every time (near.nothing_near_rule, Lead 11 Nov)
+function nearOffer(out, st) {
+  const nr = out.near_lines || []
+  delete out.near_lines
+  if (nr.length) {
+    const says = nr.map(x => (x.gives.kind === 'want' ? NEAR.want_say.replace('{label}', () => nearSay(x.title)) : nearSay(x.title)))
+    const tp = nr.length === 1 ? NEAR.template_1 : nr.length === 2 ? NEAR.template : NEAR.template_3
+    out.offer = { set: 'near', text: tp.replace(/\{([abc])\}/g, (m, k) => says['abc'.indexOf(k)] || ''), picks: nr.map(x => x.gives), labels: nr.map(x => x.title) }
+    st.lastOffer = 'near'
+  } else {
+    const sid = NEAR.nothing_near_set
+    out.offer = { set: sid, text: OF.sets[sid].text, picks: [...OF.sets[sid].picks] }
+    st.lastOffer = sid
+  }
+  return out
+}
+// A line picked under the near offer: that line, by what the pick gives, never by key words
+function pressNearSteps(gives, st) {
+  st.pending = null
+  st.lastq = false
+  return { ...gives }
 }
 
 /* ---------- the visit ---------- */
@@ -16782,6 +21794,7 @@ function offerRoute(tw) {
 }
 // ask-fix-t1 (small_talk.how_that, route2.py last_next and how_that): "ok and how do I do that", by Helper's last line
 const HT = ST.how_that
+const BARE_AFTER = ['row', 'plain', 'then', 'rowthen', 'nextline', 'term', 'fact', 'want']
 const HT_CUT = new RegExp('^(?:(?:' + HT.cut_first.map(escapeRe).join('|') + ')\\b[ ,]*)+(?=\\S)')
 // the then line and the button (next) of Helper's last line: [then or null, next or null]
 function lastNext(st) {
@@ -16792,6 +21805,7 @@ function lastNext(st) {
   }
   if (p.kind === 'plain') return [TOPICS[p.topic].plain.then || null, TOPICS[p.topic].plain.next || null]
   if (p.kind === 'term') return [null, TERMS[p.term].next || null]
+  if (p.kind === 'fact') return [null, FACTS[p.need].next || null] // breadth-t1
   // Builder: a row of the wants (route2.py has none) with text to paste counts as a line whose button is a paste box
   if (p.kind === 'want' && WANT_ROWS[p.row] && WANT_ROWS[p.row].next && WANT_ROWS[p.row].next.kind === 'paste') return [null, { kind: 'paste', label: WANT_ROWS[p.row].next.label, paste_text: WANT_ROWS[p.row].next.paste_text }]
   if (FIXED[p.kind]) return [null, FIXED[p.kind].next || null]
@@ -16800,7 +21814,14 @@ function lastNext(st) {
 function howThat(text, st) {
   let t = talkNorm(text).replace(/[ ?!.,]+$/, '')
   t = t.replace(HT_CUT, '').trim() || t
-  if (!HT.phrases.includes(t)) return null
+  // breadth-t1 (near.bare_follow_rule): how / why / and then alone after an answer line, only where CUT would show
+  const bare = NEAR.bare_follow.includes(t) && st.stage === 'open' && (BARE_AFTER.includes(st.last) || !!(FIXED[st.last] && FIXED[st.last].title)) && ['cut', null].includes(smallTalk(text, st))
+  // find-v1 part 5 (Lead, 11 Nov; ask-run 2 "For builder" 3; not in route2.py, st.fullWins false only for replaying
+  // it): one of those words alone while things to pick show (a question's answers, an offer, the picks under a
+  // don't-know) goes to that line too: the things to pick stay, never "that looks cut off" with other picks in their place
+  const picksShow = st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)
+  if (st.fullWins !== false && picksShow && NEAR.bare_follow.includes(t) && st.stage === 'open' && ['cut', null].includes(smallTalk(text, st))) return { kind: 'PICK_FIRST', same_picks: true }
+  if (!HT.phrases.includes(t) && !bare) return null
   // (1) the things to pick stay
   if (st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)) return { kind: 'PICK_FIRST', same_picks: true }
   const [then, nx] = lastNext(st)
@@ -16812,6 +21833,7 @@ function howThat(text, st) {
   if (nx && nx.kind === 'line') return { kind: 'nextline', of: p.kind, topic: p.topic, need: p.need, term: p.term, text: nx.text, id: nx.id }
   if (nx && nx.kind === 'paste') return { kind: 'HOW_PASTE', label: nx.label, button: nx, topic: p.topic }
   if (nx && nx.kind === 'part') return { kind: 'HOW_PART', label: nx.label, button: nx, topic: p.topic }
+  if (bare) return { kind: 'NO_MORE' }
   return null
 }
 // live changes-9 (not in route2.py): a next line's second wording (use1-next-mean), by the next line's id
@@ -16994,12 +22016,21 @@ function turnParts(text, st) {
   const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
   const pre = { ...steps }
+  // find-v1 (review): the message answered one of the opening's two questions (the name, what you do)
+  if (wasOpening) pre.at_opening = true
   if (steps.kind === 'PICK_FIRST') return { pre, out: steps } // ask-fix-t1: nothing changes, the same things to pick stay
   const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
   noteLast(st, out)
-  return { pre, out: attachOffer(out, st, prevTopic) }
+  attachOffer(out, st, prevTopic)
+  delete pre.near_lines
+  // breadth-t1 (near.near_rule, nothing_near_rule): under a don't-know line, the near lines or the four starting things
+  if (out.kind === 'N1' || out.kind === 'N1_AGAIN') nearOffer(out, st)
+  else delete out.near_lines
+  return { pre, out }
 }
+// find-v1 part 5: the results that are no line of their own (see turnSteps, a full typed message while a question is open)
+const FULL_NOT_FOR = ['N1', 'N1a', 'N1_AGAIN', 'N2', 'skill by name', 'CUT', 'MEAN_NONE', 'AGAIN']
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
   const out = {}
@@ -17010,6 +22041,19 @@ function turnSteps(text, st) {
     if (kind !== 'question' && kind !== 'K1') st.pending = null
     return out
   }
+  // breadth-t1 (near.last_step): where Helper would say it does not know, a full hit by any phrase (one word too) gives
+  // that line; else the don't-know line, with the lines near the message for its offer
+  const lastStep = kind => {
+    // Builder: "is there a skill for knitting" keeps its don't-know (wants fixes v1, skill_for_unknown)
+    const fh = out.code && out.code.skill_unknown ? null : fullHit(text, true)
+    if (fh) {
+      const { kind: k, ...more } = fh
+      out.by = 'title'
+      return done(k, more)
+    }
+    out.near_lines = nearLines(text, st)
+    return done(kind)
+  }
   // 1. a key
   if (looksLikeKey(text)) {
     out.kind = 'K1'
@@ -17019,6 +22063,26 @@ function turnSteps(text, st) {
   if (st.stage === 'open') {
     const hw = howThat(text, st)
     if (hw) return Object.assign(out, hw)
+  }
+  // find-v1 part 5 (Lead, 11 Nov; ask-run 2 "For builder" 2; not in route2.py): a full typed question wins over the
+  // things to pick on screen. While a topic's question is open, a message of three or more words that is no answer to
+  // it (none of that topic's rows is found in it) drops the open
+  // question and is read as if nothing were on screen: always when it is in question form; a statement ("something is
+  // broken") only when, read so, it gets a line of its own and not a don't-know (an answer in the person's own words
+  // that no row catches keeps the open question's own line, as before). One or two words, and any answer, as before.
+  if (st.pending && st.fullWins !== false && talkNorm(text).split(' ').length >= 3) {
+    const tt = cutIgnored(talkNorm(text))
+    const answers = needsFor(tt, st.pending, true).length > 0
+    let fresh = !answers && questionForm(tt)
+    if (!answers && !fresh) {
+      // read on a copy of the visit with nothing open: what the message would get
+      const probe = { ...JSON.parse(JSON.stringify(st)), pending: null, lastq: false }
+      fresh = !FULL_NOT_FOR.includes(turnSteps(text, probe).kind)
+    }
+    if (fresh) {
+      st.pending = null
+      st.lastq = false
+    }
   }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
@@ -17065,6 +22129,19 @@ function turnSteps(text, st) {
   if (remember(text, st, out)) return out
   const about = typedAboutKept(text)
   if (about) return Object.assign(out, aboutKept(about, st))
+  // breadth-t1 (near.first_step): a full hit by a phrase of two or more words (the new fact lines and first_step_old);
+  // while a question is open, only a message of three or more words
+  // Builder: not when the message names one official skill next to the word skill (the plugin's own step below, which
+  // route2.py has not: "the claude-code skill" is that skill, not the line about moving from Claude Code)
+  if (st.stage === 'open' && !buildHit(text) && !(st.wants !== false && skillOf(cutIgnored(talkNorm(text))).length === 1)) {
+    const fh = fullHit(text, false)
+    if (fh && !(st.pending && talkNorm(text).split(' ').length < 3)) {
+      st.pending = null
+      const { kind, ...more } = fh
+      out.by = 'title'
+      return done(kind, more)
+    }
+  }
   // 1 c. the person asks what they can ask
   if (asksTopics(text)) {
     st.stage = 'open'
@@ -17217,7 +22294,7 @@ function turnSteps(text, st) {
       st.pending = topic
       return r
     }
-    return done('N1')
+    return lastStep('N1')
   }
   // keeps.use: something is kept for this topic, so its question is not asked
   if (topic && keptNeed(topic, st)) {
@@ -17236,7 +22313,7 @@ function turnSteps(text, st) {
     const g = nearOf(t)
     if (g.length === 1) return done('N2', { group: g[0] })
   }
-  return done(dontKnow(text) || 'skill by name')
+  return st.stage === 'open' ? lastStep(dontKnow(text) || 'skill by name') : done(dontKnow(text) || 'skill by name')
 }
 
 /* ---------- what the person picks or presses ---------- */
@@ -17352,6 +22429,13 @@ function sayLineSteps(line, st) {
   return { kind: 'extra', line }
 }
 
+// breadth-t1: a line picked under the near offer (route2.py: "a pick gives that line")
+function pressNear(gives, st) {
+  const prevTopic = st.lastTopic
+  const o = pressNearSteps(gives, st)
+  noteLast(st, o)
+  return attachOffer(o, st, prevTopic)
+}
 // offer-t1 (route2.py press_offer): a thing picked under an offer, by its id only, never by key words.
 // ask-fix-t1 point 8 (not in route2.py): a pick of the pay offer (ChatGPT, Claude, Neither, I want it free) is kept
 // as a picked answer to the model question is.
@@ -17566,7 +22650,9 @@ function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
   // offer-t1: the offer a line carries, shown by the page as a second bubble with its things to pick
-  const offer = result.offer ? { set: result.offer.set, text: result.offer.text, answers: { kind: 'offer', hint: OF.hint, items: result.offer.picks.map(id => ({ id: 'offer-' + id, label: OF.things[id].label, offer: id })) } } : null
+  // breadth-t1: the near offer's things to pick are lines, said by their titles
+  const offerItems = o => (o.set === 'near' ? o.picks.map((g, i) => ({ id: 'near-' + i, label: o.labels[i], near: g })) : o.picks.map(id => ({ id: 'offer-' + id, label: OF.things[id].label, offer: id })))
+  const offer = result.offer ? { set: result.offer.set, text: result.offer.text, answers: { kind: 'offer', hint: OF.hint, items: offerItems(result.offer) } } : null
   const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(offer ? { offer } : {}), ...(asTyped.length ? { asTyped } : {}), ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
   // offer-t1: the faint hint N_HINT is no longer shown; the offer dont_know takes its place
@@ -17672,6 +22758,11 @@ function lineFor(result, st, typed = '', opts = {}) {
     // talk-live: the Connectors line picked by the person's AI (ai_picks_line), as a row shows it
     case 'CN1':
       return said('CN1', WANTS_DATA.fixed.CN1.text, { source: sourceText(WANTS_DATA.fixed.CN1.sources) })
+    // breadth-t1: a fact line from the docs, with its button if it has one
+    case 'fact': {
+      const f = FACTS[result.need]
+      return said(f.id, f.text, { source: sourceText(f.sources), next: nextFor(f.next, null, st) })
+    }
     case 'want': {
       const r = WANT_ROWS[result.row]
       return said(r.id, r.text, { source: sourceText(r.sources), next: wantNext(r.next, r.thing) })
@@ -18443,7 +23534,10 @@ function makeLook(ctx, host) {
 const LIVE_ROWS = LIVE_DATA.rows
 const LIVE_ROW = Object.fromEntries(LIVE_ROWS.map(r => [r.id, r]))
 // the rows word matching and the subjects rank (the next lines have no key words of their own)
-const SCORED = LIVE_ROWS.filter(r => !r.next_of)
+// (find-v1: nor the rows that are there only so the list call's picks can be handed, list_only)
+const SCORED = LIVE_ROWS.filter(r => !r.next_of && !r.list_only)
+// find-v1: the list call's list, every fact line once as { id, title }
+const LIST_LINES = LIVE_DATA.list
 // a row's next lines: its button's line, its then line (live changes-6 and -9) and, on a follow-up only, its second
 // wording (ask-fix-t1 skill-mean, plugin-mean; live changes-9 use1-next-mean); a next line may have one of its own
 const NEXT_OF = {}
@@ -18506,13 +23600,14 @@ function rowOfKey(key) {
   const [kind, topic, need, term, , row] = k
   // live changes-6 and -9, ask-fix-t1: a then line, a word line's second wording and the text of a line's button
   // came from the row they belong to
-  const id = kind === 'row' || kind === 'rowthen' ? need : kind === 'termmean' ? term : kind === 'nextline' ? need || term || (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'plain' || kind === 'then' ? (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'term' ? term : kind === 'want' ? row : ['COST', 'WHERE', 'CN1'].includes(kind) ? kind : null
+  const id = kind === 'row' || kind === 'rowthen' ? need : kind === 'termmean' ? term : kind === 'nextline' ? need || term || (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'plain' || kind === 'then' ? (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'term' ? term : kind === 'want' ? row : kind === 'fact' ? need : ['COST', 'WHERE', 'CN1'].includes(kind) || (LIVE_ROW[kind] && LIVE_ROW[kind].list_only) ? kind : null
   return id && LIVE_ROW[id] ? id : null
 }
 
 // follow_up.rule: the kinds of Helper's last line that came from rows. The data says wants; the plugin's kind
 // is want. written: a reply the AI wrote that used rows.
-const FROM_ROWS = ['row', 'plain', 'term', 'want', 'COST', 'WHERE', 'written', 'then', 'rowthen', 'termmean', 'nextline']
+// find-v1: a fact line from the docs and a fixed line that is a row now (MIG_APP, SAFE, HERMES ...) came from rows too
+const FROM_ROWS = ['row', 'plain', 'term', 'want', 'COST', 'WHERE', 'written', 'then', 'rowthen', 'termmean', 'nextline', 'fact', ...LIVE_ROWS.filter(r => r.list_only && r.subject === 'fixed').map(r => r.id)]
 const FOLLOW_CUT = ['ok', 'okay', 'so', 'and', 'cool', 'right']
 const PHRASES = LIVE_DATA.follow_up.phrases
 // the whole message, end marks and the lead words ok, okay, so, and, cool, right cut, is one of the phrases
@@ -18608,6 +23703,29 @@ function readSubject(raw) {
   return words.find(w => SUBJECT_IDS.includes(w)) || 'none'
 }
 
+// find-v1, the list call's reader (hhtech's readList, dev/checks/hhtech-find-run/find.mjs): <think> blocks cut, then
+// up to three ids of the list in the order given (any case) -> { ids }; none: { word: 'BUILD' } when the word BUILD is
+// there, else { word: 'NONE' }. Builder: a reply that starts with NONE or BUILD is that word, whatever follows (a
+// wordy "NONE, no skill line fits" must not be read as the word line skill).
+const LIST_IDS = LIVE_DATA.list.map(l => l.id)
+const LIST_ID_OF = Object.fromEntries(LIST_IDS.map(id => [id.toLowerCase(), id]))
+function readList(raw) {
+  const s = cutThink(raw)
+  const start = (s.trim().match(/^[^A-Za-z]*(none|build)\b/i) || [])[1]
+  if (start) return { word: start.toUpperCase() }
+  const out = []
+  // Builder (review): some ids are ordinary words (HERMES, skill, FREE, START ...), so a sentence could be read as
+  // picks. A list of ids has few other words: with more than three words that are no id, the reply holds no ids.
+  let other = 0
+  for (const w of s.match(/[A-Za-z0-9_-]+/g) || []) {
+    const id = LIST_ID_OF[w.toLowerCase()]
+    if (id && !out.includes(id)) out.push(id)
+    else if (!id && /[A-Za-z]/.test(w)) other++
+  }
+  if (out.length && other <= 3) return { ids: out.slice(0, 3) }
+  return { word: /\bBUILD\b/i.test(s) ? 'BUILD' : 'NONE' }
+}
+
 // pick_only.read: <think> cut, then spaces, full stops, brackets, backticks and quote marks at both ends.
 // Returns { id } for a handed id, or { word: 'TALK' | 'BUILD' | 'NONE' }; anything else counts as NONE.
 function readPick(raw, ids) {
@@ -18685,20 +23803,48 @@ const sameWords = s => talkNorm(s).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s
 const C24_RX = new RegExp(LC.c24.person_pattern, 'gi')
 const C24_STOP = new Set([...LIVE_DATA.stop_words, ...LC.c24.person_ok])
 const c24Words = s => new Set((String(s || '').toLowerCase().match(/[a-z']+/g) || []).map(w => w.replace(/s+$/, '')))
-function c24Fails(reply, work, message, hand) {
+function c24Fails(reply, work, message, hand, forms = false) {
   const allowed = new Set([...c24Words(work), ...c24Words(message), ...c24Words(hand)])
+  const handed = forms ? c24Words(hand) : null
   C24_RX.lastIndex = 0
   for (const m of String(reply).matchAll(C24_RX)) {
     const part = reply.slice(m.index + m[0].length).split(/[.,;!?]/)[0]
     for (const w of (part.match(/[A-Za-z']+/g) || []).slice(0, 3)) {
       const lw = w.toLowerCase()
-      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, ''))) return w
+      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, '')) && !(handed && /(^|\s)your\s+$/i.test(m[0]) && c24SameForm(lw, handed))) return w
     }
   }
   return null
 }
 
+/* ---------- find-v1 (Lead, 11 Nov; hhtech find-run section 4): four checks dropped replies that were true to the handed lines ----------
+   These four allowances are newer than hhcontent's check_live.py; talk.asCheckLive switches them off (the comparison
+   with check_live.py's flags in tests/live-checks.test.mjs).
+   c12  a name passes when it stands as a word in one of the person's own typed messages of this visit (talk.typed)
+        AND Helper's checked data knows that word (Mac, Siri, Signal). Builder: the second half keeps today's stop for
+        a name nobody checked ("Hermes works with Zorbo").
+   c24  a word after "your" alone that is a form of a word in the handed lines is no guess about the person ("asks for
+        your approval first" from "asks you to approve it first"); see c24SameForm.
+   c22  a Hermes word needs no plain word beside it when one handed line holds the word and its plain word.
+   c14  "the checked information does not mention ..." says what Helper has not checked; it is no claim about Hermes. */
+const LC_KNOWN_WORDS = new Set(JSON.stringify([TALK_DATA.facts, TALK_DATA.fixed, TALK_DATA.topics, TALK_DATA.terms, TALK_DATA.chat_apps, WANTS_DATA.rows]).toLowerCase().match(/[a-z0-9]+/g))
+function c12Typed(name, typed) {
+  const n = String(name).toLowerCase()
+  if (!LC_KNOWN_WORDS.has(n)) return false
+  const re = new RegExp('(^|[^a-z0-9])' + liveEsc(n) + '($|[^a-z0-9])')
+  return (typed || []).some(m => re.test(String(m).toLowerCase()))
+}
+// Builder (review): the same word with another ending: both six letters or more, at most two letters apart in length,
+// and the same up to the shorter one's last letter (approval / approve; not accountant / account, company / compare)
+const c24SameForm = (w, allowed) => w.length >= 6 && [...allowed].some(a => {
+  if (a.length < 6 || Math.abs(a.length - w.length) > 2) return false
+  const n = Math.min(a.length, w.length) - 1
+  return a.slice(0, n) === w.slice(0, n) && a !== w.slice(0, a.length)
+})
+const C14_HONEST = /\b(?:the |my |helper's )?checked (?:information|info|facts?|lines?|notes?)(?: i have| that i have)? (?:doesn't|doesnt|does not|don't|dont|do not|didn't|did not)(?: specifically| explicitly| actually| really)? (?:mention|say|cover|include|list|name|state|talk about|go into)\b/g
+
 function replyFlags(reply, rows, used, talk = {}) {
+  const allow = !talk.asCheckLive
   const ids = rows.map(r => r.id)
   const textOf = Object.fromEntries(rows.map(r => [r.id, r.text]))
   const hand = rows.map(r => r.text).join(' ').toLowerCase()
@@ -18718,11 +23864,11 @@ function replyFlags(reply, rows, used, talk = {}) {
   }
   const low = reply.toLowerCase()
   for (const [s, re] of SKILL_RX) if (re.test(low) && !hand.includes(s)) out.push('c11 skill ' + s)
-  for (const m of reply.matchAll(/(?<![.!?]\s)(?<!^)\b([A-Z][A-Za-z0-9]+)/g)) if (!OK_CAPS.has(m[1]) && !hand.includes(m[1].toLowerCase())) out.push('c12 name ' + m[1])
+  for (const m of reply.matchAll(/(?<![.!?]\s)(?<!^)\b([A-Z][A-Za-z0-9]+)/g)) if (!OK_CAPS.has(m[1]) && !hand.includes(m[1].toLowerCase()) && !(allow && c12Typed(m[1], talk.typed))) out.push('c12 name ' + m[1])
   LC_R6.lastIndex = 0
   for (const m of reply.matchAll(LC_R6)) if (!hand.includes(m[0].toLowerCase())) out.push('c13 jargon ' + m[0])
   const hc = notClasses(hand)
-  for (const cls of [...notClasses(reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
+  for (const cls of [...notClasses(allow ? reply.toLowerCase().replace(C14_HONEST, ' ') : reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
   if (/http|www\.|\(/.test(reply)) out.push('c15 link or (')
   if (c16Fails(reply)) out.push('c16 product word')
   if (LC.test_phrases.some(p => low.includes(p))) out.push('c17 test')
@@ -18736,10 +23882,10 @@ function replyFlags(reply, rows, used, talk = {}) {
   if (!ids.length || (used && (!used.length || (used.length === 1 && used[0].toLowerCase() === 'none')))) {
     if (/\d/.test(reply) || reply.includes('"') || LC_R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
   }
-  for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
+  for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply) && !(allow && rows.some(r => rx.test(r.text) && gl.test(r.text)))) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
   // c24, after c23 (changes-4: "Run c24 after c23")
-  const c24Word = c24Fails(reply, talk.work, talk.message, hand)
+  const c24Word = c24Fails(reply, talk.work, talk.message, hand, allow)
   if (c24Word) out.push('c24 about the person ' + c24Word)
   // live-v2 changes-5: c26 and c27 after c24 (c25 has adopted: false and is not built)
   const c26Word = c26Fails(reply, hand)
@@ -18850,6 +23996,21 @@ function fillList(text, slot, lines) {
   })
 }
 const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects', LIVE_DATA.subjects.map(s => `${s.id} = ${s.title}`))
+// find-v1 (Lead, 11 Nov): the list call, in place of the first call that picked a subject word. The instructions are
+// hhtech's LIST_CALL (dev/checks/hhtech-find-run/find.mjs, way W1), word for word but for "as id = title" (it ran with
+// "how the line begins"; the titles are hhcontent's now), followed by the list of every fact line. It is Helper's own
+// text, the same for every person and every message; what goes with it is the usual input (the lines that may be
+// sent and the newest message).
+const LIST_CALL = `You find the right checked line for Helper, a part of the Hermes app that explains Hermes to newcomers.
+Read the person's newest message (and the conversation before it, if any). Below are Helper's checked lines, one per line, as id = title.
+Reply with the ids of the lines that answer the message: at most three, the best first, separated by commas, and nothing else.
+If no line answers the message, or it is ordinary talk (hello, thanks, ok), reply with only the word NONE.
+If the person asks Helper to make, build, install, connect or do something for them, reply with only the word BUILD.
+Lines:
+`
+const LIST_MAX_TOKENS = 30
+const LIST_TEXT = LIST_CALL + LIVE_DATA.list.map(l => `${l.id} = ${l.title}`).join('\n')
+const listCallText = () => LIST_TEXT
 const rowLines = ids => ids.filter(id => LIVE_ROW[id]).map(id => `[${id}] ${LIVE_ROW[id].text}`)
 // live-v2 changes-4 (input.work_line): what the person does, the one kept value ever sent, as one labelled line; null
 // when nothing is kept or the value fails the guard (not secret, no key, within keeps.work.limits). Never the name.
@@ -18929,8 +24090,8 @@ const liveParams = (instructions, input, maxTokens) => oneshotParams({ instructi
 //   1. the no-AI turn runs first, exactly as before (src/talk.js turnParts); its line is the fallback, and what
 //      it keeps is kept at once;
 //   2. code's own answers are shown with no call (liveWhyNot);
-//   3. a follow-up gets the rows of the person's previous message; 4. else word matching; 5. else the first
-//      call picks a subject;
+//   3. a follow-up gets the rows of the person's previous message; 4 and 5 (find-v1, in place of word matching
+//      and the first call that picked a subject): else the list call names up to three of all fact lines by title;
 //   6. the writer call (ai_writes) or the pick call (ai_picks_line), then the checks;
 //   7. the chosen line is noted as Helper's last line (liveApply).
 // Any failure (a thrown request, no text, NONE, a failed check) gives null: the page shows the fallback and
@@ -18968,7 +24129,14 @@ function goesToAi(pre) {
   if (pre.by_again) return false
   // ask-fix-t1 (about_rule.weak_hit_then.with_ai): a weak hit goes on to the AI as when no row was found
   if (pre.weak_hit && (pre.kind === 'question' || pre.kind === 'N1')) return true
-  if (pre.kind === 'plain') return pre.why === 'what do you mean'
+  // find-v1 (Lead, 11 Nov; hhtech's W1x): a line reached by a full hit of one of its phrases is code's own
+  if (pre.by === 'title') return false
+  // find-v1: a line given from a subject word alone goes to the list call too, with code's line as the fallback: the
+  // subject's plain line (not the one "what is ..." asks for by name), the subject's own question, the nearest things
+  // (Builder, review: not at the opening's two questions, where the message is the person's name or what they do)
+  if (pre.at_opening && ['plain', 'question', 'N2'].includes(pre.kind)) return false
+  if (pre.kind === 'plain') return pre.why !== 'what is'
+  if (pre.kind === 'question' || pre.kind === 'N2') return true
   return LV_GO.includes(pre.kind)
 }
 
@@ -19007,7 +24175,8 @@ function isHowQuestion(text) {
 // the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
 // USED: line) is an ordinary fallback.
 //   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
-async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [] }) {
+//   typed: the person's own typed messages of this visit, this one included (find-v1, check c12: a name they typed)
+async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [], typed = [text] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -19025,29 +24194,27 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names })
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed })
   return thinking ? { fallback: 'thinking text', thinking: true } : got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed }) {
   let ids = null
   // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
   let follow = false
   if (isFollowUp(text, pre, before)) ids = followRows(before)
   if (ids && ids.length) follow = true
+  // find-v1 (Lead, 11 Nov; hhtech's askList): no follow-up, so ONE list call names up to three of all fact lines; the
+  // writer gets those, each with its next line, at most five. It replaces word matching and the first call that picked
+  // a subject word. NONE, no known id, a failed or slow call: code's line. BUILD: the text to paste for a request, and
+  // code's line (the don't-know with its offer) for a how or what question.
   if (!ids || !ids.length) {
-    ids = null
-    const w = byWords(message)
-    if (w.length) ids = withNext(w)
-  }
-  if (!ids) {
-    const raw = await call('first', firstCallText(), LIVE_DATA.first_call.max_tokens)
-    if (raw === null) return { fallback: 'first call failed' }
-    const subject = readSubject(raw)
-    if (subject === 'none') return { fallback: 'first call: none' }
-    if (subject === 'build') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
-    ids = subject === 'talk' ? followRows(before) : withNext(rankIn(message, subject))
-    if (subject === 'talk' && ids.length) follow = true
+    const raw = await call('list', listCallText(), LIST_MAX_TOKENS)
+    if (raw === null) return { fallback: 'list call failed' }
+    const p = readList(raw)
+    if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
+    if (!p.ids) return { fallback: 'list: none' }
+    ids = withNext(p.ids)
   }
   const handed = follow ? null : work
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
@@ -19063,7 +24230,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
   }
   const raw = await call('writer', writerText(ids, handed, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names) })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names), typed })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }
@@ -22739,9 +27906,33 @@ function makePage(ctx, opts = {}) {
   // setup-chat (hhtech-live-run2, For builder 2; Lead's points 15 and 16): SLOW_A is owed to the written answer that
   // replaced the slow one, so it shows right after that answer or not at all in this visit: when the turn was already
   // closed (the person moved on before the 12 s) it is dropped, never hung under a later, unrelated line.
-  const slowFail = w => {
-    memory.visit.aiOff = true
-    if (w.firstTurn && !memory.visit.slow) memory.visit.slow = live.waiting === w ? 'due' : 'dropped'
+  // find-v1 part 3 (Lead, 11 Nov; hhtech ask-run 2 and find-run section 9), in place of "the first slow or failed call
+  // ends the AI for the visit": a message whose try at the AI was slow (no answer in 12 s, thinking text) or failed (the
+  // call threw) is one failed try (aiFailed, once per message). A message the AI answered in time puts the count back
+  // to 0. Two failed tries in a row turn the AI step off for the rest of the visit (visit.aiOff), and when that second
+  // one was slow SLOW_A is owed to its answer: it shows right after that answer or, when it may not follow it, not at
+  // all (Lead's points 15 and 16 stand). A try that failed without being slow owes no line: Helper has no checked words
+  // for "your AI gave an error".
+  const aiFailed = (w, slow) => {
+    const v = memory.visit
+    if (w.failed) return
+    w.failed = true
+    v.aiFails = (v.aiFails || 0) + 1
+    if (v.aiFails < 2) return
+    v.aiOff = true
+    if (!v.slow) v.slow = slow && (live.waiting === w || w.answeredNow) ? 'due' : 'dropped'
+  }
+  const slowFail = w => aiFailed(w, true)
+  // a message the AI answered in time (whatever it answered): the failed tries before it no longer count
+  const aiAnswered = w => {
+    if (!w.failed) memory.visit.aiFails = 0
+  }
+  // The model is looked for again (setup.runtime_check, no model call): right after a try that failed, so the next
+  // message knows whether a model is there now (ask-run 2 run D: Hermes switched its free model on after the failed
+  // try), and at each message that could not be asked because the page knows no model. Never two looks at once (the
+  // look itself returns when one is running).
+  const lookAgain = () => {
+    if (live.recheck) live.recheck()
   }
   // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
@@ -22772,10 +27963,12 @@ function makePage(ctx, opts = {}) {
     const running = useRef(false)
     const mounted = useRef(true)
 
-    async function run() {
+    // quiet (find-v1 part 3, the look made again for Helper's AI step): the page keeps showing what it knew until the
+    // answer is there, with no "checking" in between
+    async function run(quiet = false) {
       if (running.current) return
       running.current = true
-      setStatus({ state: 'checking' })
+      if (quiet !== true) setStatus({ state: 'checking' })
       let result = { state: 'error' }
       try {
         result = await checkModel((method, params, timeout) => host.request(method, params, timeout), { sleep })
@@ -22844,7 +28037,8 @@ function makePage(ctx, opts = {}) {
     const [focusStrip, setFocusStrip] = useState(false)
     const [size, measureRef] = useOwnSize()
     const width = size.width
-    const [modelStatus] = useModelStatus()
+    const [modelStatus, recheckModel] = useModelStatus()
+    live.recheck = () => recheckModel(true)
     // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
     const dashboard = useDashboard({ active: tab === 'dashboard' })
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
@@ -23003,7 +28197,8 @@ function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     // pressed: shown is the label of a button or pick the person pressed, not their words: never sent to the AI as
     // "Person: ..." (hhtech-live-run: "Person: Skip")
-    function answer(result, shown, typed = '', pressed = false) {
+    // slowDue (find-v1 part 3): this answer is the one a second slow try was answered with (see send): SLOW_A after it
+    function answer(result, shown, typed = '', pressed = false, slowDue = false) {
       if (!result) return
       // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
       const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
@@ -23011,7 +28206,7 @@ function makePage(ctx, opts = {}) {
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
       const [line, after] = setupAfterSaid(result, said, typed)
-      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(line, may.helper), ...after].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(line, may.helper), ...(slowDue ? slowAfter(said) : []), ...after].filter(Boolean))
       setFocusAsk(true)
     }
 
@@ -23043,23 +28238,33 @@ function makePage(ctx, opts = {}) {
         const instructions = recInstructions(says[i].rec, visit.kept, seen, names)
         const first = !visit.aiTried
         visit.aiTried = true
+        // find-v1 part 3: a slow or failed call here is one failed try, as for a typed message (two in a row end the AI
+        // for the visit). The slow-AI line may not follow a line with things to pick, so it is never owed here.
+        let counted = false // (review) once for this call: slow at 12 s and failing later is one failed try
         const off = () => {
+          if (counted) return
+          counted = true
+          visit.aiFails = (visit.aiFails || 0) + 1
+          if (visit.aiFails < 2) return
           visit.aiOff = true
-          // the slow-AI line may not follow a line with things to pick, so it is dropped for this visit (as after any
-          // such answer), never hung under a later line
-          if (first && !visit.slow) visit.slow = 'dropped'
+          if (!visit.slow) visit.slow = 'dropped'
         }
         let ended = false
         const endBusy = busy.begin()
         const end = text => {
           if (ended) return
           ended = true
-          stop()
           endBusy()
           memory.recWait = null
           put(says.map((s, k) => (k === i && text ? { ...s, text: text + s.text.slice(s.text.lastIndexOf(' Want the steps?')), recBy: 'ai' } : s)))
         }
+        // find-v1: past its 12 s and still in Hermes, this call is a stuck one, as a typed message's call is: a typed
+        // message that cannot be asked because of it is the second slow try. The watch runs on when the person
+        // moved on before the 12 s (end() no longer stops it; it is stopped when the call comes back)
+        let recStuck = false
         const stop = ctx.setTimeout(() => {
+          recStuck = true
+          live.stuck = (live.stuck || 0) + 1
           off()
           end(null)
         }, LIVE_SECONDS * 1000)
@@ -23071,6 +28276,7 @@ function makePage(ctx, opts = {}) {
             res => {
               const j = judgeRec(res && res.text, says[i].rec.item, names, instructions)
               if (j.noReply) off()
+              else if (!ended && !counted) visit.aiFails = 0
               end(j.text || null)
             },
             () => {
@@ -23079,6 +28285,8 @@ function makePage(ctx, opts = {}) {
             }
           )
           .finally(() => {
+            stop()
+            if (recStuck) live.stuck--
             live.inHermes--
           })
       }
@@ -23152,6 +28360,9 @@ function makePage(ctx, opts = {}) {
       // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
       const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
       const lines = lastLines(memory.log, keptValues())
+      // find-v1: the person's own typed messages of this visit, for check c12 (a name they typed themselves); never
+      // stored, never sent
+      visit.typedSaid = [...(visit.typedSaid || []), typed]
       const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
       // pick that answers it. A message
@@ -23161,7 +28372,16 @@ function makePage(ctx, opts = {}) {
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
       const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes, off: visit.aiOff === true })
-      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
+      // find-v1 part 3: the page knows no model: no call and no dots, and the model is looked for again for a later message
+      if (why === 'model not ready') lookAgain()
+      // find-v1 part 3: this message cannot be asked because an earlier call of Helper's has been in Hermes for over 12 s:
+      // that is a second slow try (the first was that call's own message)
+      let stuckNow = false
+      if (why === 'Hermes still works on a call' && live.stuck > 0) {
+        aiFailed({ answeredNow: true }, true)
+        stuckNow = true
+      }
+      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed, false, stuckNow)
       // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
@@ -23185,8 +28405,13 @@ function makePage(ctx, opts = {}) {
       const request = (method, params, timeout) => {
         live.inHermes++
         let ended = false
+        let stuck = false
         const stopWatch = ctx.setTimeout(() => {
-          if (!ended) slowFail(w)
+          if (ended) return
+          slowFail(w)
+          // find-v1 part 3: this call is still in Hermes 12 s after it started (see send: a message that meets it)
+          stuck = true
+          live.stuck = (live.stuck || 0) + 1
         }, LIVE_SECONDS * 1000)
         let p
         try {
@@ -23204,21 +28429,26 @@ function makePage(ctx, opts = {}) {
         // gate the call.
         return p
           .catch(err => {
-            visit.aiOff = true
+            // find-v1 part 3: a call that failed is one failed try, and the model is looked for again
+            aiFailed(w, false)
+            lookAgain()
             throw err
           })
           .finally(() => {
             ended = true
             stopWatch()
+            if (stuck) live.stuck--
             live.inHermes--
           })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
         .then(got => {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
-          if (got && got.thinking) slowFail(w)
+          // find-v1 (Builder, review): so is a list call that came back too late for the writer to start
+          if (got && (got.thinking || got.fallback === 'no time for the second call')) slowFail(w)
+          else aiAnswered(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })
@@ -23250,6 +28480,7 @@ function makePage(ctx, opts = {}) {
       else if (item.group) result = pickGroup(item.group, visit)
       else if (item.want) result = pickWant(item.want, visit)
       else if (item.offer) result = pressOffer(item.offer, visit) // offer-t1: a thing picked under an offer, by its id
+      else if (item.near) result = pressNear(item.near, visit) // breadth-t1: a line picked under the near offer
       else result = pickTopic(item.topic, visit)
       answer(result, item.label, '', true)
     }

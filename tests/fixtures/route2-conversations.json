@@ -1353,11 +1353,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -2487,12 +2489,30 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Connecting Telegram",
+        "Connecting WhatsApp, Discord, Slack or Signal",
+        "Is it safe to connect a service"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "row",
+         "need": "msg1",
+         "topic": "msg"
+        },
+        {
+         "kind": "row",
+         "need": "msg2",
+         "topic": "msg"
+        },
+        {
+         "kind": "row",
+         "need": "svc2",
+         "topic": "svc"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about connecting Telegram, connecting WhatsApp, Discord, Slack or Signal, or is it safe to connect a service?"
       }
      },
      "shown": "N1",
@@ -2528,12 +2548,18 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "A summary of your email every morning"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "row",
+         "need": "sch5",
+         "topic": "sch"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about a summary of your email every morning?"
       }
      },
      "shown": "N1",
@@ -2569,12 +2595,26 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Doing two things at once",
+        "Hermes compared with Siri: a wake word",
+        "The first two steps"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_two"
+        },
+        {
+         "kind": "fact",
+         "need": "d_siri"
+        },
+        {
+         "kind": "START_2"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about doing two things at once, Hermes compared with Siri: a wake word, or the first two steps?"
       }
      },
      "shown": "N1",
@@ -2912,12 +2952,17 @@
       "calls": 1,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Linking a service like GitHub (MCP)"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "plain",
+         "topic": "svc"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about linking a service like GitHub (MCP)?"
       }
      },
      "shown": "N1",
@@ -3051,12 +3096,27 @@
       "calls": 1,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Using websites for you: clicking and forms",
+        "Writing and running code",
+        "Writing songs and briefing a music AI"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "want",
+         "need": "w_browser"
+        },
+        {
+         "kind": "want",
+         "need": "w_code"
+        },
+        {
+         "kind": "want",
+         "need": "w_music"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about using websites for you: clicking and forms, writing and running code, or writing songs and briefing a music AI?"
       }
      },
      "shown": "N1",
@@ -3724,11 +3784,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -9076,11 +9138,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -9553,11 +9617,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -9805,11 +9871,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -11258,11 +11326,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -11364,11 +11434,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -11419,11 +11491,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -11473,12 +11547,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Bringing the app window back"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_tray"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about bringing the app window back?"
       }
      },
      "shown": "N1",
@@ -11529,11 +11608,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -11584,11 +11665,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -12127,12 +12210,27 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Pausing or removing a job",
+        "Where a job's result goes",
+        "Stopping every job at once"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_job_change"
+        },
+        {
+         "kind": "fact",
+         "need": "d_job_where"
+        },
+        {
+         "kind": "fact",
+         "need": "d_job_all_stop"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about pausing or removing a job, where a job's result goes, or stopping every job at once?"
       }
      },
      "shown": "N1",
@@ -16113,7 +16211,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "line use3",
+   "expect": "fact d_rate",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -16125,17 +16223,15 @@
      "has_model": false,
      "model": null,
      "out": {
+      "by": "title",
       "calls": 0,
-      "kind": "row",
-      "need": "use3",
-      "topic": "use"
+      "kind": "fact",
+      "need": "d_rate"
      },
-     "shown": "line use3",
+     "shown": "fact d_rate",
      "state": {
       "asked": [],
-      "found": {
-       "use": "use3"
-      },
+      "found": {},
       "kept": {},
       "lastq": false,
       "met": false,
@@ -16690,12 +16786,27 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Why a command was blocked",
+        "Why answers are slow: three causes",
+        "OpenRouter: one service for many AIs"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_blocked"
+        },
+        {
+         "kind": "fact",
+         "need": "d_slow"
+        },
+        {
+         "kind": "fact",
+         "need": "d_openrouter"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about why a command was blocked, why answers are slow: three causes, or openRouter: one service for many AIs?"
       }
      },
      "shown": "N1",
@@ -17179,12 +17290,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Using websites for you: clicking and forms"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "want",
+         "need": "w_browser"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about using websites for you: clicking and forms?"
       }
      },
      "shown": "N1",
@@ -17256,12 +17372,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Using websites for you: clicking and forms"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "want",
+         "need": "w_browser"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about using websites for you: clicking and forms?"
       }
      },
      "shown": "N1",
@@ -17445,11 +17566,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -17485,12 +17608,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Hermes writes its own skills"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_skill_own"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about Hermes writes its own skills?"
       }
      },
      "shown": "N1",
@@ -18225,11 +18353,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -18686,11 +18816,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -18716,11 +18848,13 @@
       "kind": "N1_AGAIN",
       "offer": {
        "picks": [
+        "can",
         "mod",
-        "msg"
+        "msg",
+        "mem"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       },
       "repeat_of": "N1"
      },
@@ -18758,11 +18892,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -18788,11 +18924,13 @@
       "kind": "N1_AGAIN",
       "offer": {
        "picks": [
+        "can",
         "mod",
-        "msg"
+        "msg",
+        "mem"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       },
       "repeat_of": "N1"
      },
@@ -18818,12 +18956,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Finding places, routes and time zones"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "want",
+         "need": "w_maps"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about finding places, routes and time zones?"
       }
      },
      "shown": "N1",
@@ -18860,11 +19003,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -18890,11 +19035,13 @@
       "kind": "N1_AGAIN",
       "offer": {
        "picks": [
+        "can",
         "mod",
-        "msg"
+        "msg",
+        "mem"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       },
       "repeat_of": "N1"
      },
@@ -20456,11 +20603,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -20570,12 +20719,28 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Do separate Hermes share notes",
+        "Separate notes for each Hermes",
+        "Working with your Obsidian notes"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_share_notes"
+        },
+        {
+         "kind": "row",
+         "need": "mem4",
+         "topic": "mem"
+        },
+        {
+         "kind": "want",
+         "need": "w_notes"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about do separate Hermes share notes, separate notes for each Hermes, or working with your Obsidian notes?"
       }
      },
      "shown": "N1",
@@ -20648,12 +20813,27 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Hermes on an Android phone",
+        "Bringing the app window back",
+        "Chatting from your phone"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_android"
+        },
+        {
+         "kind": "fact",
+         "need": "d_tray"
+        },
+        {
+         "kind": "plain",
+         "topic": "msg"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about Hermes on an Android phone, bringing the app window back, or chatting from your phone?"
       }
      },
      "shown": "N1",
@@ -20725,12 +20905,23 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Spending less money on the AI",
+        "Looking up stock and crypto prices"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "row",
+         "need": "use2",
+         "topic": "use"
+        },
+        {
+         "kind": "want",
+         "need": "w_stocks"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about spending less money on the AI, or about looking up stock and crypto prices?"
       }
      },
      "shown": "N1",
@@ -20766,12 +20957,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Paying with a plan you already have"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_plans"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about paying with a plan you already have?"
       }
      },
      "shown": "N1",
@@ -21049,12 +21245,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Using websites for you: clicking and forms"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "want",
+         "need": "w_browser"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about using websites for you: clicking and forms?"
       }
      },
      "shown": "N1",
@@ -21296,11 +21497,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -21337,11 +21540,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -21708,12 +21913,27 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Why a command was blocked",
+        "Why answers are slow: three causes",
+        "OpenRouter: one service for many AIs"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_blocked"
+        },
+        {
+         "kind": "fact",
+         "need": "d_slow"
+        },
+        {
+         "kind": "fact",
+         "need": "d_openrouter"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about why a command was blocked, why answers are slow: three causes, or openRouter: one service for many AIs?"
       }
      },
      "shown": "N1",
@@ -21749,12 +21969,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Paying with a plan you already have"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_plans"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about paying with a plan you already have?"
       }
      },
      "shown": "N1",
@@ -21790,12 +22015,27 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Setting up an AI on your computer",
+        "Hermes fits the AI to your computer",
+        "Computers that can run a local AI"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_local_how"
+        },
+        {
+         "kind": "fact",
+         "need": "d_local_fit"
+        },
+        {
+         "kind": "fact",
+         "need": "d_local_where"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about setting up an AI on your computer, Hermes fits the AI to your computer, or computers that can run a local AI?"
       }
      },
      "shown": "N1",
@@ -21933,12 +22173,17 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Hermes writes its own skills"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_skill_own"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about Hermes writes its own skills?"
       }
      },
      "shown": "N1",
@@ -22957,11 +23202,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -24332,12 +24579,28 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "A summary of your email every morning",
+        "Searching the web and reading pages",
+        "Reading and searching Reddit"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "row",
+         "need": "sch5",
+         "topic": "sch"
+        },
+        {
+         "kind": "want",
+         "need": "w_web"
+        },
+        {
+         "kind": "want",
+         "need": "w_reddit"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about a summary of your email every morning, searching the web and reading pages, or reading and searching Reddit?"
       }
      },
      "shown": "N1",
@@ -24435,11 +24698,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -25373,11 +25638,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -25414,11 +25681,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -25444,11 +25713,13 @@
       "kind": "N1_AGAIN",
       "offer": {
        "picks": [
+        "can",
         "mod",
-        "msg"
+        "msg",
+        "mem"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       },
       "repeat_of": "N1"
      },
@@ -25539,11 +25810,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -27955,11 +28228,13 @@
       "kind": "N1",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "set": "start_four",
+       "text": "I can explain these four. Pick one."
       }
      },
      "shown": "N1",
@@ -28546,12 +28821,22 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Hermes on an Android phone",
+        "Chatting from your phone"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_android"
+        },
+        {
+         "kind": "plain",
+         "topic": "msg"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about Hermes on an Android phone, or about chatting from your phone?"
       }
      },
      "shown": "N1",
@@ -28587,12 +28872,27 @@
       "calls": 0,
       "kind": "N1",
       "offer": {
-       "picks": [
-        "what",
-        "setup"
+       "labels": [
+        "Hermes on an Android phone",
+        "Pausing or removing a job",
+        "Where a job's result goes"
        ],
-       "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "picks": [
+        {
+         "kind": "fact",
+         "need": "d_android"
+        },
+        {
+         "kind": "fact",
+         "need": "d_job_change"
+        },
+        {
+         "kind": "fact",
+         "need": "d_job_where"
+        }
+       ],
+       "set": "near",
+       "text": "Do you want to know about Hermes on an Android phone, pausing or removing a job, or where a job's result goes?"
       }
      },
      "shown": "N1",
@@ -28824,7 +29124,7 @@
    ]
   }
  ],
- "json_sha256": "06eda70cdbf3a667f455c8a0e93f6bfd2eae509d473cdd8d533e3abdf7d5879f",
+ "json_sha256": "cd2c4d54992939b44f2ef36d6b6b532dd884073fea372f9bd0b643d57d400b4c",
  "keeps_off": false,
  "last_printed_lines": [
   "ok    lc3 kept: it costs me too much, how do I spend less: use2: line use2",
@@ -28832,7 +29132,7 @@
   "conversations: 503 of 503 as expected"
  ],
  "no_wants": false,
- "route2_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9",
+ "route2_sha256": "8862ec3aeee840a82a958bc674c5dd108eab5576358136d9f5a0708409f0f56e",
  "singles": [
   {
    "landed": "mem",
@@ -30048,11 +30348,13 @@
     "kind": "N1",
     "offer": {
      "picks": [
-      "what",
-      "setup"
+      "can",
+      "mod",
+      "msg",
+      "mem"
      ],
-     "set": "dont_know",
-     "text": "Do you want to know what Hermes is, or set it up?"
+     "set": "start_four",
+     "text": "I can explain these four. Pick one."
     }
    },
    "shown": "N1",
@@ -30125,12 +30427,17 @@
     "calls": 0,
     "kind": "N1",
     "offer": {
-     "picks": [
-      "what",
-      "setup"
+     "labels": [
+      "Hermes writes its own skills"
      ],
-     "set": "dont_know",
-     "text": "Do you want to know what Hermes is, or set it up?"
+     "picks": [
+      {
+       "kind": "fact",
+       "need": "d_skill_own"
+      }
+     ],
+     "set": "near",
+     "text": "Do you want to know about Hermes writes its own skills?"
     }
    },
    "shown": "N1",
@@ -30212,12 +30519,27 @@
     "calls": 0,
     "kind": "N1",
     "offer": {
-     "picks": [
-      "what",
-      "setup"
+     "labels": [
+      "Why a command was blocked",
+      "Why answers are slow: three causes",
+      "OpenRouter: one service for many AIs"
      ],
-     "set": "dont_know",
-     "text": "Do you want to know what Hermes is, or set it up?"
+     "picks": [
+      {
+       "kind": "fact",
+       "need": "d_blocked"
+      },
+      {
+       "kind": "fact",
+       "need": "d_slow"
+      },
+      {
+       "kind": "fact",
+       "need": "d_openrouter"
+      }
+     ],
+     "set": "near",
+     "text": "Do you want to know about why a command was blocked, why answers are slow: three causes, or openRouter: one service for many AIs?"
     }
    },
    "shown": "N1",
@@ -30298,11 +30620,13 @@
     "kind": "N1",
     "offer": {
      "picks": [
-      "what",
-      "setup"
+      "can",
+      "mod",
+      "msg",
+      "mem"
      ],
-     "set": "dont_know",
-     "text": "Do you want to know what Hermes is, or set it up?"
+     "set": "start_four",
+     "text": "I can explain these four. Pick one."
     }
    },
    "shown": "N1",

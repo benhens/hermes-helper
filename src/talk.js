@@ -90,6 +90,8 @@ export function buildHit(text) {
   // changes-16 (build.build_question_rule): "can it build ...?" is a question about Hermes
   const q = whichOf(t, BUILD.build_question_words)
   if (startsWith(t, BUILD.make_not_when_starts) && q.length) return { h2: q[0] }
+  // live changes-12 (titles-t2, build.can_question_rule): a question about what Hermes can do is never a request to build
+  if (startsWith(t, BUILD.can_question_starts)) return null
   const w = whichOf(t, BUILD.build_words)
   if (w.length) return w[0]
   const pair = BUILD.build_pair
@@ -256,7 +258,10 @@ function byCode(text, st) {
       if (terms.length === 1) {
         // wants fixes v1 (skill_for_unknown): in a question, "skill(s) for / that can ..." and a word that is
         // not on skill_for_not_after is not the line about what a skill is: turn() goes on to N2 or N1
-        if (st.wants !== false && TERMS[terms[0]].key_words.includes('skill') && questionForm(t) && skillForUnknown(t)) return r
+        if (st.wants !== false && TERMS[terms[0]].key_words.includes('skill') && questionForm(t) && skillForUnknown(t)) {
+          r.skill_unknown = true // find-v1: the last step must not bring the word line back by its one-word phrase
+          return r
+        }
         r.term = terms[0]
         return r
       }
@@ -286,6 +291,97 @@ function byCode(text, st) {
     }
   }
   return r
+}
+
+/* ---------- breadth-t1 and titles-t2 (live changes-11 and -12; JSON facts_t1, near; route2.py b_words, titled, full_hit, near) ---------- */
+export const FACTS = Object.fromEntries(TALK_DATA.facts.map(f => [f.id, f]))
+const NEAR = TALK_DATA.near
+const NEAR_STOP = new Set(NEAR.stop_words)
+const NEAR_FILLER = new Set(NEAR.filler)
+// near.words_rule: lower case, apostrophes dropped, letters digits / . + kept; a word that is no stop word or filler
+// loses a final ing (over 4 letters), else a final s (over 3 letters, not ss)
+function nearWords(s) {
+  const out = []
+  for (let w of talkNorm(s).replace(/'/g, '').match(/[a-z0-9/.+]+/g) || []) {
+    w = w.replace(/^\.+|\.+$/g, '')
+    if (NEAR_STOP.has(w) || NEAR_FILLER.has(w)) {
+      out.push(w)
+      continue
+    }
+    if (w.length > 4 && w.endsWith('ing')) w = w.slice(0, -3)
+    else if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) w = w.slice(0, -1)
+    if (w) out.push(w)
+  }
+  return out
+}
+const nearContent = ws => ws.filter(w => !NEAR_STOP.has(w))
+// Every line with a title, in the data's order (route2.py titled()): what it gives, its title, its phrases. A row of
+// the wants is this plugin's { kind: 'want', row }.
+export const TITLED = [
+  ...TALK_DATA.facts.map(f => [{ kind: 'fact', need: f.id }, f]),
+  ...Object.entries(FIXED).filter(([, f]) => f.title).map(([id, f]) => [{ kind: id }, f]),
+  ...TALK_DATA.topics.flatMap(t => [...(t.plain.title ? [[{ kind: 'plain', topic: t.id }, t.plain]] : []), ...t.needs.filter(n => n.title).map(n => [{ kind: 'row', topic: t.id, need: n.id }, n])]),
+  ...TALK_DATA.terms.filter(t => t.title).map(t => [{ kind: 'term', term: t.id }, t]),
+  ...WROWS.filter(w => w.title).map(w => [{ kind: 'want', row: w.id }, w])
+].map(([gives, x]) => ({ gives, title: x.title, phrases: x.phrases.map(ph => [nearWords(ph), nearContent(nearWords(ph))]), titleWords: new Set(nearContent(nearWords(x.title))), allWords: new Set([...nearContent(nearWords(x.title)), ...nearContent(nearWords(x.phrases.join(' ')))]) }))
+const runIn = (hay, run) => hay.some((_, i) => i + run.length <= hay.length && run.every((w, j) => hay[i + j] === w))
+// a line that shows the things it holds needs them on the result (C1's picks, W2's two words)
+const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds } : g.kind === 'W2' ? { ...g, buttons: TALK_DATA.w1_pairs.find(p => p.line === 'W2').terms } : { ...g })
+// near.full_hit_rule: a phrase hits when its words stand side by side in the message, or its content words (two or
+// more) stand side by side among the message's content words. The longest hit phrase wins (content words, then
+// words); a tie goes to the line first in the data. singleOk false is the first step: phrases of two or more words,
+// of the new fact lines and the older lines on first_step_old only.
+export function fullHit(text, singleOk) {
+  const mw = nearWords(text).filter(w => !NEAR_FILLER.has(w))
+  const mc = nearContent(mw)
+  let best = null
+  for (const { gives, phrases } of TITLED) {
+    if (!singleOk && gives.kind !== 'fact' && !NEAR.first_step_old.includes(gives.kind)) continue
+    for (const [pw, cw] of phrases) {
+      if (!pw.length || (pw.length === 1 && !singleOk)) continue
+      if (runIn(mw, pw) || (cw.length >= 2 && runIn(mc, cw))) {
+        if (!best || cw.length > best[0] || (cw.length === best[0] && pw.length > best[1])) best = [cw.length, pw.length, gives]
+      }
+    }
+  }
+  return best ? givesOf(best[2]) : null
+}
+// near.near_rule: up to three lines near the message: two or more shared content words (title and phrases), or one
+// that is in the title; most shared first, ties in the data's order; never the line Helper said last
+export function nearLines(text, st) {
+  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))))
+  const sc = []
+  TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
+    const n = [...ms].filter(w => allWords.has(w)).length
+    if ((n >= 2 || [...ms].some(w => titleWords.has(w))) && lineKey(givesOf(gives)) !== st.lastKey) sc.push([n, i, gives, title])
+  })
+  return sc.sort((a, b) => b[0] - a[0] || a[1] - b[1]).slice(0, 3).map(([, , gives, title]) => ({ gives: givesOf(gives), title }))
+}
+// near.say_rule: in the question a title starts with a small letter unless its first word is on keep_caps
+// Builder: nor when the first word is written in capitals ("YOLO mode" is not on keep_caps and came out as "yOLO mode")
+const nearSay = title => (NEAR.keep_caps.includes(title.split(/\s+/)[0]) || /^[A-Z][A-Z0-9.]+(\s|$)/.test(title) ? title : title.slice(0, 1).toLowerCase() + title.slice(1))
+// The offer under a don't-know line (route2.py turn): the near lines by title, each a thing to pick that gives its
+// line; with nothing near, the four starting things, the same every time (near.nothing_near_rule, Lead 11 Nov)
+function nearOffer(out, st) {
+  const nr = out.near_lines || []
+  delete out.near_lines
+  if (nr.length) {
+    const says = nr.map(x => (x.gives.kind === 'want' ? NEAR.want_say.replace('{label}', () => nearSay(x.title)) : nearSay(x.title)))
+    const tp = nr.length === 1 ? NEAR.template_1 : nr.length === 2 ? NEAR.template : NEAR.template_3
+    out.offer = { set: 'near', text: tp.replace(/\{([abc])\}/g, (m, k) => says['abc'.indexOf(k)] || ''), picks: nr.map(x => x.gives), labels: nr.map(x => x.title) }
+    st.lastOffer = 'near'
+  } else {
+    const sid = NEAR.nothing_near_set
+    out.offer = { set: sid, text: OF.sets[sid].text, picks: [...OF.sets[sid].picks] }
+    st.lastOffer = sid
+  }
+  return out
+}
+// A line picked under the near offer: that line, by what the pick gives, never by key words
+function pressNearSteps(gives, st) {
+  st.pending = null
+  st.lastq = false
+  return { ...gives }
 }
 
 /* ---------- the visit ---------- */
@@ -853,6 +949,7 @@ function offerRoute(tw) {
 }
 // ask-fix-t1 (small_talk.how_that, route2.py last_next and how_that): "ok and how do I do that", by Helper's last line
 const HT = ST.how_that
+const BARE_AFTER = ['row', 'plain', 'then', 'rowthen', 'nextline', 'term', 'fact', 'want']
 const HT_CUT = new RegExp('^(?:(?:' + HT.cut_first.map(escapeRe).join('|') + ')\\b[ ,]*)+(?=\\S)')
 // the then line and the button (next) of Helper's last line: [then or null, next or null]
 function lastNext(st) {
@@ -863,6 +960,7 @@ function lastNext(st) {
   }
   if (p.kind === 'plain') return [TOPICS[p.topic].plain.then || null, TOPICS[p.topic].plain.next || null]
   if (p.kind === 'term') return [null, TERMS[p.term].next || null]
+  if (p.kind === 'fact') return [null, FACTS[p.need].next || null] // breadth-t1
   // Builder: a row of the wants (route2.py has none) with text to paste counts as a line whose button is a paste box
   if (p.kind === 'want' && WANT_ROWS[p.row] && WANT_ROWS[p.row].next && WANT_ROWS[p.row].next.kind === 'paste') return [null, { kind: 'paste', label: WANT_ROWS[p.row].next.label, paste_text: WANT_ROWS[p.row].next.paste_text }]
   if (FIXED[p.kind]) return [null, FIXED[p.kind].next || null]
@@ -871,7 +969,14 @@ function lastNext(st) {
 function howThat(text, st) {
   let t = talkNorm(text).replace(/[ ?!.,]+$/, '')
   t = t.replace(HT_CUT, '').trim() || t
-  if (!HT.phrases.includes(t)) return null
+  // breadth-t1 (near.bare_follow_rule): how / why / and then alone after an answer line, only where CUT would show
+  const bare = NEAR.bare_follow.includes(t) && st.stage === 'open' && (BARE_AFTER.includes(st.last) || !!(FIXED[st.last] && FIXED[st.last].title)) && ['cut', null].includes(smallTalk(text, st))
+  // find-v1 part 5 (Lead, 11 Nov; ask-run 2 "For builder" 3; not in route2.py, st.fullWins false only for replaying
+  // it): one of those words alone while things to pick show (a question's answers, an offer, the picks under a
+  // don't-know) goes to that line too: the things to pick stay, never "that looks cut off" with other picks in their place
+  const picksShow = st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)
+  if (st.fullWins !== false && picksShow && NEAR.bare_follow.includes(t) && st.stage === 'open' && ['cut', null].includes(smallTalk(text, st))) return { kind: 'PICK_FIRST', same_picks: true }
+  if (!HT.phrases.includes(t) && !bare) return null
   // (1) the things to pick stay
   if (st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)) return { kind: 'PICK_FIRST', same_picks: true }
   const [then, nx] = lastNext(st)
@@ -883,6 +988,7 @@ function howThat(text, st) {
   if (nx && nx.kind === 'line') return { kind: 'nextline', of: p.kind, topic: p.topic, need: p.need, term: p.term, text: nx.text, id: nx.id }
   if (nx && nx.kind === 'paste') return { kind: 'HOW_PASTE', label: nx.label, button: nx, topic: p.topic }
   if (nx && nx.kind === 'part') return { kind: 'HOW_PART', label: nx.label, button: nx, topic: p.topic }
+  if (bare) return { kind: 'NO_MORE' }
   return null
 }
 // live changes-9 (not in route2.py): a next line's second wording (use1-next-mean), by the next line's id
@@ -1065,12 +1171,21 @@ export function turnParts(text, st) {
   const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
   const pre = { ...steps }
+  // find-v1 (review): the message answered one of the opening's two questions (the name, what you do)
+  if (wasOpening) pre.at_opening = true
   if (steps.kind === 'PICK_FIRST') return { pre, out: steps } // ask-fix-t1: nothing changes, the same things to pick stay
   const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
   noteLast(st, out)
-  return { pre, out: attachOffer(out, st, prevTopic) }
+  attachOffer(out, st, prevTopic)
+  delete pre.near_lines
+  // breadth-t1 (near.near_rule, nothing_near_rule): under a don't-know line, the near lines or the four starting things
+  if (out.kind === 'N1' || out.kind === 'N1_AGAIN') nearOffer(out, st)
+  else delete out.near_lines
+  return { pre, out }
 }
+// find-v1 part 5: the results that are no line of their own (see turnSteps, a full typed message while a question is open)
+const FULL_NOT_FOR = ['N1', 'N1a', 'N1_AGAIN', 'N2', 'skill by name', 'CUT', 'MEAN_NONE', 'AGAIN']
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
   const out = {}
@@ -1081,6 +1196,19 @@ function turnSteps(text, st) {
     if (kind !== 'question' && kind !== 'K1') st.pending = null
     return out
   }
+  // breadth-t1 (near.last_step): where Helper would say it does not know, a full hit by any phrase (one word too) gives
+  // that line; else the don't-know line, with the lines near the message for its offer
+  const lastStep = kind => {
+    // Builder: "is there a skill for knitting" keeps its don't-know (wants fixes v1, skill_for_unknown)
+    const fh = out.code && out.code.skill_unknown ? null : fullHit(text, true)
+    if (fh) {
+      const { kind: k, ...more } = fh
+      out.by = 'title'
+      return done(k, more)
+    }
+    out.near_lines = nearLines(text, st)
+    return done(kind)
+  }
   // 1. a key
   if (looksLikeKey(text)) {
     out.kind = 'K1'
@@ -1090,6 +1218,26 @@ function turnSteps(text, st) {
   if (st.stage === 'open') {
     const hw = howThat(text, st)
     if (hw) return Object.assign(out, hw)
+  }
+  // find-v1 part 5 (Lead, 11 Nov; ask-run 2 "For builder" 2; not in route2.py): a full typed question wins over the
+  // things to pick on screen. While a topic's question is open, a message of three or more words that is no answer to
+  // it (none of that topic's rows is found in it) drops the open
+  // question and is read as if nothing were on screen: always when it is in question form; a statement ("something is
+  // broken") only when, read so, it gets a line of its own and not a don't-know (an answer in the person's own words
+  // that no row catches keeps the open question's own line, as before). One or two words, and any answer, as before.
+  if (st.pending && st.fullWins !== false && talkNorm(text).split(' ').length >= 3) {
+    const tt = cutIgnored(talkNorm(text))
+    const answers = needsFor(tt, st.pending, true).length > 0
+    let fresh = !answers && questionForm(tt)
+    if (!answers && !fresh) {
+      // read on a copy of the visit with nothing open: what the message would get
+      const probe = { ...JSON.parse(JSON.stringify(st)), pending: null, lastq: false }
+      fresh = !FULL_NOT_FOR.includes(turnSteps(text, probe).kind)
+    }
+    if (fresh) {
+      st.pending = null
+      st.lastq = false
+    }
   }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
@@ -1136,6 +1284,19 @@ function turnSteps(text, st) {
   if (remember(text, st, out)) return out
   const about = typedAboutKept(text)
   if (about) return Object.assign(out, aboutKept(about, st))
+  // breadth-t1 (near.first_step): a full hit by a phrase of two or more words (the new fact lines and first_step_old);
+  // while a question is open, only a message of three or more words
+  // Builder: not when the message names one official skill next to the word skill (the plugin's own step below, which
+  // route2.py has not: "the claude-code skill" is that skill, not the line about moving from Claude Code)
+  if (st.stage === 'open' && !buildHit(text) && !(st.wants !== false && skillOf(cutIgnored(talkNorm(text))).length === 1)) {
+    const fh = fullHit(text, false)
+    if (fh && !(st.pending && talkNorm(text).split(' ').length < 3)) {
+      st.pending = null
+      const { kind, ...more } = fh
+      out.by = 'title'
+      return done(kind, more)
+    }
+  }
   // 1 c. the person asks what they can ask
   if (asksTopics(text)) {
     st.stage = 'open'
@@ -1288,7 +1449,7 @@ function turnSteps(text, st) {
       st.pending = topic
       return r
     }
-    return done('N1')
+    return lastStep('N1')
   }
   // keeps.use: something is kept for this topic, so its question is not asked
   if (topic && keptNeed(topic, st)) {
@@ -1307,7 +1468,7 @@ function turnSteps(text, st) {
     const g = nearOf(t)
     if (g.length === 1) return done('N2', { group: g[0] })
   }
-  return done(dontKnow(text) || 'skill by name')
+  return st.stage === 'open' ? lastStep(dontKnow(text) || 'skill by name') : done(dontKnow(text) || 'skill by name')
 }
 
 /* ---------- what the person picks or presses ---------- */
@@ -1423,6 +1584,13 @@ function sayLineSteps(line, st) {
   return { kind: 'extra', line }
 }
 
+// breadth-t1: a line picked under the near offer (route2.py: "a pick gives that line")
+export function pressNear(gives, st) {
+  const prevTopic = st.lastTopic
+  const o = pressNearSteps(gives, st)
+  noteLast(st, o)
+  return attachOffer(o, st, prevTopic)
+}
 // offer-t1 (route2.py press_offer): a thing picked under an offer, by its id only, never by key words.
 // ask-fix-t1 point 8 (not in route2.py): a pick of the pay offer (ChatGPT, Claude, Neither, I want it free) is kept
 // as a picked answer to the model question is.
@@ -1637,7 +1805,9 @@ export function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
   // offer-t1: the offer a line carries, shown by the page as a second bubble with its things to pick
-  const offer = result.offer ? { set: result.offer.set, text: result.offer.text, answers: { kind: 'offer', hint: OF.hint, items: result.offer.picks.map(id => ({ id: 'offer-' + id, label: OF.things[id].label, offer: id })) } } : null
+  // breadth-t1: the near offer's things to pick are lines, said by their titles
+  const offerItems = o => (o.set === 'near' ? o.picks.map((g, i) => ({ id: 'near-' + i, label: o.labels[i], near: g })) : o.picks.map(id => ({ id: 'offer-' + id, label: OF.things[id].label, offer: id })))
+  const offer = result.offer ? { set: result.offer.set, text: result.offer.text, answers: { kind: 'offer', hint: OF.hint, items: offerItems(result.offer) } } : null
   const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(offer ? { offer } : {}), ...(asTyped.length ? { asTyped } : {}), ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
   // offer-t1: the faint hint N_HINT is no longer shown; the offer dont_know takes its place
@@ -1743,6 +1913,11 @@ export function lineFor(result, st, typed = '', opts = {}) {
     // talk-live: the Connectors line picked by the person's AI (ai_picks_line), as a row shows it
     case 'CN1':
       return said('CN1', WANTS_DATA.fixed.CN1.text, { source: sourceText(WANTS_DATA.fixed.CN1.sources) })
+    // breadth-t1: a fact line from the docs, with its button if it has one
+    case 'fact': {
+      const f = FACTS[result.need]
+      return said(f.id, f.text, { source: sourceText(f.sources), next: nextFor(f.next, null, st) })
+    }
     case 'want': {
       const r = WANT_ROWS[result.row]
       return said(r.id, r.text, { source: sourceText(r.sources), next: wantNext(r.next, r.thing) })

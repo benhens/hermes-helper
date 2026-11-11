@@ -48,7 +48,7 @@ test('changes-5 no_reply: the lists are the data\'s (checks_c5.no_reply), read a
 })
 
 test('changes-5 no_reply runs on every call before anything else: a first call, a pick call or a writer that sends it ends the turn as thinking', async () => {
-  for (const [mode, answers] of [['ai_writes', ['Thought process: the person']], ['ai_writes', ['sch', 'x **Request:** y']], ['ai_picks_line', ['sch', '<think>sch1</think>sch1']], ['ai_writes', ['sch', '**Analysis** USED: sch1']]]) {
+  for (const [mode, answers] of [['ai_writes', ['Thought process: the person']], ['ai_writes', ['sch1', 'x **Request:** y']], ['ai_picks_line', ['sch1', '<think>sch1</think>sch1']], ['ai_writes', ['sch1', '**Analysis** USED: sch1']]]) {
     let n = 0
     const request = async () => ({ text: answers[n++] })
     const st = freshVisit('open', {}, true)

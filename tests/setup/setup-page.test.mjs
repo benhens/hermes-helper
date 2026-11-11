@@ -23,6 +23,7 @@ function useHost(hermes = {}) {
       if (h.fail.includes(method)) throw new Error('read failed: ' + method)
       if (method === 'llm.oneshot') {
         host.asks.push(params)
+        if (h.oneshot) return { text: await h.oneshot(params, host.asks.length) }
         return { text: 'NONE' }
       }
       if (method === 'setup.runtime_check') return h.model ? { ok: true, provider: 'custom', model: 'mock-small' } : { ok: false, error: 'No usable credentials found' }
@@ -249,9 +250,13 @@ test('the pick "Set up Hermes" under an offer, and "where do I start" typed, bri
   await press(view, 'I know it well')
   await press(view, 'Not sure yet')
   await press(view, 'Not now')
+  // find-v1 (Lead, 11 Nov): under a don't-know with nothing near, always the four starting things; "Set up Hermes" is
+  // under the general offer (after thanks)
   await send(view, 'can it fly a plane')
-  assert.equal(bubbleLine(view), 'offer-dont_know')
-  assert.deepEqual(labels(view), ['What Hermes is', 'Set up Hermes'])
+  assert.equal(bubbleLine(view), 'offer-start_four')
+  assert.deepEqual(labels(view), ['What Hermes can do', 'Which AI to use', 'Phone and chat apps', 'What Hermes remembers'])
+  await send(view, 'thanks')
+  assert.deepEqual(labels(view), ['Set up Hermes', 'What Hermes can do'])
   await press(view, 'Set up Hermes')
   assert.equal(mine(view).at(-1), 'Set up Hermes')
   assert.equal(bubbleLine(view), 'REC')
@@ -310,4 +315,71 @@ test('the person types again before the reads are back: the first message is ans
   const seen = olds(view).find(n => n.props['data-line'] === 'SEEN')
   assert.match(oldText(seen).replace(/’/g, "'"), /I couldn't check your model this time\. I couldn't read that part this time\./)
   assert.deepEqual(mine(view).slice(-2).map(x => x.replace(/’/g, "'")), ['Do things at set times', "what's a skill?"])
+})
+
+// find-v1 (review): the recommendation's call that is slow (12 s) and then fails is ONE failed try, not two
+test('a recommendation call that gives no answer in 12 s and then fails counts once: the next question still asks the AI', opt, async () => {
+  let fail = null
+  const { view, host, timers } = await open({ hermes: { oneshot: (p, n) => (n === 1 ? new Promise((_, no) => (fail = no)) : 'NONE') } })
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, labels(view)[0])
+  await send(view, 'send reminders to my members about training')
+  assert.equal(host.asks.length, 1, 'the recommendation call')
+  timers.fire(12000)
+  await settle()
+  fail(new Error('gone'))
+  await settle()
+  finish(view)
+  await press(view, 'Not now')
+  await send(view, 'what is the weather in Riga')
+  assert.equal(host.asks.length, 2, 'one failed try does not end the AI for the visit')
+})
+
+// find-v1 (app run with a stand-in that never answers): the recommendation's call is still in Hermes after its 12 s
+// and a typed question meets it: that is the second slow try, as when a typed message's own call is the stuck one.
+// The answer comes at once, with no dots; the slow-AI line after it, once; no call after that
+test('a recommendation call that never answers, then a question that cannot be asked because of it: two slow tries, the slow-AI line once after the answer', opt, async () => {
+  const { view, host, timers } = await open({ hermes: { oneshot: () => new Promise(() => {}) } })
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, labels(view)[0])
+  await send(view, 'send reminders to my members about training')
+  assert.equal(host.asks.length, 1, 'the recommendation call')
+  timers.fire(12000)
+  await settle()
+  finish(view)
+  await press(view, 'Not now')
+  const lines = () => [...olds(view).map(n => n.props['data-line']), bubbleLine(view)]
+  await send(view, "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens")
+  assert.equal(lines().filter(l => l === 'SLOW_A').length, 0, 'code answered that one: nothing owed yet')
+  await send(view, 'what do you mean?')
+  assert.equal(host.asks.length, 1, 'no second call: Hermes still works on the first')
+  assert.deepEqual(lines().slice(-2), ['use0', 'SLOW_A'])
+  await send(view, 'what is the weather in Riga')
+  await send(view, 'what do you mean?')
+  assert.equal(host.asks.length, 1)
+  assert.equal(lines().filter(l => l === 'SLOW_A').length, 1, 'said once')
+})
+
+// the same when the person moved on before the 12 s were over (as in the app run): the watch on the call runs on
+test('the person moved on before the recommendation call\'s 12 s, and the call never answers: a question after the 12 s is the second slow try', opt, async () => {
+  const { view, host, timers } = await open({ hermes: { oneshot: () => new Promise(() => {}) } })
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, labels(view)[0])
+  await send(view, 'send reminders to my members about training')
+  assert.equal(host.asks.length, 1, 'the recommendation call')
+  // the dots show and there is nothing to pick: the person types on
+  await send(view, "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens")
+  timers.fire(12000)
+  await settle()
+  finish(view)
+  const lines = () => [...olds(view).map(n => n.props['data-line']), bubbleLine(view)]
+  await send(view, 'what do you mean?')
+  assert.equal(host.asks.length, 1)
+  assert.deepEqual(lines().slice(-2), ['use0', 'SLOW_A'])
 })

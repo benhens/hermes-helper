@@ -43,6 +43,8 @@ function show(o) {
     BACK: () => `BACK name=${py(o.name)}`, // changes-14
     HELLO: () => `HELLO name=${py(o.name)}`,
     term: () => 'term line ' + o.term,
+    fact: () => 'fact ' + o.need, // find-v1 (breadth-t1): a fact line
+    want: () => 'want ' + o.row, // a row of the wants reached by its phrase (route2.py shows it as want)
     W1: () => 'W1 buttons ' + o.buttons.join('+'),
     // changes-11
     W2: () => 'W2 buttons ' + o.buttons.join('+'),
@@ -75,7 +77,8 @@ const usesWants = c => c.steps.some(s => s.do === 'topic' && s.topic === 'wants'
 // "What do you do?" (tests/talk-live-2.test.mjs has that rule's own cases)
 // setup-chat: and live changes-9's two no-AI rules (msg1-then after the Telegram line, the second wording of the /usage
 // line), which hhcontent left out of route2.py (tests/offers.test.mjs has their cases)
-const asRoute2 = st => Object.assign(st, { wants: false, keepWork: false, c9: false })
+// find-v1 part 5: and the Builder's two rules for typed messages while things to pick show (fullWins)
+const asRoute2 = st => Object.assign(st, { wants: false, keepWork: false, c9: false, fullWins: false })
 
 function replay(conv) {
   let st = asRoute2(freshVisit(conv.stage, conv.kept ? { ...conv.kept } : {}))
@@ -303,14 +306,14 @@ test('the topics show only when the person asks what they can ask (TP): four of 
 })
 
 // offer-t1 (changes-8): the grey line N_HINT is no longer shown; the offer dont_know takes its place
-test('the don\'t-know lines show no topics and no grey hint; each carries the offer dont_know', () => {
+test('the don\'t-know lines show no topics and no grey hint; N1 carries the four starting things (find-v1), N1a the offer dont_know', () => {
   for (const [msg, line] of [['can you book me a flight?', 'N1'], ['is there a skill called "zorbo"', 'N1a'], ['what is the weather like?', 'N1']]) {
     const st = freshVisit()
     const said = lineFor(turn(msg, st), st)
     assert.equal(said.line, line, msg)
     assert.equal(said.answers, null)
     assert.equal(said.hint, null)
-    assert.equal(said.offer.set, 'dont_know')
+    assert.equal(said.offer.set, line === 'N1' ? 'start_four' : 'dont_know')
   }
   // changes-19: N1b is gone; the five once left out get their skill line (S2), both ways of naming them
   assert.equal(TALK_DATA.fixed.N1b, undefined)
@@ -583,7 +586,8 @@ test('"forget everything" (A4): the delete-all question; Yes removes the whole r
   for (const m of nw.examples_taken) assert.ok(['A2', 'A4'].includes(typedAboutKept(m) && typedAboutKept(m).kind), m)
   for (const m of nw.examples_go_on) assert.equal(typedAboutKept(m), null, m)
   // and those go on to the memory topic as before
-  for (const m of nw.examples_go_on) assert.equal(turn(m, freshVisit()).topic, 'mem', m)
+  // find-v1 (live changes-11): two of them now reach a fact line by its phrase ("close the window", "make it forget"), as in route2.py
+  for (const m of nw.examples_go_on) assert.deepEqual((o => o.topic || [o.kind, o.need])(turn(m, freshVisit())), { 'will it forget everything when I close the window': ['fact', 'd_keep_open'], 'can I make it forget everything?': ['fact', 'd_forget'] }[m] || 'mem', m)
 })
 
 test('typing in place of Yes or No counts as No: the typed message is handled as usual (Helper asked last, so no second question in a row) and nothing is deleted', () => {

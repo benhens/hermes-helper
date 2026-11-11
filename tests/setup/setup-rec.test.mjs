@@ -183,11 +183,14 @@ test('the AI never answers: the dots, then at 12 s the written sentence; the AI 
   assert.equal(all(helper(view), n => n.props['data-line'] === 'SLOW_A').length, 0)
 })
 
-test('the call fails at once (no AI set up for Helper\'s calls): the written sentence, no further call', opt, async () => {
+// find-v1 part 3: one failed try no longer ends the AI for the visit; two in a row do
+test('the call fails at once (no AI set up for Helper\'s calls): the written sentence each time; after two failed tries in a row no further call', opt, async () => {
   const { view, host } = await toRec(() => new Error('No LLM provider configured for task=helping_hand'))
   assert.equal(said(view), WRITTEN_1)
   await press(view, 'Something else')
-  assert.equal(host.asks.length, 1)
+  assert.equal(host.asks.length, 2, 'tried once more')
+  await press(view, 'Something else')
+  assert.equal(host.asks.length, 2, 'two in a row: off for the visit')
 })
 
 test('the person presses on while the AI is still writing: the written sentence shows at once and their press is taken', opt, async () => {

@@ -3,8 +3,8 @@
 //   1. the no-AI turn runs first, exactly as before (src/talk.js turnParts); its line is the fallback, and what
 //      it keeps is kept at once;
 //   2. code's own answers are shown with no call (liveWhyNot);
-//   3. a follow-up gets the rows of the person's previous message; 4. else word matching; 5. else the first
-//      call picks a subject;
+//   3. a follow-up gets the rows of the person's previous message; 4 and 5 (find-v1, in place of word matching
+//      and the first call that picked a subject): else the list call names up to three of all fact lines by title;
 //   6. the writer call (ai_writes) or the pick call (ai_picks_line), then the checks;
 //   7. the chosen line is noted as Helper's last line (liveApply).
 // Any failure (a thrown request, no text, NONE, a failed check) gives null: the page shows the fallback and
@@ -14,9 +14,9 @@ import { LIVE_DATA } from './live-data.js'
 import { TALK_DATA } from './talk-data.js'
 import { looksSecret } from './secret-rule.js'
 import { talkNorm, cutIgnored, startsWith, whichOf, lineKey, noteLast, attachOffer } from './talk.js'
-import { LIVE_ROW, byWords, rankIn, withNext, isFollowUp, followRows, resultOfRow } from './live-rows.js'
-import { readSubject, readPick, judgeWritten, noReply } from './live-checks.js'
-import { firstCallText, writerText, pickText, inputText, liveParams, workLine } from './live-request.js'
+import { LIVE_ROW, withNext, isFollowUp, followRows, resultOfRow } from './live-rows.js'
+import { readList, readPick, judgeWritten, noReply } from './live-checks.js'
+import { listCallText, LIST_MAX_TOKENS, writerText, pickText, inputText, liveParams, workLine } from './live-request.js'
 import { ONESHOT_TIMEOUT_MS } from './model-call.js'
 
 export const LIVE_SECONDS = LIVE_DATA.seconds
@@ -51,7 +51,14 @@ export function goesToAi(pre) {
   if (pre.by_again) return false
   // ask-fix-t1 (about_rule.weak_hit_then.with_ai): a weak hit goes on to the AI as when no row was found
   if (pre.weak_hit && (pre.kind === 'question' || pre.kind === 'N1')) return true
-  if (pre.kind === 'plain') return pre.why === 'what do you mean'
+  // find-v1 (Lead, 11 Nov; hhtech's W1x): a line reached by a full hit of one of its phrases is code's own
+  if (pre.by === 'title') return false
+  // find-v1: a line given from a subject word alone goes to the list call too, with code's line as the fallback: the
+  // subject's plain line (not the one "what is ..." asks for by name), the subject's own question, the nearest things
+  // (Builder, review: not at the opening's two questions, where the message is the person's name or what they do)
+  if (pre.at_opening && ['plain', 'question', 'N2'].includes(pre.kind)) return false
+  if (pre.kind === 'plain') return pre.why !== 'what is'
+  if (pre.kind === 'question' || pre.kind === 'N2') return true
   return LV_GO.includes(pre.kind)
 }
 
@@ -90,7 +97,8 @@ function isHowQuestion(text) {
 // the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
 // USED: line) is an ordinary fallback.
 //   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
-export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [] }) {
+//   typed: the person's own typed messages of this visit, this one included (find-v1, check c12: a name they typed)
+export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [], typed = [text] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -108,29 +116,27 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names })
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed })
   return thinking ? { fallback: 'thinking text', thinking: true } : got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed }) {
   let ids = null
   // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
   let follow = false
   if (isFollowUp(text, pre, before)) ids = followRows(before)
   if (ids && ids.length) follow = true
+  // find-v1 (Lead, 11 Nov; hhtech's askList): no follow-up, so ONE list call names up to three of all fact lines; the
+  // writer gets those, each with its next line, at most five. It replaces word matching and the first call that picked
+  // a subject word. NONE, no known id, a failed or slow call: code's line. BUILD: the text to paste for a request, and
+  // code's line (the don't-know with its offer) for a how or what question.
   if (!ids || !ids.length) {
-    ids = null
-    const w = byWords(message)
-    if (w.length) ids = withNext(w)
-  }
-  if (!ids) {
-    const raw = await call('first', firstCallText(), LIVE_DATA.first_call.max_tokens)
-    if (raw === null) return { fallback: 'first call failed' }
-    const subject = readSubject(raw)
-    if (subject === 'none') return { fallback: 'first call: none' }
-    if (subject === 'build') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
-    ids = subject === 'talk' ? followRows(before) : withNext(rankIn(message, subject))
-    if (subject === 'talk' && ids.length) follow = true
+    const raw = await call('list', listCallText(), LIST_MAX_TOKENS)
+    if (raw === null) return { fallback: 'list call failed' }
+    const p = readList(raw)
+    if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
+    if (!p.ids) return { fallback: 'list: none' }
+    ids = withNext(p.ids)
   }
   const handed = follow ? null : work
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
@@ -146,7 +152,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
   }
   const raw = await call('writer', writerText(ids, handed, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names) })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names), typed })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }

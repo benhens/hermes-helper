@@ -73,15 +73,17 @@ test('the lines that used to say "Ask me anything" carry the offer general: F2, 
   assert.deepEqual([th.line, th.text, th.offer.set], ['THANKS', "You're welcome.", 'general'])
 })
 
-test('the don\'t-know line carries the offer dont_know, and the same offer is never shown twice in a row', () => {
+// find-v1 (live changes-12, near.nothing_near_rule; Lead 11 Nov): in place of the offer dont_know and its instead set
+test('the don\'t-know line with nothing near carries the four starting things under Lead\'s words, the same every time', () => {
   const st = visit()
   const a = say(st, 'can it fly a plane')
-  assert.deepEqual([a.line, a.offer.set], ['N1', 'dont_know'])
-  assert.deepEqual(labels(a), ['What Hermes is', 'What Hermes can do'])
+  assert.deepEqual([a.line, a.offer.set, a.offer.text], ['N1', 'start_four', 'Do you want one of these instead?'])
+  assert.deepEqual(labels(a), ['What Hermes can do', 'Which AI to use', 'Phone and chat apps', 'What Hermes remembers'])
   const b = say(st, 'tell me about goats')
   assert.equal(b.line, 'N1_AGAIN')
-  assert.notEqual(b.offer.set, 'dont_know', 'its instead set')
-  assert.equal(b.offer.set, TALK_JSON.offers.sets.dont_know.instead)
+  assert.deepEqual([b.offer.set, b.offer.text, labels(b)], ['start_four', a.offer.text, labels(a)])
+  const c = say(st, 'what is the weather in Riga')
+  assert.deepEqual([c.offer.set, labels(c)], ['start_four', labels(a)])
 })
 
 test('his example "How can I migrate?": the line MIG with the offer move; each pick gives its own line, by its id', () => {
@@ -204,7 +206,7 @@ test('point 13: no line Helper can say holds "ask me", "type your question" or "
   // the lines of the built data too: every string the plugin can show as Helper's words (text to paste into Hermes and
   // the AI's own instructions are not Helper's lines)
   const found = []
-  const NOT_LINES = /(^|\.)(paste_text|writer|pick_only|first_call|checks|no_reply|offer_words|kinds|source|key_words|weak_key_words)(\.|$)/
+  const NOT_LINES = /(^|\.)(paste_text|writer|pick_only|first_call|checks|no_reply|offer_words|kinds|source|key_words|weak_key_words|phrases)(\.|$)/
   const walk = (o, p) => {
     if (typeof o === 'string') {
       if (OPEN_ENDED.test(o) && !NOT_LINES.test(p) && !/hint/.test(p)) found.push(p)

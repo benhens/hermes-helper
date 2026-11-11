@@ -79,7 +79,7 @@ const THINKING = 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **T
 
 test('the work line: kept at What do you do?, sent in the writer\'s instructions only, never the name; after Hermes starts again too', async () => {
   const storage = fakeStorage()
-  const { view, host } = await pastOpening('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
+  const { view, host } = await pastOpening('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod1' : 'NONE') } })
   assert.equal(storage.data.get('kept').work, 'I run a tennis club')
   send(view, 'can it fly a kite')
   await settle()
@@ -89,7 +89,7 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
   assert.doesNotMatch(host.asks[1].input, /tennis/)
   for (const a of host.asks) assert.doesNotMatch(JSON.stringify(a), /peter/i)
   // Hermes starts again with the same storage: the list and the next request still have it
-  const again = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
+  const again = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod1' : 'NONE') } })
   finish(again.view)
   send(again.view, 'what do you know about me')
   assert.deepEqual(all(byData(bubble(again.view), 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter', 'What you do: I run a tennis club'])
@@ -99,7 +99,9 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
   for (const a of again.host.asks) assert.doesNotMatch(JSON.stringify(a), /peter/i)
 })
 
-test('thinking text from the first call: the no-AI line after the dots, and no more calls in this visit', async () => {
+// find-v1 part 3 (Lead, 11 Nov): one slow or failed try no longer ends the AI for the visit; two in a row do, and SLOW_A
+// follows the second one's answer (tests/find-ai-rule.test.mjs). The tests below are brought to that rule.
+test('thinking text: the no-AI line after the dots; after two such messages in a row no more calls in this visit', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => THINKING } })
   send(view, 'can it fly a kite')
   assert.ok(dots(view))
@@ -110,44 +112,58 @@ test('thinking text from the first call: the no-AI line after the dots, and no m
   assert.equal(said(view), N1)
   finish(view)
   send(view, 'can it fly a plane')
+  assert.ok(dots(view), 'one failed try: the next message is asked')
+  await settle()
+  assert.equal(host.asks.length, 2)
+  assert.equal(line(view), 'N1_AGAIN')
+  finish(view)
+  send(view, 'do goats like it')
   assert.equal(dots(view), null, 'no dots: no call')
   await settle()
-  assert.equal(host.asks.length, 1, 'no second call in this visit')
-  assert.equal(line(view), 'N1_AGAIN')
+  assert.equal(host.asks.length, 2, 'two in a row: no further call in this visit')
 })
 
-test('no answer in 12 s: the no-AI line at 12 s, and no more calls in this visit, also once the call has ended', async () => {
-  const d = deferred()
-  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+test('no answer in 12 s: the no-AI line at 12 s; after two such messages in a row no more calls in this visit, also once the calls have ended', async () => {
+  const ds = [deferred(), deferred()]
+  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => ds[n - 1].promise } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 1)
   timers.fire(12000)
   assert.equal(line(view), 'N1')
-  d.resolve('mod')
+  ds[0].resolve('mod')
   await settle()
   finish(view)
   send(view, 'can it fly a plane')
   await settle()
-  assert.equal(host.asks.length, 1, 'off for the visit, though Hermes has no call of Helper\'s any more')
+  assert.equal(host.asks.length, 2, 'one slow try: asked again')
+  timers.fire(12000)
+  ds[1].resolve('mod')
+  await settle()
+  finish(view)
+  send(view, 'do goats like it')
+  await settle()
+  assert.equal(host.asks.length, 2, 'off for the visit, though Hermes has no call of Helper\'s any more')
   assert.equal(dots(view), null)
 })
 
-test('review: a call with no answer 12 s after it started turns the AI step off, also when the person moved on before', async () => {
-  const d = deferred()
-  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'can it fly a kite')
+test('review: a call with no answer 12 s after it started is a failed try, also when the person moved on before; two such in a row turn the AI step off', async () => {
+  const ds = [deferred(), deferred()]
+  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => ds[n - 1].promise } })
+  for (const [n, typed] of [[1, 'can it fly a kite'], [2, 'can it fly a plane']]) {
+    send(view, typed)
+    await settle()
+    assert.equal(host.asks.length, n)
+    // a new message before the 12 s: the waiting one gets its line, the call still runs in Hermes
+    send(view, 'thanks')
+    timers.fire(12000)
+    ds[n - 1].resolve('mod')
+    await settle()
+    finish(view)
+  }
+  send(view, 'do goats like it')
   await settle()
-  assert.equal(host.asks.length, 1)
-  // a new message before the 12 s: the waiting one gets its line, the call still runs in Hermes
-  send(view, 'thanks')
-  timers.fire(12000)
-  d.resolve('mod')
-  await settle()
-  finish(view)
-  send(view, 'can it fly a plane')
-  await settle()
-  assert.equal(host.asks.length, 1, 'off for the visit')
+  assert.equal(host.asks.length, 2, 'off for the visit')
 })
 
 test('the AI step off for a visit comes back when Hermes starts again (a new visit)', async () => {
@@ -156,7 +172,7 @@ test('the AI step off for a visit comes back when Hermes starts again (a new vis
   send(a.view, 'can it fly a kite')
   await settle()
   assert.equal(a.host.asks.length, 1)
-  const b = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
+  const b = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod1' : 'NONE') } })
   finish(b.view)
   send(b.view, 'can it fly a kite')
   await settle()
@@ -164,7 +180,7 @@ test('the AI step off for a visit comes back when Hermes starts again (a new vis
 })
 
 test('a reply that sits on the USED: line falls back to the no-AI line and is no such failure: the next message still asks the AI', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'msg' : 'USED: msg0, msg1. You can chat with Hermes from apps like Telegram.') } })
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'msg0, msg1' : 'USED: msg0, msg1. You can chat with Hermes from apps like Telegram.') } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 2)
@@ -193,7 +209,7 @@ test('the first-time line and the line under Kept: of what the person does, by m
 
 test('\"again\" after a written reply: the same words, with no call', async () => {
   const good = `${LIVE_ROW.mod1.text}\nUSED: mod1`
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod' : good) } })
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod1' : good) } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(line(view), 'written')

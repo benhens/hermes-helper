@@ -314,7 +314,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please search the web for <what you want to know>, and list the pages you used. If web search is not ready, tell me what it needs."
    },
-   "words": 19
+   "words": 19,
+   "title": "Searching the web and reading pages",
+   "phrases": [
+    "search the web",
+    "look it up online",
+    "google it",
+    "web search"
+   ],
+   "title_was_t2": "Search the web"
   },
   {
    "id": "w_browser",
@@ -379,7 +387,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please open <website> with your browser tool and <what to do there>. Ask me before you send, buy or sign in to anything."
    },
-   "words": 21
+   "words": 21,
+   "title": "Using websites for you: clicking and forms",
+   "phrases": [
+    "click around websites",
+    "fill in a form",
+    "use a website",
+    "browser"
+   ],
+   "title_was_t2": "Use a website for me"
   },
   {
    "id": "w_xpost",
@@ -425,7 +441,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"xurl\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 18
+   "words": 18,
+   "title": "Posting and searching on X (Twitter)",
+   "phrases": [
+    "post on x",
+    "twitter",
+    "tweet"
+   ],
+   "title_was_t2": "Post on X for me"
   },
   {
    "id": "w_reddit",
@@ -483,7 +506,14 @@
      "card_says": "Review the source before installing. Changes apply to new sessions."
     }
    },
-   "words": 21
+   "words": 21,
+   "title": "Reading and searching Reddit",
+   "phrases": [
+    "reddit",
+    "read reddit",
+    "search reddit"
+   ],
+   "title_was_t2": "Read Reddit"
   },
   {
    "id": "w_docs",
@@ -558,7 +588,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part."
    },
-   "words": 17
+   "words": 17,
+   "title": "Reading your Word, Excel and PDF files",
+   "phrases": [
+    "read a pdf",
+    "read my documents",
+    "word file",
+    "excel file"
+   ],
+   "title_was_t2": "Read my documents"
   },
   {
    "id": "w_pdf",
@@ -599,7 +637,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"pdf\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 21
+   "words": 21,
+   "title": "Making, merging or editing PDF files",
+   "phrases": [
+    "make a pdf",
+    "merge pdfs",
+    "edit a pdf",
+    "fill in a pdf"
+   ],
+   "title_was_t2": "Make or change a PDF"
   },
   {
    "id": "w_office",
@@ -646,7 +692,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"microsoft-office\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 22
+   "words": 22,
+   "title": "Making Word, PowerPoint or Excel files",
+   "phrases": [
+    "make a spreadsheet",
+    "powerpoint",
+    "word document",
+    "make slides"
+   ],
+   "title_was_t2": "Make Word or Excel files"
   },
   {
    "id": "w_notes",
@@ -690,7 +744,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"obsidian\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 20
+   "words": 20,
+   "title": "Working with your Obsidian notes",
+   "phrases": [
+    "obsidian",
+    "obsidian notes",
+    "obsidian vault"
+   ],
+   "title_was_t2": "Use my Obsidian notes"
   },
   {
    "id": "w_meeting",
@@ -735,7 +796,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"meeting-action-items\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 22
+   "words": 22,
+   "title": "Turning meeting notes into decisions and tasks",
+   "phrases": [
+    "meeting notes",
+    "action items",
+    "meeting minutes"
+   ],
+   "title_was_t2": "Sort out meeting notes"
   },
   {
    "id": "w_code",
@@ -788,7 +856,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please look at the code in <folder> and <what you want>. Ask me before you change or run anything."
    },
-   "words": 14
+   "words": 14,
+   "title": "Writing and running code",
+   "phrases": [
+    "write code",
+    "coding",
+    "run code"
+   ],
+   "title_was_t2": "Write and run code"
   },
   {
    "id": "w_computer",
@@ -841,7 +916,15 @@
     "label": "Show me what to ask",
     "paste_text": "I want you to click and type in an app on my computer: <which app, and what to do>. Tell me first what Computer Use needs. Ask me before you change anything."
    },
-   "words": 22
+   "words": 22,
+   "title": "Clicking and typing in your computer's apps",
+   "phrases": [
+    "computer use",
+    "control my computer",
+    "click and type",
+    "use my apps"
+   ],
+   "title_was_t2": "Click and type for me"
   },
   {
    "id": "w_image",
@@ -903,7 +986,16 @@
     "label": "Show me what to ask",
     "paste_text": "Please make a picture of <what>. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
    },
-   "words": 22
+   "words": 22,
+   "title": "Making pictures (images) from your words",
+   "phrases": [
+    "make pictures",
+    "make images",
+    "image generation",
+    "draw a picture",
+    "generate an image"
+   ],
+   "title_was_t2": "Make pictures"
   },
   {
    "id": "w_see",
@@ -968,7 +1060,15 @@
    },
    "words": 23,
    "was_16": "Hermes can look at a picture you give it. This is built in. The AI you use must be able to read pictures.",
-   "note_16": "changes-16: was \"The AI you use must be able to read pictures.\", which vision.md lines 197 to 206 contradict (hhtech-wants-run.md section 3 no. 4). Not claimed: that the second AI costs nothing or needs no key; the docs page does not say."
+   "note_16": "changes-16: was \"The AI you use must be able to read pictures.\", which vision.md lines 197 to 206 contradict (hhtech-wants-run.md section 3 no. 4). Not claimed: that the second AI costs nothing or needs no key; the docs page does not say.",
+   "title": "Looking at a photo or picture you send",
+   "phrases": [
+    "send it a photo",
+    "send a picture",
+    "look at my pictures",
+    "read a screenshot"
+   ],
+   "title_was_t2": "Look at my pictures"
   },
   {
    "id": "w_video",
@@ -1015,7 +1115,14 @@
     "label": "Show me what to ask",
     "paste_text": "I want to make a video from text. Please tell me what the Video Generation tool needs and what it costs. Turn it on only if I say yes."
    },
-   "words": 23
+   "words": 23,
+   "title": "Making a video from text or a picture",
+   "phrases": [
+    "make a video",
+    "text to video",
+    "video generation"
+   ],
+   "title_was_t2": "Make a video from text"
   },
   {
    "id": "w_anim",
@@ -1057,7 +1164,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"manim-video\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 18
+   "words": 18,
+   "title": "Making animated maths explainer videos",
+   "phrases": [
+    "animated explainer",
+    "animation",
+    "manim"
+   ],
+   "title_was_t2": "Make an animated explainer"
   },
   {
    "id": "w_presenter",
@@ -1110,7 +1224,14 @@
      "card_says": "Review the source before installing. Changes apply to new sessions."
     }
    },
-   "words": 25
+   "words": 25,
+   "title": "Making a video with an AI presenter",
+   "phrases": [
+    "presenter video",
+    "talking head video",
+    "ai presenter"
+   ],
+   "title_was_t2": "Make a presenter video"
   },
   {
    "id": "w_youtube",
@@ -1153,7 +1274,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"youtube-content\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 22
+   "words": 22,
+   "title": "Summarising a YouTube video",
+   "phrases": [
+    "youtube",
+    "summarise a video",
+    "summarize a video",
+    "youtube summary"
+   ],
+   "title_was_t2": "Sum up a YouTube video"
   },
   {
    "id": "w_meme",
@@ -1198,7 +1327,14 @@
     }
    },
    "added": "changes-16 (hhtech-wants-run.md no. 24)",
-   "words": 22
+   "words": 22,
+   "title": "Making memes",
+   "phrases": [
+    "meme",
+    "memes",
+    "make a meme"
+   ],
+   "title_was_t2": "Make memes"
   },
   {
    "id": "w_voice",
@@ -1240,7 +1376,15 @@
     "label": "Show me what to ask",
     "paste_text": "I want to talk to you with my voice. Please tell me what Voice Mode needs here and how I start it. Ask me before you change anything."
    },
-   "words": 22
+   "words": 22,
+   "title": "Talking to Hermes out loud (voice)",
+   "phrases": [
+    "voice mode",
+    "talk out loud",
+    "by voice",
+    "use my voice"
+   ],
+   "title_was_t2": "Talk to it out loud"
   },
   {
    "id": "w_aloud",
@@ -1291,7 +1435,16 @@
     "label": "Show me what to ask",
     "paste_text": "Please read your next answer out loud. If speech is not ready, tell me what it needs."
    },
-   "words": 17
+   "words": 17,
+   "title": "Hermes reading its answers aloud to you",
+   "phrases": [
+    "read its answers to me",
+    "read aloud",
+    "text to speech",
+    "tts",
+    "read it out"
+   ],
+   "title_was_t2": "Read answers out loud"
   },
   {
    "id": "w_stt",
@@ -1350,7 +1503,16 @@
     "paste_text": "I want to send you voice messages and have them turned into text. Please tell me what that needs here. Ask me before you change anything."
    },
    "added": "changes-16 (hhtech-wants-run.md no. 6)",
-   "words": 16
+   "words": 16,
+   "title": "Turning voice messages into text",
+   "phrases": [
+    "voice note",
+    "voice notes",
+    "voice memo",
+    "transcribe",
+    "voice message"
+   ],
+   "title_was_t2": "Turn voice notes into text"
   },
   {
    "id": "w_music",
@@ -1388,7 +1550,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"songwriting-and-ai-music\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 24
+   "words": 24,
+   "title": "Writing songs and briefing a music AI",
+   "phrases": [
+    "write a song",
+    "song lyrics",
+    "suno"
+   ],
+   "title_was_t2": "Write a song"
   },
   {
    "id": "w_papers",
@@ -1427,7 +1596,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"arxiv\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 18
+   "words": 18,
+   "title": "Finding research papers on arXiv",
+   "phrases": [
+    "research papers",
+    "arxiv",
+    "scientific papers"
+   ],
+   "title_was_t2": "Find research papers"
   },
   {
    "id": "w_maps",
@@ -1473,7 +1649,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"maps\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 19
+   "words": 19,
+   "title": "Finding places, routes and time zones",
+   "phrases": [
+    "directions",
+    "find a place",
+    "route to",
+    "time zone"
+   ],
+   "title_was_t2": "Find places and routes"
   },
   {
    "id": "w_stocks",
@@ -1530,7 +1714,15 @@
      "card_says": "Review the source before installing. Changes apply to new sessions."
     }
    },
-   "words": 22
+   "words": 22,
+   "title": "Looking up stock and crypto prices",
+   "phrases": [
+    "stock price",
+    "stock prices",
+    "crypto price",
+    "bitcoin price"
+   ],
+   "title_was_t2": "Check stock prices"
   },
   {
    "id": "w_prices",
@@ -1576,7 +1768,15 @@
     "label": "Show me what to ask",
     "paste_text": "Please use your \"product-price-monitor\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
    },
-   "words": 23
+   "words": 23,
+   "title": "Watching a product's price for you",
+   "phrases": [
+    "price alert",
+    "watch a price",
+    "price drop",
+    "track a price"
+   ],
+   "title_was_t2": "Watch a price for me"
   }
  ],
  "skill_name_rule": "Changes-6, fix 3. A skill from the list below is reached by its name only when the name and the word skill or skills sit next to each other: the/a/an/this/that {name} skill(s) (changes-8: the word before the name is needed, so my sketch skills or I have no canvas skills name no skill), skill(s) called {name}, skill(s) named {name}, skill(s) for {name}, \"{name}\" skill. {name} may have spaces in place of its hyphens. Whole words. Code: dev/checks/hhcontent-changes-6/skill_next.py (PATTERNS). This step runs after the key check and the build words and BEFORE the six topics, so is there a github skill gets the github skill, not the svc question. A hand-written row for that skill wins. Otherwise line S1 or S2 with the page's own words in a box.",
@@ -3777,5 +3977,6 @@
    "agents",
    "agent"
   ]
- }
+ },
+ "titles_note_breadth_t1": "titles-t2: title and phrases of every row are hand-written (changes-12). The label stays the text on the thing to pick."
 }

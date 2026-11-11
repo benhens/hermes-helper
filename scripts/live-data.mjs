@@ -56,8 +56,33 @@ export function liveRows(talk, wants) {
   rows.push({ id: 'COST', subject: 'cost', title: 'What Hermes costs', text: fixed.COST.text, kw: ['cost', 'costs', 'price', 'pay', 'free', 'money'], weak: [], shows: { kind: 'COST' } })
   rows.push({ id: 'WHERE', subject: 'cost', title: 'My computer or one that stays on', text: fixed.WHERE.text, kw: ['cloud', 'server', 'vps', 'laptop', 'always on', '24/7'], weak: [], shows: { kind: 'WHERE' } })
   rows.push({ id: 'CN1', subject: 'svc', title: 'Gmail and Google apps: Connectors', text: wfixed.CN1.text, kw: ['gmail', 'google calendar', 'google drive', 'calendar', 'drive'], weak: [], shows: { kind: 'CN1' } })
+  // find-v1 (the list call): every fact line is a row the writer can be handed, since the list names any of them: the
+  // fixed lines with a title that are not rows yet (MIG_APP, SAFE, HERMES ...), with their next line, and the fact lines
+  // from the docs (facts_t1). list_only: they have no key words, so word matching and the subjects' ranks (hhtech's
+  // live.py, which the tests compare) never see them.
+  for (const f of talk.fixed_lines || []) {
+    if (!f.title || rows.some(r => r.id === f.id)) continue
+    rows.push({ id: f.id, subject: 'fixed', title: f.title, text: f.text, kw: [], weak: [], list_only: true, shows: { kind: f.id } })
+    noteNext(f.id, 'fixed', f.next)
+  }
+  for (const f of (talk.facts_t1 || {}).lines || []) {
+    rows.push({ id: f.id, subject: 'fact', title: f.title, text: f.text, kw: [], weak: [], list_only: true, shows: { kind: 'fact', need: f.id } })
+    noteNext(f.id, 'fact', f.next)
+  }
   for (const n of next) rows.push({ ...n, shows: { kind: 'extra', line: n.id } })
   return rows
+}
+// find-v1: the list of the list call, every fact line once as { id, title } with hhcontent's titles (near.titles_rule,
+// "Use 1"), in the data's order: the fact lines from the docs, the fixed lines, each topic's plain line and rows, the
+// word lines, the "what Hermes can do" rows. The id is the row's id (src/live-rows.js LIVE_ROW).
+export function listLines(talk, wants) {
+  return [
+    ...((talk.facts_t1 || {}).lines || []),
+    ...(talk.fixed_lines || []).filter(f => f.title),
+    ...talk.topics.flatMap(t => [...(t.plain.title ? [t.plain] : []), ...t.needs.filter(n => n.title)]),
+    ...talk.terms.filter(t => t.title),
+    ...wants.wants.filter(w => w.title)
+  ].map(x => ({ id: x.id, title: x.title }))
 }
 
 // The data's three switches: [where, value]
@@ -86,12 +111,18 @@ export function liveProblems(live, talk, wants, mode) {
     if (/\n/.test(r.text)) problems.push(`row ${r.id} has a line break (rows are sent one per line)`)
   }
   const nexts = rows.filter(r => r.next_of).map(r => r.id).sort()
-  const want4 = ['bot1-next', 'msg0-then', 'msg1-then', 'plugin-mean', 'skill-mean', 'use-more', 'use1-next', 'use1-next-mean', 'use3-next', 'use3-next-mean']
-  if (JSON.stringify(nexts) !== JSON.stringify(want4)) problems.push(`the next lines handed as rows are ${nexts.join(', ')}, not the data's ten (${want4.join(', ')})`)
+  // find-v1: plus the next lines of the fixed lines that are rows now (PRIV-next, SAFE-next)
+  const want4 = ['PRIV-next', 'SAFE-next', 'bot1-next', 'msg0-then', 'msg1-then', 'plugin-mean', 'skill-mean', 'use-more', 'use1-next', 'use1-next-mean', 'use3-next', 'use3-next-mean']
+  if (JSON.stringify(nexts) !== JSON.stringify(want4)) problems.push(`the next lines handed as rows are ${nexts.join(', ')}, not the data's twelve (${want4.join(', ')})`)
+  // find-v1: the list call's list: every line with a title is a row, no id twice, no title twice, none with a line break
+  const list = listLines(talk, wants)
+  for (const l of list) if (!rows.some(r => r.id === l.id && !r.next_of)) problems.push(`the list names ${l.id}, which is no row`)
+  if (new Set(list.map(l => l.id)).size !== list.length || new Set(list.map(l => l.title)).size !== list.length) problems.push('the list has an id or a title twice')
+  for (const l of list) if (/[\n=]/.test(l.title) || /[^A-Za-z0-9_-]/.test(l.id)) problems.push(`the list's line ${l.id} has a line break or = in its title, or an id the reader cannot read`)
   const subjects = ((live.subjects || {}).list || []).map(s => s.id)
   if (subjects.length !== 16) problems.push(`${subjects.length} subjects, not 16`)
   for (const s of subjects) if (!['talk', 'build', 'none'].includes(s) && !rows.some(r => r.subject === s)) problems.push(`subject ${s} has no rows`)
-  for (const s of new Set(rows.map(r => r.subject))) if (!subjects.includes(s)) problems.push(`rows of ${s} belong to no subject`)
+  for (const s of new Set(rows.filter(r => !r.list_only && !['fixed', 'fact'].includes(r.subject)).map(r => r.subject))) if (!subjects.includes(s)) problems.push(`rows of ${s} belong to no subject`)
   const checks = ((live.checks || {}).list || []).map(c => c.id)
   if (JSON.stringify(checks) !== JSON.stringify(CHECK_IDS)) problems.push(`the checks are ${checks.join(', ')}, not c0 to c23 in order`)
   for (const k of ['first_call', 'writer', 'pick_only']) {
@@ -172,7 +203,9 @@ export function slimLiveData(live, talk, wants) {
     code_answers: live.code_answers.kinds,
     go_to_ai: live.code_answers.go_to_ai,
     follow_up: { phrases: live.follow_up.phrases },
-    rows: liveRows(talk, wants).map(r => pick(r, ['id', 'subject', 'title', 'text', 'kw', 'weak', 'next_of', 'follow_only', 'shows'])),
+    rows: liveRows(talk, wants).map(r => pick(r, ['id', 'subject', 'title', 'text', 'kw', 'weak', 'next_of', 'follow_only', 'list_only', 'shows'])),
+    // find-v1: the list call's list (id = title)
+    list: listLines(talk, wants),
     stop_words: live.rows.stop_words.split(/\s+/).filter(Boolean),
     max_handed: live.rows.max_handed,
     subjects: live.subjects.list.map(s => ({ id: s.id, title: s.title })),
@@ -226,6 +259,12 @@ export function slimLiveData(live, talk, wants) {
 // Status line, a sentence in the conversation window's bullet after "see the rest at once.", the bullet about
 // the "The model answers" card, and point 11 of the disclosure. The build writes them for src/ai-mode.js's
 // mode (tests/readme-disclosure.test.mjs checks them); everything else in README is the Builder's.
+// find-v1 part 3 (Lead, 11 Nov): the data's window sentence still says the old rule (one slow call ends the AI for the
+// visit; the line is said after the visit's first message). The live data is pinned at a5168682, so until the content
+// team rewords it the build puts the rule as built in its place; told to Lead and hhcontent in the report.
+const SLOW_RULE_WAS = 'If your AI is too slow, Helper stops asking it for the rest of the visit. When that happens with the first message Helper sends it in a visit, Helper says so once, with a text you can paste into your own Hermes to make it quicker.'
+const SLOW_RULE_NOW = 'If your AI is too slow or fails twice in a row, Helper stops asking it for the rest of the visit. When it was too slow, Helper says so once, right after its own answer, with a text you can paste into your own Hermes to make it quicker.'
+export const slowRuleNow = sentence => sentence.replace(SLOW_RULE_WAS, SLOW_RULE_NOW)
 // setup-chat-2: point 11 names the set-up conversation's lines only when the build sends them (setupAi: its AI step is
 // built, scripts/build.mjs setupAiOf); else setup-chat changes-1's readme_point_11_work_only.
 export function readmeForMode(readme, live, mode, setupAi = false) {
@@ -244,8 +283,8 @@ export function readmeForMode(readme, live, mode, setupAi = false) {
   const anchor = 'see the rest at once.'
   if (!lines[w].includes(anchor)) throw new Error('README.md: the window bullet lost "see the rest at once."')
   let bullet = lines[w]
-  for (const m of MODES) if (lm.readme_window_sentence[m]) bullet = bullet.split(' ' + lm.readme_window_sentence[m]).join('')
-  lines[w] = lm.readme_window_sentence[mode] ? bullet.replace(anchor, `${anchor} ${lm.readme_window_sentence[mode]}`) : bullet
+  for (const m of MODES) if (lm.readme_window_sentence[m]) bullet = bullet.split(' ' + lm.readme_window_sentence[m]).join('').split(' ' + slowRuleNow(lm.readme_window_sentence[m])).join('')
+  lines[w] = lm.readme_window_sentence[mode] ? bullet.replace(anchor, `${anchor} ${slowRuleNow(lm.readme_window_sentence[mode])}`) : bullet
   const c = at(l => l.startsWith('- The "The model answers" card makes one call'), '"The model answers" bullet')
   lines[c] = `- ${lm.readme_model_call_bullet[mode]}`
   const p = at(l => l.startsWith('11. '), 'point 11')

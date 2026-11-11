@@ -1,0 +1,281 @@
+{
+ "made_by": "dev/checks/find-v1/make-fixture.py from dev/checks/hhtech-find-run/out-*.jsonl and sets.json (hhtech, 11 Nov 2026; build 2115106)",
+ "cases": [
+  {
+   "run": "2b-W1-fresh",
+   "n": "5",
+   "message": "is it open source",
+   "typed": [
+    "can it make pictures for me",
+    "it deleted something can i get it back",
+    "can it click around websites for me",
+    "who made this",
+    "is it open source"
+   ],
+   "rows": [
+    "HVC"
+   ],
+   "dropped_by": "c12 name Nous",
+   "raw": "Hermes is not open source. It is a proprietary AI helper developed by Nous Research.\n\nUSED: none"
+  },
+  {
+   "run": "2b-W1-fresh",
+   "n": "15",
+   "message": "can it do two things at once",
+   "typed": [
+    "can it make pictures for me",
+    "it deleted something can i get it back",
+    "can it click around websites for me",
+    "who made this",
+    "is it open source",
+    "can i use it on my android phone",
+    "can i use gemini",
+    "how do i tell it to forget something about me",
+    "can i send it a photo",
+    "can i change the language of the app",
+    "what does the percent full thing mean",
+    "remind me in half an hour to call the dentist, can it do that",
+    "how do i find a chat from last week",
+    "can it read its answers to me",
+    "can it do two things at once"
+   ],
+   "rows": [
+    "HVC"
+   ],
+   "dropped_by": "c19 money free",
+   "raw": "Hermes can do two things at once. This is built in, and the standard voice is free.\nUSED: [HVC]"
+  },
+  {
+   "run": "free-W1-new",
+   "n": "10",
+   "message": "got a new mac how do i take hermes with me",
+   "typed": [
+    "hi",
+    "so what does hermes actually do",
+    "is this like siri or what",
+    "im totally new where do i start",
+    "how",
+    "how much is it a month",
+    "i have claude pro can i just use that",
+    "whats a provider",
+    "what are tokens",
+    "moving from cursor, can it take my rules",
+    "ok and then",
+    "got a new mac how do i take hermes with me"
+   ],
+   "rows": [
+    "MIG_PC",
+    "MIG_APP"
+   ],
+   "dropped_by": "c12 name Mac",
+   "raw": "Pack your settings, chats, and other data into one zip file, then Hermes on your new Mac unpacks it. This replaces what is there.  \nUSED: [MIG_PC]"
+  },
+  {
+   "run": "free-W1x-fresh",
+   "n": "6",
+   "message": "can i use it on my android phone",
+   "typed": [
+    "can it make pictures for me",
+    "it deleted something can i get it back",
+    "can it click around websites for me",
+    "who made this",
+    "is it open source",
+    "can i use it on my android phone"
+   ],
+   "rows": [
+    "msg0",
+    "msg0-then",
+    "msg1",
+    "msg1-then"
+   ],
+   "dropped_by": "c20 dropped only/never",
+   "raw": "You can chat with Hermes through Telegram, WhatsApp, or Slack. For Telegram setup, scan the code with Telegram on your phone.  \nUSED: [msg0, msg1-then]"
+  },
+  {
+   "run": "free-W1x-new",
+   "n": "10",
+   "message": "got a new mac how do i take hermes with me",
+   "typed": [
+    "hi",
+    "so what does hermes actually do",
+    "is this like siri or what",
+    "im totally new where do i start",
+    "how",
+    "how much is it a month",
+    "i have claude pro can i just use that",
+    "whats a provider",
+    "what are tokens",
+    "moving from cursor, can it take my rules",
+    "ok and then",
+    "got a new mac how do i take hermes with me"
+   ],
+   "rows": [
+    "MIG_PC"
+   ],
+   "dropped_by": "c12 name Mac",
+   "raw": "Pack your settings, chats, and other data into one zip file, then have Hermes on your new Mac unpack it. This replaces what’s already there.  \nUSED: MIG_PC"
+  },
+  {
+   "run": "free-W1x-new",
+   "n": "11f",
+   "message": "i dont understand",
+   "typed": [
+    "hi",
+    "so what does hermes actually do",
+    "is this like siri or what",
+    "im totally new where do i start",
+    "how",
+    "how much is it a month",
+    "i have claude pro can i just use that",
+    "whats a provider",
+    "what are tokens",
+    "moving from cursor, can it take my rules",
+    "ok and then",
+    "got a new mac how do i take hermes with me",
+    "does it work with signal",
+    "i dont understand"
+   ],
+   "rows": [
+    "msg2"
+   ],
+   "dropped_by": "c12 name Signal",
+   "raw": "Hermes works with Signal. You can set it up from Messaging in the Hermes app.  \nUSED: [msg2]"
+  },
+  {
+   "run": "free-W1x-new",
+   "n": "13",
+   "message": "will it do stuff without asking me first",
+   "typed": [
+    "hi",
+    "so what does hermes actually do",
+    "is this like siri or what",
+    "im totally new where do i start",
+    "how",
+    "how much is it a month",
+    "i have claude pro can i just use that",
+    "whats a provider",
+    "what are tokens",
+    "moving from cursor, can it take my rules",
+    "ok and then",
+    "got a new mac how do i take hermes with me",
+    "does it work with signal",
+    "i dont understand",
+    "can it see my passwords",
+    "will it do stuff without asking me first"
+   ],
+   "rows": [
+    "SAFE"
+   ],
+   "dropped_by": "c24 about the person approval",
+   "raw": "For risky commands, such as deleting files, Hermes asks for your approval first. USED: SAFE"
+  },
+  {
+   "run": "free-W1x-old",
+   "n": "12",
+   "message": "how do I get it on my phone",
+   "typed": [
+    "How can I migrate?",
+    "ok and how do I do that",
+    "I want to switch over from Claude Code, how",
+    "can I import my chats from chatgpt",
+    "what even is this app",
+    "whats an agent",
+    "how do i set this up",
+    "what should I do first",
+    "ok and how do I do that",
+    "where do I put my openai key",
+    "can I use it without paying anything",
+    "what model should I pick for writing emails",
+    "can I run the AI on my own laptop",
+    "how do I get it on my phone"
+   ],
+   "rows": [
+    "msg0",
+    "msg0-then",
+    "msg1",
+    "msg1-then"
+   ],
+   "dropped_by": "c20 dropped only/never",
+   "raw": "You can chat with Hermes on your phone through apps like Telegram, WhatsApp, or Slack. For Telegram, open Messaging in Hermes, choose Telegram, press Create with QR, then scan the code using Telegram on your phone.  \nUSED: msg0, msg0-then, msg1-then"
+  },
+  {
+   "run": "free-W2-new",
+   "n": "2",
+   "message": "so what does hermes actually do",
+   "typed": [
+    "hi",
+    "so what does hermes actually do"
+   ],
+   "rows": [
+    "HERMES",
+    "tool",
+    "w_web"
+   ],
+   "dropped_by": "c22 term unexplained \\btools?\\b",
+   "raw": "Hermes is an AI helper that learns from experience and remembers you across chats. It can use tools such as searching the web, reading pages, and editing files.  \nUSED: HERMES, tool, w_web"
+  },
+  {
+   "run": "free-W2-new",
+   "n": "3",
+   "message": "is this like siri or what",
+   "typed": [
+    "hi",
+    "so what does hermes actually do",
+    "is this like siri or what"
+   ],
+   "rows": [
+    "HERMES"
+   ],
+   "dropped_by": "c12 name Siri",
+   "raw": "Hermes is an AI helper made by Nous Research that learns from experience and remembers you across chats. I don’t have checked information comparing it with Siri.  \nUSED: [HERMES]"
+  },
+  {
+   "run": "free-W2-new",
+   "n": "9",
+   "message": "moving from cursor, can it take my rules",
+   "typed": [
+    "hi",
+    "so what does hermes actually do",
+    "is this like siri or what",
+    "im totally new where do i start",
+    "how",
+    "how much is it a month",
+    "i have claude pro can i just use that",
+    "whats a provider",
+    "what are tokens",
+    "moving from cursor, can it take my rules"
+   ],
+   "rows": [
+    "MIG_APP"
+   ],
+   "dropped_by": "c14 no-claim does_not",
+   "raw": "Hermes can bring over notes and settings from Cursor, but the checked information doesn’t specifically mention rules.  \nUSED: MIG_APP"
+  },
+  {
+   "run": "free-W2-new",
+   "n": "11f",
+   "message": "i dont understand",
+   "typed": [
+    "hi",
+    "so what does hermes actually do",
+    "is this like siri or what",
+    "im totally new where do i start",
+    "how",
+    "how much is it a month",
+    "i have claude pro can i just use that",
+    "whats a provider",
+    "what are tokens",
+    "moving from cursor, can it take my rules",
+    "ok and then",
+    "got a new mac how do i take hermes with me",
+    "does it work with signal",
+    "i dont understand"
+   ],
+   "rows": [
+    "msg2"
+   ],
+   "dropped_by": "c12 name Signal",
+   "raw": "Hermes works with Signal. To set it up, open Messaging in the Hermes app.  \nUSED: [msg2]"
+  }
+ ]
+}
