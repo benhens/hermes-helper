@@ -262,9 +262,15 @@ function useHost(hermes = {}, reply = () => 'NONE') {
   const host = {
     hermes: h,
     asks: [],
+    checks: [],
     calls: [],
     request: async (method, params, ms) => {
       host.calls.push([method, params, ms])
+      // loom-fixes-2 part B 1: the set-up look's one check call (a fixed text) is the stand-in's own, not one of the person's asks
+      if (method === 'llm.oneshot' && params && params.instructions === 'Reply with exactly: OK') {
+        host.checks.push(params)
+        return { text: 'OK' }
+      }
       if (method === 'llm.oneshot') {
         host.asks.push(params)
         return { text: reply(params) }
@@ -533,7 +539,7 @@ test('on the page: at a step, "help" keeps its topics; picked through to an answ
 test('on the page: a step answer typed while the AI still works on a question gets no "Back to step" in front of it', opt, async () => {
   let release
   const { view, host } = await open({ mode: 'ai_writes', reply: () => 'NONE' })
-  host.request = (orig => async (m, p, ms) => (m === 'llm.oneshot' ? (host.asks.push(p), new Promise(r => (release = r))) : orig(m, p, ms)))(host.request)
+  host.request = (orig => async (m, p, ms) => (m === 'llm.oneshot' && p.instructions !== 'Reply with exactly: OK' ? (host.asks.push(p), new Promise(r => (release = r))) : orig(m, p, ms)))(host.request)
   finish(view)
   await send(view, 'Peter')
   await send(view, 'I run a tennis club')

@@ -76,7 +76,13 @@ test('what is handed: what you do, what they want, new or not, the look, the thi
 function useHost(reply) {
   const host = {
     asks: [],
+    checks: [],
     request: async (method, params) => {
+      // loom-fixes-2 part B 1: the set-up look's one check call (a fixed text) is the stand-in's own, not one of the person's asks
+      if (method === 'llm.oneshot' && params && params.instructions === 'Reply with exactly: OK') {
+        host.checks.push(params)
+        return { text: 'OK' }
+      }
       if (method === 'llm.oneshot') {
         host.asks.push(params)
         const a = await reply(params, host.asks.length)

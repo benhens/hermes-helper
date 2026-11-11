@@ -103,7 +103,10 @@ test('the model calls: only in model-call.js (the setup card), live-turn.js (the
   for (const f of files) {
     if (f !== 'model-call.js' && f !== 'live-turn.js' && f !== 'setup-rec.js') assert.doesNotMatch(src(f), /'llm\.oneshot'/, f)
   }
-  assert.equal((code.match(/'llm\.oneshot'/g) || []).length, 3)
+  // loom-fixes-2 part B 1: and the set-up look's one check call (setup-rec.js MODEL_CHECK, a fixed text), the fourth
+  assert.equal((code.match(/'llm\.oneshot'/g) || []).length, 4)
+  assert.match(src('setup-rec.js'), /request\('llm\.oneshot', oneshotParams\(MODEL_CHECK\), ONESHOT_TIMEOUT_MS\)/)
+  assert.match(src('setup-rec.js'), /export const MODEL_CHECK = \{ instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 20 \}/)
   assert.match(src('setup-rec.js'), /request\('llm\.oneshot', liveParams\(instructions, REC_INPUT, REC_MAX_TOKENS\), ONESHOT_TIMEOUT_MS\)/)
   assert.match(src('live-turn.js'), /request\('llm\.oneshot', liveParams\(instructions, input, maxTokens\), ONESHOT_TIMEOUT_MS\)/)
   assert.match(src('live-request.js'), /oneshotParams\(\{ instructions, input, temperature: LV_IN\.temperature, max_tokens: maxTokens \}\)/)

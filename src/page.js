@@ -27,7 +27,7 @@ import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pic
 import { cleanKept, keptToStore } from './kept.js'
 import { talkToStore, talkFromStore } from './talk-keep.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
-import { recInstructions, judgeRec, askRec } from './setup-rec.js'
+import { recInstructions, judgeRec, askRec, askLookCheck, modelCheckSaid, modelCheckFailed } from './setup-rec.js'
 import { AI_MODE } from './ai-mode.js'
 import { setupTyped, setupPress, setupAfter, setupStepOpen, setupReaskWaits, setupQuestionOpen, SETUP_OWN_QUESTION, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
 import { makeLook, LOOK_UNSEEN } from './setup-look.js'
@@ -311,7 +311,13 @@ export function makePage(ctx, opts = {}) {
   // find-v2 part 3 (changes-13 look.model_rule): the look's seen with what Helper saw the AI do in this visit: a model
   // the settings check found set is said to answer only when one of Helper's calls got an answer in time; one that got
   // none in 12 s is model_slow, one that failed for want of a provider model_not; else "couldn't check" (seenFrom)
-  const modelSaidOf = seen => (seen && seen.model === 'ok' && memory.visit.aiSeen ? { ...seen, modelSaid: memory.visit.aiSeen } : seen)
+  // loom-fixes-2 part B 1: checked, the look's check call was made in this visit (the faint line under the look then
+  // no longer says that no AI was used)
+  const modelSaidOf = seen => {
+    const v = memory.visit
+    const out = seen && seen.model === 'ok' && v.aiSeen ? { ...seen, modelSaid: v.aiSeen } : seen
+    return out && v.modelChecked ? { ...out, checked: true } : out
+  }
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
   // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
   // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
@@ -802,7 +808,43 @@ export function makePage(ctx, opts = {}) {
       memory.lookWait = () => once(memory.seen || LOOK_UNSEEN)
       look().then(seen => {
         memory.seen = seen
-        once(seen)
+        // loom-fixes-2 part B 1: the one check call of this set-up conversation, then Helper's lines
+        modelCheck(seen).then(() => once(seen))
+      })
+    }
+    // loom-fixes-2 part B 1 (Lead's answer 2 to find-v2's questions): once per set-up conversation, when the settings
+    // say a model is set and nothing has shown yet whether it answers, one small check call (src/setup-rec.js
+    // MODEL_CHECK: a fixed text, nothing of the person's), at most 12 s: an answer is model_ok, a failure for want of a
+    // provider model_not, no answer in 12 s model_slow (visit.aiSeen, read by modelSaidOf). No call with no model set
+    // (model_not as before), in a build with no AI step, when the AI step is off for the visit, or while Hermes still
+    // works on another call of Helper's.
+    function modelCheck(seen) {
+      const v = memory.visit
+      // (once per visit: a set-up conversation started again in the same visit knows the answer already, aiSeen)
+      if (!seen || seen.model !== 'ok' || v.aiSeen || v.modelChecked || AI_MODE === 'no_ai_step' || v.aiOff === true || live.inHermes > 0) return Promise.resolve()
+      v.modelChecked = true
+      return new Promise(resolve => {
+        let ended = false
+        const fin = said => {
+          if (ended) return
+          ended = true
+          if (said && !v.aiSeen) v.aiSeen = said
+          resolve()
+        }
+        const stop = ctx.setTimeout(() => fin('slow'), LIVE_SECONDS * 1000)
+        live.inHermes++
+        // the call is out of Hermes before Helper goes on (the recommendation's own call may follow at once)
+        const back = said => {
+          stop()
+          live.inHermes--
+          fin(said)
+        }
+        Promise.resolve()
+          .then(() => askLookCheck((method, params, timeout) => host.request(method, params, timeout)))
+          .then(
+            res => back(modelCheckSaid(res)),
+            err => back(modelCheckFailed(err))
+          )
       })
     }
     // setup-chat: "Ask me the set-up questions again" was pressed on Helper's settings page (see rereadKept)

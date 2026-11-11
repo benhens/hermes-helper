@@ -10,7 +10,7 @@ import { noReply, readWritten, c26Fails } from './live-checks.js'
 import { workOk } from './kept.js'
 import { seenLine, recText } from './setup-chat.js'
 import { liveParams } from './live-request.js'
-import { ONESHOT_TIMEOUT_MS } from './model-call.js'
+import { ONESHOT_TIMEOUT_MS, oneshotParams } from './model-call.js'
 
 const SR = SETUP_DATA
 export const REC_MAX_TOKENS = 120
@@ -84,3 +84,15 @@ export function judgeRec(raw, item, names = [], hand = '') {
   if (flags.length) return { fail: flags[0], flags }
   return { text }
 }
+
+// loom-fixes-2 part B 1 (Lead's answer 2 to find-v2's questions; hhtech ask-run 4, For builder 6): the set-up look makes
+// one small check call per set-up conversation when the settings say a model is set, so a working AI is said to have
+// answered ("it answered my check") rather than "I couldn't check your model this time". A fixed text of ours, nothing
+// of the person's in it; the page waits at most 12 s for it (no answer then: model_slow).
+export const MODEL_CHECK = { instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 20 }
+export const askLookCheck = request => request('llm.oneshot', oneshotParams(MODEL_CHECK), ONESHOT_TIMEOUT_MS)
+// what the check says of the model: any text back is an answer (ok); a failure for want of a provider is not; any other
+// failure says nothing (the look's own "couldn't check" stands)
+export const NO_PROVIDER = /no (llm )?provider|no usable credentials|provider is configured/i
+export const modelCheckSaid = res => (res && typeof res.text === 'string' && res.text.trim() ? 'ok' : null)
+export const modelCheckFailed = err => (NO_PROVIDER.test(String((err && err.message) || err)) ? 'not' : null)

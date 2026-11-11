@@ -106,6 +106,10 @@ const suGOAL_PICKS = () => suPicks(SU_Q_GOAL.answers.map(a => ['goal:' + a.id, a
 const suREC_PICKS = labels => suPicks(['rec:steps', 'rec:already', 'rec:other', 'rec:notnow'].map((a, i) => [a, labels[i]]))
 const suNamed = (line, name, slots = {}) => (name ? suFill(line.text, { ...slots, name }) : suFill(line.text_no_name, slots))
 const suOf = st => (st.setup = st.setup || { stage: null, item: null, step: 0, other: [], reasked: {}, asked: {} })
+// loom-fixes-2 part B 1: the faint line under the look says "Nothing was sent, and no AI was used."; after the look's
+// check call (seen.checked, src/page.js) that is no longer true, so only its first sentence ("Read from your Hermes on
+// this computer.") is shown until hhcontent gives a line for it (in the report, For hhcontent)
+const suLookHint = seen => (seen && seen.checked ? SU.look.under.faint.split(/(?<=\.) /)[0] : SU.look.under.faint)
 // the faint "Kept: ..." line under a line (the page strikes it when the thing is no longer kept)
 // live changes-6 (lines_by_mode.first_time_grey.setup_told): under the first Kept: line of what goes to the AI (what
 // you do, new to Hermes, what you want), once: "Your AI also gets ...". Only in a build that sends them.
@@ -341,7 +345,7 @@ function suAnswerGoal(st, id, typed, seen) {
   }
   s.seen = seen
   // under the look line: the Kept: line, the faint line, and the button "What did you look at?"
-  const look = suSaid('SEEN', seenLine(seen, id), { note, hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+  const look = suSaid('SEEN', seenLine(seen, id), { note, hint: suLookHint(seen), next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
   return suRecommend(st, seen, [look])
 }
 function suRestart(st) {
@@ -380,7 +384,7 @@ function suAsk(st) {
   }
   return suMove(true, seen => {
     s.seen = seen
-    const look = suSaid('SEEN', seenLine(seen, st.kept.setup_goal_id || s.goal || 'unsure'), { hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+    const look = suSaid('SEEN', seenLine(seen, st.kept.setup_goal_id || s.goal || 'unsure'), { hint: suLookHint(seen), next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
     return suRecommend(st, seen, [look])
   })
 }
@@ -407,7 +411,7 @@ export function setupPress(action, st) {
   // While a recommendation waits for its answer, its four answers stay under the list, so the person is not left
   // with nothing to pick.
   // setup-chat-2: the same for any open line of the set-up conversation (a step, "I can't see that yet", ...)
-  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: suOpenPicks(st) })]) : null
+  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: suLookHint(s.seen), answers: suOpenPicks(st) })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
   // loom-fixes: Go on is the next question not answered yet, or the look and the written recommendation; Answer again
   // starts the questions again
