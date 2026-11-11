@@ -324,6 +324,10 @@ test('every word on the tab comes from the data file (src/dash-data.js); numbers
   for (const it of DASH_DATA.items) for (const s of it.sources) words.add(W.setup.source.replace('{file}', s.file).replace('{line}', s.line))
   // (loom-fixes: what a screen reader hears on a tile that opens Hermes's screen: the plugins tile's own line)
   words.add('. ' + W.stats.plugins_line)
+  // look: the banner's words that Lead's job gives (not in the team's data): "Helper", "<count> set up", "Open <card>"
+  words.add('Helper')
+  words.add('set up')
+  for (const it of DASH_DATA.items) words.add(`Open ${it.name}`)
   for (const who of ['just_installed', 'half', 'all']) {
     const { view } = await open(who)
     // open every stop once, so its words are drawn too
@@ -426,9 +430,9 @@ test('the set-up is 9 cards in the data\'s order (Install and Scheduled jobs out
   const { view } = await open('half')
   assert.deepEqual(cardIds(view), NINE)
   assert.deepEqual(DASH_DATA.items.map(i => i.id), NINE)
-  // the page: the tiles, then Set up; nothing between (no Activity)
+  // the page: the banner (look), the tiles, then Set up; nothing between (no Activity)
   const parts = dash(view).props.children.filter(Boolean).map(n => n.props['data-hh'])
-  assert.deepEqual(parts, ['dash-css', 'stats', 'setup'])
+  assert.deepEqual(parts, ['dash-css', 'banner', 'stats', 'setup'])
   for (const gone of ['road', 'line', 'stop', 'next', 'all-done', 'you-are-here', 'activity', 'person-note']) assert.equal(byData(dash(view), gone), null, gone)
   assert.doesNotMatch(text(dash(view)), /You are here|Next|Scheduled jobs|Helper can't see this one/)
   // each card: Hermes's icon at the tiles' 20 px, on the tiles' icon square; the name; the why sentence from the data
@@ -523,7 +527,7 @@ test('a click on a card opens it full width under its row (one open at a time); 
   const { view } = await open('half')
   // not measured: 2 columns
   assert.equal(byData(dash(view), 'cards').props['data-columns'], 2)
-  assert.deepEqual(byData(dash(view), 'cards').props.style, { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px' })
+  assert.deepEqual(byData(dash(view), 'cards').props.style, { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' })
   const order = () => byData(dash(view), 'cards').props.children.filter(Boolean).map(n => n.props['data-card'] || n.props['data-hh'])
   click(stop(view, 'personality'))
   // personality is card 3: row 2 is personality and chat_apps; the panel goes after chat_apps
@@ -572,12 +576,13 @@ test('as many columns as fit with each card at least 260 px wide: 1 at 400 px, 2
   const { view } = await open('half')
   byData(dash(view), 'cards').props.ref({ id: 'cards' })
   const fire = width => observers.filter(o => o.watching && o.watching.id === 'cards').forEach(o => o.cb([{ contentRect: { width, height: 500 } }]))
-  for (const [width, cols] of [[336, 1], [529, 1], [530, 2], [656, 2], [799, 2], [800, 3], [1116, 4]]) {
+  // (look: the cards are 20 px apart, so n columns need n * 260 + (n - 1) * 20 px)
+  for (const [width, cols] of [[336, 1], [539, 1], [540, 2], [656, 2], [819, 2], [820, 3], [1116, 4]]) {
     fire(width)
     await settle(2)
     assert.equal(byData(dash(view), 'cards').props['data-columns'], cols, `${width} px`)
   }
-  fire(800)
+  fire(820)
   await settle(2)
   click(stop(view, 'first_chat'))
   const order = byData(dash(view), 'cards').props.children.filter(Boolean).map(n => n.props['data-card'] || n.props['data-hh'])
@@ -616,4 +621,126 @@ test('a read that comes back late, after the page was left, is dropped: the page
   await settle(6)
   const again = mount(reg.Page)
   assert.equal(tileNumber(again, 'skills'), 'waiting')
+})
+
+/* ---------- look (his words of 11 Nov, 18:20 UTC): the Dashboard as Hermes's own Capabilities page ---------- */
+const banner = view => byData(dash(view), 'banner')
+const classesOf = n => String(n.props.className || '').split(' ')
+// Hermes's order (catalog-card.tsx CARD_ACCENTS): blue, orange, purple, green, red, cyan, yellow
+const ACCENTS = [D.acc0, D.acc1, D.acc2, D.acc3, D.acc4, D.acc5, D.acc6]
+const accentsOf = n => classesOf(n).filter(c => ACCENTS.includes(c))
+
+test('look: a banner on top of the Dashboard, above the three tiles: "Helper", the count as a sentence, the first card not marked (its name and its why-line), and one main button that opens it', async () => {
+  const { view } = await open('half')
+  const parts = dash(view).props.children.filter(Boolean).map(n => n.props['data-hh'])
+  assert.deepEqual(parts.slice(0, 3), ['dash-css', 'banner', 'stats'])
+  const b = banner(view)
+  assert.ok(classesOf(b).includes(D.banner))
+  for (const part of ['banner-eyebrow', 'banner-title', 'banner-line', 'banner-open', 'banner-art', 'banner-character']) assert.ok(byData(b, part), part)
+  assert.equal(said(byData(b, 'banner-eyebrow')), 'Helper')
+  assert.equal(said(byData(b, 'banner-title')), '0 of 9 set up')
+  assert.equal(byData(b, 'banner-title').type, 'h2')
+  const first = DASH_DATA.items[0]
+  assert.equal(said(byData(b, 'banner-line')), `${first.name} ${first.why}`)
+  assert.equal(byData(b, 'banner-line').props['data-card'], 'model')
+  const go = byData(b, 'banner-open')
+  assert.equal(go.type, 'sdk:Button')
+  assert.equal(go.props.variant, 'default')
+  assert.equal(said(go), `Open ${first.name}`)
+  assert.equal(all(b, n => n.type === 'sdk:Button').length, 1, 'one button in the banner')
+  // the picture is for the eye only: two fields of dots, no image, and Helper's character in front, 224 px wide
+  const art = byData(b, 'banner-art')
+  assert.equal(art.props['aria-hidden'], true)
+  assert.deepEqual(art.props.children.map(n => n.props.className), [D.bannerDots, D.bannerDots2])
+  const figure = byData(b, 'banner-character')
+  assert.equal(figure.props['aria-hidden'], true)
+  const drawn = all(figure, n => n.props && n.props['data-hh-character'])
+  assert.equal(drawn.length, 1)
+  assert.equal(drawn[0].props.width, 224)
+  assert.equal(drawn[0].props['data-expression'], 'resting')
+  assert.equal(drawn[0].props['aria-hidden'], true)
+  assert.equal(drawn[0].props['data-rising'], undefined)
+  // its eyes hear the pointer from the Dashboard's own box
+  assert.equal(typeof dash(view).props.onPointerMove, 'function')
+  assert.equal(typeof dash(view).props.onPointerLeave, 'function')
+  dash(view).props.onPointerMove({ clientX: 10, clientY: 10 })
+  dash(view).props.onPointerLeave()
+})
+
+test('look: the banner\'s title is the count for no marks, some and all; its line and button name the first card not marked, and are gone when all are marked', async () => {
+  const some = await open('half', {}, fakeStorage({ kept: { setup_done_said: ['model', 'first_chat', 'chat_apps', 'memory'] } }))
+  assert.equal(said(byData(banner(some.view), 'banner-title')), '4 of 9 set up')
+  const next = DASH_DATA.items.find(it => it.id === 'personality')
+  assert.equal(said(byData(banner(some.view), 'banner-line')), `${next.name} ${next.why}`)
+  assert.equal(said(byData(banner(some.view), 'banner-open')), `Open ${next.name}`)
+  assert.equal(byData(banner(some.view), 'banner-open').props['data-card'], 'personality')
+  // all marked: the count sentence (the data has no all-done sentence for 9 cards), no line, no button
+  const done = await open('half', {}, fakeStorage({ kept: { setup_done_said: [...NINE] } }))
+  assert.equal(said(byData(banner(done.view), 'banner-title')), '9 of 9 set up')
+  assert.equal(byData(banner(done.view), 'banner-line'), null)
+  assert.equal(byData(banner(done.view), 'banner-open'), null)
+  assert.equal(all(banner(done.view), n => n.type === 'sdk:Button').length, 0)
+  // a mark moves the banner on
+  const { view } = await open('just_installed')
+  click(stop(view, 'model'))
+  click(byData(byData(dash(view), 'steps'), 'mark'))
+  assert.equal(said(byData(banner(view), 'banner-title')), '1 of 9 set up')
+  assert.equal(byData(banner(view), 'banner-open').props['data-card'], 'first_chat')
+})
+
+test('look: the banner\'s button opens its card as a click on the card does (the same panel under its row); a second press leaves it open', async () => {
+  const { view } = await open('half', {}, fakeStorage({ kept: { setup_done_said: ['model'] } }))
+  assert.equal(byData(dash(view), 'steps'), null)
+  click(byData(banner(view), 'banner-open'))
+  await settle(2)
+  assert.equal(stop(view, 'first_chat').props['aria-expanded'], true)
+  assert.ok(classesOf(stop(view, 'first_chat')).includes(D.sel))
+  assert.equal(byData(dash(view), 'steps').props['data-stop'], 'first_chat')
+  assert.equal(all(dash(view), n => n.props && n.props['data-hh'] === 'steps').length, 1)
+  click(byData(banner(view), 'banner-open'))
+  await settle(2)
+  assert.equal(byData(dash(view), 'steps').props['data-stop'], 'first_chat', 'still open')
+  // the card itself still closes it
+  click(stop(view, 'first_chat'))
+  assert.equal(byData(dash(view), 'steps'), null)
+})
+
+test('look: each of the 12 boxes carries its own accent class in Hermes\'s order (tile 1 to 3, then card 1 to 9 carrying on the count); the opened panel carries its card\'s accent', async () => {
+  const { view } = await open('half')
+  const tiles = ['bots', 'skills', 'plugins'].map(k => byData(dash(view), `tile-${k}`))
+  const boxes = [...tiles, ...stops(view)]
+  assert.equal(boxes.length, 12)
+  boxes.forEach((box, i) => assert.deepEqual(accentsOf(box), [ACCENTS[i % 7]], `box ${i + 1}`))
+  assert.deepEqual(boxes.map(b => ACCENTS.indexOf(accentsOf(b)[0])), [0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4])
+  // marking or opening a card does not change its accent
+  for (const [i, id] of NINE.entries()) {
+    click(stop(view, id))
+    const panel = byData(dash(view), 'steps')
+    assert.ok(classesOf(panel).includes(D.steps), id)
+    assert.deepEqual(accentsOf(panel), [ACCENTS[(3 + i) % 7]], id)
+    assert.deepEqual(accentsOf(stop(view, id)), accentsOf(panel), id)
+    click(stop(view, id))
+  }
+  // nothing else on the Dashboard wears an accent class
+  assert.equal(all(dash(view), n => n.props && accentsOf(n).length > 0).length, 12)
+})
+
+test('look: the head under the tiles is a section heading "Set up" and no longer repeats the count (the count is the banner\'s title)', async () => {
+  const { view } = await open('half', {}, fakeStorage({ kept: { setup_done_said: ['model', 'memory'] } }))
+  const setup = byData(dash(view), 'setup')
+  const head = setup.props.children.filter(Boolean)[0]
+  assert.equal(head.props.className, D.head)
+  const kids = [].concat(head.props.children).filter(Boolean)
+  assert.equal(kids.length, 1)
+  assert.equal(kids[0].type, 'h2')
+  assert.equal(kids[0].props.className, D.title)
+  assert.equal(said(kids[0]), 'Set up')
+  assert.equal(said(head), 'Set up')
+  assert.doesNotMatch(said(head), /\d/)
+  // the one count on the Dashboard sits in the banner's title
+  const counts = all(dash(view), n => n.props && n.props['data-hh'] === 'count')
+  assert.equal(counts.length, 1)
+  assert.equal(said(counts[0]), '2 of 9')
+  assert.equal(all(byData(banner(view), 'banner-title'), n => n.props && n.props['data-hh'] === 'count').length, 1)
+  assert.equal(byData(setup, 'count'), null)
 })
