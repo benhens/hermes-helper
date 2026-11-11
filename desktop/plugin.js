@@ -17090,15 +17090,17 @@ const LV_DONT_KNOW = ['N1', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE']
 // live-v2 changes-5 slow_ai, Lead's pick SLOW_A (job talk-live-3, point 4): Helper's line right after the written
 // answer when the visit's first AI call gave no answer in 12 s or gave no_reply text; its text to paste shows at once
 // under it, as H1's. Said once per visit (src/page.js keeps visit.slow: 'due', then 'said'; never stored).
-const SLOW = { line: LIVE_DATA.slow_ai.id, text: LIVE_DATA.slow_ai.text, source: null, answers: null, next: null, paste: LIVE_DATA.slow_ai.paste_text, note: null, used: null, hint: null, rows: null, docs: null }
+const SLOW_LINE = { line: LIVE_DATA.slow_ai.id, text: LIVE_DATA.slow_ai.text, source: null, answers: null, next: null, paste: LIVE_DATA.slow_ai.paste_text, note: null, used: null, hint: null, rows: null, docs: null }
 // Not after a don't-know line (hhcontent's gap: "I answered from my own notes" + "I don't have checked information"
 // read oddly together; Lead: it waits for the next written answer of the visit that is not one). The don't-know lines
-// are no_repeat's dont_know groups (N1, N1a, N1_AGAIN, and AGAIN in its place). Decided by the Builder: also not after
-// a line with things to pick or a line that asks a question, since SLOW_A after it would take the picks' place and
-// leave the question above the newest line; it waits for the next answer then too.
-const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know])
+// are no_repeat's dont_know groups (N1, N1a, N1_AGAIN, and AGAIN in its place), N1-skill (N1's words for a skill asked
+// by name) and MEAN_NONE (this file's own don't-know list for TALK, LV_DONT_KNOW). Decided by the Builder (review):
+// also not after a line with things to pick, a line that asks a question or asks for more (STUCK), a goodbye (BYE),
+// or a line with its own text to paste (H1, H2: two boxes to paste in a row), since SLOW_A after it would take the
+// picks' place, leave the question above the newest line, or read as a second hand-over; it waits for the next answer.
+const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know, ...LV_DONT_KNOW, 'N1-skill', ...TALK_DATA.no_repeat.groups.stuck, ...TALK_DATA.no_repeat.groups.bye])
 function slowFollows(visit, said) {
-  return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !/\?\s*$/.test(String(said.text || ''))
+  return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !said.paste && !/\?\s*$/.test(String(said.text || ''))
 }
 
 // Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a
@@ -18317,7 +18319,7 @@ function keepNamesWhole(text, keyAt = '') {
   return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `${keyAt}n${i}`)))
 }
 // talk-live-3 (Lead's call on question 5 of the c18 report): a line's words to read, with text to type in the paste
-// box's code style (an inline <code>, its quote marks not drawn; kept on one line unless longer than NAME_WHOLE_MAX)
+// box's code style (an inline <code>, a phrase's quote marks around it; kept on one line unless longer than NAME_WHOLE_MAX)
 // and names kept whole. typeLine: whether the whole line says "type" (src/quotes.js typedParts).
 function drawnWords(text, typeLine) {
   const parts = typedParts(text, typeLine)
@@ -19094,9 +19096,11 @@ function namesWhole(text) {
 // Text the person is to type (talk-live-3; Lead's call on question 5 of the c18 report, 11 Nov 05:08): in a line that
 // says "type" (the word, any case), a /command (a slash and letters, after a space or at the start, before a space, an
 // end mark or the end) and a phrase in quote marks (straight or curly). src/reveal.js draws each in the paste box's
-// code style, without its quote marks, and its word-by-word pace takes a quoted phrase as one word (TYPED_PHRASE).
+// code style (a quoted phrase keeps its marks, outside it), and its word-by-word pace takes a quoted phrase as one
+// word (TYPED_PHRASE).
 // A line that does not say "type" has none: "click “New session”" names a button, and "/home" may be a folder.
-//   typedParts(text, typeLine) -> null, or the parts in order: strings, and { typed: '/usage' } for each piece to type
+//   typedParts(text, typeLine) -> null, or the parts in order: strings (a phrase's quote marks among them), and
+//   { typed: '/usage' } for each piece to type
 //   typeLine: whether the whole line says "type" (a part of a line, as Said draws it, is judged by its whole line)
 const TYPE_WORD = /\btype\b/i
 const TYPED_PHRASE = /(["\u201c])([^"\u201c\u201d\n]+)(["\u201d])/g
@@ -19108,12 +19112,16 @@ function typedParts(text, typeLine = TYPE_WORD.test(String(text))) {
   for (const m of text.matchAll(TYPED_RX)) {
     const start = m[2] ? m.index + m[1].length : m.index
     if (start > at) parts.push(text.slice(at, start))
-    parts.push({ typed: m[2] || m[4] })
+    // review: a quoted phrase keeps its quote marks, drawn outside the code style, so every reader still sees and
+    // hears where it starts and ends
+    if (m[2]) parts.push({ typed: m[2] })
+    else parts.push(m[3], { typed: m[4] }, m[5])
     at = m.index + m[0].length
   }
   if (!parts.length) return null
   if (at < text.length) parts.push(text.slice(at))
-  return parts
+  // neighbouring strings (a phrase's marks and the words beside them) as one
+  return parts.reduce((out, p) => (typeof p === 'string' && typeof out[out.length - 1] === 'string' ? (out[out.length - 1] += p, out) : (out.push(p), out)), [])
 }
 
 // ---- src/talk-view.js ----
@@ -19654,18 +19662,19 @@ function makePage(ctx, opts = {}) {
       live.view.setFocusAsk(true)
     }
   }
-  // live-v2 changes-5: the visit's first AI call (w.first) gave no answer in 12 s or gave no_reply text: the AI step is
-  // off for the rest of the visit and SLOW_A is owed, once. Any later call that fails so only turns the AI step off.
+  // live-v2 changes-5: the visit's first AI call (w.firstTurn: the first message that went to the AI, its one or two
+  // calls) gave no answer in 12 s or gave no_reply text: the AI step is off for the rest of the visit and SLOW_A is owed,
+  // once. A later message whose call fails so only turns the AI step off.
   const slowFail = w => {
     memory.visit.aiOff = true
-    if (w.first && memory.visit.slow !== 'said') memory.visit.slow = 'due'
+    if (w.firstTurn && memory.visit.slow !== 'said') memory.visit.slow = 'due'
   }
   // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
   const slowAfter = said => {
     if (!slowFollows(memory.visit, said)) return []
     memory.visit.slow = 'said'
-    return [{ ...helperEntry(SLOW), send: false }]
+    return [{ ...helperEntry(SLOW_LINE), send: false }]
   }
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
@@ -19957,10 +19966,10 @@ function makePage(ctx, opts = {}) {
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
       writeKept()
-      // live-v2 changes-5: whether this is the visit's first AI call (only its failure owes SLOW_A)
-      const first = !visit.aiTried
+      // live-v2 changes-5: whether this is the visit's first message that goes to the AI (only its failure owes SLOW_A)
+      const firstTurn = !visit.aiTried
       visit.aiTried = true
-      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, first }
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, firstTurn }
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
@@ -20042,12 +20051,13 @@ function makePage(ctx, opts = {}) {
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
       if (next.kind === 'line' || next.kind === 'forget-all') {
         liveClose()
+        const result = next.kind === 'line' ? sayLine(next.line, visit) : askForgetAll(visit)
+        if (!result) return
         // talk-live-3: the button is done; its older line draws the label as plain faint text (src/talk-view.js)
         setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
+        return answer(result, next.label)
       }
-      if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
-      if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)
       if (next.kind === 'part') go(next.to)
     }
 

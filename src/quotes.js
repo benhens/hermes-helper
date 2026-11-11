@@ -49,9 +49,11 @@ export function namesWhole(text) {
 // Text the person is to type (talk-live-3; Lead's call on question 5 of the c18 report, 11 Nov 05:08): in a line that
 // says "type" (the word, any case), a /command (a slash and letters, after a space or at the start, before a space, an
 // end mark or the end) and a phrase in quote marks (straight or curly). src/reveal.js draws each in the paste box's
-// code style, without its quote marks, and its word-by-word pace takes a quoted phrase as one word (TYPED_PHRASE).
+// code style (a quoted phrase keeps its marks, outside it), and its word-by-word pace takes a quoted phrase as one
+// word (TYPED_PHRASE).
 // A line that does not say "type" has none: "click “New session”" names a button, and "/home" may be a folder.
-//   typedParts(text, typeLine) -> null, or the parts in order: strings, and { typed: '/usage' } for each piece to type
+//   typedParts(text, typeLine) -> null, or the parts in order: strings (a phrase's quote marks among them), and
+//   { typed: '/usage' } for each piece to type
 //   typeLine: whether the whole line says "type" (a part of a line, as Said draws it, is judged by its whole line)
 export const TYPE_WORD = /\btype\b/i
 export const TYPED_PHRASE = /(["\u201c])([^"\u201c\u201d\n]+)(["\u201d])/g
@@ -63,10 +65,14 @@ export function typedParts(text, typeLine = TYPE_WORD.test(String(text))) {
   for (const m of text.matchAll(TYPED_RX)) {
     const start = m[2] ? m.index + m[1].length : m.index
     if (start > at) parts.push(text.slice(at, start))
-    parts.push({ typed: m[2] || m[4] })
+    // review: a quoted phrase keeps its quote marks, drawn outside the code style, so every reader still sees and
+    // hears where it starts and ends
+    if (m[2]) parts.push({ typed: m[2] })
+    else parts.push(m[3], { typed: m[4] }, m[5])
     at = m.index + m[0].length
   }
   if (!parts.length) return null
   if (at < text.length) parts.push(text.slice(at))
-  return parts
+  // neighbouring strings (a phrase's marks and the words beside them) as one
+  return parts.reduce((out, p) => (typeof p === 'string' && typeof out[out.length - 1] === 'string' ? (out[out.length - 1] += p, out) : (out.push(p), out)), [])
 }

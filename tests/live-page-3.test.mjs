@@ -259,13 +259,13 @@ test('/usage is drawn in the paste box\'s code style, in the bubble and in the o
   assert.match(text(old), /type \/usage and send it/)
 })
 
-test('the hint under a don\'t-know line: "what can I ask you" in code style, its quote marks not drawn; a button name in marks is not', async () => {
+test('the hint under a don\'t-know line: "what can I ask you" in code style, its quote marks kept around it (review); a button name in marks is not', async () => {
   const { view } = await pastOpening('no_ai_step')
   send(view, 'can it fly a plane')
   assert.equal(line(view), 'N1')
   const hint = byData(bubble(view), 'hint')
   assert.deepEqual(all(hint, n => n.props['data-hh'] === 'typed').map(n => text(n)), ['what can I ask you'])
-  assert.equal(text(hint), 'To see what I can help with, type what can I ask you.')
+  assert.equal(text(hint), 'To see what I can help with, type \u201cwhat can I ask you\u201d.')
   send(view, TOKENS)
   assert.equal(all(bubble(view), n => n.props['data-hh'] === 'typed').length, 0, '“New session” is a button\'s name, not text to type')
 })

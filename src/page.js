@@ -26,7 +26,7 @@ import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
 import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
-import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW, slowFollows } from './live-turn.js'
+import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
 import { makeSetupCards, renderYourSetup } from './setup-tab.js'
@@ -189,18 +189,19 @@ export function makePage(ctx, opts = {}) {
       live.view.setFocusAsk(true)
     }
   }
-  // live-v2 changes-5: the visit's first AI call (w.first) gave no answer in 12 s or gave no_reply text: the AI step is
-  // off for the rest of the visit and SLOW_A is owed, once. Any later call that fails so only turns the AI step off.
+  // live-v2 changes-5: the visit's first AI call (w.firstTurn: the first message that went to the AI, its one or two
+  // calls) gave no answer in 12 s or gave no_reply text: the AI step is off for the rest of the visit and SLOW_A is owed,
+  // once. A later message whose call fails so only turns the AI step off.
   const slowFail = w => {
     memory.visit.aiOff = true
-    if (w.first && memory.visit.slow !== 'said') memory.visit.slow = 'due'
+    if (w.firstTurn && memory.visit.slow !== 'said') memory.visit.slow = 'due'
   }
   // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
   const slowAfter = said => {
     if (!slowFollows(memory.visit, said)) return []
     memory.visit.slow = 'said'
-    return [{ ...helperEntry(SLOW), send: false }]
+    return [{ ...helperEntry(SLOW_LINE), send: false }]
   }
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
@@ -492,10 +493,10 @@ export function makePage(ctx, opts = {}) {
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
       writeKept()
-      // live-v2 changes-5: whether this is the visit's first AI call (only its failure owes SLOW_A)
-      const first = !visit.aiTried
+      // live-v2 changes-5: whether this is the visit's first message that goes to the AI (only its failure owes SLOW_A)
+      const firstTurn = !visit.aiTried
       visit.aiTried = true
-      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, first }
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, firstTurn }
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
@@ -577,12 +578,13 @@ export function makePage(ctx, opts = {}) {
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
       if (next.kind === 'line' || next.kind === 'forget-all') {
         liveClose()
+        const result = next.kind === 'line' ? sayLine(next.line, visit) : askForgetAll(visit)
+        if (!result) return
         // talk-live-3: the button is done; its older line draws the label as plain faint text (src/talk-view.js)
         setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
+        return answer(result, next.label)
       }
-      if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
-      if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)
       if (next.kind === 'part') go(next.to)
     }
 

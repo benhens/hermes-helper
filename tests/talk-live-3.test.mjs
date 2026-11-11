@@ -7,7 +7,7 @@
 //   3. the work line's label is "About them: {work}" (tests/talk-live-2.test.mjs checks it in the requests)
 //   5. sch1 lost "update": "how do I update hermes" is N1 from code
 //   6. text the person is to type (a /command, or a quoted phrase in a line that says "type") is one piece in the
-//      paste box's code style; its quote marks are not drawn. (On the page: tests/live-page-3.test.mjs.)
+//      paste box's code style; a phrase keeps its quote marks, outside it (review). (On the page: tests/live-page-3.test.mjs.)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
@@ -15,8 +15,8 @@ import path from 'node:path'
 import { noReply, c26Fails, c27Fails, replyFlags, judgeWritten } from '../src/live-checks.js'
 import { LIVE_DATA } from '../src/live-data.js'
 import { LIVE_ROW } from '../src/live-rows.js'
-import { freshVisit, turnParts } from '../src/talk.js'
-import { askLive, goesToAi, SLOW } from '../src/live-turn.js'
+import { freshVisit, turnParts, lineFor } from '../src/talk.js'
+import { askLive, goesToAi, slowFollows, SLOW_LINE as SLOW } from '../src/live-turn.js'
 import { typedParts } from '../src/quotes.js'
 import { loadSrc } from './lib/render.mjs'
 import { liveProblems } from '../scripts/live-data.mjs'
@@ -123,6 +123,16 @@ test('changes-5 slow_ai: Lead\'s pick SLOW_A, word for word, with the data\'s te
   assert.equal(SLOW.paste, LIVE_JSON.slow_ai.paste_text)
 })
 
+test('review: SLOW_A waits after every don\'t-know line (N1-skill and MEAN_NONE too), a stuck or goodbye line, and a line with its own text to paste; it follows an answer', () => {
+  const due = { slow: 'due' }
+  const said = (kind, extra = {}) => lineFor({ kind, ...extra }, freshVisit('open', {}, true), 'build me a website', {})
+  for (const k of ['N1', 'N1a', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE', 'skill by name', 'STUCK', 'STUCK_SAME', 'BYE', 'H1', 'H2']) assert.equal(slowFollows(due, said(k)), false, k)
+  assert.equal(said('skill by name').line, 'N1-skill')
+  for (const k of ['THANKS', 'OK', 'CUT']) assert.equal(slowFollows(due, said(k)), true, k)
+  assert.equal(slowFollows({ slow: 'said' }, said('THANKS')), false)
+  assert.equal(slowFollows({ slow: null }, said('THANKS')), false)
+})
+
 /* ---------- 5. "update" ---------- */
 test('changes-5 sch1: "how do I update hermes" is N1 from code (no row by key words); the schedule still has every/daily/morning updates', () => {
   for (const t of ['how do I update hermes', 'how do I update hermes to the newest version']) {
@@ -144,8 +154,8 @@ test('changes-5 sch1: "how do I update hermes" is N1 from code (no row by key wo
 /* ---------- 6. text to type ---------- */
 test('look: text to type is a /command, or a quoted phrase in a line that says "type"; a quoted button name is not', () => {
   assert.deepEqual(typedParts('In a Hermes chat, not here, type /usage and send it.'), ['In a Hermes chat, not here, type ', { typed: '/usage' }, ' and send it.'])
-  assert.deepEqual(typedParts('To see what I can help with, type \u201cwhat can I ask you\u201d.'), ['To see what I can help with, type ', { typed: 'what can I ask you' }, '.'])
-  assert.deepEqual(typedParts('Sorry, I was not clear. Type the word you want explained, like "what is a skill".'), ['Sorry, I was not clear. Type the word you want explained, like ', { typed: 'what is a skill' }, '.'])
+  assert.deepEqual(typedParts('To see what I can help with, type \u201cwhat can I ask you\u201d.'), ['To see what I can help with, type \u201c', { typed: 'what can I ask you' }, '\u201d.'])
+  assert.deepEqual(typedParts('Sorry, I was not clear. Type the word you want explained, like "what is a skill".'), ['Sorry, I was not clear. Type the word you want explained, like "', { typed: 'what is a skill' }, '".'])
   assert.equal(typedParts('For a fresh chat, click \u201cNew session\u201d at the top left.'), null)
   assert.equal(typedParts('Pick one, or type your own question.'), null)
   assert.equal(typedParts('Files live in /home or C:/Users.'), null, 'a path is not a command')

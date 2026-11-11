@@ -29,15 +29,17 @@ const LV_DONT_KNOW = ['N1', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE']
 // live-v2 changes-5 slow_ai, Lead's pick SLOW_A (job talk-live-3, point 4): Helper's line right after the written
 // answer when the visit's first AI call gave no answer in 12 s or gave no_reply text; its text to paste shows at once
 // under it, as H1's. Said once per visit (src/page.js keeps visit.slow: 'due', then 'said'; never stored).
-export const SLOW = { line: LIVE_DATA.slow_ai.id, text: LIVE_DATA.slow_ai.text, source: null, answers: null, next: null, paste: LIVE_DATA.slow_ai.paste_text, note: null, used: null, hint: null, rows: null, docs: null }
+export const SLOW_LINE = { line: LIVE_DATA.slow_ai.id, text: LIVE_DATA.slow_ai.text, source: null, answers: null, next: null, paste: LIVE_DATA.slow_ai.paste_text, note: null, used: null, hint: null, rows: null, docs: null }
 // Not after a don't-know line (hhcontent's gap: "I answered from my own notes" + "I don't have checked information"
 // read oddly together; Lead: it waits for the next written answer of the visit that is not one). The don't-know lines
-// are no_repeat's dont_know groups (N1, N1a, N1_AGAIN, and AGAIN in its place). Decided by the Builder: also not after
-// a line with things to pick or a line that asks a question, since SLOW_A after it would take the picks' place and
-// leave the question above the newest line; it waits for the next answer then too.
-const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know])
+// are no_repeat's dont_know groups (N1, N1a, N1_AGAIN, and AGAIN in its place), N1-skill (N1's words for a skill asked
+// by name) and MEAN_NONE (this file's own don't-know list for TALK, LV_DONT_KNOW). Decided by the Builder (review):
+// also not after a line with things to pick, a line that asks a question or asks for more (STUCK), a goodbye (BYE),
+// or a line with its own text to paste (H1, H2: two boxes to paste in a row), since SLOW_A after it would take the
+// picks' place, leave the question above the newest line, or read as a second hand-over; it waits for the next answer.
+const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know, ...LV_DONT_KNOW, 'N1-skill', ...TALK_DATA.no_repeat.groups.stuck, ...TALK_DATA.no_repeat.groups.bye])
 export function slowFollows(visit, said) {
-  return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !/\?\s*$/.test(String(said.text || ''))
+  return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !said.paste && !/\?\s*$/.test(String(said.text || ''))
 }
 
 // Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a

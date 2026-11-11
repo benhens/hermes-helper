@@ -170,7 +170,7 @@ export function keepNamesWhole(text, keyAt = '') {
   return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `${keyAt}n${i}`)))
 }
 // talk-live-3 (Lead's call on question 5 of the c18 report): a line's words to read, with text to type in the paste
-// box's code style (an inline <code>, its quote marks not drawn; kept on one line unless longer than NAME_WHOLE_MAX)
+// box's code style (an inline <code>, a phrase's quote marks around it; kept on one line unless longer than NAME_WHOLE_MAX)
 // and names kept whole. typeLine: whether the whole line says "type" (src/quotes.js typedParts).
 export function drawnWords(text, typeLine) {
   const parts = typedParts(text, typeLine)

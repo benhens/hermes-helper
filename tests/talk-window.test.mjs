@@ -597,10 +597,9 @@ test('a message nobody has an answer for: the fixed line and, small under it, th
   const hint = byData(bubble(view), 'hint')
   assert.equal(hint.type, 'p')
   assert.equal(hint.props.className, T.where)
-  // talk-live-3 (Lead's call on question 5 of the c18 report): the words to type in the paste box's code style, their
-  // quote marks not drawn (tests/live-page-3.test.mjs)
-  assert.equal(TALK_DATA.fixed.N_HINT.text, 'To see what I can help with, type "what can I ask you".')
-  assert.equal(text(hint), 'To see what I can help with, type what can I ask you.')
+  assert.equal(text(hint), curlyQuotes(TALK_DATA.fixed.N_HINT.text))
+  assert.equal(text(hint), 'To see what I can help with, type \u201cwhat can I ask you\u201d.')
+  // talk-live-3 (Lead's call on question 5 of the c18 report): the words to type in the paste box's code style
   assert.equal(text(byData(hint, 'typed')), 'what can I ask you')
 })
 
