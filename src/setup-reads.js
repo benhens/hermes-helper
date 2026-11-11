@@ -3,6 +3,8 @@
 //
 // One copy (dash-v2, the two branches joined): the Dashboard (src/dash.js, src/dash-rules.js) and Helper's set-up
 // conversation (src/setup-look.js) both use these. They began as src/dash-rules.js of job/dash-v1 (65b108b).
+// Which bot the reads name is the caller's: the set-up conversation reads the main bot, the Dashboard the bot the app
+// has open.
 //   install        always done: this page runs only inside an installed Hermes
 //   model          setup.runtime_check { profile: main bot } says ok: true (Hermes's own free plan counts)
 //   personality    profiles.describe { name: main bot }: soul is not empty and not one of Hermes's starter texts

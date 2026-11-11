@@ -17747,6 +17747,8 @@ const hintFor = entry => (entry && entry.answers && entry.answers.items.length ?
 //
 // One copy (dash-v2, the two branches joined): the Dashboard (src/dash.js, src/dash-rules.js) and Helper's set-up
 // conversation (src/setup-look.js) both use these. They began as src/dash-rules.js of job/dash-v1 (65b108b).
+// Which bot the reads name is the caller's: the set-up conversation reads the main bot, the Dashboard the bot the app
+// has open.
 //   install        always done: this page runs only inside an installed Hermes
 //   model          setup.runtime_check { profile: main bot } says ok: true (Hermes's own free plan counts)
 //   personality    profiles.describe { name: main bot }: soul is not empty and not one of Hermes's starter texts
@@ -21073,10 +21075,11 @@ const DASH_DATA = {
 // the answers here. No AI anywhere. What each rule reads (content/dash-setup-list-v2.json, docs/answers/
 // hhtech-dash-reads.md and -reads2.md, "For builder:"):
 //   install        always done: this page runs only inside an installed Hermes
-//   model          setup.runtime_check { profile: main bot } says ok: true (Hermes's own free plan counts)
-//   personality    profiles.describe { name: main bot }: soul is not empty and not one of Hermes's starter texts
+//   (dash-v2: bot = the bot the app has open; Lead, 11 Nov)
+//   model          setup.runtime_check { profile: bot } says ok: true (Hermes's own free plan counts)
+//   personality    profiles.describe { name: bot }: soul is not empty and not one of Hermes's starter texts
 //   chat_apps      host.status(): gateway_platforms names at least one chat app (switched on, with its key)
-//   scheduled_job  cron.manage { action: 'list', profile: main bot, include_disabled: true }: at least one job
+//   scheduled_job  cron.manage { action: 'list', profile: bot, include_disabled: true }: at least one job
 //   second_bot     profiles.list: two or more bots
 // A read that failed or has not come back is "not known" (null): never shown as done, never "You are here".
 // dash-v2 (the two branches joined): the starter personality texts, which bot, and the six rules (doneFlags) are in
@@ -21198,12 +21201,13 @@ function distinctSkills(perBot) {
 // Helper itself (Helper is never in that list: hhtech-dash-icons.md point 2). A row of plugins.manage list is the
 // person's when its source is not 'bundled' (Hermes's own parts; tui_gateway/methods_tools.py counts user_count the
 // same way), and switched on when its status is 'enabled' ('not enabled' and 'disabled' are not: hermes_cli/
-// plugins_cmd.py _plugin_status). A failed read, or an answer with no rows: not shown, never a bare 1.
+// plugins_cmd.py _plugin_status). A row that does not say where it comes from is not taken for the person's. A
+// failed read, or an answer without the list of rows: not shown, never a bare 1.
 function pluginCount(read) {
   if (!read || !read.ok || !read.value || typeof read.value !== 'object') return null
   const rows = read.value.plugins
   if (!Array.isArray(rows)) return null
-  return rows.filter(r => r && typeof r === 'object' && r.source !== 'bundled' && r.status === 'enabled').length + 1
+  return rows.filter(r => r && typeof r === 'object' && typeof r.source === 'string' && r.source !== 'bundled' && r.status === 'enabled').length + 1
 }
 // A tile's word under its number (hhcontent): the number 1 takes the _one word, every other number, and a tile with
 // no number yet, the plain one. narrow: at the narrow size a tile that has a short word takes it (the plugins tile:
@@ -21341,7 +21345,16 @@ const fill = (s, map) => s.replace(/\{(\w+)\}/g, (m, k) => (k in map ? String(ma
 // The official Hermes docs: the only web address the page ever hands to the person's browser (the Dashboard's source
 // tags; Helper's "Open the Quickstart").
 const HERMES_DOCS_BASE = 'https://hermes-agent.nousresearch.com/docs/'
-const isHermesDocsUrl = url => typeof url === 'string' && url.startsWith(HERMES_DOCS_BASE) && !/[\s"'<>]/.test(url)
+// (read as a web address, so a path with ".." that leaves /docs/, another port or a name before an @ is refused)
+function isHermesDocsUrl(url) {
+  if (typeof url !== 'string' || !url.startsWith(HERMES_DOCS_BASE) || /[\s"'<>\\%@]/.test(url)) return false
+  try {
+    const u = new URL(url)
+    return u.origin + '/docs/' === HERMES_DOCS_BASE && u.pathname.startsWith('/docs/') && !u.username && u.href === url
+  } catch {
+    return false
+  }
+}
 // Opens a docs page in the person's browser (the SDK's door to the OS); anything else, or a missing door, is ignored.
 function openHermesDocs(ctx, url) {
   if (!isHermesDocsUrl(url)) return
@@ -21375,7 +21388,10 @@ function makeDashboard(ctx) {
   // tabs), so it lives while the page is on screen. active: the Dashboard is the open tab. Each time it is opened
   // (and when the app opens another bot), everything is read again from the start: nothing that was read is kept.
   function useDashboard({ active }) {
-    const openBot = openBotName(useValue(host.state.profile))
+    // the bot the app has open, as the app names it; when it gives no name (''), Hermes means its default bot
+    const given = useValue(host.state.profile)
+    const openBot = openBotName(given)
+    const nameGiven = typeof given === 'string' && given.trim() !== ''
     const [reads, setReads] = useState({})
     useEffect(() => {
       if (!active) return undefined
@@ -21396,16 +21412,19 @@ function makeDashboard(ctx) {
         if (!alive) return
         const rows = bots.ok ? botRows(bots.value) : null
         put({ bots: rows ? bots : { ok: false } })
+        // the bot every per-bot read names: the open one by the app's own name; with no name given, the one Hermes
+        // marks as default in its list of bots (else Hermes's own name for it, "default")
+        const bot = nameGiven ? openBot : mainBotName(rows) || openBot
         const listSessions = door(() => host.listPersistedSessions)
         const getStatus = door(() => host.status)
-        const sessions = listSessions ? read(() => listSessions(null, { profile: openBot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
+        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
         const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
         const [model, soul, cron, st, ses] = await Promise.all([
           // the open bot, by the name the app itself gives (never a guessed bot): so these are read also when the
           // bots read failed
-          request('setup.runtime_check', { profile: openBot }),
-          request('profiles.describe', { name: openBot }),
-          request('cron.manage', { action: 'list', profile: openBot, include_disabled: true }),
+          request('setup.runtime_check', { profile: bot }),
+          request('profiles.describe', { name: bot }),
+          request('cron.manage', { action: 'list', profile: bot, include_disabled: true }),
           status,
           sessions
         ])
@@ -21414,7 +21433,7 @@ function makeDashboard(ctx) {
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
         put({ skills: skills || [{ ok: false }] })
-        const plugins = await request('plugins.manage', { action: 'list', profile: openBot }, DASH_SLOW_READ_MS)
+        const plugins = await request('plugins.manage', { action: 'list', profile: bot }, DASH_SLOW_READ_MS)
         put({ plugins })
       })().catch(() => {})
       return () => {
@@ -21422,26 +21441,29 @@ function makeDashboard(ctx) {
         // the tab was left (or another bot opened): what was read goes
         setReads({})
       }
-    }, [active, openBot])
+    }, [active, openBot, nameGiven])
     const [open, setOpenNow] = useState(() => kept.open)
-    const setOpen = to =>
-      setOpenNow(old => {
-        const next = typeof to === 'function' ? to(old) : to
-        kept.open = next
-        return next
-      })
+    const setOpen = to => {
+      const next = typeof to === 'function' ? to(open) : to
+      kept.open = next
+      setOpenNow(next)
+    }
     const [roadWidth, roadRef] = useDashWidth()
     const [gridWidth, gridRef] = useDashWidth()
     const stepsBox = useRef(null)
     // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
     // (a stop found open on coming back is brought into view the same way)
     const [reveal, setReveal] = useState(() => kept.open !== null)
+    // It waits until the steps are on screen and the path's reads are back (Activity arrives with them and moves
+    // what is under it), so a stop found open on coming back, also to another tab first, is not missed.
+    const settled = !!reads.pathRead
     useEffect(() => {
-      if (!reveal) return
-      setReveal(false)
+      if (!reveal || !active || !settled) return
       const el = stepsBox.current
-      if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' })
-    }, [reveal])
+      if (!el) return
+      setReveal(false)
+      if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' })
+    }, [reveal, active, settled, open])
     const toggle = id => {
       setOpen(o => (o === id ? null : id))
       if (open !== id) setReveal(true)

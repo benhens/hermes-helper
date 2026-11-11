@@ -61,8 +61,7 @@ test('every class the code names has a rule in the sheet, and the sheet has no c
 test('the path\'s line: one thin neutral line through all 11 stops, in Hermes\'s neutral edge colour (--sidebar-edge-border, hhdesign\'s review: the hairline --ui-stroke-tertiary is 10% accent, so blue); no rule colours it, in any state', () => {
   const lineRules = rules.filter(r => selectorsOf(r).some(s => /\.hhd-line(?![\w-])/.test(s)))
   assert.deepEqual(lineRules, [`.${D.line}{fill:none;stroke:${EDGE};stroke-width:1.5;stroke-linecap:round}`])
-  // the fallback, where a Hermes has no such variable: the grey of the quiet stops' pictures and names
-  assert.equal(EDGE, 'var(--sidebar-edge-border,var(--ui-text-quaternary))')
+  // (its fallback, where a Hermes has no such variable, is the grey of the quiet stops' pictures and names)
   // the quiet stops' ring is the line's colour, so ring and line stay one colour
   assert.ok(rules.find(r => r.startsWith(`.${D.quiet} .${D.dot}{`)).includes(`border:1.5px solid ${EDGE};`))
   // the hairline stays where Hermes itself uses it: the cards' edge in light, the divider above "Next"

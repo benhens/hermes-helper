@@ -222,6 +222,11 @@ test('plugins: only the plugins switched on for the open bot, plus 1 for Helper;
   assert.equal(pluginCount(ok({ user_count: 1, plugins: [row('user', 'disabled')] })), 1)
   assert.equal(pluginCount(ok({ user_count: 1, plugins: [row('user', 'enabled')] })), 2)
   assert.equal(pluginCount(ok({ user_count: 3, plugins: [row('user', 'enabled'), row('git', 'enabled'), row('user', 'not enabled'), row('bundled', 'enabled')] })), 3)
+  // a row that does not say where it comes from is not taken for the person's (a Hermes that left the field out
+  // would otherwise count its own 59 switched-on parts)
+  assert.equal(pluginCount(ok({ plugins: [{ name: 'x', status: 'enabled' }, { name: 'y', source: null, status: 'enabled' }, row('user', 'enabled')] })), 2)
+  // an empty list is a Hermes with nothing listed: Helper only
+  assert.equal(pluginCount(ok({ plugins: [] })), 1)
   assert.equal(pluginCount(FAIL), null)
   assert.equal(pluginCount(ok({ user_count: 2 })), null, 'no rows to read the switches from: not shown')
   assert.equal(pluginCount(ok({ plugins: 'x' })), null)

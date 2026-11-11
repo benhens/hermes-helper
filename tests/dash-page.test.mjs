@@ -446,7 +446,7 @@ test('the docs door (the source tags and Helper\'s "Open the Quickstart") hands 
   assert.equal(HERMES_DOCS_BASE, 'https://hermes-agent.nousresearch.com/docs/')
   const opened = []
   const ctx = { os: { openExternal: u => opened.push(u) } }
-  for (const bad of ['https://example.com/docs/', 'http://hermes-agent.nousresearch.com/docs/x', 'https://hermes-agent.nousresearch.com.evil.example/docs/x', 'javascript:alert(1)', 'https://hermes-agent.nousresearch.com/docs/x" onclick="y', '', null, undefined, 42]) {
+  for (const bad of ['https://hermes-agent.nousresearch.com/docs/../x', 'https://hermes-agent.nousresearch.com/docs/..\\..\\x', 'https://hermes-agent.nousresearch.com/docs/%2e%2e/x', 'https://user@hermes-agent.nousresearch.com/docs/x', 'https://hermes-agent.nousresearch.com:8443/docs/x', 'https://example.com/docs/', 'http://hermes-agent.nousresearch.com/docs/x', 'https://hermes-agent.nousresearch.com.evil.example/docs/x', 'javascript:alert(1)', 'https://hermes-agent.nousresearch.com/docs/x" onclick="y', '', null, undefined, 42]) {
     assert.equal(isHermesDocsUrl(bad), false, String(bad))
     openHermesDocs(ctx, bad)
   }
@@ -565,6 +565,60 @@ test('the narrow sizes: under 640 px of left side the tab takes hhdesign\'s narr
   // the room: two gaps between stops (11 stops on 448 px less 16 px each side), less 8 px
   const room = Math.floor((2 * (448 - 32)) / 10) - 8
   for (const st of stops(view)) assert.deepEqual(all(st, n => n.props.className === D.label)[0].props.style, { width: `${room}px` }, st.props['data-stop'])
+})
+
+test('a read that comes back late, after the app opened another bot or the tab was left, is dropped: it never shows under the new bot', async () => {
+  useHost('half', { openBot: 'default', byBot: { bot1: 'all' }, plugins: { default: ONE_ON, bot1: [] } })
+  const host = globalThis.__hhHost
+  const plain = host.request
+  const held = []
+  // every plugins read waits until the test lets it go
+  host.request = (m, p) => (m === 'plugins.manage' ? new Promise(r => held.push(() => r(plain(m, p)))) : plain(m, p))
+  const reg = await registerPlugin(fakeStorage(), fakeTimers())
+  const view = mount(reg.Page)
+  await settle(12)
+  assert.equal(tileNumber(view, 'plugins'), 'waiting')
+  assert.equal(held.length, 1)
+  // the app opens bot1 while the main bot's plugins read is still out
+  host.profile = 'bot1'
+  click(stop(view, 'memory'))
+  await settle(12)
+  assert.equal(held.length, 2, 'bot1\'s own plugins read is out too')
+  // the main bot's answer (2) comes back now: it is not shown under bot1
+  held[0]()
+  await settle(6)
+  assert.equal(tileNumber(view, 'plugins'), 'waiting', 'the old bot\'s number is dropped')
+  held[1]()
+  await settle(6)
+  assert.equal(tileSaid(view, 'plugins'), '1 plugin on in this bot')
+  // and after the tab is left: a late answer changes nothing, and the tab opens with waiting blocks
+  host.profile = 'default'
+  click(stop(view, 'memory'))
+  await settle(12)
+  assert.equal(held.length, 3)
+  click(all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')[1])
+  held[2]()
+  await settle(6)
+  click(all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')[0])
+  assert.equal(tileNumber(view, 'plugins'), 'waiting')
+})
+
+test('the app gives no name for the open bot (an empty profile): the bot Hermes marks as default is read, by its own name', async () => {
+  useHost('half', { openBot: '' })
+  const host = globalThis.__hhHost
+  host.profiles = () => ({ profiles: [{ name: 'home', is_default: true }, { name: 'work', is_default: false }] })
+  const reg = await registerPlugin(fakeStorage(), fakeTimers())
+  const view = mount(reg.Page)
+  await settle(12)
+  const named = log.filter(e => typeof e === 'object' && e.params && (e.params.profile || e.params.name))
+  assert.deepEqual([...new Set(named.map(e => e.params.profile || e.params.name))], ['home'])
+  assert.equal(host.sdkCalls.find(c => c.name === 'listPersisted').arg.profile, 'home')
+  assert.equal(said(byData(dash(view), 'count')), '4 of 6')
+  // and when the list of bots could not be read either: Hermes's own name for it, "default"
+  const { view: v2 } = await open('half', { openBot: '', failing: ['profiles.list'] })
+  const named2 = log.filter(e => typeof e === 'object' && e.params && (e.params.profile || e.params.name))
+  assert.deepEqual([...new Set(named2.map(e => e.params.profile || e.params.name))], ['default'])
+  assert.equal(stop(v2, 'model').props['data-state'], 'done')
 })
 
 test('the bots read failed: the open bot is still read by its own name (the app says which bot is open); only A second bot is unknown, and nobody is placed after it', async () => {

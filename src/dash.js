@@ -19,7 +19,7 @@ import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, D, cx } from './look.js'
 import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
-import { botRows, openBotName, doneFlags, makeReader } from './setup-reads.js'
+import { botRows, mainBotName, openBotName, doneFlags, makeReader } from './setup-reads.js'
 import { pathStates, chatDays, activityGrid, daysSinceUsed, lastUsedLine, weeksThatFit, distinctSkills, pluginCount, tileWord } from './dash-rules.js'
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
@@ -127,7 +127,16 @@ const fill = (s, map) => s.replace(/\{(\w+)\}/g, (m, k) => (k in map ? String(ma
 // The official Hermes docs: the only web address the page ever hands to the person's browser (the Dashboard's source
 // tags; Helper's "Open the Quickstart").
 export const HERMES_DOCS_BASE = 'https://hermes-agent.nousresearch.com/docs/'
-export const isHermesDocsUrl = url => typeof url === 'string' && url.startsWith(HERMES_DOCS_BASE) && !/[\s"'<>]/.test(url)
+// (read as a web address, so a path with ".." that leaves /docs/, another port or a name before an @ is refused)
+export function isHermesDocsUrl(url) {
+  if (typeof url !== 'string' || !url.startsWith(HERMES_DOCS_BASE) || /[\s"'<>\\%@]/.test(url)) return false
+  try {
+    const u = new URL(url)
+    return u.origin + '/docs/' === HERMES_DOCS_BASE && u.pathname.startsWith('/docs/') && !u.username && u.href === url
+  } catch {
+    return false
+  }
+}
 // Opens a docs page in the person's browser (the SDK's door to the OS); anything else, or a missing door, is ignored.
 export function openHermesDocs(ctx, url) {
   if (!isHermesDocsUrl(url)) return
@@ -161,7 +170,10 @@ export function makeDashboard(ctx) {
   // tabs), so it lives while the page is on screen. active: the Dashboard is the open tab. Each time it is opened
   // (and when the app opens another bot), everything is read again from the start: nothing that was read is kept.
   function useDashboard({ active }) {
-    const openBot = openBotName(useValue(host.state.profile))
+    // the bot the app has open, as the app names it; when it gives no name (''), Hermes means its default bot
+    const given = useValue(host.state.profile)
+    const openBot = openBotName(given)
+    const nameGiven = typeof given === 'string' && given.trim() !== ''
     const [reads, setReads] = useState({})
     useEffect(() => {
       if (!active) return undefined
@@ -182,16 +194,19 @@ export function makeDashboard(ctx) {
         if (!alive) return
         const rows = bots.ok ? botRows(bots.value) : null
         put({ bots: rows ? bots : { ok: false } })
+        // the bot every per-bot read names: the open one by the app's own name; with no name given, the one Hermes
+        // marks as default in its list of bots (else Hermes's own name for it, "default")
+        const bot = nameGiven ? openBot : mainBotName(rows) || openBot
         const listSessions = door(() => host.listPersistedSessions)
         const getStatus = door(() => host.status)
-        const sessions = listSessions ? read(() => listSessions(null, { profile: openBot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
+        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
         const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
         const [model, soul, cron, st, ses] = await Promise.all([
           // the open bot, by the name the app itself gives (never a guessed bot): so these are read also when the
           // bots read failed
-          request('setup.runtime_check', { profile: openBot }),
-          request('profiles.describe', { name: openBot }),
-          request('cron.manage', { action: 'list', profile: openBot, include_disabled: true }),
+          request('setup.runtime_check', { profile: bot }),
+          request('profiles.describe', { name: bot }),
+          request('cron.manage', { action: 'list', profile: bot, include_disabled: true }),
           status,
           sessions
         ])
@@ -200,7 +215,7 @@ export function makeDashboard(ctx) {
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
         put({ skills: skills || [{ ok: false }] })
-        const plugins = await request('plugins.manage', { action: 'list', profile: openBot }, DASH_SLOW_READ_MS)
+        const plugins = await request('plugins.manage', { action: 'list', profile: bot }, DASH_SLOW_READ_MS)
         put({ plugins })
       })().catch(() => {})
       return () => {
@@ -208,26 +223,29 @@ export function makeDashboard(ctx) {
         // the tab was left (or another bot opened): what was read goes
         setReads({})
       }
-    }, [active, openBot])
+    }, [active, openBot, nameGiven])
     const [open, setOpenNow] = useState(() => kept.open)
-    const setOpen = to =>
-      setOpenNow(old => {
-        const next = typeof to === 'function' ? to(old) : to
-        kept.open = next
-        return next
-      })
+    const setOpen = to => {
+      const next = typeof to === 'function' ? to(open) : to
+      kept.open = next
+      setOpenNow(next)
+    }
     const [roadWidth, roadRef] = useDashWidth()
     const [gridWidth, gridRef] = useDashWidth()
     const stepsBox = useRef(null)
     // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
     // (a stop found open on coming back is brought into view the same way)
     const [reveal, setReveal] = useState(() => kept.open !== null)
+    // It waits until the steps are on screen and the path's reads are back (Activity arrives with them and moves
+    // what is under it), so a stop found open on coming back, also to another tab first, is not missed.
+    const settled = !!reads.pathRead
     useEffect(() => {
-      if (!reveal) return
-      setReveal(false)
+      if (!reveal || !active || !settled) return
       const el = stepsBox.current
-      if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' })
-    }, [reveal])
+      if (!el) return
+      setReveal(false)
+      if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' })
+    }, [reveal, active, settled, open])
     const toggle = id => {
       setOpen(o => (o === id ? null : id))
       if (open !== id) setReveal(true)

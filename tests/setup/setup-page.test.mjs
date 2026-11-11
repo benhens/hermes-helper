@@ -95,6 +95,8 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   await send(view, 'send reminders to my members about training')
   // the look: by itself, the main bot's three reads after the list of bots, and no AI call
   assert.deepEqual(lookCalls(host).map(([m]) => m).sort(), READS)
+  // in all, each of these was asked twice: once by the Dashboard when the page opened, once by the look
+  for (const m of READS) assert.equal(host.calls.filter(([x, p]) => x === m && p && (p.profile || p.name)).length, 2, m)
   for (const [m, p] of lookCalls(host)) assert.equal(m === 'profiles.describe' ? p.name : p.profile, 'default', m + ' for the main bot')
   assert.deepEqual(lookCalls(host).find(([m]) => m === 'cron.manage')[1], { action: 'list', profile: 'default', include_disabled: true })
   const seen = olds(view).at(-1)
@@ -196,6 +198,26 @@ test('no model that answers: the model first (R1), whatever the answers', opt, a
   await press(view, 'Several bots, one per job')
   assert.match(oldText(olds(view).find(n => n.props['data-line'] === 'SEEN')), /You have no model that answers yet \(the AI that thinks\)\. You have one bot so far\./)
   assert.equal(bubbleSaid(view), 'Hermes needs a model before anything else. Next: A model. The AI that does the thinking. Your app may already have a free one. Want the steps?')
+})
+
+// dash-v2: the Dashboard reads the bot the app has open; Helper's set-up conversation still reads the main bot
+test('another bot open in the app: the look still reads the main bot (the one Hermes marks as default), never the open one', opt, async () => {
+  const host = useHost({ bots: 2 })
+  host.profile = 'bot1'
+  const { Page } = await registerPlugin(fakeStorage(), fakeTimers({ hold: [12000] }), {}, src => aiModeSource(src, 'ai_writes'))
+  const view = mount(Page)
+  await settle()
+  finish(view)
+  byData(view.tree, 'skip').props.onClick({ preventDefault() {} })
+  finish(view)
+  await press(view, 'I know it well')
+  await press(view, 'Several bots, one per job')
+  assert.deepEqual(lookCalls(host).map(([m]) => m).sort(), READS)
+  for (const [m, p] of lookCalls(host)) assert.equal(m === 'profiles.describe' ? p.name : p.profile, 'default', m + ' for the main bot')
+  // while the Dashboard, on the same page, read the open bot
+  const dashReads = host.calls.filter(([m, p, ms]) => ms !== LOOK_READ_MS && p && (p.profile || p.name))
+  assert.ok(dashReads.length >= 3)
+  for (const [m, p] of dashReads) assert.equal(p.profile || p.name, 'bot1', m + ' for the open bot')
 })
 
 // dash-v2 (the two branches joined): the docs door is one for the whole page now (src/dash.js openHermesDocs)

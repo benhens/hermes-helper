@@ -2,10 +2,11 @@
 // the answers here. No AI anywhere. What each rule reads (content/dash-setup-list-v2.json, docs/answers/
 // hhtech-dash-reads.md and -reads2.md, "For builder:"):
 //   install        always done: this page runs only inside an installed Hermes
-//   model          setup.runtime_check { profile: main bot } says ok: true (Hermes's own free plan counts)
-//   personality    profiles.describe { name: main bot }: soul is not empty and not one of Hermes's starter texts
+//   (dash-v2: bot = the bot the app has open; Lead, 11 Nov)
+//   model          setup.runtime_check { profile: bot } says ok: true (Hermes's own free plan counts)
+//   personality    profiles.describe { name: bot }: soul is not empty and not one of Hermes's starter texts
 //   chat_apps      host.status(): gateway_platforms names at least one chat app (switched on, with its key)
-//   scheduled_job  cron.manage { action: 'list', profile: main bot, include_disabled: true }: at least one job
+//   scheduled_job  cron.manage { action: 'list', profile: bot, include_disabled: true }: at least one job
 //   second_bot     profiles.list: two or more bots
 // A read that failed or has not come back is "not known" (null): never shown as done, never "You are here".
 import { DASH_DATA } from './dash-data.js'
@@ -128,12 +129,13 @@ export function distinctSkills(perBot) {
 // Helper itself (Helper is never in that list: hhtech-dash-icons.md point 2). A row of plugins.manage list is the
 // person's when its source is not 'bundled' (Hermes's own parts; tui_gateway/methods_tools.py counts user_count the
 // same way), and switched on when its status is 'enabled' ('not enabled' and 'disabled' are not: hermes_cli/
-// plugins_cmd.py _plugin_status). A failed read, or an answer with no rows: not shown, never a bare 1.
+// plugins_cmd.py _plugin_status). A row that does not say where it comes from is not taken for the person's. A
+// failed read, or an answer without the list of rows: not shown, never a bare 1.
 export function pluginCount(read) {
   if (!read || !read.ok || !read.value || typeof read.value !== 'object') return null
   const rows = read.value.plugins
   if (!Array.isArray(rows)) return null
-  return rows.filter(r => r && typeof r === 'object' && r.source !== 'bundled' && r.status === 'enabled').length + 1
+  return rows.filter(r => r && typeof r === 'object' && typeof r.source === 'string' && r.source !== 'bundled' && r.status === 'enabled').length + 1
 }
 // A tile's word under its number (hhcontent): the number 1 takes the _one word, every other number, and a tile with
 // no number yet, the plain one. narrow: at the narrow size a tile that has a short word takes it (the plugins tile:
