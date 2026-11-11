@@ -114,6 +114,27 @@ test('apostrophes: drawn curly in Helper\'s lines; straight in the text to paste
   for (const s of [lineFor({ kind: 'F3' }, st).text, TALK_DATA.fixed.H1.text]) assert.match(s, /\p{L}'\p{L}/u, 'the data keeps its straight ones')
 })
 
+test('a name the person typed is left as typed inside Helper\'s line ("O\'Neil"), while the line\'s own apostrophes are curled', async () => {
+  assert.equal(curlyQuotes("Thanks, O'Neil. What's next?", ["O'Neil"]), "Thanks, O'Neil. What’s next?")
+  assert.equal(curlyQuotes("It's O'Neil's", ["O'Neil"]), "It’s O'Neil's", 'only the typed name is kept; the line around it is curled')
+  assert.equal(curlyQuotes("What's up", ['Ann']), 'What’s up')
+  // in the window: the first answer, a name with an apostrophe; later, the name typed again; and Hermes opened again
+  const storage = fakeStorage()
+  const { view } = await open(storage)
+  finish(view)
+  send(view, "O'Neil")
+  assert.equal(said(view), "Nice to meet you, O'Neil. What do you do?")
+  assert.equal(storage.data.get('kept').name, "O'Neil")
+  finish(view)
+  send(view, 'I run a tennis club')
+  send(view, "my name is D'Arcy")
+  assert.equal(said(view), "Thanks, D'Arcy. Ask me anything about Hermes.")
+  const old = conversation(view).filter(c => c.props['data-hh'] === 'old')
+  assert.ok(old.some(o => text(o).includes("Nice to meet you, O'Neil.")), 'the older line too')
+  const { view: again } = await open(storage)
+  assert.equal(said(again), "Hi again, D'Arcy. What would you like Hermes to help you with?")
+})
+
 test('every Helper line drawn in the bubble and the older lines has no straight pair left, and no straight apostrophe between letters, while the data keeps its own', async () => {
   const { view } = await pastOpening()
   const seen = []

@@ -9202,10 +9202,10 @@ function keptToStore(kept) {
 // its own, and no AI step: nothing here sends anything anywhere.
 // tests/talk.test.mjs replays every conversation route2.py itself ran and must get the same result
 // at every turn, the stored record included.
-//   freshVisit(stage, kept)       what Helper knows in this visit: the stage of the opening, the
+//   freshVisit(stage, kept, met)  what Helper knows in this visit: the stage of the opening, the
 //                                 open question, what was asked and found, the name and what the
-//                                 person does, and `kept`, the stored record (the only part the page
-//                                 writes to storage, src/kept.js).
+//                                 person does, `kept`, the stored record (written by the page,
+//                                 src/kept.js), and `met`, whether Helper has said hello before (changes-14).
 //   turn(text, visit)             a typed message -> a result { kind, ... }
 //   pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer   what the person picks or presses
 //   lineFor(result, visit, typed, opts)   the result as the line Helper says, its answers, its button
@@ -9946,6 +9946,9 @@ function noRepeat(out, st, text) {
     } else cands.push({ kind: c })
   }
   const next = cands.find(x => !avoid.includes(lineKey(x))) || cands.find(x => lineKey(x) !== st.lastKey)
+  // no other line to say (not possible with today's data: every in_place group has two lines that are not
+  // 'plain'): the line as chosen, rather than a crash
+  if (!next) return out
   for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) next[x] = out[x]
   next.repeat_of = k
   st.pending = null
@@ -10412,7 +10415,9 @@ function openingLine(st = null) {
 //   note: the faint "Kept: ..." line { text, link, first }; used: "From what I keep: ..." { text,
 //   link, topic }; hint: a small faint line (N_HINT); rows: the list of kept things (A1).
 function lineFor(result, st, typed = '', opts = {}) {
-  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...more })
+  // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
+  const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
+  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(asTyped.length ? { asTyped } : {}), ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
   const dontKnowLine = id => said(id, FIXED[id].text, { hint: FIXED.N_HINT.text })
   const RM = Object.fromEntries(KEEP_REMEMBER.lines.map(l => [l.id, l]))
@@ -12347,8 +12352,20 @@ function BubbleLink() {
 // A quote mark with no partner stays straight.
 // Apostrophes (hhdesign's review of d1ceddc, section 3 point 3): in the same step, a straight ' between two
 // letters is drawn as ’ (I’m, What’s, Helper’s), with the same four exceptions.
-function curlyQuotes(text) {
-  return typeof text === 'string' ? text.replace(/"([^"\n]*)"/g, '\u201c$1\u201d').replace(/(\p{L})'(?=\p{L})/gu, '$1\u2019') : text
+// asTyped: the person's own words filled into the line (a name such as O'Neil, lineFor's asTyped): left as typed.
+const curlPart = s => s.replace(/"([^"\n]*)"/g, '\u201c$1\u201d').replace(/(\p{L})'(?=\p{L})/gu, '$1\u2019')
+const typedRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function curlyQuotes(text, asTyped = []) {
+  if (typeof text !== 'string') return text
+  const keep = (Array.isArray(asTyped) ? asTyped : []).filter(s => typeof s === 'string' && /['"]/.test(s) && text.includes(s))
+  if (!keep.length) return curlPart(text)
+  let out = ''
+  let at = 0
+  for (const m of text.matchAll(new RegExp(keep.map(typedRe).join('|'), 'g'))) {
+    out += curlPart(text.slice(at, m.index)) + m[0]
+    at = m.index + m[0].length
+  }
+  return out + curlPart(text.slice(at))
 }
 
 // A name in curly marks with no space in it (a skill such as “email-inbox-triage”) is kept on one line with its
@@ -12397,7 +12414,7 @@ function namesWhole(text) {
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
 // A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js)
-const drawn = text => keepNamesWhole(curlyQuotes(text))
+const drawn = (text, asTyped) => keepNamesWhole(curlyQuotes(text, asTyped))
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
 // (talk v2 look: once its part is open, the style sheet turns the down arrow up.)
@@ -12491,7 +12508,7 @@ function OldLine({ entry, onNext }) {
     'data-line': entry.line,
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
-      drawn(entry.text),
+      drawn(entry.text, entry.asTyped),
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
@@ -12606,7 +12623,7 @@ function Bubble({ entry, clock, fresh, said, onNext }) {
     'data-said': said,
     'aria-live': 'polite',
     children: [
-      jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text), className: T.line, fresh }, entry.key),
+      jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,

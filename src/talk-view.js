@@ -28,7 +28,7 @@ import { columnsFor, linesAllowed } from './layout.js'
 import { noteForgotten } from './talk.js'
 import { curlyQuotes } from './quotes.js'
 // A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js)
-const drawn = text => keepNamesWhole(curlyQuotes(text))
+const drawn = (text, asTyped) => keepNamesWhole(curlyQuotes(text, asTyped))
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
 // (talk v2 look: once its part is open, the style sheet turns the down arrow up.)
@@ -122,7 +122,7 @@ function OldLine({ entry, onNext }) {
     'data-line': entry.line,
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
-      drawn(entry.text),
+      drawn(entry.text, entry.asTyped),
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
@@ -237,7 +237,7 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
     'data-said': said,
     'aria-live': 'polite',
     children: [
-      jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text), className: T.line, fresh }, entry.key),
+      jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,

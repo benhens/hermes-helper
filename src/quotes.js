@@ -6,8 +6,20 @@
 // A quote mark with no partner stays straight.
 // Apostrophes (hhdesign's review of d1ceddc, section 3 point 3): in the same step, a straight ' between two
 // letters is drawn as ’ (I’m, What’s, Helper’s), with the same four exceptions.
-export function curlyQuotes(text) {
-  return typeof text === 'string' ? text.replace(/"([^"\n]*)"/g, '\u201c$1\u201d').replace(/(\p{L})'(?=\p{L})/gu, '$1\u2019') : text
+// asTyped: the person's own words filled into the line (a name such as O'Neil, lineFor's asTyped): left as typed.
+const curlPart = s => s.replace(/"([^"\n]*)"/g, '\u201c$1\u201d').replace(/(\p{L})'(?=\p{L})/gu, '$1\u2019')
+const typedRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+export function curlyQuotes(text, asTyped = []) {
+  if (typeof text !== 'string') return text
+  const keep = (Array.isArray(asTyped) ? asTyped : []).filter(s => typeof s === 'string' && /['"]/.test(s) && text.includes(s))
+  if (!keep.length) return curlPart(text)
+  let out = ''
+  let at = 0
+  for (const m of text.matchAll(new RegExp(keep.map(typedRe).join('|'), 'g'))) {
+    out += curlPart(text.slice(at, m.index)) + m[0]
+    at = m.index + m[0].length
+  }
+  return out + curlPart(text.slice(at))
 }
 
 // A name in curly marks with no space in it (a skill such as “email-inbox-triage”) is kept on one line with its

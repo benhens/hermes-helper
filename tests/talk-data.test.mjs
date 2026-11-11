@@ -27,6 +27,8 @@ test('the data as copied has no problem, and the built data file is what the bui
   assert.deepEqual(TALK_DATA, slimTalkData(read(), JSON.parse(fs.readFileSync(path.join(ROOT, 'content/skills-list-v1.json'), 'utf8'))))
   // changes-18: without the Forget row's word the build stops
   assert.ok(talkProblems(broken(d => delete d.keeps.settings_file.forget_all.action)).includes('keeps.settings_file.forget_all.action is missing'))
+  // never the same line twice: each in_place group needs two lines besides 'plain', or noRepeat would have none to say
+  assert.ok(talkProblems(broken(d => { d.no_repeat.in_place.answer = ['plain', d.no_repeat.in_place.answer.find(id => id !== 'plain')] })).includes('no_repeat.in_place.answer needs two lines'))
 })
 
 test('the line rules are hhcontent\'s check.py: the same findings for every line of the data and for lines broken on purpose', () => {

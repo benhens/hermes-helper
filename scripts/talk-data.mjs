@@ -266,7 +266,8 @@ export function talkProblems(d) {
   if (ab.use_now !== 'no_ai_step') problems.push(`small_talk.ai_line_by_build.use_now is ${ab.use_now}: this build has no AI step`)
   const nr = d.no_repeat || {}
   for (const k of ['exempt', 'wrong_starts', 'wrong_anywhere']) if (!(nr[k] || []).length) problems.push(`no_repeat.${k} is empty`)
-  for (const k of ['talk', 'dont_know', 'answer']) if ((((nr.in_place || {})[k]) || []).length < 2) problems.push(`no_repeat.in_place.${k} needs two lines`)
+  // two lines that are not 'plain' (a line with no topic has no plain one), so noRepeat in src/talk.js always has another
+  for (const k of ['talk', 'dont_know', 'answer']) if ((((nr.in_place || {})[k]) || []).filter(id => id !== 'plain').length < 2) problems.push(`no_repeat.in_place.${k} needs two lines`)
   for (const [g, ids] of Object.entries(nr.in_place || {})) for (const id of ids) if (id !== 'plain' && !FIXED_USED.includes(id)) problems.push(`no_repeat.in_place.${g} names a line the plugin does not say: ${id}`)
   if (!((nr.asked_again || {}).words || []).length) problems.push('no_repeat.asked_again.words is empty')
   for (const k of ['make_words', 'make_not_followed_by', 'make_not_when_starts', 'build_question_words', 'software_lead_ins', 'software_verbs', 'software_things', 'software_between_not']) if (!((d.build || {})[k] || []).length) problems.push(`build.${k} is empty`)

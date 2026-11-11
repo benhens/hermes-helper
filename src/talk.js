@@ -4,10 +4,10 @@
 // its own, and no AI step: nothing here sends anything anywhere.
 // tests/talk.test.mjs replays every conversation route2.py itself ran and must get the same result
 // at every turn, the stored record included.
-//   freshVisit(stage, kept)       what Helper knows in this visit: the stage of the opening, the
+//   freshVisit(stage, kept, met)  what Helper knows in this visit: the stage of the opening, the
 //                                 open question, what was asked and found, the name and what the
-//                                 person does, and `kept`, the stored record (the only part the page
-//                                 writes to storage, src/kept.js).
+//                                 person does, `kept`, the stored record (written by the page,
+//                                 src/kept.js), and `met`, whether Helper has said hello before (changes-14).
 //   turn(text, visit)             a typed message -> a result { kind, ... }
 //   pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer   what the person picks or presses
 //   lineFor(result, visit, typed, opts)   the result as the line Helper says, its answers, its button
@@ -753,6 +753,9 @@ function noRepeat(out, st, text) {
     } else cands.push({ kind: c })
   }
   const next = cands.find(x => !avoid.includes(lineKey(x))) || cands.find(x => lineKey(x) !== st.lastKey)
+  // no other line to say (not possible with today's data: every in_place group has two lines that are not
+  // 'plain'): the line as chosen, rather than a crash
+  if (!next) return out
   for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) next[x] = out[x]
   next.repeat_of = k
   st.pending = null
@@ -1219,7 +1222,9 @@ export function openingLine(st = null) {
 //   note: the faint "Kept: ..." line { text, link, first }; used: "From what I keep: ..." { text,
 //   link, topic }; hint: a small faint line (N_HINT); rows: the list of kept things (A1).
 export function lineFor(result, st, typed = '', opts = {}) {
-  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...more })
+  // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
+  const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
+  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(asTyped.length ? { asTyped } : {}), ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
   const dontKnowLine = id => said(id, FIXED[id].text, { hint: FIXED.N_HINT.text })
   const RM = Object.fromEntries(KEEP_REMEMBER.lines.map(l => [l.id, l]))
