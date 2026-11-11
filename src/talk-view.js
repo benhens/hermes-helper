@@ -27,6 +27,7 @@ import { BubbleLink } from './bubble-link.js'
 import { columnsFor, linesAllowed } from './layout.js'
 import { noteForgotten } from './talk.js'
 import { curlyQuotes } from './quotes.js'
+import { mdBlocks } from './md.js'
 // A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js), and
 // (talk-live-3) text to type in the paste box's code style (src/reveal.js drawnWords)
 const drawn = (text, asTyped) => drawnWords(curlyQuotes(text, asTyped))
@@ -72,6 +73,53 @@ const BubblePaste = ({ text, old }) =>
       jsx(CopyButton, { text, label: 'Copy', appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
     ]
   })
+
+// normal-chat: the model's reply, drawn from its markdown (src/md.js): paragraphs, numbered steps, `code`, code
+// blocks as Hermes's own code card with Copy, links that open in the browser (http and https only, through the
+// page's opener: setMdOpener). Shown whole, never word by word.
+let mdOpen = () => {}
+export const setMdOpener = fn => {
+  mdOpen = typeof fn === 'function' ? fn : () => {}
+}
+const MdParts = parts =>
+  parts.map((p, i) =>
+    p.t === 'code'
+      ? jsx('code', { className: K.typed, 'data-hh': 'md-code', children: p.text }, i)
+      : p.t === 'b'
+        ? jsx('strong', { children: p.text }, i)
+        : p.t === 'i'
+          ? jsx('em', { children: p.text }, i)
+          : p.t === 'a'
+            ? jsx(
+                'a',
+                {
+                  className: T.link,
+                  href: p.href,
+                  'data-hh': 'md-link',
+                  title: p.href,
+                  onClick: e => {
+                    e.preventDefault()
+                    if (/^https?:\/\//.test(p.href)) mdOpen(p.href)
+                  },
+                  children: p.text
+                },
+                i
+              )
+            : p.text
+  )
+export function Markdown({ text, old = false }) {
+  return jsx('div', {
+    className: cx(T.md, old && T.mdOld),
+    'data-hh': 'md',
+    children: mdBlocks(text).map((b, i) =>
+      b.kind === 'code'
+        ? jsx(BubblePaste, { text: b.text, old }, i)
+        : b.kind === 'ol' || b.kind === 'ul'
+          ? jsx(b.kind, { start: b.kind === 'ol' && b.start !== 1 ? b.start : undefined, children: b.items.map((it, k) => jsx('li', { children: MdParts(it) }, k)) }, i)
+          : jsx('p', { 'data-hh': b.kind === 'h' ? 'md-head' : undefined, children: b.kind === 'h' ? jsx('strong', { children: MdParts(b.parts) }) : MdParts(b.parts) }, i)
+    )
+  })
+}
 
 // The faint lines that go with a Helper line: "Kept: ..." with its link, the first-time line under
 // it once, and "From what I keep: ..." with Change. Small faint text on Helper's side, never a
@@ -133,7 +181,7 @@ function OldLine({ entry, onNext }) {
     'data-line': entry.line,
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
-      drawn(entry.text, entry.asTyped),
+      entry.md ? jsx(Markdown, { text: entry.text, old: true }, 'md') : drawn(entry.text, entry.asTyped),
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
@@ -253,7 +301,7 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
     'data-said': said,
     'aria-live': 'polite',
     children: [
-      jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
+      entry.md ? jsx(Markdown, { text: entry.text }, entry.key) : jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,

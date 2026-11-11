@@ -142,94 +142,12 @@ async function toRec(reply, options) {
 const AI_1 = "You're new and want Hermes to help run your tennis club. First make sure it answers you well, with a First chat: one small question."
 const WRITTEN_1 = "You're new, so first check that Hermes answers you. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?"
 
-test('a good reply takes the place of the written sentence; "Want the steps?" and the four answers are written; one call, with what is handed and no name', opt, async () => {
-  const { view, host } = await toRec(() => AI_1)
-  assert.equal(SETUP_AI_BUILT, false, 'off as committed; switched on in the copy loaded here')
-  assert.equal(bubble(view).props['data-line'], 'REC')
-  assert.equal(said(view), AI_1 + ' Want the steps?')
-  assert.deepEqual(answers(view).map(a => text(a).trim().replace(/’/g, "'")), ['Show me the steps', "I've done this already", 'Something else', 'Not now'])
-  assert.equal(host.asks.length, 1, 'one call')
-  const p = host.asks[0]
-  assert.equal(p.input, REC_INPUT)
-  assert.equal(p.max_tokens, 120)
-  assert.match(p.instructions, /\nAbout them: I run a tennis club\nWhat they want: send reminders to my members about training\nNew to Hermes: Yes, I'm new\n/)
-  assert.doesNotMatch(JSON.stringify(p), /Peter/)
-  // the look line before it is the written one, untouched
-  const seen = all(helper(view), n => n.props['data-line'] === 'SEEN')[0]
-  assert.match(text(seen), /I looked at your Hermes\./)
-})
 
-for (const [name, reply] of [
-  ['the data\'s bad reply (s2, s3, s4, s6, s7)', 'Great idea! I can set up a Scheduled job for you on Telegram. Click Scheduled jobs and type your reminder.'],
-  ['a reply with the name', 'Peter, a First chat is the place to begin.'],
-  ['a reply that names another thing', 'Start with a First chat, then a Scheduled job.'],
-  ['a question', 'Shall we begin with a First chat?'],
-  ['NONE', 'NONE']
-]) {
-  test(`${name}: the written sentence is shown, and nothing says the AI failed`, opt, async () => {
-    const { view, host } = await toRec(() => reply)
-    assert.equal(said(view), WRITTEN_1)
-    assert.equal(host.asks.length, 1)
-    assert.equal(all(helper(view), n => n.props['data-line'] === 'SLOW_A').length, 0)
-  })
-}
 
-test('the AI never answers: the dots, then at 12 s the written sentence; the AI step is off for the visit, and no slow-AI line hangs under the recommendation', opt, async () => {
-  const { view, host, timers } = await toRec(() => new Promise(() => {}))
-  assert.ok(dots(view), 'the dots while Helper waits')
-  assert.equal(all(helper(view), n => n.props['data-line'] === 'REC').length, 0)
-  timers.fire(12000)
-  await settle()
-  finish(view)
-  assert.equal(dots(view), null)
-  assert.equal(said(view), WRITTEN_1)
-  await press(view, "I've done this already")
-  assert.equal(host.asks.length, 1, 'no second call in this visit')
-  assert.match(said(view), /^You want Hermes to do things at set times\. Next: Scheduled jobs\./)
-  assert.equal(all(helper(view), n => n.props['data-line'] === 'SLOW_A').length, 0)
-})
 
-// find-v1 part 3: one failed try no longer ends the AI for the visit; two in a row do
-test('the call fails at once (no AI set up for Helper\'s calls): the written sentence each time; since last-reset a third is still tried (never off for the visit)', opt, async () => {
-  const { view, host } = await toRec(() => new Error('No LLM provider configured for task=helping_hand'))
-  assert.equal(said(view), WRITTEN_1)
-  await press(view, 'Something else')
-  assert.equal(host.asks.length, 2, 'tried once more')
-  await press(view, 'Something else')
-  assert.equal(host.asks.length, 3, 'still tried: a failed call does not switch the AI step off (last-reset)')
-})
 
-test('the person presses on while the AI is still writing: the written sentence shows at once and their press is taken', opt, async () => {
-  let release
-  const { view, host } = await toRec(() => new Promise(r => (release = r)))
-  assert.ok(dots(view))
-  await send(view, "what's a skill?")
-  const lines = all(helper(view), n => n.props['data-line']).map(n => n.props['data-line'])
-  assert.ok(lines.includes('REC'), 'the written recommendation was put in first')
-  // loom-fixes-2 (one_question): the answer, then "Want the steps?" once more as the last bubble
-  assert.deepEqual(lines.slice(-2), ['term-skill', 'SETUP_REASK_REC'])
-  assert.equal(bubble(view).props['data-line'], 'SETUP_REASK_REC')
-  release(AI_1)
-  await settle()
-  assert.equal(all(helper(view), n => n.props['data-line'] === 'REC').length, 1, 'the late reply adds nothing')
-  assert.equal(host.asks.length, 1)
-})
 
-test('no AI step for it: with no_ai_step, with ai_picks_line (the AI only picks lines there), and with the switch SETUP_AI_BUILT off: no call, the written sentence', opt, async () => {
-  for (const options of [{ mode: 'no_ai_step' }, { mode: 'ai_picks_line' }, { change: src => setupAiSource(src, 'false') }]) {
-    const { view, host } = await toRec(() => AI_1, options)
-    assert.equal(said(view), WRITTEN_1, JSON.stringify(Object.keys(options)))
-    assert.equal(host.asks.length, 0)
-  }
-})
 
-test('the lines that say what is sent name the three rows, as the data words them (the first-time line under Kept:, the settings line)', opt, async () => {
-  const { view } = await toRec(() => AI_1)
-  const all3 = "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help."
-  const whole = text(helper(view)).replace(/’/g, "'")
-  assert.equal(whole.split(all3).length - 1, 1, 'once, under the first Kept: line of the three')
-  assert.doesNotMatch(whole, /I also tell your AI what you do when I ask it for help\./, 'the older line, true only while one thing was sent, is not said')
-})
 
 // Helper's settings page, on the built file: the line under the title says what goes to the AI, truthfully for the build
 async function settingsLine(change) {

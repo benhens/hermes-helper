@@ -164,3 +164,13 @@
 .hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}
 @keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}
 .hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}
+/* normal-chat: the model's reply, drawn from its markdown. Smaller than a one-line answer (it can be long): Hermes's
+   own chat size; paragraphs, numbered steps and code cards spaced apart; links underlined as Helper's other links. */
+.hh-md{font-size:14px;line-height:21px;font-weight:400;text-wrap:pretty;color:var(--ui-text-primary);display:flex;flex-direction:column;gap:8px;min-width:0;overflow-wrap:anywhere}
+.hh-md p{margin:0}
+.hh-md ol,.hh-md ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.hh-md ol{list-style:decimal}
+.hh-md ul{list-style:disc}
+.hh-md li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}
+.hh-md a{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
+.hh-md.hh-md-old{font-size:13px;line-height:19px;gap:5px;color:var(--ui-text-secondary)}

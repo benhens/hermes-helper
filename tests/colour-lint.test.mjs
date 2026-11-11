@@ -16,7 +16,11 @@ const DOCS_QUOTE = '**Memory fit** \u2014 green (*Fits your GPU*'
 // loom-fixes-2: hhcontent's names list (helper-loom-fixes-v2) holds the provider Azure OpenAI, a product name with a
 // colour word in it; exactly that name (and its alias forms) is read without it
 const AZURE = /\b(Azure OpenAI|azure openai|azureopenai)\b/g
-const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8').split(DOCS_QUOTE).join('**Memory fit** (*Fits your GPU*').replace(AZURE, 'Cloud OpenAI')
+// normal-chat: the Hermes docs chunks (src/docs-data.js, made by scripts/docs-data.mjs) are the docs' own words and
+// code samples ("#fff" in a theme example, "red" in a sentence), sent to the model as text, never a colour of ours; that
+// one data line is read without them
+const DOCS_DATA_LINE = /^(?:export )?const DOCS_CHUNKS = .*$/m
+const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8').replace(DOCS_DATA_LINE, '').split(DOCS_QUOTE).join('**Memory fit** (*Fits your GPU*').replace(AZURE, 'Cloud OpenAI')
 const srcFiles = fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js')).map(f => 'src/' + f)
 const plugin = read('desktop/plugin.js')
 

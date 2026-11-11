@@ -136,10 +136,10 @@ test('no model connected, or the check failed: the message box stays usable and 
     const h = text(helper(view))
     for (const line of [NO_MODEL_LINE, NO_MODEL_BOX, CANT_CHECK_LINE]) assert.ok(!h.includes(line), line)
     assert.equal(byLabel(helper(view), 'Check again'), null)
-    // a message is answered all the same: picks and key words need no model
+    // the name is answered all the same: it needs no model (normal-chat: its line is CHAT_HELLO, no longer F1)
     box(view).props.onChange({ target: { value: 'Peter' } })
     box(view).props.onKeyDown({ key: 'Enter', shiftKey: false, preventDefault() {} })
-    assert.equal(byData(helper(view), 'bubble').props['data-line'], 'F1')
+    assert.equal(byData(helper(view), 'bubble').props['data-line'], 'CHAT_HELLO')
   }
 })
 

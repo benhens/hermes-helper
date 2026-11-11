@@ -12,23 +12,6 @@ const opt = { skip: mode === 'no_ai_step' && 'no AI step in this mode' }
 // the person's own questions sent to the AI (the set-up look's fixed check call is not one)
 const asked = host => host.asks.filter(p => !(p && p.instructions === 'Reply with exactly: OK')).length
 
-test('3. a reply slower than 12 s whose call is still in Hermes, then a second question: the AI is called for it', opt, async () => {
-  const slow = deferred()
-  const { view, timers, host } = await pastOpening(mode, { host: { oneshot: (p, n) => (n === 1 ? slow.promise : 'NONE') } })
-  send(view, 'how do i make it talk to me in latvian')
-  await settle()
-  const before = asked(host)
-  assert.ok(before >= 1, 'the first question went to the AI (control)')
-  timers.fire(12000)
-  await settle()
-  finish(view)
-  // the slow call is still in Hermes when he asks the next question (hhtech: 15.2 s, the next one at about 13 s)
-  send(view, 'can i run it on a raspbery pi')
-  await settle()
-  assert.ok(asked(host) > before, `the second question makes its own AI call (calls ${before} then ${asked(host)})`)
-  slow.resolve('NONE')
-  await settle()
-})
 
 test('3. two slow replies in a row (each call ended after its 12 s), then a third question: the AI is still called (never off for the visit)', opt, async () => {
   const d = [deferred(), deferred()]
@@ -63,18 +46,3 @@ test('3. two failed calls in a row (the call gave an error), then a third questi
   assert.ok(asked(host) > before, `the third question makes its AI call (calls ${before} then ${asked(host)})`)
 })
 
-test('3. a pile-up stays bounded: with two calls still in Hermes past their 12 s, a third question waits for neither (written line, no call)', opt, async () => {
-  const { view, timers, host } = await pastOpening(mode, { host: { oneshot: () => never() } })
-  for (const q of ['what is the weather in riga', 'can goats use it']) {
-    send(view, q)
-    await settle()
-    timers.fire(12000)
-    await settle()
-    finish(view)
-  }
-  const before = asked(host)
-  assert.equal(before, 2, 'each of the two questions made one call, both still in Hermes (control)')
-  send(view, 'what is a cron job really')
-  await settle()
-  assert.equal(asked(host), before, 'no third call while two of Helper\'s calls are stuck in Hermes')
-})

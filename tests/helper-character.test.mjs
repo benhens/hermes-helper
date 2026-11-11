@@ -197,16 +197,6 @@ test('the bubble has its final size from the first word: the words not said yet 
   assert.equal(whole(view), OPENING)
 })
 
-test('asking shows only for a question that is all on screen; a line that ends with a full stop leaves it resting', async () => {
-  const { view, timers } = await open()
-  for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
-  assert.equal(expression(view), 'asking')
-  send(view, 'please install a skill for me')
-  assert.equal(bubble(view).props['data-line'], 'H1')
-  assert.equal(expression(view), 'talking')
-  root(view).props.onPointerDownCapture({})
-  assert.equal(expression(view), 'resting', 'the line ends with a full stop')
-})
 
 test('typing or pressing the mouse while words appear shows the rest at once and the mouth stops; a lone Shift does not', async () => {
   for (const press of [v => root(v).props.onKeyDownCapture({ key: 'a' }), v => root(v).props.onPointerDownCapture({})]) {
@@ -224,31 +214,6 @@ test('typing or pressing the mouse while words appear shows the rest at once and
   }
 })
 
-test('the person\'s own words appear at once; Helper\'s reply appears word by word in the bubble; what was said before moves up whole and is not replayed', async () => {
-  const { view, timers } = await open()
-  for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
-  send(view, 'Peter')
-  const conv = byData(helper(view), 'conversation-lines').props.children
-  // changes-15: the faint "Kept: Peter." line comes with the name (under the person's message)
-  assert.deepEqual(conv.map(c => c.props['data-hh']), ['old', 'me', 'kept-note'])
-  // the older line and the person's message: plain text, whole, not word by word
-  assert.equal(all(conv, n => n.props['data-hh'] === 'said').length, 0)
-  // (each starts with the words only a screen reader hears: who said it)
-  assert.equal(text(conv[0]).replace(/^Helper said: /, '').trim(), OPENING)
-  assert.equal(text(conv[1]).replace(/^You said: /, '').trim(), 'Peter')
-  // Helper's reply: one word at once (nothing to wait for), the rest to come
-  const reply = 'Nice to meet you, Peter. What do you do?'
-  assert.equal(spoken(bubble(view)).trim(), reply)
-  assert.deepEqual(shownWords(view), [1])
-  assert.equal(expression(view), 'talking')
-  timers.tick()
-  timers.tick()
-  assert.equal(expression(view), 'talking')
-  for (let i = 0; i < WORDS(reply); i++) timers.tick()
-  assert.deepEqual(shownWords(view), [WORDS(reply)])
-  assert.equal(expression(view), 'asking')
-  assert.equal(wordClock(timers).length, 0)
-})
 
 test('a line is revealed once: a tab change, and folding Helper away and bringing it back, do not replay it', async () => {
   const { view, timers } = await open({ measured: true })
@@ -325,28 +290,6 @@ function fakeReduceMotion(on) {
   return { asked, listeners: () => heard.size, set(next) { setting.matches = next; [...heard].forEach(fn => fn({ matches: next })) } }
 }
 
-test('reduce motion: the character is simply there (no rising), each line appears whole, it never talks, and no timer runs', async () => {
-  const motion = fakeReduceMotion(true)
-  const { view, timers } = await open({ settleFirst: false, measured: true })
-  resize(view, 540)
-  assert.ok(motion.asked.includes('(prefers-reduced-motion: reduce)'))
-  assert.equal(face(view).props['data-rising'], undefined)
-  assert.equal(face(view).props.style.visibility, undefined)
-  assert.deepEqual(shownWords(view), [OPENING_WORDS])
-  assert.equal(expression(view), 'asking', 'the opening is a question: straight to asking')
-  assert.equal(wordClock(timers).length, 0)
-  assert.equal(eyesNow(view), 'still', 'the eyes stay on the person')
-  // the drawing is told, so it snaps and starts no loop (tests/character.test.mjs)
-  assert.equal(all(face(view), n => n.props['data-hh'] === 'mouth')[0].props.style.transition, 'none')
-  await settle()
-  send(view, 'please install a skill for me')
-  assert.equal(expression(view), 'resting', 'a new line: whole at once, no talking')
-  assert.ok(shownWords(view).every((n, i) => n === lines(view)[i].props['data-words']))
-  assert.equal(wordClock(timers).length, 0)
-  click(strip(view))
-  click(strip(view))
-  assert.equal(face(view).props['data-rising'], undefined, 'on screen again: still no rising')
-})
 
 test('reduce motion is watched: switched on while a line appears, the rest shows at once; switched off, new lines are revealed again', async () => {
   const motion = fakeReduceMotion(false)

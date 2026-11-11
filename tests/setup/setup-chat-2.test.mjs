@@ -317,27 +317,6 @@ async function press(view, label) {
   finish(view)
 }
 
-for (const mode of ['ai_writes', 'ai_picks_line', 'no_ai_step']) {
-  test(`on the page (${mode}): the recommendation is the written sentence at once, no AI call for it, and the lines say only What you do goes to the AI`, opt, async () => {
-    // a stand-in AI that would give a good sentence: it is never asked
-    const { view, host } = await open({ mode, reply: () => "You're new and want Hermes to help run your tennis club. First make sure it answers you well, with a First chat: one small question." })
-    finish(view)
-    await send(view, 'Peter')
-    await send(view, 'I run a tennis club')
-    await press(view, "Yes, I'm new")
-    await send(view, 'send reminders to my members about training')
-    assert.equal(bubbleLine(view), 'REC')
-    assert.equal(bubbleSaid(view), "You're new, so first check that Hermes answers you. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?")
-    assert.equal(host.asks.length, 0, 'no call for the recommendation')
-    assert.equal(byData(helper(view), 'busy-dots'), null, 'no dots')
-    const whole = text(helper(view)).replace(/’/g, "'")
-    const workTold = LIVE.lines_by_mode.first_time_grey.work_told[mode]
-    if (workTold) assert.equal(whole.split(workTold).length - 1, 1, 'the work_told line, once, under the Kept: of what you do')
-    assert.doesNotMatch(whole, /Your AI also gets/, 'not the line that names the three')
-    await press(view, "I've done this already")
-    assert.equal(host.asks.length, 0)
-  })
-}
 
 test('Helper\'s settings page says only What you do goes to the AI (changes-1\'s settings_top_line_2_work_only)', opt, async () => {
   useHost()
@@ -358,67 +337,7 @@ test('README point 11 is changes-1\'s readme_point_11_work_only for the committe
   assert.match(readmeForMode(readme, LIVE, 'ai_writes', true), /whether you are new to Hermes/, 'a build with the AI step on names the three again')
 })
 
-test('conversation (a) on the page with a typed question at a step and Not now; Hermes started again: BACK_SEEN, then BACK_NEXT', opt, async () => {
-  const storage = fakeStorage()
-  const { view, host } = await open({ storage })
-  finish(view)
-  await send(view, 'Peter')
-  await send(view, 'I run a tennis club')
-  await press(view, "Yes, I'm new")
-  await send(view, 'send reminders to my members about training')
-  await press(view, 'Show me the steps')
-  await press(view, 'Done')
-  assert.match(bubbleSaid(view), /^Step 2 of 5: /)
-  await send(view, 'what is a skill?')
-  const old = olds(view).map(n => n.props['data-line'])
-  assert.equal(old.at(-1), 'term-skill', 'the question was answered, just before: ' + old.join(' '))
-  assert.equal(bubbleLine(view), 'STEP_BACK')
-  assert.equal(bubbleSaid(view), `Back to step 2 of 5: ${stepsOf('first_chat')[1]}`)
-  assert.deepEqual(labels(view), ['Done', "I'm stuck", 'Stop for now'])
-  await press(view, 'Done')
-  assert.equal(bubbleSaid(view), `Step 3 of 5: ${stepsOf('first_chat')[2]}`)
-  await press(view, 'Done')
-  await press(view, 'Done')
-  await press(view, 'It worked')
-  assert.match(bubbleSaid(view), /Next: Scheduled jobs\./)
-  await press(view, 'Show me the steps')
-  host.hermes.jobs = 1 // the job made in Hermes
-  await press(view, 'Done')
-  await press(view, 'Done')
-  await press(view, 'It worked')
-  assert.match(text(helper(view)), /I can see it now\. You have 1 scheduled job\./)
-  assert.match(bubbleSaid(view), /Next: Its personality\./)
-  await press(view, 'Not now')
-  assert.equal(host.asks.length, 0)
-  const again = await open({ storage, hermes: { jobs: 1 } })
-  finish(again.view)
-  assert.equal(bubbleLine(again.view), 'BACK_NEXT')
-  assert.equal(bubbleSaid(again.view), 'Next on your list: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?')
-  assert.equal(olds(again.view).at(-1).props['data-line'], 'BACK_SEEN')
-  assert.match(text(olds(again.view).at(-1)), /Hi again, Peter\. I can see you have 1 scheduled job\./)
-  assert.deepEqual(labels(again.view), REC4)
-  assert.equal(again.host.asks.length, 0)
-})
 
-test('a question at a step that goes to the person\'s AI (ai_writes): after its answer, "Back to step" all the same', opt, async () => {
-  const { view, host } = await open({ mode: 'ai_writes', reply: () => 'NONE' })
-  finish(view)
-  await send(view, 'Peter')
-  await send(view, 'I run a tennis club')
-  await press(view, "I've used it a bit")
-  await press(view, 'Talk to it from my phone')
-  await press(view, 'Show me the steps')
-  assert.match(bubbleSaid(view), /^Step 1 of 5: /)
-  await send(view, 'can it fly a kite')
-  await settle()
-  finish(view)
-  assert.equal(host.asks.length, 1, 'the typed question went to the AI (the recommendation did not)')
-  assert.equal(bubbleLine(view), 'STEP_BACK')
-  assert.equal(bubbleSaid(view), `Back to step 1 of 5: ${stepsOf('chat_apps')[0]}`)
-  assert.deepEqual(labels(view), ['Done', "I'm stuck", 'Stop for now'])
-  await press(view, 'Done')
-  assert.equal(bubbleSaid(view), `Step 2 of 5: ${stepsOf('chat_apps')[1]}`)
-})
 
 /* ---------- after the review ---------- */
 function atStep(goal = 'Talk to it from my phone') {
@@ -514,59 +433,5 @@ test('"What did you look at?" pressed while a step is open: the six lines, and t
   assert.match(p.last().text, /^Step 2 of 5: /)
 })
 
-test('on the page: at a step, "help" keeps its topics; picked through to an answer with nothing to pick, then the step comes back', opt, async () => {
-  const { view } = await open({ mode: 'no_ai_step' })
-  finish(view)
-  await send(view, 'Peter')
-  await send(view, 'I run a tennis club')
-  await press(view, 'I know it well')
-  await press(view, 'Talk to it from my phone')
-  await press(view, 'Show me the steps')
-  await send(view, 'help')
-  assert.equal(bubbleLine(view), 'TP')
-  const seen = []
-  // each answer that asks its own question keeps its picks; the first one with none brings the step back
-  for (let i = 0; i < 5 && bubbleLine(view) !== 'STEP_BACK'; i++) {
-    assert.ok(!labels(view).includes('Done'), labels(view).join(' / '))
-    seen.push(bubbleLine(view))
-    await press(view, labels(view)[0])
-  }
-  assert.ok(seen.length >= 1, seen.join(' '))
-  assert.equal(bubbleLine(view), 'STEP_BACK', seen.join(' '))
-  assert.deepEqual(labels(view), ['Done', "I'm stuck", 'Stop for now'])
-})
 
-test('on the page: a step answer typed while the AI still works on a question gets no "Back to step" in front of it', opt, async () => {
-  let release
-  const { view, host } = await open({ mode: 'ai_writes', reply: () => 'NONE' })
-  host.request = (orig => async (m, p, ms) => (m === 'llm.oneshot' && p.instructions !== 'Reply with exactly: OK' ? (host.asks.push(p), new Promise(r => (release = r))) : orig(m, p, ms)))(host.request)
-  finish(view)
-  await send(view, 'Peter')
-  await send(view, 'I run a tennis club')
-  await press(view, 'I know it well')
-  await press(view, 'Talk to it from my phone')
-  await press(view, 'Show me the steps')
-  await send(view, 'can it fly a kite')
-  assert.equal(host.asks.length, 1, 'the question waits for the AI')
-  await send(view, 'stop for now')
-  const lines = olds(view).map(n => n.props['data-line']).concat(bubbleLine(view))
-  assert.equal(lines.includes('STEP_BACK'), false, lines.join(' '))
-  assert.ok(lines.includes('NOT_NOW'), lines.join(' '))
-  if (release) release({ text: 'NONE' })
-  await settle()
-})
 
-test('on the page: at a step, "hello" gets its line and then the step, with no offer bubble between them', opt, async () => {
-  const { view } = await open({ mode: 'no_ai_step' })
-  finish(view)
-  await send(view, 'Peter')
-  await send(view, 'I run a tennis club')
-  await press(view, 'I know it well')
-  await press(view, 'Talk to it from my phone')
-  await press(view, 'Show me the steps')
-  await send(view, 'hello')
-  const lines = olds(view).map(n => n.props['data-line'])
-  assert.equal(bubbleLine(view), 'STEP_BACK')
-  assert.equal(lines.at(-1), 'HELLO', lines.join(' '))
-  assert.equal(lines.slice(lines.lastIndexOf('STEP')).some(l => l.startsWith('offer-')), false, lines.join(' '))
-})

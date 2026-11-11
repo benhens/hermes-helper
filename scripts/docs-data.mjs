@@ -1,0 +1,133 @@
+// normal-chat (Pēteris's second Loom of 11 Nov): Helper's resources. Turns the Hermes docs (a copy of the Hermes
+// website's docs folder, by default ../dev/hermes-src/website/docs, outside this repo) into chunks of about 1,500
+// characters, each with its page title, heading and docs address, and writes them to src/docs-data.js, which is
+// committed (the copy of the docs is not in this repo, so `npm test` does not run this script).
+//   node scripts/docs-data.mjs [docs folder]
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const DOCS = path.resolve(process.argv[2] || path.join(ROOT, '..', 'dev', 'hermes-src', 'website', 'docs'))
+const PARTS = ['getting-started', 'user-guide', 'guides', 'integrations', 'reference']
+// left out: one page per skill (user-guide/skills/bundled and optional, 2.6 MB of the 7.3 MB): each skill's own
+// manual, not about setting Hermes up or using it; with them the built file grew by about 7 MB instead of about 4
+const SKIP = ['user-guide/skills/bundled', 'user-guide/skills/optional']
+const OUT = path.join(ROOT, 'src', 'docs-data.js')
+const BASE = 'https://hermes-agent.nousresearch.com/docs/'
+export const CHUNK_CHARS = 1500
+
+function files(dir) {
+  const out = []
+  for (const e of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const p = path.join(dir, e.name)
+    if (e.isDirectory()) out.push(...files(p))
+    else if (/\.mdx?$/.test(e.name)) out.push(p)
+  }
+  return out
+}
+
+// front matter off; JSX (imports, exports, tags such as <Tabs>, {/* comments */}) off; code blocks kept as they are
+export function cleanPage(text) {
+  let title = null
+  let body = text.replace(/\r\n/g, '\n')
+  const fm = body.match(/^---\n([\s\S]*?)\n---\n/)
+  if (fm) {
+    const t = fm[1].match(/^title:\s*["']?(.*?)["']?\s*$/m)
+    if (t) title = t[1]
+    body = body.slice(fm[0].length)
+  }
+  const out = []
+  let inCode = false
+  for (const line of body.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      inCode = !inCode
+      out.push(line.replace(/^\s+/, ''))
+      continue
+    }
+    if (inCode) {
+      out.push(line)
+      continue
+    }
+    if (/^\s*(import|export)\s/.test(line)) continue
+    let l = line.replace(/\{\/\*[\s\S]*?\*\/\}/g, '').replace(/<\/?[A-Z][A-Za-z.]*(\s[^>]*)?\/?>/g, '').replace(/<\/?(div|details|summary|br|img|span|p)(\s[^>]*)?\/?>/g, '')
+    l = l.replace(/^:::\w*.*$/, '').replace(/^:::$/, '')
+    out.push(l)
+  }
+  body = out.join('\n').replace(/\n{3,}/g, '\n\n').trim()
+  if (!title) {
+    const h = body.match(/^#\s+(.+)$/m)
+    title = h ? h[1].trim() : null
+  }
+  return { title, body }
+}
+
+// split at headings first, then at blank lines, never inside a code block, to about CHUNK_CHARS characters
+export function chunkPage(rel, text) {
+  const { title, body } = cleanPage(text)
+  const url = BASE + rel.replace(/\\/g, '/').replace(/\.mdx?$/, '').replace(/\/index$/, '')
+  const pageTitle = title || rel
+  const sections = []
+  let cur = { heading: pageTitle, lines: [] }
+  let inCode = false
+  for (const line of body.split('\n')) {
+    if (/^(```|~~~)/.test(line)) inCode = !inCode
+    const h = !inCode && line.match(/^#{1,4}\s+(.+)$/)
+    if (h) {
+      if (cur.lines.join('').trim()) sections.push(cur)
+      cur = { heading: h[1].replace(/\{#[^}]*\}/, '').trim(), lines: [] }
+      continue
+    }
+    cur.lines.push(line)
+  }
+  if (cur.lines.join('').trim()) sections.push(cur)
+  const chunks = []
+  for (const s of sections) {
+    // blocks: paragraphs, with a code block kept whole
+    const blocks = []
+    let b = []
+    let code = false
+    for (const line of s.lines) {
+      if (/^(```|~~~)/.test(line)) code = !code
+      if (!code && !line.trim()) {
+        if (b.length) blocks.push(b.join('\n'))
+        b = []
+      } else b.push(line)
+    }
+    if (b.length) blocks.push(b.join('\n'))
+    let text = ''
+    for (const blk of blocks) {
+      if (text && text.length + blk.length > CHUNK_CHARS) {
+        chunks.push({ title: pageTitle, heading: s.heading, url, text })
+        text = ''
+      }
+      text = text ? text + '\n\n' + blk : blk.length > CHUNK_CHARS * 2 ? blk.slice(0, CHUNK_CHARS * 2) : blk
+    }
+    if (text.trim()) chunks.push({ title: pageTitle, heading: s.heading, url, text })
+  }
+  return chunks
+}
+
+export function buildChunks(docs = DOCS) {
+  const all = []
+  for (const part of PARTS) {
+    const dir = path.join(docs, part)
+    if (!fs.existsSync(dir)) continue
+    for (const f of files(dir)) if (!SKIP.some(s => path.relative(docs, f).replace(/\\/g, '/').startsWith(s + '/'))) all.push(...chunkPage(path.relative(docs, f), fs.readFileSync(f, 'utf8')))
+  }
+  return all
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const chunks = buildChunks()
+  if (!chunks.length) throw new Error(`no docs found in ${DOCS}`)
+  const src = [
+    '// Generated by scripts/docs-data.mjs from the Hermes docs (getting-started, user-guide, guides, integrations,',
+    '// reference): chunks of about 1,500 characters, each with its page title, heading and docs address. Helper sends',
+    '// the best 5 for a message to the person\'s own model (src/chat.js). Run the script again to bring them up to date.',
+    `export const DOCS_CHUNKS = ${JSON.stringify(chunks.map(c => [c.title, c.heading, c.url, c.text]))}`,
+    ''
+  ].join('\n')
+  fs.writeFileSync(OUT, src)
+  console.log(`${chunks.length} chunks, ${src.length} characters -> ${path.relative(ROOT, OUT)}`)
+}

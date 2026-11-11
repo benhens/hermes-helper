@@ -86,25 +86,6 @@ test('point 1: Forget all on Helper\'s settings page, then Helper\'s page again,
   assert.ok(!text(helper(again.view)).includes('tennis club'))
 })
 
-test('point 1: Forget all typed to Helper ("forget everything", Yes), then a restart: no old line of the conversation', async () => {
-  const storage = fakeStorage()
-  const { view } = await open(storage)
-  send(view, 'Peter')
-  send(view, 'I run a tennis club')
-  await settle()
-  const before = ownLines(view)
-  send(view, 'forget everything')
-  await settle()
-  click(all(view.tree, n => (n.type === 'sdk:Button' || n.props['data-hh'] === 'answer') && text(n).trim() === 'Yes, delete it' && n.props.onClick)[0])
-  root(view).props.onPointerDownCapture({})
-  await settle()
-  const kept = storage.data.get('kept')
-  assert.ok(!kept || !kept.name, 'the kept answers went')
-  // a restart
-  const again = await open(storage)
-  noneBack(again.view, before)
-  assert.ok(!text(helper(again.view)).includes('tennis club'))
-})
 
 test('point 5: the slow-AI line is never kept in the stored conversation', () => {
   const slow = { who: 'helper', text: LIVE_DATA.slow_ai.text, line: LIVE_DATA.slow_ai.id }

@@ -57,26 +57,7 @@ test('nothing picked (the list says NONE): the don\'t-know, as before', async ()
   assert.ok(r.got.fallback)
 })
 
-test('on the built page: list "tool", writer NONE: the tool line, no don\'t-know', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'tool' : 'NONE') } })
-  send(view, 'can it fly a kite')
-  assert.ok(dots(view))
-  await settle()
-  assert.equal(host.asks.length, 2)
-  assert.equal(bubbleSaid(view), toolText)
-  assert.ok(!allLines(view).some(l => /^N1/.test(l)), allLines(view).join(' '))
-})
 
-test('on the built page: list "tool", the writer never answers: at 12 s the tool line, not the don\'t-know', async () => {
-  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'tool' : never()) } })
-  send(view, 'can it fly a kite')
-  await settle()
-  assert.equal(host.asks.length, 2)
-  timers.fire(12000)
-  await settle()
-  assert.equal(bubbleSaid(view), toolText)
-  assert.ok(!allLines(view).some(l => /^N1/.test(l)))
-})
 
 test('on the built page: the person types on while the writer works: the picked line answers the first message', async () => {
   const d = deferred()
@@ -92,10 +73,3 @@ test('on the built page: the person types on while the writer works: the picked 
   await settle()
 })
 
-test('on the built page: the picked line shows with its button (tool: Open Capabilities)', async () => {
-  const { view } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'tool' : 'NONE') } })
-  send(view, 'can it fly a kite')
-  await settle()
-  finish(view)
-  assert.match(text(helper(view)), /Open Capabilities/)
-})

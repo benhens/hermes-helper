@@ -46,7 +46,8 @@ test('every key the plugin stores is on the allowed list: about the person, only
   let calls = 0
   // (dash-v1: the parked files are not in the built plugin, so not read here; the parked Your setup stored 'remember')
   for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js') && !PARKED.includes(x))) {
-    const src = fs.readFileSync(path.join(dir, f), 'utf8')
+    // normal-chat: the docs chunks' data line is the docs' own text (it mentions storage), not code
+    const src = fs.readFileSync(path.join(dir, f), 'utf8').replace(/^export const DOCS_CHUNKS = .*$/m, '')
     for (const m of src.matchAll(/storage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) {
       calls++
       const arg = m[2].trim()
@@ -78,7 +79,8 @@ test('every key the plugin stores is on the allowed list: about the person, only
   for (const key of found) assert.ok(STORED_KEYS.includes(key), `a stored key that is not on the allowed list: ${key}`)
   for (const key of STORED_KEYS) assert.ok(found.has(key), `on the list but never stored: ${key}`)
   // the same in the built file Hermes loads
-  const built = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'desktop', 'plugin.js'), 'utf8')
+  // (normal-chat: without the docs chunks' data line, the docs' own text: it names localStorage in a sample)
+  const built = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'desktop', 'plugin.js'), 'utf8').replace(/^const DOCS_CHUNKS = .*$/m, '')
   assert.doesNotMatch(built, /localStorage|sessionStorage|indexedDB|document\s*\.\s*cookie|caches\s*\.\s*open|navigator\s*\.\s*storage/)
 })
 

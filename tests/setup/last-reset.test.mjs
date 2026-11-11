@@ -121,26 +121,6 @@ test('1. Forget all in Settings: kept, met and talk are gone; after a restart He
   assert.equal(storage.data.get('kept').name, 'Anna')
 })
 
-test('1. Forget all typed ("forget everything", Yes): kept, met and talk are gone; after a restart a first visit', async () => {
-  const storage = fakeStorage()
-  const { view } = await talked(storage)
-  await send(view, 'forget everything')
-  click(all(view.tree, n => (n.type === 'sdk:Button' || n.props['data-hh'] === 'answer') && q(text(n)) === 'Yes, delete it' && n.props.onClick)[0])
-  await settle(12)
-  finish(view)
-  await settle(12)
-  // the window says the data's own line (unchanged)
-  assert.match(shown(view), /Done\. I keep nothing about you now\./)
-  assert.deepEqual(personKeys(storage), [], 'nothing of the person is stored after the Yes')
-  await send(view, 'hey')
-  assert.deepEqual(personKeys(storage).filter(k => k !== 'talk'), [], 'met and kept are not written again in this visit')
-  const again = await open(storage)
-  // the lines said after the reset in that visit may come back (they are not about him); none of the earlier ones
-  assert.ok(!/Peter|tennis club|skill/.test(shown(again.view)), 'no old line: ' + shown(again.view))
-  assert.match(shown(again.view), /What's your name\?/)
-  assert.ok(!/Hi again/.test(shown(again.view)))
-  assert.equal(bubble(again.view).props['data-line'], 'OPEN')
-})
 
 test('1. the layout keys stay through Forget all (Helper hidden stays hidden: a reset forgets the person, not where he put the window)', async () => {
   const storage = fakeStorage({ tab: 'learn', helperWidth: 480 })

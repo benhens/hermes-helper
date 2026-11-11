@@ -13,13 +13,15 @@ import { looksSecret } from './secret-rule.js'
 
 export const TALK_KEEP_MAX = 50
 const TALK_TEXT_MAX = 2000
+// normal-chat: a reply of the model can be longer (900 tokens); it is kept up to this many characters, with its mark md
+const TALK_REPLY_MAX = 8000
 const talkStr = (v, max = TALK_TEXT_MAX) => (typeof v === 'string' && v.trim() && Array.from(v).length <= max ? v : null)
 const talkUnsafe = s => typeof s === 'string' && (looksLikeKey(s) || looksSecret(s))
 
 // One line of the conversation as it is kept, or null when it may not be kept.
 export function talkKeepOne(e) {
   if (!e || (e.who !== 'you' && e.who !== 'helper')) return null
-  const text = talkStr(e.text)
+  const text = talkStr(e.text, e.md === true ? TALK_REPLY_MAX : TALK_TEXT_MAX)
   if (!text || talkUnsafe(text)) return null
   if (e.who === 'you') return { who: 'you', text }
   // an offer's question is not kept: its picks were in the message box, and without them it would ask for nothing
@@ -28,6 +30,7 @@ export function talkKeepOne(e) {
   // loom-fixes-2 (Lead's answer): the slow-AI line belongs to its moment, not to the kept conversation
   if (e.line === 'SLOW_A') return null
   const out = { who: 'helper', text, line: talkStr(e.line, 120) || 'kept' }
+  if (e.md === true) out.md = true
   const n = e.next
   if (n && typeof n === 'object' && typeof n.label === 'string') {
     if (n.kind === 'paste' && talkStr(n.text) && !talkUnsafe(n.text)) out.next = { kind: 'paste', label: n.label, text: n.text }

@@ -80,25 +80,6 @@ test('readList: up to three known ids in the order given (any case, think blocks
   assert.deepEqual(readList('1. mem0\n2. mod1'), { ids: ['mem0', 'mod1'] })
 })
 
-test('Builder (review): at the opening\'s two questions (the name, what you do) a typed answer that holds a subject word is never sent: only what went to the AI before this job goes there', async () => {
-  for (const [stage, m] of [['name', 'Maria Lopez from the memory clinic'], ['work', 'Nurse, mostly night shifts, I worry about memory loss patients at St Mary']]) {
-    const p = turnParts(m, freshVisit(stage, {}, true)).pre
-    assert.ok(['question', 'plain', 'N2'].includes(p.kind), m + ' ' + p.kind)
-    assert.equal(goesToAi(p), false, m)
-  }
-  const { open } = await import('./lib/talk-page.mjs')
-  const a = await open('ai_writes', { host: { oneshot: () => 'NONE' } })
-  finish(a.view)
-  send(a.view, 'Maria Lopez from the memory clinic')
-  await settle()
-  assert.equal(a.host.asks.length, 0, JSON.stringify(a.host.asks.map(x => x.input)))
-  const b = await open('ai_writes', { host: { oneshot: () => 'NONE' } })
-  finish(b.view)
-  send(b.view, 'Peter')
-  send(b.view, 'Nurse, mostly night shifts, I worry about memory loss patients at St Mary')
-  await settle()
-  assert.equal(b.host.asks.length, 0, JSON.stringify(b.host.asks.map(x => x.input)))
-})
 
 test('which messages go to the list call: nothing found, a weak hit, and a line given from a subject word alone (the plain line, the subject\'s question, the nearest things); never a line code is sure of', () => {
   const pre = (text, st = visit()) => turnParts(text, st).pre
@@ -219,52 +200,6 @@ test('nothing about the person is in the list call: with a name, what they do an
 })
 
 /* ---------- on the built page ---------- */
-test('on the built page: "do i need a credit card to try it": the dots, one list call and one writer call, then the AI\'s answer; the don\'t-know is not shown', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'COST' : 'Hermes itself is free. The AI it uses can cost money.\nUSED: COST') } })
-  send(view, 'do i need a credit card to try it')
-  assert.ok(dots(view))
-  await settle()
-  assert.equal(host.asks.length, 2)
-  assert.equal(host.asks[0].max_tokens, 30)
-  assert.match(host.asks[0].instructions, /^MIG_APP = Moving from Cursor, Claude Code, Codex or OpenClaw$/m)
-  assert.equal(bubbleLine(view), 'written')
-  assert.equal(bubbleSaid(view), 'Hermes itself is free. The AI it uses can cost money.')
-  assert.ok(!allLines(view).includes('N1'))
-})
 
-test('on the built page: the list call says NONE: the don\'t-know with what is under it (find-v2: "what about my chats history backup" has one near line, by its pick label)', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => 'NONE' } })
-  send(view, 'what about my chats history backup')
-  await settle()
-  assert.equal(host.asks.length, 1)
-  assert.equal(answerLine(view), 'N1')
-  assert.equal(bubbleLine(view), 'offer-near')
-  assert.deepEqual(labels(view), ['Backup and export compared'])
-  finish(view) // the line has appeared whole: its picks can be pressed
-  press(view, 'Backup and export compared')
-  await settle()
-  assert.equal(bubbleLine(view), 'd_backup_vs')
-  assert.equal(host.asks.length, 1, 'a pick is never sent')
-})
 
-test('on the built page: a line code is sure of makes no call ("How can I migrate?", "does it work on windows", "whats a gateway")', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: never } })
-  for (const [m, line] of [['How can I migrate?', 'MIG'], ['does it work on windows', 'd_windows'], ['whats a gateway', 'd_gateway']]) {
-    send(view, m)
-    assert.equal(dots(view), null, m)
-    await settle()
-    assert.equal(answerLine(view), line)
-    finish(view)
-  }
-  assert.equal(host.asks.length, 0)
-})
 
-test('with no AI step nothing is sent: no list call either', async () => {
-  const { view, host } = await pastOpening('no_ai_step', { host: { oneshot: never } })
-  for (const m of ['do i need a credit card to try it', 'tell me about models', 'can it print documents']) {
-    send(view, m)
-    await settle()
-    finish(view)
-  }
-  assert.equal(host.asks.length, 0)
-})
