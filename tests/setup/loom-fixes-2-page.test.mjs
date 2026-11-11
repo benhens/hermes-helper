@@ -211,3 +211,29 @@ test('point 7: a thing Helper cannot see after "It worked": the open bot is name
   assert.equal(bubbleLine(view), 'NOT_SEEN')
   assert.equal(bubbleSaid(view), "I can't see it yet. I only look at the bot that is open in Hermes now, default.")
 })
+
+// part B 3 (hhtech ask-run 4, For builder 1; A-mig m3): "How can I migrate?" won at the goal question; the follow-up
+// "ok and how do i do that" stays with it, typed before a pick or after one, and is never kept as the goal
+for (const pickFirst of [false, true]) {
+  test(`B3: "How can I migrate?" at the goal question, ${pickFirst ? 'a pick, ' : ''}then "ok and how do i do that": not kept as the goal; one question on screen; the goal question comes back`, opt, async () => {
+    const storage = fakeStorage({ met: true, kept: { setup_new: 'new' } })
+    const { view } = await open({ storage })
+    finish(view)
+    assert.deepEqual(labels(view), GOAL4)
+    await send(view, 'How can I migrate?')
+    assert.deepEqual(labels(view), ['From another AI app', 'To another computer'])
+    if (pickFirst) await press(view, 'To another computer')
+    await send(view, 'ok and how do i do that')
+    assert.equal((storage.data.get('kept') || {}).setup_goal, undefined, 'not kept as the goal')
+    assert.doesNotMatch(q(text(helper(view))), /Kept: ok and how do i do that/)
+    assert.ok(!screen(view).some(([, line]) => line === 'REC'), 'the set-up did not go on to the recommendation')
+    assert.deepEqual(twoInARow(view), [])
+    // the goal question is back once its own question is answered (or at once, when nothing of its own waits)
+    if (!labels(view).includes('Do things at set times')) await press(view, labels(view)[0])
+    assert.deepEqual(labels(view), GOAL4)
+    // and REC once only when the goal is then given
+    await press(view, 'Do things at set times')
+    const recs = screen(view).filter(([, line]) => line === 'REC').length
+    assert.equal(recs, 1, 'the REC line once')
+  })
+}

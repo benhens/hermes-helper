@@ -201,10 +201,15 @@ export const isRestart = text => suInList(suFlat(text), SU.restart_phrases)
 // small talk (the talk data's small-talk kinds the rule names, read as in a fresh visit). Restart words come first
 // (setupTyped). His "can we start from the begining" was kept as his goal (Loom 1:56).
 const SU_TA = SU.typed_answer
+// loom-fixes-2 part B 3 (hhtech ask-run 4, For builder 1: "ok and how do i do that", a follow-up to the question that
+// had just won, was kept as the goal): the starts are read also after the words a question may open with (the talk
+// data's names.lead_ins: so, ok, and, also, but ...), so "ok and how ..." is a question too
+const SU_LEAD = new RegExp(`^(?:(?:${TALK_DATA.names.lead_ins.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})[ ,]+)+`)
 export function notAnAnswer(text) {
   const t = suFlat(text)
   if (String(text).includes('?')) return true
-  if (startsWith(t, SU_TA.question_starts) || startsWith(t, SU_TA.request_starts) || suInList(t, SU_TA.request_words)) return true
+  for (const u of [t, t.replace(SU_LEAD, '')]) if (startsWith(u, SU_TA.question_starts) || startsWith(u, SU_TA.request_starts)) return true
+  if (suInList(t, SU_TA.request_words)) return true
   return SU_TA.small_talk_kinds.includes(smallTalk(text, freshVisit('open')))
 }
 export const isSetupAsk = text => suInList(suFlat(text), SU.ask_phrases)
@@ -479,6 +484,9 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'new') {
     const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
     if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
+    // loom-fixes-2 part B 3: while a typed question's own things to pick stand in for this question (reaskWaits), a
+    // typed message belongs to that question, never to this one: only this question's own labels count
+    if (s.reaskWaits) return null
     if (isSetupAsk(text)) return suAsk(st)
     if (question || hasTopicWord(text) || notAnAnswer(text)) return null
     const id = suTypedNew(text)
@@ -488,6 +496,7 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'goal') {
     const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
     if (i >= 0) return suMove(true, seen => suAnswerGoal(st, SU_Q_GOAL.answers[i].id, null, seen))
+    if (s.reaskWaits) return null // loom-fixes-2 part B 3, as at Q_NEW
     if (isSetupAsk(text)) return suAsk(st)
     if (question || notAnAnswer(text)) return null
     // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
