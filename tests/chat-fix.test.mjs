@@ -98,7 +98,7 @@ test('at most three quick replies; a fourth is dropped', async () => {
   assert.doesNotMatch(text(bubble(view)), /\[\[|\]\]|Four/)
 })
 
-test('[[card:skills]] at the end of a reply: the skills card\'s video place and "Open Skills on the Dashboard", which opens that card; no brackets', async () => {
+test('[[card:skills]] at the end of a reply: no video box (no address yet), only "Open Skills on the Dashboard", which opens that card; no brackets', async () => {
   const { DASH_DATA } = await loadSrc('dash-data.js')
   const skills = DASH_DATA.items.find(it => it.id === 'skills')
   const { view } = await named(() => 'A skill is written know-how that teaches Hermes one task.\n\n[[card:skills]]')
@@ -109,10 +109,8 @@ test('[[card:skills]] at the end of a reply: the skills card\'s video place and 
   const place = byData(b, 'chat-card')
   assert.ok(place, 'the card place under the reply')
   assert.equal(place.props['data-card'], 'skills')
-  // the video place exactly as the opened card shows it: no address yet, so the quiet box with the card's name
-  const soon = byData(place, 'video-soon')
-  assert.ok(soon, 'the quiet Video coming soon box')
-  assert.equal(shownText(soon), `${skills.name} ${DASH_DATA.words.setup.video_soon}`.replace(/\s+/g, ' '))
+  // round 20:12 (point 2): no address yet, so no video box in the conversation at all, only the button
+  assert.equal(byData(place, 'video-soon'), null, 'no empty video box in the conversation')
   assert.equal(byData(place, 'video'), null)
   const openBtn = byData(place, 'chat-card-open')
   assert.equal(shownText(openBtn), `Open ${skills.name} on the Dashboard`)
@@ -122,8 +120,8 @@ test('[[card:skills]] at the end of a reply: the skills card\'s video place and 
   const steps = byData(view.tree, 'steps')
   assert.ok(steps, 'the card is open on the Dashboard')
   assert.equal(steps.props['data-stop'], 'skills')
-  // the same box as the opened card's own
-  assert.equal(shownText(byData(steps, 'video-soon')), shownText(soon))
+  // the opened card keeps its quiet Video coming soon place
+  assert.equal(shownText(byData(steps, 'video-soon')), `${skills.name} ${DASH_DATA.words.setup.video_soon}`.replace(/\s+/g, ' '))
   // a second click leaves it open (it opens, it does not toggle)
   click(byData(byData(bubble(view), 'chat-card'), 'chat-card-open'))
   await settle()
@@ -180,7 +178,7 @@ test('the instructions: one step at a time, the 80-word rule, quick replies, the
   assert.match(CHAT_INSTRUCTIONS, /Tell me when that's done, or tell me what you see\./)
   assert.match(CHAT_INSTRUCTIONS, /No headings, no tables/)
   assert.match(CHAT_INSTRUCTIONS, /ask which one first/)
-  assert.match(CHAT_INSTRUCTIONS, /\[\[Claude Code\]\] \[\[The Claude app\]\]/)
+  assert.match(CHAT_INSTRUCTIONS, /\[\[Claude Code setup\]\] \[\[A Claude Code conversation\]\]/) // round 20:12: the example no longer offers the Claude app (point 6)
   assert.match(CHAT_INSTRUCTIONS, /\[\[card:ID\]\]/)
   assert.deepEqual(CHAT_CARDS.map(c => c[0]), DASH_DATA.items.map(it => it.id), 'the nine ids, in the Dashboard\'s order')
   assert.equal(CHAT_CARDS.length, 9)

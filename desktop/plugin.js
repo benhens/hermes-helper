@@ -24232,23 +24232,40 @@ const CHAT_CARDS = [
   ['chat_apps', 'talking to Hermes from Telegram, Discord or another chat app on a phone'],
   ['tools_apps', 'tools (actions Hermes can take) and outside apps such as Gmail'],
   ['skills', 'skills: written know-how that teaches Hermes one task'],
-  ['memory', 'memory: what Hermes remembers between chats, and memory providers such as Hindsight'],
+  ['memory', "Hermes's built-in memory: what it remembers between chats (not memory providers such as Hindsight)"],
   ['second_bot', 'a second bot (a profile): one more separate Hermes with its own name, memory and skills'],
   ['safety', 'safety: Hermes asking first before it runs anything risky']
 ]
 const CHAT_QUICK_MAX = 3
+// round 20:12 (point 4): each card's place in the app, the words of its first step on the Dashboard (written here,
+// because this module is set up before the Dashboard's data in the built file; tests/chat-round-2012.test.mjs holds
+// the two together)
+const CHAT_CARD_PLACES = {
+  model: 'Open Settings (Ctrl and comma; Cmd and comma on a Mac). Click Providers.',
+  first_chat: 'Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).',
+  personality: 'Click Bots at the top of the left list.',
+  chat_apps: 'Click Messaging in the left list.',
+  tools_apps: 'Click Capabilities in the left list, then Tools. Each group of actions has a switch.',
+  skills: 'Click Capabilities in the left list, then Skills. Each skill has a switch.',
+  memory: 'Nothing to switch on. Memory is on from the start.',
+  second_bot: 'Click Bots at the top of the left list.',
+  safety: 'Nothing to switch on. Asking first is on from the start.'
+}
+const chatCardPlace = id => CHAT_CARD_PLACES[id] || ''
 
 const CHAT_INSTRUCTIONS = `You are Helper. You live inside the Hermes Desktop app and help a newcomer set up and use Hermes, an AI agent app by Nous Research. Talk like a patient friend who knows Hermes well: warm, plain words, never a manual.
 
 How to answer:
 - Keep every reply short: at most about 80 words. No headings, no tables, no long lists. Leave out config-file names and setting names unless the person has to type them.
 - Go one step at a time. When the answer takes several steps, first say in one line what you will do together and how many steps it takes ("This takes 3 short steps. Here's the first."). Then give ONLY the first step: exactly what to click or what to type, with anything to type in \`code\`. End with a short check such as "Tell me when that's done, or tell me what you see." Give the next step in your next reply; the conversation so far shows which step they are on. If they say it didn't work, help with that step before going on.
-- For "What is X?": say what it is in one or two plain sentences, then where it is in the app (the exact place to click), then what to do first.
-- When the question has two readings that change the answer (for example "Claude" can mean the Claude app or Claude Code), don't assume: ask which one first, and give the choices as quick replies.
-- Quick replies: you may end a reply with up to three choices on one last line, each in double square brackets, like this: [[Claude Code]] [[The Claude app]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
-- Dashboard cards: Helper's Dashboard has nine set-up cards, each with its steps and a place for a video. When the question is about one of these subjects, end your reply with [[card:ID]] on its own line, with that card's id (one card at most):
-${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
-- Do it for me: Helper can run one kind of step for the person: bringing a setup over from another agent. When that import is the step to do now and you know which agent, end your reply with [[do:import AGENT]] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw. The person then sees a button "Do it for me": it first shows a preview and changes nothing until they press "Import it". Tell them in one line that they can press it. For every other step, give the step to do by hand, and never write [[do:...]] for anything else.
+- For "What is X?", in this order: first what it is, in one or two plain sentences. Then what it needs, if the excerpts say it needs an account, a key or money. Then where it is in the app, naming the place to click (for a card's subject, the place in that card's line below, such as "Capabilities in the left list, then Skills"). Only if the person then asks how, give the first step. Never open a "What is" answer with a terminal command, and never count the steps before giving one.
+- An install is given as text the person pastes to their own bot in a chat, never as "type this in your terminal", unless it is the Do it for me action below.
+- When the question has two readings that change the answer, don't assume: ask which one first, and give the choices as quick replies.
+- Offer only choices the doc excerpts can answer. For Claude, that is Claude Code's setup and a Claude Code conversation, never "The Claude app". If the person asks about the Claude app, say the docs cover Claude Code only.
+- Quick replies: you may end a reply with two or three choices, each in double square brackets, all together on the very last line of the reply, after the "Read more:" line, like this: [[Claude Code setup]] [[A Claude Code conversation]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
+- Dashboard cards: Helper's Dashboard has nine set-up cards, each with its steps and a place for a video. Add a card only when your reply is about that card's own subject, and then end your reply with [[card:ID]] on its own line, with that card's id (one card at most). A reply about something near it gets no card: [[card:memory]] is for Hermes's built-in memory, so a reply about a memory provider such as Hindsight carries no card. Each card's id, subject and place in the app:
+${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}. Place: ${chatCardPlace(id)}`).join('\n')}
+- Do it for me: Helper can run one kind of step for the person: bringing a setup over from another agent. When that import is the step to do now and you know which agent, end your reply with [[do:import AGENT]] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw. The person then sees a button "Do it for me". If Hermes's own import add-on (agent-importers, from Nous Research) is not installed yet, Helper first offers to install it: that is the one change before the preview. Then it shows a preview, and the import itself waits until they press "Import it". Tell them in one line that they can press it. Never write "nothing changes before that". For every other step, give the step to do by hand, and never write [[do:...]] for anything else.
 - Use the doc excerpts you are given. They come from the Hermes docs. When they don't cover the question, say so in one line, give your best short answer, and point to the closest docs page.
 - Don't invent commands, settings or menu names that are not in the excerpts. If you are not sure, say so.
 - Never ask for an API key, password or token, and never repeat one. If the person needs a key, tell them where in the app to put it (Settings), not to send it in the chat.
@@ -24269,6 +24286,7 @@ Write in markdown: short paragraphs, \`code\` for anything to type.`
 const CHAT_MARK_ANY = /\[\[([^\n]*?)\]\]/g
 const CHAT_MARK_NAMED = /\[\[\s*(card|do)\s*:([^[\]\n]*)\]\]/gi
 const CHAT_MARKS_TAIL = /(?:\s*\[\[[^[\]\n`]*\]\])+\s*$/
+const CHAT_MARKS_RUN = /[ \t]*\[\[[^[\]\n`]*\]\](?:[ \t]*\[\[[^[\]\n`]*\]\])+[ \t]*/g
 const CHAT_QUICK_CHARS = 60
 function chatParts(reply) {
   const lines = String(reply || '').replace(/\r\n?/g, '\n').split('\n')
@@ -24323,7 +24341,15 @@ function chatParts(reply) {
   const out = []
   kept.forEach((k, i) => {
     if (k.typed) return out.push(k.line)
-    let shown = k.line
+    // round 20:12 (hhtech's point 1): a run of two or three marks is a set of choices wherever it stands in the reply
+    // (mid-line, before or after "Read more"); it leaves no trace in the words
+    let shown = outside(k.line, part =>
+      part.replace(CHAT_MARKS_RUN, (run, at, all) => {
+        for (const m of run.matchAll(CHAT_MARK_ANY)) choice(m[1])
+        return all.slice(0, at).trim() && all.slice(at + run.length).trim() ? ' ' : ''
+      })
+    )
+    if (k.line.trim() && !shown.trim()) return
     const tail = shown.match(CHAT_MARKS_TAIL)
     if (tail && (i === last || !shown.slice(0, tail.index).trim())) {
       for (const m of tail[0].matchAll(CHAT_MARK_ANY)) choice(m[1])
@@ -24375,6 +24401,8 @@ function chatActionLines(output) {
 }
 // Hermes without its import add-on says so and names the install command (seen in Hermes v0.23.0, exit code 2)
 const chatNeedsPlugin = lines => /agent-importers/.test(lines.join('\n')) && /not loaded|plugins install/.test(lines.join('\n'))
+// round 20:12: the preview found no folder of the other agent on this computer (Hermes v0.23.0: "Agent directory not found")
+const chatNoAgent = lines => /agent directory not found/i.test(lines.join('\n'))
 // the last lines of a failed run, each cut short
 const chatActionTail = (lines, count = 6) => lines.slice(-count).map(l => (l.length > 200 ? l.slice(0, 200) + '…' : l.trim()))
 // The things an import names, in plain words (the importer's own ids; an id not listed here is shown as it is)
@@ -24405,6 +24433,7 @@ const CHAT_ACT_TOLD = {
   plugin: ' (Helper tried to run this step for the person: Hermes needs its import add-on first, and Helper offered to install it.)',
   preview: ' (Helper ran the preview for the person and showed what would come over; the import itself has not been run yet.)',
   done: ' (Helper ran the import for the person; it is done.)',
+  missing: ' (Helper tried the preview for the person: that program is not on this computer, so there is nothing to bring over.)',
   failed: ' (Helper tried to run this step for the person; the command failed, and Helper showed how to do it by hand.)'
 }
 
@@ -31800,9 +31829,11 @@ function ReplyAction({ entry, onAct }) {
   if (act.state === 'running') parts = [jsx('p', { role: 'status', 'data-hh': 'act-line', children: 'Working on it…' }, 'l')]
   else if (act.state === 'plugin')
     parts = [
-      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its import add-on first (the agent-importers plugin, from Nous Research). Installing it runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
+      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its own import add-on first (agent-importers, from Nous Research). Installing it adds that add-on to Hermes: this is the one change before the preview. It runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
       button('plugin', 'Install it')
     ]
+  // round 20:12: the other program is not on this computer: plain words only (no folder path, no error, no command)
+  else if (act.state === 'missing') parts = [jsx('p', { 'data-hh': 'act-line', children: `I don’t see ${name} on this computer, so there is nothing to bring over.` }, 'l')]
   else if (act.state === 'preview')
     parts = rows
       ? [
@@ -31847,7 +31878,9 @@ function ReplyExtras({ entry, onQuick, onCard, onAct }) {
             className: T.chatCard,
             'data-hh': 'chat-card',
             'data-card': it.id,
-            children: [jsx(CardVideo, { it }, 'video'), jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'chat-card-open', onClick: () => onCard && onCard(it.id), children: `Open ${it.name} on the Dashboard` }, 'open')]
+            // round 20:12 (his words, 18:11 UTC: "The video is not there but it should show where you should go"): the
+            // video only when the card has an address; otherwise only the button (the opened card keeps its place)
+            children: [it.video && isVideoUrl(it.video.url) ? jsx(CardVideo, { it }, 'video') : null, jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'chat-card-open', onClick: () => onCard && onCard(it.id), children: `Open ${it.name} on the Dashboard` }, 'open')]
           },
           'card'
         )
@@ -32361,6 +32394,8 @@ function makePage(ctx, opts = {}) {
           if (r.blocked) return setAct(id, { ...base, state: 'failed', tail: typeof r.hint === 'string' && r.hint.trim() ? [r.hint.trim()] : [] })
           if (r.code !== 0) {
             if (stepNow === 'preview' && chatNeedsPlugin(lines)) return setAct(id, { ...base, state: 'plugin' })
+            // round 20:12 (hhtech's points 2 and 3): the other program is not on this computer: plain words, no path
+            if (stepNow === 'preview' && chatNoAgent(lines)) return setAct(id, { ...base, state: 'missing' })
             return setAct(id, { ...base, state: 'failed', tail: chatActionTail(lines) })
           }
           // the add-on is in: now the preview the person asked for with "Do it for me"

@@ -119,7 +119,8 @@ test('Hermes without its import add-on: installing it is the first step, shown a
   click(button(view))
   await settle(10)
   assert.equal(act(view).props['data-state'], 'plugin')
-  assert.equal(shownText(byData(act(view), 'act-line')), 'Hermes needs its import add-on first (the agent-importers plugin, from Nous Research). Installing it runs hermes plugins install agent-importers --enable. Then I show you the preview.')
+  // round 20:12 (point 3): the line says plainly that this adds Hermes's own add-on and is the one change before the preview
+  assert.equal(shownText(byData(act(view), 'act-line')), "Hermes needs its own import add-on first (agent-importers, from Nous Research). Installing it adds that add-on to Hermes: this is the one change before the preview. It runs hermes plugins install agent-importers --enable. Then I show you the preview.")
   assert.equal(shownText(button(view)), 'Install it')
   await settle(10)
   assert.deepEqual(argvs(host), ['import-agent claude-code --dry-run'], 'nothing is installed without a click')
@@ -131,14 +132,39 @@ test('Hermes without its import add-on: installing it is the first step, shown a
   assert.ok(!argvs(host).some(a => a.includes('--yes')), 'the import itself still waits for its click')
 })
 
+// round 20:12 (hhtech's points 2 and 3): Claude Code not on this computer (Hermes's real output, fixture dry-none)
+test('the agent\'s folder not found: plain words, no folder path, no error box, no by-hand command; also after Install it', async () => {
+  const none = { blocked: false, code: 1, output: fixture('dry-none') }
+  for (const [label, exec, clicks] of [
+    ['first try', () => none, 1],
+    ['after Install it', (p, n) => (n === 1 ? { blocked: false, code: 2, output: fixture('no-plugin') } : n === 2 ? { blocked: false, code: 0, output: '✓ Plugin agent-importers enabled.' } : none), 2]
+  ]) {
+    const { view, host } = await page(REPLY('claude-code'), exec)
+    for (let i = 0; i < clicks; i++) {
+      click(button(view))
+      await settle(10)
+    }
+    assert.equal(act(view).props['data-state'], 'missing', label)
+    assert.equal(shownText(act(view)), "I don't see Claude Code on this computer, so there is nothing to bring over.", label)
+    assert.doesNotMatch(text(act(view)), /\/|\.claude|Agent directory|hermes import-agent|terminal/, label)
+    assert.equal(byData(act(view), 'act-output'), null, label)
+    assert.equal(byData(act(view), 'act-by-hand'), null, label)
+    assert.equal(byData(act(view), 'paste'), null, label)
+    assert.equal(button(view), null, label)
+    await settle(10)
+    assert.equal(host.exec.length, clicks === 1 ? 1 : 3, label)
+  }
+})
+
 test('a failed run shows the last lines of its output in plain words and the step to do by hand', async () => {
-  const { view, host } = await page(REPLY('claude-code'), () => ({ blocked: false, code: 1, output: fixture('dry-none') }))
+  const other = fixture('dry-none').replace('Agent directory not found: /Users/peter/.claude', 'Could not read /Users/peter/.claude')
+  const { view, host } = await page(REPLY('claude-code'), () => ({ blocked: false, code: 1, output: other }))
   click(button(view))
   await settle(10)
   assert.equal(act(view).props['data-state'], 'failed')
   assert.equal(shownText(byData(act(view), 'act-line')), "That didn't work. Hermes said:")
   const said = text(byData(act(view), 'act-output'))
-  assert.match(said, /✗ Agent directory not found: \/Users\/peter\/\.claude/)
+  assert.match(said, /✗ Could not read \/Users\/peter\/\.claude/)
   assert.match(said, /Specify a custom path: hermes import-agent claude-code --source \/path\/to\/\.claude/)
   assert.doesNotMatch(said, /[┌│└─]{2}|☤/, 'no drawn box')
   assert.equal(shownText(byData(act(view), 'act-by-hand')), 'You can do this step by hand: open a terminal and paste this.')
@@ -216,7 +242,11 @@ test('the instructions tell the model about Do it for me: the four agents, only 
   const { CHAT_INSTRUCTIONS } = await loadSrc('chat.js')
   assert.match(CHAT_INSTRUCTIONS, /\[\[do:import AGENT\]\] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw/)
   assert.match(CHAT_INSTRUCTIONS, /For every other step, give the step to do by hand, and never write \[\[do:\.\.\.\]\] for anything else\./)
-  assert.match(CHAT_INSTRUCTIONS, /changes nothing until they press "Import it"/)
+  // round 20:12 (point 3, hhtech's point 4): the add-on's install is named as the one change before the preview
+  assert.match(CHAT_INSTRUCTIONS, /import add-on \(agent-importers, from Nous Research\)/)
+  assert.match(CHAT_INSTRUCTIONS, /that is the one change before the preview/)
+  assert.match(CHAT_INSTRUCTIONS, /the import itself waits until they press "Import it"/)
+  assert.match(CHAT_INSTRUCTIONS, /Never write "nothing changes before that"/)
 })
 
 test('the person types on while a command runs: the action leaves the bubble, and its older line says how it ended; the import is not started by anything but its button', async () => {
