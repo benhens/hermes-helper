@@ -7902,7 +7902,8 @@ const TALK_DATA = {
         "source": "index.mdx:5",
         "next": {
           "kind": "line",
-          "id": "HERMES"
+          "id": "HERMES",
+          "label": "What Hermes is"
         }
       },
       "FB_PLAN": {
@@ -24438,6 +24439,8 @@ const capFirst = s => {
 
 // The request step: null, the words that make it a request (H1), or { h2: words } for a question whether
 // Hermes can build something (changes-16, H2).
+// loom-fixes-2: the build words that only say "connect" (see turnSteps, a chat app named with them)
+const CONNECT_PLAIN = ['connect it', 'connect this'] // not "please connect Telegram": route2.py's own case V12a keeps H1 there
 function buildHit(text) {
   const t = cutIgnored(talkNorm(text)) // the ignore phrases are cut before this step too
   if (startsWith(t, BUILD.skip_starts) || whichOf(t, BUILD.how_phrases).length) return null // a question about how is never a request
@@ -24685,14 +24688,23 @@ const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds }
 // more) stand side by side among the message's content words. The longest hit phrase wins (content words, then
 // words); a tie goes to the line first in the data. singleOk false is the first step: phrases of two or more words,
 // of the new fact lines and the older lines on first_step_old only.
+// loom-fixes-2 part B 2 (hhtech ask-run 4, For builder 3: "whats a contex window" got the Windows line with no AI):
+// a phrase with the word window or windows hits only where the message names Windows the system: the word "windows"
+// itself (never "window", which the word rule makes the same), not after context, contex, token or a word that makes
+// it an app's window ("two windows", "chat windows"). Builder's rule; route2.py has none.
+const APP_WINDOWS = /(^|[^a-z0-9])(?:cont[a-z]*|token|chat|app|apps|browser|terminal|two|three|several|multiple|many|second|separate|extra|more|these|those)\s+windows($|[^a-z0-9])/g
+const namesWindowsOs = text => /(^|[^a-z0-9])windows($|[^a-z0-9])/.test(talkNorm(text).replace(APP_WINDOWS, ' '))
+const aboutWindow = pw => pw.includes('window')
 function fullHit(text, singleOk) {
   const mw = nearWords(text).filter(w => !NEAR_FILLER.has(w))
   const mc = nearContent(mw)
+  const os = namesWindowsOs(text)
   let best = null
   for (const { gives, phrases } of TITLED) {
     if (!singleOk && gives.kind !== 'fact' && !NEAR.first_step_old.includes(gives.kind)) continue
     for (const [pw, cw] of phrases) {
       if (!pw.length || (pw.length === 1 && !singleOk)) continue
+      if (!os && aboutWindow(pw) && gives.need === 'd_windows') continue
       if (runIn(mw, pw) || (cw.length >= 2 && runIn(mc, cw))) {
         if (!best || cw.length > best[0] || (cw.length === best[0] && pw.length > best[1])) best = [cw.length, pw.length, gives]
       }
@@ -24707,7 +24719,9 @@ const NEVER_NEAR = new Set([...(NEAR.never_near || []), ...nearWords((NEAR.never
 function nearLines(text, st) {
   const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w)))
   const sc = []
+  const os = namesWindowsOs(text) // loom-fixes-2 part B 2: the Windows line is not near an app's window or a context window
   TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
+    if (!os && gives.need === 'd_windows') return
     const n = [...ms].filter(w => allWords.has(w)).length
     if ((n >= 2 || [...ms].some(w => titleWords.has(w))) && lineKey(givesOf(gives)) !== st.lastKey) sc.push([n, i, gives, title])
   })
@@ -25434,6 +25448,12 @@ function offerSaid(sid, st) {
 const offerIsSetup = thing => OF.things[thing].gives.kind === 'setup_chat'
 // the message holds a key word of a topic or a Hermes term
 const hasTopicWord = text => knownWords(cutIgnored(talkNorm(text)))
+// loom-fixes-2 (review; route2.py setup_typed, typed_answer.no_match_v2): the ordinary talk would answer this message by a
+// fixed line, an offer's words or a known word ("laptop or a server")
+const talkWouldAnswer = text => {
+  const tw = cutIgnored(talkNorm(text))
+  return !!(fixedByWords(tw, { wants: false, pending: null }) || offerRoute(tw) || knownWords(tw))
+}
 // Every offer question this build can show: [set id, text, pick ids] (tests; the after_topic sets by topic)
 const offerSets = () => [...Object.keys(OF.sets).filter(k => k !== 'after_topic').map(k => offerSet(k)), ...Object.keys(OF.sets.after_topic.by_topic).map(t => offerSet('after_topic', t))]
 
@@ -25560,7 +25580,7 @@ function turn(text, st) {
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 function turnParts(text, st) {
   // loom-fixes-2 (back_alone; route2.py turn): only back words, with nothing of Helper's open: BACK_NONE with the offer
-  if (st.stage === 'open' && backAlone(text)) {
+  if (st.stage === 'open' && !st.pending && !(st.setup && ['new', 'goal', 'rec', 'step'].includes(st.setup.stage)) && backAlone(text)) {
     const out = { kind: 'BACK_NONE' }
     noteLast(st, out)
     attachOffer(out, st)
@@ -25804,6 +25824,16 @@ function turnSteps(text, st) {
   }
   if (built) {
     st.stage = 'open'
+    // loom-fixes-2 (Lead, the block added to the job: "connect it to telegram" got H1 in route2.py while hhtech saw the
+    // Telegram line in the app; keep what helps a newcomer): a plain connect request that names a chat app gets that
+    // app's line with its steps (the msg row), not "I can't do that for you". Builder's rule; route2.py gives H1.
+    if (CONNECT_PLAIN.includes(built)) {
+      const c = byCode(text, st)
+      if (c.topic === 'msg' && c.need && !c.rows) {
+        st.found.msg = c.need
+        return done('row', { topic: 'msg', need: c.need })
+      }
+    }
     return done('H1', { why: built })
   }
   const t = cutIgnored(talkNorm(text))
@@ -25957,7 +25987,19 @@ function turnSteps(text, st) {
   // the near miss: no row, but a subject word of exactly one group: N2 with that group's rows
   if (st.wants !== false) {
     const g = nearOf(t)
-    if (g.length === 1) return done('N2', { group: g[0] })
+    if (g.length === 1) {
+      // loom-fixes-2 part B 4 (Lead's answer 3 to find-v2's questions): a full hit by a phrase of one of the wants rows
+      // wins over the near miss, as in route2.py, which has no near miss and gives that row in its last step ("can it
+      // watch youtube videos": hhcontent's YouTube line w_youtube, not the nearest rows). Only the wants rows: a fact
+      // line's phrase leaves the near miss as the wants layers have it
+      const fh = out.code && out.code.skill_unknown ? null : fullHit(text, true)
+      if (fh && fh.kind === 'want') {
+        const { kind: k, ...more } = fh
+        out.by = 'title'
+        return done(k, more)
+      }
+      return done('N2', { group: g[0] })
+    }
   }
   return st.stage === 'open' ? lastStep(dontKnow(text) || 'skill by name') : done(dontKnow(text) || 'skill by name')
 }
@@ -26176,6 +26218,11 @@ const EXTRA_LINES = (() => {
   }
   TALK_DATA.terms.forEach(t => take(t.next))
   Object.values(FIXED).forEach(f => take(f.next)) // ask-fix-t1: PRIV-next, SAFE-next
+  // loom-fixes-2 part B 4: a correction's button names a fixed line by its id alone (FB_MAKER: HERMES)
+  for (const l of Object.values((TALK_DATA.false_belief || {}).lines || {})) {
+    const n = l.next
+    if (n && n.kind === 'line' && !n.text && FIXED[n.id]) lines[n.id] = { id: n.id, text: FIXED[n.id].text, source: FIXED[n.id].source || null }
+  }
   return lines
 })()
 
@@ -26798,6 +26845,10 @@ const suGOAL_PICKS = () => suPicks(SU_Q_GOAL.answers.map(a => ['goal:' + a.id, a
 const suREC_PICKS = labels => suPicks(['rec:steps', 'rec:already', 'rec:other', 'rec:notnow'].map((a, i) => [a, labels[i]]))
 const suNamed = (line, name, slots = {}) => (name ? suFill(line.text, { ...slots, name }) : suFill(line.text_no_name, slots))
 const suOf = st => (st.setup = st.setup || { stage: null, item: null, step: 0, other: [], reasked: {}, asked: {} })
+// loom-fixes-2 part B 1: the faint line under the look says "Nothing was sent, and no AI was used."; after the look's
+// check call (seen.checked, src/page.js) that is no longer true, so only its first sentence ("Read from your Hermes on
+// this computer.") is shown until hhcontent gives a line for it (in the report, For hhcontent)
+const suLookHint = seen => (seen && seen.checked ? SU.look.under.faint.split(/(?<=\.) /)[0] : SU.look.under.faint)
 // the faint "Kept: ..." line under a line (the page strikes it when the thing is no longer kept)
 // live changes-6 (lines_by_mode.first_time_grey.setup_told): under the first Kept: line of what goes to the AI (what
 // you do, new to Hermes, what you want), once: "Your AI also gets ...". Only in a build that sends them.
@@ -26889,10 +26940,15 @@ const isRestart = text => suInList(suFlat(text), SU.restart_phrases)
 // small talk (the talk data's small-talk kinds the rule names, read as in a fresh visit). Restart words come first
 // (setupTyped). His "can we start from the begining" was kept as his goal (Loom 1:56).
 const SU_TA = SU.typed_answer
+// loom-fixes-2 part B 3 (hhtech ask-run 4, For builder 1: "ok and how do i do that", a follow-up to the question that
+// had just won, was kept as the goal): the starts are read also after the words a question may open with (the talk
+// data's names.lead_ins: so, ok, and, also, but ...), so "ok and how ..." is a question too
+const SU_LEAD = new RegExp(`^(?:(?:${TALK_DATA.names.lead_ins.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})[ ,]+)+`)
 function notAnAnswer(text) {
   const t = suFlat(text)
   if (String(text).includes('?')) return true
-  if (startsWith(t, SU_TA.question_starts) || startsWith(t, SU_TA.request_starts) || suInList(t, SU_TA.request_words)) return true
+  for (const u of [t, t.replace(SU_LEAD, '')]) if (startsWith(u, SU_TA.question_starts) || startsWith(u, SU_TA.request_starts)) return true
+  if (suInList(t, SU_TA.request_words)) return true
   return SU_TA.small_talk_kinds.includes(smallTalk(text, freshVisit('open')))
 }
 const isSetupAsk = text => suInList(suFlat(text), SU.ask_phrases)
@@ -27033,7 +27089,7 @@ function suAnswerGoal(st, id, typed, seen) {
   }
   s.seen = seen
   // under the look line: the Kept: line, the faint line, and the button "What did you look at?"
-  const look = suSaid('SEEN', seenLine(seen, id), { note, hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+  const look = suSaid('SEEN', seenLine(seen, id), { note, hint: suLookHint(seen), next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
   return suRecommend(st, seen, [look])
 }
 function suRestart(st) {
@@ -27072,7 +27128,7 @@ function suAsk(st) {
   }
   return suMove(true, seen => {
     s.seen = seen
-    const look = suSaid('SEEN', seenLine(seen, st.kept.setup_goal_id || s.goal || 'unsure'), { hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+    const look = suSaid('SEEN', seenLine(seen, st.kept.setup_goal_id || s.goal || 'unsure'), { hint: suLookHint(seen), next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
     return suRecommend(st, seen, [look])
   })
 }
@@ -27099,7 +27155,7 @@ function setupPress(action, st) {
   // While a recommendation waits for its answer, its four answers stay under the list, so the person is not left
   // with nothing to pick.
   // setup-chat-2: the same for any open line of the set-up conversation (a step, "I can't see that yet", ...)
-  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: suOpenPicks(st) })]) : null
+  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: suLookHint(s.seen), answers: suOpenPicks(st) })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
   // loom-fixes: Go on is the next question not answered yet, or the look and the written recommendation; Answer again
   // starts the questions again
@@ -27167,6 +27223,9 @@ function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'new') {
     const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
     if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
+    // loom-fixes-2 part B 3: while a typed question's own things to pick stand in for this question (reaskWaits), a
+    // typed message belongs to that question, never to this one: only this question's own labels count
+    if (s.reaskWaits) return null
     if (isSetupAsk(text)) return suAsk(st)
     if (question || hasTopicWord(text) || notAnAnswer(text)) return null
     const id = suTypedNew(text)
@@ -27176,6 +27235,7 @@ function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'goal') {
     const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
     if (i >= 0) return suMove(true, seen => suAnswerGoal(st, SU_Q_GOAL.answers[i].id, null, seen))
+    if (s.reaskWaits) return null // loom-fixes-2 part B 3, as at Q_NEW
     if (isSetupAsk(text)) return suAsk(st)
     if (question || notAnAnswer(text)) return null
     // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
@@ -27184,7 +27244,7 @@ function setupTyped(text, st, hasTopicWord = () => false) {
     // loom-fixes-2 (typed_answer.no_match_v2; route2.py setup_typed): a message that matches none of the goal lists
     // but that the ordinary talk would answer (a topic word: "laptop or a server") is no answer either; only other
     // messages are kept as unsure
-    if (goal === 'unsure' && hasTopicWord(text)) return null
+    if (goal === 'unsure' && (hasTopicWord(text) || talkWouldAnswer(text))) return null
     return suMove(true, seen => suAnswerGoal(st, goal, text, seen))
   }
   if (s.stage === 'rec') {
@@ -27277,6 +27337,7 @@ function setupOpening(st, seen) {
     s.item = cur
     if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
     s.stage = 'rec'
+    s.asked.rec = true // (review) its "Want the steps?" was shown: go back from step 1 comes here, not BACK_FIRST
     // loom-fixes (here_rule, one rule with the Dashboard: src/setup-reads.js hereStop): the stop named is the Dashboard's
     // "You are here"; with the stop kept as current not done, that is this stop
     const done = doneSet(st, seen)
@@ -28236,6 +28297,18 @@ function judgeRec(raw, item, names = [], hand = '') {
   if (flags.length) return { fail: flags[0], flags }
   return { text }
 }
+
+// loom-fixes-2 part B 1 (Lead's answer 2 to find-v2's questions; hhtech ask-run 4, For builder 6): the set-up look makes
+// one small check call per set-up conversation when the settings say a model is set, so a working AI is said to have
+// answered ("it answered my check") rather than "I couldn't check your model this time". A fixed text of ours, nothing
+// of the person's in it; the page waits at most 12 s for it (no answer then: model_slow).
+const MODEL_CHECK = { instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 20 }
+const askLookCheck = request => request('llm.oneshot', oneshotParams(MODEL_CHECK), ONESHOT_TIMEOUT_MS)
+// what the check says of the model: any text back is an answer (ok); a failure for want of a provider is not; any other
+// failure says nothing (the look's own "couldn't check" stands)
+const NO_PROVIDER = /no (llm )?provider|no usable credentials|provider is configured/i
+const modelCheckSaid = res => (res && typeof res.text === 'string' && res.text.trim() ? 'ok' : null)
+const modelCheckFailed = err => (NO_PROVIDER.test(String((err && err.message) || err)) ? 'not' : null)
 
 // ---- src/settings-file.js ----
 // Helper's settings page as a short file (content/helper-settings-edit-v1.md; JSON
@@ -31820,7 +31893,8 @@ function makePage(ctx, opts = {}) {
   const setupAfterSaid = (result, said, typed) => {
     if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN', 'OPEN_TALK'].includes(result.kind)) return [said, []]
     if (!setupQuestionOpen(memory.visit)) return [said, []]
-    if (!typed && !setupReaskWaits(memory.visit)) return [said, []]
+    // (review) a pressed answer while a step is open gets the step back, as before (setup-chat-2)
+    if (!typed && !setupStepOpen(memory.visit) && !setupReaskWaits(memory.visit)) return [said, []]
     // find-v2 part 5 wins where both jobs touched the same thing (Lead, 11 Nov 14:15): things to pick of the answer's
     // own (its answers, or an offer that asks about the answer: two kinds of moving, which app, which plan, the near
     // lines) keep the set-up question back until they are answered, as own_question_kinds do; only one question is on
@@ -31843,7 +31917,13 @@ function makePage(ctx, opts = {}) {
   // find-v2 part 3 (changes-13 look.model_rule): the look's seen with what Helper saw the AI do in this visit: a model
   // the settings check found set is said to answer only when one of Helper's calls got an answer in time; one that got
   // none in 12 s is model_slow, one that failed for want of a provider model_not; else "couldn't check" (seenFrom)
-  const modelSaidOf = seen => (seen && seen.model === 'ok' && memory.visit.aiSeen ? { ...seen, modelSaid: memory.visit.aiSeen } : seen)
+  // loom-fixes-2 part B 1: checked, the look's check call was made in this visit (the faint line under the look then
+  // no longer says that no AI was used)
+  const modelSaidOf = seen => {
+    const v = memory.visit
+    const out = seen && seen.model === 'ok' && v.aiSeen ? { ...seen, modelSaid: v.aiSeen } : seen
+    return out && v.modelChecked ? { ...out, checked: true } : out
+  }
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
   // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
   // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
@@ -32245,6 +32325,12 @@ function makePage(ctx, opts = {}) {
     function runSetup(mv, shown) {
       liveClose()
       memory.opening = null
+      // (review) a move of the set-up conversation shows its own line: nothing of an earlier typed question's own picks
+      // waits any more, and the step's own answers count again
+      if (visit.setup) {
+        visit.setup.reaskWaits = false
+        visit.setup.stepHidden = false
+      }
       if (shown) addToLog([{ ...youEntry(shown), send: false }])
       const finish = seen => {
         const says = mv.go(modelSaidOf(seen))
@@ -32334,7 +32420,43 @@ function makePage(ctx, opts = {}) {
       memory.lookWait = () => once(memory.seen || LOOK_UNSEEN)
       look().then(seen => {
         memory.seen = seen
-        once(seen)
+        // loom-fixes-2 part B 1: the one check call of this set-up conversation, then Helper's lines
+        modelCheck(seen).then(() => once(seen))
+      })
+    }
+    // loom-fixes-2 part B 1 (Lead's answer 2 to find-v2's questions): once per set-up conversation, when the settings
+    // say a model is set and nothing has shown yet whether it answers, one small check call (src/setup-rec.js
+    // MODEL_CHECK: a fixed text, nothing of the person's), at most 12 s: an answer is model_ok, a failure for want of a
+    // provider model_not, no answer in 12 s model_slow (visit.aiSeen, read by modelSaidOf). No call with no model set
+    // (model_not as before), in a build with no AI step, when the AI step is off for the visit, or while Hermes still
+    // works on another call of Helper's.
+    function modelCheck(seen) {
+      const v = memory.visit
+      // (once per visit: a set-up conversation started again in the same visit knows the answer already, aiSeen)
+      if (!seen || seen.model !== 'ok' || v.aiSeen || v.modelChecked || AI_MODE === 'no_ai_step' || v.aiOff === true || live.inHermes > 0) return Promise.resolve()
+      v.modelChecked = true
+      return new Promise(resolve => {
+        let ended = false
+        const fin = said => {
+          if (ended) return
+          ended = true
+          if (said && !v.aiSeen) v.aiSeen = said
+          resolve()
+        }
+        const stop = ctx.setTimeout(() => fin('slow'), LIVE_SECONDS * 1000)
+        live.inHermes++
+        // the call is out of Hermes before Helper goes on (the recommendation's own call may follow at once)
+        const back = said => {
+          stop()
+          live.inHermes--
+          fin(said)
+        }
+        Promise.resolve()
+          .then(() => askLookCheck((method, params, timeout) => host.request(method, params, timeout)))
+          .then(
+            res => back(modelCheckSaid(res)),
+            err => back(modelCheckFailed(err))
+          )
       })
     }
     // setup-chat: "Ask me the set-up questions again" was pressed on Helper's settings page (see rereadKept)

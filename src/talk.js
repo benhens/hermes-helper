@@ -85,6 +85,8 @@ const capFirst = s => {
 
 // The request step: null, the words that make it a request (H1), or { h2: words } for a question whether
 // Hermes can build something (changes-16, H2).
+// loom-fixes-2: the build words that only say "connect" (see turnSteps, a chat app named with them)
+const CONNECT_PLAIN = ['connect it', 'connect this'] // not "please connect Telegram": route2.py's own case V12a keeps H1 there
 export function buildHit(text) {
   const t = cutIgnored(talkNorm(text)) // the ignore phrases are cut before this step too
   if (startsWith(t, BUILD.skip_starts) || whichOf(t, BUILD.how_phrases).length) return null // a question about how is never a request
@@ -332,14 +334,23 @@ const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds }
 // more) stand side by side among the message's content words. The longest hit phrase wins (content words, then
 // words); a tie goes to the line first in the data. singleOk false is the first step: phrases of two or more words,
 // of the new fact lines and the older lines on first_step_old only.
+// loom-fixes-2 part B 2 (hhtech ask-run 4, For builder 3: "whats a contex window" got the Windows line with no AI):
+// a phrase with the word window or windows hits only where the message names Windows the system: the word "windows"
+// itself (never "window", which the word rule makes the same), not after context, contex, token or a word that makes
+// it an app's window ("two windows", "chat windows"). Builder's rule; route2.py has none.
+const APP_WINDOWS = /(^|[^a-z0-9])(?:cont[a-z]*|token|chat|app|apps|browser|terminal|two|three|several|multiple|many|second|separate|extra|more|these|those)\s+windows($|[^a-z0-9])/g
+export const namesWindowsOs = text => /(^|[^a-z0-9])windows($|[^a-z0-9])/.test(talkNorm(text).replace(APP_WINDOWS, ' '))
+const aboutWindow = pw => pw.includes('window')
 export function fullHit(text, singleOk) {
   const mw = nearWords(text).filter(w => !NEAR_FILLER.has(w))
   const mc = nearContent(mw)
+  const os = namesWindowsOs(text)
   let best = null
   for (const { gives, phrases } of TITLED) {
     if (!singleOk && gives.kind !== 'fact' && !NEAR.first_step_old.includes(gives.kind)) continue
     for (const [pw, cw] of phrases) {
       if (!pw.length || (pw.length === 1 && !singleOk)) continue
+      if (!os && aboutWindow(pw) && gives.need === 'd_windows') continue
       if (runIn(mw, pw) || (cw.length >= 2 && runIn(mc, cw))) {
         if (!best || cw.length > best[0] || (cw.length === best[0] && pw.length > best[1])) best = [cw.length, pw.length, gives]
       }
@@ -354,7 +365,9 @@ const NEVER_NEAR = new Set([...(NEAR.never_near || []), ...nearWords((NEAR.never
 export function nearLines(text, st) {
   const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w)))
   const sc = []
+  const os = namesWindowsOs(text) // loom-fixes-2 part B 2: the Windows line is not near an app's window or a context window
   TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
+    if (!os && gives.need === 'd_windows') return
     const n = [...ms].filter(w => allWords.has(w)).length
     if ((n >= 2 || [...ms].some(w => titleWords.has(w))) && lineKey(givesOf(gives)) !== st.lastKey) sc.push([n, i, gives, title])
   })
@@ -1081,6 +1094,12 @@ export function offerSaid(sid, st) {
 export const offerIsSetup = thing => OF.things[thing].gives.kind === 'setup_chat'
 // the message holds a key word of a topic or a Hermes term
 export const hasTopicWord = text => knownWords(cutIgnored(talkNorm(text)))
+// loom-fixes-2 (review; route2.py setup_typed, typed_answer.no_match_v2): the ordinary talk would answer this message by a
+// fixed line, an offer's words or a known word ("laptop or a server")
+export const talkWouldAnswer = text => {
+  const tw = cutIgnored(talkNorm(text))
+  return !!(fixedByWords(tw, { wants: false, pending: null }) || offerRoute(tw) || knownWords(tw))
+}
 // Every offer question this build can show: [set id, text, pick ids] (tests; the after_topic sets by topic)
 export const offerSets = () => [...Object.keys(OF.sets).filter(k => k !== 'after_topic').map(k => offerSet(k)), ...Object.keys(OF.sets.after_topic.by_topic).map(t => offerSet('after_topic', t))]
 
@@ -1207,7 +1226,7 @@ export function turn(text, st) {
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 export function turnParts(text, st) {
   // loom-fixes-2 (back_alone; route2.py turn): only back words, with nothing of Helper's open: BACK_NONE with the offer
-  if (st.stage === 'open' && backAlone(text)) {
+  if (st.stage === 'open' && !st.pending && !(st.setup && ['new', 'goal', 'rec', 'step'].includes(st.setup.stage)) && backAlone(text)) {
     const out = { kind: 'BACK_NONE' }
     noteLast(st, out)
     attachOffer(out, st)
@@ -1451,6 +1470,16 @@ function turnSteps(text, st) {
   }
   if (built) {
     st.stage = 'open'
+    // loom-fixes-2 (Lead, the block added to the job: "connect it to telegram" got H1 in route2.py while hhtech saw the
+    // Telegram line in the app; keep what helps a newcomer): a plain connect request that names a chat app gets that
+    // app's line with its steps (the msg row), not "I can't do that for you". Builder's rule; route2.py gives H1.
+    if (CONNECT_PLAIN.includes(built)) {
+      const c = byCode(text, st)
+      if (c.topic === 'msg' && c.need && !c.rows) {
+        st.found.msg = c.need
+        return done('row', { topic: 'msg', need: c.need })
+      }
+    }
     return done('H1', { why: built })
   }
   const t = cutIgnored(talkNorm(text))
@@ -1604,7 +1633,19 @@ function turnSteps(text, st) {
   // the near miss: no row, but a subject word of exactly one group: N2 with that group's rows
   if (st.wants !== false) {
     const g = nearOf(t)
-    if (g.length === 1) return done('N2', { group: g[0] })
+    if (g.length === 1) {
+      // loom-fixes-2 part B 4 (Lead's answer 3 to find-v2's questions): a full hit by a phrase of one of the wants rows
+      // wins over the near miss, as in route2.py, which has no near miss and gives that row in its last step ("can it
+      // watch youtube videos": hhcontent's YouTube line w_youtube, not the nearest rows). Only the wants rows: a fact
+      // line's phrase leaves the near miss as the wants layers have it
+      const fh = out.code && out.code.skill_unknown ? null : fullHit(text, true)
+      if (fh && fh.kind === 'want') {
+        const { kind: k, ...more } = fh
+        out.by = 'title'
+        return done(k, more)
+      }
+      return done('N2', { group: g[0] })
+    }
   }
   return st.stage === 'open' ? lastStep(dontKnow(text) || 'skill by name') : done(dontKnow(text) || 'skill by name')
 }
@@ -1823,6 +1864,11 @@ export const EXTRA_LINES = (() => {
   }
   TALK_DATA.terms.forEach(t => take(t.next))
   Object.values(FIXED).forEach(f => take(f.next)) // ask-fix-t1: PRIV-next, SAFE-next
+  // loom-fixes-2 part B 4: a correction's button names a fixed line by its id alone (FB_MAKER: HERMES)
+  for (const l of Object.values((TALK_DATA.false_belief || {}).lines || {})) {
+    const n = l.next
+    if (n && n.kind === 'line' && !n.text && FIXED[n.id]) lines[n.id] = { id: n.id, text: FIXED[n.id].text, source: FIXED[n.id].source || null }
+  }
   return lines
 })()
 

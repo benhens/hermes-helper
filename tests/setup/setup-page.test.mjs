@@ -17,10 +17,18 @@ function useHost(hermes = {}) {
   const host = {
     hermes: h,
     asks: [],
+    checks: [],
     calls: [],
     request: async (method, params, ms) => {
       host.calls.push([method, params, ms])
       if (h.fail.includes(method)) throw new Error('read failed: ' + method)
+      // loom-fixes-2 part B 1: the set-up look's one check call (a fixed text) is the stand-in's own, not one of the person's asks
+      if (method === 'llm.oneshot' && params && params.instructions === 'Reply with exactly: OK') {
+        host.checks.push(params)
+        const a = h.modelCheck ? await h.modelCheck() : 'OK'
+        if (a instanceof Error) throw a
+        return { text: a }
+      }
       if (method === 'llm.oneshot') {
         host.asks.push(params)
         if (h.oneshot) return { text: await h.oneshot(params, host.asks.length) }
@@ -103,9 +111,14 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   const seen = olds(view).at(-1)
   assert.equal(seen.props['data-line'], 'SEEN')
   // find-v2 part 3: no call of Helper's has answered in this visit, so the model part is "couldn't check"
-  assert.match(oldText(seen), /^I looked at your Hermes\. I couldn[’']t check your model this time\. You have no scheduled jobs yet\./)
+  // loom-fixes-2 part B 1: the look's one check call answered (the stand-in says OK), so the model part is model_ok
+  assert.match(oldText(seen), /^I looked at your Hermes\. You have a model, the AI that thinks, and it answered my check\. You have no scheduled jobs yet\./)
+  assert.equal(host.checks.length, 1, 'one check call')
+  assert.deepEqual([host.checks[0].instructions, host.checks[0].input], ['Reply with exactly: OK', 'Reply with exactly: OK'], 'a fixed text of ours')
+  assert.doesNotMatch(JSON.stringify(host.checks[0]), /Peter|tennis|reminders/, 'nothing of the person\'s in it')
   assert.match(text(helper(view)), /Kept: send reminders to my members about training\./)
-  assert.equal(text(byData(seen, 'hint')), 'Read from your Hermes on this computer. Nothing was sent, and no AI was used.')
+  // loom-fixes-2 part B 1: after the check call, "Nothing was sent, and no AI was used." would be untrue
+  assert.equal(text(byData(seen, 'hint')), 'Read from your Hermes on this computer.')
   assert.match(text(seen), /What did you look at\?/)
   assert.equal(bubbleLine(view), 'REC')
   assert.equal(bubbleSaid(view), 'You’re new, so first check that Hermes answers you. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?')
@@ -131,7 +144,9 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   assert.equal(host.asks.length, 0, 'no call, also for the recommendations')
   // (dash-v2: plugins.manage is the Dashboard's read of the plugins list when the page opened, only ever action 'list')
   // (loom-fixes: no plugins read any more)
-  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'profiles.describe', 'setup.runtime_check'])
+  // loom-fixes-2 part B 1: and the look's one check call (llm.oneshot, a fixed text; host.checks above)
+  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check'])
+  assert.equal(host.calls.filter(([m]) => m === 'llm.oneshot').length, 1, 'one check call in the whole conversation')
   for (const [m, p] of host.calls) if (m === 'plugins.manage' || m === 'cron.manage') assert.equal(p.action, 'list', m)
   // kept between visits
   const kept = storage.data.get('kept')
@@ -414,9 +429,39 @@ test('find-v2: no AI set up (the model check says no): "You have no model set up
   assert.match(SEEN_OF(view), /^I looked at your Hermes\. You have no model set up yet, the AI that thinks\./)
   assert.doesNotMatch(SEEN_OF(view), /answered my check/)
 })
-test('find-v2: a model is set but nothing has answered yet (run D: the check says ok): "I couldn\'t check your model this time."', opt, async () => {
-  const { view } = await open()
+// loom-fixes-2 part B 1 (Lead's answer 2 to find-v2's questions; hhtech ask-run 4, For builder 6): the look makes one
+// small check call per set-up conversation when the settings say a model is set: it answers, model_ok; it fails for
+// want of a provider (run D), model_not; no answer in 12 s, model_slow; any other failure, model_unread as before
+test('loom-fixes-2: a model is set: the look\'s one check call decides the model part (answered, no provider, no answer in 12 s, another failure)', opt, async () => {
+  const cases = [
+    [() => 'OK', /^I looked at your Hermes\. You have a model, the AI that thinks, and it answered my check\./],
+    [() => new Error('No LLM provider configured for task=helping_hand provider=auto. Run: hermes setup'), /^I looked at your Hermes\. You have no model set up yet, the AI that thinks\./],
+    [() => new Promise(() => {}), /^I looked at your Hermes\. You have a model, but it did not answer my check in time\./],
+    [() => new Error('read failed: llm.oneshot'), /^I looked at your Hermes\. I couldn't check your model this time\./]
+  ]
+  for (const [modelCheck, want] of cases) {
+    const { view, host, timers } = await open({ hermes: { modelCheck } })
+    finish(view)
+    await send(view, 'Peter')
+    await send(view, 'I run a tennis club')
+    await press(view, 'I know it well')
+    await send(view, 'send reminders to my members about training')
+    timers.fire(12000)
+    await settle()
+    assert.equal(host.checks.length, 1, String(want))
+    assert.match(SEEN_OF(view), want)
+  }
+})
+test('loom-fixes-2: no AI set up (the settings check says no model): no check call, "You have no model set up yet"', opt, async () => {
+  const { view, host } = await open({ hermes: { model: false } })
   await toSeen(view)
+  assert.equal(host.checks.length, 0)
+  assert.match(SEEN_OF(view), /^I looked at your Hermes\. You have no model set up yet, the AI that thinks\./)
+})
+test('loom-fixes-2: in a build with no AI step, no check call', opt, async () => {
+  const { view, host } = await open({ mode: 'no_ai_step' })
+  await toSeen(view)
+  assert.equal(host.checks.length, 0)
   assert.match(SEEN_OF(view), /^I looked at your Hermes\. I couldn't check your model this time\./)
 })
 test('find-v2: a call failed with "No LLM provider configured": model_not; one that answered: model_ok; one with no answer in 12 s: model_slow', opt, async () => {

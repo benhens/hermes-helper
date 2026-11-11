@@ -16,7 +16,13 @@ function useHost(hermes = {}) {
   const host = {
     hermes: h,
     asks: [],
+    checks: [],
     request: async (method, params) => {
+      // loom-fixes-2 part B 1: the set-up look's one check call (a fixed text) is the stand-in's own, not one of the person's asks
+      if (method === 'llm.oneshot' && params && params.instructions === 'Reply with exactly: OK') {
+        host.checks.push(params)
+        return { text: 'OK' }
+      }
       if (method === 'llm.oneshot') {
         host.asks.push(params)
         return { text: 'NONE' }
@@ -204,4 +210,77 @@ test('point 7: a thing Helper cannot see after "It worked": the open bot is name
   await press(view, 'It worked')
   assert.equal(bubbleLine(view), 'NOT_SEEN')
   assert.equal(bubbleSaid(view), "I can't see it yet. I only look at the bot that is open in Hermes now, default.")
+})
+
+// part B 3 (hhtech ask-run 4, For builder 1; A-mig m3): "How can I migrate?" won at the goal question; the follow-up
+// "ok and how do i do that" stays with it, typed before a pick or after one, and is never kept as the goal
+for (const pickFirst of [false, true]) {
+  test(`B3: "How can I migrate?" at the goal question, ${pickFirst ? 'a pick, ' : ''}then "ok and how do i do that": not kept as the goal; one question on screen; the goal question comes back`, opt, async () => {
+    const storage = fakeStorage({ met: true, kept: { setup_new: 'new' } })
+    const { view } = await open({ storage })
+    finish(view)
+    assert.deepEqual(labels(view), GOAL4)
+    await send(view, 'How can I migrate?')
+    assert.deepEqual(labels(view), ['From another AI app', 'To another computer'])
+    if (pickFirst) await press(view, 'To another computer')
+    await send(view, 'ok and how do i do that')
+    assert.equal((storage.data.get('kept') || {}).setup_goal, undefined, 'not kept as the goal')
+    assert.doesNotMatch(q(text(helper(view))), /Kept: ok and how do i do that/)
+    assert.ok(!screen(view).some(([, line]) => line === 'REC'), 'the set-up did not go on to the recommendation')
+    assert.deepEqual(twoInARow(view), [])
+    // the goal question is back once its own question is answered (or at once, when nothing of its own waits)
+    if (!labels(view).includes('Do things at set times')) await press(view, labels(view)[0])
+    assert.deepEqual(labels(view), GOAL4)
+    // and REC once only when the goal is then given
+    await press(view, 'Do things at set times')
+    const recs = screen(view).filter(([, line]) => line === 'REC').length
+    assert.equal(recs, 1, 'the REC line once')
+  })
+}
+
+// review findings fixed (report: "Review")
+test('review: "laptop or a server" at the goal question is answered, never kept as the goal (route2.py: the ordinary talk would answer it)', opt, async () => {
+  const storage = fakeStorage({ met: true, kept: { setup_new: 'new' } })
+  const { view } = await open({ storage })
+  finish(view)
+  await send(view, 'laptop or a server')
+  assert.equal((storage.data.get('kept') || {}).setup_goal, undefined)
+  assert.equal(bubbleLine(view), 'SETUP_REASK_GOAL')
+})
+
+test('review: "back" while a set-up question is open never says "No question of mine is open"', opt, async () => {
+  const storage = fakeStorage({ met: true })
+  const { view } = await open({ storage })
+  finish(view)
+  await send(view, 'Set up Hermes')
+  await send(view, 'back')
+  assert.ok(!screen(view).some(([, line]) => line === 'BACK_NONE'), JSON.stringify(screen(view).slice(-3)))
+  // ("back" alone is no back word of the set-up conversation's; the ordinary talk answers it, with near picks of its
+  // own, find-v2's rule; one question on screen)
+  assert.deepEqual(twoInARow(view), [])
+})
+
+test('review: after "How can I migrate?" and "go back", the first question takes a typed answer again', opt, async () => {
+  const storage = fakeStorage({ met: true })
+  const { view } = await open({ storage })
+  finish(view)
+  await send(view, 'Set up Hermes')
+  await press(view, "I've used it a bit")
+  await send(view, 'How can I migrate?')
+  await send(view, 'go back')
+  assert.equal(bubbleLine(view), 'Q_NEW')
+  await send(view, 'yes')
+  assert.equal(storage.data.get('kept').setup_new, 'new', 'the typed answer is kept')
+  assert.equal(bubbleLine(view), 'Q_GOAL')
+})
+
+test('review: on a later visit, "go back" at step 1 goes to "Want the steps?" (it was shown), not "This is my first set-up question"', opt, async () => {
+  const storage = fakeStorage({ met: true, kept: { setup_current: 'first_chat' } })
+  const { view } = await open({ storage })
+  finish(view)
+  await press(view, 'Show me the steps')
+  assert.match(bubbleSaid(view), /^Step 1 of/)
+  await send(view, 'go back')
+  const s = screen(view).slice(-2).map(x => x[1])
+  assert.deepEqual(s, ['BACK_ONE', 'REC'])
 })

@@ -393,6 +393,14 @@ export function talkProblems(d) {
 
 const pickKeys = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undefined).map(k => [k, o[k]]))
 const slimLine = x => (x ? pickKeys(x, ['id', 'text', 'source']) : undefined)
+// loom-fixes-2 part B 4 (Lead's answer 4 to find-v2's questions): FB_MAKER's next is the line HERMES with no label in
+// hhcontent's data, so it was no button; the build gives it the label "What Hermes is" until the data has one of its
+// own (in the report, For hhcontent)
+export const FB_NEXT_LABELS = { FB_MAKER: 'What Hermes is' }
+const fbNext = l => {
+  const n = slimNext(l.next)
+  return n.kind === 'line' && !n.label && FB_NEXT_LABELS[l.id] ? { ...n, label: FB_NEXT_LABELS[l.id] } : n
+}
 const slimNext = n => (n ? { ...pickKeys(n, ['kind', 'label', 'part', 'paste_text', 'id', 'text', 'source']), ...(n.mean ? { mean: slimLine(n.mean) } : {}) } : { kind: 'none' })
 const slimAnswers = list => (list || []).map(a => pickKeys(a, ['label', 'gives']))
 
@@ -533,7 +541,7 @@ export function slimTalkData(d, skills = { skills: [] }) {
     // find-v2 (live-v2 changes-13): never_near (near_rule), keep_subject (keep_subject_rule), each line's pick_label, and
     // false_belief (FB_MAKER, FB_PLAN)
     near: pickKeys(d.near, ['stop_words', 'filler', 'first_step_old', 'keep_caps', 'want_say', 'template', 'template_1', 'template_3', 'nothing_near_set', 'bare_follow', 'never_near', 'keep_subject']),
-    false_belief: { ...pickKeys(d.false_belief, ['maker_names', 'maker_cues', 'plan_names', 'plan_words', 'need_words']), lines: Object.fromEntries(d.false_belief.lines.map(l => [l.id, { text: l.text, source: l.sources.map(x => `${x.file}:${x.line}`).join(', '), next: slimNext(l.next) }])) },
+    false_belief: { ...pickKeys(d.false_belief, ['maker_names', 'maker_cues', 'plan_names', 'plan_words', 'need_words']), lines: Object.fromEntries(d.false_belief.lines.map(l => [l.id, { text: l.text, source: l.sources.map(x => `${x.file}:${x.line}`).join(', '), next: fbNext(l) }])) },
     keeps: slimKeeps(d.keeps),
     skills: (skills.skills || []).map(s => ({ name: s.name })),
     // loom-fixes-2 (helper-loom-fixes-v2 points 1, 2 and 6): how a name question is read; back words with nothing

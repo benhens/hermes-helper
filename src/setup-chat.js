@@ -10,7 +10,7 @@
 // (the thing last recommended). Not kept: Skip, Not sure yet, what the look saw, Something else.
 import { SETUP_DATA } from './setup-data.js'
 import { TALK_DATA } from './talk-data.js'
-import { talkNorm, whichOf, startsWith, smallTalk, freshVisit } from './talk.js'
+import { talkNorm, whichOf, startsWith, smallTalk, freshVisit, talkWouldAnswer } from './talk.js'
 import { workOk, workSqueeze } from './kept.js'
 import { looksLikeKey } from './key-check.js'
 import { LIVE_DATA } from './live-data.js'
@@ -106,6 +106,10 @@ const suGOAL_PICKS = () => suPicks(SU_Q_GOAL.answers.map(a => ['goal:' + a.id, a
 const suREC_PICKS = labels => suPicks(['rec:steps', 'rec:already', 'rec:other', 'rec:notnow'].map((a, i) => [a, labels[i]]))
 const suNamed = (line, name, slots = {}) => (name ? suFill(line.text, { ...slots, name }) : suFill(line.text_no_name, slots))
 const suOf = st => (st.setup = st.setup || { stage: null, item: null, step: 0, other: [], reasked: {}, asked: {} })
+// loom-fixes-2 part B 1: the faint line under the look says "Nothing was sent, and no AI was used."; after the look's
+// check call (seen.checked, src/page.js) that is no longer true, so only its first sentence ("Read from your Hermes on
+// this computer.") is shown until hhcontent gives a line for it (in the report, For hhcontent)
+const suLookHint = seen => (seen && seen.checked ? SU.look.under.faint.split(/(?<=\.) /)[0] : SU.look.under.faint)
 // the faint "Kept: ..." line under a line (the page strikes it when the thing is no longer kept)
 // live changes-6 (lines_by_mode.first_time_grey.setup_told): under the first Kept: line of what goes to the AI (what
 // you do, new to Hermes, what you want), once: "Your AI also gets ...". Only in a build that sends them.
@@ -197,10 +201,15 @@ export const isRestart = text => suInList(suFlat(text), SU.restart_phrases)
 // small talk (the talk data's small-talk kinds the rule names, read as in a fresh visit). Restart words come first
 // (setupTyped). His "can we start from the begining" was kept as his goal (Loom 1:56).
 const SU_TA = SU.typed_answer
+// loom-fixes-2 part B 3 (hhtech ask-run 4, For builder 1: "ok and how do i do that", a follow-up to the question that
+// had just won, was kept as the goal): the starts are read also after the words a question may open with (the talk
+// data's names.lead_ins: so, ok, and, also, but ...), so "ok and how ..." is a question too
+const SU_LEAD = new RegExp(`^(?:(?:${TALK_DATA.names.lead_ins.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})[ ,]+)+`)
 export function notAnAnswer(text) {
   const t = suFlat(text)
   if (String(text).includes('?')) return true
-  if (startsWith(t, SU_TA.question_starts) || startsWith(t, SU_TA.request_starts) || suInList(t, SU_TA.request_words)) return true
+  for (const u of [t, t.replace(SU_LEAD, '')]) if (startsWith(u, SU_TA.question_starts) || startsWith(u, SU_TA.request_starts)) return true
+  if (suInList(t, SU_TA.request_words)) return true
   return SU_TA.small_talk_kinds.includes(smallTalk(text, freshVisit('open')))
 }
 export const isSetupAsk = text => suInList(suFlat(text), SU.ask_phrases)
@@ -341,7 +350,7 @@ function suAnswerGoal(st, id, typed, seen) {
   }
   s.seen = seen
   // under the look line: the Kept: line, the faint line, and the button "What did you look at?"
-  const look = suSaid('SEEN', seenLine(seen, id), { note, hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+  const look = suSaid('SEEN', seenLine(seen, id), { note, hint: suLookHint(seen), next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
   return suRecommend(st, seen, [look])
 }
 function suRestart(st) {
@@ -380,7 +389,7 @@ function suAsk(st) {
   }
   return suMove(true, seen => {
     s.seen = seen
-    const look = suSaid('SEEN', seenLine(seen, st.kept.setup_goal_id || s.goal || 'unsure'), { hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+    const look = suSaid('SEEN', seenLine(seen, st.kept.setup_goal_id || s.goal || 'unsure'), { hint: suLookHint(seen), next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
     return suRecommend(st, seen, [look])
   })
 }
@@ -407,7 +416,7 @@ export function setupPress(action, st) {
   // While a recommendation waits for its answer, its four answers stay under the list, so the person is not left
   // with nothing to pick.
   // setup-chat-2: the same for any open line of the set-up conversation (a step, "I can't see that yet", ...)
-  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: suOpenPicks(st) })]) : null
+  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: suLookHint(s.seen), answers: suOpenPicks(st) })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
   // loom-fixes: Go on is the next question not answered yet, or the look and the written recommendation; Answer again
   // starts the questions again
@@ -475,6 +484,9 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'new') {
     const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
     if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
+    // loom-fixes-2 part B 3: while a typed question's own things to pick stand in for this question (reaskWaits), a
+    // typed message belongs to that question, never to this one: only this question's own labels count
+    if (s.reaskWaits) return null
     if (isSetupAsk(text)) return suAsk(st)
     if (question || hasTopicWord(text) || notAnAnswer(text)) return null
     const id = suTypedNew(text)
@@ -484,6 +496,7 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'goal') {
     const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
     if (i >= 0) return suMove(true, seen => suAnswerGoal(st, SU_Q_GOAL.answers[i].id, null, seen))
+    if (s.reaskWaits) return null // loom-fixes-2 part B 3, as at Q_NEW
     if (isSetupAsk(text)) return suAsk(st)
     if (question || notAnAnswer(text)) return null
     // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
@@ -492,7 +505,7 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
     // loom-fixes-2 (typed_answer.no_match_v2; route2.py setup_typed): a message that matches none of the goal lists
     // but that the ordinary talk would answer (a topic word: "laptop or a server") is no answer either; only other
     // messages are kept as unsure
-    if (goal === 'unsure' && hasTopicWord(text)) return null
+    if (goal === 'unsure' && (hasTopicWord(text) || talkWouldAnswer(text))) return null
     return suMove(true, seen => suAnswerGoal(st, goal, text, seen))
   }
   if (s.stage === 'rec') {
@@ -585,6 +598,7 @@ export function setupOpening(st, seen) {
     s.item = cur
     if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
     s.stage = 'rec'
+    s.asked.rec = true // (review) its "Want the steps?" was shown: go back from step 1 comes here, not BACK_FIRST
     // loom-fixes (here_rule, one rule with the Dashboard: src/setup-reads.js hereStop): the stop named is the Dashboard's
     // "You are here"; with the stop kept as current not done, that is this stop
     const done = doneSet(st, seen)
