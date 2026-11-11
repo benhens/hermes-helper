@@ -85,6 +85,8 @@ const capFirst = s => {
 
 // The request step: null, the words that make it a request (H1), or { h2: words } for a question whether
 // Hermes can build something (changes-16, H2).
+// loom-fixes-2: the build words that only say "connect" (see turnSteps, a chat app named with them)
+const CONNECT_PLAIN = ['connect it', 'connect this'] // not "please connect Telegram": route2.py's own case V12a keeps H1 there
 export function buildHit(text) {
   const t = cutIgnored(talkNorm(text)) // the ignore phrases are cut before this step too
   if (startsWith(t, BUILD.skip_starts) || whichOf(t, BUILD.how_phrases).length) return null // a question about how is never a request
@@ -1462,6 +1464,16 @@ function turnSteps(text, st) {
   }
   if (built) {
     st.stage = 'open'
+    // loom-fixes-2 (Lead, the block added to the job: "connect it to telegram" got H1 in route2.py while hhtech saw the
+    // Telegram line in the app; keep what helps a newcomer): a plain connect request that names a chat app gets that
+    // app's line with its steps (the msg row), not "I can't do that for you". Builder's rule; route2.py gives H1.
+    if (CONNECT_PLAIN.includes(built)) {
+      const c = byCode(text, st)
+      if (c.topic === 'msg' && c.need && !c.rows) {
+        st.found.msg = c.need
+        return done('row', { topic: 'msg', need: c.need })
+      }
+    }
     return done('H1', { why: built })
   }
   const t = cutIgnored(talkNorm(text))

@@ -24,3 +24,11 @@ test('the correction "Hermes is not made by OpenAI": a button "What Hermes is" t
   const r = sayLine('HERMES', st)
   assert.equal(lineFor(r, st).text, TALK_DATA.fixed.HERMES.text)
 })
+
+// Part A, Lead's added block: "connect it to telegram" got H1 ("I can't do that for you") in route2.py, the Telegram line
+// in hhtech's app run; the build keeps the line that helps a newcomer: the chat app's own line with its steps
+test('"connect it to telegram": the Telegram line (msg1), not "I can\'t do that"; a connect request with no chat app is still H1', () => {
+  const o = turn('connect it to telegram', freshVisit('open', {}, true))
+  assert.deepEqual([o.kind, o.topic, o.need], ['row', 'msg', 'msg1'])
+  for (const m of ['connect it', 'connect it to my server', 'please connect my gmail', 'please connect Telegram']) assert.equal(turn(m, freshVisit('open', {}, true)).kind, 'H1', m)
+})
