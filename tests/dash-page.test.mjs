@@ -196,7 +196,8 @@ test('hhcontent\'s corrected steps are what an opened stop shows: Its personalit
   click(stop(view, 'personality'))
   const box = byData(dash(view), 'steps')
   assert.equal(box.props['aria-label'], 'Its personality')
-  assert.equal(said(byData(stop(view, 'personality'), 'card-name')), 'Its personality')
+  // follow-up 19:47: the card shows the short name; the opened card's own text (its label) keeps the team's name
+  assert.equal(said(byData(stop(view, 'personality'), 'card-name')), 'Personality')
   assert.deepEqual(all(box, n => n.type === 'ol')[0].props.children.map(li => text(li).trim()), [
     'Click Bots at the top of the left list.',
     'Right-click your main bot, then click "Edit…".',
@@ -207,7 +208,8 @@ test('hhcontent\'s corrected steps are what an opened stop shows: Its personalit
   assert.doesNotMatch(text(box), /Edit Profile/)
   click(stop(view, 'model'))
   const model = byData(dash(view), 'steps')
-  assert.equal(said(byData(stop(view, 'model'), 'card-name')), 'A model')
+  assert.equal(said(byData(stop(view, 'model'), 'card-name')), 'Model')
+  assert.equal(model.props['aria-label'], 'A model')
   assert.equal(said(byData(stop(view, 'model'), 'card-why')), 'The AI that does the thinking. Your app may already have a free one.')
   assert.doesNotMatch(text(dash(view)), /Pick a model/)
   // the team's marks on a step (seen / not seen) are for the team: never on the page, never in the built data
@@ -327,9 +329,10 @@ test('every word on the tab comes from the data file (src/dash-data.js); numbers
   // look: the banner's words that Lead's job gives (not in the team's data): "Helper", "<count> set up", "Open <card>"
   words.add('Helper')
   words.add('set up')
-  for (const it of DASH_DATA.items) words.add(`Open ${it.name}`)
+  // (follow-up 19:47: the banner names the card by its short name)
+  for (const it of DASH_DATA.items) words.add(`Open ${it.short_name}`)
   // look-fix: the banner's line names the card as "Next: <card>." (the approved mockup)
-  for (const it of DASH_DATA.items) words.add(`Next: ${it.name}.`)
+  for (const it of DASH_DATA.items) words.add(`Next: ${it.short_name}.`)
   for (const who of ['just_installed', 'half', 'all']) {
     const { view } = await open(who)
     // open every stop once, so its words are drawn too
@@ -444,7 +447,7 @@ test('the set-up is 9 cards in the data\'s order (Install and Scheduled jobs out
     assert.equal(c.type, 'button')
     assert.equal(c.props.type, 'button')
     assert.ok(c.props.className.split(' ').includes(D.scard))
-    assert.equal(said(byData(c, 'card-name')), it.name)
+    assert.equal(said(byData(c, 'card-name')), it.short_name)
     assert.equal(said(byData(c, 'card-why')), it.why)
     const sq = all(c, n => n.props && n.props.className === D.tileIcon)
     assert.equal(sq.length, 1, it.id)
@@ -562,7 +565,7 @@ test('a click on a card opens it full width under its row (one open at a time); 
   assert.ok(all(open2, n => n.props && n.props['data-hh'] === 'source').length >= 1)
 })
 
-test('as many columns as fit with each card at least 260 px wide: 1 at 400 px, 2 at about 600, 3 at 820 and more; the panel follows the row', async () => {
+test('as many columns as fit with each card at least 260 px wide, at most 3 (his decision 11 Nov 19:47, the approved after.png): 1 at 400 px, 2 at about 600, 3 at 820 and more; the panel follows the row', async () => {
   const observers = []
   globalThis.ResizeObserver = class {
     constructor(cb) {
@@ -580,7 +583,7 @@ test('as many columns as fit with each card at least 260 px wide: 1 at 400 px, 2
   byData(dash(view), 'cards').props.ref({ id: 'cards' })
   const fire = width => observers.filter(o => o.watching && o.watching.id === 'cards').forEach(o => o.cb([{ contentRect: { width, height: 500 } }]))
   // (look: the cards are 20 px apart, so n columns need n * 260 + (n - 1) * 20 px)
-  for (const [width, cols] of [[336, 1], [539, 1], [540, 2], [656, 2], [819, 2], [820, 3], [1116, 4]]) {
+  for (const [width, cols] of [[336, 1], [539, 1], [540, 2], [656, 2], [819, 2], [820, 3], [1116, 3], [1128, 3], [1600, 3], [3000, 3]]) {
     fire(width)
     await settle(2)
     assert.equal(byData(dash(view), 'cards').props['data-columns'], cols, `${width} px`)
@@ -645,14 +648,15 @@ test('look: a banner on top of the Dashboard, above the three tiles: "Helper", t
   assert.equal(byData(b, 'banner-title').type, 'h2')
   const first = DASH_DATA.items[0]
   // look-fix: two parts, "Next: <name>." (its own element) and the why-line
-  assert.equal(said(byData(b, 'banner-line')), `Next: ${first.name}. ${first.why}`)
-  assert.equal(said(byData(b, 'banner-next')), `Next: ${first.name}.`)
+  // follow-up 19:47: the short name (the set-up's earlier names, page_words.marks), as in the approved after.png
+  assert.equal(said(byData(b, 'banner-line')), `Next: Model. ${first.why}`)
+  assert.equal(said(byData(b, 'banner-next')), 'Next: Model.')
   assert.equal(byData(b, 'banner-next').props.className, D.bannerName)
   assert.equal(byData(b, 'banner-line').props['data-card'], 'model')
   const go = byData(b, 'banner-open')
   assert.equal(go.type, 'sdk:Button')
   assert.equal(go.props.variant, 'default')
-  assert.equal(said(go), `Open ${first.name}`)
+  assert.equal(said(go), 'Open Model')
   assert.equal(all(b, n => n.type === 'sdk:Button').length, 1, 'one button in the banner')
   // the picture is for the eye only: two fields of dots, no image, and Helper's character in front, 224 px wide
   const art = byData(b, 'banner-art')
@@ -678,8 +682,8 @@ test('look: the banner\'s title is the count for no marks, some and all; its lin
   const some = await open('half', {}, fakeStorage({ kept: { setup_done_said: ['model', 'first_chat', 'chat_apps', 'memory'] } }))
   assert.equal(said(byData(banner(some.view), 'banner-title')), '4 of 9 set up')
   const next = DASH_DATA.items.find(it => it.id === 'personality')
-  assert.equal(said(byData(banner(some.view), 'banner-line')), `Next: ${next.name}. ${next.why}`)
-  assert.equal(said(byData(banner(some.view), 'banner-open')), `Open ${next.name}`)
+  assert.equal(said(byData(banner(some.view), 'banner-line')), `Next: Personality. ${next.why}`)
+  assert.equal(said(byData(banner(some.view), 'banner-open')), 'Open Personality')
   assert.equal(byData(banner(some.view), 'banner-open').props['data-card'], 'personality')
   // all marked: the count sentence (the data has no all-done sentence for 9 cards), no line, no button
   const done = await open('half', {}, fakeStorage({ kept: { setup_done_said: [...NINE] } }))

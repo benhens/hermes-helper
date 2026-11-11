@@ -184,6 +184,9 @@ export function slimDashData(data) {
     items: data.items.filter(it => it.on_path === true && !CARDS_OUT.includes(it.id)).map(it => ({
       id: it.id,
       name: it.card_name,
+      // follow-up 19:47 (his decision): the cards and the banner show the set-up's earlier short names, the team's
+      // page_words.marks (dashProblems stops the build when one is missing); the opened card keeps card_name
+      short_name: w.marks[it.id],
       why: it.why,
       steps: it.steps.map((s, k) => {
         const r = routes.find(x => x.item === it.id && x.step === k + 1)

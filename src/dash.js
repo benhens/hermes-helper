@@ -114,6 +114,8 @@ function useDashWidth() {
 
 // Before the cards' row is measured (and in the tests, which have no layout): this width (2 columns).
 export const CARDS_WIDTH_UNMEASURED = 560
+// follow-up 19:47: never more than three columns of cards (the approved mockup design/dash-look-r8/after.png)
+export const CARD_COLUMNS_MAX = 3
 // The left side's width under which the tab takes hhdesign's narrow sizes (r5-r7: 720 px wide side at 1180, 580 at 940).
 export const DASH_COMPACT_UNDER_PX = 640
 
@@ -319,7 +321,9 @@ export function makeDashboard(ctx) {
     const isDone = id => cards.states[items.findIndex(it => it.id === id)] === 'done'
     // as many columns as fit with each card at least CARD_MIN_PX wide
     // (look: the boxes are 20 px apart now, so the count is taken with that gap and a card stays 260 px or wider)
-    const columns = cardColumns(cardsWidth || CARDS_WIDTH_UNMEASURED, CARD_MIN_PX, BOX_GAP_PX)
+    // follow-up 19:47 (his decision): at most CARD_COLUMNS_MAX at any width, as in the approved after.png, so his
+    // picked sign (PICK.md) shows at full size at 1920 px; the 260 px rule still takes it down to two and one
+    const columns = Math.min(CARD_COLUMNS_MAX, cardColumns(cardsWidth || CARDS_WIDTH_UNMEASURED, CARD_MIN_PX, BOX_GAP_PX))
     const openAt = open ? items.findIndex(it => it.id === open) : -1
     const openItem = openAt >= 0 ? items[openAt] : null
 
@@ -349,7 +353,7 @@ export function makeDashboard(ctx) {
                     {
                       className: D.scardHead,
                       children: [
-                        jsx('span', { className: D.scardName, 'data-hh': 'card-name', children: it.name }, 'n'),
+                        jsx('span', { className: D.scardName, 'data-hh': 'card-name', children: it.short_name }, 'n'),
                         // a marked card says Done; the first card not marked carries "Start here"; any other card: nothing
                         done
                           ? jsxs('span', { className: D.doneLine, 'data-hh': 'card-done', children: [jsx(DashIcon, { icon: DASH_ICONS.check, size: 14 }, 'c'), W.setup.state_done] }, 'd')
@@ -609,14 +613,14 @@ export function makeDashboard(ctx) {
           ),
           // the name and the why-line of the first card not marked, and the button that opens it as a click on it does
           nextItem
-            ? jsxs('p', { className: D.bannerLine, 'data-hh': 'banner-line', 'data-card': nextItem.id, children: [jsx('b', { className: D.bannerName, 'data-hh': 'banner-next', children: fill(BANNER_WORDS.next, { name: nextItem.name }) }, 'n'), ' ', nextItem.why] }, 'l')
+            ? jsxs('p', { className: D.bannerLine, 'data-hh': 'banner-line', 'data-card': nextItem.id, children: [jsx('b', { className: D.bannerName, 'data-hh': 'banner-next', children: fill(BANNER_WORDS.next, { name: nextItem.short_name }) }, 'n'), ' ', nextItem.why] }, 'l')
             : null,
           nextItem
             ? jsx(
                 'div',
                 {
                   className: D.bannerOpen,
-                  children: jsx(Button, { variant: 'default', 'data-hh': 'banner-open', 'data-card': nextItem.id, onClick: () => state.openCard(nextItem.id), children: fill(BANNER_WORDS.open, { name: nextItem.name }) })
+                  children: jsx(Button, { variant: 'default', 'data-hh': 'banner-open', 'data-card': nextItem.id, onClick: () => state.openCard(nextItem.id), children: fill(BANNER_WORDS.open, { name: nextItem.short_name }) })
                 },
                 'o'
               )

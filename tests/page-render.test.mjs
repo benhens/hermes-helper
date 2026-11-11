@@ -188,7 +188,7 @@ test('one primary button per screen at most: the Dashboard with and without a mo
   // his pick of 11 Nov); every other button there is secondary, ghost or link
   for (const runtime of [{ ok: true, model: 'm' }, { ok: false }, new Error('down')]) {
     const { view } = await open(fakeStorage(), { runtime })
-    assert.deepEqual(primaries(view.tree), ['Open A model'], JSON.stringify(runtime))
+    assert.deepEqual(primaries(view.tree), ['Open Model'], JSON.stringify(runtime))
     assert.equal(byData(view.tree, 'banner-open').props.variant, 'default')
     assert.deepEqual(primaries(helper(view)), [])
   }

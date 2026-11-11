@@ -6,6 +6,7 @@ export const DASH_DATA = {
     {
       "id": "model",
       "name": "A model",
+      "short_name": "Model",
       "why": "The AI that does the thinking. Your app may already have a free one.",
       "steps": [
         {
@@ -48,6 +49,7 @@ export const DASH_DATA = {
     {
       "id": "first_chat",
       "name": "First chat",
+      "short_name": "First chat",
       "why": "Ask Hermes one small thing, to see that it works.",
       "steps": [
         {
@@ -82,6 +84,7 @@ export const DASH_DATA = {
     {
       "id": "personality",
       "name": "Its personality",
+      "short_name": "Personality",
       "why": "A short text that tells your Hermes who it is and how to talk.",
       "steps": [
         {
@@ -116,6 +119,7 @@ export const DASH_DATA = {
     {
       "id": "chat_apps",
       "name": "Chat apps",
+      "short_name": "Chat apps",
       "why": "Talk to your Hermes from Telegram or another chat app on your phone.",
       "steps": [
         {
@@ -158,6 +162,7 @@ export const DASH_DATA = {
     {
       "id": "tools_apps",
       "name": "Tools and apps",
+      "short_name": "Tools and apps",
       "why": "Actions Hermes can take, and outside apps like Gmail it can use.",
       "steps": [
         {
@@ -189,6 +194,7 @@ export const DASH_DATA = {
     {
       "id": "skills",
       "name": "Skills",
+      "short_name": "Skills",
       "why": "Written know-how that teaches Hermes one task. Many come already installed.",
       "steps": [
         {
@@ -217,6 +223,7 @@ export const DASH_DATA = {
     {
       "id": "memory",
       "name": "Memory",
+      "short_name": "Memory",
       "why": "Short notes Hermes keeps about you, so it remembers between chats.",
       "steps": [
         {
@@ -244,6 +251,7 @@ export const DASH_DATA = {
     {
       "id": "second_bot",
       "name": "A second bot",
+      "short_name": "Second bot",
       "why": "A bot is one separate Hermes, with its own name, memory and skills.",
       "steps": [
         {
@@ -282,6 +290,7 @@ export const DASH_DATA = {
     {
       "id": "safety",
       "name": "Safety",
+      "short_name": "Safety",
       "why": "Hermes asks you first before it runs anything risky on your computer.",
       "steps": [
         {
