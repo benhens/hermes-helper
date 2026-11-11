@@ -32,11 +32,16 @@ import { makeEyes } from './eyes.js'
 import { CHARACTER_PX } from './layout.js'
 
 const ACCENT = { fill: 'var(--ui-accent)' }
-// The dots (loom2): cell: the grid's step in the drawing's units (6 = 5 px at 168 px wide, 4 px at 132 px); blur: how
-// far in from an edge the squares are still shrinking; gain: how soon inside a shape they reach full size; fill: a
-// full square's side as a share of its cell (the rest is the gap between squares). area: the filter's region, all the
+// The dots (loom2): cellPx: the grid's step on screen, a whole number of pixels (5 at 168 px wide and up, 4 below:
+// with 6 units for both, 3.96 px at 132, the squares drifted across the pixels and were 3 px wide on the left of the
+// face and 2 px on the right; cellOf turns it into the drawing's units for the size drawn); blur: how
+// far in from an edge the squares are still shrinking (4 at first: the small mouth then kept only a few squares and the
+// pupils' holes went ragged, so 2.5); gain: how soon inside a shape they reach full size; fill: a
+// full square's side as a share of its cell (the rest is the gap between squares; at 0.75 the squares ran together at
+// 132 px in the app, where a cell is 4 px: 0.62 keeps a gap of a pixel or more). area: the filter's region, all the
 // body can reach (it rises 10 units and starts 101 units down when it comes up from behind the box).
-export const DOTS = { cell: 6, blur: 4, gain: 1.5, fill: 0.75, area: { x: -30, y: -40, width: 260, height: 240 } }
+export const DOTS = { cellPx: { large: 5, small: 4 }, smallUnder: 150, blur: 2.5, gain: 1.6, fill: 0.62, area: { x: -30, y: -40, width: 260, height: 240 } }
+export const cellOf = size => Math.round(((size < DOTS.smallUnder ? DOTS.cellPx.small : DOTS.cellPx.large) * FACE.view.width * 10000) / size) / 10000
 const SIDES = ['left', 'right']
 const FINGER_COUNT = EXPRESSIONS.resting.fingers.length
 // A blink, piece by piece: [piece, what changes, open, shut] (src/expressions.js).
@@ -191,6 +196,7 @@ export function Character({ size = CHARACTER_PX, expression = 'resting', rising 
   // area as a pattern on the drawing's fixed grid; the filter adds each ramp to how deep the point is in the shapes
   // and keeps what passes half way: a square per cell whose side grows with the depth.
   const A = DOTS.area
+  const cell = cellOf(size)
   const ramp = dir =>
     jsxs(
       'linearGradient',
@@ -207,7 +213,7 @@ export function Character({ size = CHARACTER_PX, expression = 'resting', rising 
   const grid = dir => [
     jsx(
       'pattern',
-      { id: `${uid}-cells-${dir}`, patternUnits: 'userSpaceOnUse', x: 0, y: 0, width: DOTS.cell, height: DOTS.cell, children: jsx('rect', { width: DOTS.cell, height: DOTS.cell, fill: `url(#${uid}-ramp-${dir})` }) },
+      { id: `${uid}-cells-${dir}`, patternUnits: 'userSpaceOnUse', x: 0, y: 0, width: cell, height: cell, children: jsx('rect', { width: cell, height: cell, fill: `url(#${uid}-ramp-${dir})` }) },
       `cells-${dir}`
     ),
     jsx('rect', { id: `${uid}-grid-${dir}`, ...A, fill: `url(#${uid}-cells-${dir})` }, `grid-${dir}`)

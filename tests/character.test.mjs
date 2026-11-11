@@ -13,7 +13,7 @@ import { mount, all, loadSrc } from './lib/render.mjs'
 import { useState } from './fakes/react.mjs'
 import { FACE, EXPRESSIONS, EXPRESSION_NAMES, RISE, eyeTransform, pupilScale, pupilHole, fingerRect, talkFrames, drumHeights } from '../src/expressions.js'
 
-const { Character, DOTS } = await loadSrc('character.js')
+const { Character, DOTS, cellOf } = await loadSrc('character.js')
 const { CHARACTER_PX } = await import('../src/layout.js')
 
 const ACCENT = 'var(--ui-accent)'
@@ -535,7 +535,7 @@ test('the glide into a loop starts from what is drawn at that moment, read from 
 // His second Loom of 11 Nov, 2:28-2:50 ("a bunch of dots"); his reference: a portrait made only of squares on one strict
 // grid, big where it is dark, small toward the edges, no outlines.
 
-test('the dots: every shape is drawn through one filter on one fixed grid (6 units = 5 px at 168, 4 px at 132): squares inside, smaller toward the edges, the accent as the ink', () => {
+test('the dots: every shape is drawn through one filter on one fixed grid (5 px at 168, 4 px at 132): squares inside, smaller toward the edges, the accent as the ink', () => {
   const tree = draw({})
   const dotted = named(tree, 'dotted')
   assert.ok(dotted)
@@ -547,9 +547,10 @@ test('the dots: every shape is drawn through one filter on one fixed grid (6 uni
   // the grid: the drawing's own units, anchored at 0,0, the same in every expression (it does not move with the body)
   const cells = all(tree, n => n.type === 'pattern')
   assert.equal(cells.length, 2)
-  for (const c of cells) assert.deepEqual([c.props.patternUnits, c.props.x, c.props.y, c.props.width, c.props.height], ['userSpaceOnUse', 0, 0, DOTS.cell, DOTS.cell])
-  assert.equal(DOTS.cell, 6)
-  assert.deepEqual([168, 132].map(px => Math.round((DOTS.cell * px) / 200)), [5, 4])
+  for (const c of cells) assert.deepEqual([c.props.patternUnits, c.props.x, c.props.y, c.props.width, c.props.height], ['userSpaceOnUse', 0, 0, cellOf(168), cellOf(168)])
+  // a whole number of pixels a cell at both sizes (in the app a cell of 3.96 px drifted across the pixels)
+  assert.deepEqual([168, 132].map(px => Math.round(((cellOf(px) * px) / 200) * 1000) / 1000), [5, 4])
+  for (const c of all(draw({ size: 132 }), n => n.type === 'pattern')) assert.equal(c.props.width, cellOf(132))
   for (const name of EXPRESSION_NAMES) assert.deepEqual(all(draw({ expression: name }), n => n.type === 'pattern').map(c => [c.props.x, c.props.y]), [[0, 0], [0, 0]], name)
   // the steps: how deep a point is (the shapes' outline blurred), a square per cell that size, the accent as ink
   const steps = filter.props.children.map(n => n.type)
@@ -574,7 +575,7 @@ test('the dots cost no element per square: the drawing has the same handful of s
     assert.ok(all(tree, n => typeof n.type === 'string').length < 80, name)
   }
   const src = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', 'character.js'), 'utf8')
-  assert.doesNotMatch(src, /for \([^)]*DOTS|DOTS\.cell\)\.map|Array\.from\(\{ length/)
+  assert.doesNotMatch(src, /for \([^)]*(DOTS|cell)|cell\)\.map|Array\.from\(\{ length/)
 })
 
 test('the dots in dark and light: one colour, the theme\'s accent variable, with nothing of a theme\'s own', () => {
