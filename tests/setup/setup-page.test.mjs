@@ -441,3 +441,25 @@ test('find-v2: a call failed with "No LLM provider configured": model_not; one t
     assert.match(seen, want)
   }
 })
+
+// find-v2 part 5 (5) (Lead's answer 5 to find-v1's questions; find-v1 fault 8): a typed question wins over the set-up
+// conversation's question too, and the set-up question is offered again after the answer. "How can I migrate?" at
+// "Do you want jobs at set times, phone chats, or something else?": the two kinds of moving with their two picks (not
+// the set-up question in their place); the person's pick is answered; then the set-up question again.
+test('find-v2: "How can I migrate?" typed at the set-up conversation\'s goal question: the moving line and its picks; after the pick, the goal question again', opt, async () => {
+  const { view } = await open()
+  finish(view)
+  await send(view, 'Peter')
+  await send(view, 'I run a tennis club')
+  await press(view, 'Skip')
+  assert.equal(bubbleLine(view), 'Q_GOAL')
+  await send(view, 'How can I migrate?')
+  const lines = () => [...olds(view).map(n => n.props['data-line']), bubbleLine(view)]
+  assert.ok(lines().includes('MIG'), lines().join(' '))
+  assert.deepEqual(labels(view), ['From another AI app', 'To another computer'], 'the moving picks show, not the set-up question in their place')
+  assert.ok(!mine(view).length || !mine(view).at(-1).startsWith('Kept'), 'nothing kept')
+  await press(view, 'To another computer')
+  assert.ok(lines().includes('MIG_PC'), lines().join(' '))
+  assert.ok(lines().slice(-3).some(l => /^SETUP_REASK_GOAL|^Q_GOAL/.test(l)), 'the goal question is offered again: ' + lines().join(' '))
+  assert.ok(labels(view).length >= 2, 'with its picks: ' + labels(view).join(' / '))
+})

@@ -115,7 +115,8 @@ test('thinking text: the no-AI line after the dots; after two such messages in a
   assert.ok(dots(view), 'one failed try: the next message is asked')
   await settle()
   assert.equal(host.asks.length, 2)
-  assert.equal(line(view), 'N1_AGAIN')
+  // find-v2 part 5: the second failed try owes the slow-AI line, said between the don't-know and its picks
+  assert.equal(line(view), 'SLOW_A')
   finish(view)
   send(view, 'do goats like it')
   assert.equal(dots(view), null, 'no dots: no call')

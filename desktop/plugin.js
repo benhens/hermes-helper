@@ -26476,6 +26476,14 @@ function setupTyped(text, st, hasTopicWord = () => false) {
 // again, once for each question; else null. picks: the answer has things of its own to pick (setup-chat-2, below).
 function setupAfter(st, { picks = false } = {}) {
   const s = suOf(st)
+  // find-v2 part 5 (Lead's answer 5 to find-v1's questions; fault 8): a typed question wins over the set-up question:
+  // an answer with things of its own to pick ("How can I migrate?": From another AI app | To another computer) keeps
+  // them, and the set-up question is asked again after the answer to those (the page calls this after a picked answer
+  // too while one waits, setupReaskWaits)
+  if ((s.stage === 'new' && !s.reasked.new) || (s.stage === 'goal' && !s.reasked.goal)) {
+    s.reaskWaits = picks
+    if (picks) return null
+  }
   if (s.stage === 'new' && !s.reasked.new) {
     s.reasked.new = true
     return suSaid('SETUP_REASK', SU_L.SETUP_REASK.text, { answers: suNEW_PICKS() })
@@ -26498,6 +26506,8 @@ function setupAfter(st, { picks = false } = {}) {
 }
 // setup-chat-2: whether a step of the set-up conversation is the open line
 const setupStepOpen = st => !!(st.setup && st.setup.stage === 'step')
+// find-v2 part 5: a set-up question waits to be asked again until the answer's own things to pick are answered
+const setupReaskWaits = st => !!(st.setup && st.setup.reaskWaits && ['new', 'goal'].includes(st.setup.stage))
 
 // setup-chat-2 (changes-1 BACK_SEEN): the one thing a return visit names as seen done: the goal's thing if it is, else
 // the first seen done in the order the data's BACK_SEEN gives (scheduled_job, personality, second_bot). What is there
@@ -27209,6 +27219,22 @@ const SLOW_LINE = { line: LIVE_DATA.slow_ai.id, text: LIVE_DATA.slow_ai.text, so
 const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know, ...LV_DONT_KNOW, 'N1-skill', ...TALK_DATA.no_repeat.groups.stuck, ...TALK_DATA.no_repeat.groups.bye])
 function slowFollows(visit, said) {
   return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !said.paste && !/\?\s*$/.test(String(said.text || ''))
+}
+// find-v2 part 5 (Lead's answer 2 to find-v1's questions; hhtech ask-run 3: the line was never said, the fallback
+// being mostly a don't-know with picks): where the owed slow-AI line goes, or null (not here: it is dropped).
+//   'between': between the line and its offer bubble (a don't-know and its picks, or any line with an offer)
+//   'carry': after a line with things of its own to pick, the slow-AI line carrying those picks, so they still show
+//   'after': right after the line, as before
+// Still never after a line with its own text to paste (two boxes in a row), a STUCK or a goodbye, or a question with
+// nothing to pick.
+const SLOW_NEVER = new Set([...TALK_DATA.no_repeat.groups.stuck, ...TALK_DATA.no_repeat.groups.bye])
+const SLOW_DONT_KNOW = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know, ...LV_DONT_KNOW, 'N1-skill'])
+function slowPlace(visit, said) {
+  if (visit.slow !== 'due' || !said || said.paste || SLOW_NEVER.has(said.line)) return null
+  if (said.offer) return 'between'
+  if (said.answers) return 'carry'
+  if (SLOW_DONT_KNOW.has(said.line)) return 'after'
+  return slowFollows(visit, said) ? 'after' : null
 }
 
 // Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a
@@ -31034,8 +31060,12 @@ function makePage(ctx, opts = {}) {
   const setupAfterSaid = (result, said, typed) => {
     if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return [said, []]
     const step = setupStepOpen(memory.visit)
-    if (!step && !typed) return [said, []]
-    const again = setupAfter(memory.visit, { picks: !!said.answers })
+    if (!step && !typed && !setupReaskWaits(memory.visit)) return [said, []]
+    // find-v2 part 5: things to pick of the answer's own (its answers, or an offer that asks about the answer: two kinds
+    // of moving, which app, which plan, the near lines) keep the set-up question back until they are answered; a
+    // general offer (set up or see what it does, the four starting things) gives way to it, as before
+    const ownOffer = !!(said.offer && ['move', 'mig_which', 'mig_which_2', 'pay', 'stuck', 'words', 'near'].includes(said.offer.set))
+    const again = setupAfter(memory.visit, { picks: !!said.answers || (!setupStepOpen(memory.visit) && ownOffer) })
     if (!again) return [said, []]
     return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
   }
@@ -31059,7 +31089,7 @@ function makePage(ctx, opts = {}) {
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
     const [shown, after] = quiet ? [said, []] : setupAfterSaid(result, said, w.typed)
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(shown, w.sendHelper), ...slowAfter(said), ...after].slice(-LOG_MAX)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...withSlow(shown, saidEntries(shown, w.sendHelper)), ...after].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -31108,14 +31138,20 @@ function makePage(ctx, opts = {}) {
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
   // Called only for the written answer of the turn that failed (liveFinish): when SLOW_A may not follow that answer (a
   // don't-know line, a question, things to pick or an offer, a paste box), it is dropped for this visit.
-  const slowAfter = said => {
-    if (memory.visit.slow !== 'due') return []
-    if (!slowFollows(memory.visit, said)) {
+  // find-v2 part 5: the entries of the line just said with SLOW_A placed by slowPlace (src/live-turn.js): between a line
+  // and its offer bubble, or after a line carrying its things to pick, or after it; else dropped for the visit
+  const withSlow = (shown, entries) => {
+    if (memory.visit.slow !== 'due') return entries
+    const where = slowPlace(memory.visit, shown)
+    if (!where) {
       memory.visit.slow = 'dropped'
-      return []
+      return entries
     }
     memory.visit.slow = 'said'
-    return [{ ...helperEntry(SLOW_LINE), send: false }]
+    const slow = { ...helperEntry(SLOW_LINE), send: false }
+    if (where === 'between' && entries.length > 1) return [entries[0], slow, ...entries.slice(1)]
+    if (where === 'carry' && entries[0].answers) return [...entries, { ...slow, answers: entries[0].answers }]
+    return [...entries, slow]
   }
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
@@ -31432,7 +31468,7 @@ function makePage(ctx, opts = {}) {
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
       const [line, after] = setupAfterSaid(result, said, typed)
-      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(line, may.helper), ...(slowDue ? slowAfter(said) : []), ...after].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...(slowDue ? withSlow(line, saidEntries(line, may.helper)) : saidEntries(line, may.helper)), ...after].filter(Boolean))
       setFocusAsk(true)
     }
 

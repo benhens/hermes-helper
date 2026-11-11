@@ -41,6 +41,22 @@ const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK
 export function slowFollows(visit, said) {
   return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !said.paste && !/\?\s*$/.test(String(said.text || ''))
 }
+// find-v2 part 5 (Lead's answer 2 to find-v1's questions; hhtech ask-run 3: the line was never said, the fallback
+// being mostly a don't-know with picks): where the owed slow-AI line goes, or null (not here: it is dropped).
+//   'between': between the line and its offer bubble (a don't-know and its picks, or any line with an offer)
+//   'carry': after a line with things of its own to pick, the slow-AI line carrying those picks, so they still show
+//   'after': right after the line, as before
+// Still never after a line with its own text to paste (two boxes in a row), a STUCK or a goodbye, or a question with
+// nothing to pick.
+const SLOW_NEVER = new Set([...TALK_DATA.no_repeat.groups.stuck, ...TALK_DATA.no_repeat.groups.bye])
+const SLOW_DONT_KNOW = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know, ...LV_DONT_KNOW, 'N1-skill'])
+export function slowPlace(visit, said) {
+  if (visit.slow !== 'due' || !said || said.paste || SLOW_NEVER.has(said.line)) return null
+  if (said.offer) return 'between'
+  if (said.answers) return 'carry'
+  if (SLOW_DONT_KNOW.has(said.line)) return 'after'
+  return slowFollows(visit, said) ? 'after' : null
+}
 
 // Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a
 // plain line given for "what do you mean" keeps its why. N1_AGAIN and AGAIN are no_repeat's own lines in place

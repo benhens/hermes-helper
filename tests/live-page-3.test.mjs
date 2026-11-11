@@ -137,7 +137,9 @@ test('thinking text twice in a row: the written answer, then SLOW_A, at once (no
 // setup-chat (hhtech-live-run2, For builder 2; Lead's points 15 and 16): SLOW_A is owed to the written answer that
 // replaced the slow one. When it may not follow that answer (a don't-know line, a question, things to pick or an offer,
 // a paste box) it is dropped for the visit; it never waits for a later, unrelated line (talk-live-3 had it wait).
-test('a don\'t-know line is not followed by SLOW_A, and SLOW_A is then dropped for the visit: never under a later line', async () => {
+// find-v2 part 5 (Lead's answer 2 to find-v1's questions): brought to the new rule: SLOW_A now goes between the
+// don't-know and its picks, once; it never comes again under a later line
+test('a don\'t-know line: SLOW_A between it and its picks, once; never under a later line', async () => {
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: never } })
   send(view, 'can it fly a kite')
   await settle()
@@ -147,12 +149,13 @@ test('a don\'t-know line is not followed by SLOW_A, and SLOW_A is then dropped f
   assert.equal(count(view, 'SLOW_A'), 0)
   send(view, 'can it fly a plane')
   await settle()
-  assert.equal(line(view), 'N1_AGAIN')
-  assert.equal(count(view, 'SLOW_A'), 0)
+  assert.deepEqual(oldLines(view).slice(-2), ['N1_AGAIN', 'SLOW_A'])
+  // (with the offer's picks up, line() is the last older line, so count() would see this SLOW_A twice)
+  assert.equal(oldLines(view).filter(l => l === 'SLOW_A').length, 1)
   send(view, 'what is a skill')
   assert.equal(line(view), 'term-skill', 'the next answer is the answer, with no SLOW_A after it')
   send(view, 'what is a model')
-  assert.equal(count(view, 'SLOW_A'), 0, 'dropped for the visit')
+  assert.equal(oldLines(view).filter(l => l === 'SLOW_A').length, 1, 'once for the visit: ' + helperLines(view).join(' '))
   assert.equal(host.asks.length, 1)
 })
 

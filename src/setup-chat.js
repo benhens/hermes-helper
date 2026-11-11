@@ -473,6 +473,14 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
 // again, once for each question; else null. picks: the answer has things of its own to pick (setup-chat-2, below).
 export function setupAfter(st, { picks = false } = {}) {
   const s = suOf(st)
+  // find-v2 part 5 (Lead's answer 5 to find-v1's questions; fault 8): a typed question wins over the set-up question:
+  // an answer with things of its own to pick ("How can I migrate?": From another AI app | To another computer) keeps
+  // them, and the set-up question is asked again after the answer to those (the page calls this after a picked answer
+  // too while one waits, setupReaskWaits)
+  if ((s.stage === 'new' && !s.reasked.new) || (s.stage === 'goal' && !s.reasked.goal)) {
+    s.reaskWaits = picks
+    if (picks) return null
+  }
   if (s.stage === 'new' && !s.reasked.new) {
     s.reasked.new = true
     return suSaid('SETUP_REASK', SU_L.SETUP_REASK.text, { answers: suNEW_PICKS() })
@@ -495,6 +503,8 @@ export function setupAfter(st, { picks = false } = {}) {
 }
 // setup-chat-2: whether a step of the set-up conversation is the open line
 export const setupStepOpen = st => !!(st.setup && st.setup.stage === 'step')
+// find-v2 part 5: a set-up question waits to be asked again until the answer's own things to pick are answered
+export const setupReaskWaits = st => !!(st.setup && st.setup.reaskWaits && ['new', 'goal'].includes(st.setup.stage))
 
 // setup-chat-2 (changes-1 BACK_SEEN): the one thing a return visit names as seen done: the goal's thing if it is, else
 // the first seen done in the order the data's BACK_SEEN gives (scheduled_job, personality, second_bot). What is there

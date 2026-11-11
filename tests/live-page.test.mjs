@@ -125,7 +125,9 @@ test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes s
   assert.equal(said(view), N1)
   // the next message, while Hermes still has the dropped call: no request, its own line at once
   send(view, 'tell me a joke')
-  assert.equal(line(view), 'N1_AGAIN')
+  // find-v2 part 5: this is the second slow try (the first call is still in Hermes after its 12 s), so the slow-AI line
+  // follows the don't-know, between it and its picks
+  assert.equal(line(view), 'SLOW_A')
   await settle()
   assert.equal(host.asks.length, 1, 'no second call while the first is still in Hermes')
   // the late reply is dropped: nothing changes
