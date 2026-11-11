@@ -52,7 +52,14 @@ function show(o) {
     F2: () => `F2 name=${py(o.name)} work=${py(o.work)}`,
     C1: () => 'C1 picks ' + o.buttons.join('+'),
     'can-q': () => 'question can-q groups ' + o.buttons.join('+'),
-    C2: () => 'C2 picks ' + o.buttons.join('+')
+    C2: () => 'C2 picks ' + o.buttons.join('+'),
+    // live changes-6, ask-fix-t1
+    then: () => 'then line ' + o.topic + '0-then',
+    rowthen: () => 'then line ' + o.need + '-then',
+    nextline: () => 'next line ' + o.id,
+    termmean: () => 'mean line ' + o.term + '-mean',
+    HOW_PASTE: () => `HOW_PASTE (${o.label})`,
+    HOW_PART: () => `HOW_PART (${o.label})`
   }
   return (by[o.kind] || (() => o.kind))()
 }
@@ -66,7 +73,9 @@ const usesWants = c => c.steps.some(s => s.do === 'topic' && s.topic === 'wants'
 // route2.py's own (pick_topic), so it stays.
 // talk-live-2: and the keep rule of what the person does (live-v2 changes-4) off, since route2.py keeps nothing at
 // "What do you do?" (tests/talk-live-2.test.mjs has that rule's own cases)
-const asRoute2 = st => Object.assign(st, { wants: false, keepWork: false })
+// setup-chat: and live changes-9's two no-AI rules (msg1-then after the Telegram line, the second wording of the /usage
+// line), which hhcontent left out of route2.py (tests/offers.test.mjs has their cases)
+const asRoute2 = st => Object.assign(st, { wants: false, keepWork: false, c9: false })
 
 function replay(conv) {
   let st = asRoute2(freshVisit(conv.stage, conv.kept ? { ...conv.kept } : {}))
@@ -247,8 +256,10 @@ test('the opening: greeting, name, what the person does, then a line with nothin
   assert.deepEqual(f1.note, { text: 'Kept: Peter.', link: 'See what I keep', first: TALK.FIRST_TIME, items: [['name', 'Peter']] }) // talk-live: the line of this build's AI mode (tested on its own below)
   assert.equal(st.met, true)
   const f2 = lineFor(turn('I run a tennis club', st), st)
-  assert.equal(f2.text, 'Thanks, Peter. Ask me anything about Hermes.')
+  // offer-t1 (changes-8): F2 no longer says "Ask me anything"; it carries the offer general (tests/offers.test.mjs)
+  assert.equal(f2.text, 'Thanks, Peter.')
   assert.equal(f2.answers, null, 'no topics after the greeting')
+  assert.equal(f2.offer.set, 'general')
   // talk-live-2 (live-v2 changes-4, keeps.work step 7): what the person does is kept, with its own Kept: line (the
   // first-time line was told under F1 already) and, in a build with an AI step, the line that the AI is told it
   assert.deepEqual(f2.note, { text: 'Kept: I run a tennis club.', link: 'See what I keep', first: null, ...(TALK.WORK_TOLD ? { workTold: TALK.WORK_TOLD } : {}), items: [['work', 'I run a tennis club']] })
@@ -261,15 +272,16 @@ test('no name given: the lines without a name and nothing kept; Skip: the "that\
   const st = freshVisit('name')
   assert.equal(lineFor(turn('hi', st), st).text, 'Nice to meet you. What do you do?')
   const f2 = lineFor(turn('this and that', st), st)
-  assert.equal(f2.text, 'Thanks. Ask me anything about Hermes.')
+  assert.equal(f2.text, 'Thanks.')
   // talk-live-2 (live-v2 changes-4): the answer to What do you do? is kept, with the first-time line (nothing was kept before)
   assert.equal(f2.note.text, 'Kept: this and that.')
   assert.equal(f2.note.first, TALK.FIRST_TIME)
   assert.deepEqual(st.kept, { work: 'this and that', told: true, ...(TALK.WORK_TOLD ? { told_work: true } : {}) })
   const st2 = freshVisit('name')
   const f3 = lineFor(skip(st2), st2)
-  assert.equal(f3.text, "That's fine. Ask me anything about Hermes.")
+  assert.equal(f3.text, "That's fine.")
   assert.equal(f3.answers, null)
+  assert.equal(f3.offer.set, 'general', 'offer-t1: F3 carries the offer general')
   assert.equal(skip(st2), null, 'Skip does nothing once the opening is over')
 })
 
@@ -278,7 +290,7 @@ test('the topics show only when the person asks what they can ask (TP): four of 
     const st = freshVisit('name')
     const said = lineFor(turn(ask, st), st)
     assert.equal(said.line, 'TP', ask)
-    assert.equal(said.text, 'You can ask me how Hermes works and how to set it up. Pick one, or type your own question.')
+    assert.equal(said.text, 'I can explain how Hermes works and help you set it up. Pick one.') // offer-t1 (changes-8)
     assert.deepEqual(said.answers.items.map(a => a.label), ['What Hermes can do', 'Which AI to use', 'Phone and chat apps', 'What Hermes remembers'])
     assert.equal(hintFor(said), 'Or type your question')
     assert.equal(st.stage, 'open')
@@ -290,14 +302,15 @@ test('the topics show only when the person asks what they can ask (TP): four of 
   assert.equal(turn('?', freshVisit()).kind, 'CUT')
 })
 
-test('the don\'t-know lines show no topics, and the small grey line under each tells how to see them', () => {
-  const hint = 'To see what I can help with, type "what can I ask you".'
+// offer-t1 (changes-8): the grey line N_HINT is no longer shown; the offer dont_know takes its place
+test('the don\'t-know lines show no topics and no grey hint; each carries the offer dont_know', () => {
   for (const [msg, line] of [['can you book me a flight?', 'N1'], ['is there a skill called "zorbo"', 'N1a'], ['what is the weather like?', 'N1']]) {
     const st = freshVisit()
     const said = lineFor(turn(msg, st), st)
     assert.equal(said.line, line, msg)
     assert.equal(said.answers, null)
-    assert.equal(said.hint, hint)
+    assert.equal(said.hint, null)
+    assert.equal(said.offer.set, 'dont_know')
   }
   // changes-19: N1b is gone; the five once left out get their skill line (S2), both ways of naming them
   assert.equal(TALK_DATA.fixed.N1b, undefined)
@@ -330,11 +343,11 @@ test('never more than four things to pick: the topics, every answer list, C1, an
   assert.equal(said.answers.hint, 'Or type your own answer')
 })
 
-test('answers to pick only under the questions that carry them (answers.when_shown): which AI, which chat app, which service', () => {
-  const carries = Object.fromEntries(Object.entries(DATA.answers.when_shown.questions).map(([k, v]) => [k.split(' ')[0], v]))
-  // changes-14 (For builder 5): the topic use (reached by typing only) is not in that table; its four answers sit
-  // under use-q like the other picked answers
-  carries['use-q'] = true
+// offer-t1 (changes-8): mem-q, sch-q and bot-q carry answers now, so every topic question does; answers.no_answers
+// (OPEN and F1) is the list of questions that carry none (answers.when_shown still holds the 10 Nov table)
+test('every topic question carries answers to pick (offer-t1); only the opening\'s two questions carry none', () => {
+  assert.deepEqual(DATA.answers.no_answers, ['OPEN', 'F1'])
+  const carries = Object.fromEntries(TALK_DATA.topics.map(t => [t.question.id, true]))
   for (const t of TALK_DATA.topics) {
     const st = freshVisit()
     const q = lineFor(pickTopic(t.id, st), st)
@@ -342,7 +355,7 @@ test('answers to pick only under the questions that carry them (answers.when_sho
     assert.equal(!!q.answers, carries[t.question.id], t.question.id)
     assert.equal(hintFor(q), q.answers ? 'Or type your own answer' : REPLY_HINT)
   }
-  assert.deepEqual(TALK_DATA.topics.filter(t => t.question.answers.length).map(t => t.id).sort(), ['mod', 'msg', 'svc', 'use'])
+  assert.deepEqual(TALK_DATA.topics.filter(t => t.question.answers.length).map(t => t.id).sort(), ['bot', 'mem', 'mod', 'msg', 'sch', 'svc', 'use'])
   // and no pick reaches use: it is on no topic pick
   assert.deepEqual(TALK_DATA.topics.filter(t => t.typed_only).map(t => t.id), ['use'])
   assert.ok(!JSON.stringify(TALK_DATA.topic_picks || []).includes('"use"'))
@@ -367,7 +380,7 @@ test('"What Hermes can do": C1 with its full text and four picks, the wants firs
   assert.equal(c1.text, DATA.fixed_lines.find(f => f.id === 'C1').text)
   assert.deepEqual(c1.answers.items.map(a => a.label), ['Web, files, pictures and voice', 'Daily jobs and reminders', 'Gmail and other services', 'More than one Hermes'])
   assert.equal(c1.answers.hint, 'Or type your question')
-  assert.equal(lineFor(pickTopic('sch', st), st).text, 'What should Hermes do on a schedule, such as a daily summary?')
+  assert.equal(lineFor(pickTopic('sch', st), st).text, 'Do you want a daily job, a reminder, or a regular check?') // offer-t1 (changes-8)
 })
 
 test('the service fills the text to paste: from the picked answer, from the key word, from the typed answer (cut to 40 characters), from what is kept', () => {
@@ -480,13 +493,14 @@ test('a later visit (changes-14): met, or a kept name, opens with BACK and no qu
   assert.equal(st.stage, 'open')
   const said = openingLine(st)
   assert.equal(said.line, 'BACK')
-  assert.equal(said.text, 'Hi again, Peter. What would you like Hermes to help you with?')
+  assert.equal(said.text, 'Hi again, Peter.') // offer-t1 (changes-8): no "What would you like ...?"; the offer general
   assert.equal(said.text, TALK_DATA.fixed.BACK.text.replace('{name}', 'Peter'))
   assert.equal(said.answers, null)
+  assert.equal(said.offer.set, 'general')
   // Skip pressed on the first visit: met, no name: BACK without the name
   const skipped = laterVisit({}, true)
   assert.equal(skipped.stage, 'open')
-  assert.equal(openingLine(skipped).text, 'Hi again. What would you like Hermes to help you with?')
+  assert.equal(openingLine(skipped).text, 'Hi again.')
   assert.equal(openingLine(laterVisit(null, true)).line, 'BACK')
   // never met: the opening, with the name question
   assert.equal(laterVisit({ mod: 'mod1', told: true }).stage, 'name', 'no kept name, never met: the name is asked')
@@ -496,7 +510,7 @@ test('a later visit (changes-14): met, or a kept name, opens with BACK and no qu
   const v = laterVisit({ name: 'Peter', told: true })
   forgetAnswer('all', true, v)
   assert.deepEqual(v.kept, {})
-  assert.equal(openingLine(laterVisit(v.kept, v.met)).text, 'Hi again. What would you like Hermes to help you with?')
+  assert.equal(openingLine(laterVisit(v.kept, v.met)).text, 'Hi again.')
 })
 
 test('a kept answer is used where its question would be asked: "From what I keep" and Change, which asks again', () => {

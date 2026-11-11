@@ -1,5 +1,5 @@
 {
- "made_by": "dev/checks/talk-live/dump_live.py: hhcontent's check_live.py (fix, run_checks) on hhtech's recorded replies, pinned copy team-root-c2b",
+ "made_by": "dev/checks/talk-live/dump_live.py: hhcontent's check_live.py (fix, run_checks) on hhtech's recorded replies, pinned copy dev/checks/setup-chat/team-root-c10 (live-v2 changes-10)",
  "check_live_summary": [
   "      reply: A skill is written steps that teach Hermes to do one task.",
   "      reply: A skill is a set of written steps that teaches Hermes one task.",
@@ -8,7 +8,7 @@
   "      reply: A skill is like a recipe book that teaches you exactly how to cook a specific dish step by step. It's a collection of written instructions designed to help you perform one task.",
   "free way c   written 17 | good 16, wrongly flagged 0 | not good  1, caught 0",
   "free way b   written 17 | good 17, wrongly flagged 1 | not good  0, caught 0",
-  "2b way c     written 17 | good  5, wrongly flagged 2 | not good 12, caught 7",
+  "2b way c     written 17 | good  5, wrongly flagged 2 | not good 12, caught 10",
   "data problems: 0"
  ],
  "cases": [

@@ -31,10 +31,12 @@ async function one(text, st, opts = {}) {
   return { got, pre, out, before, shown: liveApply(st, got, out, before, text) }
 }
 
-test('hhtech\'s 24 messages, each on its own: code answers 18, the AI step is asked for 6 (the plan\'s probe counted 5; "how do I update hermes" and the weather now have rows)', () => {
+// setup-chat: "hi there, I'm new to all this" is a greeting with more words (live changes-6 greet_more) and "how do I
+// update hermes ..." has the line UPDATE (offer-t1), so code answers 20 and the AI step is asked for 4
+test('hhtech\'s 24 messages, each on its own: code answers 20, the AI step is asked for 4', () => {
   assert.equal(M24.length, 24)
   const toAi = M24.filter(t => goesToAi(turnParts(t, freshVisit()).pre))
-  assert.deepEqual(toAi, ['what do you mean?', 'ok and then?', "hi there, I'm new to all this", "sorry I don't get it", "what's the weather in Riga tomorrow", 'how do I update hermes to the newest version'])
+  assert.deepEqual(toAi, ['what do you mean?', 'ok and then?', "sorry I don't get it", "what's the weather in Riga tomorrow"])
 })
 
 test('his three messages never reach the AI (code answers each); "what do you mean?" after the tokens line is a follow-up with the tokens rows', async () => {

@@ -54,8 +54,15 @@ async function open(mode, { storage = fakeStorage(), host = {} } = {}) {
 }
 const helper = view => byData(view.tree, 'helper')
 const bubble = view => byData(helper(view), 'bubble')
-const line = view => (bubble(view) ? bubble(view).props['data-line'] : null)
-const said = view => spoken(byData(bubble(view), 'said')).trim()
+// setup-chat (offer-t1, changes-8): a line that carries an offer is followed by a second bubble with the offer's
+// question. line() and said() below still mean Helper's line for the message: when the bubble holds an offer, the
+// line just above it. offerLine() and offerSaid() read the offer bubble itself (tests/offers-page.test.mjs has its cases).
+const offerUp = view => !!bubble(view) && String(bubble(view).props['data-line']).startsWith('offer-')
+const lastOld = view => all(helper(view), n => n.props['data-hh'] === 'old').at(-1)
+const offerLine = view => (offerUp(view) ? bubble(view).props['data-line'] : null)
+const offerSaid = view => (offerUp(view) ? spoken(byData(bubble(view), 'said')).trim() : null)
+const line = view => (offerUp(view) ? lastOld(view).props['data-line'] : bubble(view) ? bubble(view).props['data-line'] : null)
+const said = view => (offerUp(view) ? text(lastOld(view)).replace(/^Helper said: /, '').replace(/\s+/g, ' ').trim() : spoken(byData(bubble(view), 'said')).trim())
 const dots = view => byData(helper(view), 'busy-dots')
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
 const finish = view => byData(view.tree, 'page').props.onPointerDownCapture({})
@@ -138,7 +145,8 @@ test('a second message while Helper waits: the waiting one gets its no-AI line a
   assert.deepEqual(mine(view).slice(-2), ['send me a summary', 'what is a skill'])
   assert.equal(line(view), 'term-skill')
   const older = all(helper(view), n => n.props['data-hh'] === 'old').map(n => text(n))
-  assert.ok(older.at(-1).includes(N1), 'the waiting message got the don\'t-know line')
+  // offer-t1: the don't-know line, then its offer's question, are the two older lines before the new message's answer
+  assert.ok(older.at(-2).includes(N1), 'the waiting message got the don\'t-know line')
   d.resolve(goodReply('sch1'))
   await settle()
   assert.equal(line(view), 'term-skill', 'the late reply never shows under a later message')
@@ -204,10 +212,11 @@ test('nothing Helper keeps is ever sent, not even the name: a kept name, answers
 test('a name given with a question at "What\'s your name?": only the part after the name is sent', async () => {
   const { view, host } = await open('ai_writes', { host: { oneshot: () => 'NONE' } })
   finish(view)
-  send(view, 'Hi, I\'m Peter, how do I update hermes')
+  // setup-chat: "how do I update hermes" has a line of code's now (UPDATE, offer-t1); a question nobody has a line for
+  send(view, 'Hi, I\'m Peter, can it fly a kite?')
   await settle()
   assert.equal(host.asks.length, 1)
-  assert.match(host.asks[0].input, /\nThe person's newest message: how do I update hermes$/)
+  assert.match(host.asks[0].input, /(^|\n)The person's newest message: can it fly a kite\?$/)
   assert.doesNotMatch(host.asks[0].instructions + host.asks[0].input, /peter/i)
 })
 
@@ -277,7 +286,7 @@ test('a kept answer is never sent: the picked "Claude" and Helper\'s line for it
   pickLabel(view, paid)
   finish(view)
   const answerLine = said(view).replace(/[\u201c\u201d]/g, '"').replace(/\u2019/g, "'")
-  for (const m of ['tell me a joke', 'is it safe']) {
+  for (const m of ['tell me a joke', 'can it fly a kite']) { // setup-chat: "is it safe" has code's line SAFE now
     send(view, m)
     await settle()
     finish(view)

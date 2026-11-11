@@ -24,7 +24,7 @@ import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
@@ -116,7 +116,7 @@ export function makePage(ctx, opts = {}) {
       // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
       const metStored = readMet()
       memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
-      memory.log = [helperEntry(openingLine(memory.visit))]
+      memory.log = saidEntries(openingLine(memory.visit), true)
       writeKept()
     }
     return memory
@@ -153,6 +153,20 @@ export function makePage(ctx, opts = {}) {
     return { id, key: `h${id}`, who: 'helper', opened: false, ...said }
   }
   const youEntry = text => ({ id: memory.nextId++, who: 'you', text })
+  // offer-t1: what Helper says for one result, as the entries of the conversation: its line and, when the line carries
+  // an offer, a second bubble with the offer's question, whose things to pick show in the message box as every other
+  // pick. send: whether the line may ever be sent to the AI; the offer's question never is. ask-fix-t1 (PICK_FIRST):
+  // the things to pick of the line before stay under it.
+  const saidEntries = (said, send) => {
+    const { offer, samePicks, ...line } = said
+    if (samePicks) {
+      const last = [...memory.log].reverse().find(e => e.who === 'helper')
+      if (last && last.answers) line.answers = last.answers
+    }
+    const out = [{ ...helperEntry(line), send }]
+    if (offer) out.push({ ...helperEntry({ line: 'offer-' + offer.set, text: offer.text, source: null, answers: offer.answers, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false, offer: true })
+    return out
+  }
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
   // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
@@ -182,8 +196,7 @@ export function makePage(ctx, opts = {}) {
     const result = final || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
-    const entry = { ...helperEntry(said), send: w.sendHelper }
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry, ...slowAfter(said)].slice(-LOG_MAX)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(said, w.sendHelper), ...slowAfter(said)].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -192,14 +205,23 @@ export function makePage(ctx, opts = {}) {
   // live-v2 changes-5: the visit's first AI call (w.firstTurn: the first message that went to the AI, its one or two
   // calls) gave no answer in 12 s or gave no_reply text: the AI step is off for the rest of the visit and SLOW_A is owed,
   // once. A later message whose call fails so only turns the AI step off.
+  // setup-chat (hhtech-live-run2, For builder 2; Lead's points 15 and 16): SLOW_A is owed to the written answer that
+  // replaced the slow one, so it shows right after that answer or not at all in this visit: when the turn was already
+  // closed (the person moved on before the 12 s) it is dropped, never hung under a later, unrelated line.
   const slowFail = w => {
     memory.visit.aiOff = true
-    if (w.firstTurn && memory.visit.slow !== 'said') memory.visit.slow = 'due'
+    if (w.firstTurn && !memory.visit.slow) memory.visit.slow = live.waiting === w ? 'due' : 'dropped'
   }
   // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
+  // Called only for the written answer of the turn that failed (liveFinish): when SLOW_A may not follow that answer (a
+  // don't-know line, a question, things to pick or an offer, a paste box), it is dropped for this visit.
   const slowAfter = said => {
-    if (!slowFollows(memory.visit, said)) return []
+    if (memory.visit.slow !== 'due') return []
+    if (!slowFollows(memory.visit, said)) {
+      memory.visit.slow = 'dropped'
+      return []
+    }
     memory.visit.slow = 'said'
     return [{ ...helperEntry(SLOW_LINE), send: false }]
   }
@@ -455,14 +477,16 @@ export function makePage(ctx, opts = {}) {
     }
     // Helper's answer to something the person did. shown: the person's side of it, as their message.
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
-    function answer(result, shown, typed = '') {
+    // pressed: shown is the label of a button or pick the person pressed, not their words: never sent to the AI as
+    // "Person: ..." (hhtech-live-run: "Person: Skip")
+    function answer(result, shown, typed = '', pressed = false) {
       if (!result) return
       // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
       const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }, ...slowAfter(said)].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper)].filter(Boolean))
       setFocusAsk(true)
     }
 
@@ -476,8 +500,9 @@ export function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       liveClose()
-      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null }
-      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper')
+      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null, lastOffer: visit.lastOffer || null, lastTopic: visit.lastTopic || null }
+      // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
+      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
       const lines = lastLines(memory.log, keptValues())
       const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
@@ -521,11 +546,20 @@ export function makePage(ctx, opts = {}) {
         } catch (err) {
           p = Promise.reject(err)
         }
-        return p.finally(() => {
-          ended = true
-          stopWatch()
-          live.inHermes--
-        })
+        // setup-chat (hhtech-live-run section 6 point 1, live-run2 and ask-run: with no AI that answers Helper's calls,
+        // every message still tried one, each failing at once): a call that fails makes no AI answer for this visit, so
+        // no further call is tried and no dots show. (Hermes's own check said a model was ready there: its free model
+        // answers chats, while llm.oneshot for Helper's task had no provider; only the call itself tells.)
+        return p
+          .catch(err => {
+            visit.aiOff = true
+            throw err
+          })
+          .finally(() => {
+            ended = true
+            stopWatch()
+            live.inHermes--
+          })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
       askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
@@ -558,8 +592,9 @@ export function makePage(ctx, opts = {}) {
       else if (item.forget) result = forgetAnswer(item.forget[0], item.forget[1], visit)
       else if (item.group) result = pickGroup(item.group, visit)
       else if (item.want) result = pickWant(item.want, visit)
+      else if (item.offer) result = pressOffer(item.offer, visit) // offer-t1: a thing picked under an offer, by its id
       else result = pickTopic(item.topic, visit)
-      answer(result, item.label)
+      answer(result, item.label, '', true)
     }
 
     // Opens one of Hermes's own screens (a missing door is ignored).
@@ -582,7 +617,7 @@ export function makePage(ctx, opts = {}) {
         if (!result) return
         // talk-live-3: the button is done; its older line draws the label as plain faint text (src/talk-view.js)
         setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
-        return answer(result, next.label)
+        return answer(result, next.label, '', true)
       }
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'part') go(next.to)
@@ -593,18 +628,18 @@ export function makePage(ctx, opts = {}) {
     function pressNote(entry, which) {
       if (which === 'change' && entry.used) {
         liveClose()
-        return answer(change(entry.used.topic, visit), entry.used.link)
+        return answer(change(entry.used.topic, visit), entry.used.link, '', true)
       }
       if (which !== 'see' || !entry.note) return
       if (settingsPage) return go(settingsHref)
       liveClose()
-      answer(seeKept(visit), entry.note.link)
+      answer(seeKept(visit), entry.note.link, '', true)
     }
 
     // Skip, at "What's your name?" and "What do you do?".
     function skipOpening() {
       liveClose()
-      answer(skip(visit), 'Skip')
+      answer(skip(visit), 'Skip', '', true)
     }
 
     // Picking an answer on a step: saved. Helper stays silent: its lines come from the conversation only.

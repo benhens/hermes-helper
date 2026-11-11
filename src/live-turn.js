@@ -13,10 +13,10 @@ import { AI_MODE } from './ai-mode.js'
 import { LIVE_DATA } from './live-data.js'
 import { TALK_DATA } from './talk-data.js'
 import { looksSecret } from './secret-rule.js'
-import { talkNorm, cutIgnored, startsWith, whichOf, lineKey, noteLast } from './talk.js'
+import { talkNorm, cutIgnored, startsWith, whichOf, lineKey, noteLast, attachOffer } from './talk.js'
 import { LIVE_ROW, byWords, rankIn, withNext, isFollowUp, followRows, resultOfRow } from './live-rows.js'
 import { readSubject, readPick, judgeWritten, noReply } from './live-checks.js'
-import { firstCallText, writerText, pickText, inputText, liveParams } from './live-request.js'
+import { firstCallText, writerText, pickText, inputText, liveParams, workLine } from './live-request.js'
 import { ONESHOT_TIMEOUT_MS } from './model-call.js'
 
 export const LIVE_SECONDS = LIVE_DATA.seconds
@@ -49,6 +49,8 @@ export function goesToAi(pre) {
   if (!pre) return false
   // live-v2 changes-3: anything from kind again is code's, AGAIN and MEAN_NONE included
   if (pre.by_again) return false
+  // ask-fix-t1 (about_rule.weak_hit_then.with_ai): a weak hit goes on to the AI as when no row was found
+  if (pre.weak_hit && (pre.kind === 'question' || pre.kind === 'N1')) return true
   if (pre.kind === 'plain') return pre.why === 'what do you mean'
   return LV_GO.includes(pre.kind)
 }
@@ -70,7 +72,9 @@ export function liveWhyNot({ mode = AI_MODE, pre, text, status, inHermes = 0, of
 // build: a how-question is never a request (route2.py's guard, build.skip_starts and build.how_phrases)
 function isHowQuestion(text) {
   const t = cutIgnored(talkNorm(text))
-  return startsWith(t, TALK_DATA.build.skip_starts) || whichOf(t, TALK_DATA.build.how_phrases).length > 0
+  // live changes-9 (build.model_pick_rule, the third condition): a message that opens with a question word asks
+  // something; the pick build is then read as none
+  return startsWith(t, TALK_DATA.build.skip_starts) || whichOf(t, TALK_DATA.build.how_phrases).length > 0 || startsWith(t, TALK_DATA.model_pick_not_when_starts)
 }
 
 // The steps 3 to 6 for one message. Returns { result, rows } (a line to show in place of the fallback), or
@@ -110,7 +114,10 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
 
 async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
   let ids = null
+  // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
+  let follow = false
   if (isFollowUp(text, pre, before)) ids = followRows(before)
+  if (ids && ids.length) follow = true
   if (!ids || !ids.length) {
     ids = null
     const w = byWords(message)
@@ -123,11 +130,13 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     if (subject === 'none') return { fallback: 'first call: none' }
     if (subject === 'build') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     ids = subject === 'talk' ? followRows(before) : withNext(rankIn(message, subject))
+    if (subject === 'talk' && ids.length) follow = true
   }
+  const handed = follow ? null : work
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
   const rows = ids.map(id => ({ id, text: LIVE_ROW[id].text }))
   if (mode === 'ai_picks_line') {
-    const raw = await call('pick', pickText(ids, work, names), LIVE_DATA.pick_only.max_tokens)
+    const raw = await call('pick', pickText(ids, handed, names), LIVE_DATA.pick_only.max_tokens)
     if (raw === null) return { fallback: 'pick call failed' }
     const p = readPick(raw, ids)
     if (p.id) return { result: resultOfRow(p.id), rows: ids }
@@ -135,9 +144,9 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     return { fallback: 'pick: none' }
   }
-  const raw = await call('writer', writerText(ids, work, names), LIVE_DATA.writer.max_tokens)
+  const raw = await call('writer', writerText(ids, handed, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text, work })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names) })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }
@@ -169,6 +178,10 @@ export function liveApply(st, got, out, before, text) {
     st.lastAnswerKey = before.lastAnswerKey
   }
   noteLast(st, r)
+  // offer-t1: the offer of the line shown (a line the AI picked may carry one; a written reply carries none), judged
+  // against the offer shown before this message, not the fallback's
+  st.lastOffer = before.lastOffer || null
+  attachOffer(r, st, before.lastTopic || null)
   if (r.kind === 'written') {
     // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
     st.last = (r.used || []).some(u => u.toLowerCase() !== 'none') ? 'written' : 'written-talk'

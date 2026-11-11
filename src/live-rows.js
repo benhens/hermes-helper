@@ -9,7 +9,10 @@ export const LIVE_ROWS = LIVE_DATA.rows
 export const LIVE_ROW = Object.fromEntries(LIVE_ROWS.map(r => [r.id, r]))
 // the rows word matching and the subjects rank (the next lines have no key words of their own)
 const SCORED = LIVE_ROWS.filter(r => !r.next_of)
-const NEXT_OF = Object.fromEntries(LIVE_ROWS.filter(r => r.next_of).map(r => [r.next_of, r.id]))
+// a row's next lines: its button's line, its then line (live changes-6 and -9) and, on a follow-up only, its second
+// wording (ask-fix-t1 skill-mean, plugin-mean; live changes-9 use1-next-mean); a next line may have one of its own
+const NEXT_OF = {}
+for (const r of LIVE_ROWS.filter(x => x.next_of)) (NEXT_OF[r.next_of] = NEXT_OF[r.next_of] || []).push(r)
 const STOP = new Set(LIVE_DATA.stop_words)
 export const MAX_HANDED = LIVE_DATA.max_handed
 
@@ -43,13 +46,14 @@ export function rankIn(text, subject, k = MAX_HANDED) {
 }
 
 // rows.from item 2: a next line is handed with its row, right after it; then cut at 5
-export function withNext(ids) {
+// followUp: the message is a follow-up, so the second wordings are handed too
+export function withNext(ids, followUp = false) {
   const out = []
-  for (const id of ids) {
+  const add = id => {
     if (!out.includes(id)) out.push(id)
-    const n = NEXT_OF[id]
-    if (n && !out.includes(n)) out.push(n)
+    for (const n of NEXT_OF[id] || []) if (followUp || !n.follow_only) add(n.id)
   }
+  ids.forEach(add)
   return out.slice(0, MAX_HANDED)
 }
 
@@ -65,13 +69,15 @@ export function rowOfKey(key) {
   }
   if (!Array.isArray(k)) return null
   const [kind, topic, need, term, , row] = k
-  const id = kind === 'row' ? need : kind === 'plain' ? (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'term' ? term : kind === 'want' ? row : ['COST', 'WHERE', 'CN1'].includes(kind) ? kind : null
+  // live changes-6 and -9, ask-fix-t1: a then line, a word line's second wording and the text of a line's button
+  // came from the row they belong to
+  const id = kind === 'row' || kind === 'rowthen' ? need : kind === 'termmean' ? term : kind === 'nextline' ? need || term || (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'plain' || kind === 'then' ? (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'term' ? term : kind === 'want' ? row : ['COST', 'WHERE', 'CN1'].includes(kind) ? kind : null
   return id && LIVE_ROW[id] ? id : null
 }
 
 // follow_up.rule: the kinds of Helper's last line that came from rows. The data says wants; the plugin's kind
 // is want. written: a reply the AI wrote that used rows.
-const FROM_ROWS = ['row', 'plain', 'term', 'want', 'COST', 'WHERE', 'written']
+const FROM_ROWS = ['row', 'plain', 'term', 'want', 'COST', 'WHERE', 'written', 'then', 'rowthen', 'termmean', 'nextline']
 const FOLLOW_CUT = ['ok', 'okay', 'so', 'and', 'cool', 'right']
 const PHRASES = LIVE_DATA.follow_up.phrases
 // the whole message, end marks and the lead words ok, okay, so, and, cool, right cut, is one of the phrases
@@ -103,9 +109,9 @@ export function isFollowUp(text, pre, before) {
 // follow_up.rows: the rows handed for the person's previous message, in the same order, each with its next
 // line; if that message got a line from code, the row of that line with its next line. At most 5.
 export function followRows(before) {
-  if (before.liveRows && before.liveRows.key === before.lastKey) return withNext(before.liveRows.ids)
+  if (before.liveRows && before.liveRows.key === before.lastKey) return withNext(before.liveRows.ids, true)
   const id = rowOfKey(before.lastKey)
-  return id ? withNext([id]) : []
+  return id ? withNext([id], true) : []
 }
 
 // What a handed row shows when the AI picks it (pick_only.read): the result code would give for that row.

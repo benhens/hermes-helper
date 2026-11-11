@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { TALK_DATA } from './talk-data.js'
 import { AI_MODE } from './ai-mode.js'
+import { SETUP_BUILT } from './setup-built.js'
 import { LIVE_DATA } from './live-data.js'
 import { K } from './look.js'
 import { cleanKept, hasKept, keptToStore } from './kept.js'
@@ -21,7 +22,9 @@ import { renderKept, saveBox } from './settings-file.js'
 import { curlyQuotes } from './quotes.js'
 
 const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
-export const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode.settings_top_line_2[AI_MODE]
+// live changes-6: with the set-up conversation built the line names its three rows; without it, only what the person
+// does is sent, and the line says that (lines_by_mode.settings_top_line_2 was_c6)
+export const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode[SETUP_BUILT ? 'settings_top_line_2' : 'settings_top_line_2_no_setup'][AI_MODE]
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')

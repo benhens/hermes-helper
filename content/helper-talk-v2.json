@@ -175,10 +175,7 @@
   "hint_note": "The grey text in the empty message box while answers, or topic picks, are showing.",
   "no_answers": [
    "OPEN",
-   "F1",
-   "mem-q",
-   "sch-q",
-   "bot-q"
+   "F1"
   ],
   "no_answers_note": "These questions have no answers to pick (answers.when_shown). Skip stays under OPEN and F1.",
   "term_labels_note": "A term label under W1 (Tools, Skills, Profile and so on) is the word the person just typed. It is not checked against R5 and R6.",
@@ -199,7 +196,14 @@
     "A2 and A4 Delete ...?": true,
     "settings page: Save, and forget ...?": true
    }
-  }
+  },
+  "no_answers_was_offer_t1": [
+   "OPEN",
+   "F1",
+   "mem-q",
+   "sch-q",
+   "bot-q"
+  ]
  },
  "fixed_lines": [
   {
@@ -219,52 +223,62 @@
   {
    "id": "F2",
    "kind": "reply",
-   "text": "Thanks, {name}. Ask me anything about Hermes.",
-   "text_no_name": "Thanks. Ask me anything about Hermes.",
+   "text": "Thanks, {name}.",
+   "text_no_name": "Thanks.",
    "under": "the grey kept line (keeps.tell) when something was kept. No topic picks.",
    "answers": "none",
    "when": "After What do you do?, always. Nothing new is written here since changes-15: the name was written at F1. A kept line shows only if a name was given here for the first time (the fake-model route).",
-   "when_c4": "changes-4: F2 now writes work (keeps.work step 7) and shows Kept: {work}. under it."
+   "when_c4": "changes-4: F2 now writes work (keeps.work step 7) and shows Kept: {work}. under it.",
+   "text_was_offer_t1": "Thanks, {name}. Ask me anything about Hermes.",
+   "offer": "general"
   },
   {
    "id": "F3",
    "kind": "reply",
-   "text": "That's fine. Ask me anything about Hermes.",
+   "text": "That's fine.",
    "under": "the grey kept line if a name was given (keeps.tell). No topic picks.",
    "answers": "none",
    "when": "Skip pressed at What's your name? or What do you do?. met is written. A name given before Skip was already written at F1 (changes-15), so nothing new is kept and no kept line shows.",
-   "when_c4": "changes-4: also for a non-answer at What do you do? (keeps.work step 4)."
+   "when_c4": "changes-4: also for a non-answer at What do you do? (keeps.work step 4).",
+   "text_was_offer_t1": "That's fine. Ask me anything about Hermes.",
+   "offer": "general"
   },
   {
    "id": "N1",
    "kind": "reply",
    "text": "Sorry, I don't have checked information on that yet. I only say what I have checked.",
-   "under": "the grey line N_HINT. No topic picks.",
+   "under": "offer-t1: the offer dont_know in place of the grey line N_HINT. No topic picks.",
    "answers": "none",
-   "when": "No row, no term and no other line fits. True in every case, because it gives no reason. His pick of the three lines is open; this is option 4 of content/helper-dont-know-v1.md."
+   "when": "No row, no term and no other line fits. True in every case, because it gives no reason. His pick of the three lines is open; this is option 4 of content/helper-dont-know-v1.md.",
+   "text_was_offer_t1": "Sorry, I don't have checked information on that yet. I only say what I have checked.",
+   "offer": "dont_know"
   },
   {
    "id": "N1a",
    "kind": "reply",
    "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
-   "under": "the grey line N_HINT. No topic picks.",
+   "under": "offer-t1: the offer dont_know in place of the grey line N_HINT. No topic picks.",
    "answers": "none",
    "when": "The message names a skill with skill called NAME, skill named NAME, or a quoted \"NAME\" skill, and NAME is not on content/skills-list-v1.json. Only skills: Helper has no full list of official plugins, so a plugin name gets N1. A name that is on the list (all 186 official skills, the five once proposed for leaving out included, changes-19) gets the skill line S1 or S2 of content/helper-wants-v1.json, never a don't-know line.",
-   "note": "His reason (not official), kept true by using it only when the name is on no official list. His words, 10 Nov 19:30, ended with \"we're working on expanding it\": left out here because it promises updates after the hackathon. His call (Questions for Pēteris)."
+   "note": "His reason (not official), kept true by using it only when the name is on no official list. His words, 10 Nov 19:30, ended with \"we're working on expanding it\": left out here because it promises updates after the hackathon. His call (Questions for Pēteris).",
+   "text_was_offer_t1": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
+   "offer": "dont_know"
   },
   {
    "id": "N_HINT",
    "kind": "grey",
    "text": "To see what I can help with, type \"what can I ask you\".",
-   "when": "Small and grey under N1 and N1a, every time. Not a question and nothing to press: the person types it if they want the topics."
+   "when": "Small and grey under N1 and N1a, every time. Not a question and nothing to press: the person types it if they want the topics.",
+   "status_offer_t1": "Not shown any more: the offer dont_know replaces it under N1, N1a and N1_AGAIN."
   },
   {
    "id": "TP",
    "kind": "reply",
-   "text": "You can ask me how Hermes works and how to set it up. Pick one, or type your own question.",
+   "text": "I can explain how Hermes works and help you set it up. Pick one.",
    "under": "the topic picks (topic_picks), four",
    "answers": "topics",
-   "when": "Only when the person asks what they can ask (asks_for_topics). Nothing else shows the topic picks."
+   "when": "Only when the person asks what they can ask (asks_for_topics). Nothing else shows the topic picks.",
+   "text_was_offer_t1": "You can ask me how Hermes works and how to set it up. Pick one, or type your own question."
   },
   {
    "id": "W1",
@@ -364,69 +378,85 @@
   {
    "id": "NAME_AGAIN",
    "kind": "reply",
-   "text": "Hi again, {name}. Ask me anything about Hermes.",
+   "text": "Hi again, {name}.",
    "answers": "none",
    "when": "Stage open, nothing pending, a name is kept, and the whole message is the kept name (any capitals), or the name patterns (opening.name_strong_pattern or name_weak_pattern) catch the kept name. Nothing is written.",
-   "added": "changes-11, hhtech-run-e86b410 section 6 item 6"
+   "added": "changes-11, hhtech-run-e86b410 section 6 item 6",
+   "text_was_offer_t1": "Hi again, {name}. Ask me anything about Hermes.",
+   "offer": "general"
   },
   {
    "id": "NAME_NEW",
    "kind": "reply",
-   "text": "Thanks, {name}. Ask me anything about Hermes.",
+   "text": "Thanks, {name}.",
    "answers": "none",
    "when": "Stage open, nothing pending, at most six words, no question mark, and opening.name_strong_pattern catches a name that passes opening.name_refused and differs from the kept one (or none is kept). The name is written (it replaces the kept one) and the grey line Kept: {name}. shows under it.",
    "note": "A single word that is not the kept name is not taken as a name here: on a later visit it could be anything. It goes on as before (often N1).",
-   "added": "changes-11, hhtech-run-e86b410 section 6 item 6"
+   "added": "changes-11, hhtech-run-e86b410 section 6 item 6",
+   "text_was_offer_t1": "Thanks, {name}. Ask me anything about Hermes.",
+   "offer": "general"
   },
   {
    "id": "BACK",
    "kind": "opening",
-   "text": "Hi again, {name}. What would you like Hermes to help you with?",
-   "text_no_name": "Hi again. What would you like Hermes to help you with?",
+   "text": "Hi again, {name}.",
+   "text_no_name": "Hi again.",
    "answers": "none",
    "when": "The window opens and the stored flag met is true. With a kept name: text. No kept name (skipped, or deleted with Forget all): text_no_name. In place of OPEN. Stage starts at open. Like OPEN, it does not set lastq, so a topic question may follow it.",
-   "added": "changes-14, his words of 11 Nov (inputs/pb-words-11nov-helper-useless.md): It should not do that. It's only the first time."
+   "added": "changes-14, his words of 11 Nov (inputs/pb-words-11nov-helper-useless.md): It should not do that. It's only the first time.",
+   "text_was_offer_t1": "Hi again, {name}. What would you like Hermes to help you with?",
+   "offer": "general"
   },
   {
    "id": "HELLO",
-   "kind": "greeting",
-   "text": "Hi, {name}. What would you like Hermes to help you with?",
+   "kind": "reply",
+   "text": "Hi, {name}.",
    "answers": "none",
    "when": "small_talk kind hello, when Helper's line just before was not BACK, HELLO or a question (lastq false). Like OPEN, it does not set lastq.",
    "added": "changes-14",
-   "text_no_name": "Hi. What would you like Hermes to help you with?"
+   "text_no_name": "Hi.",
+   "text_was_offer_t1": "Hi, {name}. What would you like Hermes to help you with?",
+   "offer": "general"
   },
   {
    "id": "HELLO_SAME",
    "kind": "reply",
-   "text": "I'm here. Type your question whenever you are ready.",
+   "text": "I'm here.",
    "answers": "none",
    "when": "small_talk kind hello, when Helper's line just before was BACK, HELLO, HELLO_SAME or a question (lastq true). Never a second question in a row.",
-   "added": "changes-14"
+   "added": "changes-14",
+   "text_was_offer_t1": "I'm here. Type your question whenever you are ready.",
+   "offer": "general"
   },
   {
    "id": "THANKS",
    "kind": "reply",
-   "text": "You're welcome. Ask me more about Hermes whenever you like.",
+   "text": "You're welcome.",
    "answers": "none",
    "when": "small_talk kind thanks.",
-   "added": "changes-14"
+   "added": "changes-14",
+   "text_was_offer_t1": "You're welcome. Ask me more about Hermes whenever you like.",
+   "offer": "after_topic"
   },
   {
    "id": "OK",
    "kind": "reply",
-   "text": "Good. I'm here if you want to know more.",
+   "text": "Good.",
    "answers": "none",
    "when": "small_talk kind ok, only when no question of Helper's is open (pending empty). With a question open, ok goes on as before.",
-   "added": "changes-14"
+   "added": "changes-14",
+   "text_was_offer_t1": "Good. I'm here if you want to know more.",
+   "offer": "after_topic"
   },
   {
    "id": "HOW",
    "kind": "reply",
-   "text": "I'm good, thanks for asking. I'm here when you have a question about Hermes.",
+   "text": "I'm good, thanks for asking.",
    "answers": "none",
    "when": "small_talk kind how.",
-   "added": "changes-14"
+   "added": "changes-14",
+   "text_was_offer_t1": "I'm good, thanks for asking. I'm here when you have a question about Hermes.",
+   "offer": "general"
   },
   {
    "id": "WHO",
@@ -435,7 +465,8 @@
    "answers": "none",
    "when": "small_talk kind who.",
    "added": "changes-14",
-   "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs)."
+   "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs).",
+   "offer": "general"
   },
   {
    "id": "AI",
@@ -443,7 +474,8 @@
    "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs.",
    "answers": "none",
    "when": "small_talk kind ai, in a build that sends nothing to any AI (keeps.disclosure_point_11.use_now no_ai_step).",
-   "added": "changes-14"
+   "added": "changes-14",
+   "offer": "general"
   },
   {
    "id": "AI_PICK",
@@ -452,7 +484,8 @@
    "answers": "none",
    "when": "small_talk kind ai, in a build where the person's AI chooses a pre-written line (option 2 of content/helper-talk-live-v1.md). NOT this build.",
    "added": "changes-14",
-   "text_was": "I'm a small program inside Hermes, not a person. Your own AI only picks which checked line fits."
+   "text_was": "I'm a small program inside Hermes, not a person. Your own AI only picks which checked line fits.",
+   "offer": "general"
   },
   {
    "id": "AI_WRITES",
@@ -461,82 +494,101 @@
    "answers": "none",
    "when": "small_talk kind ai, in a build where the person's AI writes the reply (option 1 of content/helper-talk-live-v1.md). NOT this build; only if he picks option 1.",
    "added": "changes-14",
-   "text_was": "I'm a small program inside Hermes, not a person. Your own AI writes my words from checked facts."
+   "text_was": "I'm a small program inside Hermes, not a person. Your own AI writes my words from checked facts.",
+   "offer": "general"
   },
   {
    "id": "BYE",
    "kind": "reply",
-   "text": "Bye. Come back any time you have a question about Hermes.",
+   "text": "Bye. Come back any time.",
    "answers": "none",
    "when": "small_talk kind bye.",
-   "added": "changes-14"
+   "added": "changes-14",
+   "text_was_offer_t1": "Bye. Come back any time you have a question about Hermes.",
+   "offer_note": "No offer: the person is leaving. Only the invitation to bring a question is cut."
   },
   {
    "id": "CUT",
    "kind": "reply",
-   "text": "Sorry, that looks cut off. Tell me a bit more about what you need.",
+   "text": "Sorry, that looks cut off.",
    "answers": "none",
    "when": "small_talk kind cut. Not a question, so it does not set lastq.",
-   "added": "changes-14"
+   "added": "changes-14",
+   "text_was_offer_t1": "Sorry, that looks cut off. Tell me a bit more about what you need.",
+   "offer": "general"
   },
   {
    "id": "MEAN_NONE",
    "kind": "reply",
-   "text": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\".",
+   "text": "Sorry, I was not clear.",
    "text_was": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\".",
    "text_changed": "live-v2 changes-3 (hhtech-run-c18 section 3, I'm confused): \"that was not clear\" could be read as blaming the person's message. Every message of kind mean says Helper's words were not clear, so Helper takes the blame.",
    "answers": "none",
    "when": "small_talk kind mean, when there is nothing to say again in other words (see small_talk.mean_rule).",
-   "added": "changes-14"
+   "added": "changes-14",
+   "text_was_offer_t1": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\".",
+   "offer": "words"
   },
   {
    "id": "WRONG",
    "kind": "reply",
-   "text": "Sorry about that. Please say it another way.",
+   "text": "Sorry about that.",
    "answers": "none",
    "when": "small_talk kind wrong (that's wrong, not what I meant ... as the whole message), or a bare no after an answer (small_talk.no_rule). No question mark (an answer line may not end with one, check R), nothing to pick. It sets no pending topic.",
-   "added": "changes-15"
+   "added": "changes-15",
+   "text_was_offer_t1": "Sorry about that. Please say it another way.",
+   "offer": "general"
   },
   {
    "id": "AGAIN",
    "kind": "reply",
-   "text": "Sorry, I have nothing more on that. Please ask it another way.",
+   "text": "Sorry, I have nothing more on that.",
    "answers": "none",
    "when": "no_repeat: in place of a line that would be the same as the one just before, when the topic's plain line does not fit (no topic, or it was the line just before).",
-   "added": "changes-15"
+   "added": "changes-15",
+   "text_was_offer_t1": "Sorry, I have nothing more on that. Please ask it another way.",
+   "offer": "general"
   },
   {
    "id": "N1_AGAIN",
    "kind": "reply",
    "text": "Sorry, I don't have checked information on that one either.",
    "answers": "none",
-   "under": "the grey line N_HINT, as under N1. No topic picks.",
+   "under": "offer-t1: the offer dont_know (its instead set when N1 showed it last).",
    "when": "no_repeat: in place of N1 or N1a when the line just before was a don't-know line of the same id. True in every case, because it gives no reason.",
-   "added": "changes-15"
+   "added": "changes-15",
+   "text_was_offer_t1": "Sorry, I don't have checked information on that one either.",
+   "offer": "dont_know"
   },
   {
    "id": "OK_SAME",
    "kind": "reply",
-   "text": "All right. I'm here when you need me.",
+   "text": "All right.",
    "answers": "none",
    "when": "no_repeat group ok: in place of OK when OK would show twice in a row.",
-   "added": "live-v2 changes-3"
+   "added": "live-v2 changes-3",
+   "text_was_offer_t1": "All right. I'm here when you need me.",
+   "offer": "after_topic"
   },
   {
    "id": "THANKS_SAME",
    "kind": "reply",
-   "text": "Any time. I'm here if you have another question.",
+   "text": "Any time.",
    "answers": "none",
    "when": "no_repeat group thanks: in place of THANKS when THANKS would show twice in a row.",
-   "added": "live-v2 changes-3"
+   "added": "live-v2 changes-3",
+   "text_was_offer_t1": "Any time. I'm here if you have another question.",
+   "offer": "after_topic"
   },
   {
    "id": "HOW_SAME",
    "kind": "reply",
-   "text": "Still good, thanks. Ask me anything about Hermes.",
+   "text": "Still good, thanks.",
    "answers": "none",
    "when": "no_repeat group how: in place of HOW when HOW would show twice in a row.",
-   "added": "live-v2 changes-3"
+   "added": "live-v2 changes-3",
+   "text_was_offer_t1": "Still good, thanks. Ask me anything about Hermes.",
+   "offer": "general"
   },
   {
    "id": "BYE_SAME",
@@ -549,34 +601,381 @@
   {
    "id": "CUT_SAME",
    "kind": "reply",
-   "text": "I can't tell what you need from that. Type your whole question in one message.",
+   "text": "I can't tell what you need from that.",
    "answers": "none",
    "when": "no_repeat group cut: in place of CUT when CUT would show twice in a row.",
-   "added": "live-v2 changes-3"
+   "added": "live-v2 changes-3",
+   "text_was_offer_t1": "I can't tell what you need from that. Type your whole question in one message.",
+   "offer": "general"
   },
   {
    "id": "WRONG_SAME",
    "kind": "reply",
-   "text": "Sorry again. Try other words, or ask about another part of Hermes.",
+   "text": "Sorry again.",
    "answers": "none",
    "when": "no_repeat group wrong: in place of WRONG when WRONG would show twice in a row or the person just called it wrong. True each time, because WRONG (Sorry about that ...) is always the line it replaces or was rejected just before.",
-   "added": "live-v2 changes-3"
+   "added": "live-v2 changes-3",
+   "text_was_offer_t1": "Sorry again. Try other words, or ask about another part of Hermes.",
+   "offer": "general"
   },
   {
    "id": "STUCK",
    "kind": "reply",
-   "text": "Sorry it didn't work. Tell me what you tried and what you saw on the screen.",
+   "text": "Sorry it isn't working.",
    "answers": "none",
    "when": "small_talk kind stuck (that didn't work, it's not working ... as the whole message). No question mark, nothing to pick, no pending topic.",
-   "added": "live-v2 changes-3 (hhtech-run-c18 section 3: that didn't work got N1)"
+   "added": "live-v2 changes-3 (hhtech-run-c18 section 3: that didn't work got N1)",
+   "text_was_offer_t1": "Sorry it didn't work. Tell me what you tried and what you saw on the screen.",
+   "offer": "stuck"
   },
   {
    "id": "STUCK_SAME",
    "kind": "reply",
-   "text": "Sorry it still isn't working. Try other words, or ask about another part of Hermes.",
+   "text": "Sorry it still isn't working.",
    "answers": "none",
    "when": "no_repeat group stuck: in place of STUCK when STUCK would show twice in a row.",
-   "added": "live-v2 changes-3"
+   "added": "live-v2 changes-3",
+   "text_was_offer_t1": "Sorry it still isn't working. Try other words, or ask about another part of Hermes.",
+   "offer": "general"
+  },
+  {
+   "id": "PRIV",
+   "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+   "source": "user-guide/local-models.md line 14: \"Nothing leaves your computer: no account, no API key, and no network access after a model is downloaded.\" Second sentence: user-guide/features/provider-routing.md line 98: \"Controls whether providers can use your prompts for training.\" and user-guide/configuring-models.md line 79: \"the vendor may train on your prompts and completions\" (both show prompts reach the provider; no docs line says it in general words or names the free model)",
+   "added": "live changes-6",
+   "kind": "reply",
+   "when": "A privacy question with nothing pending (live_c6.privacy_rule).",
+   "next": {
+    "kind": "line",
+    "label": "And my files?",
+    "id": "PRIV-next",
+    "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+    "source": "the line SAFE, word for word (/hermes-docs/user-guide/security.md lines 16 and 26)",
+    "added": "ask-fix-t1: is my data safe gets what leaves the computer, and the approval one press away"
+   }
+  },
+  {
+   "id": "POWER",
+   "text": "On your own computer, small AIs run well with an 8 GB graphics card. Hermes shows which ones fit.",
+   "source": "user-guide/local-models.md line 202: \"A GPU with 8 GB+ of memory runs the small catalog models comfortably;\" and line 65: \"**Memory fit** — green (*Fits your GPU*: runs entirely in GPU memory),\". No docs line says an AI from a company needs no strong computer, so the line does not say it.",
+   "added": "live changes-6",
+   "kind": "reply",
+   "when": "A question about what computer is needed (live_c6.power_words)."
+  },
+  {
+   "id": "HVC",
+   "text": "Hermes learns from experience and remembers you across chats. ChatGPT can be the AI inside it.",
+   "source": "index.mdx line 19: \"The self-improving AI agent built by Nous Research. ... it creates skills from experience, improves them during use, ... and builds a deepening model of who you are across sessions.\" Third sentence: mod1's source, integrations/providers.md (OpenAI Codex row): sign in with a ChatGPT plan.",
+   "added": "live changes-6",
+   "note": "The docs' word \"agent\" is on r6_never, so the line says what the docs say an agent does here, without the word.",
+   "kind": "reply",
+   "when": "Hermes compared with ChatGPT, Claude and the like (live_c6.vs_rule)."
+  },
+  {
+   "id": "MIG",
+   "kind": "reply",
+   "text": "There are two kinds of moving.",
+   "source": "Helper's own lead-in; the two kinds are the offer move",
+   "added": "offer-t1",
+   "offer": "move",
+   "when": "offer_words.migrate, and neither a listed app, a not-listed app nor a computer word in the message"
+  },
+  {
+   "id": "MIG_APP",
+   "kind": "reply",
+   "text": "Hermes can bring over your notes and settings from other AI apps. The docs name OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot.",
+   "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (\"imports your existing **OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot** setup into Hermes with one command\") and line 4 (\"instructions, rules, allowlists, MCP servers, skills, memories\")",
+   "added": "offer-t1",
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please bring my setup over from <my old AI app> with hermes migrate. Show me the plan before you write anything.",
+    "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 15 (\"Already set up? Run `hermes migrate` for the same offer\") and line 9 (\"You always see a per-item plan before anything is written\")",
+    "not_checked": "Not seen run: whether a person's Hermes can run hermes migrate for them from a chat (it asks to confirm)."
+   },
+   "when": "offer_words.migrate with a listed app; or the pick From another AI app"
+  },
+  {
+   "id": "MIG_NOT_LISTED",
+   "kind": "reply",
+   "text": "The docs name only OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot. I have nothing checked on other apps.",
+   "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (the list of six); no other app is named on that page",
+   "added": "offer-t1",
+   "offer": "general",
+   "when": "offer_words.migrate with a not-listed app (chatgpt and the like)"
+  },
+  {
+   "id": "MIG_PC",
+   "kind": "reply",
+   "text": "Hermes can pack your settings, chats and other data into one zip file. Hermes on the new computer unpacks it. That replaces what is there.",
+   "source": "dev/hermes-src/website/docs/reference/cli-commands.md line 1116 (\"Create a zip archive of your Hermes configuration, skills, sessions, and data.\") and line 1192 (\"Restore a previously created Hermes backup into your Hermes home directory. All files in the archive overwrite existing files\")",
+   "added": "offer-t1",
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is.",
+    "then_on_new_computer": "Install Hermes there, then: Please restore my Hermes from <the zip file> with hermes import.",
+    "source": "dev/hermes-src/website/docs/reference/cli-commands.md lines 1110 to 1123 (hermes backup, default ~/hermes-backup-<timestamp>.zip) and 1186 to 1192 (hermes import <zipfile>)",
+    "not_checked": "Not seen run. A key kept in the vault travels without its unlock code (user-guide/features/credential-vault.md line 128), so a key may need entering again: not checked."
+   },
+   "when": "offer_words.migrate or move/moving with a computer word; or the pick To another computer"
+  },
+  {
+   "id": "HERMES",
+   "kind": "reply",
+   "text": "Hermes is an AI helper made by Nous Research. It learns from experience and remembers you across chats.",
+   "source": "dev/hermes-src/website/docs/index.mdx line 19 (\"The self-improving AI agent built by [Nous Research]... it creates skills from experience, improves them during use, ... builds a deepening model of who you are across sessions.\")",
+   "added": "offer-t1",
+   "offer": "general",
+   "word_note": "agent said as AI helper (r6_say_instead agent: Hermes, or bot); 'helper' is a plain word here, not the product name",
+   "when": "offer_words.what_hermes is the whole message (after cuts and end marks); or the pick What Hermes is"
+  },
+  {
+   "id": "START",
+   "kind": "reply",
+   "text": "Most people start by picking the AI Hermes uses. The quick setup signs you in, with no secret key.",
+   "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** — OAuth login, no API keys to manage ... The recommended fast path.\")",
+   "added": "offer-t1",
+   "offer": "general",
+   "when": "offer_words.start in the message, no topic or term key word (a build with the set-up conversation takes these as setup_ask instead)"
+  },
+  {
+   "id": "KEY",
+   "kind": "reply",
+   "text": "Not always. The quick setup signs you in, so you need no key. A key is a secret code some AI companies give you instead.",
+   "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"OAuth login, no API keys to manage\") and line 119 (\"**OpenRouter** ... Enter your API key\"). 'secret code': K1's own wording; the docs keep keys in .env, 'secrets only' (dev/hermes-src/AGENTS.md, User state).",
+   "added": "offer-t1",
+   "next": {
+    "kind": "part",
+    "label": "Open Model",
+    "part": "model"
+   },
+   "when": "offer_words.key in the message (before the terms and topics)"
+  },
+  {
+   "id": "UPDATE",
+   "kind": "reply",
+   "text": "The Hermes app checks for updates by itself. When one is ready, it offers a one-click update.",
+   "source": "dev/hermes-src/website/docs/user-guide/desktop.md line 526 (\"The app checks for updates in the background and offers a one-click update when one is ready.\")",
+   "added": "offer-t1",
+   "applies_to": "the Hermes desktop app only; other installs are updated another way (reference/cli-commands.md line 2073, not said)",
+   "when": "offer_words.update in the message, no topic key word"
+  },
+  {
+   "id": "SAFE",
+   "kind": "reply",
+   "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+   "source": "dev/hermes-src/website/docs/user-guide/security.md line 26 (\"Before executing any command, Hermes checks it against a curated list of dangerous patterns. If a match is found, the user must explicitly approve it.\") and line 16 (\"human-in-the-loop for destructive operations\")",
+   "added": "offer-t1",
+   "not_said": "The approval mode can be changed (line 30); Helper does not say it is always on.",
+   "when": "offer_words.safe in the message, no topic key word other than svc safety (svc2 wins when a service is named)",
+   "next": {
+    "kind": "line",
+    "label": "And my messages?",
+    "id": "SAFE-next",
+    "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+    "source": "the line PRIV, word for word (its source)",
+    "added": "ask-fix-t1"
+   }
+  },
+  {
+   "id": "PERSONALITY",
+   "kind": "reply",
+   "text": "You change its personality in SOUL.md, the file that says who your Hermes is.",
+   "source": "dev/hermes-src/website/docs/user-guide/features/personality.md line 9 (\"Hermes Agent's personality is fully customizable. `SOUL.md` is the **primary identity**\") and line 50 (\"Edit `~/.hermes/SOUL.md` to change Hermes' default personality.\")",
+   "added": "offer-t1",
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please show me my SOUL.md and help me change how you talk. Ask me before you save anything."
+   },
+   "when": "offer_words.personality in the message"
+  },
+  {
+   "id": "KEY_WHAT",
+   "kind": "reply",
+   "text": "A key is a secret code from an AI company. It lets Hermes use that company's AI. Keys go in Settings, never in a chat.",
+   "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 118 (\"Anthropic ... or API key for pay-per-token\") and line 119 (\"OpenRouter ... Enter your API key\"); 'Keys go in Settings, never in a chat': line K1, word for word. 'secret': dev/hermes-src/AGENTS.md, User state (\".env (secrets only)\").",
+   "added": "offer-t1",
+   "when": "offer_words.key and the message starts with what is / what's / whats / what are",
+   "next": {
+    "kind": "part",
+    "label": "Open Model",
+    "part": "model"
+   }
+  },
+  {
+   "id": "MIG_CHATGPT",
+   "kind": "reply",
+   "text": "The docs name no way to move chats or settings from ChatGPT. ChatGPT can still be the AI inside Hermes.",
+   "source": "/hermes-docs/user-guide/import-from-other-agents.md line 9 (the six apps: \"**OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot**\"; ChatGPT is not among them) and line 4 (what comes over: \"instructions, rules, allowlists, MCP servers, skills, memories\"; no chats). Second sentence: mod1's source (integrations/providers.md, OpenAI Codex row: sign in with a ChatGPT plan).",
+   "added": "ask-fix-t1",
+   "when": "offer_words.migrate with chatgpt or chat gpt in the message",
+   "status": "not_run",
+   "next": {
+    "kind": "part",
+    "label": "Open Model",
+    "part": "model"
+   }
+  },
+  {
+   "id": "AGENT",
+   "kind": "reply",
+   "text": "That is an AI that works by itself. The docs say Hermes gets better the longer it runs.",
+   "source": "/hermes-docs/index.mdx line 115 (\"It's an **autonomous agent** that gets more capable the longer it runs.\")",
+   "added": "ask-fix-t1",
+   "when": "what is / what's / whats / what are + one of offer_words.agent_what",
+   "status": "not_run",
+   "offer": "general",
+   "word_note": "agent is on r6_never, so the line explains the word without saying it, as the profile term line does. The docs give no one-sentence meaning of agent; 'works by itself' is hhcontent's plain wording of autonomous."
+  },
+  {
+   "id": "KEY_WHERE",
+   "kind": "reply",
+   "text": "A key is a secret code. In the Hermes app it goes in Settings, never in a chat.",
+   "source": "/hermes-docs/user-guide/desktop.md line 447 (\"**Providers settings pane** — a dedicated place to manage inference providers, with an Accounts / API-keys UX for signing in and storing credentials per provider\"). First sentence: line K1, word for word. Seen: the Settings list has a row Providers (docs/answers/hhtech-helper-settings.md line 15, hhtech ran the app v0.23.0).",
+   "added": "ask-fix-t1",
+   "when": "offer_words.key with one of offer_words.key_where in the message",
+   "status": "not_run",
+   "next": {
+    "kind": "part",
+    "label": "Open Model",
+    "part": "model"
+   },
+   "not_checked": "Nobody on the team has reported what the Providers screen shows for an OpenAI key.",
+   "not_said": "The row inside Settings is called Providers (seen by hhtech, docs/answers/hhtech-helper-settings.md line 15; docs desktop.md line 447). Provider is on r6_never, so the line stops at Settings. If Lead wants the row named, the text would end: open Settings, then Providers."
+  },
+  {
+   "id": "FREE",
+   "kind": "reply",
+   "text": "Hermes itself is free. An AI on your own computer needs no account. Some AI companies let you start free.",
+   "source": "/hermes-docs/getting-started/official-domains.md line 61 (\"Hermes Agent is MIT-licensed and free to self-host.\"); user-guide/local-models.md line 14 (\"Nothing leaves your computer: no account, no API key\"); integrations/providers.md line 653 (\"Free tier included\") and line 521 (\"Create an account and a free API key\")",
+   "added": "ask-fix-t1",
+   "when": "offer_words.free in the message, nothing pending",
+   "status": "not_run",
+   "next": {
+    "kind": "part",
+    "label": "Open Model",
+    "part": "model"
+   },
+   "not_said": "What a fresh install switches on by itself: no docs line says it (hhtech saw a free Nous model switch on in a run; that is a run, not a docs line)."
+  },
+  {
+   "id": "MODEL_FOR",
+   "kind": "reply",
+   "text": "I have nothing checked on which AI suits which kind of work.",
+   "source": "No docs page was found that matches an AI to a kind of work (not a full search of the docs: checked user-guide/configuring-models.md and integrations/providers.md headings only).",
+   "added": "ask-fix-t1",
+   "when": "one of offer_words.model_for and the word for in the message",
+   "status": "not_run",
+   "offer": "pay"
+  },
+  {
+   "id": "MODEL_CHANGE",
+   "kind": "reply",
+   "text": "In a Hermes chat, the message box shows the AI's name. Click it to choose another.",
+   "source": "/hermes-docs/user-guide/desktop.md line 283 (\"The model picker lives in the **composer**, just left of the microphone. Click it to switch the model\")",
+   "added": "ask-fix-t1",
+   "when": "offer_words.model_change in the message",
+   "status": "not_run",
+   "next": {
+    "kind": "part",
+    "label": "Open Model",
+    "part": "model"
+   },
+   "not_checked": "From the docs and the app's source (docs/answers/hhtech-model-display-name.md line 9). hhcontent has not seen it in the running app, so the line names no button."
+  },
+  {
+   "id": "SKILL_ADD",
+   "kind": "reply",
+   "text": "A skill is written steps for one task. To add one, click \"Capabilities\", then \"Skills\", then a card, then \"Install\".",
+   "source": "Seen run by hhtech in Hermes Desktop v0.23.0 (docs/answers/hhtech-wants-check.md section 5; the same clicks as the steps in helper-wants-v1.json, w_reddit next). Docs: /hermes-docs/user-guide/desktop.md line 483 (\"The Skills tab lists your installed skills ... each entry has a one-click **Install** button\")",
+   "added": "ask-fix-t1",
+   "when": "offer_words.skill_add in the message",
+   "status": "not_run",
+   "next": {
+    "kind": "part",
+    "label": "Open Capabilities",
+    "part": "capabilities"
+   },
+   "after": "It works from your next new chat, not this one."
+  },
+  {
+   "id": "PLUGIN_WHICH",
+   "kind": "reply",
+   "text": "A plugin is an add-on. You need none to start. Hermes loads its built-in ones by itself.",
+   "source": "/hermes-docs/user-guide/features/plugins.md line 290 (\"bundled \\\"always-works\\\" infrastructure loads automatically; third-party general plugins are opt-in\")",
+   "added": "ask-fix-t1",
+   "when": "offer_words.plugin_which in the message",
+   "status": "not_run",
+   "next": {
+    "kind": "part",
+    "label": "Open Capabilities",
+    "part": "capabilities"
+   },
+   "not_said": "Which plugins suit this person: Helper has no checked list of plugins to advise from."
+  },
+  {
+   "id": "PLUGIN_ADD",
+   "kind": "reply",
+   "text": "A plugin is an add-on. Your own Hermes can add one when you give it the name.",
+   "source": "/hermes-docs/user-guide/features/plugins.md line 429 (\"hermes plugins install <name>                # install a catalog entry\") and line 222 (\"you're asked `Enable 'name' now? [y/N]`\")",
+   "added": "ask-fix-t1",
+   "when": "offer_words.plugin_add in the message, in a how question (a plain request to install is H1, as before)",
+   "status": "not_run",
+   "next": {
+    "kind": "paste",
+    "label": "Show me what to ask",
+    "paste_text": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on."
+   },
+   "not_checked": "Not seen run: whether a person's Hermes can run hermes plugins install from a chat. The app's own clicks for plugins were not seen by hhcontent."
+  },
+  {
+   "id": "CODING",
+   "kind": "reply",
+   "text": "The docs do not say it in general. For jobs on a schedule they say you just ask in plain words.",
+   "source": "/hermes-docs/user-guide/features/cron.md line 24 (\"you can create, pause, edit, and remove jobs by asking in plain language — no CLI required\"). user-guide/desktop.md line 9 does not say whether coding is needed.",
+   "added": "ask-fix-t1",
+   "when": "offer_words.coding_ask in the message; checked before the wants step, so the row w_code (Write and run code) is not shown for it",
+   "status": "not_run",
+   "offer": "general"
+  },
+  {
+   "id": "PICK_FIRST",
+   "kind": "reply",
+   "text": "Choose one, and I will show you how.",
+   "source": "Helper's own line",
+   "added": "ask-fix-t1",
+   "when": "the person types one of small_talk.how_that.phrases while Helper's question or offer with things to pick is the last line. The same things to pick stay under this line; nothing else changes (pending stays).",
+   "status": "not_run"
+  },
+  {
+   "id": "HOW_PASTE",
+   "kind": "reply",
+   "text": "Press \"{label}\". Copy the text and paste it into a chat with Hermes.",
+   "source": "Helper's own line; {label} is the label of the paste button of Helper's last answer",
+   "added": "ask-fix-t1",
+   "when": "small_talk.how_that after a line whose next is a paste box. The same button shows again under this line.",
+   "status": "not_run"
+  },
+  {
+   "id": "HOW_PART",
+   "kind": "reply",
+   "text": "Press \"{label}\". It opens that part for you.",
+   "source": "Helper's own line; {label} is the label of the part button of Helper's last answer",
+   "added": "ask-fix-t1",
+   "when": "small_talk.how_that after a line whose next opens a part. The same button shows again under this line.",
+   "status": "not_run"
+  },
+  {
+   "id": "START_2",
+   "kind": "reply",
+   "text": "First choose the AI Hermes uses. Then send Hermes one message to see that it answers.",
+   "source": "/hermes-docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** ... The recommended fast path.\") and line 182 (\"## 3. Run Your First Chat\")",
+   "added": "ask-fix-t1",
+   "offer": "general_2",
+   "status": "not_run",
+   "when": "no_repeat: START would show twice in a row (what should I do first, right after how do I set this up); group start"
   }
  ],
  "keeps": {
@@ -1508,7 +1907,7 @@
    "status": "Wanted in this release (his words, 10 Nov 20:05: like memory.md under Helper in Settings). Whether it fits before the deadline is hhtech's and the Builder's to say (hhtech's cut order put it first to go).",
    "where": "Settings, then Plugins, then Helper (hhtech ran: docs/answers/hhtech-helper-settings.md).",
    "top_line": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
-   "top_line_2": "Only the What you do line is sent to your AI, when Helper asks it for help.",
+   "top_line_2": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.",
    "top_line_2_note": "Shown only in a build that calls a model (mode ai_picks_line or ai_writes). live-v2: was \"Only your name goes to your AI, when you type to Helper.\"",
    "box_lines": {
     "name": {
@@ -1722,7 +2121,9 @@
    "changed_settings_edit": "10 Nov 2026, 20:45 UTC: read, the new why lines and messages, Undo changes, second under_box line. Account: content/helper-settings-edit-v1.md.",
    "facts_note_12": "Changes-12: the fourth fact is the settings page's one warning, shown with the other facts whenever the page is open. Not repeated per line.",
    "top_line_2_was": "Only your name goes to your AI, when you type to Helper.",
-   "top_line_2_was_c4": "Nothing on this page is sent to any AI."
+   "top_line_2_was_c4": "Nothing on this page is sent to any AI.",
+   "top_line_2_was_c6": "Only the What you do line is sent to your AI, when Helper asks it for help.",
+   "top_line_2_note_c6": "live changes-6: same as helper-talk-live-v2.json lines_by_mode.settings_top_line_2 (AI builds); the setup chat sends three kept lines. The old line failed R1-R9 (17-word sentence)."
   },
   "disclosure_point_11": {
    "use_now": "no_ai_step",
@@ -1941,12 +2342,21 @@
     ]
    },
    "lines": {
-    "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes.",
+    "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number.",
     "WORK_LONG": "Thanks. That is too long for me to keep. In 12 words or fewer, what do you do?",
-    "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
-    "WORK_ASK": "What do you do now?"
+    "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long.",
+    "WORK_ASK": "What do you do now?",
+    "was_offer_t1": {
+     "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
+     "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes."
+    }
    },
-   "status": "not_run: route2.py is not changed in changes-4 (it still keeps nothing at F2). Data and the reference check apply_c4.py only."
+   "status": "not_run: route2.py is not changed in changes-4 (it still keeps nothing at F2). Data and the reference check apply_c4.py only.",
+   "offer_t1": {
+    "WORK_LONG_2": "general",
+    "WORK_SECRET": "general",
+    "note": "offer-t1: these two lines end with the offer general, as F2 does."
+   }
   }
  },
  "opening": {
@@ -2215,36 +2625,7 @@
    "tell me how",
    "show me how"
   ],
-  "skip_starts": [
-   "what is",
-   "what's",
-   "whats",
-   "what are",
-   "what does",
-   "what do",
-   "why",
-   "is it",
-   "is that",
-   "is this",
-   "are there",
-   "does it",
-   "does that",
-   "do i need",
-   "should i",
-   "which",
-   "how do i",
-   "how can i",
-   "how to",
-   "can i",
-   "how",
-   "explain",
-   "could you explain",
-   "can you explain",
-   "would you explain",
-   "please explain",
-   "tell me how",
-   "show me how"
-  ],
+  "skip_starts": ["what is", "what's", "whats", "what are", "what does", "what do", "why", "is it", "is that", "is this", "are there", "does it", "does that", "do i need", "should i", "which", "how do i", "how can i", "how to", "can i", "how", "explain", "could you explain", "can you explain", "would you explain", "please explain", "tell me how", "show me how"],
   "how_phrases": [
    "how to",
    "how do i",
@@ -2263,126 +2644,7 @@
    "connect my",
    "link my"
   ],
-  "build_words": [
-   "do it for me",
-   "do this for me",
-   "do that for me",
-   "can you install",
-   "could you install",
-   "would you install",
-   "please install",
-   "install it",
-   "install this",
-   "install that",
-   "install them",
-   "can you connect",
-   "could you connect",
-   "please connect",
-   "connect it",
-   "connect this",
-   "can you build",
-   "could you build",
-   "please build",
-   "build me",
-   "build it",
-   "can you set up",
-   "could you set up",
-   "please set up",
-   "set it up",
-   "set this up",
-   "set everything up",
-   "set it all up",
-   "can you configure",
-   "please configure",
-   "configure it",
-   "can you enable",
-   "please enable",
-   "enable it",
-   "turn it on",
-   "switch it on",
-   "deploy it",
-   "just do it",
-   "do it now",
-   "build an app",
-   "make an app",
-   "build a website",
-   "make a website",
-   "build a bot",
-   "make a bot",
-   "write the code",
-   "do it all",
-   "make it work",
-   "do everything",
-   "connect my chatgpt",
-   "connect my claude",
-   "connect chatgpt",
-   "connect claude",
-   "add my key",
-   "add my api key",
-   "use my key",
-   "here is my key",
-   "here's my key",
-   "my key is",
-   "switch my model",
-   "change my model",
-   "change the model",
-   "set my model",
-   "download a model",
-   "download the model",
-   "install a model",
-   "install the model",
-   "sign me in",
-   "log me in",
-   "sign in for me",
-   "log in for me",
-   "set up a server",
-   "set up my server",
-   "rent a server",
-   "rent me a server",
-   "deploy hermes",
-   "move hermes",
-   "move it to",
-   "connect to my server",
-   "connect my server",
-   "set up hermes cloud",
-   "sign up for hermes cloud",
-   "sign me up",
-   "install hermes",
-   "keep my computer awake",
-   "install a skill",
-   "install the skill",
-   "install a plugin",
-   "install the plugin",
-   "add a skill",
-   "add the skill",
-   "add this skill",
-   "add a plugin",
-   "add the plugin",
-   "add this plugin",
-   "add an mcp",
-   "add the mcp",
-   "set up mcp",
-   "set up an mcp",
-   "connect gmail",
-   "connect my gmail",
-   "connect my email",
-   "connect my calendar",
-   "connect github",
-   "connect my github",
-   "connect notion",
-   "connect my notion",
-   "write a skill",
-   "create a skill",
-   "make a skill",
-   "build a plugin",
-   "make a plugin",
-   "write a plugin",
-   "turn on the",
-   "switch on the",
-   "enable the",
-   "connect my",
-   "link my"
-  ],
+  "build_words": ["do it for me", "do this for me", "do that for me", "can you install", "could you install", "would you install", "please install", "install it", "install this", "install that", "install them", "can you connect", "could you connect", "please connect", "connect it", "connect this", "can you build", "could you build", "please build", "build me", "build it", "can you set up", "could you set up", "please set up", "set it up", "set this up", "set everything up", "set it all up", "can you configure", "please configure", "configure it", "can you enable", "please enable", "enable it", "turn it on", "switch it on", "deploy it", "just do it", "do it now", "build an app", "make an app", "build a website", "make a website", "build a bot", "make a bot", "write the code", "do it all", "make it work", "do everything", "connect my chatgpt", "connect my claude", "connect chatgpt", "connect claude", "add my key", "add my api key", "use my key", "here is my key", "here's my key", "my key is", "switch my model", "change my model", "change the model", "set my model", "download a model", "download the model", "install a model", "install the model", "sign me in", "log me in", "sign in for me", "log in for me", "set up a server", "set up my server", "rent a server", "rent me a server", "deploy hermes", "move hermes", "move it to", "connect to my server", "connect my server", "set up hermes cloud", "sign up for hermes cloud", "sign me up", "install hermes", "keep my computer awake", "install a skill", "install the skill", "install a plugin", "install the plugin", "add a skill", "add the skill", "add this skill", "add a plugin", "add the plugin", "add this plugin", "add an mcp", "add the mcp", "set up mcp", "set up an mcp", "connect gmail", "connect my gmail", "connect my email", "connect my calendar", "connect github", "connect my github", "connect notion", "connect my notion", "write a skill", "create a skill", "make a skill", "build a plugin", "make a plugin", "write a plugin", "turn on the", "switch on the", "enable the", "connect my", "link my"],
   "build_pair": {
    "must_have": "for me",
    "and_one_of": [
@@ -2463,6 +2725,36 @@
    "make me an app",
    "make me a website"
   ],
+  "model_pick_rule": {
+   "rule": "The first call's pick build is taken (H1 with the paste box) only when all three hold: the message does not start with one of skip_starts; it has none of how_phrases; and it does not start with one of not_when_starts. Otherwise the pick is read as none and the turn goes on as if the AI had said none.",
+   "not_when_starts": [
+    "what",
+    "which",
+    "who",
+    "where",
+    "when",
+    "why",
+    "how",
+    "should",
+    "do i",
+    "do you",
+    "does",
+    "is",
+    "are",
+    "am i",
+    "can i",
+    "could i",
+    "will it",
+    "can it",
+    "can hermes",
+    "must i",
+    "have i"
+   ],
+   "why": "hhtech-live-run2 section 2 item 3: the 2B picked build for \"what should I set up first\" and Helper showed the can't-do line. A message that opens with a question word asks something; it does not ask Helper to do something. A real request the build words missed (\"can you book me a flight?\") opens with can you, please, or a verb, and is still taken.",
+   "reference": "dev/checks/hhcontent-talk-v2/route2.py now holds all three conditions (ask-fix-t1).",
+   "added": "live changes-9",
+   "status": "ran_on_recorded (check_c9.py: every recorded first-call pick of build)"
+  },
   "build_question_rule": "changes-16 (hhtech-wants-run.md no. 30). When the message starts with one of make_not_when_starts (can it, can hermes, will it ...) and has one of build_question_words, it is a question about Hermes, not an order: line H2, not H1. Checked after skip_starts and how_phrases, before build_words. Other build words after can it (can it set it up) are unchanged. changes-15's rule stays: can it make me a summary every morning has no build_question_word and gets sch1.",
   "software_verbs": [
    "write",
@@ -2719,8 +3011,25 @@
    "weak_key_words": [],
    "question": {
     "id": "mem-q",
-    "text": "What do you want Hermes to remember?",
-    "answers": [],
+    "text": "Do you want Hermes to remember you, or find old chats?",
+    "answers": [
+     {
+      "label": "Things about me",
+      "gives": "mem1"
+     },
+     {
+      "label": "Our old chats",
+      "gives": "mem2"
+     },
+     {
+      "label": "It forgot something",
+      "gives": "mem3"
+     },
+     {
+      "label": "Separate notes per Hermes",
+      "gives": "mem4"
+     }
+    ],
     "answers_off_7": [
      {
       "label": "Things about me",
@@ -2739,7 +3048,8 @@
       "gives": "mem4"
      }
     ],
-    "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them."
+    "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them.",
+    "text_was_offer_t1": "What do you want Hermes to remember?"
    },
    "plain": {
     "id": "mem0",
@@ -3172,6 +3482,12 @@
     "next": {
      "kind": "part",
      "label": "Open Messaging"
+    },
+    "then": {
+     "id": "msg0-then",
+     "text": "In the Hermes app, open Messaging and pick your chat app. For Telegram, press Create with QR.",
+     "source": "user-guide/desktop.md line 451 (msg1 and msg2's source); content/dash-setup-list-v2.json, Chat apps steps",
+     "added": "live changes-6: said for and then / what next / how right after msg0, with no AI; handed as a row to the AI as a follow-up"
     }
    },
    "needs": [
@@ -3193,6 +3509,13 @@
       "kind": "part",
       "label": "Open Messaging",
       "part": "messaging"
+     },
+     "then": {
+      "id": "msg1-then",
+      "text": "Scan the code with Telegram on your phone. Hermes makes the bot, lets only you in, and restarts by itself.",
+      "source": "user-guide/desktop.md line 487 in /hermes-docs (\"scan the code (or open the link) in Telegram, and Hermes creates the bot, detects your user ID for the allowlist, saves the credentials, and restarts the gateway for you\"); the same two sentences as content/dash-setup-list-v2.json, chat_apps steps 3 and 4",
+      "added": "live changes-9: said for and then / what next / how right after msg1, with no AI, as msg0-then is after msg0; handed as a row to the AI as a follow-up. Right after msg0-then it is also the next step (msg0-then ends at Create with QR).",
+      "status": "not_run"
      }
     },
     {
@@ -3345,8 +3668,25 @@
    "weak_key_words": [],
    "question": {
     "id": "sch-q",
-    "text": "What should Hermes do on a schedule, such as a daily summary?",
-    "answers": [],
+    "text": "Do you want a daily job, a reminder, or a regular check?",
+    "answers": [
+     {
+      "label": "A job every day",
+      "gives": "sch1"
+     },
+     {
+      "label": "A reminder",
+      "gives": "sch2"
+     },
+     {
+      "label": "A regular check",
+      "gives": "sch3"
+     },
+     {
+      "label": "My email every morning",
+      "gives": "sch5"
+     }
+    ],
     "answers_off_7": [
      {
       "label": "Send me a summary",
@@ -3366,7 +3706,8 @@
      }
     ],
     "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them.",
-    "text_before_7": "What should Hermes do on a schedule?"
+    "text_before_7": "What should Hermes do on a schedule?",
+    "text_was_offer_t1": "What should Hermes do on a schedule, such as a daily summary?"
    },
    "plain": {
     "id": "sch0",
@@ -3667,7 +4008,8 @@
       "kind": "paste",
       "label": "Show me what to ask",
       "paste_text": "Please connect {service}. If there is a ready-made MCP for it, add that. Ask me before you change anything."
-     }
+     },
+     "also_any_answer_note_ask_fix_t1": "Also not when the message is in question form (it starts with a question word): how do I give it a personality, typed while the service question was open, got this row (hhtech-ask-run.md #29)."
     },
     {
      "id": "svc2",
@@ -3745,8 +4087,21 @@
    "weak_key_words": [],
    "question": {
     "id": "bot-q",
-    "text": "What would a second Hermes do for you?",
-    "answers": [],
+    "text": "Do you want one more Hermes, or two that work together?",
+    "answers": [
+     {
+      "label": "One more Hermes",
+      "gives": "bot1"
+     },
+     {
+      "label": "Two working together",
+      "gives": "bot2"
+     },
+     {
+      "label": "Many chats in one",
+      "gives": "bot3"
+     }
+    ],
     "answers_off_7": [
      {
       "label": "A different kind of work",
@@ -3761,7 +4116,8 @@
       "gives": "bot3"
      }
     ],
-    "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them."
+    "answers_note_7": "No answers to pick since changes-7 (answers.when_shown). The old ones are kept here only so they can come back if he wants them.",
+    "text_was_offer_t1": "What would a second Hermes do for you?"
    },
    "plain": {
     "id": "bot0",
@@ -4035,6 +4391,14 @@
       "id": "use1-next",
       "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
       "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many.",
+      "mean": {
+       "id": "use1-next-mean",
+       "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+       "source": "the same as use1-next: reference/faq.md lines 558 to 559 (/usage); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" (dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png, opened by Lead)",
+       "rule": "Kind mean (what do you mean, i don't get it, explain ...) right after use1-next gives this line with no AI, not MEAN_NONE. Kind mean right after this line gives MEAN_NONE. With an AI it is a follow-up and this line is handed as a row after use1-next.",
+       "added": "live changes-9 (hhtech-live-run2 section 2: every AI got MEAN_NONE here)",
+       "status": "not_run"
+      },
       "label_was_17": "What helps",
       "text_was_17": "Start a new chat when one gets long. Also switch off actions you never use."
      },
@@ -4105,6 +4469,14 @@
       "id": "use3-next",
       "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
       "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many.",
+      "mean": {
+       "id": "use3-next-mean",
+       "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+       "source": "the same as use3-next: reference/faq.md lines 558 to 559 (/usage); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" (dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png, opened by Lead)",
+       "rule": "Kind mean (what do you mean, i don't get it, explain ...) right after use3-next gives this line with no AI, not MEAN_NONE. Kind mean right after this line gives MEAN_NONE. With an AI it is a follow-up and this line is handed as a row after use3-next.",
+       "added": "live changes-9 (hhtech-live-run2 section 2: every AI got MEAN_NONE here)",
+       "status": "not_run"
+      },
       "label_was_17": "What helps",
       "text_was_17": "Each message also carries a list of Hermes's actions. Switch off the ones you never use."
      },
@@ -4185,6 +4557,13 @@
     "kind": "part",
     "label": "Open Capabilities",
     "part": "capabilities"
+   },
+   "mean": {
+    "id": "skill-mean",
+    "text": "Think of a skill as a recipe. Hermes follows its steps when a task needs it.",
+    "source": "the same as the skill line: getting-started/quickstart.md line 295 (\"on-demand instruction documents that teach Hermes how to do a specific task ... a step-by-step procedure\"). 'recipe' is hhcontent's own everyday comparison, not a docs word.",
+    "added": "ask-fix-t1",
+    "status": "not_run"
    }
   },
   {
@@ -4205,6 +4584,13 @@
     "kind": "part",
     "label": "Open Capabilities",
     "part": "capabilities"
+   },
+   "mean": {
+    "id": "plugin-mean",
+    "text": "It is like an app on your phone. You add it, and Hermes gets one more feature.",
+    "source": "the same as the plugin line: user-guide/features/plugins.md line 10. 'like an app on your phone' is hhcontent's own everyday comparison, not a docs word.",
+    "added": "ask-fix-t1",
+    "status": "not_run"
    }
   },
   {
@@ -4982,7 +5368,15 @@
     "that doesn't help",
     "that doesnt help",
     "that did nothing",
-    "nothing happened"
+    "nothing happened",
+    "not answering",
+    "isn't answering",
+    "isnt answering",
+    "not responding",
+    "doesn't answer",
+    "doesnt answer",
+    "no answer",
+    "not replying"
    ],
    "again": [
     "again",
@@ -5003,7 +5397,8 @@
    "WHERE",
    "skill by name",
    "wants",
-   "written"
+   "written",
+   "then"
   ],
   "again_note": "skill by name: the skills-by-name line (S1, S2). wants: a row of helper-wants-v1.json. written: a reply written by the person's AI (AI builds only); it is shown again word for word, with no new call. Not brought back: small talk, questions, don't-know lines, AGAIN, MEAN_NONE, H1 and H2 (a paste box is on screen already), K1, RM lines.",
   "lines": {
@@ -5033,7 +5428,8 @@
    "words": [
     "how",
     "and",
-    "and then"
+    "and then",
+    "why"
    ],
    "words_note": "live-v2 changes-2 (Lead's job of 11 Nov 02:58): and and and then added (so also and? and and then?). The whole message is compared, so these may be more than one word; the one-word limit of rule (c) does not apply here. and then was N1 here before, not CUT; it now gets what mean_rule gives, like how.",
    "after": [
@@ -5043,7 +5439,8 @@
     "wants",
     "COST",
     "WHERE",
-    "written"
+    "written",
+    "then"
    ],
    "rule": "live-v2 changes-1 (Lead's job of 11 Nov 02:45; the Builder's talk-live-plan finding 3). Checked just before cut rule (c), under the same conditions (stage open, nothing pending, no topic key word, misspelling or term key word): when the whole message, after the usual cuts (so how? and how?? too), is one of words, and Helper's last line in this visit is one of after, the kind is mean, not cut. It then gets what mean_rule gives: after a topic's row, that topic's plain line with its next; after its plain line, a term line, COST, WHERE or a wants row, MEAN_NONE. In a build with an AI step it is a follow-up (helper-talk-live-v2.json follow_up). After any other line (BACK, OK, CUT, N1, a skill line ...), how and and stay cut and and then stays N1, as before.",
    "after_note": "The same list as helper-talk-live-v2.json follow_up.rule. wants: a row of helper-wants-v1.json (the plugin's kind want). written: a reply written by the person's AI that used rows (AI builds only)."
@@ -5093,7 +5490,8 @@
    "H1",
    "skill by name",
    "C1",
-   "AGAIN"
+   "AGAIN",
+   "then"
   ],
   "no_rule": "changes-15. A whole message no, nope or nah (kind ok by the list) counts as kind wrong when nothing is pending and Helper's line just before is one of no_means_wrong_after (an answer). Otherwise it stays kind ok, as in changes-14 (no with nothing before gets OK; with a question open it is the answer).",
   "at_opening_15": "wrong is not taken at stage name or work (as hello, ok and mean).",
@@ -5129,7 +5527,48 @@
   ],
   "cut_rule_e": "changes-17, rule (e), stage open and nothing pending, as (c) and (d): at most 3 words, the first word is one of opening.question_starts, and every other word is one of cut_small_words (can you, can it, will it, is it, do you, can i). Lists come first, so how are you and who are you keep their own lines.",
   "wrong_rule_17": "changes-17. When the whole message is not on a list: it is kind wrong when it says wrong by no_repeat's words (wrong_anywhere anywhere, or wrong_starts at the start other than a bare no, nope or nah) and has no topic key word, misspelling, term key word or weak key word. At stage name or work it is not taken (at_opening_15). With a question open it is taken (when_pending_15). So no that's not right and that isn't what I asked get WRONG; no that's wrong, I meant the Hermes app on my phone (key words app, phone) goes on as before.",
-  "changed_17": "thanks_tail, cut_rule_e, wrong_rule_17; kinds unchanged."
+  "changed_17": "thanks_tail, cut_rule_e, wrong_rule_17; kinds unchanged.",
+  "stuck_note_offer_t1": "offer-t1: 'it's not answering' and the like count as stuck when the message, after the usual cuts, is one of these or starts with one followed only by what do i do / help.",
+  "mean_rule_ask_fix_t1": "Kind mean right after a term line that has a mean field shows that field's text (skill-mean, plugin-mean), with no AI. Kind mean right after that text gives MEAN_NONE with the offer words. With an AI it is a follow-up and the mean text is handed as a row. The same shape as use1-next.mean (live changes-9). Only for the mean words themselves (small_talk.kinds.mean longer than 4 letters), not for how? or and? after a term line (those stay MEAN_NONE).",
+  "how_that": {
+   "phrases": [
+    "how do i do that",
+    "how do i do this",
+    "how do i do it",
+    "how would i do that",
+    "how can i do that",
+    "how to do that",
+    "how do i set that up",
+    "how do i set it up",
+    "how do i get that",
+    "how do i start",
+    "how do i start that",
+    "how do i use that",
+    "how do i use it",
+    "show me how",
+    "where do i do that",
+    "where is that",
+    "where do i find that"
+   ],
+   "cut_first": [
+    "ok",
+    "okay",
+    "so",
+    "and",
+    "cool",
+    "right",
+    "but",
+    "well",
+    "yes",
+    "yeah",
+    "sure",
+    "great",
+    "nice",
+    "good"
+   ],
+   "rule": "ask-fix-t1. Checked first, at stage open, with or without an AI (no AI call). The whole message, lower-cased, end marks cut and the cut_first words cut from the start, is one of phrases. Then, by Helper's last line: (1) things to pick are showing (a question with answers, W1, W2, TP, or a line with an offer): line PICK_FIRST and the same things to pick stay; nothing else changes. (2) the last line has a then line (msg0, msg1): that then line. (3) its next is a line (bot1-next, use1-next, PRIV-next ...): that line's text. (4) its next is a paste box: HOW_PASTE with the same button. (5) its next opens a part: HOW_PART with the same button. (6) else: as before (N1 with its offer). Never a general line.",
+   "added": "ask-fix-t1 (hhtech-ask-run.md #1f, #7f, #12f, #19f)"
+  }
  },
  "changed_14": "hhcontent, 11 Nov 2026 (content/helper-talk-v2-changes-14.md): keeps.met and line BACK (the name is asked only the first time, ever); small_talk and lines HELLO, HELLO_SAME, THANKS, OK, HOW, WHO, AI, AI_PICK, AI_WRITES, BYE, CUT, MEAN_NONE; asks_for_topics.whole_message without ?; topic use (Using less, typed only) with use-q, use0 to use4; token is an R5 term (was R6); see_line_deleted, delete_all.after_yes, settings_file.forget_all.under and after_yes; keeps.disclosure_point_6.",
  "no_repeat": {
@@ -5155,7 +5594,10 @@
    "F3",
    "OPEN",
    "BACK",
-   "skill by name"
+   "skill by name",
+   "PICK_FIRST",
+   "HOW_PASTE",
+   "HOW_PART"
   ],
   "exempt_why": "Each says something new each time (a new paste box, a new kept thing, a new skill), or must be said every time it is true (a key, a refused secret, what Helper is), or the person asked for it (TP).",
   "groups": {
@@ -5198,6 +5640,10 @@
     "N1",
     "N1a",
     "N1_AGAIN"
+   ],
+   "start": [
+    "START",
+    "START_2"
    ]
   },
   "in_place": {
@@ -5245,6 +5691,10 @@
     "plain",
     "AGAIN",
     "MEAN_NONE"
+   ],
+   "start": [
+    "START_2",
+    "START"
    ]
   },
   "groups_rule_c3": "live-v2 changes-3 (hhtech-run-c18 section 5: Good. ... came in place of a repeated hello, hi and that's wrong). A swap line must fit the same kind of message. Each kind of small talk has its own group, and its in_place list holds only lines written for that kind: the kind's line and its _SAME line, which take turns. A swap never takes a line from another group (OK's Good. never answers a greeting or a complaint). HELLO in place carries the name, as small_line gives it (HELLO's text or text_no_name). ai_line means the line of small_talk.ai_line_by_build for this build (AI, AI_PICK or AI_WRITES): it says what Helper is, so it fits who are you.",
@@ -5577,5 +6027,829 @@
   },
   "changed_17": "changes-17: slow, speed up, speed it up, bill, too long, fills up, filling up, filled up (topic use)."
  },
- "changed_live_c4": "hhcontent, 11 Nov 2026, live-v2 changes-4: what the person does is kept (keeps.work, things.work, rules 1, 5, 8, settings rows, forget words, first_time and top_line_2 for AI builds). Account: content/helper-talk-live-v2-changes-4.md."
+ "changed_live_c4": "hhcontent, 11 Nov 2026, live-v2 changes-4: what the person does is kept (keeps.work, things.work, rules 1, 5, 8, settings rows, forget words, first_time and top_line_2 for AI builds). Account: content/helper-talk-live-v2-changes-4.md.",
+ "live_c6": {
+  "about": "live changes-6 (Lead's job of 11 Nov 05:45). With nothing pending, at stage open, after what_is and before COST/WHERE: privacy, power, hermes_vs. Then the mod3 guard, the correction rule and greet_more.",
+  "privacy_words": [
+   "private",
+   "privacy",
+   "my data",
+   "data private",
+   "data safe",
+   "is my data",
+   "who sees",
+   "who can see",
+   "who reads",
+   "leave my computer",
+   "leaves my computer",
+   "leave my laptop",
+   "stay on my computer",
+   "stays on my computer",
+   "confidential",
+   "spy",
+   "spying"
+  ],
+  "privacy_rule": "With no question of Helper's open, a privacy word gives PRIV, before any topic, so mod3 is never the answer to a privacy question. As the answer to Helper's model question (\"no, I want it free and private\") it goes on as before to mod3, which is then the right line: an AI on your own computer.",
+  "power_words": [
+   "powerful computer",
+   "strong computer",
+   "good computer",
+   "fast computer",
+   "beefy",
+   "what computer",
+   "which computer",
+   "computer do i need",
+   "kind of computer",
+   "type of computer",
+   "hardware",
+   "specs",
+   "gpu",
+   "graphics card",
+   "powerful laptop",
+   "powerful pc",
+   "strong pc",
+   "good pc"
+  ],
+  "power_rule": "A power word gives POWER.",
+  "vs_names": [
+   "chatgpt",
+   "chat gpt",
+   "claude",
+   "gemini",
+   "copilot",
+   "grok",
+   "openai"
+  ],
+  "vs_words": [
+   "difference",
+   "different",
+   "differ",
+   "compare",
+   "compared",
+   "comparison",
+   "vs",
+   "versus",
+   "better than",
+   "instead of",
+   "why use",
+   "why not just",
+   "same as",
+   "like chatgpt",
+   "like claude"
+  ],
+  "vs_rule": "A message with one of vs_names and one of vs_words gives HVC, never mod1. If HVC is ever removed, it gives N1 (no row answers it), never mod1.",
+  "hosted_words": [
+   "free model",
+   "free ai",
+   "free one",
+   "free plan",
+   "free tier",
+   "nous",
+   "chatgpt",
+   "chat gpt",
+   "claude",
+   "gpt",
+   "openai",
+   "gemini",
+   "hosted",
+   "cloud ai",
+   "online ai"
+  ],
+  "mod3_guard": "When code would show mod3 and the message names a hosted or free model (hosted_words), mod3 is not shown: the need is dropped and the topic goes on as with no need (its question, or its plain line).",
+  "correction_rule": "Kind wrong also when: stage open, nothing pending, the message starts with a wrong word (no_repeat.wrong_starts; a bare no, nope or nah alone is left to no_rule), Helper's last line is the plain line of a topic (row 0, such as msg0), and every topic the message names (strong or weak key words) is that topic. Then the topic again would only repeat that plain line. After a row (such as msg2) a correction naming the same topic goes on as before and gets the plain line (changes-15 his case). Also when only MEAN_NONE, CUT or CUT_SAME stands between that plain or then line and the correction (his run: and then?, why, then the correction).",
+  "then_rule": "After msg0 (the msg plain line), the whole message how, and, and then, then, what next, next, now what (after cutting ok, so, and) gives msg0-then with no AI. In AI builds it is a follow-up and msg0-then is handed as a row (follow_up.rows).",
+  "why_rule": "why joins how_after_rows.words: right after a line from rows it is a follow-up (kind mean), not CUT. As a first message, or after small talk, why stays CUT (Sorry, that looks cut off. Tell me a bit more about what you need.).",
+  "greet_more": {
+   "rule": "When the whole message is on no list: it is ordinary talk when it starts with a phrase of kinds hello, thanks or bye (or ok followed by a thanks or bye phrase), has at most 9 words, no ?, no topic, term or weak key word, and none of question_words after the first phrase. The kind is bye if a bye phrase is in it, else thanks if a thanks phrase is in it, else the kind of the first phrase.",
+   "question_words": [
+    "how",
+    "what",
+    "why",
+    "which",
+    "where",
+    "when",
+    "who",
+    "can",
+    "could",
+    "should",
+    "does",
+    "do",
+    "is",
+    "are",
+    "will",
+    "would",
+    "help"
+   ]
+  },
+  "then_note": "then (the line msg0-then) counts as an answer from rows: it is in how_after_rows.after, no_means_wrong_after and again_brings_back. Kind mean right after it gives MEAN_NONE (no second step is checked). The correction rule also applies right after it."
+ },
+ "offers": {
+  "about": "offer-t1 (11 Nov, his words inputs/pb-words-11nov-test-helper.md): Helper never leaves the person to think of what to type. Where a line used to invite a question, it now ends with one either/or question, shown as its own bubble right under the line, with two or three things to pick. Typing stays possible (grey hint as under any question). Each thing to pick is tied to an id, never to key words.",
+  "rule": "A fixed line with an offer field shows its text, then the offer set's question in a second bubble, with the set's picks under it. Which set: 1. the line's offer field names it. 'after_topic' means: if Helper's last answer before this line came from a topic (row, question, plain, then), the set after_topic.<that topic>; else 'general'. 2. No repeat: if the set chosen is the set shown on Helper's last line, show that set's instead set. 3. Build without the set-up conversation (helper-setup-chat-v1.json not built): every set with text_no_setup uses it and picks_no_setup.",
+  "hint": "Or type your own question",
+  "things": {
+   "setup": {
+    "label": "Set up Hermes",
+    "say": "set up Hermes",
+    "gives": {
+     "kind": "setup_chat",
+     "id": "Q_NEW",
+     "note": "the set-up conversation's first question (helper-setup-chat-v1.json questions Q_NEW); with a goal already kept, REC for the kept item"
+    }
+   },
+   "can": {
+    "label": "What Hermes can do",
+    "say": "see what it does",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "can"
+    }
+   },
+   "mod": {
+    "label": "Which AI to use",
+    "say": "pick its AI",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "mod"
+    }
+   },
+   "msg": {
+    "label": "Phone and chat apps",
+    "say": "use your phone",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "msg"
+    }
+   },
+   "mem": {
+    "label": "What Hermes remembers",
+    "say": "see what it remembers",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "mem"
+    }
+   },
+   "sch": {
+    "label": "Daily jobs and reminders",
+    "say": "set up daily jobs",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "sch"
+    }
+   },
+   "svc": {
+    "label": "Gmail and other services",
+    "say": "link a service",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "svc"
+    }
+   },
+   "bot": {
+    "label": "More than one Hermes",
+    "say": "add a second Hermes",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "bot"
+    }
+   },
+   "what": {
+    "label": "What Hermes is",
+    "say": "know what Hermes is",
+    "gives": {
+     "kind": "line",
+     "id": "HERMES"
+    }
+   },
+   "mig_app": {
+    "label": "From another AI app",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_APP"
+    }
+   },
+   "mig_pc": {
+    "label": "To another computer",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_PC"
+    }
+   },
+   "fix_ai": {
+    "label": "Check its AI",
+    "gives": {
+     "kind": "topic_pick",
+     "id": "mod"
+    }
+   },
+   "fix_app": {
+    "label": "Check my chat app",
+    "gives": {
+     "kind": "row",
+     "id": "msg3"
+    }
+   },
+   "skill": {
+    "label": "Skills",
+    "gives": {
+     "kind": "term",
+     "id": "skill"
+    }
+   },
+   "plugin": {
+    "label": "Plugins",
+    "gives": {
+     "kind": "term",
+     "id": "plugin"
+    }
+   },
+   "mcp": {
+    "label": "MCP",
+    "gives": {
+     "kind": "term",
+     "id": "mcp"
+    }
+   },
+   "pay_mod1": {
+    "label": "ChatGPT",
+    "gives": {
+     "kind": "row",
+     "id": "mod1"
+    }
+   },
+   "pay_mod2": {
+    "label": "Claude",
+    "gives": {
+     "kind": "row",
+     "id": "mod2"
+    }
+   },
+   "pay_mod4": {
+    "label": "Neither",
+    "gives": {
+     "kind": "row",
+     "id": "mod4"
+    }
+   },
+   "pay_mod3": {
+    "label": "I want it free",
+    "gives": {
+     "kind": "row",
+     "id": "mod3"
+    }
+   }
+  },
+  "sets": {
+   "general": {
+    "text": "Do you want to set up Hermes, or see what it does?",
+    "picks": [
+     "setup",
+     "can"
+    ],
+    "text_no_setup": "Do you want to see what Hermes does, or pick its AI?",
+    "picks_no_setup": [
+     "can",
+     "mod"
+    ],
+    "instead": "general_2"
+   },
+   "general_2": {
+    "text": "Do you want to pick its AI, or chat from your phone?",
+    "picks": [
+     "mod",
+     "msg"
+    ],
+    "instead": "general"
+   },
+   "dont_know": {
+    "text": "Do you want to know what Hermes is, or set it up?",
+    "picks": [
+     "what",
+     "setup"
+    ],
+    "text_no_setup": "Do you want to know what Hermes is, or what it does?",
+    "picks_no_setup": [
+     "what",
+     "can"
+    ],
+    "instead": "general_2"
+   },
+   "words": {
+    "text": "Do you want one of these words explained?",
+    "picks": [
+     "skill",
+     "plugin",
+     "mcp"
+    ],
+    "instead": "general",
+    "labels_note": "The picks are the term labels Skills, Plugins, MCP, as under W1 and W2 (answers.term_labels_note: not checked against R5 and R6)."
+   },
+   "move": {
+    "text": "Do you mean from another AI app, or to a new computer?",
+    "picks": [
+     "mig_app",
+     "mig_pc"
+    ],
+    "instead": "general"
+   },
+   "stuck": {
+    "text": "Do you want to check its AI, or your chat app?",
+    "picks": [
+     "fix_ai",
+     "fix_app"
+    ],
+    "instead": "general",
+    "source": "dev/hermes-src/website/docs/reference/faq.md line 255 (\"The AI model service isn't reachable right now\") and line 423 (\"#### Bot not responding to messages\"): the two causes the FAQ names for no answer"
+   },
+   "after_topic": {
+    "template": "Do you want to {say1}, or {say2}?",
+    "by_topic": {
+     "mod": [
+      "msg",
+      "mem"
+     ],
+     "msg": [
+      "sch",
+      "svc"
+     ],
+     "mem": [
+      "msg",
+      "bot"
+     ],
+     "sch": [
+      "svc",
+      "msg"
+     ],
+     "svc": [
+      "sch",
+      "mod"
+     ],
+     "bot": [
+      "mem",
+      "msg"
+     ],
+     "use": [
+      "mod",
+      "can"
+     ]
+    },
+    "instead": "general",
+    "note": "Two next things that follow from the topic just answered. Rows carry one next each (their button), so the second-next comes from this list, not from the row."
+   },
+   "pay": {
+    "text": "Do you already pay for ChatGPT or Claude?",
+    "picks": [
+     "pay_mod1",
+     "pay_mod2",
+     "pay_mod4",
+     "pay_mod3"
+    ],
+    "instead": "general",
+    "note": "ask-fix-t1: the model topic's own question and answers, shown as an offer under MODEL_FOR. A pick gives the row and is kept as a picked answer to that question is."
+   }
+  },
+  "on_lines": {
+   "F2": "general",
+   "F3": "general",
+   "NAME_AGAIN": "general",
+   "NAME_NEW": "general",
+   "BACK": "general",
+   "HELLO": "general",
+   "HELLO_SAME": "general",
+   "THANKS": "after_topic",
+   "THANKS_SAME": "after_topic",
+   "OK": "after_topic",
+   "OK_SAME": "after_topic",
+   "HOW": "general",
+   "HOW_SAME": "general",
+   "CUT": "general",
+   "CUT_SAME": "general",
+   "MEAN_NONE": "words",
+   "WRONG": "general",
+   "WRONG_SAME": "general",
+   "AGAIN": "general",
+   "STUCK": "stuck",
+   "STUCK_SAME": "general",
+   "N1": "dont_know",
+   "N1a": "dont_know",
+   "N1_AGAIN": "dont_know",
+   "WHO": "general",
+   "AI": "general",
+   "AI_PICK": "general",
+   "AI_WRITES": "general",
+   "MIG": "move",
+   "MIG_NOT_LISTED": "general",
+   "HERMES": "general",
+   "START": "general"
+  }
+ },
+ "offer_words": {
+  "about": "offer-t1, part 3. Checked in this order, at stage open, after what_is and before cost/where; only when no topic or term key word matched (except MIG names).",
+  "migrate": [
+   "migrate",
+   "migrating",
+   "migration",
+   "move from",
+   "move over",
+   "bring over",
+   "bring my stuff",
+   "bring things",
+   "bring my",
+   "switch from",
+   "import my",
+   "move my stuff",
+   "move to hermes",
+   "moving to hermes",
+   "transfer",
+   "switch over",
+   "switching from",
+   "switching over",
+   "coming from",
+   "import my chats",
+   "import chats",
+   "chats from",
+   "bring my chats",
+   "move my chats"
+  ],
+  "listed_apps": [
+   "openclaw",
+   "claude code",
+   "codex",
+   "cursor",
+   "grok bot",
+   "openbot",
+   "clawdbot",
+   "moltbot"
+  ],
+  "not_listed_apps": [
+   "chatgpt",
+   "chat gpt",
+   "gemini",
+   "copilot",
+   "perplexity"
+  ],
+  "computer": [
+   "new computer",
+   "another computer",
+   "new laptop",
+   "another laptop",
+   "new mac",
+   "new pc",
+   "other computer",
+   "new machine",
+   "another machine"
+  ],
+  "what_hermes": [
+   "what is hermes",
+   "what's hermes",
+   "whats hermes",
+   "what is this",
+   "what does hermes do",
+   "tell me about hermes"
+  ],
+  "start": [
+   "get started",
+   "getting started",
+   "where to begin",
+   "where do i begin",
+   "where to start",
+   "where do i start",
+   "set up first",
+   "start with",
+   "i'm lost",
+   "im lost",
+   "i am lost",
+   "don't know where",
+   "dont know where",
+   "what do i do first",
+   "what should i do first",
+   "set this up",
+   "set it up",
+   "set hermes up",
+   "set up hermes",
+   "do first",
+   "start first",
+   "first step",
+   "what first"
+  ],
+  "key": [
+   "api key",
+   "api keys",
+   "a key",
+   "an api",
+   "openai key",
+   "anthropic key",
+   "claude key",
+   "my key",
+   "key go",
+   "keys go"
+  ],
+  "update": [
+   "update hermes",
+   "upgrade hermes",
+   "update the app",
+   "new version",
+   "newest version",
+   "latest version",
+   "how do i update",
+   "how to update"
+  ],
+  "safe": [
+   "delete my files",
+   "deletes my files",
+   "delete files",
+   "delete my stuff",
+   "is it safe",
+   "safe to use",
+   "break my computer",
+   "mess up my computer"
+  ],
+  "personality": [
+   "personality",
+   "its tone",
+   "how it talks",
+   "talk differently",
+   "change how it talks"
+  ],
+  "stuck_more": [
+   "not answering",
+   "isn't answering",
+   "isnt answering",
+   "not responding",
+   "doesn't answer",
+   "doesnt answer",
+   "no answer",
+   "not replying",
+   "is broken",
+   "it's broken",
+   "its broken",
+   "something broke",
+   "it broke",
+   "keeps crashing",
+   "crashed",
+   "an error",
+   "error message"
+  ],
+  "laptop_off": [
+   "laptop is closed",
+   "laptop closed",
+   "close my laptop",
+   "computer is off",
+   "laptop is off",
+   "turn off my computer",
+   "computer off"
+  ],
+  "key_what_starts": [
+   "what is",
+   "what's",
+   "whats",
+   "what are",
+   "what does"
+  ],
+  "laptop_off_gives": "row msg3 (\"It answers only while its computer is on. ...\"), when no topic, weak or term key word is in the message; with a schedule word, sch4 answers as before",
+  "chatgpt_names": [
+   "chatgpt",
+   "chat gpt"
+  ],
+  "agent_what": [
+   "agent",
+   "agents",
+   "ai agent",
+   "ai agents",
+   "an agent"
+  ],
+  "what_hermes_any": [
+   "what even is this",
+   "what is this app",
+   "what's this app",
+   "whats this app",
+   "what does this app",
+   "what even is hermes",
+   "what is this thing",
+   "what is this program"
+  ],
+  "key_where": [
+   "where do i put",
+   "where do i enter",
+   "where do i add",
+   "where do i paste",
+   "where to put",
+   "where should i put",
+   "where can i put",
+   "where does",
+   "put my",
+   "enter my",
+   "paste my",
+   "add my",
+   "key go",
+   "keys go"
+  ],
+  "free": [
+   "without paying",
+   "not pay",
+   "don't want to pay",
+   "dont want to pay",
+   "do not want to pay",
+   "pay nothing",
+   "cost nothing",
+   "costs nothing",
+   "no money",
+   "for free"
+  ],
+  "model_for": [
+   "which model",
+   "what model",
+   "which ai",
+   "what ai",
+   "best model",
+   "best ai",
+   "model should",
+   "ai should"
+  ],
+  "model_change": [
+   "change the model",
+   "change model",
+   "change my model",
+   "switch model",
+   "switch models",
+   "switch the model",
+   "change the ai",
+   "change its ai",
+   "switch the ai",
+   "switch ai",
+   "different model",
+   "another model",
+   "swap the model"
+  ],
+  "own_ai": [
+   "run the ai",
+   "run an ai",
+   "run ai",
+   "ai on my",
+   "model on my",
+   "run a model",
+   "run models",
+   "run the model"
+  ],
+  "skill_add": [
+   "add a skill",
+   "add skills",
+   "add a new skill",
+   "add new skills",
+   "install a skill",
+   "install skills",
+   "get a skill",
+   "get more skills",
+   "get new skills"
+  ],
+  "plugin_which": [
+   "what plugins",
+   "which plugins",
+   "which plugin",
+   "plugins should",
+   "plugins do i need",
+   "need plugins",
+   "need a plugin",
+   "need any plugins",
+   "best plugins"
+  ],
+  "plugin_add": [
+   "install a plugin",
+   "install plugins",
+   "install the plugin",
+   "install this plugin",
+   "add a plugin",
+   "add plugins",
+   "get a plugin"
+  ],
+  "coding_ask": [
+   "know coding",
+   "need to know coding",
+   "know how to code",
+   "need to code",
+   "have to code",
+   "need coding",
+   "without coding",
+   "know programming",
+   "be a programmer",
+   "be a developer",
+   "not a programmer",
+   "not a developer",
+   "can't code",
+   "cant code",
+   "not technical",
+   "non-technical"
+  ],
+  "pending_rule": "ask-fix-t1: while Helper's own question is open (pending), a typed message in question form that these words recognise is a new question, not an answer; its line shows and the open question is dropped. Not for free (free words answer the pay question, row mod3 as picked) and not for laptop_off.",
+  "order_ask_fix_t1": "migrate (computer, listed app, chatgpt -> MIG_CHATGPT, other not-listed app, else MIG); agent_what -> AGENT; key (key_where -> KEY_WHERE, what-start -> KEY_WHAT, else KEY); personality; stuck_more; free -> FREE; model_change -> MODEL_CHANGE; model_for with the word for -> MODEL_FOR; own_ai with one of about_rule.rows.mod3 -> row mod3; skill_add -> SKILL_ADD; plugin_which -> PLUGIN_WHICH; plugin_add -> PLUGIN_ADD; coding_ask -> CODING; what_hermes_any -> HERMES; then, only with no topic, weak or term key word, as before: laptop_off, what_hermes (whole message), update, safe, start.",
+  "free_note": "free model, free ai and free one are not here: they stay with the model topic (its question, and the mod3 guard of live changes-6)."
+ },
+ "changed_offer_t1": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2-changes-8.md): offers (new), fixed lines rewritten to end with an either/or offer, mem/sch/bot questions get answers, new lines MIG, MIG_APP, MIG_NOT_LISTED, MIG_PC, HERMES, START, KEY, UPDATE, SAFE, PERSONALITY, offer_words (new), where.words and small_talk.kinds.stuck widened.",
+ "about_rule": {
+  "about": "ask-fix-t1 (hhcontent, 11 Nov 2026, content/helper-talk-live-v2-changes-10.md). Stops one key word from choosing a line that answers another question (hhtech-ask-run.md section 2).",
+  "rule": "A row found by code from typed key words is final only when the message also has one of that row's about words (rows below). It is also final when the person picked it (a button, an offer pick, an answer under Helper's question) or typed it as the answer to that topic's own open question (pending). Otherwise it is a weak hit: the row's sentence is not shown from code. The same holds for a row that code would show again only because it was found earlier in the visit (found).",
+  "weak_hit_then": {
+   "with_ai": "The turn goes on to the person's AI as when no row was found; the AI may still choose that row from the facts.",
+   "no_ai": "The topic's own question with its things to pick, also when it was asked before in this visit. Only if that question was Helper's last line: the don't-know line N1 with its offer. A kept answer is not shown for a weak hit."
+  },
+  "rows": {
+   "mod1": [
+    "plan",
+    "plans",
+    "subscription",
+    "subscriptions",
+    "subscribe",
+    "subscribed",
+    "sign in",
+    "sign-in",
+    "signed in",
+    "log in",
+    "login",
+    "account",
+    "accounts",
+    "pay",
+    "pays",
+    "paying",
+    "paid",
+    "i have",
+    "i've got",
+    "i got",
+    "i already",
+    "i use",
+    "i'm on",
+    "im on",
+    "use my",
+    "with my",
+    "works with",
+    "work with",
+    "plus",
+    "use chatgpt",
+    "use gpt",
+    "use openai",
+    "with chatgpt",
+    "my chatgpt"
+   ],
+   "mod2": [
+    "plan",
+    "plans",
+    "subscription",
+    "subscriptions",
+    "subscribe",
+    "subscribed",
+    "sign in",
+    "sign-in",
+    "signed in",
+    "log in",
+    "login",
+    "account",
+    "accounts",
+    "pay",
+    "pays",
+    "paying",
+    "paid",
+    "i have",
+    "i've got",
+    "i got",
+    "i already",
+    "i use",
+    "i'm on",
+    "im on",
+    "use my",
+    "with my",
+    "works with",
+    "work with",
+    "max",
+    "pro",
+    "use claude",
+    "with claude",
+    "my claude"
+   ],
+   "mod3": [
+    "own computer",
+    "my computer",
+    "own laptop",
+    "my laptop",
+    "laptop",
+    "own machine",
+    "my machine",
+    "my pc",
+    "my mac",
+    "local",
+    "locally",
+    "offline",
+    "private",
+    "privately",
+    "no account",
+    "ollama",
+    "local ai",
+    "leaves my computer",
+    "leave my computer"
+   ]
+  },
+  "rows_note": "Rows not listed are unchanged: their key words already say what the row is about (a chat app's name for msg1/msg2, a service's name for svc1). mod1 and mod2 are about paying for a plan and signing in with it; a brand name alone (chatgpt, claude, openai, gpt, codex, anthropic) is a weak hit. mod3 is about an AI on the person's own computer; free, cheap, without paying, spend, budget alone are weak hits (the line FREE answers those).",
+  "not_covered": "Term lines (skill, plugin, MCP ...) and the rows of helper-wants-v1.json have no about words yet. For them only the new routes of offer_words stand in front (skill_add, plugin_which, plugin_add, coding_ask).",
+  "added": "ask-fix-t1",
+  "status": "ran in route2.py (no AI); not run in the app"
+ },
+ "changed_ask_fix_t1": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2-changes-10.md): about_rule (new); fixed lines MIG_CHATGPT, AGENT, KEY_WHERE, FREE, MODEL_FOR, MODEL_CHANGE, SKILL_ADD, PLUGIN_WHICH, PLUGIN_ADD, CODING, PICK_FIRST, HOW_PASTE, HOW_PART; next on PRIV and SAFE; offer set pay; mean on terms skill and plugin; small_talk.how_that; offer_words extended. Nothing of changes-8 or changes-9 removed."
 }

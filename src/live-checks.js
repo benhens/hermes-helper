@@ -13,7 +13,16 @@ const LC = LIVE_DATA.checks
 const SUBJECT_IDS = LIVE_DATA.subjects.map(s => s.id)
 const LC_R9 = pyRegExp(LC.r9_pattern, 'i')
 const LC_R6 = pyRegExp(LC.r6_pattern, 'gi')
-const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i')
+const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'gi')
+// live changes-6 (checks.list c16.allow_c6, check_live.py c16_fails): guide and guides fail only in a sentence that
+// speaks of Helper; every other product word fails as before
+const C16_HELPER = pyRegExp(LC.c16_allow.speaks_of_helper, '')
+export function c16Fails(reply) {
+  for (const sent of String(reply).split(/(?<=[.!?])\s+/)) {
+    for (const m of sent.matchAll(LC_R8)) if (!LC.c16_allow.words.includes(m[0].toLowerCase()) || C16_HELPER.test(sent)) return true
+  }
+  return false
+}
 const LC_R5 = LC.r5_patterns.map(p => pyRegExp(p, 'i'))
 const GLOSS_RX = LC.gloss.map(g => [pyRegExp(g.term, g.ignore_case ? 'i' : ''), pyRegExp(g.explained_by, 'i')])
 const OK_CAPS = new Set(LC.ok_caps)
@@ -60,9 +69,18 @@ export function readPick(raw, ids) {
 // the ids after the last USED: (null when there is none: not a failure, as run).
 export function readWritten(raw) {
   let s = cutThink(raw).trim()
-  const usedAll = [...s.matchAll(/USED:\s*(.*)$/gm)]
-  const used = usedAll.length ? usedAll[usedAll.length - 1][1].match(/[A-Za-z_0-9-]+/g) || [] : null
-  s = s.replace(/\n?\s*USED:.*$/gm, '').trim()
+  // live changes-6 (checks_c5.used_reader, check_live.py read_used): the label in any case (USED, Used, used), the last
+  // one; from the label to the end of its line is the list, cut from the reply. When nothing is left after trimming
+  // spaces, full stops and commas, or only the word none, there is no reply ("Used: none." is never shown). A second
+  // label still in the reply fails c26.
+  const usedAll = [...s.matchAll(/\bused\s*:(.*)$/gim)]
+  let used = null
+  if (usedAll.length) {
+    const m = usedAll[usedAll.length - 1]
+    used = m[1].match(/[A-Za-z_0-9-]+/g) || []
+    s = (s.slice(0, m.index) + s.slice(m.index + m[0].length)).trim()
+    if (/^(?:none)?$/i.test(s.replace(/^[\s.,]+|[\s.,]+$/g, ''))) s = ''
+  }
   // a code fence around the whole reply, then quote marks around the whole reply
   s = s.replace(/^```\w*\s*|\s*```$/g, '').trim()
   if (s.length > 1 && '"\'\u201c'.includes(s[0]) && '"\'\u201d'.includes(s[s.length - 1])) s = s.slice(1, -1).trim()
@@ -152,14 +170,16 @@ export function replyFlags(reply, rows, used, talk = {}) {
   const hc = notClasses(hand)
   for (const cls of [...notClasses(reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
   if (/http|www\.|\(/.test(reply)) out.push('c15 link or (')
-  if (LC_R8.test(reply)) out.push('c16 product word')
+  if (c16Fails(reply)) out.push('c16 product word')
   if (LC.test_phrases.some(p => low.includes(p))) out.push('c17 test')
   if (reply.includes('?') && /\?\s*$/.test(talk.lastLine || '')) out.push('c18 a second question')
   const mc = moneyCut(reply)
   for (const [m, re] of MONEY_RX) if (re.test(mc) && !hand.includes(m)) out.push('c19 money ' + m)
   const uh = (used || []).filter(u => ids.includes(u)).map(u => textOf[u]).join(' ').toLowerCase()
-  if (/\b(only|never)\b/.test(uh) && !/\b(only|never)\b/.test(low)) out.push('c20 dropped only/never')
-  if (!ids.length || !used || !used.length || (used.length === 1 && used[0].toLowerCase() === 'none')) {
+  if (c20Fails(uh, low)) out.push('c20 dropped only/never')
+  // live changes-6 (c21.what): ordinary talk only when no row was handed, or the USED line lists nothing or only none;
+  // a reply with no USED line after rows were handed gets every other check, as a reply from rows does
+  if (!ids.length || (used && (!used.length || (used.length === 1 && used[0].toLowerCase() === 'none')))) {
     if (/\d/.test(reply) || reply.includes('"') || LC_R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
   }
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
@@ -168,20 +188,67 @@ export function replyFlags(reply, rows, used, talk = {}) {
   const c24Word = c24Fails(reply, talk.work, talk.message, hand)
   if (c24Word) out.push('c24 about the person ' + c24Word)
   // live-v2 changes-5: c26 and c27 after c24 (c25 has adopted: false and is not built)
-  const c26Word = c26Fails(reply)
+  const c26Word = c26Fails(reply, hand)
   if (c26Word) out.push('c26 notes shown ' + c26Word)
   for (const id of c27Fails(reply, talk.message || '')) out.push('c27 ' + id)
+  // offer-t1 (changes-8) c28, then live changes-9 c29 (only when the About them line was in the call)
+  if (c28Fails(reply)) out.push('c28 ends on an invitation or a question')
+  const c29Word = talk.workHanded ? c29Fails(reply, talk.work, hand) : null
+  if (c29Word) out.push('c29 what the person does ' + c29Word)
   return out
 }
 
 // live-v2 changes-5 c26: the reply holds one of the words (any case): the model's own notes or an instruction label
 // shown to the person. "USED" counts only in capitals, as a word (check_c5.py). Returns the word found, or null.
 const C26_WORDS = LC.c26.filter(w => w !== 'USED').map(w => w.toLowerCase())
-export function c26Fails(reply) {
+// live changes-6 (c26.skip_in_hand): a word that is also in the handed rows does not fail the reply; USED in capitals
+// always fails, and so does a label still in the reply after the reader cut the last one (used_reader)
+export function c26Fails(reply, hand = '') {
   const low = String(reply).toLowerCase()
-  const w = C26_WORDS.find(x => low.includes(x))
+  const h = String(hand).toLowerCase()
+  const w = C26_WORDS.find(x => low.includes(x) && !h.includes(x))
   if (w) return w
-  return /\bUSED\b/.test(reply) ? 'USED' : null
+  return /\bUSED\b/.test(reply) || /\bused\s*:/i.test(reply) ? 'USED' : null
+}
+// c20: a used row says only or never and the reply does not. Builder (job setup-chat point 14, hhtech-ask-run 19f; told
+// to Lead): "only" also counts as kept when the reply holds the three words that follow it in the row ("only while
+// Hermes is" / "It runs while Hermes is running ..."): the condition is still said. "never" must be said.
+function c20Fails(usedText, low) {
+  if (!/\b(only|never)\b/.test(usedText) || /\b(only|never)\b/.test(low)) return false
+  if (/\bnever\b/.test(usedText)) return true
+  const flat = s => s.replace(/[\u2018\u2019]/g, "'").replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ')
+  const after = [...flat(usedText).matchAll(/\bonly ((?:[a-z0-9']+ ){2}[a-z0-9']+)/g)].map(m => m[1])
+  return !(after.length && after.every(a => flat(low).includes(a)))
+}
+// offer-t1 (changes-8) c28: the reply's last sentence ends with ? or holds one of ends (any case)
+export function c28Fails(reply) {
+  const sents = String(reply).trim().split(/(?<=[.!?])\s+/).filter(s => s.trim())
+  const last = (sents[sents.length - 1] || '').toLowerCase()
+  return /\?\s*$/.test(last) || LC.c28.some(e => last.includes(e.toLowerCase()))
+}
+// live changes-9 c29 (check_c9.py c29): what the person does used as a step or as a fact about Hermes. Work words: runs
+// of 3 letters or more in the kept line, not stop words, not on skip, not a word of the handed facts; matched whole,
+// also with a final s, es or ing. Fails when a sentence with a work word also holds a step word, or holds a work word
+// that is not led in (none of lead_ins among the 3 words before it, and the word before it is not a led-in work word).
+const C29_STOP = new Set([...LIVE_DATA.stop_words, ...LC.c29.skip])
+export function c29Fails(reply, work, hand) {
+  if (!work) return null
+  const hw = new Set(String(hand).toLowerCase().match(/[a-z]{3,}/g) || [])
+  const ww = (String(work).toLowerCase().match(/[a-z]{3,}/g) || []).filter(w => !C29_STOP.has(w) && !hw.has(w))
+  if (!ww.length) return null
+  const rx = new RegExp('^(?:' + ww.map(liveEsc).join('|') + ')(?:s|es|ing)?$')
+  for (const sent of String(reply).split(/(?<=[.!?])\s+/)) {
+    const toks = sent.toLowerCase().match(/[a-z']+/g) || []
+    const at = toks.map((t, i) => (rx.test(t) ? i : -1)).filter(i => i >= 0)
+    if (!at.length) continue
+    if (toks.some(t => LC.c29.step_words.includes(t))) return 'in a step sentence'
+    const led = new Set()
+    for (const i of at) {
+      if (toks.slice(Math.max(0, i - 3), i).some(t => LC.c29.lead_ins.includes(t)) || led.has(i - 1)) led.add(i)
+      else return 'not led in: ' + toks[i]
+    }
+  }
+  return null
 }
 // live-v2 changes-5 c27: for each class, when the person's newest message (only that one) asks it (a word of asks, or
 // the whole message one of asks_whole), the reply must hold a word of gives. Returns the failed class ids, in order.
@@ -189,7 +256,11 @@ export function c26Fails(reply) {
 // A word: not next to a letter or an apostrophe (check_c5.py's hasw).
 const c27Whole = t => String(t).toLowerCase().trim().replace(/[?.! ]+$/, '').replace(/^(?:(?:ok|okay|so|and|cool|right)\b[ ,]*)+/, '').trim()
 const c27Has = (t, w) => new RegExp("(^|[^a-z'])" + liveEsc(w.toLowerCase()) + "($|[^a-z'])").test(String(t).toLowerCase())
+// live changes-7 (c27.apostrophes): curly apostrophes in the message and in the reply are read as straight ones
+const c27Apos = s => String(s).replace(/[\u2018\u2019]/g, "'")
 export function c27Fails(reply, message) {
+  reply = c27Apos(reply)
+  message = c27Apos(message)
   const w = c27Whole(message)
   return LC.c27.filter(c => ((c.asks || []).some(x => c27Has(message, x)) || (c.asks_whole || []).includes(w)) && !c.gives.some(g => c27Has(reply, g))).map(c => c.id)
 }

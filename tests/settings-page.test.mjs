@@ -12,6 +12,7 @@ import { TALK_DATA } from '../src/talk-data.js'
 import { renderKept } from '../src/settings-file.js'
 import { curlyQuotes } from '../src/quotes.js'
 import { AI_MODE } from '../src/ai-mode.js'
+import { SETUP_BUILT } from '../src/setup-built.js'
 
 const SF = TALK_DATA.keeps.settings_file
 
@@ -60,7 +61,8 @@ test('the page: hhcontent\'s top line, the box drawn from the stored record with
   assert.equal(row.props.wide, true)
   // talk-live: a second top line only in a build with an AI step (lines_by_mode.settings_top_line_2)
   // live-v2 changes-4: the What you do line is sent, so the AI builds' second top line says so
-  assert.equal(row.props.description, AI_MODE === 'no_ai_step' ? undefined : 'Only the What you do line is sent to your AI, when Helper asks it for help.')
+  // setup-chat (live changes-6): with the set-up conversation built, the line names its three rows
+  assert.equal(row.props.description, AI_MODE === 'no_ai_step' ? undefined : SETUP_BUILT ? 'These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.' : 'Only the What you do line is sent to your AI, when Helper asks it for help.')
   assert.equal(box(view).type, 'sdk:Textarea')
   assert.equal(box(view).props.value, renderKept(PETER))
   assert.match(box(view).props.value, /^Name: Peter \(Helper greets you with it\)$/m)

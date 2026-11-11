@@ -48,8 +48,15 @@ async function open(mode, { storage = fakeStorage(), host = {} } = {}) {
 }
 const helper = view => byData(view.tree, 'helper')
 const bubble = view => byData(helper(view), 'bubble')
-const line = view => (bubble(view) ? bubble(view).props['data-line'] : null)
-const said = view => spoken(byData(bubble(view), 'said')).trim()
+// setup-chat (offer-t1, changes-8): a line that carries an offer is followed by a second bubble with the offer's
+// question. line() and said() below still mean Helper's line for the message: when the bubble holds an offer, the
+// line just above it. offerLine() and offerSaid() read the offer bubble itself (tests/offers-page.test.mjs has its cases).
+const offerUp = view => !!bubble(view) && String(bubble(view).props['data-line']).startsWith('offer-')
+const lastOld = view => all(helper(view), n => n.props['data-hh'] === 'old').at(-1)
+const offerLine = view => (offerUp(view) ? bubble(view).props['data-line'] : null)
+const offerSaid = view => (offerUp(view) ? spoken(byData(bubble(view), 'said')).trim() : null)
+const line = view => (offerUp(view) ? lastOld(view).props['data-line'] : bubble(view) ? bubble(view).props['data-line'] : null)
+const said = view => (offerUp(view) ? text(lastOld(view)).replace(/^Helper said: /, '').replace(/\s+/g, ' ').trim() : spoken(byData(bubble(view), 'said')).trim())
 const dots = view => byData(helper(view), 'busy-dots')
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
 const finish = view => byData(view.tree, 'page').props.onPointerDownCapture({})
@@ -74,7 +81,7 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
   const storage = fakeStorage()
   const { view, host } = await pastOpening('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
   assert.equal(storage.data.get('kept').work, 'I run a tennis club')
-  send(view, 'what should I set up first')
+  send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 2)
   assert.doesNotMatch(host.asks[0].instructions + host.asks[0].input, /tennis/, 'never in the first call')
@@ -86,7 +93,7 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
   finish(again.view)
   send(again.view, 'what do you know about me')
   assert.deepEqual(all(byData(bubble(again.view), 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter', 'What you do: I run a tennis club'])
-  send(again.view, 'what should I set up first')
+  send(again.view, 'can it fly a kite')
   await settle()
   assert.ok(again.host.asks[1].instructions.includes(WORK))
   for (const a of again.host.asks) assert.doesNotMatch(JSON.stringify(a), /peter/i)
@@ -94,7 +101,7 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
 
 test('thinking text from the first call: the no-AI line after the dots, and no more calls in this visit', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => THINKING } })
-  send(view, 'what should I set up first')
+  send(view, 'can it fly a kite')
   assert.ok(dots(view))
   await settle()
   assert.equal(host.asks.length, 1)
@@ -112,7 +119,7 @@ test('thinking text from the first call: the no-AI line after the dots, and no m
 test('no answer in 12 s: the no-AI line at 12 s, and no more calls in this visit, also once the call has ended', async () => {
   const d = deferred()
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'what should I set up first')
+  send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 1)
   timers.fire(12000)
@@ -129,7 +136,7 @@ test('no answer in 12 s: the no-AI line at 12 s, and no more calls in this visit
 test('review: a call with no answer 12 s after it started turns the AI step off, also when the person moved on before', async () => {
   const d = deferred()
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'what should I set up first')
+  send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 1)
   // a new message before the 12 s: the waiting one gets its line, the call still runs in Hermes
@@ -146,19 +153,19 @@ test('review: a call with no answer 12 s after it started turns the AI step off,
 test('the AI step off for a visit comes back when Hermes starts again (a new visit)', async () => {
   const storage = fakeStorage()
   const a = await pastOpening('ai_writes', { storage, host: { oneshot: () => THINKING } })
-  send(a.view, 'what should I set up first')
+  send(a.view, 'can it fly a kite')
   await settle()
   assert.equal(a.host.asks.length, 1)
   const b = await open('ai_writes', { storage, host: { oneshot: (p, n) => (n === 1 ? 'mod' : 'NONE') } })
   finish(b.view)
-  send(b.view, 'what should I set up first')
+  send(b.view, 'can it fly a kite')
   await settle()
   assert.ok(b.host.asks.length >= 1, 'a new visit calls again')
 })
 
 test('a reply that sits on the USED: line falls back to the no-AI line and is no such failure: the next message still asks the AI', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'msg' : 'USED: msg0, msg1. You can chat with Hermes from apps like Telegram.') } })
-  send(view, 'what should I set up first')
+  send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 2)
   assert.equal(line(view), 'N1')
@@ -187,7 +194,7 @@ test('the first-time line and the line under Kept: of what the person does, by m
 test('\"again\" after a written reply: the same words, with no call', async () => {
   const good = `${LIVE_ROW.mod1.text}\nUSED: mod1`
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod' : good) } })
-  send(view, 'what should I set up first')
+  send(view, 'can it fly a kite')
   await settle()
   assert.equal(line(view), 'written')
   const words = said(view)

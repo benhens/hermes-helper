@@ -21,23 +21,27 @@ export const TALK_DATA = {
       "text_no_name": "Nice to meet you. What do you do?"
     },
     "F2": {
-      "text": "Thanks, {name}. Ask me anything about Hermes.",
-      "text_no_name": "Thanks. Ask me anything about Hermes."
+      "text": "Thanks, {name}.",
+      "text_no_name": "Thanks.",
+      "offer": "general"
     },
     "F3": {
-      "text": "That's fine. Ask me anything about Hermes."
+      "text": "That's fine.",
+      "offer": "general"
     },
     "N1": {
-      "text": "Sorry, I don't have checked information on that yet. I only say what I have checked."
+      "text": "Sorry, I don't have checked information on that yet. I only say what I have checked.",
+      "offer": "dont_know"
     },
     "N1a": {
-      "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use."
+      "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
+      "offer": "dont_know"
     },
     "N_HINT": {
       "text": "To see what I can help with, type \"what can I ask you\"."
     },
     "TP": {
-      "text": "You can ask me how Hermes works and how to set it up. Pick one, or type your own question."
+      "text": "I can explain how Hermes works and help you set it up. Pick one."
     },
     "W1": {
       "text": "Which one do you mean?"
@@ -80,85 +84,305 @@ export const TALK_DATA = {
       "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin"
     },
     "NAME_AGAIN": {
-      "text": "Hi again, {name}. Ask me anything about Hermes."
+      "text": "Hi again, {name}.",
+      "offer": "general"
     },
     "NAME_NEW": {
-      "text": "Thanks, {name}. Ask me anything about Hermes."
+      "text": "Thanks, {name}.",
+      "offer": "general"
     },
     "BACK": {
-      "text": "Hi again, {name}. What would you like Hermes to help you with?",
-      "text_no_name": "Hi again. What would you like Hermes to help you with?"
+      "text": "Hi again, {name}.",
+      "text_no_name": "Hi again.",
+      "offer": "general"
     },
     "HELLO": {
-      "text": "Hi, {name}. What would you like Hermes to help you with?",
-      "text_no_name": "Hi. What would you like Hermes to help you with?"
+      "text": "Hi, {name}.",
+      "text_no_name": "Hi.",
+      "offer": "general"
     },
     "HELLO_SAME": {
-      "text": "I'm here. Type your question whenever you are ready."
+      "text": "I'm here.",
+      "offer": "general"
     },
     "THANKS": {
-      "text": "You're welcome. Ask me more about Hermes whenever you like."
+      "text": "You're welcome.",
+      "offer": "after_topic"
     },
     "OK": {
-      "text": "Good. I'm here if you want to know more."
+      "text": "Good.",
+      "offer": "after_topic"
     },
     "HOW": {
-      "text": "I'm good, thanks for asking. I'm here when you have a question about Hermes."
+      "text": "I'm good, thanks for asking.",
+      "offer": "general"
     },
     "WHO": {
       "text": "I'm Helper. I help you learn about Hermes and set it up. Your own Hermes does the work.",
-      "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs)."
+      "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs).",
+      "offer": "general"
     },
     "AI": {
-      "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs."
+      "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs.",
+      "offer": "general"
     },
     "AI_PICK": {
-      "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits."
+      "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits.",
+      "offer": "general"
     },
     "AI_WRITES": {
-      "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong."
+      "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong.",
+      "offer": "general"
     },
     "BYE": {
-      "text": "Bye. Come back any time you have a question about Hermes."
+      "text": "Bye. Come back any time."
     },
     "CUT": {
-      "text": "Sorry, that looks cut off. Tell me a bit more about what you need."
+      "text": "Sorry, that looks cut off.",
+      "offer": "general"
     },
     "MEAN_NONE": {
-      "text": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\"."
+      "text": "Sorry, I was not clear.",
+      "offer": "words"
     },
     "WRONG": {
-      "text": "Sorry about that. Please say it another way."
+      "text": "Sorry about that.",
+      "offer": "general"
     },
     "AGAIN": {
-      "text": "Sorry, I have nothing more on that. Please ask it another way."
+      "text": "Sorry, I have nothing more on that.",
+      "offer": "general"
     },
     "N1_AGAIN": {
-      "text": "Sorry, I don't have checked information on that one either."
+      "text": "Sorry, I don't have checked information on that one either.",
+      "offer": "dont_know"
     },
     "OK_SAME": {
-      "text": "All right. I'm here when you need me."
+      "text": "All right.",
+      "offer": "after_topic"
     },
     "THANKS_SAME": {
-      "text": "Any time. I'm here if you have another question."
+      "text": "Any time.",
+      "offer": "after_topic"
     },
     "HOW_SAME": {
-      "text": "Still good, thanks. Ask me anything about Hermes."
+      "text": "Still good, thanks.",
+      "offer": "general"
     },
     "BYE_SAME": {
       "text": "Bye for now."
     },
     "CUT_SAME": {
-      "text": "I can't tell what you need from that. Type your whole question in one message."
+      "text": "I can't tell what you need from that.",
+      "offer": "general"
     },
     "WRONG_SAME": {
-      "text": "Sorry again. Try other words, or ask about another part of Hermes."
+      "text": "Sorry again.",
+      "offer": "general"
     },
     "STUCK": {
-      "text": "Sorry it didn't work. Tell me what you tried and what you saw on the screen."
+      "text": "Sorry it isn't working.",
+      "offer": "stuck"
     },
     "STUCK_SAME": {
-      "text": "Sorry it still isn't working. Try other words, or ask about another part of Hermes."
+      "text": "Sorry it still isn't working.",
+      "offer": "general"
+    },
+    "PRIV": {
+      "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+      "source": "user-guide/local-models.md line 14: \"Nothing leaves your computer: no account, no API key, and no network access after a model is downloaded.\" Second sentence: user-guide/features/provider-routing.md line 98: \"Controls whether providers can use your prompts for training.\" and user-guide/configuring-models.md line 79: \"the vendor may train on your prompts and completions\" (both show prompts reach the provider; no docs line says it in general words or names the free model)",
+      "next": {
+        "kind": "line",
+        "label": "And my files?",
+        "id": "PRIV-next",
+        "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+        "source": "the line SAFE, word for word (/hermes-docs/user-guide/security.md lines 16 and 26)"
+      }
+    },
+    "POWER": {
+      "text": "On your own computer, small AIs run well with an 8 GB graphics card. Hermes shows which ones fit.",
+      "source": "user-guide/local-models.md line 202: \"A GPU with 8 GB+ of memory runs the small catalog models comfortably;\" and line 65: \"**Memory fit** — green (*Fits your GPU*: runs entirely in GPU memory),\". No docs line says an AI from a company needs no strong computer, so the line does not say it."
+    },
+    "HVC": {
+      "text": "Hermes learns from experience and remembers you across chats. ChatGPT can be the AI inside it.",
+      "source": "index.mdx line 19: \"The self-improving AI agent built by Nous Research. ... it creates skills from experience, improves them during use, ... and builds a deepening model of who you are across sessions.\" Third sentence: mod1's source, integrations/providers.md (OpenAI Codex row): sign in with a ChatGPT plan."
+    },
+    "MIG": {
+      "text": "There are two kinds of moving.",
+      "source": "Helper's own lead-in; the two kinds are the offer move",
+      "offer": "move"
+    },
+    "MIG_APP": {
+      "text": "Hermes can bring over your notes and settings from other AI apps. The docs name OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot.",
+      "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (\"imports your existing **OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot** setup into Hermes with one command\") and line 4 (\"instructions, rules, allowlists, MCP servers, skills, memories\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please bring my setup over from <my old AI app> with hermes migrate. Show me the plan before you write anything.",
+        "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 15 (\"Already set up? Run `hermes migrate` for the same offer\") and line 9 (\"You always see a per-item plan before anything is written\")"
+      }
+    },
+    "MIG_NOT_LISTED": {
+      "text": "The docs name only OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot. I have nothing checked on other apps.",
+      "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (the list of six); no other app is named on that page",
+      "offer": "general"
+    },
+    "MIG_PC": {
+      "text": "Hermes can pack your settings, chats and other data into one zip file. Hermes on the new computer unpacks it. That replaces what is there.",
+      "source": "dev/hermes-src/website/docs/reference/cli-commands.md line 1116 (\"Create a zip archive of your Hermes configuration, skills, sessions, and data.\") and line 1192 (\"Restore a previously created Hermes backup into your Hermes home directory. All files in the archive overwrite existing files\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is.",
+        "source": "dev/hermes-src/website/docs/reference/cli-commands.md lines 1110 to 1123 (hermes backup, default ~/hermes-backup-<timestamp>.zip) and 1186 to 1192 (hermes import <zipfile>)"
+      }
+    },
+    "HERMES": {
+      "text": "Hermes is an AI helper made by Nous Research. It learns from experience and remembers you across chats.",
+      "source": "dev/hermes-src/website/docs/index.mdx line 19 (\"The self-improving AI agent built by [Nous Research]... it creates skills from experience, improves them during use, ... builds a deepening model of who you are across sessions.\")",
+      "offer": "general"
+    },
+    "START": {
+      "text": "Most people start by picking the AI Hermes uses. The quick setup signs you in, with no secret key.",
+      "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** — OAuth login, no API keys to manage ... The recommended fast path.\")",
+      "offer": "general"
+    },
+    "KEY": {
+      "text": "Not always. The quick setup signs you in, so you need no key. A key is a secret code some AI companies give you instead.",
+      "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"OAuth login, no API keys to manage\") and line 119 (\"**OpenRouter** ... Enter your API key\"). 'secret code': K1's own wording; the docs keep keys in .env, 'secrets only' (dev/hermes-src/AGENTS.md, User state).",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "UPDATE": {
+      "text": "The Hermes app checks for updates by itself. When one is ready, it offers a one-click update.",
+      "source": "dev/hermes-src/website/docs/user-guide/desktop.md line 526 (\"The app checks for updates in the background and offers a one-click update when one is ready.\")"
+    },
+    "SAFE": {
+      "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+      "source": "dev/hermes-src/website/docs/user-guide/security.md line 26 (\"Before executing any command, Hermes checks it against a curated list of dangerous patterns. If a match is found, the user must explicitly approve it.\") and line 16 (\"human-in-the-loop for destructive operations\")",
+      "next": {
+        "kind": "line",
+        "label": "And my messages?",
+        "id": "SAFE-next",
+        "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+        "source": "the line PRIV, word for word (its source)"
+      }
+    },
+    "PERSONALITY": {
+      "text": "You change its personality in SOUL.md, the file that says who your Hermes is.",
+      "source": "dev/hermes-src/website/docs/user-guide/features/personality.md line 9 (\"Hermes Agent's personality is fully customizable. `SOUL.md` is the **primary identity**\") and line 50 (\"Edit `~/.hermes/SOUL.md` to change Hermes' default personality.\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please show me my SOUL.md and help me change how you talk. Ask me before you save anything."
+      }
+    },
+    "KEY_WHAT": {
+      "text": "A key is a secret code from an AI company. It lets Hermes use that company's AI. Keys go in Settings, never in a chat.",
+      "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 118 (\"Anthropic ... or API key for pay-per-token\") and line 119 (\"OpenRouter ... Enter your API key\"); 'Keys go in Settings, never in a chat': line K1, word for word. 'secret': dev/hermes-src/AGENTS.md, User state (\".env (secrets only)\").",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "MIG_CHATGPT": {
+      "text": "The docs name no way to move chats or settings from ChatGPT. ChatGPT can still be the AI inside Hermes.",
+      "source": "/hermes-docs/user-guide/import-from-other-agents.md line 9 (the six apps: \"**OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot**\"; ChatGPT is not among them) and line 4 (what comes over: \"instructions, rules, allowlists, MCP servers, skills, memories\"; no chats). Second sentence: mod1's source (integrations/providers.md, OpenAI Codex row: sign in with a ChatGPT plan).",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "AGENT": {
+      "text": "That is an AI that works by itself. The docs say Hermes gets better the longer it runs.",
+      "source": "/hermes-docs/index.mdx line 115 (\"It's an **autonomous agent** that gets more capable the longer it runs.\")",
+      "offer": "general"
+    },
+    "KEY_WHERE": {
+      "text": "A key is a secret code. In the Hermes app it goes in Settings, never in a chat.",
+      "source": "/hermes-docs/user-guide/desktop.md line 447 (\"**Providers settings pane** — a dedicated place to manage inference providers, with an Accounts / API-keys UX for signing in and storing credentials per provider\"). First sentence: line K1, word for word. Seen: the Settings list has a row Providers (docs/answers/hhtech-helper-settings.md line 15, hhtech ran the app v0.23.0).",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "FREE": {
+      "text": "Hermes itself is free. An AI on your own computer needs no account. Some AI companies let you start free.",
+      "source": "/hermes-docs/getting-started/official-domains.md line 61 (\"Hermes Agent is MIT-licensed and free to self-host.\"); user-guide/local-models.md line 14 (\"Nothing leaves your computer: no account, no API key\"); integrations/providers.md line 653 (\"Free tier included\") and line 521 (\"Create an account and a free API key\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "MODEL_FOR": {
+      "text": "I have nothing checked on which AI suits which kind of work.",
+      "source": "No docs page was found that matches an AI to a kind of work (not a full search of the docs: checked user-guide/configuring-models.md and integrations/providers.md headings only).",
+      "offer": "pay"
+    },
+    "MODEL_CHANGE": {
+      "text": "In a Hermes chat, the message box shows the AI's name. Click it to choose another.",
+      "source": "/hermes-docs/user-guide/desktop.md line 283 (\"The model picker lives in the **composer**, just left of the microphone. Click it to switch the model\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "SKILL_ADD": {
+      "text": "A skill is written steps for one task. To add one, click \"Capabilities\", then \"Skills\", then a card, then \"Install\".",
+      "source": "Seen run by hhtech in Hermes Desktop v0.23.0 (docs/answers/hhtech-wants-check.md section 5; the same clicks as the steps in helper-wants-v1.json, w_reddit next). Docs: /hermes-docs/user-guide/desktop.md line 483 (\"The Skills tab lists your installed skills ... each entry has a one-click **Install** button\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Capabilities",
+        "part": "capabilities"
+      }
+    },
+    "PLUGIN_WHICH": {
+      "text": "A plugin is an add-on. You need none to start. Hermes loads its built-in ones by itself.",
+      "source": "/hermes-docs/user-guide/features/plugins.md line 290 (\"bundled \\\"always-works\\\" infrastructure loads automatically; third-party general plugins are opt-in\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Capabilities",
+        "part": "capabilities"
+      }
+    },
+    "PLUGIN_ADD": {
+      "text": "A plugin is an add-on. Your own Hermes can add one when you give it the name.",
+      "source": "/hermes-docs/user-guide/features/plugins.md line 429 (\"hermes plugins install <name>                # install a catalog entry\") and line 222 (\"you're asked `Enable 'name' now? [y/N]`\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on."
+      }
+    },
+    "CODING": {
+      "text": "The docs do not say it in general. For jobs on a schedule they say you just ask in plain words.",
+      "source": "/hermes-docs/user-guide/features/cron.md line 24 (\"you can create, pause, edit, and remove jobs by asking in plain language — no CLI required\"). user-guide/desktop.md line 9 does not say whether coding is needed.",
+      "offer": "general"
+    },
+    "PICK_FIRST": {
+      "text": "Choose one, and I will show you how.",
+      "source": "Helper's own line"
+    },
+    "HOW_PASTE": {
+      "text": "Press \"{label}\". Copy the text and paste it into a chat with Hermes.",
+      "source": "Helper's own line; {label} is the label of the paste button of Helper's last answer"
+    },
+    "HOW_PART": {
+      "text": "Press \"{label}\". It opens that part for you.",
+      "source": "Helper's own line; {label} is the label of the part button of Helper's last answer"
+    },
+    "START_2": {
+      "text": "First choose the AI Hermes uses. Then send Hermes one message to see that it answers.",
+      "source": "/hermes-docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** ... The recommended fast path.\") and line 182 (\"## 3. Run Your First Chat\")",
+      "offer": "general_2"
     }
   },
   "opening": {
@@ -712,6 +936,29 @@ export const TALK_DATA = {
       "hermes"
     ]
   },
+  "model_pick_not_when_starts": [
+    "what",
+    "which",
+    "who",
+    "where",
+    "when",
+    "why",
+    "how",
+    "should",
+    "do i",
+    "do you",
+    "does",
+    "is",
+    "are",
+    "am i",
+    "can i",
+    "could i",
+    "will it",
+    "can it",
+    "can hermes",
+    "must i",
+    "have i"
+  ],
   "small_talk": {
     "cut_end_words": [
       "helper",
@@ -999,7 +1246,15 @@ export const TALK_DATA = {
         "that doesn't help",
         "that doesnt help",
         "that did nothing",
-        "nothing happened"
+        "nothing happened",
+        "not answering",
+        "isn't answering",
+        "isnt answering",
+        "not responding",
+        "doesn't answer",
+        "doesnt answer",
+        "no answer",
+        "not replying"
       ],
       "again": [
         "again",
@@ -1062,7 +1317,8 @@ export const TALK_DATA = {
       "H1",
       "skill by name",
       "C1",
-      "AGAIN"
+      "AGAIN",
+      "then"
     ],
     "thanks_tail": [
       "so much",
@@ -1088,13 +1344,15 @@ export const TALK_DATA = {
       "WHERE",
       "skill by name",
       "wants",
-      "written"
+      "written",
+      "then"
     ],
     "how_after_rows": {
       "words": [
         "how",
         "and",
-        "and then"
+        "and then",
+        "why"
       ],
       "after": [
         "row",
@@ -1103,7 +1361,801 @@ export const TALK_DATA = {
         "wants",
         "COST",
         "WHERE",
-        "written"
+        "written",
+        "then"
+      ]
+    },
+    "how_that": {
+      "phrases": [
+        "how do i do that",
+        "how do i do this",
+        "how do i do it",
+        "how would i do that",
+        "how can i do that",
+        "how to do that",
+        "how do i set that up",
+        "how do i set it up",
+        "how do i get that",
+        "how do i start",
+        "how do i start that",
+        "how do i use that",
+        "how do i use it",
+        "show me how",
+        "where do i do that",
+        "where is that",
+        "where do i find that"
+      ],
+      "cut_first": [
+        "ok",
+        "okay",
+        "so",
+        "and",
+        "cool",
+        "right",
+        "but",
+        "well",
+        "yes",
+        "yeah",
+        "sure",
+        "great",
+        "nice",
+        "good"
+      ]
+    }
+  },
+  "live_c6": {
+    "privacy_words": [
+      "private",
+      "privacy",
+      "my data",
+      "data private",
+      "data safe",
+      "is my data",
+      "who sees",
+      "who can see",
+      "who reads",
+      "leave my computer",
+      "leaves my computer",
+      "leave my laptop",
+      "stay on my computer",
+      "stays on my computer",
+      "confidential",
+      "spy",
+      "spying"
+    ],
+    "power_words": [
+      "powerful computer",
+      "strong computer",
+      "good computer",
+      "fast computer",
+      "beefy",
+      "what computer",
+      "which computer",
+      "computer do i need",
+      "kind of computer",
+      "type of computer",
+      "hardware",
+      "specs",
+      "gpu",
+      "graphics card",
+      "powerful laptop",
+      "powerful pc",
+      "strong pc",
+      "good pc"
+    ],
+    "vs_names": [
+      "chatgpt",
+      "chat gpt",
+      "claude",
+      "gemini",
+      "copilot",
+      "grok",
+      "openai"
+    ],
+    "vs_words": [
+      "difference",
+      "different",
+      "differ",
+      "compare",
+      "compared",
+      "comparison",
+      "vs",
+      "versus",
+      "better than",
+      "instead of",
+      "why use",
+      "why not just",
+      "same as",
+      "like chatgpt",
+      "like claude"
+    ],
+    "hosted_words": [
+      "free model",
+      "free ai",
+      "free one",
+      "free plan",
+      "free tier",
+      "nous",
+      "chatgpt",
+      "chat gpt",
+      "claude",
+      "gpt",
+      "openai",
+      "gemini",
+      "hosted",
+      "cloud ai",
+      "online ai"
+    ],
+    "greet_more": {
+      "question_words": [
+        "how",
+        "what",
+        "why",
+        "which",
+        "where",
+        "when",
+        "who",
+        "can",
+        "could",
+        "should",
+        "does",
+        "do",
+        "is",
+        "are",
+        "will",
+        "would",
+        "help"
+      ]
+    }
+  },
+  "offers": {
+    "hint": "Or type your own question",
+    "things": {
+      "setup": {
+        "label": "Set up Hermes",
+        "say": "set up Hermes",
+        "gives": {
+          "kind": "setup_chat",
+          "id": "Q_NEW"
+        }
+      },
+      "can": {
+        "label": "What Hermes can do",
+        "say": "see what it does",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "can"
+        }
+      },
+      "mod": {
+        "label": "Which AI to use",
+        "say": "pick its AI",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "mod"
+        }
+      },
+      "msg": {
+        "label": "Phone and chat apps",
+        "say": "use your phone",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "msg"
+        }
+      },
+      "mem": {
+        "label": "What Hermes remembers",
+        "say": "see what it remembers",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "mem"
+        }
+      },
+      "sch": {
+        "label": "Daily jobs and reminders",
+        "say": "set up daily jobs",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "sch"
+        }
+      },
+      "svc": {
+        "label": "Gmail and other services",
+        "say": "link a service",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "svc"
+        }
+      },
+      "bot": {
+        "label": "More than one Hermes",
+        "say": "add a second Hermes",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "bot"
+        }
+      },
+      "what": {
+        "label": "What Hermes is",
+        "say": "know what Hermes is",
+        "gives": {
+          "kind": "line",
+          "id": "HERMES"
+        }
+      },
+      "mig_app": {
+        "label": "From another AI app",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP"
+        }
+      },
+      "mig_pc": {
+        "label": "To another computer",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_PC"
+        }
+      },
+      "fix_ai": {
+        "label": "Check its AI",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "mod"
+        }
+      },
+      "fix_app": {
+        "label": "Check my chat app",
+        "gives": {
+          "kind": "row",
+          "id": "msg3"
+        }
+      },
+      "skill": {
+        "label": "Skills",
+        "gives": {
+          "kind": "term",
+          "id": "skill"
+        }
+      },
+      "plugin": {
+        "label": "Plugins",
+        "gives": {
+          "kind": "term",
+          "id": "plugin"
+        }
+      },
+      "mcp": {
+        "label": "MCP",
+        "gives": {
+          "kind": "term",
+          "id": "mcp"
+        }
+      },
+      "pay_mod1": {
+        "label": "ChatGPT",
+        "gives": {
+          "kind": "row",
+          "id": "mod1"
+        }
+      },
+      "pay_mod2": {
+        "label": "Claude",
+        "gives": {
+          "kind": "row",
+          "id": "mod2"
+        }
+      },
+      "pay_mod4": {
+        "label": "Neither",
+        "gives": {
+          "kind": "row",
+          "id": "mod4"
+        }
+      },
+      "pay_mod3": {
+        "label": "I want it free",
+        "gives": {
+          "kind": "row",
+          "id": "mod3"
+        }
+      }
+    },
+    "sets": {
+      "general": {
+        "text": "Do you want to set up Hermes, or see what it does?",
+        "picks": [
+          "setup",
+          "can"
+        ],
+        "text_no_setup": "Do you want to see what Hermes does, or pick its AI?",
+        "picks_no_setup": [
+          "can",
+          "mod"
+        ],
+        "instead": "general_2"
+      },
+      "general_2": {
+        "text": "Do you want to pick its AI, or chat from your phone?",
+        "picks": [
+          "mod",
+          "msg"
+        ],
+        "instead": "general"
+      },
+      "dont_know": {
+        "text": "Do you want to know what Hermes is, or set it up?",
+        "picks": [
+          "what",
+          "setup"
+        ],
+        "text_no_setup": "Do you want to know what Hermes is, or what it does?",
+        "picks_no_setup": [
+          "what",
+          "can"
+        ],
+        "instead": "general_2"
+      },
+      "words": {
+        "text": "Do you want one of these words explained?",
+        "picks": [
+          "skill",
+          "plugin",
+          "mcp"
+        ],
+        "instead": "general"
+      },
+      "move": {
+        "text": "Do you mean from another AI app, or to a new computer?",
+        "picks": [
+          "mig_app",
+          "mig_pc"
+        ],
+        "instead": "general"
+      },
+      "stuck": {
+        "text": "Do you want to check its AI, or your chat app?",
+        "picks": [
+          "fix_ai",
+          "fix_app"
+        ],
+        "instead": "general"
+      },
+      "after_topic": {
+        "instead": "general",
+        "template": "Do you want to {say1}, or {say2}?",
+        "by_topic": {
+          "mod": [
+            "msg",
+            "mem"
+          ],
+          "msg": [
+            "sch",
+            "svc"
+          ],
+          "mem": [
+            "msg",
+            "bot"
+          ],
+          "sch": [
+            "svc",
+            "msg"
+          ],
+          "svc": [
+            "sch",
+            "mod"
+          ],
+          "bot": [
+            "mem",
+            "msg"
+          ],
+          "use": [
+            "mod",
+            "can"
+          ]
+        }
+      },
+      "pay": {
+        "text": "Do you already pay for ChatGPT or Claude?",
+        "picks": [
+          "pay_mod1",
+          "pay_mod2",
+          "pay_mod4",
+          "pay_mod3"
+        ],
+        "instead": "general"
+      }
+    }
+  },
+  "offer_words": {
+    "migrate": [
+      "migrate",
+      "migrating",
+      "migration",
+      "move from",
+      "move over",
+      "bring over",
+      "bring my stuff",
+      "bring things",
+      "bring my",
+      "switch from",
+      "import my",
+      "move my stuff",
+      "move to hermes",
+      "moving to hermes",
+      "transfer",
+      "switch over",
+      "switching from",
+      "switching over",
+      "coming from",
+      "import my chats",
+      "import chats",
+      "chats from",
+      "bring my chats",
+      "move my chats"
+    ],
+    "listed_apps": [
+      "openclaw",
+      "claude code",
+      "codex",
+      "cursor",
+      "grok bot",
+      "openbot",
+      "clawdbot",
+      "moltbot"
+    ],
+    "not_listed_apps": [
+      "chatgpt",
+      "chat gpt",
+      "gemini",
+      "copilot",
+      "perplexity"
+    ],
+    "computer": [
+      "new computer",
+      "another computer",
+      "new laptop",
+      "another laptop",
+      "new mac",
+      "new pc",
+      "other computer",
+      "new machine",
+      "another machine"
+    ],
+    "what_hermes": [
+      "what is hermes",
+      "what's hermes",
+      "whats hermes",
+      "what is this",
+      "what does hermes do",
+      "tell me about hermes"
+    ],
+    "start": [
+      "get started",
+      "getting started",
+      "where to begin",
+      "where do i begin",
+      "where to start",
+      "where do i start",
+      "set up first",
+      "start with",
+      "i'm lost",
+      "im lost",
+      "i am lost",
+      "don't know where",
+      "dont know where",
+      "what do i do first",
+      "what should i do first",
+      "set this up",
+      "set it up",
+      "set hermes up",
+      "set up hermes",
+      "do first",
+      "start first",
+      "first step",
+      "what first"
+    ],
+    "key": [
+      "api key",
+      "api keys",
+      "a key",
+      "an api",
+      "openai key",
+      "anthropic key",
+      "claude key",
+      "my key",
+      "key go",
+      "keys go"
+    ],
+    "update": [
+      "update hermes",
+      "upgrade hermes",
+      "update the app",
+      "new version",
+      "newest version",
+      "latest version",
+      "how do i update",
+      "how to update"
+    ],
+    "safe": [
+      "delete my files",
+      "deletes my files",
+      "delete files",
+      "delete my stuff",
+      "is it safe",
+      "safe to use",
+      "break my computer",
+      "mess up my computer"
+    ],
+    "personality": [
+      "personality",
+      "its tone",
+      "how it talks",
+      "talk differently",
+      "change how it talks"
+    ],
+    "stuck_more": [
+      "not answering",
+      "isn't answering",
+      "isnt answering",
+      "not responding",
+      "doesn't answer",
+      "doesnt answer",
+      "no answer",
+      "not replying",
+      "is broken",
+      "it's broken",
+      "its broken",
+      "something broke",
+      "it broke",
+      "keeps crashing",
+      "crashed",
+      "an error",
+      "error message"
+    ],
+    "laptop_off": [
+      "laptop is closed",
+      "laptop closed",
+      "close my laptop",
+      "computer is off",
+      "laptop is off",
+      "turn off my computer",
+      "computer off"
+    ],
+    "key_what_starts": [
+      "what is",
+      "what's",
+      "whats",
+      "what are",
+      "what does"
+    ],
+    "chatgpt_names": [
+      "chatgpt",
+      "chat gpt"
+    ],
+    "agent_what": [
+      "agent",
+      "agents",
+      "ai agent",
+      "ai agents",
+      "an agent"
+    ],
+    "what_hermes_any": [
+      "what even is this",
+      "what is this app",
+      "what's this app",
+      "whats this app",
+      "what does this app",
+      "what even is hermes",
+      "what is this thing",
+      "what is this program"
+    ],
+    "key_where": [
+      "where do i put",
+      "where do i enter",
+      "where do i add",
+      "where do i paste",
+      "where to put",
+      "where should i put",
+      "where can i put",
+      "where does",
+      "put my",
+      "enter my",
+      "paste my",
+      "add my",
+      "key go",
+      "keys go"
+    ],
+    "free": [
+      "without paying",
+      "not pay",
+      "don't want to pay",
+      "dont want to pay",
+      "do not want to pay",
+      "pay nothing",
+      "cost nothing",
+      "costs nothing",
+      "no money",
+      "for free"
+    ],
+    "model_for": [
+      "which model",
+      "what model",
+      "which ai",
+      "what ai",
+      "best model",
+      "best ai",
+      "model should",
+      "ai should"
+    ],
+    "model_change": [
+      "change the model",
+      "change model",
+      "change my model",
+      "switch model",
+      "switch models",
+      "switch the model",
+      "change the ai",
+      "change its ai",
+      "switch the ai",
+      "switch ai",
+      "different model",
+      "another model",
+      "swap the model"
+    ],
+    "own_ai": [
+      "run the ai",
+      "run an ai",
+      "run ai",
+      "ai on my",
+      "model on my",
+      "run a model",
+      "run models",
+      "run the model"
+    ],
+    "skill_add": [
+      "add a skill",
+      "add skills",
+      "add a new skill",
+      "add new skills",
+      "install a skill",
+      "install skills",
+      "get a skill",
+      "get more skills",
+      "get new skills"
+    ],
+    "plugin_which": [
+      "what plugins",
+      "which plugins",
+      "which plugin",
+      "plugins should",
+      "plugins do i need",
+      "need plugins",
+      "need a plugin",
+      "need any plugins",
+      "best plugins"
+    ],
+    "plugin_add": [
+      "install a plugin",
+      "install plugins",
+      "install the plugin",
+      "install this plugin",
+      "add a plugin",
+      "add plugins",
+      "get a plugin"
+    ],
+    "coding_ask": [
+      "know coding",
+      "need to know coding",
+      "know how to code",
+      "need to code",
+      "have to code",
+      "need coding",
+      "without coding",
+      "know programming",
+      "be a programmer",
+      "be a developer",
+      "not a programmer",
+      "not a developer",
+      "can't code",
+      "cant code",
+      "not technical",
+      "non-technical"
+    ]
+  },
+  "about_rule": {
+    "rows": {
+      "mod1": [
+        "plan",
+        "plans",
+        "subscription",
+        "subscriptions",
+        "subscribe",
+        "subscribed",
+        "sign in",
+        "sign-in",
+        "signed in",
+        "log in",
+        "login",
+        "account",
+        "accounts",
+        "pay",
+        "pays",
+        "paying",
+        "paid",
+        "i have",
+        "i've got",
+        "i got",
+        "i already",
+        "i use",
+        "i'm on",
+        "im on",
+        "use my",
+        "with my",
+        "works with",
+        "work with",
+        "plus",
+        "use chatgpt",
+        "use gpt",
+        "use openai",
+        "with chatgpt",
+        "my chatgpt"
+      ],
+      "mod2": [
+        "plan",
+        "plans",
+        "subscription",
+        "subscriptions",
+        "subscribe",
+        "subscribed",
+        "sign in",
+        "sign-in",
+        "signed in",
+        "log in",
+        "login",
+        "account",
+        "accounts",
+        "pay",
+        "pays",
+        "paying",
+        "paid",
+        "i have",
+        "i've got",
+        "i got",
+        "i already",
+        "i use",
+        "i'm on",
+        "im on",
+        "use my",
+        "with my",
+        "works with",
+        "work with",
+        "max",
+        "pro",
+        "use claude",
+        "with claude",
+        "my claude"
+      ],
+      "mod3": [
+        "own computer",
+        "my computer",
+        "own laptop",
+        "my laptop",
+        "laptop",
+        "own machine",
+        "my machine",
+        "my pc",
+        "my mac",
+        "local",
+        "locally",
+        "offline",
+        "private",
+        "privately",
+        "no account",
+        "ollama",
+        "local ai",
+        "leaves my computer",
+        "leave my computer"
       ]
     }
   },
@@ -1127,7 +2179,10 @@ export const TALK_DATA = {
       "F3",
       "OPEN",
       "BACK",
-      "skill by name"
+      "skill by name",
+      "PICK_FIRST",
+      "HOW_PASTE",
+      "HOW_PART"
     ],
     "groups": {
       "hello": [
@@ -1169,6 +2224,10 @@ export const TALK_DATA = {
         "N1",
         "N1a",
         "N1_AGAIN"
+      ],
+      "start": [
+        "START",
+        "START_2"
       ]
     },
     "in_place": {
@@ -1216,6 +2275,10 @@ export const TALK_DATA = {
         "plain",
         "AGAIN",
         "MEAN_NONE"
+      ],
+      "start": [
+        "START_2",
+        "START"
       ]
     },
     "wrong_starts": [
@@ -1836,8 +2899,25 @@ export const TALK_DATA = {
       },
       "question": {
         "id": "mem-q",
-        "text": "What do you want Hermes to remember?",
-        "answers": []
+        "text": "Do you want Hermes to remember you, or find old chats?",
+        "answers": [
+          {
+            "label": "Things about me",
+            "gives": "mem1"
+          },
+          {
+            "label": "Our old chats",
+            "gives": "mem2"
+          },
+          {
+            "label": "It forgot something",
+            "gives": "mem3"
+          },
+          {
+            "label": "Separate notes per Hermes",
+            "gives": "mem4"
+          }
+        ]
       },
       "plain": {
         "id": "mem0",
@@ -2243,6 +3323,11 @@ export const TALK_DATA = {
         "next": {
           "kind": "part",
           "label": "Open Messaging"
+        },
+        "then": {
+          "id": "msg0-then",
+          "text": "In the Hermes app, open Messaging and pick your chat app. For Telegram, press Create with QR.",
+          "source": "user-guide/desktop.md line 451 (msg1 and msg2's source); content/dash-setup-list-v2.json, Chat apps steps"
         }
       },
       "needs": [
@@ -2262,6 +3347,11 @@ export const TALK_DATA = {
             "kind": "part",
             "label": "Open Messaging",
             "part": "messaging"
+          },
+          "then": {
+            "id": "msg1-then",
+            "text": "Scan the code with Telegram on your phone. Hermes makes the bot, lets only you in, and restarts by itself.",
+            "source": "user-guide/desktop.md line 487 in /hermes-docs (\"scan the code (or open the link) in Telegram, and Hermes creates the bot, detects your user ID for the allowlist, saves the credentials, and restarts the gateway for you\"); the same two sentences as content/dash-setup-list-v2.json, chat_apps steps 3 and 4"
           }
         },
         {
@@ -2407,8 +3497,25 @@ export const TALK_DATA = {
       },
       "question": {
         "id": "sch-q",
-        "text": "What should Hermes do on a schedule, such as a daily summary?",
-        "answers": []
+        "text": "Do you want a daily job, a reminder, or a regular check?",
+        "answers": [
+          {
+            "label": "A job every day",
+            "gives": "sch1"
+          },
+          {
+            "label": "A reminder",
+            "gives": "sch2"
+          },
+          {
+            "label": "A regular check",
+            "gives": "sch3"
+          },
+          {
+            "label": "My email every morning",
+            "gives": "sch5"
+          }
+        ]
       },
       "plain": {
         "id": "sch0",
@@ -2760,8 +3867,21 @@ export const TALK_DATA = {
       },
       "question": {
         "id": "bot-q",
-        "text": "What would a second Hermes do for you?",
-        "answers": []
+        "text": "Do you want one more Hermes, or two that work together?",
+        "answers": [
+          {
+            "label": "One more Hermes",
+            "gives": "bot1"
+          },
+          {
+            "label": "Two working together",
+            "gives": "bot2"
+          },
+          {
+            "label": "Many chats in one",
+            "gives": "bot3"
+          }
+        ]
       },
       "plain": {
         "id": "bot0",
@@ -3019,7 +4139,12 @@ export const TALK_DATA = {
             "label": "See what uses them",
             "id": "use1-next",
             "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
-            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many.",
+            "mean": {
+              "id": "use1-next-mean",
+              "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+              "source": "the same as use1-next: reference/faq.md lines 558 to 559 (/usage); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" (dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png, opened by Lead)"
+            }
           }
         },
         {
@@ -3081,7 +4206,12 @@ export const TALK_DATA = {
             "label": "See what uses them",
             "id": "use3-next",
             "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
-            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many.",
+            "mean": {
+              "id": "use3-next-mean",
+              "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+              "source": "the same as use3-next: reference/faq.md lines 558 to 559 (/usage); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" (dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png, opened by Lead)"
+            }
           }
         },
         {
@@ -3151,6 +4281,11 @@ export const TALK_DATA = {
         "kind": "part",
         "label": "Open Capabilities",
         "part": "capabilities"
+      },
+      "mean": {
+        "id": "skill-mean",
+        "text": "Think of a skill as a recipe. Hermes follows its steps when a task needs it.",
+        "source": "the same as the skill line: getting-started/quickstart.md line 295 (\"on-demand instruction documents that teach Hermes how to do a specific task ... a step-by-step procedure\"). 'recipe' is hhcontent's own everyday comparison, not a docs word."
       }
     },
     {
@@ -3170,6 +4305,11 @@ export const TALK_DATA = {
         "kind": "part",
         "label": "Open Capabilities",
         "part": "capabilities"
+      },
+      "mean": {
+        "id": "plugin-mean",
+        "text": "It is like an app on your phone. You add it, and Hermes gets one more feature.",
+        "source": "the same as the plugin line: user-guide/features/plugins.md line 10. 'like an app on your phone' is hhcontent's own everyday comparison, not a docs word."
       }
     },
     {
@@ -3439,10 +4579,14 @@ export const TALK_DATA = {
         "..."
       ],
       "lines": {
-        "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes.",
+        "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number.",
         "WORK_LONG": "Thanks. That is too long for me to keep. In 12 words or fewer, what do you do?",
-        "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
+        "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long.",
         "WORK_ASK": "What do you do now?"
+      },
+      "offers": {
+        "WORK_LONG_2": "general",
+        "WORK_SECRET": "general"
       },
       "typed_change": {
         "starts": [

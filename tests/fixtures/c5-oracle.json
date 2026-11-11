@@ -1,5 +1,5 @@
 {
- "made_by": "dev/checks/talk-live-3/dump_c5.py: hhcontent's check_c5.py (checks, no_reply) as it is, on the pinned copy team-root-c5",
+ "made_by": "dev/checks/talk-live-3/dump_c5.py: hhcontent's check_c5.py (checks, no_reply) as it is, on the pinned copy dev/checks/setup-chat/team-root-c10 (check_c5.py at changes-7)",
  "recorded_checks": [
   {
    "reply": "Hermes can read your Gmail messages through its \"Connectors\" page, which links apps like Gmail. You can ask Hermes to add your Gmail account to this list.",

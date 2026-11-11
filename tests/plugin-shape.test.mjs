@@ -66,14 +66,9 @@ test('the old name is gone from everything a person can read', () => {
   const OLD = /helping[ -]?hand/i
   const files = ['plugin.yaml', 'package.json', 'README.md', 'content/README.md', 'content/steps-v1.json', 'scripts/build.mjs', 'desktop/plugin.js',
     ...fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js')).map(f => 'src/' + f)]
-  // talk-live-3: one known exception, reported to Lead, not hidden: live-v2 changes-5's slow_ai.paste_text (hhcontent's
-  // words, which Lead picked with SLOW_A) says "Helping Hand's short calls". Exactly that line of the data may hold it.
-  const KNOWN = 'Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \\"none\\". It switches thinking off only for Helping Hand\'s short calls, not for my own chats. Show me the change before you save it.'
-  const known = l => l.includes(KNOWN) && l.replace(KNOWN, '').replace(/helping_hand/g, '').search(OLD) < 0
-  const found = files.flatMap(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l) && !known(l)).map(l => `${f}: ${l.trim().slice(0, 60)}`))
+  // live changes-7: the slow-AI paste text says "Helper's short calls" now, so talk-live-3's one exception is gone
+  const found = files.flatMap(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l)).map(l => `${f}: ${l.trim().slice(0, 60)}`))
   assert.deepEqual(found, [])
-  // the exception is exactly that line: in src/live-data.js and the built file, once each
-  assert.equal(['src/live-data.js', 'desktop/plugin.js'].map(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l)).length).join(','), '1,1')
 })
 
 test('helper panel is a div with role complementary, never an <aside>', () => {

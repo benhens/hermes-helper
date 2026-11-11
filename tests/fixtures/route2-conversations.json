@@ -424,6 +424,14 @@
       ],
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "club management for Tournated"
      },
      "shown": "F2 name=Peter work=club management for Tournated +kept=name +first",
@@ -492,6 +500,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "my daily work is coaching tennis"
      },
      "shown": "F2 name=Peter work=my daily work is coaching tennis",
@@ -560,6 +576,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a small online shop and check orders every day"
      },
      "shown": "F2 name=Peter work=I run a small online shop and check orders every day",
@@ -1326,7 +1350,15 @@
      "model": "{\"topic\": \"none\", \"need\": \"\", \"name\": \"\", \"work\": \"\"}",
      "out": {
       "calls": 1,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -2336,7 +2368,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "question mod",
+   "expect": "MODEL_CHANGE",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -2349,20 +2381,17 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "question",
-      "topic": "mod"
+      "kind": "MODEL_CHANGE"
      },
-     "shown": "question mod",
+     "shown": "MODEL_CHANGE",
      "state": {
-      "asked": [
-       "mod"
-      ],
+      "asked": [],
       "found": {},
       "kept": {},
-      "lastq": true,
+      "lastq": false,
       "met": false,
       "name": null,
-      "pending": "mod",
+      "pending": null,
       "stage": "open",
       "work": null
      },
@@ -2456,7 +2485,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -2489,7 +2526,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -2522,7 +2567,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -2857,7 +2910,15 @@
      "model": "{\"topic\": \"none\", \"need\": \"\", \"name\": \"\", \"work\": \"\"}",
      "out": {
       "calls": 1,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -2988,7 +3049,15 @@
      "model": "{\"topic\": \"build\", \"need\": \"\", \"name\": \"\", \"work\": \"\"}",
      "out": {
       "calls": 1,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -3652,7 +3721,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -3821,6 +3898,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -3889,6 +3974,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -3982,6 +4075,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -4078,6 +4179,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -4177,6 +4286,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -4408,6 +4525,14 @@
       "calls": 0,
       "kind": "F2",
       "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": null
      },
      "shown": "F2 name=None work=None",
@@ -4466,6 +4591,14 @@
       "calls": 0,
       "kind": "F2",
       "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=None work=I run a tennis club",
@@ -8940,7 +9073,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -9039,6 +9180,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -9401,7 +9550,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -9434,7 +9591,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1a"
+      "kind": "N1a",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1a",
      "state": {
@@ -9637,7 +9802,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -10526,7 +10699,15 @@
      "out": {
       "calls": 0,
       "kind": "NAME_AGAIN",
-      "name": "Anna"
+      "name": "Anna",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_AGAIN name=Anna",
      "state": {
@@ -10574,7 +10755,15 @@
      "out": {
       "calls": 0,
       "kind": "NAME_AGAIN",
-      "name": "Anna"
+      "name": "Anna",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_AGAIN name=Anna",
      "state": {
@@ -10625,7 +10814,15 @@
        "name"
       ],
       "kind": "NAME_NEW",
-      "name": "Bea"
+      "name": "Bea",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_NEW name=Bea +kept=name",
      "state": {
@@ -10672,7 +10869,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -10717,7 +10922,15 @@
        "name"
       ],
       "kind": "NAME_NEW",
-      "name": "Bea"
+      "name": "Bea",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_NEW name=Bea +kept=name +first",
      "state": {
@@ -10950,7 +11163,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "line mod3",
+   "expect": "FREE",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -10963,16 +11176,12 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "row",
-      "need": "mod3",
-      "topic": "mod"
+      "kind": "FREE"
      },
-     "shown": "line mod3",
+     "shown": "FREE",
      "state": {
       "asked": [],
-      "found": {
-       "mod": "mod3"
-      },
+      "found": {},
       "kept": {},
       "lastq": false,
       "met": false,
@@ -11046,7 +11255,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -11144,7 +11361,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -11191,7 +11416,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -11238,7 +11471,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -11285,7 +11526,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -11332,7 +11581,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -11383,7 +11640,15 @@
        "name"
       ],
       "kind": "NAME_NEW",
-      "name": "Bea"
+      "name": "Bea",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_NEW name=Bea +kept=name",
      "state": {
@@ -11434,7 +11699,15 @@
        "name"
       ],
       "kind": "NAME_NEW",
-      "name": "Bea"
+      "name": "Bea",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_NEW name=Bea +kept=name",
      "state": {
@@ -11485,7 +11758,15 @@
        "name"
       ],
       "kind": "NAME_NEW",
-      "name": "May"
+      "name": "May",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_NEW name=May +kept=name",
      "state": {
@@ -11844,7 +12125,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -12025,6 +12314,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -12349,6 +12646,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -12471,6 +12776,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -12628,7 +12941,15 @@
        "name"
       ],
       "kind": "NAME_NEW",
-      "name": "Peter"
+      "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "NAME_NEW name=Peter +kept=name +first",
      "state": {
@@ -12776,7 +13097,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WHO"
+      "kind": "WHO",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WHO",
      "state": {
@@ -13051,7 +13380,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13149,7 +13486,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13173,7 +13518,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -13318,7 +13671,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13433,7 +13794,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13467,7 +13836,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13501,7 +13878,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13535,7 +13920,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13572,7 +13965,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": "Anna"
+      "name": "Anna",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=Anna",
      "state": {
@@ -13666,7 +14067,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME"
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO_SAME",
      "state": {
@@ -13700,7 +14109,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -13722,7 +14139,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME"
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "HELLO_SAME",
      "state": {
@@ -13780,7 +14205,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME"
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO_SAME",
      "state": {
@@ -13815,7 +14248,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -13848,7 +14289,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -13881,7 +14330,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -13914,7 +14371,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -13970,7 +14435,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -14089,7 +14562,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "msg",
+        "mem"
+       ],
+       "set": "after_topic:mod",
+       "text": "Do you want to use your phone, or see what it remembers?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -14124,7 +14605,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HOW"
+      "kind": "HOW",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HOW",
      "state": {
@@ -14157,7 +14646,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WHO"
+      "kind": "WHO",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WHO",
      "state": {
@@ -14190,7 +14687,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WHO"
+      "kind": "WHO",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WHO",
      "state": {
@@ -14223,7 +14728,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "AI"
+      "kind": "AI",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AI",
      "state": {
@@ -14256,7 +14769,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "AI"
+      "kind": "AI",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AI",
      "state": {
@@ -14289,7 +14810,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "AI"
+      "kind": "AI",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AI",
      "state": {
@@ -14421,7 +14950,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14454,7 +14991,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14487,7 +15032,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14520,7 +15073,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14553,7 +15114,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14586,7 +15155,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14619,7 +15196,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14912,7 +15497,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -14963,7 +15556,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WHO"
+      "kind": "WHO",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WHO",
      "state": {
@@ -15169,7 +15770,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -15206,7 +15816,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -15226,7 +15845,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "MEAN_NONE",
+   "expect": "mean line skill-mean",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -15262,9 +15881,10 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "termmean",
+      "term": "skill"
      },
-     "shown": "MEAN_NONE",
+     "shown": "mean line skill-mean",
      "state": {
       "asked": [],
       "found": {},
@@ -16068,7 +16688,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -16549,7 +17177,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -16618,7 +17254,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -16798,7 +17442,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -16831,7 +17483,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -16953,11 +17613,11 @@
   },
   {
    "about_keeping": true,
-   "expect": "AGAIN +norepeat",
+   "expect": "WRONG",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "c15 his case once more: AGAIN",
+   "name": "c15 his case once more: WRONG (live changes-6: a correction right after the plain line of the same topic)",
    "stage": "open",
    "steps": [
     {
@@ -17057,10 +17717,17 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "AGAIN",
-      "repeat_of": "row"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
-     "shown": "AGAIN +norepeat",
+     "shown": "WRONG",
      "state": {
       "asked": [
        "msg"
@@ -17085,11 +17752,11 @@
   },
   {
    "about_keeping": true,
-   "expect": "MEAN_NONE +norepeat",
+   "expect": "AGAIN +norepeat",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "c15 his case a third time: MEAN_NONE, never the WhatsApp line again",
+   "name": "c15 his case a third time: never the WhatsApp line again (live changes-6: AGAIN, was MEAN_NONE)",
    "stage": "open",
    "steps": [
     {
@@ -17189,10 +17856,17 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "AGAIN",
-      "repeat_of": "row"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
-     "shown": "AGAIN +norepeat",
+     "shown": "WRONG",
      "state": {
       "asked": [
        "msg"
@@ -17219,10 +17893,18 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE",
+      "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "row"
      },
-     "shown": "MEAN_NONE +norepeat",
+     "shown": "AGAIN +norepeat",
      "state": {
       "asked": [
        "msg"
@@ -17320,7 +18002,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -17420,7 +18110,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -17483,7 +18181,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -17516,7 +18222,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -17538,7 +18252,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -17571,7 +18293,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -17604,7 +18334,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -17626,7 +18364,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -17748,7 +18494,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -17843,7 +18597,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -17873,6 +18635,14 @@
      "out": {
       "calls": 0,
       "kind": "WRONG_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "WRONG"
      },
      "shown": "WRONG_SAME +norepeat",
@@ -17913,7 +18683,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -17936,6 +18714,14 @@
      "out": {
       "calls": 0,
       "kind": "N1_AGAIN",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "N1"
      },
      "shown": "N1_AGAIN +norepeat",
@@ -17969,7 +18755,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -17992,6 +18786,14 @@
      "out": {
       "calls": 0,
       "kind": "N1_AGAIN",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "N1"
      },
      "shown": "N1_AGAIN +norepeat",
@@ -18014,7 +18816,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -18047,7 +18857,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -18070,6 +18888,14 @@
      "out": {
       "calls": 0,
       "kind": "N1_AGAIN",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "N1"
      },
      "shown": "N1_AGAIN +norepeat",
@@ -18220,7 +19046,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -18283,6 +19117,14 @@
      "out": {
       "calls": 0,
       "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "COST"
      },
      "shown": "AGAIN +norepeat",
@@ -18316,7 +19158,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -18339,6 +19189,14 @@
      "out": {
       "calls": 0,
       "kind": "THANKS_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "THANKS"
      },
      "shown": "THANKS_SAME +norepeat",
@@ -18372,7 +19230,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -18395,6 +19261,14 @@
      "out": {
       "calls": 0,
       "kind": "CUT_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "CUT"
      },
      "shown": "CUT_SAME +norepeat",
@@ -18664,7 +19538,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "AI"
+      "kind": "AI",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AI",
      "state": {
@@ -18686,7 +19568,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "AI"
+      "kind": "AI",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "AI",
      "state": {
@@ -18995,7 +19885,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -19421,6 +20320,14 @@
       "calls": 0,
       "kind": "F2",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "work": "I run a tennis club"
      },
      "shown": "F2 name=Peter work=I run a tennis club",
@@ -19546,7 +20453,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -19653,7 +20568,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -19723,7 +20646,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -19792,7 +20723,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -19825,7 +20764,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -20100,7 +21047,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -20297,7 +21252,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -20330,7 +21293,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -20363,7 +21334,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -20419,7 +21398,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -20452,7 +21439,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -20485,7 +21480,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -20703,7 +21706,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -20736,7 +21747,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -20769,7 +21788,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -20904,7 +21931,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -21031,7 +22066,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -21087,7 +22130,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -21143,7 +22194,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "STUCK"
+      "kind": "STUCK",
+      "offer": {
+       "picks": [
+        "fix_ai",
+        "fix_app"
+       ],
+       "set": "stuck",
+       "text": "Do you want to check its AI, or your chat app?"
+      }
      },
      "shown": "STUCK",
      "state": {
@@ -21539,7 +22598,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -21594,7 +22662,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -21716,7 +22793,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -21756,7 +22842,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -21789,7 +22883,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -21811,7 +22913,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -21844,7 +22954,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -21866,7 +22984,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -21886,11 +23012,11 @@
   },
   {
    "about_keeping": false,
-   "expect": "CUT",
+   "expect": "plain line mem0",
    "failed": null,
    "kept": null,
    "kept_after": null,
-   "name": "lc1 kept: why? after a row: CUT",
+   "name": "lc1 changed by live changes-6: why? after a row is a follow-up: the plain line",
    "stage": "open",
    "steps": [
     {
@@ -21952,9 +23078,11 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what do you mean"
      },
-     "shown": "CUT",
+     "shown": "plain line mem0",
      "state": {
       "asked": [
        "mem"
@@ -21971,6 +23099,1260 @@
       "work": null
      },
      "text": "why?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "CUT",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 why as the first message: CUT",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "CUT",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "why"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MEAN_NONE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 why after msg0: MEAN_NONE with no AI (a follow-up in AI builds)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use it on my phone"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "msg"
+     },
+     "shown": "plain line msg0",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
+     },
+     "shown": "MEAN_NONE",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "why"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "PRIV",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 privacy, free model: PRIV",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "PRIV"
+     },
+     "shown": "PRIV",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "is my data private if I use the free model"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "PRIV",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 privacy plain: PRIV",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "PRIV"
+     },
+     "shown": "PRIV",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "who can see my chats"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question mod",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 is the free model good: never mod3",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mod"
+     },
+     "shown": "question mod",
+     "state": {
+      "asked": [
+       "mod"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mod",
+      "stage": "open",
+      "work": null
+     },
+     "text": "is the free model any good"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "HVC",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 hermes vs chatgpt: HVC, never mod1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HVC"
+     },
+     "shown": "HVC",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what's the difference between hermes and chatgpt"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "HVC",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 why use hermes instead of claude: HVC",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HVC"
+     },
+     "shown": "HVC",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "why use hermes instead of claude"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line mod1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 chatgpt plan still mod1",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "mod1",
+      "topic": "mod"
+     },
+     "shown": "line mod1",
+     "state": {
+      "asked": [],
+      "found": {
+       "mod": "mod1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use my chatgpt plan"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "then line msg0-then",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 his run 11-14: and then after msg0",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use it on my phone"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "msg"
+     },
+     "shown": "plain line msg0",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "then",
+      "topic": "msg"
+     },
+     "shown": "then line msg0-then",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MEAN_NONE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 his run: why after msg0-then: MEAN_NONE",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use it on my phone"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "msg"
+     },
+     "shown": "plain line msg0",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "then",
+      "topic": "msg"
+     },
+     "shown": "then line msg0-then",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
+     },
+     "shown": "MEAN_NONE",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "why"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "WRONG",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 his run: correction after msg0-then: WRONG",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use it on my phone"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "msg"
+     },
+     "shown": "plain line msg0",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "then",
+      "topic": "msg"
+     },
+     "shown": "then line msg0-then",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "WRONG",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "no, that's not right, it works on my phone already"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "WRONG",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 his run as typed: why, then the correction: WRONG",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use it on my phone"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "msg"
+     },
+     "shown": "plain line msg0",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "then",
+      "topic": "msg"
+     },
+     "shown": "then line msg0-then",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "and then?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
+     },
+     "shown": "MEAN_NONE",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "why"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "WRONG",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "no, that's not right, it works on my phone already"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "WRONG",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 his run: correction after msg0: WRONG",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use it on my phone"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "msg"
+     },
+     "shown": "plain line msg0",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "WRONG",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "no, that's not right, it works on my phone already"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "question mem",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 correction naming another topic goes on",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "msg"
+     },
+     "shown": "question msg",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "msg",
+      "stage": "open",
+      "work": null
+     },
+     "text": "can I use it on my phone"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "msg"
+     },
+     "shown": "plain line msg0",
+     "state": {
+      "asked": [
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how?"
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "question",
+      "topic": "mem"
+     },
+     "shown": "question mem",
+     "state": {
+      "asked": [
+       "mem",
+       "msg"
+      ],
+      "found": {},
+      "kept": {},
+      "lastq": true,
+      "met": false,
+      "name": null,
+      "pending": "mem",
+      "stage": "open",
+      "work": null
+     },
+     "text": "no, I meant does it remember my chats"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "POWER",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 powerful computer: POWER",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "POWER"
+     },
+     "shown": "POWER",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "do I need a powerful computer for this"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "POWER",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 what hardware do I need: POWER",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "POWER"
+     },
+     "shown": "POWER",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what hardware do I need"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "THANKS",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 thank you so much, that helps: THANKS",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "THANKS",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thank you so much, that helps"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "BYE",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 ok thanks bye: BYE",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "BYE"
+     },
+     "shown": "BYE",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "ok thanks bye"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "HELLO name=None",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 hi there, I'm new to all this: HELLO",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO",
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "HELLO name=None",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hi there, I'm new to all this"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "line msg1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 hi, how do I add telegram is not small talk",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "row",
+      "need": "msg1",
+      "topic": "msg"
+     },
+     "shown": "line msg1",
+     "state": {
+      "asked": [],
+      "found": {
+       "msg": "msg1"
+      },
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hi, how do I add telegram"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "c6 thanks with a question is not small talk",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "thanks, can hermes read my emails"
     }
    ]
   },
@@ -22050,7 +24432,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -22159,7 +24549,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -22586,7 +24984,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -22641,7 +25048,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -22763,7 +25179,16 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE",
      "state": {
@@ -22803,7 +25228,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -22836,7 +25269,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -22858,7 +25299,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -22891,7 +25340,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -22913,7 +25370,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -22946,7 +25411,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -22969,6 +25442,14 @@
      "out": {
       "calls": 0,
       "kind": "N1_AGAIN",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "N1"
      },
      "shown": "N1_AGAIN +norepeat",
@@ -23055,7 +25536,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -23229,7 +25718,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -23266,7 +25763,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -23288,7 +25793,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME"
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "HELLO_SAME",
      "state": {
@@ -23312,6 +25825,14 @@
       "calls": 0,
       "kind": "HELLO",
       "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "HELLO_SAME"
      },
      "shown": "HELLO name=None +norepeat",
@@ -23403,7 +25924,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME"
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO_SAME",
      "state": {
@@ -23427,6 +25956,14 @@
       "calls": 0,
       "kind": "HELLO",
       "name": null,
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "HELLO_SAME"
      },
      "shown": "HELLO name=None +norepeat",
@@ -23554,7 +26091,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME"
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO_SAME",
      "state": {
@@ -23581,6 +26126,14 @@
       "calls": 0,
       "kind": "HELLO",
       "name": "Peter",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "HELLO_SAME"
      },
      "shown": "HELLO name=Peter +norepeat",
@@ -23618,7 +26171,15 @@
      "out": {
       "calls": 0,
       "kind": "HELLO",
-      "name": null
+      "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HELLO name=None",
      "state": {
@@ -23640,7 +26201,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HELLO_SAME"
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      }
      },
      "shown": "HELLO_SAME",
      "state": {
@@ -23664,6 +26233,14 @@
       "calls": 0,
       "kind": "HELLO",
       "name": null,
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "HELLO_SAME"
      },
      "shown": "HELLO name=None +norepeat",
@@ -23757,7 +26334,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -23787,6 +26372,14 @@
      "out": {
       "calls": 0,
       "kind": "WRONG_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "WRONG"
      },
      "shown": "WRONG_SAME +norepeat",
@@ -23817,6 +26410,14 @@
      "out": {
       "calls": 0,
       "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "WRONG"
      },
      "shown": "WRONG +norepeat",
@@ -23917,7 +26518,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WRONG"
+      "kind": "WRONG",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WRONG",
      "state": {
@@ -23947,6 +26556,14 @@
      "out": {
       "calls": 0,
       "kind": "WRONG_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "WRONG"
      },
      "shown": "WRONG_SAME +norepeat",
@@ -23987,7 +26604,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -24010,6 +26635,14 @@
      "out": {
       "calls": 0,
       "kind": "THANKS_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "THANKS"
      },
      "shown": "THANKS_SAME +norepeat",
@@ -24043,7 +26676,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -24066,6 +26707,14 @@
      "out": {
       "calls": 0,
       "kind": "THANKS_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "THANKS"
      },
      "shown": "THANKS_SAME +norepeat",
@@ -24088,7 +26737,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -24121,7 +26778,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -24144,6 +26809,14 @@
      "out": {
       "calls": 0,
       "kind": "OK_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "OK"
      },
      "shown": "OK_SAME +norepeat",
@@ -24177,7 +26850,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "HOW"
+      "kind": "HOW",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "HOW",
      "state": {
@@ -24200,6 +26881,14 @@
      "out": {
       "calls": 0,
       "kind": "HOW_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "HOW"
      },
      "shown": "HOW_SAME +norepeat",
@@ -24233,7 +26922,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "WHO"
+      "kind": "WHO",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "WHO",
      "state": {
@@ -24256,6 +26953,14 @@
      "out": {
       "calls": 0,
       "kind": "AI",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "WHO"
      },
      "shown": "AI +norepeat",
@@ -24345,7 +27050,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "CUT"
+      "kind": "CUT",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "CUT",
      "state": {
@@ -24368,6 +27081,14 @@
      "out": {
       "calls": 0,
       "kind": "CUT_SAME",
+      "offer": {
+       "picks": [
+        "mod",
+        "msg"
+       ],
+       "set": "general_2",
+       "text": "Do you want to pick its AI, or chat from your phone?"
+      },
       "repeat_of": "CUT"
      },
      "shown": "CUT_SAME +norepeat",
@@ -24425,6 +27146,14 @@
      "out": {
       "calls": 0,
       "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "term"
      },
      "shown": "AGAIN +norepeat",
@@ -24506,6 +27235,14 @@
      "out": {
       "calls": 0,
       "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "term"
      },
      "shown": "AGAIN +norepeat",
@@ -24553,7 +27290,15 @@
      "out": {
       "by_again": true,
       "calls": 0,
-      "kind": "AGAIN"
+      "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AGAIN +again",
      "state": {
@@ -24610,6 +27355,14 @@
      "out": {
       "calls": 0,
       "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "term"
      },
      "shown": "AGAIN +norepeat",
@@ -24657,7 +27410,15 @@
      "out": {
       "by_again": true,
       "calls": 0,
-      "kind": "AGAIN"
+      "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AGAIN +again",
      "state": {
@@ -24820,7 +27581,15 @@
      "out": {
       "by_again": true,
       "calls": 0,
-      "kind": "AGAIN"
+      "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AGAIN +again",
      "state": {
@@ -24875,7 +27644,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "THANKS"
+      "kind": "THANKS",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "THANKS",
      "state": {
@@ -24984,7 +27761,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "OK"
+      "kind": "OK",
+      "offer": {
+       "picks": [
+        "msg",
+        "bot"
+       ],
+       "set": "after_topic:mem",
+       "text": "Do you want to use your phone, or add a second Hermes?"
+      }
      },
      "shown": "OK",
      "state": {
@@ -25051,7 +27836,16 @@
      "out": {
       "by_again": true,
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE +again",
      "state": {
@@ -25085,7 +27879,16 @@
      "out": {
       "by_again": true,
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE +again",
      "state": {
@@ -25108,7 +27911,15 @@
      "out": {
       "by_again": true,
       "calls": 0,
-      "kind": "AGAIN"
+      "kind": "AGAIN",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
      },
      "shown": "AGAIN +again",
      "state": {
@@ -25141,7 +27952,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -25164,7 +27983,16 @@
      "out": {
       "by_again": true,
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "MEAN_NONE",
+      "offer": {
+       "picks": [
+        "skill",
+        "plugin",
+        "mcp"
+       ],
+       "set": "words",
+       "text": "Do you want one of these words explained?"
+      }
      },
      "shown": "MEAN_NONE +again",
      "state": {
@@ -25367,7 +28195,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "STUCK"
+      "kind": "STUCK",
+      "offer": {
+       "picks": [
+        "fix_ai",
+        "fix_app"
+       ],
+       "set": "stuck",
+       "text": "Do you want to check its AI, or your chat app?"
+      }
      },
      "shown": "STUCK",
      "state": {
@@ -25423,7 +28259,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "STUCK"
+      "kind": "STUCK",
+      "offer": {
+       "picks": [
+        "fix_ai",
+        "fix_app"
+       ],
+       "set": "stuck",
+       "text": "Do you want to check its AI, or your chat app?"
+      }
      },
      "shown": "STUCK",
      "state": {
@@ -25479,7 +28323,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "STUCK"
+      "kind": "STUCK",
+      "offer": {
+       "picks": [
+        "fix_ai",
+        "fix_app"
+       ],
+       "set": "stuck",
+       "text": "Do you want to check its AI, or your chat app?"
+      }
      },
      "shown": "STUCK",
      "state": {
@@ -25502,6 +28354,14 @@
      "out": {
       "calls": 0,
       "kind": "STUCK_SAME",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      },
       "repeat_of": "STUCK"
      },
      "shown": "STUCK_SAME +norepeat",
@@ -25522,7 +28382,7 @@
   },
   {
    "about_keeping": false,
-   "expect": "MEAN_NONE",
+   "expect": "mean line skill-mean",
    "failed": null,
    "kept": null,
    "kept_after": null,
@@ -25558,9 +28418,10 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "MEAN_NONE"
+      "kind": "termmean",
+      "term": "skill"
      },
-     "shown": "MEAN_NONE",
+     "shown": "mean line skill-mean",
      "state": {
       "asked": [],
       "found": {},
@@ -25683,7 +28544,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -25716,7 +28585,15 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "N1"
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "what",
+        "setup"
+       ],
+       "set": "dont_know",
+       "text": "Do you want to know what Hermes is, or set it up?"
+      }
      },
      "shown": "N1",
      "state": {
@@ -25947,15 +28824,15 @@
    ]
   }
  ],
- "json_sha256": "65bddf953d33a1ad04edf3ba19006c9c11885fe24014596c039ee9dbfa3ebced",
+ "json_sha256": "06eda70cdbf3a667f455c8a0e93f6bfd2eae509d473cdd8d533e3abdf7d5879f",
  "keeps_off": false,
  "last_printed_lines": [
   "ok    lc3 kept: it costs me too much, how do I spend less: use2: line use2",
   "",
-  "conversations: 482 of 482 as expected"
+  "conversations: 503 of 503 as expected"
  ],
  "no_wants": false,
- "route2_sha256": "0356dfb91c0bfde85a56280434e6886a90e5b82a91bbfb27ddce1a1387e7ffbe",
+ "route2_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9",
  "singles": [
   {
    "landed": "mem",
@@ -26305,21 +29182,20 @@
    "landed": "mod",
    "out": {
     "calls": 0,
-    "kind": "row",
-    "need": "mod3",
+    "kind": "question",
     "topic": "mod"
    },
-   "shown": "line mod3",
+   "shown": "question mod",
    "state": {
-    "asked": [],
-    "found": {
-     "mod": "mod3"
-    },
+    "asked": [
+     "mod"
+    ],
+    "found": {},
     "kept": {},
-    "lastq": false,
+    "lastq": true,
     "met": false,
     "name": null,
-    "pending": null,
+    "pending": "mod",
     "stage": "open",
     "work": null
    },
@@ -26355,19 +29231,15 @@
    ]
   },
   {
-   "landed": "mod",
+   "landed": "FREE",
    "out": {
     "calls": 0,
-    "kind": "row",
-    "need": "mod3",
-    "topic": "mod"
+    "kind": "FREE"
    },
-   "shown": "line mod3",
+   "shown": "FREE",
    "state": {
     "asked": [],
-    "found": {
-     "mod": "mod3"
-    },
+    "found": {},
     "kept": {},
     "lastq": false,
     "met": false,
@@ -26378,7 +29250,7 @@
    },
    "text": "I dont want to pay for anything",
    "want": [
-    "mod"
+    "FREE"
    ]
   },
   {
@@ -27173,7 +30045,15 @@
    "landed": "none",
    "out": {
     "calls": 0,
-    "kind": "N1"
+    "kind": "N1",
+    "offer": {
+     "picks": [
+      "what",
+      "setup"
+     ],
+     "set": "dont_know",
+     "text": "Do you want to know what Hermes is, or set it up?"
+    }
    },
    "shown": "N1",
    "state": {
@@ -27243,7 +30123,15 @@
    "landed": "none",
    "out": {
     "calls": 0,
-    "kind": "N1"
+    "kind": "N1",
+    "offer": {
+     "picks": [
+      "what",
+      "setup"
+     ],
+     "set": "dont_know",
+     "text": "Do you want to know what Hermes is, or set it up?"
+    }
    },
    "shown": "N1",
    "state": {
@@ -27291,7 +30179,15 @@
    "out": {
     "calls": 0,
     "kind": "HELLO",
-    "name": null
+    "name": null,
+    "offer": {
+     "picks": [
+      "setup",
+      "can"
+     ],
+     "set": "general",
+     "text": "Do you want to set up Hermes, or see what it does?"
+    }
    },
    "shown": "HELLO name=None",
    "state": {
@@ -27314,7 +30210,15 @@
    "landed": "none",
    "out": {
     "calls": 0,
-    "kind": "N1"
+    "kind": "N1",
+    "offer": {
+     "picks": [
+      "what",
+      "setup"
+     ],
+     "set": "dont_know",
+     "text": "Do you want to know what Hermes is, or set it up?"
+    }
    },
    "shown": "N1",
    "state": {
@@ -27391,7 +30295,15 @@
    "landed": "none",
    "out": {
     "calls": 0,
-    "kind": "N1"
+    "kind": "N1",
+    "offer": {
+     "picks": [
+      "what",
+      "setup"
+     ],
+     "set": "dont_know",
+     "text": "Do you want to know what Hermes is, or set it up?"
+    }
    },
    "shown": "N1",
    "state": {

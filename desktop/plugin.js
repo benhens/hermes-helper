@@ -411,23 +411,27 @@ const TALK_DATA = {
       "text_no_name": "Nice to meet you. What do you do?"
     },
     "F2": {
-      "text": "Thanks, {name}. Ask me anything about Hermes.",
-      "text_no_name": "Thanks. Ask me anything about Hermes."
+      "text": "Thanks, {name}.",
+      "text_no_name": "Thanks.",
+      "offer": "general"
     },
     "F3": {
-      "text": "That's fine. Ask me anything about Hermes."
+      "text": "That's fine.",
+      "offer": "general"
     },
     "N1": {
-      "text": "Sorry, I don't have checked information on that yet. I only say what I have checked."
+      "text": "Sorry, I don't have checked information on that yet. I only say what I have checked.",
+      "offer": "dont_know"
     },
     "N1a": {
-      "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use."
+      "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
+      "offer": "dont_know"
     },
     "N_HINT": {
       "text": "To see what I can help with, type \"what can I ask you\"."
     },
     "TP": {
-      "text": "You can ask me how Hermes works and how to set it up. Pick one, or type your own question."
+      "text": "I can explain how Hermes works and help you set it up. Pick one."
     },
     "W1": {
       "text": "Which one do you mean?"
@@ -470,85 +474,305 @@ const TALK_DATA = {
       "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin"
     },
     "NAME_AGAIN": {
-      "text": "Hi again, {name}. Ask me anything about Hermes."
+      "text": "Hi again, {name}.",
+      "offer": "general"
     },
     "NAME_NEW": {
-      "text": "Thanks, {name}. Ask me anything about Hermes."
+      "text": "Thanks, {name}.",
+      "offer": "general"
     },
     "BACK": {
-      "text": "Hi again, {name}. What would you like Hermes to help you with?",
-      "text_no_name": "Hi again. What would you like Hermes to help you with?"
+      "text": "Hi again, {name}.",
+      "text_no_name": "Hi again.",
+      "offer": "general"
     },
     "HELLO": {
-      "text": "Hi, {name}. What would you like Hermes to help you with?",
-      "text_no_name": "Hi. What would you like Hermes to help you with?"
+      "text": "Hi, {name}.",
+      "text_no_name": "Hi.",
+      "offer": "general"
     },
     "HELLO_SAME": {
-      "text": "I'm here. Type your question whenever you are ready."
+      "text": "I'm here.",
+      "offer": "general"
     },
     "THANKS": {
-      "text": "You're welcome. Ask me more about Hermes whenever you like."
+      "text": "You're welcome.",
+      "offer": "after_topic"
     },
     "OK": {
-      "text": "Good. I'm here if you want to know more."
+      "text": "Good.",
+      "offer": "after_topic"
     },
     "HOW": {
-      "text": "I'm good, thanks for asking. I'm here when you have a question about Hermes."
+      "text": "I'm good, thanks for asking.",
+      "offer": "general"
     },
     "WHO": {
       "text": "I'm Helper. I help you learn about Hermes and set it up. Your own Hermes does the work.",
-      "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs)."
+      "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs).",
+      "offer": "general"
     },
     "AI": {
-      "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs."
+      "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs.",
+      "offer": "general"
     },
     "AI_PICK": {
-      "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits."
+      "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits.",
+      "offer": "general"
     },
     "AI_WRITES": {
-      "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong."
+      "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong.",
+      "offer": "general"
     },
     "BYE": {
-      "text": "Bye. Come back any time you have a question about Hermes."
+      "text": "Bye. Come back any time."
     },
     "CUT": {
-      "text": "Sorry, that looks cut off. Tell me a bit more about what you need."
+      "text": "Sorry, that looks cut off.",
+      "offer": "general"
     },
     "MEAN_NONE": {
-      "text": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\"."
+      "text": "Sorry, I was not clear.",
+      "offer": "words"
     },
     "WRONG": {
-      "text": "Sorry about that. Please say it another way."
+      "text": "Sorry about that.",
+      "offer": "general"
     },
     "AGAIN": {
-      "text": "Sorry, I have nothing more on that. Please ask it another way."
+      "text": "Sorry, I have nothing more on that.",
+      "offer": "general"
     },
     "N1_AGAIN": {
-      "text": "Sorry, I don't have checked information on that one either."
+      "text": "Sorry, I don't have checked information on that one either.",
+      "offer": "dont_know"
     },
     "OK_SAME": {
-      "text": "All right. I'm here when you need me."
+      "text": "All right.",
+      "offer": "after_topic"
     },
     "THANKS_SAME": {
-      "text": "Any time. I'm here if you have another question."
+      "text": "Any time.",
+      "offer": "after_topic"
     },
     "HOW_SAME": {
-      "text": "Still good, thanks. Ask me anything about Hermes."
+      "text": "Still good, thanks.",
+      "offer": "general"
     },
     "BYE_SAME": {
       "text": "Bye for now."
     },
     "CUT_SAME": {
-      "text": "I can't tell what you need from that. Type your whole question in one message."
+      "text": "I can't tell what you need from that.",
+      "offer": "general"
     },
     "WRONG_SAME": {
-      "text": "Sorry again. Try other words, or ask about another part of Hermes."
+      "text": "Sorry again.",
+      "offer": "general"
     },
     "STUCK": {
-      "text": "Sorry it didn't work. Tell me what you tried and what you saw on the screen."
+      "text": "Sorry it isn't working.",
+      "offer": "stuck"
     },
     "STUCK_SAME": {
-      "text": "Sorry it still isn't working. Try other words, or ask about another part of Hermes."
+      "text": "Sorry it still isn't working.",
+      "offer": "general"
+    },
+    "PRIV": {
+      "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+      "source": "user-guide/local-models.md line 14: \"Nothing leaves your computer: no account, no API key, and no network access after a model is downloaded.\" Second sentence: user-guide/features/provider-routing.md line 98: \"Controls whether providers can use your prompts for training.\" and user-guide/configuring-models.md line 79: \"the vendor may train on your prompts and completions\" (both show prompts reach the provider; no docs line says it in general words or names the free model)",
+      "next": {
+        "kind": "line",
+        "label": "And my files?",
+        "id": "PRIV-next",
+        "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+        "source": "the line SAFE, word for word (/hermes-docs/user-guide/security.md lines 16 and 26)"
+      }
+    },
+    "POWER": {
+      "text": "On your own computer, small AIs run well with an 8 GB graphics card. Hermes shows which ones fit.",
+      "source": "user-guide/local-models.md line 202: \"A GPU with 8 GB+ of memory runs the small catalog models comfortably;\" and line 65: \"**Memory fit** — green (*Fits your GPU*: runs entirely in GPU memory),\". No docs line says an AI from a company needs no strong computer, so the line does not say it."
+    },
+    "HVC": {
+      "text": "Hermes learns from experience and remembers you across chats. ChatGPT can be the AI inside it.",
+      "source": "index.mdx line 19: \"The self-improving AI agent built by Nous Research. ... it creates skills from experience, improves them during use, ... and builds a deepening model of who you are across sessions.\" Third sentence: mod1's source, integrations/providers.md (OpenAI Codex row): sign in with a ChatGPT plan."
+    },
+    "MIG": {
+      "text": "There are two kinds of moving.",
+      "source": "Helper's own lead-in; the two kinds are the offer move",
+      "offer": "move"
+    },
+    "MIG_APP": {
+      "text": "Hermes can bring over your notes and settings from other AI apps. The docs name OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot.",
+      "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (\"imports your existing **OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot** setup into Hermes with one command\") and line 4 (\"instructions, rules, allowlists, MCP servers, skills, memories\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please bring my setup over from <my old AI app> with hermes migrate. Show me the plan before you write anything.",
+        "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 15 (\"Already set up? Run `hermes migrate` for the same offer\") and line 9 (\"You always see a per-item plan before anything is written\")"
+      }
+    },
+    "MIG_NOT_LISTED": {
+      "text": "The docs name only OpenClaw, Claude Code, Codex, Cursor, \"Grok Bot\" and OpenBot. I have nothing checked on other apps.",
+      "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (the list of six); no other app is named on that page",
+      "offer": "general"
+    },
+    "MIG_PC": {
+      "text": "Hermes can pack your settings, chats and other data into one zip file. Hermes on the new computer unpacks it. That replaces what is there.",
+      "source": "dev/hermes-src/website/docs/reference/cli-commands.md line 1116 (\"Create a zip archive of your Hermes configuration, skills, sessions, and data.\") and line 1192 (\"Restore a previously created Hermes backup into your Hermes home directory. All files in the archive overwrite existing files\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is.",
+        "source": "dev/hermes-src/website/docs/reference/cli-commands.md lines 1110 to 1123 (hermes backup, default ~/hermes-backup-<timestamp>.zip) and 1186 to 1192 (hermes import <zipfile>)"
+      }
+    },
+    "HERMES": {
+      "text": "Hermes is an AI helper made by Nous Research. It learns from experience and remembers you across chats.",
+      "source": "dev/hermes-src/website/docs/index.mdx line 19 (\"The self-improving AI agent built by [Nous Research]... it creates skills from experience, improves them during use, ... builds a deepening model of who you are across sessions.\")",
+      "offer": "general"
+    },
+    "START": {
+      "text": "Most people start by picking the AI Hermes uses. The quick setup signs you in, with no secret key.",
+      "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** — OAuth login, no API keys to manage ... The recommended fast path.\")",
+      "offer": "general"
+    },
+    "KEY": {
+      "text": "Not always. The quick setup signs you in, so you need no key. A key is a secret code some AI companies give you instead.",
+      "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"OAuth login, no API keys to manage\") and line 119 (\"**OpenRouter** ... Enter your API key\"). 'secret code': K1's own wording; the docs keep keys in .env, 'secrets only' (dev/hermes-src/AGENTS.md, User state).",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "UPDATE": {
+      "text": "The Hermes app checks for updates by itself. When one is ready, it offers a one-click update.",
+      "source": "dev/hermes-src/website/docs/user-guide/desktop.md line 526 (\"The app checks for updates in the background and offers a one-click update when one is ready.\")"
+    },
+    "SAFE": {
+      "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
+      "source": "dev/hermes-src/website/docs/user-guide/security.md line 26 (\"Before executing any command, Hermes checks it against a curated list of dangerous patterns. If a match is found, the user must explicitly approve it.\") and line 16 (\"human-in-the-loop for destructive operations\")",
+      "next": {
+        "kind": "line",
+        "label": "And my messages?",
+        "id": "SAFE-next",
+        "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
+        "source": "the line PRIV, word for word (its source)"
+      }
+    },
+    "PERSONALITY": {
+      "text": "You change its personality in SOUL.md, the file that says who your Hermes is.",
+      "source": "dev/hermes-src/website/docs/user-guide/features/personality.md line 9 (\"Hermes Agent's personality is fully customizable. `SOUL.md` is the **primary identity**\") and line 50 (\"Edit `~/.hermes/SOUL.md` to change Hermes' default personality.\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please show me my SOUL.md and help me change how you talk. Ask me before you save anything."
+      }
+    },
+    "KEY_WHAT": {
+      "text": "A key is a secret code from an AI company. It lets Hermes use that company's AI. Keys go in Settings, never in a chat.",
+      "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 118 (\"Anthropic ... or API key for pay-per-token\") and line 119 (\"OpenRouter ... Enter your API key\"); 'Keys go in Settings, never in a chat': line K1, word for word. 'secret': dev/hermes-src/AGENTS.md, User state (\".env (secrets only)\").",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "MIG_CHATGPT": {
+      "text": "The docs name no way to move chats or settings from ChatGPT. ChatGPT can still be the AI inside Hermes.",
+      "source": "/hermes-docs/user-guide/import-from-other-agents.md line 9 (the six apps: \"**OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot**\"; ChatGPT is not among them) and line 4 (what comes over: \"instructions, rules, allowlists, MCP servers, skills, memories\"; no chats). Second sentence: mod1's source (integrations/providers.md, OpenAI Codex row: sign in with a ChatGPT plan).",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "AGENT": {
+      "text": "That is an AI that works by itself. The docs say Hermes gets better the longer it runs.",
+      "source": "/hermes-docs/index.mdx line 115 (\"It's an **autonomous agent** that gets more capable the longer it runs.\")",
+      "offer": "general"
+    },
+    "KEY_WHERE": {
+      "text": "A key is a secret code. In the Hermes app it goes in Settings, never in a chat.",
+      "source": "/hermes-docs/user-guide/desktop.md line 447 (\"**Providers settings pane** — a dedicated place to manage inference providers, with an Accounts / API-keys UX for signing in and storing credentials per provider\"). First sentence: line K1, word for word. Seen: the Settings list has a row Providers (docs/answers/hhtech-helper-settings.md line 15, hhtech ran the app v0.23.0).",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "FREE": {
+      "text": "Hermes itself is free. An AI on your own computer needs no account. Some AI companies let you start free.",
+      "source": "/hermes-docs/getting-started/official-domains.md line 61 (\"Hermes Agent is MIT-licensed and free to self-host.\"); user-guide/local-models.md line 14 (\"Nothing leaves your computer: no account, no API key\"); integrations/providers.md line 653 (\"Free tier included\") and line 521 (\"Create an account and a free API key\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "MODEL_FOR": {
+      "text": "I have nothing checked on which AI suits which kind of work.",
+      "source": "No docs page was found that matches an AI to a kind of work (not a full search of the docs: checked user-guide/configuring-models.md and integrations/providers.md headings only).",
+      "offer": "pay"
+    },
+    "MODEL_CHANGE": {
+      "text": "In a Hermes chat, the message box shows the AI's name. Click it to choose another.",
+      "source": "/hermes-docs/user-guide/desktop.md line 283 (\"The model picker lives in the **composer**, just left of the microphone. Click it to switch the model\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Model",
+        "part": "model"
+      }
+    },
+    "SKILL_ADD": {
+      "text": "A skill is written steps for one task. To add one, click \"Capabilities\", then \"Skills\", then a card, then \"Install\".",
+      "source": "Seen run by hhtech in Hermes Desktop v0.23.0 (docs/answers/hhtech-wants-check.md section 5; the same clicks as the steps in helper-wants-v1.json, w_reddit next). Docs: /hermes-docs/user-guide/desktop.md line 483 (\"The Skills tab lists your installed skills ... each entry has a one-click **Install** button\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Capabilities",
+        "part": "capabilities"
+      }
+    },
+    "PLUGIN_WHICH": {
+      "text": "A plugin is an add-on. You need none to start. Hermes loads its built-in ones by itself.",
+      "source": "/hermes-docs/user-guide/features/plugins.md line 290 (\"bundled \\\"always-works\\\" infrastructure loads automatically; third-party general plugins are opt-in\")",
+      "next": {
+        "kind": "part",
+        "label": "Open Capabilities",
+        "part": "capabilities"
+      }
+    },
+    "PLUGIN_ADD": {
+      "text": "A plugin is an add-on. Your own Hermes can add one when you give it the name.",
+      "source": "/hermes-docs/user-guide/features/plugins.md line 429 (\"hermes plugins install <name>                # install a catalog entry\") and line 222 (\"you're asked `Enable 'name' now? [y/N]`\")",
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on."
+      }
+    },
+    "CODING": {
+      "text": "The docs do not say it in general. For jobs on a schedule they say you just ask in plain words.",
+      "source": "/hermes-docs/user-guide/features/cron.md line 24 (\"you can create, pause, edit, and remove jobs by asking in plain language — no CLI required\"). user-guide/desktop.md line 9 does not say whether coding is needed.",
+      "offer": "general"
+    },
+    "PICK_FIRST": {
+      "text": "Choose one, and I will show you how.",
+      "source": "Helper's own line"
+    },
+    "HOW_PASTE": {
+      "text": "Press \"{label}\". Copy the text and paste it into a chat with Hermes.",
+      "source": "Helper's own line; {label} is the label of the paste button of Helper's last answer"
+    },
+    "HOW_PART": {
+      "text": "Press \"{label}\". It opens that part for you.",
+      "source": "Helper's own line; {label} is the label of the part button of Helper's last answer"
+    },
+    "START_2": {
+      "text": "First choose the AI Hermes uses. Then send Hermes one message to see that it answers.",
+      "source": "/hermes-docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** ... The recommended fast path.\") and line 182 (\"## 3. Run Your First Chat\")",
+      "offer": "general_2"
     }
   },
   "opening": {
@@ -1102,6 +1326,29 @@ const TALK_DATA = {
       "hermes"
     ]
   },
+  "model_pick_not_when_starts": [
+    "what",
+    "which",
+    "who",
+    "where",
+    "when",
+    "why",
+    "how",
+    "should",
+    "do i",
+    "do you",
+    "does",
+    "is",
+    "are",
+    "am i",
+    "can i",
+    "could i",
+    "will it",
+    "can it",
+    "can hermes",
+    "must i",
+    "have i"
+  ],
   "small_talk": {
     "cut_end_words": [
       "helper",
@@ -1389,7 +1636,15 @@ const TALK_DATA = {
         "that doesn't help",
         "that doesnt help",
         "that did nothing",
-        "nothing happened"
+        "nothing happened",
+        "not answering",
+        "isn't answering",
+        "isnt answering",
+        "not responding",
+        "doesn't answer",
+        "doesnt answer",
+        "no answer",
+        "not replying"
       ],
       "again": [
         "again",
@@ -1452,7 +1707,8 @@ const TALK_DATA = {
       "H1",
       "skill by name",
       "C1",
-      "AGAIN"
+      "AGAIN",
+      "then"
     ],
     "thanks_tail": [
       "so much",
@@ -1478,13 +1734,15 @@ const TALK_DATA = {
       "WHERE",
       "skill by name",
       "wants",
-      "written"
+      "written",
+      "then"
     ],
     "how_after_rows": {
       "words": [
         "how",
         "and",
-        "and then"
+        "and then",
+        "why"
       ],
       "after": [
         "row",
@@ -1493,7 +1751,801 @@ const TALK_DATA = {
         "wants",
         "COST",
         "WHERE",
-        "written"
+        "written",
+        "then"
+      ]
+    },
+    "how_that": {
+      "phrases": [
+        "how do i do that",
+        "how do i do this",
+        "how do i do it",
+        "how would i do that",
+        "how can i do that",
+        "how to do that",
+        "how do i set that up",
+        "how do i set it up",
+        "how do i get that",
+        "how do i start",
+        "how do i start that",
+        "how do i use that",
+        "how do i use it",
+        "show me how",
+        "where do i do that",
+        "where is that",
+        "where do i find that"
+      ],
+      "cut_first": [
+        "ok",
+        "okay",
+        "so",
+        "and",
+        "cool",
+        "right",
+        "but",
+        "well",
+        "yes",
+        "yeah",
+        "sure",
+        "great",
+        "nice",
+        "good"
+      ]
+    }
+  },
+  "live_c6": {
+    "privacy_words": [
+      "private",
+      "privacy",
+      "my data",
+      "data private",
+      "data safe",
+      "is my data",
+      "who sees",
+      "who can see",
+      "who reads",
+      "leave my computer",
+      "leaves my computer",
+      "leave my laptop",
+      "stay on my computer",
+      "stays on my computer",
+      "confidential",
+      "spy",
+      "spying"
+    ],
+    "power_words": [
+      "powerful computer",
+      "strong computer",
+      "good computer",
+      "fast computer",
+      "beefy",
+      "what computer",
+      "which computer",
+      "computer do i need",
+      "kind of computer",
+      "type of computer",
+      "hardware",
+      "specs",
+      "gpu",
+      "graphics card",
+      "powerful laptop",
+      "powerful pc",
+      "strong pc",
+      "good pc"
+    ],
+    "vs_names": [
+      "chatgpt",
+      "chat gpt",
+      "claude",
+      "gemini",
+      "copilot",
+      "grok",
+      "openai"
+    ],
+    "vs_words": [
+      "difference",
+      "different",
+      "differ",
+      "compare",
+      "compared",
+      "comparison",
+      "vs",
+      "versus",
+      "better than",
+      "instead of",
+      "why use",
+      "why not just",
+      "same as",
+      "like chatgpt",
+      "like claude"
+    ],
+    "hosted_words": [
+      "free model",
+      "free ai",
+      "free one",
+      "free plan",
+      "free tier",
+      "nous",
+      "chatgpt",
+      "chat gpt",
+      "claude",
+      "gpt",
+      "openai",
+      "gemini",
+      "hosted",
+      "cloud ai",
+      "online ai"
+    ],
+    "greet_more": {
+      "question_words": [
+        "how",
+        "what",
+        "why",
+        "which",
+        "where",
+        "when",
+        "who",
+        "can",
+        "could",
+        "should",
+        "does",
+        "do",
+        "is",
+        "are",
+        "will",
+        "would",
+        "help"
+      ]
+    }
+  },
+  "offers": {
+    "hint": "Or type your own question",
+    "things": {
+      "setup": {
+        "label": "Set up Hermes",
+        "say": "set up Hermes",
+        "gives": {
+          "kind": "setup_chat",
+          "id": "Q_NEW"
+        }
+      },
+      "can": {
+        "label": "What Hermes can do",
+        "say": "see what it does",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "can"
+        }
+      },
+      "mod": {
+        "label": "Which AI to use",
+        "say": "pick its AI",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "mod"
+        }
+      },
+      "msg": {
+        "label": "Phone and chat apps",
+        "say": "use your phone",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "msg"
+        }
+      },
+      "mem": {
+        "label": "What Hermes remembers",
+        "say": "see what it remembers",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "mem"
+        }
+      },
+      "sch": {
+        "label": "Daily jobs and reminders",
+        "say": "set up daily jobs",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "sch"
+        }
+      },
+      "svc": {
+        "label": "Gmail and other services",
+        "say": "link a service",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "svc"
+        }
+      },
+      "bot": {
+        "label": "More than one Hermes",
+        "say": "add a second Hermes",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "bot"
+        }
+      },
+      "what": {
+        "label": "What Hermes is",
+        "say": "know what Hermes is",
+        "gives": {
+          "kind": "line",
+          "id": "HERMES"
+        }
+      },
+      "mig_app": {
+        "label": "From another AI app",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP"
+        }
+      },
+      "mig_pc": {
+        "label": "To another computer",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_PC"
+        }
+      },
+      "fix_ai": {
+        "label": "Check its AI",
+        "gives": {
+          "kind": "topic_pick",
+          "id": "mod"
+        }
+      },
+      "fix_app": {
+        "label": "Check my chat app",
+        "gives": {
+          "kind": "row",
+          "id": "msg3"
+        }
+      },
+      "skill": {
+        "label": "Skills",
+        "gives": {
+          "kind": "term",
+          "id": "skill"
+        }
+      },
+      "plugin": {
+        "label": "Plugins",
+        "gives": {
+          "kind": "term",
+          "id": "plugin"
+        }
+      },
+      "mcp": {
+        "label": "MCP",
+        "gives": {
+          "kind": "term",
+          "id": "mcp"
+        }
+      },
+      "pay_mod1": {
+        "label": "ChatGPT",
+        "gives": {
+          "kind": "row",
+          "id": "mod1"
+        }
+      },
+      "pay_mod2": {
+        "label": "Claude",
+        "gives": {
+          "kind": "row",
+          "id": "mod2"
+        }
+      },
+      "pay_mod4": {
+        "label": "Neither",
+        "gives": {
+          "kind": "row",
+          "id": "mod4"
+        }
+      },
+      "pay_mod3": {
+        "label": "I want it free",
+        "gives": {
+          "kind": "row",
+          "id": "mod3"
+        }
+      }
+    },
+    "sets": {
+      "general": {
+        "text": "Do you want to set up Hermes, or see what it does?",
+        "picks": [
+          "setup",
+          "can"
+        ],
+        "text_no_setup": "Do you want to see what Hermes does, or pick its AI?",
+        "picks_no_setup": [
+          "can",
+          "mod"
+        ],
+        "instead": "general_2"
+      },
+      "general_2": {
+        "text": "Do you want to pick its AI, or chat from your phone?",
+        "picks": [
+          "mod",
+          "msg"
+        ],
+        "instead": "general"
+      },
+      "dont_know": {
+        "text": "Do you want to know what Hermes is, or set it up?",
+        "picks": [
+          "what",
+          "setup"
+        ],
+        "text_no_setup": "Do you want to know what Hermes is, or what it does?",
+        "picks_no_setup": [
+          "what",
+          "can"
+        ],
+        "instead": "general_2"
+      },
+      "words": {
+        "text": "Do you want one of these words explained?",
+        "picks": [
+          "skill",
+          "plugin",
+          "mcp"
+        ],
+        "instead": "general"
+      },
+      "move": {
+        "text": "Do you mean from another AI app, or to a new computer?",
+        "picks": [
+          "mig_app",
+          "mig_pc"
+        ],
+        "instead": "general"
+      },
+      "stuck": {
+        "text": "Do you want to check its AI, or your chat app?",
+        "picks": [
+          "fix_ai",
+          "fix_app"
+        ],
+        "instead": "general"
+      },
+      "after_topic": {
+        "instead": "general",
+        "template": "Do you want to {say1}, or {say2}?",
+        "by_topic": {
+          "mod": [
+            "msg",
+            "mem"
+          ],
+          "msg": [
+            "sch",
+            "svc"
+          ],
+          "mem": [
+            "msg",
+            "bot"
+          ],
+          "sch": [
+            "svc",
+            "msg"
+          ],
+          "svc": [
+            "sch",
+            "mod"
+          ],
+          "bot": [
+            "mem",
+            "msg"
+          ],
+          "use": [
+            "mod",
+            "can"
+          ]
+        }
+      },
+      "pay": {
+        "text": "Do you already pay for ChatGPT or Claude?",
+        "picks": [
+          "pay_mod1",
+          "pay_mod2",
+          "pay_mod4",
+          "pay_mod3"
+        ],
+        "instead": "general"
+      }
+    }
+  },
+  "offer_words": {
+    "migrate": [
+      "migrate",
+      "migrating",
+      "migration",
+      "move from",
+      "move over",
+      "bring over",
+      "bring my stuff",
+      "bring things",
+      "bring my",
+      "switch from",
+      "import my",
+      "move my stuff",
+      "move to hermes",
+      "moving to hermes",
+      "transfer",
+      "switch over",
+      "switching from",
+      "switching over",
+      "coming from",
+      "import my chats",
+      "import chats",
+      "chats from",
+      "bring my chats",
+      "move my chats"
+    ],
+    "listed_apps": [
+      "openclaw",
+      "claude code",
+      "codex",
+      "cursor",
+      "grok bot",
+      "openbot",
+      "clawdbot",
+      "moltbot"
+    ],
+    "not_listed_apps": [
+      "chatgpt",
+      "chat gpt",
+      "gemini",
+      "copilot",
+      "perplexity"
+    ],
+    "computer": [
+      "new computer",
+      "another computer",
+      "new laptop",
+      "another laptop",
+      "new mac",
+      "new pc",
+      "other computer",
+      "new machine",
+      "another machine"
+    ],
+    "what_hermes": [
+      "what is hermes",
+      "what's hermes",
+      "whats hermes",
+      "what is this",
+      "what does hermes do",
+      "tell me about hermes"
+    ],
+    "start": [
+      "get started",
+      "getting started",
+      "where to begin",
+      "where do i begin",
+      "where to start",
+      "where do i start",
+      "set up first",
+      "start with",
+      "i'm lost",
+      "im lost",
+      "i am lost",
+      "don't know where",
+      "dont know where",
+      "what do i do first",
+      "what should i do first",
+      "set this up",
+      "set it up",
+      "set hermes up",
+      "set up hermes",
+      "do first",
+      "start first",
+      "first step",
+      "what first"
+    ],
+    "key": [
+      "api key",
+      "api keys",
+      "a key",
+      "an api",
+      "openai key",
+      "anthropic key",
+      "claude key",
+      "my key",
+      "key go",
+      "keys go"
+    ],
+    "update": [
+      "update hermes",
+      "upgrade hermes",
+      "update the app",
+      "new version",
+      "newest version",
+      "latest version",
+      "how do i update",
+      "how to update"
+    ],
+    "safe": [
+      "delete my files",
+      "deletes my files",
+      "delete files",
+      "delete my stuff",
+      "is it safe",
+      "safe to use",
+      "break my computer",
+      "mess up my computer"
+    ],
+    "personality": [
+      "personality",
+      "its tone",
+      "how it talks",
+      "talk differently",
+      "change how it talks"
+    ],
+    "stuck_more": [
+      "not answering",
+      "isn't answering",
+      "isnt answering",
+      "not responding",
+      "doesn't answer",
+      "doesnt answer",
+      "no answer",
+      "not replying",
+      "is broken",
+      "it's broken",
+      "its broken",
+      "something broke",
+      "it broke",
+      "keeps crashing",
+      "crashed",
+      "an error",
+      "error message"
+    ],
+    "laptop_off": [
+      "laptop is closed",
+      "laptop closed",
+      "close my laptop",
+      "computer is off",
+      "laptop is off",
+      "turn off my computer",
+      "computer off"
+    ],
+    "key_what_starts": [
+      "what is",
+      "what's",
+      "whats",
+      "what are",
+      "what does"
+    ],
+    "chatgpt_names": [
+      "chatgpt",
+      "chat gpt"
+    ],
+    "agent_what": [
+      "agent",
+      "agents",
+      "ai agent",
+      "ai agents",
+      "an agent"
+    ],
+    "what_hermes_any": [
+      "what even is this",
+      "what is this app",
+      "what's this app",
+      "whats this app",
+      "what does this app",
+      "what even is hermes",
+      "what is this thing",
+      "what is this program"
+    ],
+    "key_where": [
+      "where do i put",
+      "where do i enter",
+      "where do i add",
+      "where do i paste",
+      "where to put",
+      "where should i put",
+      "where can i put",
+      "where does",
+      "put my",
+      "enter my",
+      "paste my",
+      "add my",
+      "key go",
+      "keys go"
+    ],
+    "free": [
+      "without paying",
+      "not pay",
+      "don't want to pay",
+      "dont want to pay",
+      "do not want to pay",
+      "pay nothing",
+      "cost nothing",
+      "costs nothing",
+      "no money",
+      "for free"
+    ],
+    "model_for": [
+      "which model",
+      "what model",
+      "which ai",
+      "what ai",
+      "best model",
+      "best ai",
+      "model should",
+      "ai should"
+    ],
+    "model_change": [
+      "change the model",
+      "change model",
+      "change my model",
+      "switch model",
+      "switch models",
+      "switch the model",
+      "change the ai",
+      "change its ai",
+      "switch the ai",
+      "switch ai",
+      "different model",
+      "another model",
+      "swap the model"
+    ],
+    "own_ai": [
+      "run the ai",
+      "run an ai",
+      "run ai",
+      "ai on my",
+      "model on my",
+      "run a model",
+      "run models",
+      "run the model"
+    ],
+    "skill_add": [
+      "add a skill",
+      "add skills",
+      "add a new skill",
+      "add new skills",
+      "install a skill",
+      "install skills",
+      "get a skill",
+      "get more skills",
+      "get new skills"
+    ],
+    "plugin_which": [
+      "what plugins",
+      "which plugins",
+      "which plugin",
+      "plugins should",
+      "plugins do i need",
+      "need plugins",
+      "need a plugin",
+      "need any plugins",
+      "best plugins"
+    ],
+    "plugin_add": [
+      "install a plugin",
+      "install plugins",
+      "install the plugin",
+      "install this plugin",
+      "add a plugin",
+      "add plugins",
+      "get a plugin"
+    ],
+    "coding_ask": [
+      "know coding",
+      "need to know coding",
+      "know how to code",
+      "need to code",
+      "have to code",
+      "need coding",
+      "without coding",
+      "know programming",
+      "be a programmer",
+      "be a developer",
+      "not a programmer",
+      "not a developer",
+      "can't code",
+      "cant code",
+      "not technical",
+      "non-technical"
+    ]
+  },
+  "about_rule": {
+    "rows": {
+      "mod1": [
+        "plan",
+        "plans",
+        "subscription",
+        "subscriptions",
+        "subscribe",
+        "subscribed",
+        "sign in",
+        "sign-in",
+        "signed in",
+        "log in",
+        "login",
+        "account",
+        "accounts",
+        "pay",
+        "pays",
+        "paying",
+        "paid",
+        "i have",
+        "i've got",
+        "i got",
+        "i already",
+        "i use",
+        "i'm on",
+        "im on",
+        "use my",
+        "with my",
+        "works with",
+        "work with",
+        "plus",
+        "use chatgpt",
+        "use gpt",
+        "use openai",
+        "with chatgpt",
+        "my chatgpt"
+      ],
+      "mod2": [
+        "plan",
+        "plans",
+        "subscription",
+        "subscriptions",
+        "subscribe",
+        "subscribed",
+        "sign in",
+        "sign-in",
+        "signed in",
+        "log in",
+        "login",
+        "account",
+        "accounts",
+        "pay",
+        "pays",
+        "paying",
+        "paid",
+        "i have",
+        "i've got",
+        "i got",
+        "i already",
+        "i use",
+        "i'm on",
+        "im on",
+        "use my",
+        "with my",
+        "works with",
+        "work with",
+        "max",
+        "pro",
+        "use claude",
+        "with claude",
+        "my claude"
+      ],
+      "mod3": [
+        "own computer",
+        "my computer",
+        "own laptop",
+        "my laptop",
+        "laptop",
+        "own machine",
+        "my machine",
+        "my pc",
+        "my mac",
+        "local",
+        "locally",
+        "offline",
+        "private",
+        "privately",
+        "no account",
+        "ollama",
+        "local ai",
+        "leaves my computer",
+        "leave my computer"
       ]
     }
   },
@@ -1517,7 +2569,10 @@ const TALK_DATA = {
       "F3",
       "OPEN",
       "BACK",
-      "skill by name"
+      "skill by name",
+      "PICK_FIRST",
+      "HOW_PASTE",
+      "HOW_PART"
     ],
     "groups": {
       "hello": [
@@ -1559,6 +2614,10 @@ const TALK_DATA = {
         "N1",
         "N1a",
         "N1_AGAIN"
+      ],
+      "start": [
+        "START",
+        "START_2"
       ]
     },
     "in_place": {
@@ -1606,6 +2665,10 @@ const TALK_DATA = {
         "plain",
         "AGAIN",
         "MEAN_NONE"
+      ],
+      "start": [
+        "START_2",
+        "START"
       ]
     },
     "wrong_starts": [
@@ -2226,8 +3289,25 @@ const TALK_DATA = {
       },
       "question": {
         "id": "mem-q",
-        "text": "What do you want Hermes to remember?",
-        "answers": []
+        "text": "Do you want Hermes to remember you, or find old chats?",
+        "answers": [
+          {
+            "label": "Things about me",
+            "gives": "mem1"
+          },
+          {
+            "label": "Our old chats",
+            "gives": "mem2"
+          },
+          {
+            "label": "It forgot something",
+            "gives": "mem3"
+          },
+          {
+            "label": "Separate notes per Hermes",
+            "gives": "mem4"
+          }
+        ]
       },
       "plain": {
         "id": "mem0",
@@ -2633,6 +3713,11 @@ const TALK_DATA = {
         "next": {
           "kind": "part",
           "label": "Open Messaging"
+        },
+        "then": {
+          "id": "msg0-then",
+          "text": "In the Hermes app, open Messaging and pick your chat app. For Telegram, press Create with QR.",
+          "source": "user-guide/desktop.md line 451 (msg1 and msg2's source); content/dash-setup-list-v2.json, Chat apps steps"
         }
       },
       "needs": [
@@ -2652,6 +3737,11 @@ const TALK_DATA = {
             "kind": "part",
             "label": "Open Messaging",
             "part": "messaging"
+          },
+          "then": {
+            "id": "msg1-then",
+            "text": "Scan the code with Telegram on your phone. Hermes makes the bot, lets only you in, and restarts by itself.",
+            "source": "user-guide/desktop.md line 487 in /hermes-docs (\"scan the code (or open the link) in Telegram, and Hermes creates the bot, detects your user ID for the allowlist, saves the credentials, and restarts the gateway for you\"); the same two sentences as content/dash-setup-list-v2.json, chat_apps steps 3 and 4"
           }
         },
         {
@@ -2797,8 +3887,25 @@ const TALK_DATA = {
       },
       "question": {
         "id": "sch-q",
-        "text": "What should Hermes do on a schedule, such as a daily summary?",
-        "answers": []
+        "text": "Do you want a daily job, a reminder, or a regular check?",
+        "answers": [
+          {
+            "label": "A job every day",
+            "gives": "sch1"
+          },
+          {
+            "label": "A reminder",
+            "gives": "sch2"
+          },
+          {
+            "label": "A regular check",
+            "gives": "sch3"
+          },
+          {
+            "label": "My email every morning",
+            "gives": "sch5"
+          }
+        ]
       },
       "plain": {
         "id": "sch0",
@@ -3150,8 +4257,21 @@ const TALK_DATA = {
       },
       "question": {
         "id": "bot-q",
-        "text": "What would a second Hermes do for you?",
-        "answers": []
+        "text": "Do you want one more Hermes, or two that work together?",
+        "answers": [
+          {
+            "label": "One more Hermes",
+            "gives": "bot1"
+          },
+          {
+            "label": "Two working together",
+            "gives": "bot2"
+          },
+          {
+            "label": "Many chats in one",
+            "gives": "bot3"
+          }
+        ]
       },
       "plain": {
         "id": "bot0",
@@ -3409,7 +4529,12 @@ const TALK_DATA = {
             "label": "See what uses them",
             "id": "use1-next",
             "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
-            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many.",
+            "mean": {
+              "id": "use1-next-mean",
+              "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+              "source": "the same as use1-next: reference/faq.md lines 558 to 559 (/usage); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" (dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png, opened by Lead)"
+            }
           }
         },
         {
@@ -3471,7 +4596,12 @@ const TALK_DATA = {
             "label": "See what uses them",
             "id": "use3-next",
             "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
-            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many.",
+            "mean": {
+              "id": "use3-next-mean",
+              "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+              "source": "the same as use3-next: reference/faq.md lines 558 to 559 (/usage); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" (dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png, opened by Lead)"
+            }
           }
         },
         {
@@ -3541,6 +4671,11 @@ const TALK_DATA = {
         "kind": "part",
         "label": "Open Capabilities",
         "part": "capabilities"
+      },
+      "mean": {
+        "id": "skill-mean",
+        "text": "Think of a skill as a recipe. Hermes follows its steps when a task needs it.",
+        "source": "the same as the skill line: getting-started/quickstart.md line 295 (\"on-demand instruction documents that teach Hermes how to do a specific task ... a step-by-step procedure\"). 'recipe' is hhcontent's own everyday comparison, not a docs word."
       }
     },
     {
@@ -3560,6 +4695,11 @@ const TALK_DATA = {
         "kind": "part",
         "label": "Open Capabilities",
         "part": "capabilities"
+      },
+      "mean": {
+        "id": "plugin-mean",
+        "text": "It is like an app on your phone. You add it, and Hermes gets one more feature.",
+        "source": "the same as the plugin line: user-guide/features/plugins.md line 10. 'like an app on your phone' is hhcontent's own everyday comparison, not a docs word."
       }
     },
     {
@@ -3829,10 +4969,14 @@ const TALK_DATA = {
         "..."
       ],
       "lines": {
-        "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes.",
+        "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number.",
         "WORK_LONG": "Thanks. That is too long for me to keep. In 12 words or fewer, what do you do?",
-        "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
+        "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long.",
         "WORK_ASK": "What do you do now?"
+      },
+      "offers": {
+        "WORK_LONG_2": "general",
+        "WORK_SECRET": "general"
       },
       "typed_change": {
         "starts": [
@@ -8158,6 +9302,12 @@ const WANTS_DATA = {
 // The build stops when the data's own switches (use_now) say otherwise (scripts/live-data.mjs).
 const AI_MODES = ['no_ai_step', 'ai_picks_line', 'ai_writes']
 const AI_MODE = 'ai_writes'
+
+// ---- src/setup-built.js ----
+// Whether the set-up conversation (content/helper-setup-chat-v1.json) is in this build. false: every offer set that
+// has text_no_setup uses it with picks_no_setup, so the pick "Set up Hermes" never shows before it works (Lead, 11 Nov
+// 06:25, note b). One line, as src/ai-mode.js: a test loader and the build of a "try" file swap only this line.
+const SETUP_BUILT = false
 
 // ---- src/live-data.js ----
 // Generated by scripts/build.mjs from content/helper-talk-live-v2.json (hhcontent's data for Helper's AI step),
@@ -12943,6 +14093,32 @@ const LIVE_DATA = {
       }
     },
     {
+      "id": "msg0-then",
+      "subject": "msg",
+      "title": "",
+      "text": "In the Hermes app, open Messaging and pick your chat app. For Telegram, press Create with QR.",
+      "kw": [],
+      "weak": [],
+      "next_of": "msg0",
+      "shows": {
+        "kind": "extra",
+        "line": "msg0-then"
+      }
+    },
+    {
+      "id": "msg1-then",
+      "subject": "msg",
+      "title": "",
+      "text": "Scan the code with Telegram on your phone. Hermes makes the bot, lets only you in, and restarts by itself.",
+      "kw": [],
+      "weak": [],
+      "next_of": "msg1",
+      "shows": {
+        "kind": "extra",
+        "line": "msg1-then"
+      }
+    },
+    {
       "id": "bot1-next",
       "subject": "bot",
       "title": "",
@@ -12982,6 +14158,20 @@ const LIVE_DATA = {
       }
     },
     {
+      "id": "use1-next-mean",
+      "subject": "use",
+      "title": "",
+      "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+      "kw": [],
+      "weak": [],
+      "next_of": "use1-next",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "use1-next-mean"
+      }
+    },
+    {
       "id": "use3-next",
       "subject": "use",
       "title": "",
@@ -12992,6 +14182,48 @@ const LIVE_DATA = {
       "shows": {
         "kind": "extra",
         "line": "use3-next"
+      }
+    },
+    {
+      "id": "use3-next-mean",
+      "subject": "use",
+      "title": "",
+      "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+      "kw": [],
+      "weak": [],
+      "next_of": "use3-next",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "use3-next-mean"
+      }
+    },
+    {
+      "id": "skill-mean",
+      "subject": "words",
+      "title": "",
+      "text": "Think of a skill as a recipe. Hermes follows its steps when a task needs it.",
+      "kw": [],
+      "weak": [],
+      "next_of": "skill",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "skill-mean"
+      }
+    },
+    {
+      "id": "plugin-mean",
+      "subject": "words",
+      "title": "",
+      "text": "It is like an app on your phone. You add it, and Hermes gets one more feature.",
+      "kw": [],
+      "weak": [],
+      "next_of": "plugin",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "plugin-mean"
       }
     }
   ],
@@ -13130,7 +14362,7 @@ const LIVE_DATA = {
     "max_tokens": 20
   },
   "writer": {
-    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
+    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence. Add no fact.\n5b. End with a statement. Never end with \"ask me\", \"let me know\", \"feel free to ask\" or a question. Helper shows things to pick under your reply.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
     "max_tokens": 200
   },
   "pick_only": {
@@ -13323,8 +14555,10 @@ const LIVE_DATA = {
       },
       {
         "term": "\\btokens?\\b",
-        "explained_by": "pieces of words|word pieces",
-        "ignore_case": true
+        "explained_by": "pieces? of (?:a )?words?|word[- ]?pieces?|(?:text|word) units?|units? of (?:text|words?)|(?:small|short|tiny) (?:pieces?|bits?|chunks?|parts?) of (?:text|a word|words)|bits? of text|chunks? of text",
+        "ignore_case": true,
+        "was_c6": "pieces of words|word pieces",
+        "changed": "live changes-6: hhtech-ai-share section 4 point 1: \"small text units\" and \"a small piece of a word\" explain tokens and were refused."
       }
     ],
     "r9_pattern": "\\bI(?:'ll| will| can)?\\s+(?:set up|install|connect|build|create)\\b",
@@ -13692,7 +14926,67 @@ const LIVE_DATA = {
           "don't say"
         ]
       }
-    ]
+    ],
+    "c16_allow": {
+      "words": [
+        "guide",
+        "guides"
+      ],
+      "speaks_of_helper": "\\b(?:I|I'm|me|my|Helper|Helper's)\\b|\\byour guides?\\b"
+    },
+    "c28": [
+      "ask me",
+      "let me know",
+      "feel free to ask",
+      "feel free to",
+      "just ask",
+      "any questions",
+      "any other questions",
+      "anything else",
+      "happy to help",
+      "here to help"
+    ],
+    "c29": {
+      "skip": [
+        "run",
+        "runs",
+        "work",
+        "works",
+        "own",
+        "teach",
+        "study",
+        "manage",
+        "coach",
+        "sell",
+        "have",
+        "small",
+        "big",
+        "local"
+      ],
+      "step_words": [
+        "then",
+        "next",
+        "after",
+        "first",
+        "now",
+        "step",
+        "steps",
+        "start",
+        "open",
+        "press",
+        "click",
+        "type",
+        "paste",
+        "scan",
+        "go"
+      ],
+      "lead_ins": [
+        "your",
+        "about",
+        "for",
+        "like"
+      ]
+    }
   },
   "no_reply": {
     "starts": [
@@ -13711,7 +15005,7 @@ const LIVE_DATA = {
   "slow_ai": {
     "id": "SLOW_A",
     "text": "Your AI took too long to answer, so I answered from my own notes. To make it quicker for me, paste this into a new chat with your Hermes.",
-    "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helping Hand's short calls, not for my own chats. Show me the change before you save it."
+    "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helper's short calls, not for my own chats. Show me the change before you save it."
   },
   "lines_by_mode": {
     "are_you_an_ai": {
@@ -13726,6 +15020,11 @@ const LIVE_DATA = {
     },
     "settings_top_line_2": {
       "no_ai_step": null,
+      "ai_picks_line": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.",
+      "ai_writes": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help."
+    },
+    "settings_top_line_2_no_setup": {
+      "no_ai_step": null,
       "ai_picks_line": "Only the What you do line is sent to your AI, when Helper asks it for help.",
       "ai_writes": "Only the What you do line is sent to your AI, when Helper asks it for help."
     },
@@ -13733,6 +15032,11 @@ const LIVE_DATA = {
       "no_ai_step": null,
       "ai_picks_line": "I also tell your AI what you do when I ask it for help.",
       "ai_writes": "I also tell your AI what you do when I ask it for help."
+    },
+    "setup_told": {
+      "no_ai_step": null,
+      "ai_picks_line": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help.",
+      "ai_writes": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help."
     }
   }
 }
@@ -15392,7 +16696,7 @@ function byCode(text, st) {
     const unsure = whichOf(t, TALK_DATA.unsure_words).length > 0
     if (ns.length === 1) r.need = ns[0]
     else if (!ns.length) {
-      if (topic === 'svc' && answering && !strong.length && !unsure && !t.includes('?')) r.need = 'svc1'
+      if (topic === 'svc' && answering && !strong.length && !unsure && !t.includes('?') && !questionForm(t)) r.need = 'svc1' // ask-fix-t1: a question is not a service name
       else if (st.found[topic] && !unsure) r.need = st.found[topic]
     }
   }
@@ -15417,7 +16721,7 @@ function byCode(text, st) {
 // the visit has made its first AI call; slow, the slow-AI line SLOW_A: null, 'due' (owed after the next answer that
 // may have it, src/live-turn.js slowFollows), 'said'.
 function freshVisit(stage = 'open', kept = {}, met = false) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false, aiTried: false, slow: null }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false, aiTried: false, slow: null, lastOffer: null, lastParts: null, c9: true }
 }
 // A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
 // earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,
@@ -15439,7 +16743,7 @@ function opening(st) {
     out = { kind: 'OPEN' }
   }
   noteLast(st, out)
-  return out
+  return attachOffer(out, st, null) // offer-t1: BACK carries the offer general
 }
 // route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
 // wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
@@ -15448,12 +16752,14 @@ const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.
 // data's wants is this plugin's want; its "skill by name", the skills-by-name line S1 or S2, is this plugin's skill)
 const AGAIN_BACK = (TALK_DATA.small_talk.again_brings_back || []).map(k => (k === 'wants' ? 'want' : k === 'skill by name' ? 'skill' : k))
 // what a line brought back by "again" leaves out: its faint Kept: line and what only that moment had
-const AGAIN_DROP = ['kept', 'first', 'name_taken', 'thing', 'repeat_of', 'by_again', 'code', 'work_first']
+const AGAIN_DROP = ['kept', 'first', 'name_taken', 'thing', 'repeat_of', 'by_again', 'code', 'work_first', 'weak_hit', 'offer']
 function noteLast(st, o) {
   if (!o) return o
   st.last = o.kind
   st.lastKey = lineKey(o)
-  st.lastTopic = ['row', 'question', 'plain'].includes(o.kind) ? o.topic || null : null
+  st.lastTopic = ['row', 'question', 'plain', 'then'].includes(o.kind) ? o.topic || null : null // live changes-6: then
+  // ask-fix-t1 (route2.py last_next reads last_key's fields): the parts of Helper's last line, for its then line and its button
+  st.lastParts = { kind: o.kind, topic: o.topic || null, need: o.need || null, term: o.term || null, row: o.row || null, line: o.line || o.id || null }
   st.lastByAgain = !!o.by_again
   if (AGAIN_BACK.includes(o.kind)) {
     st.lastAnswer = Object.fromEntries(Object.entries(o).filter(([k]) => !AGAIN_DROP.includes(k)))
@@ -15799,7 +17105,7 @@ const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
 // live-v2 changes-4: under the first Kept: of what the person does, in a build that calls an AI
 const WORK_TOLD = LIVE_DATA.lines_by_mode.work_told[AI_MODE]
 // live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
-const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
+const HOW_AFTER = ST.how_after_rows.after.flatMap(k => (k === 'wants' ? ['want'] : k === 'then' ? ['then', 'rowthen'] : [k]))
 const NR = TALK_DATA.no_repeat
 const LETTER = /\p{L}/u
 const ONE_WORD = /^(?:\p{L}|['-]){2,30}$/u
@@ -15848,6 +17154,8 @@ function smallTalk(text, st) {
       }
     }
   }
+  if (kind === null && !opening) kind = greetMore(t) // live changes-6: live_c6.greet_more
+  if (kind === null && !opening && !st.pending && correction(t, st)) kind = 'wrong' // live changes-6: live_c6.correction_rule
   if (kind === null) {
     const letters = /[a-z0-9]/.test(t)
     const one = /^[a-z]+$/.test(t)
@@ -15873,11 +17181,169 @@ function smallTalk(text, st) {
   if (st.pending && (kind === 'ok' || kind === 'mean' || kind === 'again')) return null
   return kind
 }
+/* ---------- live changes-6 (route2.py greet_more, correction, c6_line), offer-t1 and ask-fix-t1 (offer_route, how_that, about_ok) ---------- */
+const C6 = TALK_DATA.live_c6
+const knownWords = tc => strongTopics(tc).length > 0 || anyTerm(tc) || whichOf(tc, WEAK_ALL).length > 0
+// live_c6.greet_more: a greeting, thanks or bye with a few more words
+function greetMore(t) {
+  if (t.includes('?') || typedWords(t).length > 9 || knownWords(cutIgnored(t))) return null
+  let first = null
+  let rest = ''
+  for (const k of ['hello', 'thanks', 'bye', 'ok']) {
+    for (const w of [...ST.kinds[k]].sort((a, b) => b.length - a.length)) {
+      if (startsWith(t, [w])) {
+        first = k
+        rest = t.slice(w.length)
+        break
+      }
+    }
+    if (first) break
+  }
+  if (!first) return null
+  if (C6.greet_more.question_words.some(q => hits(rest, q))) return null
+  const has = k => ST.kinds[k].some(w => w.length > 2 && hits(t, w))
+  if (has('bye')) return 'bye'
+  if (has('thanks')) return 'thanks'
+  return first === 'ok' ? null : first
+}
+// live_c6.correction_rule: a correction right after a topic's plain line or its then line (or with only Helper's
+// not-clear or cut-off line between), naming no other topic
+function correction(t, st) {
+  const la = st.lastAnswer || {}
+  let topic
+  if (['plain', 'then'].includes(st.last) && st.lastTopic) topic = st.lastTopic
+  else if (['MEAN_NONE', 'CUT', 'CUT_SAME'].includes(st.last) && ['plain', 'then'].includes(la.kind)) topic = la.topic
+  else return false
+  if (!startsWith(t, NR.wrong_starts) || ST.no_words.includes(t.trim())) return false
+  const tc = cutIgnored(t)
+  let ts = strongTopics(tc)
+  if (!ts.length) ts = TOPIC_IDS.filter(k => whichOf(tc, TOPICS[k].weak_key_words).length)
+  return ts.length > 0 && ts.every(x => x === topic)
+}
+// live_c6: PRIV, POWER, HVC, or null
+function c6Line(t) {
+  if (whichOf(t, C6.privacy_words).length) return 'PRIV'
+  if (whichOf(t, C6.power_words).length) return 'POWER'
+  if (whichOf(t, C6.vs_names).length && whichOf(t, C6.vs_words).length) return 'HVC'
+  return null
+}
+const THEN_W = ['how', 'and', 'and then', 'then', 'what next', 'next', 'now what', 'then what', 'what then', 'and next']
+// ask-fix-t1 (about_rule): a row found by key words is final only when the message has one of its about words
+const ABOUT_ROWS = TALK_DATA.about_rule.rows
+const aboutOk = (t, need) => !ABOUT_ROWS[need] || whichOf(t, ABOUT_ROWS[need]).length > 0
+// offer-t1 and ask-fix-t1 (route2.py offer_route): the kind of a new line, 'ROW:<need>', or null. tw: cut, normed message
+const OW = TALK_DATA.offer_words
+function offerRoute(tw) {
+  const t = tw.replace(/[ ?!.]+$/, '')
+  const has = k => whichOf(t, OW[k]).length > 0
+  if (has('migrate') || (has('computer') && /\b(?:move|moving|migrate|transfer|copy)\b/.test(t))) {
+    if (has('computer')) return 'MIG_PC'
+    if (has('listed_apps')) return 'MIG_APP'
+    if (has('chatgpt_names')) return 'MIG_CHATGPT'
+    if (has('not_listed_apps')) return 'MIG_NOT_LISTED'
+    return 'MIG'
+  }
+  const m = WHAT_IS && WHAT_IS.exec(t)
+  if (m && OW.agent_what.includes(m[1].replace(/^[ ?.!]+|[ ?.!]+$/g, ''))) return 'AGENT'
+  if (has('key')) return has('key_where') ? 'KEY_WHERE' : startsWith(t, OW.key_what_starts) ? 'KEY_WHAT' : 'KEY'
+  if (has('personality')) return 'PERSONALITY'
+  if (has('stuck_more')) return 'STUCK'
+  if (has('free')) return 'FREE'
+  if (has('model_change')) return 'MODEL_CHANGE'
+  if (has('model_for') && hits(t, 'for')) return 'MODEL_FOR'
+  if (has('own_ai') && whichOf(t, ABOUT_ROWS.mod3).length) return 'ROW:mod3'
+  if (has('skill_add')) return 'SKILL_ADD'
+  if (has('plugin_which')) return 'PLUGIN_WHICH'
+  if (has('plugin_add')) return 'PLUGIN_ADD'
+  if (has('coding_ask')) return 'CODING'
+  if (has('what_hermes_any')) return 'HERMES'
+  if (knownWords(t)) return null // a strong, weak or term key word: the topics answer it
+  if (has('laptop_off')) return 'ROW:msg3'
+  if (OW.what_hermes.includes(t)) return 'HERMES'
+  if (has('update')) return 'UPDATE'
+  if (has('safe')) return 'SAFE'
+  if (has('start')) return 'START'
+  return null
+}
+// ask-fix-t1 (small_talk.how_that, route2.py last_next and how_that): "ok and how do I do that", by Helper's last line
+const HT = ST.how_that
+const HT_CUT = new RegExp('^(?:(?:' + HT.cut_first.map(escapeRe).join('|') + ')\\b[ ,]*)+(?=\\S)')
+// the then line and the button (next) of Helper's last line: [then or null, next or null]
+function lastNext(st) {
+  const p = st.lastParts || {}
+  if (p.kind === 'row') {
+    const n = TOPICS[p.topic].needs.find(x => x.id === p.need)
+    return [n.then || null, n.next || null]
+  }
+  if (p.kind === 'plain') return [TOPICS[p.topic].plain.then || null, TOPICS[p.topic].plain.next || null]
+  if (p.kind === 'term') return [null, TERMS[p.term].next || null]
+  // Builder: a row of the wants (route2.py has none) with text to paste counts as a line whose button is a paste box
+  if (p.kind === 'want' && WANT_ROWS[p.row] && WANT_ROWS[p.row].next && WANT_ROWS[p.row].next.kind === 'paste') return [null, { kind: 'paste', label: WANT_ROWS[p.row].next.label, paste_text: WANT_ROWS[p.row].next.paste_text }]
+  if (FIXED[p.kind]) return [null, FIXED[p.kind].next || null]
+  return [null, null]
+}
+function howThat(text, st) {
+  let t = talkNorm(text).replace(/[ ?!.,]+$/, '')
+  t = t.replace(HT_CUT, '').trim() || t
+  if (!HT.phrases.includes(t)) return null
+  // (1) the things to pick stay
+  if (st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)) return { kind: 'PICK_FIRST', same_picks: true }
+  const [then, nx] = lastNext(st)
+  const p = st.lastParts || {}
+  if (then) {
+    st.pending = null
+    return p.kind === 'row' ? { kind: 'rowthen', topic: p.topic, need: p.need } : { kind: 'then', topic: p.topic }
+  }
+  if (nx && nx.kind === 'line') return { kind: 'nextline', of: p.kind, topic: p.topic, need: p.need, term: p.term, text: nx.text, id: nx.id }
+  if (nx && nx.kind === 'paste') return { kind: 'HOW_PASTE', label: nx.label, button: nx, topic: p.topic }
+  if (nx && nx.kind === 'part') return { kind: 'HOW_PART', label: nx.label, button: nx, topic: p.topic }
+  return null
+}
+// live changes-9 (not in route2.py): a next line's second wording (use1-next-mean), by the next line's id
+const NEXT_MEAN = Object.fromEntries(TALK_DATA.topics.flatMap(t => [t.plain.next, ...t.needs.map(n => n.next)]).filter(n => n && n.mean).map(n => [n.id, n.mean]))
+
+/* ---------- offer-t1 (JSON offers; route2.py offer_set, attach_offer, press_offer) ---------- */
+const OF = TALK_DATA.offers
+// the offer a line carries: a fixed line's own, or keeps.work.offer_t1's (WORK_LONG_2, WORK_SECRET)
+const offerOfLine = kind => (FIXED[kind] && FIXED[kind].offer) || (KEEPS.work.offers || {})[kind] || null
+// [set id, question text, pick ids]
+function offerSet(sid, prevTopic = null) {
+  const S = OF.sets
+  if (sid === 'after_topic') {
+    const bt = S.after_topic.by_topic
+    if (prevTopic && bt[prevTopic]) {
+      const [a, b] = bt[prevTopic]
+      return ['after_topic:' + prevTopic, S.after_topic.template.replace('{say1}', OF.things[a].say).replace('{say2}', OF.things[b].say), [a, b]]
+    }
+    sid = 'general'
+  }
+  const s = S[sid]
+  if (!SETUP_BUILT && s.text_no_setup) return [sid, s.text_no_setup, s.picks_no_setup]
+  return [sid, s.text, s.picks]
+}
+// A line with an offer gets it (o.offer: { set, text, picks }); never the same set twice in a row (its instead set).
+// prevTopic: the topic of Helper's last answer before this line, for after_topic.
+function attachOffer(o, st, prevTopic = null) {
+  const of = o && offerOfLine(o.kind)
+  if (!of) {
+    st.lastOffer = null
+    return o
+  }
+  let [sid, text, picks] = offerSet(of, prevTopic)
+  if (sid === st.lastOffer) [sid, text, picks] = offerSet(sid.startsWith('after_topic:') ? OF.sets.after_topic.instead : OF.sets[sid].instead)
+  o.offer = { set: sid, text, picks }
+  st.lastOffer = sid
+  return o
+}
+// Every offer question this build can show: [set id, text, pick ids] (tests; the after_topic sets by topic)
+const offerSets = () => [...Object.keys(OF.sets).filter(k => k !== 'after_topic').map(k => offerSet(k)), ...Object.keys(OF.sets.after_topic.by_topic).map(t => offerSet('after_topic', t))]
+
 // The fixed line for a small-talk kind: [line, the name for HELLO or the topic for a plain line].
 function smallLine(kind, st) {
   const name = st.name || st.kept.name || null
   if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
   if (kind === 'ai') return [LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE], null] // talk-live: AI, AI_PICK or AI_WRITES
+  if (kind === 'mean' && (st.last === 'then' || st.last === 'rowthen')) return ['MEAN_NONE', null] // live changes-6
   if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
   return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG', stuck: 'STUCK' }[kind], null] // changes-3: stuck
 }
@@ -15995,11 +17461,14 @@ function turn(text, st) {
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 function turnParts(text, st) {
   const wasOpening = st.stage === 'name' || st.stage === 'work'
+  const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
   const pre = { ...steps }
+  if (steps.kind === 'PICK_FIRST') return { pre, out: steps } // ask-fix-t1: nothing changes, the same things to pick stay
   const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
-  return { pre, out: noteLast(st, out) }
+  noteLast(st, out)
+  return { pre, out: attachOffer(out, st, prevTopic) }
 }
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
@@ -16016,13 +17485,45 @@ function turnSteps(text, st) {
     out.kind = 'K1'
     return out
   }
+  // ask-fix-t1 (small_talk.how_that): "ok and how do I do that", first at stage open, before small talk and any AI call
+  if (st.stage === 'open') {
+    const hw = howThat(text, st)
+    if (hw) return Object.assign(out, hw)
+  }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
+  // ask-fix-t1 (mean_rule_ask_fix_t1): the mean words themselves right after a word line with a mean field
+  if (sk === 'mean' && st.last === 'term' && TERMS[st.lastParts.term].mean && ST.kinds.mean.some(w => w.length > 4 && hits(talkNorm(text), w))) {
+    st.stage = 'open'
+    return done('termmean', { term: st.lastParts.term })
+  }
   // live-v2 changes-3 (small_talk.again_rule): this visit's last answer line again, or AGAIN or MEAN_NONE
   if (sk === 'again') {
     st.stage = 'open'
     const { kind, ...more } = againLine(st)
     return done(kind, { ...more, by_again: true })
+  }
+  if (sk === 'mean') {
+    const bare = talkNorm(text).replace(/[ ?!.]+$/, '')
+    const w = bare.replace(/^(?:(?:ok|okay|so|and|cool|right)\b[ ,]*)+(?=\S)/, '').trim() || bare
+    const thenWord = THEN_W.includes(w) || THEN_W.includes(bare)
+    // live changes-6 (then_rule): the then words right after a plain line that has a then line
+    if (thenWord && st.last === 'plain' && st.lastTopic && TOPICS[st.lastTopic].plain.then) {
+      st.stage = 'open'
+      return done('then', { topic: st.lastTopic })
+    }
+    // live changes-9 (not in route2.py; st.c9 false only for replaying it): the then words right after a row with a then
+    // line (msg1), and right after a topic's then line when one row of that topic has one (msg0-then, then msg1-then)
+    if (st.c9 !== false && thenWord && st.last === 'row') {
+      const n = TOPICS[st.lastParts.topic].needs.find(x => x.id === st.lastParts.need)
+      if (n && n.then) return done('rowthen', { topic: st.lastParts.topic, need: n.id })
+    }
+    if (st.c9 !== false && thenWord && st.last === 'then' && st.lastTopic) {
+      const ns = TOPICS[st.lastTopic].needs.filter(x => x.then)
+      if (ns.length === 1) return done('rowthen', { topic: st.lastTopic, need: ns[0].id })
+    }
+    // live changes-9: kind mean right after a next line with a second wording (use1-next, use3-next)
+    if (st.c9 !== false && ['extra', 'nextline'].includes(st.last) && NEXT_MEAN[st.lastParts.line]) return done('nextmean', { id: NEXT_MEAN[st.lastParts.line].id })
   }
   if (sk) {
     const [line, x] = smallLine(sk, st)
@@ -16133,15 +17634,32 @@ function turnSteps(text, st) {
     const nl = nameLater(text, st, out)
     if (nl) return done(nl.kind, { name: nl.name })
     const tw = cutIgnored(talkNorm(text))
+    // offer-t1: offer_words, new lines from the docs; ask-fix-t1 (offer_words.pending_rule): while a question is open,
+    // only a message in question form, and never FREE or a row
+    let orr = offerRoute(tw)
+    if (st.pending && !(orr && questionForm(tw) && orr !== 'FREE' && !orr.startsWith('ROW:'))) orr = null
+    if (orr && orr.startsWith('ROW:')) return done('row', { topic: orr.slice(4, 7), need: orr.slice(4) })
+    if (orr) return done(orr)
     const wi = whatIs(tw)
     if (wi) return done('plain', { topic: wi, why: 'what is' })
+    // live changes-6: PRIV, POWER, HVC; not as the answer to Helper's own question
+    const c6 = st.pending ? null : c6Line(tw)
+    if (c6) return done(c6)
     const fx = fixedByWords(tw, st)
     if (fx) return done(fx)
   }
   // 4 and 5. the topic and the need, by key words
   const code = byCode(text, st)
   out.code = code
-  const { topic, need, several } = code
+  const { topic, several } = code
+  let { need } = code
+  // live changes-6 (mod3_guard): mod3 is not the answer when the message names a hosted or free AI
+  if (need === 'mod3' && whichOf(t, C6.hosted_words).length) need = code.need = null
+  // ask-fix-t1 (about_rule): a key word alone never shows the row (a weak hit)
+  if (need && topic && st.pending !== topic && !aboutOk(t, need)) {
+    out.weak_hit = need
+    need = code.need = null
+  }
   // the rows: one is shown; two or more, "Which one do you mean?" with their labels (three and
   // "More" when over four; wants_step.py shows the first four)
   if (code.rows) return code.rows.length === 1 ? done('want', { row: code.rows[0] }) : done('W1', { buttons: code.rows })
@@ -16160,6 +17678,17 @@ function turnSteps(text, st) {
     return withServiceLine(done('row', { topic, need }), st)
   }
   if (several) return done('W1', { buttons: several.slice(0, TALK_DATA.answers.max_at_once) })
+  // ask-fix-t1 (about_rule.weak_hit_then.no_ai): the topic's own question again, also when it was asked before; only if
+  // that question was Helper's last line, the don't-know line. A kept answer is not shown for a weak hit.
+  if (out.weak_hit && topic) {
+    if (TOPICS[topic].question.answers.length && st.lastKey !== lineKey({ kind: 'question', topic })) {
+      if (!st.asked.includes(topic)) st.asked.push(topic)
+      const r = done('question', { topic })
+      st.pending = topic
+      return r
+    }
+    return done('N1')
+  }
   // keeps.use: something is kept for this topic, so its question is not asked
   if (topic && keptNeed(topic, st)) {
     const r = fromKept(topic, st)
@@ -16283,7 +17812,7 @@ function skip(st) {
   const out = { kind: 'F3' }
   noteLast(st, out)
   if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
-  return out
+  return attachOffer(out, st, null) // offer-t1: F3 carries the offer general
 }
 
 // A button that makes Helper say one more pre-written line.
@@ -16291,6 +17820,27 @@ function sayLineSteps(line, st) {
   st.lastq = false
   st.pending = null
   return { kind: 'extra', line }
+}
+
+// offer-t1 (route2.py press_offer): a thing picked under an offer, by its id only, never by key words.
+// ask-fix-t1 point 8 (not in route2.py): a pick of the pay offer (ChatGPT, Claude, Neither, I want it free) is kept
+// as a picked answer to the model question is.
+function pressOffer(thing, st) {
+  const g = OF.things[thing].gives
+  const prevTopic = st.lastTopic
+  let o
+  if (g.kind === 'topic_pick') o = pickTopicSteps(g.id, st)
+  else if (g.kind === 'term') o = { kind: 'term', term: g.id }
+  else if (g.kind === 'row') {
+    o = { kind: 'row', topic: g.id.slice(0, 3), need: g.id }
+    if (thing.startsWith('pay_')) {
+      st.found.mod = g.id
+      keep(st, o, 'mod', g.id)
+    }
+  } else if (g.kind === 'setup_chat') o = { kind: 'SETUP_' + g.id }
+  else o = { kind: g.id }
+  noteLast(st, o)
+  return attachOffer(o, st, prevTopic)
 }
 
 // "See what I keep" pressed where Helper's settings page cannot open: the list, as for A1.
@@ -16351,6 +17901,7 @@ const EXTRA_LINES = (() => {
     t.needs.forEach(n => take(n.next))
   }
   TALK_DATA.terms.forEach(t => take(t.next))
+  Object.values(FIXED).forEach(f => take(f.next)) // ask-fix-t1: PRIV-next, SAFE-next
   return lines
 })()
 
@@ -16479,9 +18030,12 @@ function keptWasShown(log) {
 function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
-  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(asTyped.length ? { asTyped } : {}), ...more })
+  // offer-t1: the offer a line carries, shown by the page as a second bubble with its things to pick
+  const offer = result.offer ? { set: result.offer.set, text: result.offer.text, answers: { kind: 'offer', hint: OF.hint, items: result.offer.picks.map(id => ({ id: 'offer-' + id, label: OF.things[id].label, offer: id })) } } : null
+  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(offer ? { offer } : {}), ...(asTyped.length ? { asTyped } : {}), ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
-  const dontKnowLine = id => said(id, FIXED[id].text, { hint: FIXED.N_HINT.text })
+  // offer-t1: the faint hint N_HINT is no longer shown; the offer dont_know takes its place
+  const dontKnowLine = id => said(id, FIXED[id].text)
   const RM = Object.fromEntries(KEEP_REMEMBER.lines.map(l => [l.id, l]))
   const ONE = KEEP_TYPED.forget_one
   const ALL = KEEPS.tell.see.delete_all
@@ -16614,6 +18168,35 @@ function lineFor(result, st, typed = '', opts = {}) {
       const x = EXTRA_LINES[result.line]
       return said(x.id, x.text, { source: x.source })
     }
+    // live changes-6 and -9: a then line (msg0-then, msg1-then); ask-fix-t1: the text of the last line's button, a word
+    // line's second wording with the word line's button; live changes-9: a next line's second wording
+    case 'then': {
+      const x = TOPICS[result.topic].plain.then
+      return said(x.id, x.text, { source: x.source || null })
+    }
+    case 'rowthen': {
+      const x = TOPICS[result.topic].needs.find(n => n.id === result.need).then
+      return said(x.id, x.text, { source: x.source || null })
+    }
+    case 'nextline':
+      return said(result.id, result.text, { source: (EXTRA_LINES[result.id] || {}).source || null })
+    case 'termmean': {
+      const t = TERMS[result.term]
+      return said(t.mean.id, t.mean.text, { source: t.mean.source || null, next: nextFor(t.next, null, st) })
+    }
+    case 'nextmean': {
+      const x = Object.values(NEXT_MEAN).find(m => m.id === result.id)
+      return said(x.id, x.text, { source: x.source || null })
+    }
+    // ask-fix-t1: the same things to pick stay under it (the page shows the last line's again)
+    case 'PICK_FIRST':
+      return said('PICK_FIRST', FIXED.PICK_FIRST.text, { samePicks: true })
+    // ask-fix-t1: the last line's button again, named in the line
+    case 'HOW_PASTE':
+    case 'HOW_PART': {
+      const next = nextFor(result.button, result.topic || null, st)
+      return said(result.kind, fillSlots(FIXED[result.kind].text, { label: next && next.label ? next.label : result.label }), { next })
+    }
     case 'RM1':
     case 'RM3':
     case 'RM4':
@@ -16645,6 +18228,8 @@ function lineFor(result, st, typed = '', opts = {}) {
       // a line that shows the topics it holds ("What Hermes can do")
       const f = FIXED[result.kind]
       if (!f) return dontKnowLine('N1')
+      // live changes-6, offer-t1, ask-fix-t1: a fixed line from the docs (PRIV, MIG, KEY ...), with its button if it has one
+      if (!result.buttons) return said(result.kind, f.text, { source: f.source || null, next: nextFor(f.next, null, st) })
       return said(result.kind, f.text, { source: f.source || null, answers: { kind: 'pair', hint: TALK_DATA.answers.hint_under_topics, items: (result.buttons || []).map(id => ({ id, label: labelOf(id), topic: id })) } })
     }
   }
@@ -16665,7 +18250,10 @@ const LIVE_ROWS = LIVE_DATA.rows
 const LIVE_ROW = Object.fromEntries(LIVE_ROWS.map(r => [r.id, r]))
 // the rows word matching and the subjects rank (the next lines have no key words of their own)
 const SCORED = LIVE_ROWS.filter(r => !r.next_of)
-const NEXT_OF = Object.fromEntries(LIVE_ROWS.filter(r => r.next_of).map(r => [r.next_of, r.id]))
+// a row's next lines: its button's line, its then line (live changes-6 and -9) and, on a follow-up only, its second
+// wording (ask-fix-t1 skill-mean, plugin-mean; live changes-9 use1-next-mean); a next line may have one of its own
+const NEXT_OF = {}
+for (const r of LIVE_ROWS.filter(x => x.next_of)) (NEXT_OF[r.next_of] = NEXT_OF[r.next_of] || []).push(r)
 const STOP = new Set(LIVE_DATA.stop_words)
 const MAX_HANDED = LIVE_DATA.max_handed
 
@@ -16699,13 +18287,14 @@ function rankIn(text, subject, k = MAX_HANDED) {
 }
 
 // rows.from item 2: a next line is handed with its row, right after it; then cut at 5
-function withNext(ids) {
+// followUp: the message is a follow-up, so the second wordings are handed too
+function withNext(ids, followUp = false) {
   const out = []
-  for (const id of ids) {
+  const add = id => {
     if (!out.includes(id)) out.push(id)
-    const n = NEXT_OF[id]
-    if (n && !out.includes(n)) out.push(n)
+    for (const n of NEXT_OF[id] || []) if (followUp || !n.follow_only) add(n.id)
   }
+  ids.forEach(add)
   return out.slice(0, MAX_HANDED)
 }
 
@@ -16721,13 +18310,15 @@ function rowOfKey(key) {
   }
   if (!Array.isArray(k)) return null
   const [kind, topic, need, term, , row] = k
-  const id = kind === 'row' ? need : kind === 'plain' ? (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'term' ? term : kind === 'want' ? row : ['COST', 'WHERE', 'CN1'].includes(kind) ? kind : null
+  // live changes-6 and -9, ask-fix-t1: a then line, a word line's second wording and the text of a line's button
+  // came from the row they belong to
+  const id = kind === 'row' || kind === 'rowthen' ? need : kind === 'termmean' ? term : kind === 'nextline' ? need || term || (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'plain' || kind === 'then' ? (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'term' ? term : kind === 'want' ? row : ['COST', 'WHERE', 'CN1'].includes(kind) ? kind : null
   return id && LIVE_ROW[id] ? id : null
 }
 
 // follow_up.rule: the kinds of Helper's last line that came from rows. The data says wants; the plugin's kind
 // is want. written: a reply the AI wrote that used rows.
-const FROM_ROWS = ['row', 'plain', 'term', 'want', 'COST', 'WHERE', 'written']
+const FROM_ROWS = ['row', 'plain', 'term', 'want', 'COST', 'WHERE', 'written', 'then', 'rowthen', 'termmean', 'nextline']
 const FOLLOW_CUT = ['ok', 'okay', 'so', 'and', 'cool', 'right']
 const PHRASES = LIVE_DATA.follow_up.phrases
 // the whole message, end marks and the lead words ok, okay, so, and, cool, right cut, is one of the phrases
@@ -16759,9 +18350,9 @@ function isFollowUp(text, pre, before) {
 // follow_up.rows: the rows handed for the person's previous message, in the same order, each with its next
 // line; if that message got a line from code, the row of that line with its next line. At most 5.
 function followRows(before) {
-  if (before.liveRows && before.liveRows.key === before.lastKey) return withNext(before.liveRows.ids)
+  if (before.liveRows && before.liveRows.key === before.lastKey) return withNext(before.liveRows.ids, true)
   const id = rowOfKey(before.lastKey)
-  return id ? withNext([id]) : []
+  return id ? withNext([id], true) : []
 }
 
 // What a handed row shows when the AI picks it (pick_only.read): the result code would give for that row.
@@ -16782,7 +18373,16 @@ const LC = LIVE_DATA.checks
 const SUBJECT_IDS = LIVE_DATA.subjects.map(s => s.id)
 const LC_R9 = pyRegExp(LC.r9_pattern, 'i')
 const LC_R6 = pyRegExp(LC.r6_pattern, 'gi')
-const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i')
+const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'gi')
+// live changes-6 (checks.list c16.allow_c6, check_live.py c16_fails): guide and guides fail only in a sentence that
+// speaks of Helper; every other product word fails as before
+const C16_HELPER = pyRegExp(LC.c16_allow.speaks_of_helper, '')
+function c16Fails(reply) {
+  for (const sent of String(reply).split(/(?<=[.!?])\s+/)) {
+    for (const m of sent.matchAll(LC_R8)) if (!LC.c16_allow.words.includes(m[0].toLowerCase()) || C16_HELPER.test(sent)) return true
+  }
+  return false
+}
 const LC_R5 = LC.r5_patterns.map(p => pyRegExp(p, 'i'))
 const GLOSS_RX = LC.gloss.map(g => [pyRegExp(g.term, g.ignore_case ? 'i' : ''), pyRegExp(g.explained_by, 'i')])
 const OK_CAPS = new Set(LC.ok_caps)
@@ -16829,9 +18429,18 @@ function readPick(raw, ids) {
 // the ids after the last USED: (null when there is none: not a failure, as run).
 function readWritten(raw) {
   let s = cutThink(raw).trim()
-  const usedAll = [...s.matchAll(/USED:\s*(.*)$/gm)]
-  const used = usedAll.length ? usedAll[usedAll.length - 1][1].match(/[A-Za-z_0-9-]+/g) || [] : null
-  s = s.replace(/\n?\s*USED:.*$/gm, '').trim()
+  // live changes-6 (checks_c5.used_reader, check_live.py read_used): the label in any case (USED, Used, used), the last
+  // one; from the label to the end of its line is the list, cut from the reply. When nothing is left after trimming
+  // spaces, full stops and commas, or only the word none, there is no reply ("Used: none." is never shown). A second
+  // label still in the reply fails c26.
+  const usedAll = [...s.matchAll(/\bused\s*:(.*)$/gim)]
+  let used = null
+  if (usedAll.length) {
+    const m = usedAll[usedAll.length - 1]
+    used = m[1].match(/[A-Za-z_0-9-]+/g) || []
+    s = (s.slice(0, m.index) + s.slice(m.index + m[0].length)).trim()
+    if (/^(?:none)?$/i.test(s.replace(/^[\s.,]+|[\s.,]+$/g, ''))) s = ''
+  }
   // a code fence around the whole reply, then quote marks around the whole reply
   s = s.replace(/^```\w*\s*|\s*```$/g, '').trim()
   if (s.length > 1 && '"\'\u201c'.includes(s[0]) && '"\'\u201d'.includes(s[s.length - 1])) s = s.slice(1, -1).trim()
@@ -16921,14 +18530,16 @@ function replyFlags(reply, rows, used, talk = {}) {
   const hc = notClasses(hand)
   for (const cls of [...notClasses(reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
   if (/http|www\.|\(/.test(reply)) out.push('c15 link or (')
-  if (LC_R8.test(reply)) out.push('c16 product word')
+  if (c16Fails(reply)) out.push('c16 product word')
   if (LC.test_phrases.some(p => low.includes(p))) out.push('c17 test')
   if (reply.includes('?') && /\?\s*$/.test(talk.lastLine || '')) out.push('c18 a second question')
   const mc = moneyCut(reply)
   for (const [m, re] of MONEY_RX) if (re.test(mc) && !hand.includes(m)) out.push('c19 money ' + m)
   const uh = (used || []).filter(u => ids.includes(u)).map(u => textOf[u]).join(' ').toLowerCase()
-  if (/\b(only|never)\b/.test(uh) && !/\b(only|never)\b/.test(low)) out.push('c20 dropped only/never')
-  if (!ids.length || !used || !used.length || (used.length === 1 && used[0].toLowerCase() === 'none')) {
+  if (c20Fails(uh, low)) out.push('c20 dropped only/never')
+  // live changes-6 (c21.what): ordinary talk only when no row was handed, or the USED line lists nothing or only none;
+  // a reply with no USED line after rows were handed gets every other check, as a reply from rows does
+  if (!ids.length || (used && (!used.length || (used.length === 1 && used[0].toLowerCase() === 'none')))) {
     if (/\d/.test(reply) || reply.includes('"') || LC_R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
   }
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
@@ -16937,20 +18548,67 @@ function replyFlags(reply, rows, used, talk = {}) {
   const c24Word = c24Fails(reply, talk.work, talk.message, hand)
   if (c24Word) out.push('c24 about the person ' + c24Word)
   // live-v2 changes-5: c26 and c27 after c24 (c25 has adopted: false and is not built)
-  const c26Word = c26Fails(reply)
+  const c26Word = c26Fails(reply, hand)
   if (c26Word) out.push('c26 notes shown ' + c26Word)
   for (const id of c27Fails(reply, talk.message || '')) out.push('c27 ' + id)
+  // offer-t1 (changes-8) c28, then live changes-9 c29 (only when the About them line was in the call)
+  if (c28Fails(reply)) out.push('c28 ends on an invitation or a question')
+  const c29Word = talk.workHanded ? c29Fails(reply, talk.work, hand) : null
+  if (c29Word) out.push('c29 what the person does ' + c29Word)
   return out
 }
 
 // live-v2 changes-5 c26: the reply holds one of the words (any case): the model's own notes or an instruction label
 // shown to the person. "USED" counts only in capitals, as a word (check_c5.py). Returns the word found, or null.
 const C26_WORDS = LC.c26.filter(w => w !== 'USED').map(w => w.toLowerCase())
-function c26Fails(reply) {
+// live changes-6 (c26.skip_in_hand): a word that is also in the handed rows does not fail the reply; USED in capitals
+// always fails, and so does a label still in the reply after the reader cut the last one (used_reader)
+function c26Fails(reply, hand = '') {
   const low = String(reply).toLowerCase()
-  const w = C26_WORDS.find(x => low.includes(x))
+  const h = String(hand).toLowerCase()
+  const w = C26_WORDS.find(x => low.includes(x) && !h.includes(x))
   if (w) return w
-  return /\bUSED\b/.test(reply) ? 'USED' : null
+  return /\bUSED\b/.test(reply) || /\bused\s*:/i.test(reply) ? 'USED' : null
+}
+// c20: a used row says only or never and the reply does not. Builder (job setup-chat point 14, hhtech-ask-run 19f; told
+// to Lead): "only" also counts as kept when the reply holds the three words that follow it in the row ("only while
+// Hermes is" / "It runs while Hermes is running ..."): the condition is still said. "never" must be said.
+function c20Fails(usedText, low) {
+  if (!/\b(only|never)\b/.test(usedText) || /\b(only|never)\b/.test(low)) return false
+  if (/\bnever\b/.test(usedText)) return true
+  const flat = s => s.replace(/[\u2018\u2019]/g, "'").replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ')
+  const after = [...flat(usedText).matchAll(/\bonly ((?:[a-z0-9']+ ){2}[a-z0-9']+)/g)].map(m => m[1])
+  return !(after.length && after.every(a => flat(low).includes(a)))
+}
+// offer-t1 (changes-8) c28: the reply's last sentence ends with ? or holds one of ends (any case)
+function c28Fails(reply) {
+  const sents = String(reply).trim().split(/(?<=[.!?])\s+/).filter(s => s.trim())
+  const last = (sents[sents.length - 1] || '').toLowerCase()
+  return /\?\s*$/.test(last) || LC.c28.some(e => last.includes(e.toLowerCase()))
+}
+// live changes-9 c29 (check_c9.py c29): what the person does used as a step or as a fact about Hermes. Work words: runs
+// of 3 letters or more in the kept line, not stop words, not on skip, not a word of the handed facts; matched whole,
+// also with a final s, es or ing. Fails when a sentence with a work word also holds a step word, or holds a work word
+// that is not led in (none of lead_ins among the 3 words before it, and the word before it is not a led-in work word).
+const C29_STOP = new Set([...LIVE_DATA.stop_words, ...LC.c29.skip])
+function c29Fails(reply, work, hand) {
+  if (!work) return null
+  const hw = new Set(String(hand).toLowerCase().match(/[a-z]{3,}/g) || [])
+  const ww = (String(work).toLowerCase().match(/[a-z]{3,}/g) || []).filter(w => !C29_STOP.has(w) && !hw.has(w))
+  if (!ww.length) return null
+  const rx = new RegExp('^(?:' + ww.map(liveEsc).join('|') + ')(?:s|es|ing)?$')
+  for (const sent of String(reply).split(/(?<=[.!?])\s+/)) {
+    const toks = sent.toLowerCase().match(/[a-z']+/g) || []
+    const at = toks.map((t, i) => (rx.test(t) ? i : -1)).filter(i => i >= 0)
+    if (!at.length) continue
+    if (toks.some(t => LC.c29.step_words.includes(t))) return 'in a step sentence'
+    const led = new Set()
+    for (const i of at) {
+      if (toks.slice(Math.max(0, i - 3), i).some(t => LC.c29.lead_ins.includes(t)) || led.has(i - 1)) led.add(i)
+      else return 'not led in: ' + toks[i]
+    }
+  }
+  return null
 }
 // live-v2 changes-5 c27: for each class, when the person's newest message (only that one) asks it (a word of asks, or
 // the whole message one of asks_whole), the reply must hold a word of gives. Returns the failed class ids, in order.
@@ -16958,7 +18616,11 @@ function c26Fails(reply) {
 // A word: not next to a letter or an apostrophe (check_c5.py's hasw).
 const c27Whole = t => String(t).toLowerCase().trim().replace(/[?.! ]+$/, '').replace(/^(?:(?:ok|okay|so|and|cool|right)\b[ ,]*)+/, '').trim()
 const c27Has = (t, w) => new RegExp("(^|[^a-z'])" + liveEsc(w.toLowerCase()) + "($|[^a-z'])").test(String(t).toLowerCase())
+// live changes-7 (c27.apostrophes): curly apostrophes in the message and in the reply are read as straight ones
+const c27Apos = s => String(s).replace(/[\u2018\u2019]/g, "'")
 function c27Fails(reply, message) {
+  reply = c27Apos(reply)
+  message = c27Apos(message)
   const w = c27Whole(message)
   return LC.c27.filter(c => ((c.asks || []).some(x => c27Has(message, x)) || (c.asks_whole || []).includes(w)) && !c.gives.some(g => c27Has(reply, g))).map(c => c.id)
 }
@@ -17110,6 +18772,8 @@ function goesToAi(pre) {
   if (!pre) return false
   // live-v2 changes-3: anything from kind again is code's, AGAIN and MEAN_NONE included
   if (pre.by_again) return false
+  // ask-fix-t1 (about_rule.weak_hit_then.with_ai): a weak hit goes on to the AI as when no row was found
+  if (pre.weak_hit && (pre.kind === 'question' || pre.kind === 'N1')) return true
   if (pre.kind === 'plain') return pre.why === 'what do you mean'
   return LV_GO.includes(pre.kind)
 }
@@ -17131,7 +18795,9 @@ function liveWhyNot({ mode = AI_MODE, pre, text, status, inHermes = 0, off = fal
 // build: a how-question is never a request (route2.py's guard, build.skip_starts and build.how_phrases)
 function isHowQuestion(text) {
   const t = cutIgnored(talkNorm(text))
-  return startsWith(t, TALK_DATA.build.skip_starts) || whichOf(t, TALK_DATA.build.how_phrases).length > 0
+  // live changes-9 (build.model_pick_rule, the third condition): a message that opens with a question word asks
+  // something; the pick build is then read as none
+  return startsWith(t, TALK_DATA.build.skip_starts) || whichOf(t, TALK_DATA.build.how_phrases).length > 0 || startsWith(t, TALK_DATA.model_pick_not_when_starts)
 }
 
 // The steps 3 to 6 for one message. Returns { result, rows } (a line to show in place of the fallback), or
@@ -17171,7 +18837,10 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
 
 async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
   let ids = null
+  // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
+  let follow = false
   if (isFollowUp(text, pre, before)) ids = followRows(before)
+  if (ids && ids.length) follow = true
   if (!ids || !ids.length) {
     ids = null
     const w = byWords(message)
@@ -17184,11 +18853,13 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     if (subject === 'none') return { fallback: 'first call: none' }
     if (subject === 'build') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     ids = subject === 'talk' ? followRows(before) : withNext(rankIn(message, subject))
+    if (subject === 'talk' && ids.length) follow = true
   }
+  const handed = follow ? null : work
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
   const rows = ids.map(id => ({ id, text: LIVE_ROW[id].text }))
   if (mode === 'ai_picks_line') {
-    const raw = await call('pick', pickText(ids, work, names), LIVE_DATA.pick_only.max_tokens)
+    const raw = await call('pick', pickText(ids, handed, names), LIVE_DATA.pick_only.max_tokens)
     if (raw === null) return { fallback: 'pick call failed' }
     const p = readPick(raw, ids)
     if (p.id) return { result: resultOfRow(p.id), rows: ids }
@@ -17196,9 +18867,9 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     return { fallback: 'pick: none' }
   }
-  const raw = await call('writer', writerText(ids, work, names), LIVE_DATA.writer.max_tokens)
+  const raw = await call('writer', writerText(ids, handed, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text, work })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names) })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }
@@ -17230,6 +18901,10 @@ function liveApply(st, got, out, before, text) {
     st.lastAnswerKey = before.lastAnswerKey
   }
   noteLast(st, r)
+  // offer-t1: the offer of the line shown (a line the AI picked may carry one; a written reply carries none), judged
+  // against the offer shown before this message, not the fallback's
+  st.lastOffer = before.lastOffer || null
+  attachOffer(r, st, before.lastTopic || null)
   if (r.kind === 'written') {
     // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
     st.last = (r.used || []).some(u => u.toLowerCase() !== 'none') ? 'written' : 'written-talk'
@@ -19589,7 +21264,7 @@ function makePage(ctx, opts = {}) {
       // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
       const metStored = readMet()
       memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
-      memory.log = [helperEntry(openingLine(memory.visit))]
+      memory.log = saidEntries(openingLine(memory.visit), true)
       writeKept()
     }
     return memory
@@ -19626,6 +21301,20 @@ function makePage(ctx, opts = {}) {
     return { id, key: `h${id}`, who: 'helper', opened: false, ...said }
   }
   const youEntry = text => ({ id: memory.nextId++, who: 'you', text })
+  // offer-t1: what Helper says for one result, as the entries of the conversation: its line and, when the line carries
+  // an offer, a second bubble with the offer's question, whose things to pick show in the message box as every other
+  // pick. send: whether the line may ever be sent to the AI; the offer's question never is. ask-fix-t1 (PICK_FIRST):
+  // the things to pick of the line before stay under it.
+  const saidEntries = (said, send) => {
+    const { offer, samePicks, ...line } = said
+    if (samePicks) {
+      const last = [...memory.log].reverse().find(e => e.who === 'helper')
+      if (last && last.answers) line.answers = last.answers
+    }
+    const out = [{ ...helperEntry(line), send }]
+    if (offer) out.push({ ...helperEntry({ line: 'offer-' + offer.set, text: offer.text, source: null, answers: offer.answers, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false, offer: true })
+    return out
+  }
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
   // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
@@ -19655,8 +21344,7 @@ function makePage(ctx, opts = {}) {
     const result = final || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
-    const entry = { ...helperEntry(said), send: w.sendHelper }
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry, ...slowAfter(said)].slice(-LOG_MAX)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(said, w.sendHelper), ...slowAfter(said)].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -19665,14 +21353,23 @@ function makePage(ctx, opts = {}) {
   // live-v2 changes-5: the visit's first AI call (w.firstTurn: the first message that went to the AI, its one or two
   // calls) gave no answer in 12 s or gave no_reply text: the AI step is off for the rest of the visit and SLOW_A is owed,
   // once. A later message whose call fails so only turns the AI step off.
+  // setup-chat (hhtech-live-run2, For builder 2; Lead's points 15 and 16): SLOW_A is owed to the written answer that
+  // replaced the slow one, so it shows right after that answer or not at all in this visit: when the turn was already
+  // closed (the person moved on before the 12 s) it is dropped, never hung under a later, unrelated line.
   const slowFail = w => {
     memory.visit.aiOff = true
-    if (w.firstTurn && memory.visit.slow !== 'said') memory.visit.slow = 'due'
+    if (w.firstTurn && !memory.visit.slow) memory.visit.slow = live.waiting === w ? 'due' : 'dropped'
   }
   // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
+  // Called only for the written answer of the turn that failed (liveFinish): when SLOW_A may not follow that answer (a
+  // don't-know line, a question, things to pick or an offer, a paste box), it is dropped for this visit.
   const slowAfter = said => {
-    if (!slowFollows(memory.visit, said)) return []
+    if (memory.visit.slow !== 'due') return []
+    if (!slowFollows(memory.visit, said)) {
+      memory.visit.slow = 'dropped'
+      return []
+    }
     memory.visit.slow = 'said'
     return [{ ...helperEntry(SLOW_LINE), send: false }]
   }
@@ -19928,14 +21625,16 @@ function makePage(ctx, opts = {}) {
     }
     // Helper's answer to something the person did. shown: the person's side of it, as their message.
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
-    function answer(result, shown, typed = '') {
+    // pressed: shown is the label of a button or pick the person pressed, not their words: never sent to the AI as
+    // "Person: ..." (hhtech-live-run: "Person: Skip")
+    function answer(result, shown, typed = '', pressed = false) {
       if (!result) return
       // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
       const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }, ...slowAfter(said)].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper)].filter(Boolean))
       setFocusAsk(true)
     }
 
@@ -19949,8 +21648,9 @@ function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       liveClose()
-      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null }
-      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper')
+      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null, lastOffer: visit.lastOffer || null, lastTopic: visit.lastTopic || null }
+      // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
+      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
       const lines = lastLines(memory.log, keptValues())
       const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
@@ -19994,11 +21694,20 @@ function makePage(ctx, opts = {}) {
         } catch (err) {
           p = Promise.reject(err)
         }
-        return p.finally(() => {
-          ended = true
-          stopWatch()
-          live.inHermes--
-        })
+        // setup-chat (hhtech-live-run section 6 point 1, live-run2 and ask-run: with no AI that answers Helper's calls,
+        // every message still tried one, each failing at once): a call that fails makes no AI answer for this visit, so
+        // no further call is tried and no dots show. (Hermes's own check said a model was ready there: its free model
+        // answers chats, while llm.oneshot for Helper's task had no provider; only the call itself tells.)
+        return p
+          .catch(err => {
+            visit.aiOff = true
+            throw err
+          })
+          .finally(() => {
+            ended = true
+            stopWatch()
+            live.inHermes--
+          })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
       askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
@@ -20031,8 +21740,9 @@ function makePage(ctx, opts = {}) {
       else if (item.forget) result = forgetAnswer(item.forget[0], item.forget[1], visit)
       else if (item.group) result = pickGroup(item.group, visit)
       else if (item.want) result = pickWant(item.want, visit)
+      else if (item.offer) result = pressOffer(item.offer, visit) // offer-t1: a thing picked under an offer, by its id
       else result = pickTopic(item.topic, visit)
-      answer(result, item.label)
+      answer(result, item.label, '', true)
     }
 
     // Opens one of Hermes's own screens (a missing door is ignored).
@@ -20055,7 +21765,7 @@ function makePage(ctx, opts = {}) {
         if (!result) return
         // talk-live-3: the button is done; its older line draws the label as plain faint text (src/talk-view.js)
         setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
-        return answer(result, next.label)
+        return answer(result, next.label, '', true)
       }
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'part') go(next.to)
@@ -20066,18 +21776,18 @@ function makePage(ctx, opts = {}) {
     function pressNote(entry, which) {
       if (which === 'change' && entry.used) {
         liveClose()
-        return answer(change(entry.used.topic, visit), entry.used.link)
+        return answer(change(entry.used.topic, visit), entry.used.link, '', true)
       }
       if (which !== 'see' || !entry.note) return
       if (settingsPage) return go(settingsHref)
       liveClose()
-      answer(seeKept(visit), entry.note.link)
+      answer(seeKept(visit), entry.note.link, '', true)
     }
 
     // Skip, at "What's your name?" and "What do you do?".
     function skipOpening() {
       liveClose()
-      answer(skip(visit), 'Skip')
+      answer(skip(visit), 'Skip', '', true)
     }
 
     // Picking an answer on a step: saved. Helper stays silent: its lines come from the conversation only.
@@ -20658,7 +22368,9 @@ function makePage(ctx, opts = {}) {
 // Memory & Context, whose address is not in the plugin docs.
 
 const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
-const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode.settings_top_line_2[AI_MODE]
+// live changes-6: with the set-up conversation built the line names its three rows; without it, only what the person
+// does is sent, and the line says that (lines_by_mode.settings_top_line_2 was_c6)
+const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode[SETUP_BUILT ? 'settings_top_line_2' : 'settings_top_line_2_no_setup'][AI_MODE]
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')

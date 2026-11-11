@@ -48,8 +48,15 @@ const OPEN = 'Hi, I’m Helper. I can help you learn about Hermes and set it up.
 const helper = view => byData(view.tree, 'helper')
 const root = view => byData(view.tree, 'page')
 const bubble = view => byData(helper(view), 'bubble')
-const line = view => bubble(view).props['data-line']
-const said = view => spoken(byData(bubble(view), 'said')).trim()
+// setup-chat (offer-t1, changes-8): a line that carries an offer is followed by a second bubble with the offer's
+// question. line() and said() below still mean Helper's line for the message: when the bubble holds an offer, the
+// line just above it. offerLine() and offerSaid() read the offer bubble itself (tests/offers-page.test.mjs has its cases).
+const offerUp = view => !!bubble(view) && String(bubble(view).props['data-line']).startsWith('offer-')
+const lastOld = view => all(helper(view), n => n.props['data-hh'] === 'old').at(-1)
+const offerLine = view => (offerUp(view) ? bubble(view).props['data-line'] : null)
+const offerSaid = view => (offerUp(view) ? spoken(byData(bubble(view), 'said')).trim() : null)
+const line = view => (offerUp(view) ? lastOld(view).props['data-line'] : bubble(view).props['data-line'])
+const said = view => (offerUp(view) ? text(lastOld(view)).replace(/^Helper said: /, '').replace(/\s+/g, ' ').trim() : spoken(byData(bubble(view), 'said')).trim())
 // Everything above the bubble: older lines, the person's messages and the faint lines.
 const conversation = view => byData(helper(view), 'conversation-lines').props.children
 // Only the older lines and the person's messages.
@@ -132,7 +139,7 @@ test('the opening: the greeting in the bubble, nothing above it, nothing to pick
   assert.equal(skipLink(view).props.className, T.skip)
 })
 
-test('the opening, played: the name, with the faint "Kept: Peter." line and its first-time line under it (changes-15), what the person does, then "Ask me anything" with nothing to pick', async () => {
+test('the opening, played: the name, with the faint "Kept: Peter." line and its first-time line under it (changes-15), what the person does, then "Thanks, Peter." and under it the offer with two things to pick (offer-t1)', async () => {
   const { view } = await open()
   finish(view)
   send(view, 'Peter')
@@ -154,26 +161,30 @@ test('the opening, played: the name, with the faint "Kept: Peter." line and its 
   finish(view)
   send(view, 'I run a tennis club')
   assert.equal(line(view), 'F2')
-  assert.equal(said(view), 'Thanks, Peter. Ask me anything about Hermes.')
+  assert.equal(said(view), 'Thanks, Peter.')
   assert.equal(skipLink(view), null)
   // talk-live-2 (live-v2 changes-4): what the person does is kept, with its own faint line; the first-time line was
   // told under F1, so not again; in a build with an AI step, the line that the AI is told it, once
-  const workNote = conversation(view).at(-1)
+  // (offer-t1: F2 is an older line now, its offer in the bubble; the faint line is just above F2)
+  const workNote = conversation(view).at(-2)
   assert.equal(workNote.props['data-hh'], 'kept-note')
   assert.equal(text(workNote.props.children[0]), 'Kept: I run a tennis club.')
   assert.equal(byData(workNote, 'kept-first'), null, 'the first-time line was told once, under F1')
   if (WORK_TOLD) assert.equal(text(byData(workNote, 'kept-work-told')), WORK_TOLD)
   else assert.equal(byData(workNote, 'kept-work-told'), null)
   finish(view)
-  // talk v2 (changes-7): no topics after the greeting
-  assert.equal(picks(view), null)
-  assert.equal(box(view).props.placeholder, 'Reply to Helper')
+  // offer-t1 (changes-8; it replaces changes-7's "no topics after the greeting"): the offer's question in a second
+  // bubble, its two things to pick in the message box
+  assert.match(offerLine(view), /^offer-general/)
+  assert.equal(labels(view).length, 2)
+  assert.equal(box(view).props.placeholder, 'Or type your own question')
   // what was said before has moved up: Helper's lines small on its side, the person's on theirs
   assert.deepEqual(lines(view).map(c => [c.props['data-hh'], c.props.className, words(c)]), [
     ['old', T.old, OPEN],
     ['me', T.me, 'Peter'],
     ['old', T.old, 'Nice to meet you, Peter. What do you do?'],
-    ['me', T.me, 'I run a tennis club']
+    ['me', T.me, 'I run a tennis club'],
+    ['old', T.old, 'Thanks, Peter.']
   ])
   assert.equal(notes(view).length, 2)
   // the first-time line comes once only
@@ -183,15 +194,16 @@ test('the opening, played: the name, with the faint "Kept: Peter." line and its 
   assert.equal(byData(notes(view).at(-1), 'kept-first'), null)
 })
 
-test('"Skip" at the name question: it becomes the person\'s message, Helper says "That\'s fine", nothing to pick; no name is asked for again', async () => {
+test('"Skip" at the name question: it becomes the person\'s message, Helper says "That\'s fine" with the offer under it (offer-t1); no name is asked for again', async () => {
   const { view } = await open()
   click(skipLink(view))
   assert.equal(line(view), 'F3')
-  assert.equal(said(view), 'That’s fine. Ask me anything about Hermes.')
+  assert.equal(said(view), 'That’s fine.')
   assert.equal(skipLink(view), null)
-  assert.deepEqual(lines(view).map(c => words(c)), [OPEN, 'Skip'])
+  assert.deepEqual(lines(view).map(c => words(c)), [OPEN, 'Skip', 'That’s fine.'])
   finish(view)
-  assert.equal(picks(view), null)
+  assert.match(offerLine(view), /^offer-general/)
+  assert.equal(labels(view).length, 2)
   // and at the second question
   const second = await open()
   send(second.view, 'Peter')
@@ -203,7 +215,7 @@ test('the topics only when asked: "what can I ask" gives line TP with the four t
   const { view } = await pastOpening()
   send(view, 'what can I ask')
   assert.equal(line(view), 'TP')
-  assert.equal(said(view), 'You can ask me how Hermes works and how to set it up. Pick one, or type your own question.')
+  assert.equal(said(view), 'I can explain how Hermes works and help you set it up. Pick one.') // offer-t1 (changes-8)
   finish(view)
   assert.deepEqual(labels(view), TOPIC_LABELS)
   assert.equal(labels(view).length, 4)
@@ -297,7 +309,7 @@ test('a pick becomes the person\'s message and Helper answers at once; the keybo
   assert.equal(line(view), 'msg-q')
   assert.equal(said(view), 'Which chat app do you use most?')
   assert.deepEqual(lines(view).slice(-2).map(c => [c.props['data-hh'], words(c)]), [
-    ['old', 'You can ask me how Hermes works and how to set it up. Pick one, or type your own question.'],
+    ['old', 'I can explain how Hermes works and help you set it up. Pick one.'],
     ['me', 'Phone and chat apps']
   ])
   // only the newest line has things to pick
@@ -314,10 +326,8 @@ test('a pick becomes the person\'s message and Helper answers at once; the keybo
   assert.equal(words(lines(view).at(-1)), 'WhatsApp')
 })
 
-test('answers to pick only under the questions that carry them: an open question has none, and is answered by typing', async () => {
-  // the team's own list (answers.when_shown), read from the data file: the build keeps only the code's part
-  const raw = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, '..', 'content', 'helper-talk-v2.json'), 'utf8'))
-  const carry = raw.answers.when_shown.questions
+// offer-t1 (changes-8): mem-q, sch-q and bot-q carry answers now, so every topic question shows its answers
+test('every topic question shows its answers to pick (offer-t1); typing still works under them', async () => {
   for (const topic of TALK_DATA.topics) {
     const { view } = await atTopics()
     const held = TALK_DATA.topic_picks.find(p => p.holds && p.holds.includes(topic.id))
@@ -328,9 +338,8 @@ test('answers to pick only under the questions that carry them: an open question
     assert.equal(line(view), topic.question.id)
     finish(view)
     assert.equal(labels(view).length, topic.question.answers.length, topic.id)
-    const key = Object.keys(carry).find(q => q.startsWith(topic.question.id + ' '))
-    // use-q is not in that list: changes-14 says its four answers sit under it like the other picked answers
-    assert.equal(labels(view).length > 0, topic.typed_only ? true : carry[key], `${topic.id}: ${key}`)
+    assert.ok(labels(view).length >= 2 && labels(view).length <= 4, topic.id)
+    assert.equal(box(view).props.placeholder, 'Or type your own answer')
   }
 })
 
@@ -358,8 +367,8 @@ test('a pick goes by its own id, never through the key words: every answer of ev
       checked++
     }
   }
-  // changes-14: use-q's four answers join the twelve
-  assert.equal(checked, 16)
+  // changes-14: use-q's four answers join the twelve; offer-t1 (changes-8): and the eleven of mem-q, sch-q and bot-q
+  assert.equal(checked, 27)
 })
 
 test('the pick that holds four: "What Hermes can do" gives its own line with the wants first; "Web, files, pictures and voice" asks what you want Hermes to do, with the four groups', async () => {
@@ -587,20 +596,18 @@ test('"Which one do you mean?": the matches to pick, at most four; the pick answ
   assert.deepEqual(labels(view), ['What Hermes remembers', 'Which AI to use', 'Phone and chat apps', 'Daily jobs and reminders'])
 })
 
-test('a message nobody has an answer for: the fixed line and, small under it, the hint (N_HINT); no topics', async () => {
+// offer-t1 (changes-8): the hint N_HINT (type "what can I ask you") is gone; the offer dont_know takes its place
+test('a message nobody has an answer for: the fixed line with no hint under it, then the offer with two things to pick; no topics', async () => {
   const { view } = await pastOpening()
   send(view, 'what is the weather in Riga')
   await settle() // talk-live: in an AI mode the line comes after the (failing) call; with no AI step at once
   assert.equal(line(view), 'N1')
   finish(view)
-  assert.equal(picks(view), null)
-  const hint = byData(bubble(view), 'hint')
-  assert.equal(hint.type, 'p')
-  assert.equal(hint.props.className, T.where)
-  assert.equal(text(hint), curlyQuotes(TALK_DATA.fixed.N_HINT.text))
-  assert.equal(text(hint), 'To see what I can help with, type \u201cwhat can I ask you\u201d.')
-  // talk-live-3 (Lead's call on question 5 of the c18 report): the words to type in the paste box's code style
-  assert.equal(text(byData(hint, 'typed')), 'what can I ask you')
+  assert.equal(byData(lastOld(view), 'hint'), null)
+  assert.doesNotMatch(text(helper(view)), /what can I ask you/)
+  assert.match(offerLine(view), /^offer-/)
+  assert.equal(labels(view).length, 2)
+  assert.equal(labels(view).includes('What Hermes is'), true)
 })
 
 test('a long message is shown back cut to 500 characters; Helper still reads all of it', async () => {
@@ -669,10 +676,12 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   const second = await registerPlugin(storage, fakeTimers())
   const fresh = mount(second.Page)
   await settle()
-  assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'BACK')
+  // offer-t1 (changes-8): BACK no longer asks "What would you like ...?"; its offer is in the bubble under it
+  assert.equal(line(fresh), 'BACK')
   finish(fresh)
-  assert.equal(spoken(byData(byData(fresh.tree, 'bubble'), 'said')).trim(), 'Hi again, Peter. What would you like Hermes to help you with?')
-  assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children, [])
+  assert.equal(said(fresh), 'Hi again, Peter.')
+  assert.match(offerLine(fresh), /^offer-general/)
+  assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children.map(c => c.props['data-line']), ['BACK'])
   assert.equal(byData(fresh.tree, 'skip'), null, 'no question to skip')
   assert.doesNotMatch(text(fresh.tree), /tennis|your name/, 'Helper does not say on a later visit what it remembers (not decided)')
   send(fresh, 'what do you know about me')
@@ -697,9 +706,9 @@ test('his complaint (changes-14): Skip on the first visit is remembered; after H
     const again = await registerPlugin(storage, fakeTimers())
     const v = mount(again.Page)
     await settle()
-    assert.equal(byData(v.tree, 'bubble').props['data-line'], 'BACK')
+    assert.equal(line(v), 'BACK')
     finish(v)
-    assert.equal(said(v), 'Hi again. What would you like Hermes to help you with?')
+    assert.equal(said(v), 'Hi again.') // offer-t1 (changes-8)
     assert.equal(skipLink(v), null)
     send(v, 'hey')
     assert.equal(line(v), 'HELLO_SAME', 'a hello right after BACK: the same-greeting line')
@@ -713,7 +722,7 @@ test('his complaint (changes-14): Skip on the first visit is remembered; after H
   const third = await registerPlugin(storage, fakeTimers())
   const v3 = mount(third.Page)
   await settle()
-  assert.equal(byData(v3.tree, 'bubble').props['data-line'], 'BACK')
+  assert.equal(line(v3), 'BACK')
 })
 
 test('"See what I keep" opens Helper\'s settings page; "what do you know about me" lists what is kept with "Open Helper settings" and the way there by hand', async () => {
@@ -975,7 +984,8 @@ test('a skill by its name: Helper\'s fixed line, and under it a box headed "From
   assert.match(all(stepsList(view), n => n.type === 'li').map(n => text(n)).join(' '), /Find the card “dspy”\. If it is not there, scroll down and click “Show more”\./)
   // the older line keeps its docs box, small
   send(view, 'thanks')
-  const older = lines(view).filter(c => c.props['data-hh'] === 'old').at(-1)
+  // offer-t1: "You're welcome." is an older line too (its offer is in the bubble); the skill line is the one before it
+  const older = lines(view).filter(c => c.props['data-hh'] === 'old').at(-2)
   assert.equal(older.props['data-line'], 'S2')
   assert.ok(byData(older, 'docs'))
 })
@@ -1113,15 +1123,15 @@ test('a later visit (the name question skipped), then the name typed anyway: "Hi
   // changes-14: the window opens with BACK, by the kept name, and asks nothing
   assert.equal(line(view), 'BACK')
   finish(view)
-  assert.equal(said(view), 'Hi again, Anna. What would you like Hermes to help you with?')
+  assert.equal(said(view), 'Hi again, Anna.') // offer-t1 (changes-8)
   send(view, 'Anna')
   assert.equal(line(view), 'NAME_AGAIN')
-  assert.equal(said(view), 'Hi again, Anna. Ask me anything about Hermes.')
+  assert.equal(said(view), 'Hi again, Anna.')
   assert.deepEqual(storage.data.get('kept'), ANNA())
   finish(view)
   send(view, 'my name is Bea')
   assert.equal(line(view), 'NAME_NEW')
-  assert.equal(said(view), 'Thanks, Bea. Ask me anything about Hermes.')
+  assert.equal(said(view), 'Thanks, Bea.')
   finish(view)
   assert.equal(text(keptNotes(view).at(-1).props.children[0]), 'Kept: Bea.')
   assert.equal(storage.data.get('kept').name, 'Bea')

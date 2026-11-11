@@ -25,7 +25,14 @@ async function open(storage = fakeStorage()) {
 }
 const helper = view => byData(view.tree, 'helper')
 const bubble = view => byData(helper(view), 'bubble')
-const said = view => spoken(byData(bubble(view), 'said')).trim()
+// setup-chat (offer-t1, changes-8): a line that carries an offer is followed by a second bubble with the offer's
+// question. line() and said() below still mean Helper's line for the message: when the bubble holds an offer, the
+// line just above it. offerLine() and offerSaid() read the offer bubble itself (tests/offers-page.test.mjs has its cases).
+const offerUp = view => !!bubble(view) && String(bubble(view).props['data-line']).startsWith('offer-')
+const lastOld = view => all(helper(view), n => n.props['data-hh'] === 'old').at(-1)
+const offerLine = view => (offerUp(view) ? bubble(view).props['data-line'] : null)
+const offerSaid = view => (offerUp(view) ? spoken(byData(bubble(view), 'said')).trim() : null)
+const said = view => (offerUp(view) ? text(lastOld(view)).replace(/^Helper said: /, '').replace(/\s+/g, ' ').trim() : spoken(byData(bubble(view), 'said')).trim())
 const conversation = view => byData(helper(view), 'conversation-lines').props.children
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
 const answers = view => all(view.tree, n => n.props['data-hh'] === 'answer')
@@ -87,7 +94,8 @@ test('in the window: a skill named by name keeps its name whole in the bubble an
   assert.match(text(me), /what's the "email-inbox-triage" skill/)
   assert.deepEqual(whole(me), [])
   send(view, 'thanks')
-  const old = conversation(view).filter(c => c.props['data-hh'] === 'old').at(-1)
+  // offer-t1: "You're welcome." is an older line too now (its offer is in the bubble); the skill line is before it
+  const old = conversation(view).filter(c => c.props['data-hh'] === 'old' && c.props['data-line'] === 'S1').at(-1)
   assert.deepEqual(whole(old), [['nowrap', '“email-inbox-triage”']])
 })
 
@@ -128,11 +136,11 @@ test('a name the person typed is left as typed inside Helper\'s line ("O\'Neil")
   finish(view)
   send(view, 'I run a tennis club')
   send(view, "my name is D'Arcy")
-  assert.equal(said(view), "Thanks, D'Arcy. Ask me anything about Hermes.")
+  assert.equal(said(view), "Thanks, D'Arcy.") // offer-t1 (changes-8)
   const old = conversation(view).filter(c => c.props['data-hh'] === 'old')
   assert.ok(old.some(o => text(o).includes("Nice to meet you, O'Neil.")), 'the older line too')
   const { view: again } = await open(storage)
-  assert.equal(said(again), "Hi again, D'Arcy. What would you like Hermes to help you with?")
+  assert.equal(said(again), "Hi again, D'Arcy.") // offer-t1 (changes-8)
 })
 
 test('every Helper line drawn in the bubble and the older lines has no straight pair left, and no straight apostrophe between letters, while the data keeps its own', async () => {
