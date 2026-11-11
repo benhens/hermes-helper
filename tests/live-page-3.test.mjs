@@ -80,7 +80,7 @@ const THINKING = 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **T
 // find-v1 part 3 (Lead, 11 Nov): one slow or failed try no longer ends the AI for the visit; two in a row do, and SLOW_A
 // follows the second one's answer (tests/find-ai-rule.test.mjs). The tests below are brought to that rule.
 for (const mode of ['ai_writes', 'ai_picks_line']) {
-  test(`${mode}: the AI never answers, twice in a row: the written answer at 12 s; at the second such message the written answer, then SLOW_A with its text to paste; no call and no second SLOW_A after that`, async () => {
+  test(`${mode}: the AI never answers, twice in a row: the written answer at 12 s; at the second such message (last-reset: its own call) the written answer at 12 s, then SLOW_A with its text to paste; no second SLOW_A after that`, async () => {
     const { view, host, timers } = await pastOpening(mode, { host: { oneshot: never } })
     send(view, TOKENS)
     assert.equal(line(view), 'use1')
@@ -96,9 +96,13 @@ for (const mode of ['ai_writes', 'ai_picks_line']) {
     assert.equal(count(view, 'SLOW_A'), 0)
     finish(view)
     send(view, TOKENS + ' 2')
-    send(view, 'what do you mean?') // the first call is still in Hermes after its 12 s: the second slow try
+    // last-reset (Lead, 11 Nov 15:41): the first call, still in Hermes after its 12 s, no longer holds this one back: it
+    // makes its own call, slow too: the second slow try
+    send(view, 'what do you mean?')
     await settle()
-    assert.equal(host.asks.length, 1)
+    assert.equal(host.asks.length, 2)
+    timers.fire(12000)
+    await settle()
     assert.equal(oldLines(view).at(-1), 'use0', 'the written answer first, as the older line')
     assert.equal(line(view), 'SLOW_A')
     assert.equal(said(view), curlyQuotes(SLOW_TEXT))
@@ -106,8 +110,9 @@ for (const mode of ['ai_writes', 'ai_picks_line']) {
     assert.equal(byData(bubble(view), 'bubble-button'), null, 'the box is open at once, as H1\'s')
     send(view, 'what do you mean?')
     await settle()
+    // two of Helper's calls still in Hermes past their 12 s: the pile-up stays bounded, no third call
     assert.equal(dots(view), null, 'no dots: no call')
-    assert.equal(host.asks.length, 1, 'no call for the rest of the visit')
+    assert.equal(host.asks.length, 2, 'no third call while two are stuck')
     assert.notEqual(line(view), 'SLOW_A')
     send(view, 'what is a skill')
     send(view, 'thanks')
@@ -147,7 +152,11 @@ test('a don\'t-know line: SLOW_A between it and its picks, once; never under a l
   await settle()
   assert.equal(line(view), 'N1')
   assert.equal(count(view, 'SLOW_A'), 0)
+  // last-reset (Lead, 11 Nov 15:41): this one makes its own call although the first is still in Hermes; slow too
   send(view, 'can it fly a plane')
+  await settle()
+  assert.equal(host.asks.length, 2)
+  timers.fire(12000)
   await settle()
   assert.deepEqual(oldLines(view).slice(-2), ['N1_AGAIN', 'SLOW_A'])
   // (with the offer's picks up, line() is the last older line, so count() would see this SLOW_A twice)
@@ -156,7 +165,7 @@ test('a don\'t-know line: SLOW_A between it and its picks, once; never under a l
   assert.equal(line(view), 'term-skill', 'the next answer is the answer, with no SLOW_A after it')
   send(view, 'what is a model')
   assert.equal(oldLines(view).filter(l => l === 'SLOW_A').length, 1, 'once for the visit: ' + helperLines(view).join(' '))
-  assert.equal(host.asks.length, 1)
+  assert.equal(host.asks.length, 2)
 })
 
 test('a written answer that asks a question with things to pick is not followed by SLOW_A (a weak hit\'s fallback, the model question); it is dropped for the visit', async () => {

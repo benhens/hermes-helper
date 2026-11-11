@@ -31981,7 +31981,8 @@ function makePage(ctx, opts = {}) {
     w.failed = true
     v.aiFails = (v.aiFails || 0) + 1
     if (v.aiFails < 2) return
-    v.aiOff = true
+    // last-reset (Lead, 11 Nov 15:41, his answer to the Builder's question 2): a slow or failed call no longer turns the
+    // AI step off for the visit; two failed tries in a row only make SLOW_A owed, as before
     if (!v.slow) v.slow = slow && (live.waiting === w || w.answeredNow) ? 'due' : 'dropped'
   }
   const slowFail = w => aiFailed(w, true)
@@ -32379,7 +32380,7 @@ function makePage(ctx, opts = {}) {
           counted = true
           visit.aiFails = (visit.aiFails || 0) + 1
           if (visit.aiFails < 2) return
-          visit.aiOff = true
+          // last-reset: no longer turns the AI step off for the visit
           if (!visit.slow) visit.slow = 'dropped'
         }
         let ended = false
@@ -32540,7 +32541,10 @@ function makePage(ctx, opts = {}) {
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
-      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes, off: visit.aiOff === true })
+      // last-reset (hhtech-final-run, For builder 1): a slow reply costs only its own message. One call of Helper's still
+      // in Hermes past its 12 s (its message already has its written line) does not hold the next question back; two
+      // or more do (the pile-up stays at most two such calls; host.request ends each after 90 s)
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes - (live.stuck === 1 ? 1 : 0), off: visit.aiOff === true })
       // find-v1 part 3: the page knows no model: no call and no dots, and the model is looked for again for a later message
       if (why === 'model not ready') lookAgain()
       // find-v1 part 3: this message cannot be asked because an earlier call of Helper's has been in Hermes for over 12 s:

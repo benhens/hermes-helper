@@ -366,7 +366,7 @@ test('a recommendation call that gives no answer in 12 s and then fails counts o
 // find-v1 (app run with a stand-in that never answers): the recommendation's call is still in Hermes after its 12 s
 // and a typed question meets it: that is the second slow try, as when a typed message's own call is the stuck one.
 // The answer comes at once, with no dots; the slow-AI line after it, once; no call after that
-test('a recommendation call that never answers, then a question that cannot be asked because of it: two slow tries, the slow-AI line once after the answer', opt, async () => {
+test('a recommendation call that never answers, then a question: since last-reset it makes its own call; slow too, two slow tries, the slow-AI line once after the answer', opt, async () => {
   const { view, host, timers } = await open({ hermes: { oneshot: () => new Promise(() => {}) }, change: AI_REC })
   finish(view)
   await send(view, 'Peter')
@@ -382,11 +382,15 @@ test('a recommendation call that never answers, then a question that cannot be a
   await send(view, "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens")
   assert.equal(lines().filter(l => l === 'SLOW_A').length, 0, 'code answered that one: nothing owed yet')
   await send(view, 'what do you mean?')
-  assert.equal(host.asks.length, 1, 'no second call: Hermes still works on the first')
+  // last-reset (Lead, 11 Nov 15:41): the recommendation call, still in Hermes past its 12 s, no longer holds this one back
+  assert.equal(host.asks.length, 2, 'its own call')
+  timers.fire(12000)
+  await settle(12)
+  finish(view)
   assert.deepEqual(lines().slice(-2), ['use0', 'SLOW_A'])
   await send(view, 'what is the weather in Riga')
   await send(view, 'what do you mean?')
-  assert.equal(host.asks.length, 1)
+  assert.equal(host.asks.length, 2, 'two calls stuck in Hermes: no third one (the pile-up stays bounded)')
   assert.equal(lines().filter(l => l === 'SLOW_A').length, 1, 'said once')
 })
 
@@ -406,7 +410,11 @@ test('the person moved on before the recommendation call\'s 12 s, and the call n
   finish(view)
   const lines = () => [...olds(view).map(n => n.props['data-line']), bubbleLine(view)]
   await send(view, 'what do you mean?')
-  assert.equal(host.asks.length, 1)
+  // last-reset: its own call (the stuck recommendation call no longer holds it back), slow too: the second slow try
+  assert.equal(host.asks.length, 2)
+  timers.fire(12000)
+  await settle(12)
+  finish(view)
   // loom-fixes-2 (one_question): "Want the steps?" is still open, so it comes once more as the last bubble
   assert.deepEqual(lines().slice(-3), ['use0', 'SLOW_A', 'SETUP_REASK_REC'])
 })
