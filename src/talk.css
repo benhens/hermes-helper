@@ -62,10 +62,12 @@
 .hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}
 /* talk v2 look (hhdesign's notes-wants.md rule C point 1): never a hard cut through letters. An edge with
    something hidden behind it fades out over 20 px, as Hermes's own FadeScroll (1.25rem); the page sets
-   data-fade from the scroll position (src/talk-view.js). The gradient's colour only carries its alpha. */
-.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-text-primary) 20px)}
-.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-text-primary) 20px)}
-.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-text-primary) 20px,var(--ui-text-primary) calc(100% - 20px),transparent 100%)}
+   data-fade from the scroll position (src/talk-view.js). A mask uses only its colour's alpha: --ui-base is
+   the theme's own foreground at full strength (--ui-text-primary is 94 % of it, which would dim the whole
+   conversation to 94 %); measured opaque in both themes in the app. */
+.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}
+.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}
+.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}
 .hh-conv-in{display:flex;flex-direction:column;gap:9px}
 .hh-conv-in>*{flex:none}
 .hh-me{overflow-wrap:anywhere}
@@ -115,8 +117,10 @@
 .hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
 /* Talk v2 row 5, look by hhdesign's notes-wants.md rule A. The box "From the Hermes docs": the docs page's
    own words, in Hermes's own quote look (markdown-text.tsx: a 2 px line on its left, 12 px in, italic),
-   directly under Helper's line, 8 px apart; its line one step stronger than the divider. */
-.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-stroke-secondary)}
+   directly under Helper's line, 8 px apart. Its line: hhdesign's --ui-stroke-secondary measured 1.46:1
+   against the bubble in light and in dark, under 3:1, so the line stays --ui-text-tertiary (3.54:1 light,
+   5.19:1 dark), which rule A allows in that case (dev/checks/talk-v2-look/run/look-report.txt). */
+.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}
 .hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}
 .hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}
 .hh-old .hh-docs{margin-top:4px}

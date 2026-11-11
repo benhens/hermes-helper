@@ -184,7 +184,7 @@ test('the faint lines do not leave one word alone (text-wrap: pretty on .hh-note
 test('rule A, B, C and items 3 and 7 in the style sheet, with hhdesign\'s values', async () => {
   const { TALK_CSS } = await import('../src/talk-css.js')
   const has = r => assert.ok(TALK_CSS.split('\n').includes(r), r)
-  has('.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-stroke-secondary)}')
+  has('.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}')
   assert.match(TALK_CSS, /\.hh-docs-words\{[^}]*font-style:italic/)
   has('.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}')
   has('.hh-steps li+li{margin-top:6px}')
@@ -193,8 +193,8 @@ test('rule A, B, C and items 3 and 7 in the style sheet, with hhdesign\'s values
   has('.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}')
   has('.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}')
   // the cut edges fade over 20 px, only where something is hidden
-  assert.match(TALK_CSS, /\.hh-conv\[data-fade=top\]\{mask-image:linear-gradient\(to bottom,transparent 0,var\(--ui-text-primary\) 20px\)\}/)
-  assert.match(TALK_CSS, /\.hh-conv\[data-fade=bottom\]\{mask-image:linear-gradient\(to top,transparent 0,var\(--ui-text-primary\) 20px\)\}/)
+  assert.match(TALK_CSS, /\.hh-conv\[data-fade=top\]\{mask-image:linear-gradient\(to bottom,transparent 0,var\(--ui-base\) 20px\)\}/)
+  assert.match(TALK_CSS, /\.hh-conv\[data-fade=bottom\]\{mask-image:linear-gradient\(to top,transparent 0,var\(--ui-base\) 20px\)\}/)
   assert.match(TALK_CSS, /\.hh-conv\[data-fade=both\]/)
   assert.doesNotMatch(TALK_CSS, /\.hh-conv\{[^}]*mask-image/, 'no fade on an edge with nothing behind it')
 })

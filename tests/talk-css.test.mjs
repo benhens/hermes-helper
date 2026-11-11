@@ -45,7 +45,7 @@ test('every colour is a Hermes variable; no fonts, no shadows, no pictures', () 
   assert.doesNotMatch(sheet, /font-family|@font-face|box-shadow|text-shadow|url\(|@import/)
   // the variables it names are the ones read in the running app (docs/build/talk-v1-stage1.md, part 0)
   const named = [...new Set([...sheet.matchAll(/var\((--(?!hh-)[\w-]+)/g)].map(m => m[1]))].sort()
-  assert.deepEqual(named, ['--dt-user-bubble-border', '--ui-accent', '--ui-bg-elevated', '--ui-bg-tertiary', '--ui-chat-bubble-background', '--ui-control-active-background',
+  assert.deepEqual(named, ['--dt-user-bubble-border', '--ui-accent', '--ui-base', '--ui-bg-elevated', '--ui-bg-tertiary', '--ui-chat-bubble-background', '--ui-control-active-background',
     '--ui-control-hover-background', '--ui-sidebar-surface-background', '--ui-stroke-primary', '--ui-stroke-secondary', '--ui-stroke-tertiary', '--ui-text-primary', '--ui-text-quaternary',
     '--ui-text-secondary', '--ui-text-tertiary'])
 })
