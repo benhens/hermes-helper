@@ -18,7 +18,7 @@ import { cleanKept, keptToStore } from '../src/kept.js'
 import { renderKept, readBox, saveBox } from '../src/settings-file.js'
 import { writerText, pickText, firstCallText, workLine, sendable } from '../src/live-request.js'
 import { c24Fails, replyFlags, isThinking } from '../src/live-checks.js'
-import { askLive, goesToAi, liveWhyNot } from '../src/live-turn.js'
+import { askLive, goesToAi, liveWhyNot, liveApply } from '../src/live-turn.js'
 import { isFollowUp } from '../src/live-rows.js'
 
 const { freshVisit, laterVisit, turn, turnParts, lineFor, keptRows, forgetAnswer, pickWant } = TALK
@@ -357,6 +357,20 @@ test('changes-4 c24 runs after c23, with or without a kept value', () => {
 })
 
 /* ---------- hhtech-weak-ai: thinking text is no reply ---------- */
+test('review: when the AI\'s line replaces a fallback that was an answer line, "again" finds the answer before, never the fallback that was not shown', () => {
+  const st = freshVisit('open', {}, true)
+  turn('how does memory work?', st)
+  assert.equal(turn('things about me', st).need, 'mem1') // a row: the last answer
+  const before = { last: st.last, lastKey: st.lastKey, liveRows: null, lastAnswer: st.lastAnswer, lastAnswerKey: st.lastAnswerKey }
+  const { pre, out } = turnParts('what do you mean?', st)
+  assert.deepEqual([pre.kind, pre.why], ['plain', 'what do you mean']) // code's fallback, an answer line, goes to the AI
+  // the AI answered instead with the hand-over line (H1), which again never brings back
+  const shown = liveApply(st, { result: { kind: 'H1', why: 'ai' }, rows: [] }, out, before, 'what do you mean?')
+  assert.equal(shown.kind, 'H1')
+  const back = turn('again', st)
+  assert.deepEqual([back.kind, back.need], ['row', 'mem1'], 'the row shown before, not the plain line that never showed')
+})
+
 test('weak AI: an unclosed <think>, text starting \"Thinking Process\", or holding \"**Analyze\" is thinking; a closed block and a plain reply are not', () => {
   for (const s of ['<think>Okay, the user', 'ok <think> hmm', 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Task:**', '  Thinking Process: 1.', 'Sure. 1. **Analyze the request', 'mem\n**Analyze**'])
     assert.equal(isThinking(s), true, s)
