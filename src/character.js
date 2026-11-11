@@ -35,11 +35,12 @@ const ACCENT = { fill: 'var(--ui-accent)' }
 // The dots (loom2): cellPx: the grid's step on screen, a whole number of pixels (5 at 168 px wide and up, 4 below:
 // with 6 units for both, 3.96 px at 132, the squares drifted across the pixels and were 3 px wide on the left of the
 // face and 2 px on the right; cellOf turns it into the drawing's units for the size drawn); blur: how
-// far in from an edge the squares are still shrinking; gain: how soon inside a shape they reach full size; fill: a
+// far in from an edge the squares are still shrinking (4 at first: the small mouth then kept only a few squares and the
+// pupils' holes went ragged, so 2.5); gain: how soon inside a shape they reach full size; fill: a
 // full square's side as a share of its cell (the rest is the gap between squares; at 0.75 the squares ran together at
 // 132 px in the app, where a cell is 4 px: 0.62 keeps a gap of a pixel or more). area: the filter's region, all the
 // body can reach (it rises 10 units and starts 101 units down when it comes up from behind the box).
-export const DOTS = { cellPx: { large: 5, small: 4 }, smallUnder: 150, blur: 4, gain: 1.5, fill: 0.62, area: { x: -30, y: -40, width: 260, height: 240 } }
+export const DOTS = { cellPx: { large: 5, small: 4 }, smallUnder: 150, blur: 2.5, gain: 1.6, fill: 0.62, area: { x: -30, y: -40, width: 260, height: 240 } }
 export const cellOf = size => Math.round(((size < DOTS.smallUnder ? DOTS.cellPx.small : DOTS.cellPx.large) * FACE.view.width * 10000) / size) / 10000
 const SIDES = ['left', 'right']
 const FINGER_COUNT = EXPRESSIONS.resting.fingers.length

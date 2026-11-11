@@ -113,4 +113,7 @@ test('the corners sit behind one value: --hhd-round is set once (1 = the round l
 test('at the narrow size a tile\'s word may take a second line rather than run out of its tile (a 340 px left side leaves a tile 65 px of room)', () => {
   assert.match(ruleOf(`.${D.tileLabel}`), /white-space:nowrap/)
   assert.equal(ruleOf(`.${D.compact} .${D.tileLabel}`), `.${D.compact} .${D.tileLabel}{white-space:normal}`)
+  // loom2: on a tile that is a button (skills, plugins) the word may wrap at any size: in the app at 1180 px "See them in
+  // Capabilities" ran past the plugins tile's edge by a few pixels
+  assert.equal(ruleOf(`.${D.tileBtn} .${D.tileLabel}`), `.${D.tileBtn} .${D.tileLabel}{white-space:normal}`)
 })
