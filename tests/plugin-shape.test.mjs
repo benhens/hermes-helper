@@ -12,7 +12,10 @@ import { looksLikeKey } from '../src/key-check.js'
 import { selectorFor, missingClasses } from '../scripts/check-hermes-classes.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
-const plugin = fs.readFileSync(path.join(ROOT, 'desktop/plugin.js'), 'utf8')
+// normal-chat: the Hermes docs chunks (one data line, scripts/docs-data.mjs) are the docs' own prose and code samples
+// for the model to read ("import(", "session_id", "document.querySelector" in a sample), not the plugin's program
+const builtFile = fs.readFileSync(path.join(ROOT, 'desktop/plugin.js'), 'utf8')
+const plugin = builtFile.replace(/^const DOCS_CHUNKS = .*$/m, '')
 // Code without comments, so a rule can't pass or fail because of a comment. loom-fixes-2: a "/*" inside a
 // double-quoted string is no comment (hhcontent's names list quotes the docs' "openai/*, openai-codex/*"), so those
 // strings are stepped over whole
@@ -26,7 +29,7 @@ const SETUP_BLOCK = /\nconst SETUP_DATA = \{[\s\S]*?\n\}\n/
 const codeOnly = code.replace(DASH_BLOCK, '\n').replace(SETUP_BLOCK, '\n')
 
 test('desktop/plugin.js is the current build of src/ (nobody edited it by hand or forgot to build)', () => {
-  assert.equal(plugin, buildSource())
+  assert.equal(builtFile, buildSource())
 })
 
 test('node --check passes', () => {

@@ -56,15 +56,6 @@ test('2. an answer still answers: typed in the answer\'s words (any length), or 
   assert.equal(say(st5, 'the green one over there').line, 'mem0')
 })
 
-test('2. on the built page: "something is broken" while the memory picks show', async () => {
-  const { view } = await pastOpening('no_ai_step')
-  send(view, 'tell me about memory')
-  assert.equal(bubbleLine(view), 'mem-q')
-  assert.ok(labels(view).length >= 2)
-  send(view, 'something is broken')
-  await settle()
-  assert.equal(answerLine(view), 'STUCK')
-})
 
 test('3. "how" alone: after an answer line its next step or "That is all I have checked on that."; while things to pick show they stay ("Pick one of these first"); never "that looks cut off" after Helper said something to pick from', () => {
   const after = (first, word = 'how') => {
@@ -85,15 +76,3 @@ test('3. "how" alone: after an answer line its next step or "That is all I have 
   for (const w of ['how?', 'why', 'and then', 'ok and then?']) assert.equal(after('what is the weather in Riga', w)[1], 'PICK_FIRST', w)
 })
 
-test('3. the picks stay the same ones under "how": the don\'t-know\'s four are still there to pick', async () => {
-  const { view } = await pastOpening('no_ai_step')
-  send(view, 'what is the weather in Riga')
-  await settle()
-  const before = labels(view)
-  assert.equal(before.length, 4)
-  send(view, 'how')
-  await settle()
-  assert.equal(answerLine(view), 'PICK_FIRST')
-  finish(view)
-  assert.deepEqual(labels(view), before)
-})

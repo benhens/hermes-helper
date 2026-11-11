@@ -247,31 +247,3 @@ test('Esc inside the box does not reach Hermes (Hermes closes Settings on Esc, a
   assert.equal(stopped, 1)
 })
 
-test('the conversation reads the record again when it is put on screen: a name deleted on the settings page is gone from "what do you know about me"', async () => {
-  const storage = fakeStorage({ kept: PETER })
-  const reg = await registerPlugin(storage, fakeTimers())
-  const talk = mount(reg.Page)
-  await settle()
-  const settings = mount(reg.settingsPages[0].render().type)
-  type(settings, 'Chat app: WhatsApp\nRemember: my club has six courts')
-  press(settings, 'save')
-  press(settings, 'yes')
-  assert.equal(storage.data.get('kept').name, undefined)
-  // back to Helper's page: Hermes draws it fresh
-  talk.unmount()
-  const again = mount(reg.Page)
-  const send = words => {
-    const b = all(again.tree, n => n.type === 'sdk:Textarea')[0]
-    b.props.onChange({ target: { value: words } })
-    all(again.tree, n => n.type === 'sdk:Textarea')[0].props.onKeyDown({ key: 'Enter', shiftKey: false, preventDefault() {} })
-  }
-  send('what do you know about me')
-  const rows = all(byData(byData(again.tree, 'bubble'), 'kept-rows'), n => n.type === 'li').map(n => text(n))
-  assert.ok(!rows.some(r => /Peter/.test(r)), rows.join(' / '))
-  assert.ok(rows.some(r => /WhatsApp/.test(r)))
-  // and what the conversation writes next does not bring the old name back
-  send('remember that the courts open at nine')
-  assert.equal(storage.data.get('kept').name, undefined)
-  assert.deepEqual(storage.data.get('kept').asked, ['my club has six courts', 'the courts open at nine'])
-  assert.equal(storage.data.get('kept').msg, 'WhatsApp')
-})

@@ -80,28 +80,6 @@ test('Hide Helper: the window folds to a thin strip with only Show Helper; the D
   assert.equal(storage.data.has('helperHidden'), false)
 })
 
-test('the conversation is there on the next visit: the lines are kept (last 50) and shown again above the new visit\'s, its buttons faint, its text to copy copyable', async () => {
-  const storage = fakeStorage()
-  const { view } = await open(storage)
-  send(view, 'Peter')
-  send(view, 'I run a tennis club')
-  send(view, 'install a skill for me')
-  const kept = storage.data.get('talk')
-  assert.ok(Array.isArray(kept) && kept.length >= 5, JSON.stringify(kept))
-  assert.ok(kept.some(e => e.who === 'you' && e.text === 'I run a tennis club'))
-  const pasteLine = kept.find(e => e.paste)
-  assert.ok(pasteLine, 'a line with a text to copy is kept with it')
-  assert.match(pasteLine.paste, /install a skill for me/)
-  // Hermes closed and opened again
-  const again = await open(storage)
-  const shown = olds(again.view)
-  assert.ok(shown.some(l => l.includes('I run a tennis club')), shown.join(' | '))
-  // the restored line's text to copy is there, copyable (its own copy button)
-  const restored = all(helper(again.view), n => n.props['data-hh'] === 'old' && n.props['data-line'] === pasteLine.line).at(0)
-  assert.ok(restored)
-  assert.ok(text(restored).includes(pasteLine.paste), 'the text to copy shows')
-  assert.equal(all(restored, n => n.type === 'sdk:CopyButton' && n.props.text === pasteLine.paste).length, 1, 'with its Copy button')
-})
 
 test('a kept line whose button led on shows that button as plain faint text; a text-to-copy button stays a button', () => {
   const [a, b] = talkFromStore([

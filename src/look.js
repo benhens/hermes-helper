@@ -392,7 +392,10 @@ export const T = {
   wait: 'hh-wait',
   skip: 'hh-link hh-skip',
   grip: 'hh-grip',
-  gripPill: 'hh-grip-pill'
+  gripPill: 'hh-grip-pill',
+  // normal-chat: the model's reply, drawn from its markdown (src/talk-view.js Markdown); smaller in an older line
+  md: 'hh-md',
+  mdOld: 'hh-md-old'
 }
 
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks

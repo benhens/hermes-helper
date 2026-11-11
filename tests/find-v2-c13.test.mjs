@@ -80,18 +80,6 @@ test('7. a follow-up keeps its subject, before any AI call: #21 "where do i do t
   assert.notEqual(say(visit(), 'is that hard').said.line, 'NO_MORE')
 })
 
-test('on the built page: "where do i do that" after a line with no button: NO_MORE, no dots, no call', async () => {
-  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => 'NONE' } })
-  send(view, 'how do i turn on dark mode')
-  await settle()
-  finish(view)
-  assert.equal(answerLine(view), 'd_dark')
-  send(view, 'where do i do that')
-  assert.equal(dots(view), null)
-  await settle()
-  assert.equal(answerLine(view), 'NO_MORE')
-  assert.equal(host.asks.length, 0)
-})
 
 // find-v2 part 5 (4) (Lead's answer 4 to find-v1's questions): hhtech opened Settings at #/settings?tab=providers&pview=keys
 // (Providers, API keys). The key lines get a button "Open API keys" that goes there through host.navigate (seen working

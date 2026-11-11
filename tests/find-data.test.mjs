@@ -70,16 +70,6 @@ test('"can it make pictures for me" is a question, not a request to build: the p
   assert.equal(turn('make pictures for me', visit()).kind, 'H1')
 })
 
-test('"can it make pictures for me" on the built page, with and without an AI step: the picture row, no call', async () => {
-  for (const mode of ['no_ai_step', 'ai_writes']) {
-    const { view, host } = await pastOpening(mode)
-    send(view, 'can it make pictures for me')
-    await settle()
-    assert.equal(bubbleLine(view), 'w_image', mode)
-    assert.doesNotMatch(bubbleSaid(view), /I can't do that/)
-    assert.equal(host.asks.length, 0)
-  }
-})
 
 test('a don\'t-know with something near: up to three near lines offered by their pick labels under the fixed sentence (find-v2, changes-13); a pick gives that line', () => {
   const st = visit()
@@ -107,19 +97,6 @@ test('a don\'t-know with nothing near: "Do you want one of these instead?" and t
   }
 })
 
-test('on the built page: the near offer is a second bubble with its picks, and a pick shows the line with the title as the person\'s message', async () => {
-  const { view } = await pastOpening('no_ai_step')
-  send(view, 'what about my chats history backup')
-  await settle()
-  assert.equal(oldLines(view).at(-1), 'N1')
-  assert.equal(bubbleLine(view), 'offer-near')
-  const first = labels(view)[0]
-  press(view, first)
-  await settle()
-  assert.equal(mine(view).at(-1), first)
-  assert.notEqual(bubbleLine(view), 'offer-near')
-  assert.doesNotMatch(bubbleLine(view), /^N1/)
-})
 
 test('"how", "why", "and then" alone after an answer line: its button or copy box, its then line, or "That is all I have checked on that."', () => {
   const st = visit()

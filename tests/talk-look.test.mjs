@@ -85,91 +85,10 @@ test('a name in curly marks with no space in it stays on one line with its marks
   assert.ok(WANTS_DATA.skills.every(s => Array.from(s.name).length <= NAME_WHOLE_MAX))
 })
 
-test('in the window: a skill named by name keeps its name whole in the bubble and in the older line; the person\'s own words are left as typed', async () => {
-  const { view } = await pastOpening()
-  send(view, 'what\'s the "email-inbox-triage" skill')
-  const whole = n => all(n, x => x.props && x.props['data-hh'] === 'name-whole').map(x => [x.props.style.whiteSpace, text(x)])
-  assert.deepEqual(whole(bubble(view)), [['nowrap', '“email-inbox-triage”']])
-  const me = conversation(view).filter(c => c.props['data-hh'] === 'me').at(-1)
-  assert.match(text(me), /what's the "email-inbox-triage" skill/)
-  assert.deepEqual(whole(me), [])
-  send(view, 'thanks')
-  // offer-t1: "You're welcome." is an older line too now (its offer is in the bubble); the skill line is before it
-  const old = conversation(view).filter(c => c.props['data-hh'] === 'old' && c.props['data-line'] === 'S1').at(-1)
-  assert.deepEqual(whole(old), [['nowrap', '“email-inbox-triage”']])
-})
 
-test('apostrophes: drawn curly in Helper\'s lines; straight in the text to paste, the person\'s words, the "Kept:" line, the settings box and what is stored', async () => {
-  const { view, storage } = await pastOpening()
-  send(view, 'remember that my club\'s courts are clay')
-  const me = conversation(view).filter(c => c.props['data-hh'] === 'me').at(-1)
-  assert.match(text(me), /my club's courts/)
-  const note = conversation(view).filter(c => c.props['data-hh'] === 'kept-note').at(-1)
-  assert.match(text(note), /club's/)
-  assert.deepEqual(storage.data.get('kept').asked, ["my club's courts are clay"])
-  send(view, 'please make me a website for my club\'s members')
-  const paste = byData(bubble(view), 'paste')
-  assert.ok(paste)
-  assert.match(text(byData(paste, 'paste-text')), /my club's members/)
-  assert.doesNotMatch(text(byData(paste, 'paste-text')), /’/)
-  // the settings box
-  const reg = await registerPlugin(fakeStorage({ kept: storage.data.get('kept') }), fakeTimers())
-  const page = mount(reg.settingsPages[0].render().type)
-  const tb = byData(all(page.tree, n => n.type === 'sdk:ListRow')[0].props.below, 'settings-box')
-  assert.match(tb.props.value, /club's/)
-  // and Helper's own lines draw what the data keeps straight
-  const st = freshVisit('name')
-  for (const s of [lineFor({ kind: 'F3' }, st).text, TALK_DATA.fixed.H1.text]) assert.match(s, /\p{L}'\p{L}/u, 'the data keeps its straight ones')
-})
 
-test('a name the person typed is left as typed inside Helper\'s line ("O\'Neil"), while the line\'s own apostrophes are curled', async () => {
-  assert.equal(curlyQuotes("Thanks, O'Neil. What's next?", ["O'Neil"]), "Thanks, O'Neil. What’s next?")
-  assert.equal(curlyQuotes("It's O'Neil's", ["O'Neil"]), "It’s O'Neil's", 'only the typed name is kept; the line around it is curled')
-  assert.equal(curlyQuotes("What's up", ['Ann']), 'What’s up')
-  // in the window: the first answer, a name with an apostrophe; later, the name typed again; and Hermes opened again
-  const storage = fakeStorage()
-  const { view } = await open(storage)
-  finish(view)
-  send(view, "O'Neil")
-  assert.equal(said(view), "Nice to meet you, O'Neil. What do you do?")
-  assert.equal(storage.data.get('kept').name, "O'Neil")
-  finish(view)
-  send(view, 'I run a tennis club')
-  send(view, "my name is D'Arcy")
-  assert.equal(said(view), "Thanks, D'Arcy.") // offer-t1 (changes-8)
-  const old = conversation(view).filter(c => c.props['data-hh'] === 'old')
-  assert.ok(old.some(o => text(o).includes("Nice to meet you, O'Neil.")), 'the older line too')
-  const { view: again } = await open(storage)
-  assert.equal(said(again), "Hi again, D'Arcy.") // offer-t1 (changes-8)
-})
 
-test('every Helper line drawn in the bubble and the older lines has no straight pair left, and no straight apostrophe between letters, while the data keeps its own', async () => {
-  const { view } = await pastOpening()
-  const seen = []
-  for (const w of ['second bot for work', 'what can I ask', 'is there a github skill', 'what does the dspy skill do', 'tell me a joke', 'can it read my gmail', 'what do you know about me', 'he', 'how do i']) {
-    send(view, w)
-    if (button(view) && button(view).props['data-kind'] === 'steps') click(button(view))
-    seen.push(said(view), text(bubble(view)))
-  }
-  for (const c of conversation(view).filter(c => c.props['data-hh'] === 'old')) seen.push(text(c))
-  assert.ok(seen.some(s => /“/.test(s)), 'some line had quote marks to curl')
-  assert.ok(seen.some(s => /\p{L}’\p{L}/u.test(s)), 'some line had an apostrophe to curl')
-  for (const s of seen) assert.doesNotMatch(s, STRAIGHT_PAIR, s)
-  for (const s of seen) assert.doesNotMatch(s, /\p{L}'\p{L}/u, s)
-  assert.match(TALK_DATA.parts.bots.where_line.text, STRAIGHT_PAIR, 'the data is not changed')
-})
 
-test('exception 1, text to paste: drawn and copied exactly as it will be pasted, straight quotes included', async () => {
-  const { view } = await pastOpening()
-  send(view, 'please install a skill for writing emails')
-  const paste = byData(bubble(view), 'paste')
-  assert.ok(paste)
-  const words = text(byData(paste, 'paste-text'))
-  // the data's own straight pair around the request ("{request}") stays straight in the text to paste
-  assert.match(words, /^I asked for this: "please install a skill for writing emails"\. /)
-  assert.doesNotMatch(words, /[“”]/)
-  assert.equal(all(paste, n => n.type === 'sdk:CopyButton')[0].props.text, words)
-})
 
 test('exception 2, the settings text box: its lines keep their straight quotes; the page\'s own words around it are curled', async () => {
   const kept = { name: 'Peter', asked: ['my shop is called "Blue Door"'], told: true }
@@ -185,64 +104,12 @@ test('exception 2, the settings text box: its lines keep their straight quotes; 
   for (const s of own) assert.doesNotMatch(curlyQuotes(s), STRAIGHT_PAIR)
 })
 
-test('exception 3, what the person typed: their message, the kept thing in a faint "Kept: ..." line and in the list, as typed', async () => {
-  const { view } = await pastOpening()
-  send(view, 'remember that my shop is called "Blue Door"')
-  const me = conversation(view).filter(c => c.props['data-hh'] === 'me').at(-1)
-  assert.match(text(me), /remember that my shop is called "Blue Door"/)
-  const note = conversation(view).filter(c => c.props['data-hh'] === 'kept-note').at(-1)
-  assert.match(text(note), /"Blue Door"/)
-  send(view, 'what do you know about me')
-  const rows = all(byData(bubble(view), 'kept-rows'), n => n.type === 'li').map(n => text(n))
-  assert.ok(rows.some(r => /"Blue Door"/.test(r)), rows.join(' / '))
-})
 
-test('exception 4, what is matched or stored: the stored record keeps the straight quotes, and the line Helper chooses (src/talk.js) keeps the data\'s words', async () => {
-  const { view, storage } = await pastOpening()
-  send(view, 'remember that my shop is called "Blue Door"')
-  assert.deepEqual(storage.data.get('kept').asked, ['my shop is called "Blue Door"'])
-  const st = freshVisit()
-  const said2 = lineFor(turn('second bot for work', st), st)
-  assert.equal(said2.text, TALK_DATA.topics.find(t => t.id === 'bot').needs.find(n => n.id === 'bot1').text)
-  // a curly quote typed by the person is matched as a straight one, as before (talkNorm)
-  const a = freshVisit()
-  const b = freshVisit()
-  assert.equal(turn('what is a “skill”', a).kind, turn('what is a "skill"', b).kind)
-})
 
 /* ---------- notes-wants.md rule A and B, items 3 and 7 ---------- */
 
-test('rule A: the docs quote sits directly under Helper\'s line, before the divider; with no button the bubble has no divider at all', async () => {
-  const { view } = await pastOpening()
-  send(view, 'is there a github skill')
-  const kids = bubble(view).props.children.filter(Boolean)
-  assert.equal(kids[1].props['data-hh'], 'docs')
-  assert.equal(kids.length, 2, 'a built-in skill: line and quote, no divider')
-  assert.equal(byData(bubble(view), 'in-bubble'), null)
-  send(view, 'what does the dspy skill do')
-  const k2 = bubble(view).props.children.filter(Boolean)
-  assert.deepEqual(k2.map(k => k.props['data-hh'] || k.type), [k2[0].props['data-hh'] || k2[0].type, 'docs', 'in-bubble'])
-  assert.equal(byData(k2[2], 'docs'), null, 'the quote is not under the divider')
-})
 
-test('rule B and item 3: the steps are Hermes\'s own list, the line after them faint (hh-after); the arrow\'s state is aria-expanded', async () => {
-  const { view } = await pastOpening()
-  send(view, 'what does the dspy skill do')
-  assert.equal(button(view).props['aria-expanded'], false)
-  click(button(view))
-  assert.equal(button(view).props['aria-expanded'], true)
-  assert.equal(byData(bubble(view), 'steps').type, 'ol')
-  assert.equal(byData(bubble(view), 'steps-after').props.className, T.after)
-})
 
-test('item 7: "More" wears hh-more besides the answer\'s own class; the other picks do not', async () => {
-  const { view } = await pastOpening()
-  send(view, 'can it edit my videos')
-  await settle() // find-v1: a line from a subject word alone goes to the list call first (it fails here): the line comes after it
-  const more = answer(view, 'More')
-  assert.equal(more.props.className, `${T.answer} ${T.more}`)
-  assert.equal(answer(view, 'Make pictures').props.className, T.answer)
-})
 
 /* ---------- review section 3 point 1: four picks ---------- */
 

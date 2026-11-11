@@ -18,24 +18,6 @@ const messageTimeUp = timers => {
   first.run()
 }
 
-test('2. the line shows while its last call is still in Hermes (under that call\'s own 12 s), the next question typed 2 s later makes its own AI call', opt, async () => {
-  const slow = deferred()
-  // ai_writes: call 1 (the list) answers at once with a row, call 2 (the writer) is slow; ai_picks_line: its one call is slow
-  const slowAt = mode === 'ai_writes' ? 2 : 1
-  const { view, timers, host } = await pastOpening(mode, { host: { oneshot: (p, n) => (n === slowAt ? slow.promise : n < slowAt ? 'tool' : 'NONE') } })
-  send(view, 'how do i make it talk to me in latvian')
-  await settle()
-  assert.equal(asked(host), slowAt, `the slow call is in Hermes (control: ${asked(host)} calls)`)
-  messageTimeUp(timers)
-  await settle()
-  finish(view)
-  const before = asked(host)
-  send(view, 'can i run it on a raspbery pi')
-  await settle()
-  assert.ok(asked(host) > before, `the second question makes its own AI call (calls ${before} then ${asked(host)})`)
-  slow.resolve('NONE')
-  await settle()
-})
 
 test('2. control: while a message still waits for its own line, a call of Helper\'s still holds the page (no second call for the same message)', opt, async () => {
   const slow = deferred()

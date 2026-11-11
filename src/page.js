@@ -21,9 +21,11 @@ import { makeEyes } from './eyes.js'
 import { makeRevealClock, wordsOf } from './reveal.js'
 import { prefersReducedMotion, watchReducedMotion } from './motion.js'
 import { readState, TAB_IDS } from './state.js'
-import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
+import { checkModel, RECHECK_AFTER_MS, NO_MODEL_LINE } from './model-status.js'
+import { askModel, failLines, FAIL_LINES } from './model-call.js'
+import { chatCall, chatHello, chatBack, chatHoldsBack } from './chat.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
-import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor, noteLast } from './talk.js'
+import { typedAboutKept, laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor, noteLast } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
 import { talkToStore, talkFromStore } from './talk-keep.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
@@ -33,7 +35,7 @@ import { setupTyped, setupPress, setupAfter, setupStepOpen, setupReaskWaits, set
 import { makeLook, LOOK_UNSEEN } from './setup-look.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowPlace, pickedResult } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
-import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
+import { Conversation, Bubble, BusyDots, Picks, Under, Grip, setMdOpener } from './talk-view.js'
 import { makeDashboard, DASH_COMPACT_UNDER_PX, openHermesDocs } from './dash.js'
 import { DASH_DATA } from './dash-data.js'
 import { layoutFor, clampHelperWidth, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
@@ -122,18 +124,9 @@ export function makePage(ctx, opts = {}) {
       // (never sent to the AI: they are not in memory.log)
       memory.before = readTalk().map(e => ({ ...e, id: memory.nextId++, key: `r${memory.nextId}` }))
       memory.talkStored = JSON.stringify(talkToStore(memory.before))
-      memory.log = saidEntries(openingLine(memory.visit), true)
-      // setup-chat: a later visit opens with the set-up conversation's returning line (BACK_REC, BACK_Q ...). It is said
-      // at once from what is kept, as if nothing could be read; the page then reads Hermes (the look) and, when the
-      // person has done nothing yet and the reads change the line (the thing is now done: BACK_DONE), says that instead.
-      // What the first, unread line would keep is not kept.
-      if (SETUP_BUILT && memory.visit.met) {
-        const before = JSON.stringify(memory.visit.kept)
-        memory.log = setupOpening(memory.visit, LOOK_UNSEEN).flatMap(setupEntries)
-        memory.opening = { kept: before, ids: memory.log.map(e => e.id) }
-        for (const k of Object.keys(memory.visit.kept)) delete memory.visit.kept[k]
-        Object.assign(memory.visit.kept, JSON.parse(before))
-      }
+      // normal-chat (Pēteris's Loom of 11 Nov): a first visit asks the name as before (OPEN); a later visit (the met mark or
+      // a kept name) says one short line and waits. No set-up questions, no offers, no picks. Never sent to the model.
+      memory.log = memory.visit.met ? [{ ...helperEntry(chatSaid('CHAT_BACK', chatBack(memory.visit.kept.name || null))), send: false }] : saidEntries(openingLine(memory.visit), false)
       writeKept()
     }
     return memory
@@ -194,8 +187,7 @@ export function makePage(ctx, opts = {}) {
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
-    const had = k => ['setup_new', 'setup_goal', 'setup_current'].some(x => k[x])
-    if (SETUP_BUILT && had(m.visit.kept) && !had(kept)) m.setupRestart = true
+    // normal-chat: the set-up questions are not asked again when their answers are deleted (there are none to ask)
     for (const k of Object.keys(m.visit.kept)) delete m.visit.kept[k]
     Object.assign(m.visit.kept, kept)
     m.stored = JSON.stringify(keptToStore(kept))
@@ -266,6 +258,63 @@ export function makePage(ctx, opts = {}) {
   // The look: Helper reads what is set up, on this computer (src/setup-look.js). No AI call, nothing sent.
   // loom-fixes: the look reads the bot the app has open, as the Dashboard does (live.profile, set on every draw)
   const look = makeLook(ctx, host, () => live.profile || '')
+
+  /* ---------- normal-chat: every typed message goes to the person's own model, one call each ---------- */
+  // A line of Helper's in the conversation's shape
+  const chatSaid = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null, ...more })
+  // Links in the model's reply open in the person's browser (the SDK's door to the OS); a missing door is ignored
+  // (only an address of the official Hermes docs, by the plugin's one door to the browser: src/dash.js openHermesDocs)
+  setMdOpener(url => openHermesDocs(ctx, url))
+  // Kept while the plugin is loaded: the messages that wait for their call (one call at a time, in the order typed), and
+  // whether a call runs. A message typed while a call runs waits here and is sent after that reply; none is dropped.
+  // names: every name seen in this plugin load (the kept one and this visit's), so a Forget all on the settings page does
+  // not let a name that is still in the conversation's lines through (review finding 6). Never stored.
+  const chat = { queue: [], running: false, names: new Set() }
+  // Helper's reply goes straight after the message it answers (a message typed meanwhile stays after it)
+  const chatPut = (afterId, entry) => {
+    const list = memory.log.map(e => (e.opened ? { ...e, opened: false } : e))
+    const i = list.findIndex(e => e.id === afterId)
+    // (review finding 2) the message is gone (Clear chat or Forget all while its call ran): its reply is dropped too
+    if (i < 0) return
+    memory.log = (i === list.length - 1 ? [...list, entry] : [...list.slice(0, i + 1), entry, ...list.slice(i + 1)]).slice(-LOG_MAX)
+    if (live.view) {
+      live.view.setLog(memory.log)
+      live.view.setFocusAsk(true)
+    }
+  }
+  // A reply's thinking text (some models write it between <think> marks) is not part of the reply
+  const chatClean = text => String(text || '').replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/^[\s\S]*<\/think>/i, '').trim()
+  const chatPump = () => {
+    if (chat.running || !chat.queue.length) return
+    const job = chat.queue.shift()
+    const at = memory.log.findIndex(e => e.id === job.id)
+    // (review finding 2) a waiting message that was cleared away is not sent
+    if (at < 0) return chatPump()
+    chat.running = true
+    const endBusy = busy.begin()
+    const v = memory.visit
+    for (const n of [v.name, v.kept.name]) if (typeof n === 'string' && n.trim()) chat.names.add(n.trim())
+    const names = [...chat.names]
+    // the lines before this message (a reply to an earlier message is among them; a message typed later is not)
+    const { chunks, ...call } = chatCall(job.text, memory.log.slice(0, at), names)
+    const request = (method, params, timeout) => host.request(method, params, timeout)
+    Promise.resolve()
+      .then(() => askModel({ request, call, recheck: () => checkModel(request, { sleep }), sleep }))
+      .catch(() => ({ ok: false, kind: 'other' }))
+      .then(r => {
+        const text = r && r.ok ? chatClean(r.text) : ''
+        if (text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', text, { md: true })), send: true })
+        lookAgain()
+        const kind = r && !r.ok ? r.kind : 'other'
+        const f = FAIL_LINES[kind] || FAIL_LINES.other
+        chatPut(job.id, { ...helperEntry(chatSaid('CHAT_FAILED', failLines(kind, 'card').join(' '), { next: f.button ? { kind: 'retry', label: f.button, text: job.text } : null })), send: false })
+      })
+      .finally(() => {
+        endBusy()
+        chat.running = false
+        chatPump()
+      })
+  }
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
   // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
@@ -898,133 +947,67 @@ export function makePage(ctx, opts = {}) {
       })
     }, [])
 
-    // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
-    // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
-    // talk-live: with an AI step (src/ai-mode.js), a message code is not sure of may go to the person's AI
-    // (src/live-turn.js liveWhyNot says when not); then the message shows at once, Helper's bubble is the three
-    // dots until the AI's line or, at the latest after 12 s, the no-AI line comes. With no_ai_step nothing is sent.
+    // normal-chat: the name question ends with one short line, and nothing more is asked (no "What do you do?"). The
+    // person's answer and everything before it is never sent to the model; the faint Kept: line of the name stays.
+    function helloAfterName(result, shown, typed) {
+      const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
+      visit.stage = 'open'
+      visit.lastq = false
+      visit.pending = null
+      visit.met = true
+      writeKept()
+      const { offer, ask, samePicks, ...line } = said
+      memory.log = memory.log.map(e => (e.send === false ? e : { ...e, send: false }))
+      addToLog([shown ? { ...youEntry(shown), send: false } : null, { ...helperEntry({ ...line, ...chatSaid('CHAT_HELLO', chatHello(visit.name || visit.kept.name || null), { note: line.note || null }) }), send: false }].filter(Boolean))
+      setFocusAsk(true)
+    }
+    // normal-chat: a message for the model. shown: as on screen; message: what is sent (a name given before a question in
+    // the same message is cut off first); sendYou: whether the shown message may be among a later call's lines.
+    function chatAsk(shown, message, sendYou) {
+      // the page knows no model: no call (a failed call can make Hermes skip the provider for 60 s), the no-model line
+      if (live.status && live.status.state === 'none') {
+        lookAgain()
+        addToLog([{ ...youEntry(shown), send: false }, { ...helperEntry(chatSaid('CHAT_NO_MODEL', NO_MODEL_LINE.split('. ')[0] + '.')), send: false }])
+        return setFocusAsk(true)
+      }
+      const you = { ...youEntry(shown), send: sendYou }
+      addToLog([you])
+      chat.queue.push({ id: you.id, text: message })
+      chatPump()
+    }
+    // The message box: Send or Enter (Shift+Enter makes a new line). A message that looks like a key or a password is
+    // never shown back, kept or sent (today's line K1). While the name question is open, the name is read as before;
+    // after it every message goes to the person's own model (chatAsk).
     function send() {
       const typed = draft
       if (!typed.trim()) return
       setDraft('')
-      liveClose()
-      // setup-chat: an answer to the set-up conversation's open question, a step word, "what should I set up first",
-      // "start again": taken by its fixed rules, with no AI call
-      if (SETUP_BUILT) {
-        const mv = setupTyped(typed, visit, hasTopicWord)
-        if (mv) {
-          const cs = Array.from(typed.trim())
-          return runSetup(mv, cs.length > MAX_INPUT_CHARS ? cs.slice(0, MAX_INPUT_CHARS).join('') + '…' : cs.join(''))
-        }
-      }
-      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null, lastOffer: visit.lastOffer || null, lastTopic: visit.lastTopic || null }
-      // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
-      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
-      const lines = lastLines(memory.log, keptValues())
-      // find-v1: the person's own typed messages of this visit, for check c12 (a name they typed themselves); never
-      // stored, never sent
-      visit.typedSaid = [...(visit.typedSaid || []), typed]
-      const { pre, out: result } = turnParts(typed, visit)
-      // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
-      // pick that answers it. A message
-      // with a key in it never gets that line, so a key is never kept here.
-      memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())
-      const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
-      // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
-      // last-reset (hhtech-final-run, For builder 1): a slow reply costs only its own message. One call of Helper's still
-      // in Hermes past its 12 s (its message already has its written line) does not hold the next question back; two
-      // or more do (the pile-up stays at most two such calls; host.request ends each after 90 s)
-      // last-words 2 (hhtech-last-reset-run fault 2): so does a call whose message already has its line, also before that
-      // call's own 12 s (ai_writes: a quick list call, then a slow writer call): such a call holds no message back
-      const answered = [...live.calls].filter(c => c.w !== live.waiting).length
-      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes - (live.stuck > 0 || answered > 0 ? 1 : 0), off: visit.aiOff === true })
-      // find-v1 part 3: the page knows no model: no call and no dots, and the model is looked for again for a later message
-      if (why === 'model not ready') lookAgain()
-      // find-v1 part 3: this message cannot be asked because an earlier call of Helper's has been in Hermes for over 12 s:
-      // that is a second slow try (the first was that call's own message)
-      let stuckNow = false
-      if (why === 'Hermes still works on a call' && live.stuck > 0) {
-        aiFailed({ answeredNow: true }, true)
-        stuckNow = true
+      const shown = chars.length > 2000 ? chars.slice(0, 2000).join('') + '…' : chars.join('')
+      if (chatHoldsBack(typed)) {
+        const k = lineFor({ kind: 'K1' }, visit)
+        addToLog(saidEntries({ ...k }, false))
+        return setFocusAsk(true)
       }
-      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed, false, stuckNow)
-      // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
-      const message = pre.name_taken ? nameWithMore(typed)[1] : typed
-      const may = sendable(result)
-      writeKept()
-      // live-v2 changes-5: whether this is the visit's first message that goes to the AI (only its failure owes SLOW_A)
-      const firstTurn = !visit.aiTried
-      visit.aiTried = true
-      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, firstTurn, before, picked: null }
-      live.waiting = w
-      addToLog([{ ...youEntry(shown), send: may.you }])
-      const started = Date.now()
-      // no answer in 12 s: the written line, and (changes-5 no_reply's "the same as no answer in 12 s") no more calls in
-      // this visit
-      w.stopTimer = ctx.setTimeout(() => {
-        slowFail(w)
-        liveFinish(w, null)
-      }, LIVE_SECONDS * 1000)
-      // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
-      // hhtech-weak-ai: a call with no answer 12 s after it started turns the AI step off for the rest of this visit
-      // (also when the person moved on before), since a slow or thinking model is held by each abandoned call for minutes
-      const request = (method, params, timeout) => {
-        live.inHermes++
-        // last-words 2: the calls of typed messages still in Hermes, each with its message (see send)
-        const call = { w }
-        live.calls.add(call)
-        let ended = false
-        let stuck = false
-        const stopWatch = ctx.setTimeout(() => {
-          if (ended) return
-          slowFail(w)
-          // find-v1 part 3: this call is still in Hermes 12 s after it started (see send: a message that meets it)
-          stuck = true
-          live.stuck = (live.stuck || 0) + 1
-        }, LIVE_SECONDS * 1000)
-        let p
-        try {
-          p = Promise.resolve(host.request(method, params, timeout))
-        } catch (err) {
-          p = Promise.reject(err)
-        }
-        // setup-chat (hhtech-live-run section 6 point 1, live-run2 and ask-run: with no AI that answers Helper's calls,
-        // every message still tried one, each failing at once): a call that fails makes no AI answer for this visit, so
-        // no further call is tried and no dots show. Why the model check let them through is NOT found: the page already
-        // makes no call unless setup.runtime_check said ok (liveWhyNot), so in hhtech's home D that check must have
-        // said ok while llm.oneshot had no provider; what it answered there is in no record the Builder can read.
-        // So the first call of a visit is still tried (dots once). Lead (setup-chat-2): it stays so; hhtech found that
-        // setup.runtime_check answers the same in a home where the call works and in one where it fails, so it cannot
-        // gate the call.
-        return p
-          .catch(err => {
-            // find-v1 part 3: a call that failed is one failed try, and the model is looked for again
-            aiFailed(w, false, err)
-            lookAgain()
-            throw err
-          })
-          .finally(() => {
-            ended = true
-            stopWatch()
-            if (stuck) live.stuck--
-            live.calls.delete(call)
-            live.inHermes--
-          })
+      if (visit.stage === 'name' || visit.stage === 'work') {
+        const { pre, out: result } = turnParts(typed, visit)
+        if (['F1', 'F2', 'F3'].includes(result.kind)) return helloAfterName(result, shown, typed)
+        // still the name question (small talk in its place, a refused name): answered as before
+        if (visit.stage === 'name' || visit.stage === 'work') return answer(result, shown, typed)
+        // a question in place of the name: the opening ends, and the question goes to the model
+        visit.met = true
+        writeKept()
+        memory.log = memory.log.map(e => (e.send === false ? e : { ...e, send: false }))
+        // (review finding 1) never among a later call's lines: a name the rules did not catch may be in it
+        return chatAsk(shown, pre.name_taken ? nameWithMore(typed)[1] : typed, false)
       }
-      // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, onPick: id => (w.picked = id), work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
-        .then(got => {
-          // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
-          // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
-          // find-v1 (Builder, review): so is a list call that came back too late for the writer to start
-          // (find-v2: with a picked line shown in place of the fallback, the reason is in got.why)
-          if (got && (got.thinking || got.fallback === 'no time for the second call' || got.why === 'no time for the second call')) slowFail(w)
-          else aiAnswered(w)
-          if (live.waiting !== w) return
-          liveFinish(w, liveApply(visit, got, result, before, typed))
-        })
-        .catch(() => liveFinish(w, null))
+      // "what do you know about me", "forget my name", "forget everything": Helper's own fixed lines and Yes / No, as
+      // before, never the model (review finding 3: the model could say it forgot what was never deleted)
+      if (typedAboutKept(typed)) {
+        const { out: result } = turnParts(typed, visit)
+        if (result && /^A/.test(result.kind)) return answer(result, shown, typed)
+      }
+      chatAsk(shown, typed, true)
     }
 
     // Something picked in the message box: it becomes the person's message, and Helper answers at
@@ -1095,6 +1078,14 @@ export function makePage(ctx, opts = {}) {
         return runSetup(mv, next.label)
       }
       if (next.kind === 'docs') return openHermesDocs(ctx, next.url)
+      // normal-chat: Try again under a failed call: the same message once more, as a new message
+      if (next.kind === 'retry') {
+        // the failed line loses its button; the message it answered leaves the lines (it is asked again now)
+        const i = memory.log.findIndex(e => e.id === entry.id)
+        const asked = i > 0 && memory.log[i - 1].who === 'you' ? memory.log[i - 1].id : null
+        setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true, next: null } : e.id === asked ? { ...e, send: false } : e))))
+        return chatAsk(next.text, next.text, true)
+      }
       if (next.kind === 'part') go(next.to)
     }
 
@@ -1114,7 +1105,8 @@ export function makePage(ctx, opts = {}) {
     // Skip, at "What's your name?" and "What do you do?".
     function skipOpening() {
       liveClose()
-      answer(skip(visit), 'Skip', '', true)
+      const r = skip(visit)
+      if (r) helloAfterName(r, 'Skip', '')
     }
 
     /* ---------- Helper's edge to drag: between 360 and 600 px, remembered ---------- */
@@ -1242,7 +1234,7 @@ export function makePage(ctx, opts = {}) {
     // from its first draw. said = all of it is on screen: answers and buttons wait for that.
     const fresh = !reduced
     let said = true
-    if (inBubble) {
+    if (inBubble && !inBubble.md) {
       const words = wordsOf(inBubble.text).length
       saidNow.push({ key: inBubble.key, words, fresh, text: inBubble.text })
       said = clock.shown(inBubble.key, words, fresh) >= words
