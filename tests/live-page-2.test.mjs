@@ -99,7 +99,9 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
   for (const a of again.host.asks) assert.doesNotMatch(JSON.stringify(a), /peter/i)
 })
 
-test('thinking text from the first call: the no-AI line after the dots, and no more calls in this visit', async () => {
+// find-v1 part 3 (Lead, 11 Nov): one slow or failed try no longer ends the AI for the visit; two in a row do, and SLOW_A
+// follows the second one's answer (tests/find-ai-rule.test.mjs). The tests below are brought to that rule.
+test('thinking text: the no-AI line after the dots; after two such messages in a row no more calls in this visit', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => THINKING } })
   send(view, 'can it fly a kite')
   assert.ok(dots(view))
@@ -110,44 +112,58 @@ test('thinking text from the first call: the no-AI line after the dots, and no m
   assert.equal(said(view), N1)
   finish(view)
   send(view, 'can it fly a plane')
+  assert.ok(dots(view), 'one failed try: the next message is asked')
+  await settle()
+  assert.equal(host.asks.length, 2)
+  assert.equal(line(view), 'N1_AGAIN')
+  finish(view)
+  send(view, 'do goats like it')
   assert.equal(dots(view), null, 'no dots: no call')
   await settle()
-  assert.equal(host.asks.length, 1, 'no second call in this visit')
-  assert.equal(line(view), 'N1_AGAIN')
+  assert.equal(host.asks.length, 2, 'two in a row: no further call in this visit')
 })
 
-test('no answer in 12 s: the no-AI line at 12 s, and no more calls in this visit, also once the call has ended', async () => {
-  const d = deferred()
-  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+test('no answer in 12 s: the no-AI line at 12 s; after two such messages in a row no more calls in this visit, also once the calls have ended', async () => {
+  const ds = [deferred(), deferred()]
+  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => ds[n - 1].promise } })
   send(view, 'can it fly a kite')
   await settle()
   assert.equal(host.asks.length, 1)
   timers.fire(12000)
   assert.equal(line(view), 'N1')
-  d.resolve('mod')
+  ds[0].resolve('mod')
   await settle()
   finish(view)
   send(view, 'can it fly a plane')
   await settle()
-  assert.equal(host.asks.length, 1, 'off for the visit, though Hermes has no call of Helper\'s any more')
+  assert.equal(host.asks.length, 2, 'one slow try: asked again')
+  timers.fire(12000)
+  ds[1].resolve('mod')
+  await settle()
+  finish(view)
+  send(view, 'do goats like it')
+  await settle()
+  assert.equal(host.asks.length, 2, 'off for the visit, though Hermes has no call of Helper\'s any more')
   assert.equal(dots(view), null)
 })
 
-test('review: a call with no answer 12 s after it started turns the AI step off, also when the person moved on before', async () => {
-  const d = deferred()
-  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'can it fly a kite')
+test('review: a call with no answer 12 s after it started is a failed try, also when the person moved on before; two such in a row turn the AI step off', async () => {
+  const ds = [deferred(), deferred()]
+  const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => ds[n - 1].promise } })
+  for (const [n, typed] of [[1, 'can it fly a kite'], [2, 'can it fly a plane']]) {
+    send(view, typed)
+    await settle()
+    assert.equal(host.asks.length, n)
+    // a new message before the 12 s: the waiting one gets its line, the call still runs in Hermes
+    send(view, 'thanks')
+    timers.fire(12000)
+    ds[n - 1].resolve('mod')
+    await settle()
+    finish(view)
+  }
+  send(view, 'do goats like it')
   await settle()
-  assert.equal(host.asks.length, 1)
-  // a new message before the 12 s: the waiting one gets its line, the call still runs in Hermes
-  send(view, 'thanks')
-  timers.fire(12000)
-  d.resolve('mod')
-  await settle()
-  finish(view)
-  send(view, 'can it fly a plane')
-  await settle()
-  assert.equal(host.asks.length, 1, 'off for the visit')
+  assert.equal(host.asks.length, 2, 'off for the visit')
 })
 
 test('the AI step off for a visit comes back when Hermes starts again (a new visit)', async () => {

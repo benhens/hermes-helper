@@ -222,6 +222,12 @@ export function slimLiveData(live, talk, wants) {
 // Status line, a sentence in the conversation window's bullet after "see the rest at once.", the bullet about
 // the "The model answers" card, and point 11 of the disclosure. The build writes them for src/ai-mode.js's
 // mode (tests/readme-disclosure.test.mjs checks them); everything else in README is the Builder's.
+// find-v1 part 3 (Lead, 11 Nov): the data's window sentence still says the old rule (one slow call ends the AI for the
+// visit; the line is said after the visit's first message). The live data is pinned at a5168682, so until the content
+// team rewords it the build puts the rule as built in its place; told to Lead and hhcontent in the report.
+const SLOW_RULE_WAS = 'If your AI is too slow, Helper stops asking it for the rest of the visit. When that happens with the first message Helper sends it in a visit, Helper says so once, with a text you can paste into your own Hermes to make it quicker.'
+const SLOW_RULE_NOW = 'If your AI is too slow or fails twice in a row, Helper stops asking it for the rest of the visit. When it was too slow, Helper says so once, right after its own answer, with a text you can paste into your own Hermes to make it quicker.'
+export const slowRuleNow = sentence => sentence.replace(SLOW_RULE_WAS, SLOW_RULE_NOW)
 export function readmeForMode(readme, live, mode) {
   const lm = live.lines_by_mode
   const lines = readme.split('\n')
@@ -238,8 +244,8 @@ export function readmeForMode(readme, live, mode) {
   const anchor = 'see the rest at once.'
   if (!lines[w].includes(anchor)) throw new Error('README.md: the window bullet lost "see the rest at once."')
   let bullet = lines[w]
-  for (const m of MODES) if (lm.readme_window_sentence[m]) bullet = bullet.split(' ' + lm.readme_window_sentence[m]).join('')
-  lines[w] = lm.readme_window_sentence[mode] ? bullet.replace(anchor, `${anchor} ${lm.readme_window_sentence[mode]}`) : bullet
+  for (const m of MODES) if (lm.readme_window_sentence[m]) bullet = bullet.split(' ' + lm.readme_window_sentence[m]).join('').split(' ' + slowRuleNow(lm.readme_window_sentence[m])).join('')
+  lines[w] = lm.readme_window_sentence[mode] ? bullet.replace(anchor, `${anchor} ${slowRuleNow(lm.readme_window_sentence[mode])}`) : bullet
   const c = at(l => l.startsWith('- The "The model answers" card makes one call'), '"The model answers" bullet')
   lines[c] = `- ${lm.readme_model_call_bullet[mode]}`
   const p = at(l => l.startsWith('11. '), 'point 11')

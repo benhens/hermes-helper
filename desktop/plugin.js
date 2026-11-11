@@ -25456,9 +25456,33 @@ function makePage(ctx, opts = {}) {
   // setup-chat (hhtech-live-run2, For builder 2; Lead's points 15 and 16): SLOW_A is owed to the written answer that
   // replaced the slow one, so it shows right after that answer or not at all in this visit: when the turn was already
   // closed (the person moved on before the 12 s) it is dropped, never hung under a later, unrelated line.
-  const slowFail = w => {
-    memory.visit.aiOff = true
-    if (w.firstTurn && !memory.visit.slow) memory.visit.slow = live.waiting === w ? 'due' : 'dropped'
+  // find-v1 part 3 (Lead, 11 Nov; hhtech ask-run 2 and find-run section 9), in place of "the first slow or failed call
+  // ends the AI for the visit": a message whose try at the AI was slow (no answer in 12 s, thinking text) or failed (the
+  // call threw) is one failed try (aiFailed, once per message). A message the AI answered in time puts the count back
+  // to 0. Two failed tries in a row turn the AI step off for the rest of the visit (visit.aiOff), and when that second
+  // one was slow SLOW_A is owed to its answer: it shows right after that answer or, when it may not follow it, not at
+  // all (Lead's points 15 and 16 stand). A try that failed without being slow owes no line: Helper has no checked words
+  // for "your AI gave an error".
+  const aiFailed = (w, slow) => {
+    const v = memory.visit
+    if (w.failed) return
+    w.failed = true
+    v.aiFails = (v.aiFails || 0) + 1
+    if (v.aiFails < 2) return
+    v.aiOff = true
+    if (!v.slow) v.slow = slow && (live.waiting === w || w.answeredNow) ? 'due' : 'dropped'
+  }
+  const slowFail = w => aiFailed(w, true)
+  // a message the AI answered in time (whatever it answered): the failed tries before it no longer count
+  const aiAnswered = w => {
+    if (!w.failed) memory.visit.aiFails = 0
+  }
+  // The model is looked for again (setup.runtime_check, no model call): right after a try that failed, so the next
+  // message knows whether a model is there now (ask-run 2 run D: Hermes switched its free model on after the failed
+  // try), and at each message that could not be asked because the page knows no model. Never two looks at once (the
+  // look itself returns when one is running).
+  const lookAgain = () => {
+    if (live.recheck) live.recheck()
   }
   // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
@@ -25489,10 +25513,12 @@ function makePage(ctx, opts = {}) {
     const running = useRef(false)
     const mounted = useRef(true)
 
-    async function run() {
+    // quiet (find-v1 part 3, the look made again for Helper's AI step): the page keeps showing what it knew until the
+    // answer is there, with no "checking" in between
+    async function run(quiet = false) {
       if (running.current) return
       running.current = true
-      setStatus({ state: 'checking' })
+      if (quiet !== true) setStatus({ state: 'checking' })
       let result = { state: 'error' }
       try {
         result = await checkModel((method, params, timeout) => host.request(method, params, timeout), { sleep })
@@ -25561,7 +25587,8 @@ function makePage(ctx, opts = {}) {
     const [focusStrip, setFocusStrip] = useState(false)
     const [size, measureRef] = useOwnSize()
     const width = size.width
-    const [modelStatus] = useModelStatus()
+    const [modelStatus, recheckModel] = useModelStatus()
+    live.recheck = () => recheckModel(true)
     // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
     const dashboard = useDashboard({ active: tab === 'dashboard' })
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
@@ -25720,14 +25747,15 @@ function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     // pressed: shown is the label of a button or pick the person pressed, not their words: never sent to the AI as
     // "Person: ..." (hhtech-live-run: "Person: Skip")
-    function answer(result, shown, typed = '', pressed = false) {
+    // slowDue (find-v1 part 3): this answer is the one a second slow try was answered with (see send): SLOW_A after it
+    function answer(result, shown, typed = '', pressed = false, slowDue = false) {
       if (!result) return
       // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
       const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper), ...(typed ? setupReask(result) : [])].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper), ...(slowDue ? slowAfter(said) : []), ...(typed ? setupReask(result) : [])].filter(Boolean))
       setFocusAsk(true)
     }
 
@@ -25759,11 +25787,13 @@ function makePage(ctx, opts = {}) {
         const instructions = recInstructions(says[i].rec, visit.kept, seen, names)
         const first = !visit.aiTried
         visit.aiTried = true
+        // find-v1 part 3: a slow or failed call here is one failed try, as for a typed message (two in a row end the AI
+        // for the visit). The slow-AI line may not follow a line with things to pick, so it is never owed here.
         const off = () => {
+          visit.aiFails = (visit.aiFails || 0) + 1
+          if (visit.aiFails < 2) return
           visit.aiOff = true
-          // the slow-AI line may not follow a line with things to pick, so it is dropped for this visit (as after any
-          // such answer), never hung under a later line
-          if (first && !visit.slow) visit.slow = 'dropped'
+          if (!visit.slow) visit.slow = 'dropped'
         }
         let ended = false
         const endBusy = busy.begin()
@@ -25787,6 +25817,7 @@ function makePage(ctx, opts = {}) {
             res => {
               const j = judgeRec(res && res.text, says[i].rec.item, names, instructions)
               if (j.noReply) off()
+              else if (!ended) visit.aiFails = 0
               end(j.text || null)
             },
             () => {
@@ -25880,7 +25911,16 @@ function makePage(ctx, opts = {}) {
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
       const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes, off: visit.aiOff === true })
-      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
+      // find-v1 part 3: the page knows no model: no call and no dots, and the model is looked for again for a later message
+      if (why === 'model not ready') lookAgain()
+      // find-v1 part 3: this message cannot be asked because an earlier call of Helper's has been in Hermes for over 12 s:
+      // that is a second slow try (the first was that call's own message)
+      let stuckNow = false
+      if (why === 'Hermes still works on a call' && live.stuck > 0) {
+        aiFailed({ answeredNow: true }, true)
+        stuckNow = true
+      }
+      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed, false, stuckNow)
       // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
@@ -25904,8 +25944,13 @@ function makePage(ctx, opts = {}) {
       const request = (method, params, timeout) => {
         live.inHermes++
         let ended = false
+        let stuck = false
         const stopWatch = ctx.setTimeout(() => {
-          if (!ended) slowFail(w)
+          if (ended) return
+          slowFail(w)
+          // find-v1 part 3: this call is still in Hermes 12 s after it started (see send: a message that meets it)
+          stuck = true
+          live.stuck = (live.stuck || 0) + 1
         }, LIVE_SECONDS * 1000)
         let p
         try {
@@ -25921,12 +25966,15 @@ function makePage(ctx, opts = {}) {
         // So the first call of a visit is still tried (dots once); asked of Lead in the report.
         return p
           .catch(err => {
-            visit.aiOff = true
+            // find-v1 part 3: a call that failed is one failed try, and the model is looked for again
+            aiFailed(w, false)
+            lookAgain()
             throw err
           })
           .finally(() => {
             ended = true
             stopWatch()
+            if (stuck) live.stuck--
             live.inHermes--
           })
       }
@@ -25936,6 +25984,7 @@ function makePage(ctx, opts = {}) {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
           if (got && got.thinking) slowFail(w)
+          else aiAnswered(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })

@@ -77,8 +77,10 @@ const PASTE = LIVE_DATA.slow_ai.paste_text
 const count = (view, id) => helperLines(view).filter(l => l === id).length
 const THINKING = 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Task:**'
 
+// find-v1 part 3 (Lead, 11 Nov): one slow or failed try no longer ends the AI for the visit; two in a row do, and SLOW_A
+// follows the second one's answer (tests/find-ai-rule.test.mjs). The tests below are brought to that rule.
 for (const mode of ['ai_writes', 'ai_picks_line']) {
-  test(`${mode}: the visit's first call never answers: the written answer at 12 s, then SLOW_A with its text to paste; a second message makes no call and gets no second SLOW_A`, async () => {
+  test(`${mode}: the AI never answers, twice in a row: the written answer at 12 s; at the second such message the written answer, then SLOW_A with its text to paste; no call and no second SLOW_A after that`, async () => {
     const { view, host, timers } = await pastOpening(mode, { host: { oneshot: never } })
     send(view, TOKENS)
     assert.equal(line(view), 'use1')
@@ -90,6 +92,13 @@ for (const mode of ['ai_writes', 'ai_picks_line']) {
     timers.fire(12000)
     await settle()
     assert.equal(dots(view), null)
+    assert.equal(line(view), 'use0', 'the written answer; one slow try says nothing')
+    assert.equal(count(view, 'SLOW_A'), 0)
+    finish(view)
+    send(view, TOKENS + ' 2')
+    send(view, 'what do you mean?') // the first call is still in Hermes after its 12 s: the second slow try
+    await settle()
+    assert.equal(host.asks.length, 1)
     assert.equal(oldLines(view).at(-1), 'use0', 'the written answer first, as the older line')
     assert.equal(line(view), 'SLOW_A')
     assert.equal(said(view), curlyQuotes(SLOW_TEXT))
@@ -110,12 +119,18 @@ for (const mode of ['ai_writes', 'ai_picks_line']) {
   })
 }
 
-test('the visit\'s first call sends thinking text: the written answer, then SLOW_A, at once (no 12 s wait)', async () => {
+test('thinking text twice in a row: the written answer, then SLOW_A, at once (no 12 s wait)', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => THINKING } })
   send(view, TOKENS)
   send(view, 'what do you mean?')
   await settle()
   assert.equal(host.asks.length, 1)
+  assert.equal(count(view, 'SLOW_A'), 0)
+  finish(view)
+  send(view, TOKENS + ' 2')
+  send(view, 'what do you mean?')
+  await settle()
+  assert.equal(host.asks.length, 2)
   assert.deepEqual([oldLines(view).at(-1), line(view)], ['use0', 'SLOW_A'])
 })
 
@@ -156,7 +171,7 @@ test('a written answer that asks a question with things to pick is not followed 
   assert.equal(count(view, 'SLOW_A'), 0)
 })
 
-test('a later call of the visit (not the first) with no answer in 12 s: the AI step is off, and no SLOW_A (changes-5: "the first AI call of a visit")', async () => {
+test('one call with no answer in 12 s after a good one: no SLOW_A (find-v1: one slow try says nothing); the messages after it here are answered by code', async () => {
   const good = `${LIVE_ROW.mod1.text}\nUSED: mod1`
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? 'mod' : n === 2 ? good : never()) } })
   send(view, 'can it fly a kite')
@@ -170,11 +185,11 @@ test('a later call of the visit (not the first) with no answer in 12 s: the AI s
   send(view, 'what is a skill')
   send(view, 'what do you mean?')
   await settle()
-  assert.equal(host.asks.length, 3, 'off for the visit')
+  assert.equal(host.asks.length, 3, 'code answers these two itself')
   assert.equal(count(view, 'SLOW_A'), 0)
 })
 
-test('the person moved on before the 12 s, and that first call never answers: the AI step is off and SLOW_A is dropped, never under a later line', async () => {
+test('the person moved on before the 12 s, and that call never answers: nothing is said by itself, and SLOW_A never hangs under a later line', async () => {
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: never } })
   send(view, TOKENS)
   send(view, 'what do you mean?')
@@ -190,23 +205,27 @@ test('the person moved on before the 12 s, and that first call never answers: th
   send(view, 'what do you mean?')
   await settle()
   assert.equal(count(view, 'SLOW_A'), 0)
-  assert.equal(host.asks.length, 1, 'and the AI step is off for the visit')
+  assert.equal(host.asks.length, 1, 'no new call: code answered, and the first call is still in Hermes')
 })
 
 test('"said this visit" is kept for the visit only: nothing is stored, and after Hermes starts again a slow first call gets SLOW_A again', async () => {
   const storage = fakeStorage()
+  const twice = async view => {
+    for (const n of [1, 2]) {
+      send(view, TOKENS + ' ' + n)
+      send(view, 'what do you mean?')
+      await settle()
+      finish(view)
+    }
+  }
   const a = await pastOpening('ai_writes', { storage, host: { oneshot: () => THINKING } })
-  send(a.view, TOKENS)
-  send(a.view, 'what do you mean?')
-  await settle()
+  await twice(a.view)
   assert.equal(line(a.view), 'SLOW_A')
   assert.deepEqual([...storage.data.keys()].sort(), ['kept', 'met'])
   assert.doesNotMatch(JSON.stringify([...storage.data.values()]), /slow/i)
   const b = await open('ai_writes', { storage, host: { oneshot: () => THINKING } })
   finish(b.view)
-  send(b.view, TOKENS)
-  send(b.view, 'what do you mean?')
-  await settle()
+  await twice(b.view)
   assert.equal(line(b.view), 'SLOW_A')
 })
 

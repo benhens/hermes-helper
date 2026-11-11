@@ -129,9 +129,9 @@ test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes s
   d.resolve(goodReply('sch1'))
   await settle()
   assert.equal(JSON.stringify(view.tree), before)
-  // talk-live-2 (hhtech-weak-ai): a call that gave no answer in 12 s turns the AI step off for the rest of this
-  // visit, so even with Hermes free again the next message makes no call (tests/live-page-2.test.mjs)
-  send(view, 'is it safe')
+  // find-v1 part 3: that second message met the first call still in Hermes after its 12 s, so it was the second slow
+  // try in a row: the AI step is off for the rest of this visit, also with Hermes free again
+  send(view, 'do goats like it')
   await settle()
   assert.equal(host.asks.length, 1)
 })

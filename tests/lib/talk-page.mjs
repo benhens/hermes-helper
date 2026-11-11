@@ -69,3 +69,17 @@ export async function pastOpening(mode, options) {
   return o
 }
 export { settle, fakeStorage }
+// every line of Helper's on screen, oldest first (the speech bubble last), and the newest that is no offer bubble
+export const allLines = view => [...oldLines(view), bubble(view) ? bubbleLine(view) : null].filter(Boolean)
+export const answerLine = view => allLines(view).filter(l => !String(l).startsWith('offer-')).at(-1)
+export const count = (view, id) => allLines(view).filter(l => l === id).length
+export const never = () => new Promise(() => {})
+export function deferred() {
+  let resolve
+  let reject
+  const promise = new Promise((a, b) => {
+    resolve = a
+    reject = b
+  })
+  return { promise, resolve, reject }
+}

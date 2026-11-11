@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { PINS, TEAM, pinned, teamSha } from './lib/team-pins.mjs'
-import { readmeForMode } from '../scripts/live-data.mjs'
+import { readmeForMode, slowRuleNow } from '../scripts/live-data.mjs'
 import { aiModeOf } from '../scripts/build.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
@@ -73,7 +73,9 @@ test('README\'s lines by mode (Status, the waiting dots, the model calls, point 
     const differ = ['readme_status_sentence_2', 'readme_window_sentence', 'readme_model_call_bullet', 'readme_point_11'].filter(k => lm[k][m] !== lm[k][mode]).length
     assert.equal(diff, differ, m)
     if (m !== mode) assert.ok(differ >= 3, m)
-    if (lm.readme_window_sentence[m]) assert.ok(other.includes(lm.readme_window_sentence[m]), m)
+    // find-v1 part 3: the data's sentence with the slow rule as built in place of the old one (scripts/live-data.mjs)
+    if (lm.readme_window_sentence[m]) assert.ok(other.includes(slowRuleNow(lm.readme_window_sentence[m])), m)
+    if (lm.readme_window_sentence[m]) assert.ok(!other.includes('When that happens with the first message'), m)
   }
   // the clause hhcontent asked about: llm.oneshot is one plain request with no tools (Hermes's agent/oneshot.py run_oneshot:
   // messages, max_tokens, temperature, nothing else), so "no tools run" stays in the AI modes
