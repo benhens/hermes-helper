@@ -29692,8 +29692,21 @@ function Said({ clock, id, text, className, fresh = false }) {
 // its own for as long as it runs, also while it waits, and the whole drawing was then soft at its
 // edges. So the blink changes the eye's own height (ry) and the hole's own path (d), the fingers
 // their y and height, the mouth its path: with those the drawing stayed sharp.
+// loom2 (his second Loom of 11 Nov, 2:28-2:50: "a bunch of dots ... this doesn't really fit the Hermes whole vibe"; his
+// reference: a portrait made only of squares on one strict grid, big where it is dark, small toward the edges): the
+// shapes are the same, but their accent fill is drawn as squares on one fixed grid by one SVG filter on the whole
+// drawing (DOTS below). The filter reads how deep inside the shapes each point is (their outline, blurred), and on
+// every cell of the grid draws a square that size: full inside, smaller toward the edges, none outside, so the edges
+// dissolve. No outline. One colour, the theme's accent, in dark and light. The grid does not move with the drawing (it
+// is fixed to the drawing's own space), and no square is an element of its own: a glide costs one filter pass a frame,
+// not one element a square. The pupils stay real holes: around a hole the squares shrink as at any edge.
 
 const ACCENT = { fill: 'var(--ui-accent)' }
+// The dots (loom2): cell: the grid's step in the drawing's units (6 = 5 px at 168 px wide, 4 px at 132 px); blur: how
+// far in from an edge the squares are still shrinking; gain: how soon inside a shape they reach full size; fill: a
+// full square's side as a share of its cell (the rest is the gap between squares). area: the filter's region, all the
+// body can reach (it rises 10 units and starts 101 units down when it comes up from behind the box).
+const DOTS = { cell: 6, blur: 4, gain: 1.5, fill: 0.75, area: { x: -30, y: -40, width: 260, height: 240 } }
 const SIDES = ['left', 'right']
 const FINGER_COUNT = EXPRESSIONS.resting.fingers.length
 // A blink, piece by piece: [piece, what changes, open, shut] (src/expressions.js).
@@ -29844,6 +29857,57 @@ function Character({ size = CHARACTER_PX, expression = 'resting', rising = false
   }, [comesUp])
 
   const view = FACE.view
+  // The dots: two ramps across one cell (0 at its edges, 1 in its middle), sideways and downwards, laid over the whole
+  // area as a pattern on the drawing's fixed grid; the filter adds each ramp to how deep the point is in the shapes
+  // and keeps what passes half way: a square per cell whose side grows with the depth.
+  const A = DOTS.area
+  const ramp = dir =>
+    jsxs(
+      'linearGradient',
+      {
+        id: `${uid}-ramp-${dir}`,
+        x1: 0,
+        y1: 0,
+        x2: dir === 'x' ? 1 : 0,
+        y2: dir === 'y' ? 1 : 0,
+        children: [0, 0.5, 1].map(offset => jsx('stop', { offset, style: { stopColor: ACCENT.fill, stopOpacity: offset === 0.5 ? 1 : 0 } }, offset))
+      },
+      `ramp-${dir}`
+    )
+  const grid = dir => [
+    jsx(
+      'pattern',
+      { id: `${uid}-cells-${dir}`, patternUnits: 'userSpaceOnUse', x: 0, y: 0, width: DOTS.cell, height: DOTS.cell, children: jsx('rect', { width: DOTS.cell, height: DOTS.cell, fill: `url(#${uid}-ramp-${dir})` }) },
+      `cells-${dir}`
+    ),
+    jsx('rect', { id: `${uid}-grid-${dir}`, ...A, fill: `url(#${uid}-cells-${dir})` }, `grid-${dir}`)
+  ]
+  const half = dir => [
+    jsx('feImage', { href: `#${uid}-grid-${dir}`, ...A, result: `ramp${dir}` }, `img-${dir}`),
+    jsx('feComposite', { in: `ramp${dir}`, in2: 'deep', operator: 'arithmetic', k1: 0, k2: 0.5, k3: 0.5 * DOTS.fill, k4: 0, result: `sum${dir}` }, `sum-${dir}`),
+    jsx('feComponentTransfer', { in: `sum${dir}`, result: `keep${dir}`, children: jsx('feFuncA', { type: 'discrete', tableValues: '0 1' }) }, `keep-${dir}`)
+  ]
+  const dots = jsxs(
+    'filter',
+    {
+      id: `${uid}-dots`,
+      'data-hh': 'dots',
+      filterUnits: 'userSpaceOnUse',
+      primitiveUnits: 'userSpaceOnUse',
+      ...A,
+      colorInterpolationFilters: 'sRGB',
+      children: [
+        jsx('feGaussianBlur', { in: 'SourceAlpha', stdDeviation: DOTS.blur, result: 'soft' }, 'blur'),
+        jsx('feComponentTransfer', { in: 'soft', result: 'deep', children: jsx('feFuncA', { type: 'linear', slope: DOTS.gain, intercept: 0 }) }, 'gain'),
+        ...half('x'),
+        ...half('y'),
+        jsx('feComposite', { in: 'keepx', in2: 'keepy', operator: 'in', result: 'squares' }, 'squares'),
+        jsx('feFlood', { style: { floodColor: ACCENT.fill }, result: 'ink' }, 'ink'),
+        jsx('feComposite', { in: 'ink', in2: 'squares', operator: 'in' }, 'paint')
+      ]
+    },
+    'dots'
+  )
   const pupilMask = (side, i) => {
     const eye = FACE.eyes[i]
     return jsx(
@@ -29927,27 +29991,38 @@ function Character({ size = CHARACTER_PX, expression = 'resting', rising = false
     // mouse presses pass through it to the message box.
     style: { display: 'block', flex: 'none', width: size, maxWidth: '100%', height: 'auto', overflow: 'visible', pointerEvents: 'none', visibility: comesUp && !armed ? 'hidden' : undefined },
     children: [
-      jsxs('defs', { children: [jsx('clipPath', { id: `${uid}-above`, children: jsx('rect', { ...FACE.above }) }, 'above'), ...SIDES.map(pupilMask)] }, 'defs'),
-      // The body shows only above the edge, so on rising it comes out from behind the message box.
-      jsx(
+      jsxs('defs', { children: [jsx('clipPath', { id: `${uid}-above`, children: jsx('rect', { ...FACE.above }) }, 'above'), ...SIDES.map(pupilMask), ramp('x'), ramp('y'), ...grid('x'), ...grid('y'), dots] }, 'defs'),
+      // loom2: everything is drawn through the dots filter, as one picture
+      jsxs(
         'g',
         {
-          clipPath: `url(#${uid}-above)`,
-          children: jsxs('g', {
-            ref: ref('body'),
-            'data-hh': 'body',
-            style: { transform: `translateY(${-x.rise}px)`, transition: glide('transform') },
-            children: [
-              ...SIDES.map(eyeShape),
-              jsx('path', { ref: ref('mouth'), 'data-hh': 'mouth', d: x.mouth, style: { ...ACCENT, d: `path("${x.mouth}")`, transition: glide('d') } }, 'mouth')
-            ]
-          })
+          filter: `url(#${uid}-dots)`,
+          'data-hh': 'dotted',
+          children: [
+            // The body shows only above the edge, so on rising it comes out from behind the message box.
+            jsx(
+              'g',
+              {
+                clipPath: `url(#${uid}-above)`,
+                children: jsxs('g', {
+                  ref: ref('body'),
+                  'data-hh': 'body',
+                  style: { transform: `translateY(${-x.rise}px)`, transition: glide('transform') },
+                  children: [
+                    ...SIDES.map(eyeShape),
+                    jsx('path', { ref: ref('mouth'), 'data-hh': 'mouth', d: x.mouth, style: { ...ACCENT, d: `path("${x.mouth}")`, transition: glide('d') } }, 'mouth')
+                  ]
+                })
+              },
+              'body'
+            ),
+            // The fingers are drawn last, in front, and reach 7 units below the edge, over the message
+            // box's top border.
+            ...SIDES.flatMap((side, hand) => x.fingers.map((h, i) => finger(side, hand, i)))
+          ]
         },
-        'body'
-      ),
-      // The fingers are drawn last, in front, and reach 7 units below the edge, over the message
-      // box's top border.
-      ...SIDES.flatMap((side, hand) => x.fingers.map((h, i) => finger(side, hand, i)))
+        'dotted'
+      )
     ]
   })
 }
