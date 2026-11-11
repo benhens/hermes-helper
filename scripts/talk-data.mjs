@@ -407,8 +407,21 @@ const slimAnswers = list => (list || []).map(a => pickKeys(a, ['label', 'gives']
 // What src/talk.js and the settings page read of keeps: the rules as data, Helper's lines and the
 // settings page's words. The notes, the reasons and the version for a build that calls a model
 // (first_time, top_line_2) stay out.
+// last-words (Lead, 11 Nov 16:48): Forget all is a full reset, so Helper asks the name again. Until hhcontent takes
+// this sentence out of its own lines (keeps.tell.see.delete_all.after_yes, keeps.settings_file.forget_all.under and
+// .after_yes), the build cuts it; no other word changes, and a line that no longer has it passes as it is.
+export const LAST_WORDS_CUTS = [" I won't ask your name again.", " Helper still won't ask your name again.", " It won't ask your name again."]
+const lastWords = s => LAST_WORDS_CUTS.reduce((t, cut) => t.endsWith(cut) ? t.slice(0, -cut.length) : t, s)
 function slimKeeps(K) {
   const S = K.settings_file
+  const keeps = slimKeepsAsGiven(K, S)
+  const da = keeps.tell.see.delete_all, fa = keeps.settings_file.forget_all
+  da.after_yes = lastWords(da.after_yes)
+  fa.under = lastWords(fa.under)
+  fa.after_yes = lastWords(fa.after_yes)
+  return keeps
+}
+function slimKeepsAsGiven(K, S) {
   return {
     answers: {
       mod: { values: K.answers.mod.values.map(v => pickKeys(v, ['need', 'value', 'typed_words', 'typed_not_with_unsure_words'])) },

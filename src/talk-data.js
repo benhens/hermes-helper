@@ -7813,7 +7813,7 @@ export const TALK_DATA = {
         "delete_all": {
           "label": "Delete all of it",
           "question": "Delete everything I keep about you?",
-          "after_yes": "Done. I keep nothing about you now. I won't ask your name again.",
+          "after_yes": "Done. I keep nothing about you now.",
           "after_no": "Fine. Nothing is changed.",
           "answers": [
             {
@@ -8481,10 +8481,10 @@ export const TALK_DATA = {
       "forget_all": {
         "label": "Forget all of this",
         "action": "Forget",
-        "under": "Deletes everything on this page from this computer. Helper still won't ask your name again.",
+        "under": "Deletes everything on this page from this computer.",
         "question": "Delete everything Helper keeps about you?",
         "with_question": "What was already sent to your AI cannot be taken back.",
-        "after_yes": "Done. Helper keeps nothing about you now. It won't ask your name again.",
+        "after_yes": "Done. Helper keeps nothing about you now.",
         "answers": [
           {
             "label": "Yes, delete it",
