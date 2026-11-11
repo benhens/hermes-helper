@@ -34,6 +34,9 @@ const keptPlain = (v, max) => typeof v === 'string' && v.trim() !== '' && Array.
 const KEPT_SETUP_NEW = SETUP_DATA.questions.Q_NEW.answers.filter(a => a.kept_as).map(a => a.id)
 const KEPT_SETUP_GOALS = SETUP_DATA.questions.Q_GOAL.answers.map(a => a.id)
 const KEPT_SETUP_ITEMS = SETUP_DATA.rule_order
+// loom2: every set-up card on the Dashboard is marked by the person (his words, 11 Nov 17:10 UTC: "only if the person
+// clicks Done"), A model too, which the set-up conversation's rule_order leaves out (the page saw it): a mark of it is kept
+const KEPT_MARKS = [...KEPT_SETUP_ITEMS, 'model']
 
 export function cleanKept(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
@@ -55,7 +58,7 @@ export function cleanKept(v) {
     out.setup_goal_id = v.setup_goal_id
   }
   if (Array.isArray(v.setup_done_said)) {
-    const said = [...new Set(v.setup_done_said.filter(x => KEPT_SETUP_ITEMS.includes(x)))]
+    const said = [...new Set(v.setup_done_said.filter(x => KEPT_MARKS.includes(x)))]
     if (said.length) out.setup_done_said = said
   }
   if (KEPT_SETUP_ITEMS.includes(v.setup_current) || v.setup_current === 'model') out.setup_current = v.setup_current

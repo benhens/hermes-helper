@@ -131,17 +131,24 @@ export function dashProblems(data, docs) {
   return fails
 }
 
-// What src/dash.js reads: the 11 things (no done rules or reads: those are code) and the page words.
+// loom2 (Lead's job builder-loom2-dash, his second Loom of 11 Nov): the cards are the stops on the path less Scheduled
+// jobs ("scheduled jobs are not part of the setup", 2:13): 9 cards. The data keeps its 10; the cut is made here.
+export const CARDS_OUT = ['scheduled_job']
+// Lead's words for this job, not yet in hhcontent's words file (a line Lead rules on goes in here, not into the plugin's
+// copy, which is pinned to the team's checksum): the label on the first card not marked, in place of "You are here";
+// the word on a card the person marked; the button that marks it (his words, 17:10 UTC: "only if the person clicks
+// Done"), in place of "I've done this". Once the team's file has them, these are the same words and change nothing.
+export const LOOM2_WORDS = { start_here: 'Start here', state_done: 'Done', mark_done: 'Done' }
+
+// What src/dash.js reads: the cards (no done rules or reads: since loom2 nothing is read for them) and the page words.
 export function slimDashData(data) {
   const w = data.page_words
   const routes = Array.isArray(w.routes) ? w.routes : []
   return {
-    // loom-fixes: only the 10 stops on the path; seen: the page has a rule for it (SEEN_IDS), else the person marks it
-    items: data.items.filter(it => it.on_path === true).map(it => ({
+    // loom2: the 9 cards (the path's stops less Scheduled jobs), in the data's order; every one is marked by the person
+    items: data.items.filter(it => it.on_path === true && !CARDS_OUT.includes(it.id)).map(it => ({
       id: it.id,
-      seen: SEEN_IDS.includes(it.id),
       name: it.card_name,
-      mark: w.marks[it.id],
       why: it.why,
       steps: it.steps.map((s, k) => {
         const r = routes.find(x => x.item === it.id && x.step === k + 1)
@@ -150,13 +157,17 @@ export function slimDashData(data) {
       terminal: it.terminal ? { when: it.terminal.when, paste: it.terminal.paste.map(p => ({ for: p.for, text: p.text })) } : null,
       sources: it.sources.map(s => ({ file: s.file, line: s.line }))
     })),
-    total: data.items.filter(i => i.on_path === true).length,
+    total: data.items.filter(i => i.on_path === true && !CARDS_OUT.includes(i.id)).length,
+    // the path's 10 stops in order, for Helper's set-up conversation only (src/setup-chat.js: its "next" stop, as before
+    // loom2; that conversation does not run in this build)
+    path: data.items.filter(i => i.on_path === true).map(i => i.id),
     words: {
       // loom2: no tabs (Learn is out, his Loom of 11 Nov, 1:51): the tab names and Learn's line are not built in
       stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
       helperWindow: pickWords(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no']),
       // loom2: Activity is out (his Loom of 11 Nov, 0:05 "just take it out"): its words are not built in
-      setup: pickWords(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_known', 'mark_done', 'mark_undo', 'person_note', 'state_said_done'])
+      // loom2: no path, so no "You are here", Next, Open, all done line or seen states; no "Helper can't see this one"
+      setup: { ...pickWords(w.setup, ['title', 'count', 'close', 'copy', 'copied', 'source', 'mark_undo']), ...LOOM2_WORDS }
     }
   }
 }

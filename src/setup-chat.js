@@ -19,7 +19,9 @@ import { SETUP_AI_BUILT } from './setup-built.js'
 import { hereStop } from './setup-reads.js'
 import { DASH_DATA } from './dash-data.js'
 // the path's stops in order (the Dashboard's), for the one "You are here" rule
-const SU_PATH_OF = () => DASH_DATA.items.map(it => it.id)
+// loom2: the path's 10 stops as before (the Dashboard's cards are 9 now, Scheduled jobs out); this conversation does not
+// run in this build (normal-chat), and its order is unchanged
+const SU_PATH_OF = () => DASH_DATA.path
 
 const SU = SETUP_DATA
 const SU_L = SU.lines

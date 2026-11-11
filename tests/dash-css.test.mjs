@@ -59,58 +59,41 @@ test('every class the code names has a rule in the sheet, and the sheet has no c
   }
 })
 
-test('the path\'s line: one thin neutral line through all 11 stops, in a Hermes colour with no accent in it (hhdesign\'s review: the hairline --ui-stroke-tertiary is 10% accent, so blue; its first choice --sidebar-edge-border could hardly be seen in light, so its second: --ui-text-quaternary at 1 px); no rule colours it, in any state', () => {
-  const lineRules = rules.filter(r => selectorsOf(r).some(s => /\.hhd-line(?![\w-])/.test(s)))
-  assert.deepEqual(lineRules, [`.${D.line}{fill:none;stroke:${EDGE};stroke-width:1;stroke-linecap:round}`])
-  assert.doesNotMatch(DASH_CSS, /--sidebar-edge-border/)
-  // (the grey the quiet stops' pictures and names already wear)
-  // the quiet stops' ring is the line's colour, so ring and line stay one colour
-  assert.ok(rules.find(r => r.startsWith(`.${D.quiet} .${D.dot}{`)).includes(`border:1.5px solid ${EDGE};`))
-  // the hairline stays where Hermes itself uses it: the cards' edge in light, the divider above "Next"
-  assert.deepEqual(rules.filter(r => r.includes('--ui-stroke-tertiary')).map(r => r.slice(0, r.indexOf('{'))), [`html:not(.dark) .${D.card}`, `html:not(.dark) .${D.tile}`, `.${D.next}`])
-  // nothing else in the sheet draws a stroke, and nothing reaches the line through a state (done, here, ...)
-  assert.equal(rules.filter(r => /[{;]stroke(-[a-z]+)?:/.test(r)).length, 1)
-  for (const r of rules) for (const s of selectorsOf(r)) if (/hhd-line(?![\w-])/.test(s)) assert.equal(s, `.${D.line}`)
-  // in the code: every segment wears the line's class and nothing else, with no colour of its own
-  const dash = read('src/dash.js')
-  assert.match(dash, /jsx\('path', \{ d, className: D\.line, 'data-hh': 'line' \}, i\)/)
-  assert.doesNotMatch(dash, /stroke/)
-})
-
-test('the stops show the state: filled accent = done, ringed and larger = You are here, small thin ring = not counted; the halo is an outline, not a shadow', () => {
-  const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
-  assert.match(rule(`.${D.done} .${D.dot}`), /background:var\(--ui-accent\)/)
-  assert.match(rule(`.${D.here} .${D.dot}`), /width:50px;height:50px;.*border:2px solid var\(--ui-accent\);outline:5px solid color-mix\(in srgb,var\(--ui-accent\) 14%,transparent\)/)
-  assert.match(rule(`.${D.quiet} .${D.dot}`), /width:30px;height:30px;background:var\(--ui-bg-elevated\);border:1\.5px solid var\(--ui-text-quaternary\);/)
-  assert.match(rule(`.${D.todo} .${D.dot}`), /background:var\(--ui-bg-tertiary\)/)
-  assert.doesNotMatch(rule(`.${D.quiet} .${D.dot}`), /--ui-accent/)
-})
-
-test('hhdesign\'s r7 sizes: tiles 3 across, icon square 40 px at 13% accent; stops 40 px (32 narrow)', () => {
+test('hhdesign\'s r7 sizes: tiles 3 across, icon square 40 px at 13% accent; loom2: a set-up card is a tile (the same surface, edge, corners, padding and icon square)', () => {
   const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
   assert.match(rule(`.${D.stats}`), /grid-template-columns:repeat\(3,minmax\(0,1fr\)\);gap:10px/)
   assert.match(rule(`.${D.tileIcon}`), /width:40px;height:40px;border-radius:calc\(10px\*var\(--hhd-round\)\);background:color-mix\(in srgb,var\(--ui-accent\) 13%,transparent\)/)
   assert.match(rule(`.${D.tileNum}`), /font-size:28px;line-height:32px;font-weight:600/)
-  assert.match(rule(`.${D.dot}`), /width:40px;height:40px/)
-  assert.match(rule(`.${D.compact} .${D.dot}`), /width:32px;height:32px/)
+  // the same surface, corners and padding as a tile, and the same hairline edge in light
+  assert.match(rule(`.${D.scard}`), /background:var\(--ui-bg-elevated\);border-radius:calc\(12px\*var\(--hhd-round\)\);padding:14px 16px/)
+  assert.match(rule(`.${D.tile}`), /background:var\(--ui-bg-elevated\);border-radius:calc\(12px\*var\(--hhd-round\)\);padding:14px 16px/)
+  assert.equal(rule(`html:not(.dark) .${D.scard}`), `html:not(.dark) .${D.scard}{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}`)
+  assert.equal(rule(`html:not(.dark) .${D.tile}`), `html:not(.dark) .${D.tile}{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}`)
 })
 
 /* ---------- dash-v2: hhdesign's review of 65b108b (design/dash-r7/review-65b108b.md, "For builder") ---------- */
 const ruleOf = sel => rules.find(r => r.startsWith(sel + '{')) || ''
 
-test('the pointer over an opened stop: only its half above the panel is drawn (it was two-toned), and at the narrow size it is not drawn (the page scrolls, it pointed at the tab names)', () => {
+test('the pointer over an opened card: only its half above the panel is drawn (it was two-toned); the source tags are quieter: 10.5 px in --ui-text-quaternary, 4 px apart', () => {
   assert.match(ruleOf(`.${D.caret}`), /clip-path:polygon\(0 0,100% 0,0 100%\)/)
-  assert.equal(ruleOf(`.${D.compact} .${D.caret}`), `.${D.compact} .${D.caret}{display:none}`)
-})
-
-test('the small arrow after "Open" stands 4 px after the word; the source tags are quieter: 10.5 px in --ui-text-quaternary, 4 px apart', () => {
-  assert.equal(ruleOf(`.${D.openChev}`), `.${D.openChev}{display:inline-flex;margin-left:4px}`)
-  // the word and its arrow are one piece inside Hermes's Button (whose own gap between children would add to the 4 px)
-  assert.equal(ruleOf(`.${D.openWord}`), `.${D.openWord}{display:inline-flex;align-items:center}`)
   assert.match(ruleOf(`.${D.foot}`), /gap:4px/)
   assert.equal(ruleOf(`.${D.foot} .${D.src}`), `.${D.foot} .${D.src}{font-size:10.5px;color:var(--ui-text-quaternary)}`)
-  const dash = read('src/dash.js')
-  assert.match(dash, /className: `\$\{K\.chipLink\} \$\{D\.src\}`/)
+  assert.match(read('src/dash.js'), /className: `\$\{K\.chipLink\} \$\{D\.src\}`/)
+})
+
+/* ---------- loom2: the set-up as cards ---------- */
+test('no path and no line: nothing in the sheet draws a stroke or a path; the hairline is only the light edge of tiles and cards', () => {
+  assert.doesNotMatch(DASH_CSS, /[{;]stroke|hhd-line|hhd-road|hhd-stop|hhd-dot/)
+  assert.deepEqual(rules.filter(r => r.includes('--ui-stroke-tertiary')).map(r => r.slice(0, r.indexOf('{'))), [`html:not(.dark) .${D.tile}`, `html:not(.dark) .${D.scard}`])
+  assert.doesNotMatch(read('src/dash.js'), /'svg'|'path'|stroke/)
+})
+
+test('a marked card: its icon square filled with the accent and "Done" in the accent; "Start here" in the accent; the opened card ringed with an outline (no shadow)', () => {
+  assert.equal(ruleOf(`.${D.done} .${D.tileIcon}`), `.${D.done} .${D.tileIcon}{background:var(--ui-accent);color:var(--background)}`)
+  assert.match(ruleOf(`.${D.doneLine}`), /font-weight:600;color:var\(--ui-accent\)/)
+  assert.match(ruleOf(`.${D.start}`), /color:var\(--ui-accent\)/)
+  assert.equal(ruleOf(`.${D.scard}.${D.sel}`), `.${D.scard}.${D.sel}{outline:2px solid var(--ui-accent);outline-offset:-2px}`)
+  assert.match(ruleOf(`.${D.scard}:focus-visible`), /outline:2px solid var\(--ui-text-secondary\)/)
 })
 
 test('the corners sit behind one value: --hhd-round is set once (1 = the round look he picked in dash-r3), and every corner of a card, tile, panel, icon square and waiting block is its size times that value', () => {
@@ -120,9 +103,9 @@ test('the corners sit behind one value: --hhd-round is set once (1 = the round l
   const radii = [...DASH_CSS.matchAll(/border-radius:([^;}]+)/g)].map(m => m[1])
   const scaled = radii.filter(r => r.includes('--hhd-round'))
   assert.deepEqual(scaled.sort(), ['calc(10px*var(--hhd-round))', 'calc(12px*var(--hhd-round))', 'calc(12px*var(--hhd-round))', 'calc(12px*var(--hhd-round))', 'calc(7px*var(--hhd-round))'])
-  // what is left with a fixed corner is not a box: the round stops and icon discs (50%) and the 2 px day squares and pointer
-  assert.deepEqual([...new Set(radii.filter(r => !r.includes('--hhd-round')))].sort(), ['2px', '50%'])
-  for (const sel of [`.${D.card}`, `.${D.tile}`, `.${D.steps}`]) assert.match(ruleOf(sel), /border-radius:calc\(12px\*var\(--hhd-round\)\)/, sel)
+  // what is left with a fixed corner is not a box: the 2 px pointer (loom2: no round stops any more)
+  assert.deepEqual([...new Set(radii.filter(r => !r.includes('--hhd-round')))].sort(), ['2px'])
+  for (const sel of [`.${D.scard}`, `.${D.tile}`, `.${D.steps}`]) assert.match(ruleOf(sel), /border-radius:calc\(12px\*var\(--hhd-round\)\)/, sel)
   assert.match(ruleOf(`.${D.wait}`), /border-radius:calc\(7px\*var\(--hhd-round\)\)/)
 })
 

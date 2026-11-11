@@ -1,44 +1,23 @@
-// The Dashboard tab's fixed rules (dash-v1). Pure code, no React, no Hermes: src/dash.js reads Hermes and hands
-// the answers here. No AI anywhere. What each rule reads (content/dash-setup-list-v2.json, docs/answers/
-// hhtech-dash-reads.md and -reads2.md, "For builder:"):
-//   install        always done: this page runs only inside an installed Hermes
-//   (dash-v2: bot = the bot the app has open; Lead, 11 Nov)
-//   model          setup.runtime_check { profile: bot } says ok: true (Hermes's own free plan counts)
-//   personality    profiles.describe { name: bot }: soul is not empty and not one of Hermes's starter texts
-//   chat_apps      host.status(): gateway_platforms names at least one chat app (switched on, with its key)
-//   scheduled_job  cron.manage { action: 'list', profile: bot, include_disabled: true }: at least one job
-//   second_bot     profiles.list: two or more bots
-// A read that failed or has not come back is "not known" (null): never shown as done, never "You are here".
+// The Dashboard's fixed rules (dash-v1; loom2: the set-up cards). Pure code, no React, no Hermes: src/dash.js reads
+// Hermes and hands the answers here. No AI anywhere.
 import { DASH_DATA } from './dash-data.js'
-import { hereStop } from './setup-reads.js'
-// dash-v2 (the two branches joined): the starter personality texts, which bot, and the six rules (doneFlags) are in
-// src/setup-reads.js, the one copy the Dashboard and Helper's set-up conversation both use.
 
-/* ---------- the path ---------- */
-// loom-fixes (dash-setup-list-v2 eb3aeba8): the 10 stops on the path (Install is off it), every one counted. A stop the
-// page sees (it.seen) is done when its read says so; a stop the person marks is done when they said so ("I've done this"
-// here, or "I've done this already" / "It worked" in Helper's set-up conversation: the same kept list, said). A
-// stop the page sees and the person said is done too (Helper's "Count it as done").
-// The state of one stop: true, false, or null (its read failed or is still out). selfMarked(it): the person marks it.
-export function stopState(it, flags, said, selfMarked) {
-  if (said.includes(it.id)) return true
-  if (selfMarked(it)) return false
-  const f = flags[it.id]
-  return f === true ? true : f === false ? false : null
+/* ---------- loom2: the set-up cards ---------- */
+// His words (17:10 UTC, on Lead's plan): "By default no card should be shown as done, only if the person clicks Done.
+// Otherwise it doesn't show." So nothing is read to decide it: a card is 'done' when the person marked it (the kept
+// list setup_done_said), else 'todo'. start: the first card not marked ("Start here"), -1 when all are marked.
+// done: how many are marked; total: how many cards (the count "{n} of {total}").
+export function cardStates(said, items = DASH_DATA.items) {
+  const marked = new Set(Array.isArray(said) ? said : [])
+  const states = items.map(it => (marked.has(it.id) ? 'done' : 'todo'))
+  return { states, start: states.indexOf('todo'), done: states.filter(x => x === 'done').length, total: items.length }
 }
-// Each stop: 'done' (filled), 'todo', 'here' ("You are here", by the one shared rule, src/setup-reads.js hereStop),
-// 'unknown' (its read failed or is still out: drawn as not done, never "here"). The line itself has no state.
-export function pathStates(stateOf, items = DASH_DATA.items, current = null) {
-  const states = items.map(it => {
-    const v = stateOf(it.id)
-    return v === true ? 'done' : v === false ? 'todo' : 'unknown'
-  })
-  const at = hereStop(items.map(it => it.id), stateOf, current)
-  const here = at ? items.findIndex(it => it.id === at) : -1
-  if (here >= 0) states[here] = 'here'
-  const done = states.filter(s => s === 'done').length
-  return { states, here, done, total: items.length, allDone: done === items.length }
-}
+// As many columns as fit with each card at least CARD_MIN_PX wide, CARD_GAP_PX apart; at least one.
+export const CARD_MIN_PX = 260
+export const CARD_GAP_PX = 10
+export const cardColumns = (width, min = CARD_MIN_PX, gap = CARD_GAP_PX) => Math.max(1, Math.floor((width + gap) / (min + gap)))
+// An opened card's panel goes after the last card of its row (index of that card), full width.
+export const panelAfter = (index, columns, count) => Math.min(count, (Math.floor(index / columns) + 1) * columns) - 1
 
 /* ---------- the top box ---------- */
 // Skills: the different skill names across all bots (one read per bot, host.skills.list). One failed read: not

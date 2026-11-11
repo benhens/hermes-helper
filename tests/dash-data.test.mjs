@@ -66,12 +66,12 @@ test('the docs lines file could not have been made to fit: a moved line points a
 
 // loom-fixes (dash-setup-list-v2 eb3aeba8): 10 stops on the path (Install off it), every one counted; the stops the page
 // sees are exactly those the code has a rule for, First chat among them by hhtech's rule (the data marks it person)
-test('the path: 10 stops, Install off it; the page sees exactly the stops the code has a rule for (First chat by hhtech\'s rule); a stop the data gives to the page with no rule is refused', () => {
+test('the path in the data: 10 stops, Install off it (the team\'s checks still run on the file); loom2: the page builds 9 cards, Scheduled jobs out, with no seen marks', () => {
   assert.deepEqual(DATA.items.filter(i => i.on_path).map(i => i.id), ['model', 'first_chat', 'personality', 'chat_apps', 'tools_apps', 'skills', 'memory', 'scheduled_job', 'second_bot', 'safety'])
   assert.equal(DATA.items.find(i => i.id === 'install').on_path, false)
-  assert.deepEqual(DASH_DATA.items.filter(i => i.seen).map(i => i.id).sort(), [...SEEN_IDS].sort())
-  assert.deepEqual(DASH_DATA.items.filter(i => !i.seen).map(i => i.id), ['tools_apps', 'skills', 'memory', 'safety'])
-  assert.equal(DASH_DATA.total, 10)
+  assert.deepEqual(DASH_DATA.items.map(i => i.id), ['model', 'first_chat', 'personality', 'chat_apps', 'tools_apps', 'skills', 'memory', 'second_bot', 'safety'])
+  assert.equal(DASH_DATA.items.some(i => 'seen' in i), false)
+  assert.equal(DASH_DATA.total, 9)
   const b = copy()
   b.items.find(i => i.id === 'memory').marked_by = 'page'
   assert.match(dashProblems(b, DOCS).join('\n'), /the code has rules for exactly/)
@@ -177,9 +177,9 @@ test('the built data: "No chats with this bot yet" is not in it (Lead: not shown
   // every step carries one of the team's two marks (seen in the app, or docs words not seen)
   for (const it of DATA.items) for (const s of it.steps) assert.equal(Boolean(s.seen) !== Boolean(s.not_seen), true, `${it.id}: ${s.text}`)
   // the stop's names as hhcontent has them now
-  assert.deepEqual(DASH_DATA.items.map(i => i.name), ['A model', 'First chat', 'Its personality', 'Chat apps', 'Tools and apps', 'Skills', 'Memory', 'Scheduled jobs', 'A second bot', 'Safety'])
-  // the route buttons stay on the steps hhcontent names: model 3, first_chat 1, chat_apps 1, scheduled_job 3
-  assert.deepEqual(DASH_DATA.items.flatMap(i => i.steps.map((s, k) => (s.route ? `${i.id} ${k + 1}` : null)).filter(Boolean)), ['model 3', 'first_chat 1', 'chat_apps 1', 'scheduled_job 3'])
+  assert.deepEqual(DASH_DATA.items.map(i => i.name), ['A model', 'First chat', 'Its personality', 'Chat apps', 'Tools and apps', 'Skills', 'Memory', 'A second bot', 'Safety'])
+  // the route buttons stay on the steps hhcontent names: model 3, first_chat 1, chat_apps 1 (loom2: Scheduled jobs is no card)
+  assert.deepEqual(DASH_DATA.items.flatMap(i => i.steps.map((s, k) => (s.route ? `${i.id} ${k + 1}` : null)).filter(Boolean)), ['model 3', 'first_chat 1', 'chat_apps 1'])
 })
 
 test('the plugins tile\'s short word for the narrow size is hhcontent\'s variant 3 ("plugins, this bot"), taken from the words file; without it the build stops', () => {

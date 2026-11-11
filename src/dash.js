@@ -1,29 +1,25 @@
-// The Dashboard tab (dash-v1, as Pēteris picked it: design/dash-r5 way (ii), r6 Activity, r7 tiles, icons and line).
-// Three parts, top to bottom: the top box (three numbers: bots and skills for the whole Hermes, plugins for the open
-// bot), Activity (the open bot's days with a chat, GitHub's grid), Set up (the path of 11 stops). Every word comes
-// from the team's content/dash-setup-list-v2.json and content/dash-words-v1.json (src/dash-data.js); every rule from
-// src/dash-rules.js and src/setup-reads.js; every class from the K and D tables (src/look.js).
-// No AI call, no warning colours, nothing stored: the reads run each time the tab is put on screen.
-// Reads, all read-only, always naming the bot (hhtech-dash-reads.md and -reads2.md, "For builder:"):
-//   first   profiles.list (the bots: the bots number, and A second bot)
-//   then    setup.runtime_check, profiles.describe, cron.manage list, host.status() and host.listPersistedSessions
-//           (not in the SDK docs: feature-checked), all for the bot the app has open
-//           (dash-v2; Lead, 11 Nov: "The count must not mix two bots. Every per-bot rule on the path (A model, Its
-//           personality, Chat apps, Scheduled jobs) reads the bot the app has open, the same bot as the plugins tile
-//           and Activity; it rereads when the open bot changes. Install and A second bot are for the whole Hermes.")
+// The Dashboard (dash-v1; loom2, his second Loom of 11 Nov: the page is the Dashboard, no tabs). Two parts, top to
+// bottom: the top box (three tiles: bots and skills for the whole Hermes with their numbers, plugins with none) and
+// Set up: a heading "SET UP {n} of {m}" over a grid of cards, one per thing to set up (content/dash-setup-list-v2.json,
+// in its order, Install and Scheduled jobs left out: 9 cards). Every word comes from the team's
+// content/dash-setup-list-v2.json and content/dash-words-v1.json, or from Lead's job words where the build says so
+// (scripts/dash-data.mjs LOOM2_WORDS); every class from the K and D tables (src/look.js).
+// loom2 (his words, 17:10 UTC: "By default no card should be shown as done, only if the person clicks Done"): nothing is
+// read to decide what is done. A card is done only when the person pressed its Done button (the kept list
+// setup_done_said, as before); the count counts those marks; "Start here" sits on the first card not marked.
+// Activity is out (his Loom, 0:05): no chats read. Reads, all read-only, for the tiles only:
+//   first   profiles.list (the bots number)
 //   then    host.skills.list for each bot (the skills number)
-// loom-fixes: no plugins read any more (hhtech-loom-n1 1: no read gives the number Hermes's Plugins screen shows); the
-// plugins tile has no number and opens that screen. The skills tile opens Capabilities, Skills; the bots tile stays
-// plain (no address opens the Bots tab). The path: 10 stops (Install is off it), each counted; the stops the page cannot
-// see are marked by the person ("I've done this"), in the same kept list as Helper's set-up conversation's "done".
+// No AI call, no warning colours, nothing stored but the person's marks: the reads run each time the page is put on
+// screen, and again when the app opens another bot.
 import { host, useValue, icons, Button, Codicon, CopyButton } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, D, cx } from './look.js'
 import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
-import { botRows, mainBotName, openBotName, doneFlags, makeReader } from './setup-reads.js'
-import { pathStates, stopState, distinctSkills, tileWord } from './dash-rules.js'
+import { botRows, openBotName, makeReader } from './setup-reads.js'
+import { cardStates, cardColumns, panelAfter, distinctSkills, tileWord, CARD_GAP_PX } from './dash-rules.js'
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -49,7 +45,7 @@ export const DASH_ICONS = {
   // the small down arrow after "Open" on the Next row: the steps open below (hhdesign's review of 65b108b, point 5)
   open: { codicon: 'chevron-down', hermes: 'components/ui/select.tsx:38' }
 }
-const stopIcon = id => DASH_ICONS[id === 'skills' ? 'skills_stop' : id]
+const cardIcon = id => DASH_ICONS[id === 'skills' ? 'skills_stop' : id]
 
 // Icon sizes (px) at the places Hermes draws them: 16 in its sidebar and Settings rows, 14 in Settings' sub-rows
 // (hhtech-dash-icons.md point 1); 20 on the tiles (hhdesign's r7 size).
@@ -95,30 +91,8 @@ function useDashWidth() {
   return [width, holder.current.ref]
 }
 
-// The path's shape (r5/r7 build.js setup()): 11 points across the road, high and low in turn, joined by soft curves.
-export function roadShape(width, compact, here, count = DASH_DATA.items.length) {
-  const A = compact ? 16 : 20
-  // the name's row: one line of 16 px, or at the narrow size up to two lines of 15 px
-  const NAMEH = compact ? 37 : 22
-  const YOUH = compact ? 18 : 19
-  const RB = compact ? 22 : 26
-  const pad = compact ? 16 : 30
-  const yu = here >= 0 && here % 2 === 0
-  const yd = here >= 0 && here % 2 === 1
-  const top = RB + NAMEH + (yu ? YOUH : 0) + 2
-  const height = top + 2 * A + RB + NAMEH + (yd ? YOUH : 0) + 2
-  const points = Array.from({ length: count }, (_, i) => [pad + (i * (width - 2 * pad)) / (count - 1), top + (i % 2 ? 2 * A : 0)])
-  const segments = points.slice(1).map((b, i) => {
-    const a = points[i]
-    const dx = (b[0] - a[0]) / 2
-    return `M ${a[0]} ${a[1]} C ${a[0] + dx} ${a[1]} ${b[0] - dx} ${b[1]} ${b[0]} ${b[1]}`
-  })
-  // the width a name may take at the narrow size: the room between the stops on its side, less a gap
-  const nameRoom = Math.max(40, Math.floor((2 * (width - 2 * pad)) / (count - 1)) - 8)
-  return { points, segments, height, nameRoom }
-}
-// Before the road is measured (and in the tests, which have no layout): this width.
-export const ROAD_WIDTH_UNMEASURED = 560
+// Before the cards' row is measured (and in the tests, which have no layout): this width (2 columns).
+export const CARDS_WIDTH_UNMEASURED = 560
 // The left side's width under which the tab takes hhdesign's narrow sizes (r5-r7: 720 px wide side at 1180, 580 at 940).
 export const DASH_COMPACT_UNDER_PX = 640
 
@@ -148,7 +122,6 @@ export function openHermesDocs(ctx, url) {
 
 export function makeDashboard(ctx) {
   const read = makeReader(ctx)
-  const request = (method, params, ms = DASH_READ_MS) => read(() => host.request(method, params, ms), ms)
 
   // Opens a docs page in the person's browser (the SDK's door to the OS; only the official docs).
   const docsHref = file => HERMES_DOCS_BASE + String(file).replace(/\.(md|mdx)$/, '').replace(/(^|\/)index$/, '$1')
@@ -180,47 +153,18 @@ export function makeDashboard(ctx) {
       let alive = true
       setReads({})
       const put = patch => alive && setReads(r => ({ ...r, ...patch }))
-      // A host door that is missing or throws when looked at counts as missing (not every Hermes has every door).
-      const door = get => {
-        try {
-          const fn = get()
-          return typeof fn === 'function' ? fn : null
-        } catch {
-          return null
-        }
-      }
       ;(async () => {
         const bots = await read(() => host.profiles.list(), DASH_READ_MS)
         if (!alive) return
         const rows = bots.ok ? botRows(bots.value) : null
         put({ bots: rows ? bots : { ok: false } })
-        // the bot every per-bot read names: the open one by the app's own name; with no name given, the one Hermes
-        // marks as default in its list of bots (else Hermes's own name for it, "default")
-        const bot = nameGiven ? openBot : mainBotName(rows) || openBot
-        const listSessions = door(() => host.listPersistedSessions)
-        const getStatus = door(() => host.status)
-        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve(undefined)
-        const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
-        const [model, soul, cron, st, ses] = await Promise.all([
-          // the open bot, by the name the app itself gives (never a guessed bot): so these are read also when the
-          // bots read failed
-          request('setup.runtime_check', { profile: bot }),
-          request('profiles.describe', { name: bot }),
-          request('cron.manage', { action: 'list', profile: bot, include_disabled: true }),
-          status,
-          sessions
-        ])
-        if (!alive) return
-        // sessionsDoor: whether this Hermes has the sessions read at all (without it First chat is marked by the person)
-        // (loom2: Activity is out; this read is now First chat's only, and goes with the other done reads in point 3)
-        put({ model, soul, cron, status: st, sessions: ses, sessionsDoor: !!listSessions, pathRead: true })
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
         put({ skills: skills || [{ ok: false }] })
       })().catch(() => {})
       return () => {
         alive = false
-        // the tab was left (or another bot opened): what was read goes
+        // the page was left (or another bot opened): what was read goes
         setReads({})
       }
     }, [active, openBot, nameGiven])
@@ -230,36 +174,32 @@ export function makeDashboard(ctx) {
       kept.open = next
       setOpenNow(next)
     }
-    const [roadWidth, roadRef] = useDashWidth()
+    const [cardsWidth, cardsRef] = useDashWidth()
     const stepsBox = useRef(null)
-    // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
-    // (a stop found open on coming back is brought into view the same way)
+    // a card just opened: what it holds is brought into view (the page scrolls to it when it is below the fold)
+    // (a card found open on coming back is brought into view the same way)
     const [reveal, setReveal] = useState(() => kept.open !== null)
-    // It waits until the steps are on screen and the path's reads are back (Activity arrives with them and moves
-    // what is under it), so a stop found open on coming back, also to another tab first, is not missed.
-    const settled = !!reads.pathRead
     useEffect(() => {
-      if (!reveal || !active || !settled) return
+      if (!reveal || !active) return
       const el = stepsBox.current
       if (!el) return
       setReveal(false)
       if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' })
-    }, [reveal, active, settled, open])
+    }, [reveal, active, open])
     const toggle = id => {
       setOpen(o => (o === id ? null : id))
       if (open !== id) setReveal(true)
     }
     // given: the app's own name for the open bot (loom-fixes: Helper's look reads the same bot, src/page.js)
-    return { reads, open, setOpen, toggle, roadWidth, roadRef, stepsBox, given }
+    return { reads, open, setOpen, toggle, cardsWidth, cardsRef, stepsBox, given }
   }
 
-  // The tab, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
-  // kept: the record Helper keeps (src/kept.js; its setup_done_said is the person's marks, its setup_current the stop
-  // Helper recommended last); onMark(id, done): the person pressed "I've done this" or "Not done yet" (src/page.js
-  // writes the kept record)
+  // The Dashboard, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
+  // kept: the record Helper keeps (src/kept.js; its setup_done_said is the person's marks); onMark(id, done): the person
+  // pressed Done or Not done yet (src/page.js writes the kept record)
   function renderDashboard(state, { compact = false, kept = {}, onMark = () => {} } = {}) {
     const W = DASH_DATA.words
-    const { reads, open, setOpen, toggle, roadWidth, roadRef, stepsBox } = state
+    const { reads, open, setOpen, toggle, cardsWidth, cardsRef, stepsBox } = state
 
     /* ---------- the top box: three tiles ---------- */
     const rows = reads.bots && reads.bots.ok ? botRows(reads.bots.value) : null
@@ -296,127 +236,97 @@ export function makeDashboard(ctx) {
     }
     const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
 
-    /* ---------- Set up: the path ---------- */
+    /* ---------- Set up: the cards (loom2) ---------- */
     const items = DASH_DATA.items
-    const ready = !!reads.pathRead
-    const flags = ready ? doneFlags(reads) : {}
     const said = Array.isArray(kept.setup_done_said) ? kept.setup_done_said : []
-    // the person marks a stop the page cannot see; First chat too when this Hermes has no sessions read (hhtech's rule)
-    const selfMarked = it => !it.seen || (it.id === 'first_chat' && ready && !reads.sessionsDoor)
-    const stateOf = id => stopState(items.find(it => it.id === id), flags, said, selfMarked)
-    const path = pathStates(stateOf, items, kept.setup_current || null)
-    // before the path's reads are back: a stop the person marked shows it, every other one waits as not done, nobody is
-    // "here", no count
-    const states = ready ? path.states : items.map(it => (said.includes(it.id) ? 'done' : 'todo'))
-    const here = ready ? path.here : -1
-    const width = roadWidth || ROAD_WIDTH_UNMEASURED
-    const shape = roadShape(width, compact, here)
-    const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here }
-    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_known, here: W.setup.you_are_here }
-    // a stop done because the person said so (not seen by a read): "done, you said so"
-    const wordOf = (it, s) => (s === 'done' && said.includes(it.id) && flags[it.id] !== true ? W.setup.state_said_done : stateWord[s])
-    const stops = items.map((it, i) => {
-      const s = states[i]
-      const size = 16
+    // done only by the person's own mark; the first card not marked is "Start here"
+    const cards = cardStates(said, items)
+    const isDone = id => cards.states[items.findIndex(it => it.id === id)] === 'done'
+    // as many columns as fit with each card at least CARD_MIN_PX wide
+    const columns = cardColumns(cardsWidth || CARDS_WIDTH_UNMEASURED)
+    const openAt = open ? items.findIndex(it => it.id === open) : -1
+    const openItem = openAt >= 0 ? items[openAt] : null
+
+    const card = (it, i) => {
+      const done = cards.states[i] === 'done'
+      const start = i === cards.start
       return jsxs(
         'button',
         {
           type: 'button',
-          className: cx(D.stop, stateClass[s], i % 2 ? D.down : D.up, open === it.id && D.sel),
-          style: { left: `${shape.points[i][0]}px`, top: `${shape.points[i][1]}px` },
-          'aria-label': `${it.mark}: ${wordOf(it, s)}`,
-          'aria-expanded': open === it.id,
-          'aria-controls': open === it.id ? 'helper-dash-steps' : undefined,
-          'data-hh': 'stop',
-          'data-stop': it.id,
-          'data-state': s,
+          className: cx(D.scard, done && D.done, openAt === i && D.sel),
+          'aria-expanded': openAt === i,
+          'aria-controls': openAt === i ? 'helper-dash-steps' : undefined,
+          'data-hh': 'card',
+          'data-card': it.id,
+          'data-state': done ? 'done' : 'todo',
           onClick: () => toggle(it.id),
           children: [
-            jsx('span', { className: D.dot, children: jsx(DashIcon, { icon: stopIcon(it.id), size }) }, 'd'),
-            // the name, and under it (outward from the line) "You are here"; at the narrow size a long name may take
-            // two lines, no wider than the room to the next stop on its side
             jsxs(
               'span',
               {
-                className: D.label,
-                'aria-hidden': true,
-                style: compact ? { width: `${shape.nameRoom}px` } : undefined,
+                className: D.scardTop,
                 children: [
-                  jsx('span', { className: D.name, children: it.mark }, 'n'),
-                  s === 'here' ? jsx('span', { className: D.you, 'data-hh': 'you-are-here', children: W.setup.you_are_here }, 'y') : null
+                  jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: cardIcon(it.id), size: 20 }) }, 'i'),
+                  jsxs(
+                    'span',
+                    {
+                      className: D.scardHead,
+                      children: [
+                        jsx('span', { className: D.scardName, 'data-hh': 'card-name', children: it.name }, 'n'),
+                        // a marked card says Done; the first card not marked carries "Start here"; any other card: nothing
+                        done
+                          ? jsxs('span', { className: D.doneLine, 'data-hh': 'card-done', children: [jsx(DashIcon, { icon: DASH_ICONS.check, size: 14 }, 'c'), W.setup.state_done] }, 'd')
+                          : start
+                            ? jsx('span', { className: D.start, 'data-hh': 'start-here', children: W.setup.start_here }, 's')
+                            : null
+                      ]
+                    },
+                    'h'
+                  )
                 ]
               },
-              'l'
-            )
+              'top'
+            ),
+            jsx('span', { className: D.scardWhy, 'data-hh': 'card-why', children: it.why }, 'w')
           ]
         },
         it.id
       )
-    })
-    const road = jsxs(
-      'div',
-      {
-        className: D.road,
-        ref: roadRef,
-        style: { height: `${shape.height}px` },
-        'data-hh': 'road',
-        children: [
-          jsx(
-            'svg',
-            {
-              className: D.lines,
-              width,
-              height: shape.height,
-              'aria-hidden': true,
-              children: shape.segments.map((d, i) => jsx('path', { d, className: D.line, 'data-hh': 'line' }, i))
-            },
-            'svg'
-          ),
-          ...stops
-        ]
-      },
-      'road'
-    )
+    }
 
-    let under = null
-    const openItem = open ? items.find(it => it.id === open) : null
+    // What an opened card holds, full width under its row: the steps (with their route buttons), the text to paste,
+    // the Done or Not done yet button, the sources, the close button.
+    let panel = null
     if (openItem) {
-      const i = items.indexOf(openItem)
-      under = jsxs(
+      const marked = isDone(openItem.id)
+      panel = jsxs(
         'div',
         {
           className: D.steps,
           id: 'helper-dash-steps',
           ref: stepsBox,
+          role: 'region',
+          'aria-label': openItem.name,
           'data-hh': 'steps',
           'data-stop': openItem.id,
+          style: { gridColumn: '1 / -1' },
           children: [
-            jsx('i', { className: D.caret, style: { left: `${shape.points[i][0] - 7}px` }, 'aria-hidden': true }, 'caret'),
-            jsxs(
-              'div',
-              {
-                className: D.stepsHead,
-                children: [
-                  jsx('span', { className: D.stepsIcon, children: jsx(DashIcon, { icon: stopIcon(openItem.id), size: 14 }) }, 'i'),
-                  jsx('h3', { className: D.stepsName, children: openItem.name }, 'n')
-                ]
-              },
-              'head'
-            ),
-            jsx('p', { className: D.stepsWhy, children: openItem.why }, 'why'),
+            // the pointer to the opened card: over the middle of its column
+            jsx('i', { className: D.caret, style: { left: `calc(${(((openAt % columns) + 0.5) * 100) / columns}% - 7px)` }, 'aria-hidden': true }, 'caret'),
             jsx(
               'ol',
               {
                 className: D.ol,
-                children: openItem.steps.map((s, k) =>
+                children: openItem.steps.map((st, k) =>
                   jsxs(
                     'li',
                     {
                       className: D.li,
                       children: [
-                        jsx('span', { children: s.text }, 't'),
-                        s.route
-                          ? jsx('div', { className: D.route, children: jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'route', onClick: () => goTo(s.route.to), children: s.route.label }) }, 'r')
+                        jsx('span', { children: st.text }, 't'),
+                        st.route
+                          ? jsx('div', { className: D.route, children: jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'route', onClick: () => goTo(st.route.to), children: st.route.label }) }, 'r')
                           : null
                       ]
                     },
@@ -434,13 +344,13 @@ export function makeDashboard(ctx) {
                     'data-hh': 'terminal',
                     children: [
                       jsx('p', { className: D.termWhen, children: openItem.terminal.when }, 'w'),
-                      ...openItem.terminal.paste.map((p, k) =>
+                      ...openItem.terminal.paste.map((pp, k) =>
                         jsxs(
                           'div',
                           {
                             className: D.paste,
                             children: [
-                              jsx('span', { className: D.pasteFor, children: p.for }, 'f'),
+                              jsx('span', { className: D.pasteFor, children: pp.for }, 'f'),
                               jsxs(
                                 'div',
                                 {
@@ -456,11 +366,11 @@ export function makeDashboard(ctx) {
                                       {
                                         className: `${K.mono} ${D.pasteText}`,
                                         'data-hh': 'paste-text',
-                                        children: p.text.split(' ').flatMap((word, i) => [i ? ' ' : null, jsx('span', { className: D.word, children: pathBreak(word) }, i)])
+                                        children: pp.text.split(' ').flatMap((word, wi) => [wi ? ' ' : null, jsx('span', { className: D.word, children: pathBreak(word) }, wi)])
                                       },
                                       't'
                                     ),
-                                    jsx(CopyButton, { text: p.text, label: W.setup.copy, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
+                                    jsx(CopyButton, { text: pp.text, label: W.setup.copy, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
                                   ]
                                 },
                                 'p'
@@ -475,26 +385,22 @@ export function makeDashboard(ctx) {
                   'term'
                 )
               : null,
-            // loom-fixes (dash-words rules.marks): a stop the person marks: the faint sentence and one button, I've done this
-            // or, once marked, Not done yet. A stop the page sees has neither.
-            selfMarked(openItem) ? jsx('p', { className: D.quietLine, 'data-hh': 'person-note', children: W.setup.person_note }, 'pn') : null,
-            selfMarked(openItem)
-              ? jsx(
-                  'div',
-                  {
-                    className: D.route,
-                    children: jsx(Button, {
-                      variant: 'secondary',
-                      size: 'xs',
-                      'data-hh': 'mark',
-                      'data-marked': said.includes(openItem.id),
-                      onClick: () => onMark(openItem.id, !said.includes(openItem.id)),
-                      children: said.includes(openItem.id) ? W.setup.mark_undo : W.setup.mark_done
-                    })
-                  },
-                  'mark'
-                )
-              : null,
+            // loom2 (his words, 17:10 UTC): every card has a Done button; once marked it reads Not done yet, to take it back
+            jsx(
+              'div',
+              {
+                className: D.route,
+                children: jsx(Button, {
+                  variant: 'secondary',
+                  size: 'xs',
+                  'data-hh': 'mark',
+                  'data-marked': marked,
+                  onClick: () => onMark(openItem.id, !marked),
+                  children: marked ? W.setup.mark_undo : W.setup.mark_done
+                })
+              },
+              'mark'
+            ),
             jsx(
               'div',
               {
@@ -539,57 +445,15 @@ export function makeDashboard(ctx) {
         },
         'steps'
       )
-    } else if (ready && here >= 0) {
-      const it = items[here]
-      // the word and its arrow as one piece: Hermes's Button puts its own gap between its children, and the arrow
-      // stands 4 px after the word (seen: about 14 px when they were two children)
-      const openWord = jsx('span', { className: D.openWord, children: [W.setup.open, jsx('span', { className: D.openChev, children: jsx(DashIcon, { icon: DASH_ICONS.open, size: 12 }) }, 'c')] })
-      under = jsxs(
-        'div',
-        {
-          className: D.next,
-          'data-hh': 'next',
-          children: [
-            jsxs(
-              'span',
-              {
-                className: D.nextWords,
-                children: [
-                  jsxs(
-                    'span',
-                    {
-                      className: D.nextLine,
-                      children: [jsx('span', { className: D.nextLabel, children: W.setup.next }, 'l'), jsx('b', { className: D.nextName, children: it.name }, 'n')]
-                    },
-                    'a'
-                  ),
-                  jsx('span', { className: D.nextWhy, children: it.why }, 'w')
-                ]
-              },
-              'words'
-            ),
-            // "Open", then Hermes's small down arrow: the steps open below (hhdesign's review of 65b108b, point 5)
-            jsx(Button, { variant: 'link', size: 'inline', 'data-hh': 'open-next', onClick: () => toggle(it.id), children: openWord }, 'open')
-          ]
-        },
-        'next'
-      )
-    } else if (ready && path.allDone) {
-      under = jsxs(
-        'div',
-        {
-          className: D.next,
-          'data-hh': 'all-done',
-          children: [jsx('span', { className: D.allDone, children: jsx(DashIcon, { icon: DASH_ICONS.check, size: 16 }) }, 'i'), jsx('span', { className: D.nextWhy, children: W.setup.all_done }, 't')]
-        },
-        'done'
-      )
     }
+    // the cards, with the opened card's panel after the last card of its row
+    const after = openAt >= 0 ? panelAfter(openAt, columns, items.length) : -1
+    const grid = items.flatMap((it, i) => (i === after ? [card(it, i), panel] : [card(it, i)]))
 
     const setup = jsxs(
       'section',
       {
-        className: D.card,
+        className: D.setup,
         'data-hh': 'setup',
         children: [
           jsxs(
@@ -598,26 +462,34 @@ export function makeDashboard(ctx) {
               className: D.head,
               children: [
                 jsx('h2', { className: D.title, children: W.setup.title }, 't'),
-                ready
-                  ? jsx(
-                      'span',
-                      {
-                        className: D.count,
-                        'data-hh': 'count',
-                        // "{n} of {total}": the number done in bold, as r5 to r7 draw it
-                        children: W.setup.count.split('{n}').flatMap((part, k) =>
-                          k === 0 ? fill(part, { total: path.total }) : [jsx('b', { className: D.countN, children: String(path.done) }, 'n'), fill(part, { total: path.total })]
-                        )
-                      },
-                      'c'
+                jsx(
+                  'span',
+                  {
+                    className: D.count,
+                    'data-hh': 'count',
+                    // "{n} of {total}": the number marked done in bold
+                    children: W.setup.count.split('{n}').flatMap((part, k) =>
+                      k === 0 ? fill(part, { total: cards.total }) : [jsx('b', { className: D.countN, children: String(cards.done) }, 'n'), fill(part, { total: cards.total })]
                     )
-                  : null
+                  },
+                  'c'
+                )
               ]
             },
             'head'
           ),
-          road,
-          under
+          jsx(
+            'div',
+            {
+              className: D.cards,
+              ref: cardsRef,
+              'data-hh': 'cards',
+              'data-columns': columns,
+              style: { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: `${CARD_GAP_PX}px` },
+              children: grid
+            },
+            'cards'
+          )
         ]
       },
       'setup'
