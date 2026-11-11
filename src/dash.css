@@ -77,10 +77,11 @@ html:not(.dark) .hhd-tile{--hhd-rest-y:100%;--hhd-tint:6%}
 .hhd-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;min-width:0;padding:4px 0 0}
 .hhd-title{margin:0;font-size:1.4rem;font-weight:600;letter-spacing:-.025em;color:var(--ui-text-primary)}
 .hhd-cards{display:grid;align-items:stretch;min-width:0}
-.hhd-scard{position:relative;isolation:isolate;overflow:hidden;container-type:inline-size;display:flex;flex-direction:column;gap:10px;min-width:0;width:100%;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid transparent;border-radius:var(--radius-lg);padding:20px;--hhd-sign:88px;--hhd-room:calc(var(--hhd-sign) + 18px);min-height:calc(88px + 34px);--hhd-rest-y:0%;--hhd-tint:11%;background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)}
-.hhd-compact .hhd-scard{padding:12px;--hhd-sign:72px;--hhd-room:calc(var(--hhd-sign) + 26px);min-height:calc(72px + 34px)}
+.hhd-scard{position:relative;isolation:isolate;overflow:hidden;container-type:inline-size;display:flex;flex-direction:column;gap:10px;min-width:0;width:100%;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid transparent;border-radius:var(--radius-lg);padding:20px;--hhd-sign:116px;--hhd-sign-r:-8px;--hhd-sign-line:5px;--hhd-svg-line:3.4;--hhd-room:calc(var(--hhd-sign) - 7.5px);min-height:calc(116px + 26px);--hhd-rest-y:0%;--hhd-tint:11%;background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)}
+.hhd-compact .hhd-scard{padding:12px;--hhd-sign:72px;--hhd-sign-r:16px;--hhd-sign-line:3px;--hhd-svg-line:3;--hhd-room:calc(var(--hhd-sign) + 26px);min-height:calc(72px + 34px)}
 html:not(.dark) .hhd-scard{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 html:not(.dark) .hhd-scard{--hhd-rest-y:100%;--hhd-tint:6%}
+html:not(.dark) .hhd-cards{--hhd-sign-o:.95}
 .hhd-scard:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}
 /* the ring (catalog.css; REVIEW2.md 3: on a card only on hover, keyboard focus and when opened, not after a click): on every tile and card, and on the opened card's panel, only its visibility changes; it turns once every 4 s while it
    shows, and stands still with reduced motion. The opened card keeps its ring on. */
@@ -100,14 +101,20 @@ html:not(.dark) .hhd-scard{--hhd-rest-y:100%;--hhd-tint:6%}
    sits 13 px or more inside the card's right edge (16 px + 1 px border - 1.5), centred; the card is at least the sign
    plus 34 px tall (outline and 2 x 13 px); the title, the Done line and the why-line keep the sign's width plus 18 px
    (26 px compact, where the padding is 8 px less) free at the right, so 18 px or more lie between the sign and any word.
-   A container query below changes --hhd-sign only: --hhd-room keeps the card's value, the larger room */
-.hhd-scard-sign{position:absolute;right:16px;top:calc(50% - var(--hhd-sign) / 2);z-index:-1;display:flex;align-items:center;justify-content:center;width:var(--hhd-sign);height:var(--hhd-sign);font-size:var(--hhd-sign);line-height:1;opacity:.8;color:var(--hhd-accent);-webkit-text-stroke:3px currentColor;pointer-events:none;mask-image:radial-gradient(circle,var(--ui-base) 1.2px,transparent 1.7px),linear-gradient(to right,transparent 0,var(--ui-base) 25%);mask-size:4px 4px,100% 100%;mask-composite:intersect;-webkit-mask-composite:source-in}
-.hhd-scard-sign svg{width:100%;height:100%;stroke-width:3}
+   A container query below changes --hhd-sign only: --hhd-room keeps the card's value, the larger room.
+   Signs 20:15 (his words on look4): at the wide size the sign is large again, 116 px, its box 8 px past the padding
+   edge (7 px past the card's edge, clipped), a 3.4-unit line (font signs: a 5 px outline), .8 (.95 light); the card is
+   the sign + 26 px tall, 13 px above and below; the words run to 18 px before the sign's left edge with its outline
+   (109 + 2.5 + 18 - 21 px padding and border = 108.5 = 116 - 7.5). Narrow sizes keep their signs as they were. */
+.hhd-scard-sign{position:absolute;right:var(--hhd-sign-r);top:calc(50% - var(--hhd-sign) / 2);z-index:-1;display:flex;align-items:center;justify-content:center;width:var(--hhd-sign);height:var(--hhd-sign);font-size:var(--hhd-sign);line-height:1;opacity:var(--hhd-sign-o,.8);color:var(--hhd-accent);-webkit-text-stroke:var(--hhd-sign-line) currentColor;pointer-events:none;mask-image:radial-gradient(circle,var(--ui-base) 1.2px,transparent 1.7px),linear-gradient(to right,transparent 0,var(--ui-base) 25%);mask-size:4px 4px,100% 100%;mask-composite:intersect;-webkit-mask-composite:source-in}
+.hhd-scard-sign svg{width:100%;height:100%;stroke-width:var(--hhd-svg-line)}
+/* signs 20:15, point 3: in the light theme the accent mixed 20% towards the text colour, so the pale ones (First chat, Skills) show */
+html:not(.dark) .hhd-scard-sign{color:color-mix(in srgb,var(--hhd-accent) 80%,var(--ui-text-primary))}
 /* a card narrower than 300 px: the sign 66 px at .5; under 240 px none. A container query measures the content box:
    a card less its 2 x 20 px padding and 2 x 1 px border (the compact card: 2 x 12 px padding) */
-@container (max-width:257px){.hhd-scard-top,.hhd-scard-why,.hhd-scard-sign{--hhd-sign:66px}.hhd-scard-sign{opacity:.5}}
+@container (max-width:257px){.hhd-scard-top,.hhd-scard-why,.hhd-scard-sign{--hhd-sign:66px}.hhd-scard-top,.hhd-scard-why{--hhd-room:106px}.hhd-scard-sign{--hhd-sign-r:16px;--hhd-sign-line:3px;--hhd-svg-line:3;--hhd-sign-o:.5}}
 @container (max-width:197px){.hhd-scard-sign{display:none}.hhd-scard-top,.hhd-scard-why{--hhd-room:0px}}
-@container (max-width:273px){.hhd-compact .hhd-scard-top,.hhd-compact .hhd-scard-why,.hhd-compact .hhd-scard-sign{--hhd-sign:66px}.hhd-compact .hhd-scard-sign{opacity:.5}}
+@container (max-width:273px){.hhd-compact .hhd-scard-top,.hhd-compact .hhd-scard-why,.hhd-compact .hhd-scard-sign{--hhd-sign:66px}.hhd-compact .hhd-scard-sign{--hhd-sign-o:.5}}
 @container (max-width:213px){.hhd-compact .hhd-scard-sign{display:none}.hhd-compact .hhd-scard-top,.hhd-compact .hhd-scard-why{--hhd-room:0px}}
 /* marked done by the person: always green, whatever the card's accent: the icon square filled, and "Done" under the name */
 .hhd-done .hhd-tile-icon{background:var(--ui-green);color:var(--background)}
