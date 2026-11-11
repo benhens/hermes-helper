@@ -11,7 +11,7 @@
 // use (K in src/look.js). Helper's window has the one style sheet of our own (src/talk.css, the T
 // table), put into a <style> element inside our own page.
 import { host, Button, Codicon, Textarea, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, T, cx } from './look.js'
 import { TALK_CSS } from './talk-css.js'
@@ -38,7 +38,7 @@ import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip, setMdOpener } from './talk-view.js'
 import { makeDashboard, DASH_COMPACT_UNDER_PX, openHermesDocs } from './dash.js'
 import { DASH_DATA } from './dash-data.js'
-import { layoutFor, clampHelperWidth, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
+import { layoutFor, clampHelperWidth, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX, replyScrollShift } from './layout.js'
 
 // One press of an arrow key on the edge to drag moves it this far.
 const GRIP_KEY_PX = 16
@@ -46,8 +46,6 @@ const GRIP_KEY_PX = 16
 const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
-// chat-fix: how far under the conversation's top edge a long reply's first line is shown (the edge fades over 20 px)
-const CHAT_TOP_PX = 24
 
 // loom2 (his Loom of 11 Nov, 1:51 "take out the learn and just have this set up"): no tabs. With only the Dashboard
 // left there is no tab row: the page is the Dashboard. A stored tab ('learn', or an older name) is not read.
@@ -305,8 +303,9 @@ export function makePage(ctx, opts = {}) {
       .then(r => {
         // chat-fix: the reply's marks in double square brackets are taken out of its words (src/chat.js chatParts): the
         // choices and the card they name are drawn under it; a reply with no words left counts as no reply
+        // (review finding 11) a choice that would start Helper's own forget or what-do-you-keep lines is no button
         const parts = chatParts(r && r.ok ? chatClean(r.text) : '')
-        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick, card: parts.card })), send: true })
+        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick.filter(q => !typedAboutKept(q)), card: parts.card })), send: true })
         lookAgain()
         const kind = r && !r.ok ? r.kind : 'other'
         const f = FAIL_LINES[kind] || FAIL_LINES.other
@@ -689,17 +688,18 @@ export function makePage(ctx, opts = {}) {
     const newestId = log.length ? log[log.length - 1].id : 0
     // chat-fix (his words on build 11f4eda: the end of a long reply was what he saw, cut off): a reply of the model is
     // the last line of the part that scrolls. When it is higher than the room, the conversation shows it from its
-    // first line, CHAT_TOP_PX under the top edge (the edge fades over 20 px), and the person scrolls down through it.
+    // first line (src/layout.js replyScrollShift), and the person scrolls down through it.
     const scrollToNewest = () => {
       const el = helperScroll.current
       if (!el) return
       el.scrollTop = el.scrollHeight
       const reply = typeof el.querySelector === 'function' ? el.querySelector('[data-hh="bubble"]') : null
       if (!reply || typeof reply.getBoundingClientRect !== 'function') return
-      const top = reply.getBoundingClientRect().top - el.getBoundingClientRect().top
-      if (top < CHAT_TOP_PX) el.scrollTop += top - CHAT_TOP_PX
+      const shift = replyScrollShift(reply.getBoundingClientRect().top, el.getBoundingClientRect().top)
+      if (shift) el.scrollTop += shift
     }
-    useEffect(scrollToNewest, [newestId, helperShown])
+    // (review of chat-fix 1, finding 6) before the screen is painted, so a long reply never shows its end first
+    useLayoutEffect(scrollToNewest, [newestId, helperShown])
     // loom-fixes (Lead's point 17b): every change of the conversation is kept (the last 50 lines)
     useEffect(writeTalk, [log])
     // loom-fixes (Lead's point 16, his frame f-2m58s: every bubble lost its first letters for about a second while
@@ -1320,7 +1320,7 @@ export function makePage(ctx, opts = {}) {
             winBar,
             // chat-fix: a reply of the model (md) is drawn inside the part that scrolls, as its last line; Helper's own
             // short lines and the waiting dots stay in the bubble over the character
-            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, last: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard }, 'bubble') : null }, 'conversation'),
+            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, reply: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard }, 'bubble') : null }, 'conversation'),
             inBubble ? (inBubble.md ? null : jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble')) : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer

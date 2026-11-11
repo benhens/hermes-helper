@@ -24257,48 +24257,80 @@ ${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
 Write in markdown: short paragraphs, \`code\` for anything to type.`
 
 // The model's reply, taken apart: the words to show, and its marks in double square brackets, which are never shown.
-//   [[card:<id>]]            one of the nine cards (the first known one; an unknown id is dropped)
-//   [[do:...]]               an action Helper offers to run; dropped here
-//   [[A]] [[B]] at a line's end   quick replies, at most three: buttons under the reply
-// Any other pair of double brackets in the words loses its brackets and keeps its words. Text to type is left alone:
-// a code block between \`\`\` lines, and \`code\` inside a line (a shell test is written [[ -f file ]]).
-const CHAT_MARK = /\[\[([^\[\]\n]{1,80})\]\]/g
+//   [[card:<id>]]   one of the nine cards (the first known one; an unknown id is dropped)
+//   [[do:...]]      an action Helper offers to run (chatAction); anything else is dropped
+//   [[A]] [[B]]     quick replies, at most CHAT_QUICK_MAX: on a line of their own, or at the end of the last line
+// Any other pair of double brackets loses its brackets and keeps its words (a mark in the middle of a sentence stays
+// part of the sentence). Text to type is left alone: a code block as src/md.js reads it (from a ``` or ~~~ line to
+// the next line that starts with the same mark, or to the end) and `code` inside a line (a shell test is written
+// [[ -f file ]]). The reply is the model's text, so nothing in it is trusted: a mark that only forms once another
+// was taken out does nothing, and a choice that looks like a key, or that holds unseen characters, is no button.
+const CHAT_MARK_ANY = /\[\[([^\n]*?)\]\]/g
+const CHAT_MARK_NAMED = /\[\[\s*(card|do)\s*:([^[\]\n]*)\]\]/gi
+const CHAT_MARKS_TAIL = /(?:\s*\[\[[^[\]\n`]*\]\])+\s*$/
+const CHAT_QUICK_CHARS = 60
 function chatParts(reply) {
+  const lines = String(reply || '').replace(/\r\n?/g, '\n').split('\n')
   let card = null
   const quick = []
-  let fenced = false
-  const out = []
-  for (const line of String(reply || '').split('\n')) {
-    if (/^\s*```/.test(line)) {
-      fenced = !fenced
-      out.push(line)
-      continue
-    }
-    if (fenced) {
-      out.push(line)
-      continue
-    }
-    let l = line.replace(/\[\[\s*(card|do)\s*:([^\[\]\n]{0,80})\]\]/gi, (m, kind, what) => {
-      const id = what.trim().toLowerCase()
-      if (kind.toLowerCase() === 'card' && !card && CHAT_CARDS.some(c => c[0] === id)) card = id
-      return ''
-    })
-    const tail = l.match(/(?:\s*\[\[[^\[\]\n`]{1,80}\]\])+\s*$/)
-    if (tail) {
-      for (const m of tail[0].matchAll(CHAT_MARK)) {
-        const t = m[1].replace(/\s+/g, ' ').trim()
-        if (t && quick.length < CHAT_QUICK_MAX && !quick.includes(t)) quick.push(t)
-      }
-      l = l.slice(0, tail.index)
-    }
-    l = l
-      .split('`')
-      .map((part, i) => (i % 2 ? part : part.replace(CHAT_MARK, '$1')))
-      .join('`')
-    // a line that held only marks is gone with them
-    if (line.trim() && !l.trim()) continue
-    out.push(l.replace(/\s+$/, ''))
+  const typed = lines.map(() => false)
+  for (let i = 0; i < lines.length; i++) {
+    const fence = lines[i].match(/^\s*(```|~~~)/)
+    if (!fence) continue
+    typed[i++] = true
+    while (i < lines.length && !lines[i].trim().startsWith(fence[1])) typed[i++] = true
+    if (i < lines.length) typed[i] = true
   }
+  // the words of a line outside its `code`, changed by f
+  const outside = (line, f) => {
+    const parts = line.split('`')
+    return parts.map((part, i) => (i % 2 && i < parts.length - 1 ? part : f(part))).join('`')
+  }
+  const named = (kind, what) => {
+    const id = what.trim().toLowerCase()
+    if (kind.toLowerCase() === 'card' && !card && CHAT_CARDS.some(c => c[0] === id)) card = id
+  }
+  const choice = words => {
+    const t = words.replace(/[\p{Cc}\p{Cf}]/gu, '').replace(/\s+/g, ' ').trim()
+    if (!t || Array.from(t).length > CHAT_QUICK_CHARS || /^(card|do)\s*:/i.test(t) || chatHoldsBack(t)) return
+    if (quick.length < CHAT_QUICK_MAX && !quick.includes(t)) quick.push(t)
+  }
+  // 1. the card and action marks go, wherever they are outside text to type
+  const kept = []
+  lines.forEach((line, i) => {
+    if (typed[i]) return kept.push({ line, typed: true })
+    const shown = outside(line, part => {
+      let first = true
+      for (;;) {
+        const next = part.replace(CHAT_MARK_NAMED, (m, kind, what) => {
+          if (first) named(kind, what)
+          return ''
+        })
+        if (next === part) return part
+        part = next
+        first = false
+      }
+    })
+    if (line.trim() && !shown.trim()) return
+    kept.push({ line: shown, typed: false })
+  })
+  // 2. the choices: a line that is only marks, and the marks that end the last line
+  let last = kept.length - 1
+  while (last >= 0 && (kept[last].typed || !kept[last].line.trim())) last--
+  const out = []
+  kept.forEach((k, i) => {
+    if (k.typed) return out.push(k.line)
+    let shown = k.line
+    const tail = shown.match(CHAT_MARKS_TAIL)
+    if (tail && (i === last || !shown.slice(0, tail.index).trim())) {
+      for (const m of tail[0].matchAll(CHAT_MARK_ANY)) choice(m[1])
+      shown = shown.slice(0, tail.index)
+    }
+    // 3. what is left of double brackets loses them
+    shown = outside(shown, part => part.replace(CHAT_MARK_ANY, '$1').replace(/\[\[|\]\]/g, ''))
+    if (k.line.trim() && !shown.trim()) return
+    out.push(shown.replace(/\s+$/, ''))
+  })
   return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), quick, card }
 }
 
@@ -29058,7 +29090,7 @@ const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-root{overflow:clip}\n.hh-bar{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:4px;min-height:24px;margin:-8px -8px 2px 0}\n.hh-bar-ask{flex:1;min-width:0;font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}\n.hh-md{font-size:14px;line-height:21px;font-weight:400;text-wrap:pretty;color:var(--ui-text-primary);display:flex;flex-direction:column;gap:8px;min-width:0;overflow-wrap:anywhere}\n.hh-md p{margin:0}\n.hh-md ol,.hh-md ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}\n.hh-md ol{list-style:decimal}\n.hh-md ul{list-style:disc}\n.hh-md li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-md a{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-md.hh-md-old{font-size:13px;line-height:19px;gap:5px;color:var(--ui-text-secondary)}\n.hh-conv-in>.hh-bubble{margin-top:5px}\n.hh-win>.hh-bubble{flex:0 1 auto;min-height:0;overflow:hidden auto}\n.hh-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}\n.hh-quick .hh-answer{min-height:27px;padding:3px 11px;font-size:13px;line-height:19px}\n.hh-chat-card{--hhd-round:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px;min-width:0;width:100%}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-root{overflow:clip}\n.hh-bar{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:4px;min-height:24px;margin:-8px -8px 2px 0}\n.hh-bar-ask{flex:1;min-width:0;font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}\n.hh-md{font-size:14px;line-height:21px;font-weight:400;text-wrap:pretty;color:var(--ui-text-primary);display:flex;flex-direction:column;gap:8px;min-width:0;overflow-wrap:anywhere}\n.hh-md p{margin:0}\n.hh-md ol,.hh-md ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}\n.hh-md ol{list-style:decimal}\n.hh-md ul{list-style:disc}\n.hh-md li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-md a{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-md.hh-md-old{font-size:13px;line-height:19px;gap:5px;color:var(--ui-text-secondary)}\n.hh-conv-in>.hh-bubble{margin-top:5px}\n.hh-win>.hh-bubble{flex:0 1 auto;min-height:0;overflow:hidden auto}\n.hh-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}\n.hh-quick .hh-answer{min-height:27px;padding:3px 11px;font-size:13px;line-height:19px}\n.hh-chat-card{--hhd-round:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px;min-width:0;width:100%}\n.hh-chat-card>:first-child{box-sizing:border-box;border:1px solid var(--ui-stroke-tertiary)}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -29166,6 +29198,13 @@ function layoutFor({ width, height, tab, helperWidth, folded = false }) {
     tight
   }
 }
+
+// chat-fix: a reply of the model is the last line of the conversation's scrolling part. When its top would be above
+// the room, or closer than REPLY_TOP_PX to the room's top edge (the edge fades over 20 px), the conversation is
+// scrolled back by the difference, so the reply shows from its first line. Returns what to add to scrollTop (0 or
+// less), from the reply's top and the room's top as the screen has them at the newest end.
+const REPLY_TOP_PX = 24
+const replyScrollShift = (replyTop, roomTop, clear = REPLY_TOP_PX) => Math.min(0, replyTop - roomTop - clear)
 
 // ---- src/expressions.js ----
 // The character's numbers and rules, as plain code (no React): variation 2 of hhdesign's
@@ -31578,7 +31617,7 @@ function convFade(el) {
   const v = above && below ? 'both' : above ? 'top' : below ? 'bottom' : ''
   if (el.dataset.fade !== v) el.dataset.fade = v
 }
-function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, last = null, onCard }) {
+function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, reply = null, onCard }) {
   // talk v2 look (hhdesign's notes-wants.md rule C point 1): an edge of the conversation fades out over
   // 20 px, as Hermes's own FadeScroll does, but only an edge that has something hidden behind it. The
   // conversation stacks from its bottom (column-reverse), so in Chromium its scrollTop is 0 at the newest
@@ -31607,7 +31646,7 @@ function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, last =
   if (newest) items.push(...notesOf(newest, onNote, kept))
   // chat-fix: a reply of the model is the last line of the part that scrolls (the page hands its bubble in), so a long
   // one can be scrolled and pushes nothing out of the window
-  if (last) items.push(last)
+  if (reply) items.push(reply)
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,
@@ -31631,7 +31670,7 @@ function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, last =
 // chat-fix: what the model's marks become, under its reply. A card: that card's video place exactly as the Dashboard's
 // opened card shows it (src/dash.js CardVideo) and a button that opens the card there. Quick replies: up to three
 // small buttons; a click sends that text as the person's message. An id that is no card shows nothing.
-function ChatExtras({ entry, onQuick, onCard }) {
+function ReplyExtras({ entry, onQuick, onCard }) {
   const it = entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
   const quick = Array.isArray(entry.quick) ? entry.quick : []
   return [
@@ -31699,7 +31738,7 @@ function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard }) {
     'aria-live': 'polite',
     children: [
       entry.md ? jsx(Markdown, { text: entry.text }, entry.key) : jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
-      ...(entry.md ? ChatExtras({ entry, onQuick, onCard }) : []),
+      ...(entry.md ? ReplyExtras({ entry, onQuick, onCard }) : []),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,
@@ -31847,8 +31886,6 @@ const GRIP_KEY_PX = 16
 const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
-// chat-fix: how far under the conversation's top edge a long reply's first line is shown (the edge fades over 20 px)
-const CHAT_TOP_PX = 24
 
 // loom2 (his Loom of 11 Nov, 1:51 "take out the learn and just have this set up"): no tabs. With only the Dashboard
 // left there is no tab row: the page is the Dashboard. A stored tab ('learn', or an older name) is not read.
@@ -32106,8 +32143,9 @@ function makePage(ctx, opts = {}) {
       .then(r => {
         // chat-fix: the reply's marks in double square brackets are taken out of its words (src/chat.js chatParts): the
         // choices and the card they name are drawn under it; a reply with no words left counts as no reply
+        // (review finding 11) a choice that would start Helper's own forget or what-do-you-keep lines is no button
         const parts = chatParts(r && r.ok ? chatClean(r.text) : '')
-        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick, card: parts.card })), send: true })
+        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick.filter(q => !typedAboutKept(q)), card: parts.card })), send: true })
         lookAgain()
         const kind = r && !r.ok ? r.kind : 'other'
         const f = FAIL_LINES[kind] || FAIL_LINES.other
@@ -32490,17 +32528,18 @@ function makePage(ctx, opts = {}) {
     const newestId = log.length ? log[log.length - 1].id : 0
     // chat-fix (his words on build 11f4eda: the end of a long reply was what he saw, cut off): a reply of the model is
     // the last line of the part that scrolls. When it is higher than the room, the conversation shows it from its
-    // first line, CHAT_TOP_PX under the top edge (the edge fades over 20 px), and the person scrolls down through it.
+    // first line (src/layout.js replyScrollShift), and the person scrolls down through it.
     const scrollToNewest = () => {
       const el = helperScroll.current
       if (!el) return
       el.scrollTop = el.scrollHeight
       const reply = typeof el.querySelector === 'function' ? el.querySelector('[data-hh="bubble"]') : null
       if (!reply || typeof reply.getBoundingClientRect !== 'function') return
-      const top = reply.getBoundingClientRect().top - el.getBoundingClientRect().top
-      if (top < CHAT_TOP_PX) el.scrollTop += top - CHAT_TOP_PX
+      const shift = replyScrollShift(reply.getBoundingClientRect().top, el.getBoundingClientRect().top)
+      if (shift) el.scrollTop += shift
     }
-    useEffect(scrollToNewest, [newestId, helperShown])
+    // (review of chat-fix 1, finding 6) before the screen is painted, so a long reply never shows its end first
+    useLayoutEffect(scrollToNewest, [newestId, helperShown])
     // loom-fixes (Lead's point 17b): every change of the conversation is kept (the last 50 lines)
     useEffect(writeTalk, [log])
     // loom-fixes (Lead's point 16, his frame f-2m58s: every bubble lost its first letters for about a second while
@@ -33121,7 +33160,7 @@ function makePage(ctx, opts = {}) {
             winBar,
             // chat-fix: a reply of the model (md) is drawn inside the part that scrolls, as its last line; Helper's own
             // short lines and the waiting dots stay in the bubble over the character
-            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, last: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard }, 'bubble') : null }, 'conversation'),
+            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, reply: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard }, 'bubble') : null }, 'conversation'),
             inBubble ? (inBubble.md ? null : jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble')) : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer

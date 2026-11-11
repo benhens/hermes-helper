@@ -53,48 +53,80 @@ ${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
 Write in markdown: short paragraphs, \`code\` for anything to type.`
 
 // The model's reply, taken apart: the words to show, and its marks in double square brackets, which are never shown.
-//   [[card:<id>]]            one of the nine cards (the first known one; an unknown id is dropped)
-//   [[do:...]]               an action Helper offers to run; dropped here
-//   [[A]] [[B]] at a line's end   quick replies, at most three: buttons under the reply
-// Any other pair of double brackets in the words loses its brackets and keeps its words. Text to type is left alone:
-// a code block between \`\`\` lines, and \`code\` inside a line (a shell test is written [[ -f file ]]).
-const CHAT_MARK = /\[\[([^\[\]\n]{1,80})\]\]/g
+//   [[card:<id>]]   one of the nine cards (the first known one; an unknown id is dropped)
+//   [[do:...]]      an action Helper offers to run (chatAction); anything else is dropped
+//   [[A]] [[B]]     quick replies, at most CHAT_QUICK_MAX: on a line of their own, or at the end of the last line
+// Any other pair of double brackets loses its brackets and keeps its words (a mark in the middle of a sentence stays
+// part of the sentence). Text to type is left alone: a code block as src/md.js reads it (from a ``` or ~~~ line to
+// the next line that starts with the same mark, or to the end) and `code` inside a line (a shell test is written
+// [[ -f file ]]). The reply is the model's text, so nothing in it is trusted: a mark that only forms once another
+// was taken out does nothing, and a choice that looks like a key, or that holds unseen characters, is no button.
+const CHAT_MARK_ANY = /\[\[([^\n]*?)\]\]/g
+const CHAT_MARK_NAMED = /\[\[\s*(card|do)\s*:([^[\]\n]*)\]\]/gi
+const CHAT_MARKS_TAIL = /(?:\s*\[\[[^[\]\n`]*\]\])+\s*$/
+const CHAT_QUICK_CHARS = 60
 export function chatParts(reply) {
+  const lines = String(reply || '').replace(/\r\n?/g, '\n').split('\n')
   let card = null
   const quick = []
-  let fenced = false
-  const out = []
-  for (const line of String(reply || '').split('\n')) {
-    if (/^\s*```/.test(line)) {
-      fenced = !fenced
-      out.push(line)
-      continue
-    }
-    if (fenced) {
-      out.push(line)
-      continue
-    }
-    let l = line.replace(/\[\[\s*(card|do)\s*:([^\[\]\n]{0,80})\]\]/gi, (m, kind, what) => {
-      const id = what.trim().toLowerCase()
-      if (kind.toLowerCase() === 'card' && !card && CHAT_CARDS.some(c => c[0] === id)) card = id
-      return ''
-    })
-    const tail = l.match(/(?:\s*\[\[[^\[\]\n`]{1,80}\]\])+\s*$/)
-    if (tail) {
-      for (const m of tail[0].matchAll(CHAT_MARK)) {
-        const t = m[1].replace(/\s+/g, ' ').trim()
-        if (t && quick.length < CHAT_QUICK_MAX && !quick.includes(t)) quick.push(t)
-      }
-      l = l.slice(0, tail.index)
-    }
-    l = l
-      .split('`')
-      .map((part, i) => (i % 2 ? part : part.replace(CHAT_MARK, '$1')))
-      .join('`')
-    // a line that held only marks is gone with them
-    if (line.trim() && !l.trim()) continue
-    out.push(l.replace(/\s+$/, ''))
+  const typed = lines.map(() => false)
+  for (let i = 0; i < lines.length; i++) {
+    const fence = lines[i].match(/^\s*(```|~~~)/)
+    if (!fence) continue
+    typed[i++] = true
+    while (i < lines.length && !lines[i].trim().startsWith(fence[1])) typed[i++] = true
+    if (i < lines.length) typed[i] = true
   }
+  // the words of a line outside its `code`, changed by f
+  const outside = (line, f) => {
+    const parts = line.split('`')
+    return parts.map((part, i) => (i % 2 && i < parts.length - 1 ? part : f(part))).join('`')
+  }
+  const named = (kind, what) => {
+    const id = what.trim().toLowerCase()
+    if (kind.toLowerCase() === 'card' && !card && CHAT_CARDS.some(c => c[0] === id)) card = id
+  }
+  const choice = words => {
+    const t = words.replace(/[\p{Cc}\p{Cf}]/gu, '').replace(/\s+/g, ' ').trim()
+    if (!t || Array.from(t).length > CHAT_QUICK_CHARS || /^(card|do)\s*:/i.test(t) || chatHoldsBack(t)) return
+    if (quick.length < CHAT_QUICK_MAX && !quick.includes(t)) quick.push(t)
+  }
+  // 1. the card and action marks go, wherever they are outside text to type
+  const kept = []
+  lines.forEach((line, i) => {
+    if (typed[i]) return kept.push({ line, typed: true })
+    const shown = outside(line, part => {
+      let first = true
+      for (;;) {
+        const next = part.replace(CHAT_MARK_NAMED, (m, kind, what) => {
+          if (first) named(kind, what)
+          return ''
+        })
+        if (next === part) return part
+        part = next
+        first = false
+      }
+    })
+    if (line.trim() && !shown.trim()) return
+    kept.push({ line: shown, typed: false })
+  })
+  // 2. the choices: a line that is only marks, and the marks that end the last line
+  let last = kept.length - 1
+  while (last >= 0 && (kept[last].typed || !kept[last].line.trim())) last--
+  const out = []
+  kept.forEach((k, i) => {
+    if (k.typed) return out.push(k.line)
+    let shown = k.line
+    const tail = shown.match(CHAT_MARKS_TAIL)
+    if (tail && (i === last || !shown.slice(0, tail.index).trim())) {
+      for (const m of tail[0].matchAll(CHAT_MARK_ANY)) choice(m[1])
+      shown = shown.slice(0, tail.index)
+    }
+    // 3. what is left of double brackets loses them
+    shown = outside(shown, part => part.replace(CHAT_MARK_ANY, '$1').replace(/\[\[|\]\]/g, ''))
+    if (k.line.trim() && !shown.trim()) return
+    out.push(shown.replace(/\s+$/, ''))
+  })
   return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), quick, card }
 }
 

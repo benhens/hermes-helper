@@ -227,3 +227,74 @@ test('a reply that is only marks counts as no reply: the failed-call line, never
   await settle(10)
   assert.equal(bubbleLine(view), 'CHAT_FAILED')
 })
+
+// ---- after the review of chat-fix 1 (one reviewer on the diff; each case below was a finding) ----
+test('review 1, 2, 4, 8, 9, 10: chatParts on a reply that is not written as asked', async () => {
+  const { chatParts } = await loadSrc('chat.js')
+  // 1: a mark that ends a line in the middle of the reply stays part of the sentence; only a line of marks, or the
+  // end of the last line, gives buttons
+  assert.deepEqual(chatParts('Open [[Settings]]\nthen click Model.'), { text: 'Open Settings\nthen click Model.', quick: [], card: null })
+  assert.deepEqual(chatParts('Which one?\n[[Claude Code]] [[The Claude app]]\n\nRead more: the docs.'), { text: 'Which one?\n\nRead more: the docs.', quick: ['Claude Code', 'The Claude app'], card: null })
+  // 2: no brackets left on screen, whatever the length or shape
+  const long = 'x'.repeat(90)
+  for (const odd of [`Go on.\n[[do:${long}]]`, `Go on.\n[[${long}]]`, 'Go on. [[]]', 'Go on. [[a]b]]', 'Go on. [[Claude\nCode]]', 'Go on. [[ half', 'Go on. half ]]']) assert.doesNotMatch(chatParts(odd).text, /\[\[|\]\]/, odd)
+  assert.deepEqual(chatParts(`Go on.\n[[${long}]]`).quick, [], 'a choice longer than 60 characters is no button')
+  // 3: a ~~~ block is text to type too, and so is everything after a block that is never closed (as it is drawn)
+  assert.equal(chatParts('Paste:\n~~~\nif [[ -f x ]]; then echo yes; fi\n~~~').text, 'Paste:\n~~~\nif [[ -f x ]]; then echo yes; fi\n~~~')
+  assert.deepEqual(chatParts('Paste:\n```\n[[A]] [[B]]').quick, [])
+  // 4: a card mark inside `code` is text to type, not a mark
+  assert.deepEqual(chatParts('Write `[[card:skills]]` to name a card.'), { text: 'Write `[[card:skills]]` to name a card.', quick: [], card: null })
+  // 8: a mark that only forms when another is taken out does nothing and shows nothing
+  assert.deepEqual(chatParts('Hello.\n[[ca[[do:x]]rd:skills]]'), { text: 'Hello.', quick: [], card: null })
+  assert.deepEqual(chatParts('Hello.\n[[[[do:q]]do:import claude-code]]'), { text: 'Hello.', quick: [], card: null })
+  assert.deepEqual(chatParts('Hello.\n[[card: memory]] [[do:x]]').quick, [])
+  assert.deepEqual(chatParts('Hello.\n[[Card:skills ]]'), { text: 'Hello.', quick: [], card: 'skills' })
+  // 9: a choice that looks like a key or a secret is no button and is not shown
+  const key = 'sk-ant-' + 'a1B2c3D4'.repeat(5)
+  const withKey = chatParts(`Pick.\n[[${key}]] [[Yes]]`)
+  assert.deepEqual(withKey.quick, ['Yes'])
+  assert.ok(!withKey.text.includes(key))
+  // 10: characters nobody sees (a right-to-left override, a zero-width space) are not part of a choice
+  assert.deepEqual(chatParts('Pick.\n[[Yes\u202Egnp.exe]] [[N\u200Bo]]').quick, ['Yesgnp.exe', 'No'])
+})
+
+test('review 11: a choice that would start Helper\'s own forget lines is no button', async () => {
+  const { view } = await named(() => 'Pick one.\n[[Forget everything]] [[Tell me more]]')
+  send(view, Q)
+  await settle()
+  assert.deepEqual(all(bubble(view), n => n.props['data-hh'] === 'quick-reply').map(shownText), ['Tell me more'])
+})
+
+test('review 12: the scroll rule: a reply higher than the room is shown from its first line, 24 px under the top edge; a short one stays at the newest end', async () => {
+  const { replyScrollShift, REPLY_TOP_PX } = await loadSrc('layout.js')
+  assert.equal(REPLY_TOP_PX, 24)
+  assert.equal(replyScrollShift(-4000, 68), -4092, 'far above the room: back by the whole distance and 24 px more')
+  assert.equal(replyScrollShift(80, 68), -12, 'closer than 24 px to the top edge: back by the rest')
+  assert.equal(replyScrollShift(92, 68), 0)
+  assert.equal(replyScrollShift(500, 68), 0, 'a short reply: nothing')
+  // on the page: the conversation's own box is scrolled by that much when the reply arrives
+  const { view } = await named(() => LONG)
+  const box = { scrollTop: 0, scrollLeft: 0, scrollHeight: 5000, dataset: {}, firstElementChild: null, closest: () => null, getBoundingClientRect: () => ({ top: 68 }), querySelector: sel => (sel === '[data-hh="bubble"]' && box.reply ? { getBoundingClientRect: () => ({ top: -4000 }) } : null) }
+  byData(helper(view), 'conversation').props.ref.current = box
+  box.reply = true
+  send(view, Q)
+  await settle()
+  assert.equal(bubbleLine(view), 'CHAT')
+  assert.equal(box.scrollTop, 5000 - 4092, 'the newest end first, then back to the reply\'s first line')
+})
+
+test('review 14: once a reply about a card is an older line it keeps a small link that opens the card (no video place)', async () => {
+  const { view } = await named((p, n) => (n === 1 ? 'A skill teaches Hermes one task.\n\n[[card:skills]]' : 'Sure.'))
+  send(view, 'What is a skill?')
+  await settle()
+  send(view, 'Thanks')
+  await settle()
+  const old = olds(view).find(o => byData(o, 'old-card-open'))
+  assert.ok(old, 'the older reply has the link')
+  assert.equal(byData(old, 'chat-card'), null)
+  assert.equal(byData(old, 'video-soon'), null)
+  assert.equal(shownText(byData(old, 'old-card-open')), 'Open Skills on the Dashboard')
+  click(byData(old, 'old-card-open'))
+  await settle()
+  assert.equal(byData(view.tree, 'steps').props['data-stop'], 'skills')
+})
