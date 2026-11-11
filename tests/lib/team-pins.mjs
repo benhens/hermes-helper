@@ -35,8 +35,10 @@ export const PINS = {
 export function pinned(t, file) {
   const [pin, where] = PINS[file]
   const src = path.join(TEAM, where)
-  // a note must name the pin on the same line as the file's own name (not under another file)
-  const lines = where.endsWith('.md') ? fs.readFileSync(src, 'utf8').split('\n') : null
+  // where: a note that names the pin (it must name it on the same line as the file's own name, not under
+  // another file), or the team's own copy of the file (same name), whose checksum must be the pin
+  const isCopy = path.basename(where) === path.basename(file)
+  const lines = isCopy ? null : fs.readFileSync(src, 'utf8').split('\n')
   const named = lines ? lines.some(l => l.includes(pin) && l.includes(path.basename(file))) : sha(src) === pin
   if (!named) throw new Error(`${file}: the pin ${pin.slice(0, 12)} is not named in ${where}`)
   const now = sha(path.join(TEAM, file))
