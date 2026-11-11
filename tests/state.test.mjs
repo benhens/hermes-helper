@@ -37,7 +37,7 @@ test('what the old helper header stored (side, hidden or closed, chat log) is no
 test('every key the plugin stores is on the allowed list: about the person, only the one record of what Helper keeps', () => {
   // The allowed list: the page's own state, and
   // 'kept', the record of what Helper keeps by fixed rules (src/kept.js; talk v2 row 3), and 'met'
-  // (changes-14: Helper has said hello; true or nothing, never removed).
+  // (changes-14: Helper has said hello; true or nothing; last-reset, Lead 11 Nov: removed by Forget all, a full reset).
   // (dash-v1: the Dashboard stores nothing; the step list's step and answers left with it)
   // loom-fixes (Lead's point 17): 'talk', the last 50 lines of the conversation (src/talk-keep.js), and 'helperHidden'
   assert.deepEqual([...STORED_KEYS].sort(), ['helperHidden', 'helperWidth', 'kept', 'met', 'tab', 'talk'])
@@ -55,8 +55,9 @@ test('every key the plugin stores is on the allowed list: about the person, only
       const literal = arg.match(/^'([\w-]+)'$/)
       assert.ok(literal, `${f}: a storage call whose key is not a plain text: ${m[0]}`)
       // remove only for the record of what Helper keeps: deleting everything removes it whole (loom-fixes: and the
-      // kept conversation, by Clear chat and Forget all, and the hidden mark, by Show Helper)
-      assert.ok(['get', 'set'].includes(m[1]) || (m[1] === 'remove' && ['kept', 'talk', 'helperHidden'].includes(literal[1])), `${f}: storage.${m[1]}(${literal[1]})`)
+      // kept conversation, by Clear chat and Forget all, and the hidden mark, by Show Helper; last-reset: the met mark,
+      // by Forget all)
+      assert.ok(['get', 'set'].includes(m[1]) || (m[1] === 'remove' && ['kept', 'talk', 'helperHidden', 'met'].includes(literal[1])), `${f}: storage.${m[1]}(${literal[1]})`)
       found.add(literal[1])
     }
     for (const m of src.matchAll(/\bkeep\(\s*'([\w-]+)'/g)) found.add(m[1])

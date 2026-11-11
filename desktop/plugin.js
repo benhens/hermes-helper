@@ -24210,7 +24210,7 @@ function looksSecret(text) {
 
 // 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
 // 'met' (changes-14, keeps.met): true once Helper has said hello, so the name is asked only on the first
-// visit; nothing about the person, and no Forget removes it (src/page.js).
+// visit; Forget all removes it since last-reset (a full reset: the next visit asks the name again).
 // loom-fixes (Lead's point 17): 'talk', the last 50 lines of the conversation with Helper (src/talk-keep.js), and
 // 'helperHidden', whether the person put Helper's window away with Hide Helper (true, or nothing)
 const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met', 'talk', 'helperHidden']
@@ -24716,8 +24716,13 @@ function fullHit(text, singleOk) {
 // that is in the title; most shared first, ties in the data's order; never the line Helper said last
 // find-v2 (live-v2 changes-13, near_rule): the words of near.never_near never count as shared (home, file, turn ...)
 const NEVER_NEAR = new Set([...(NEAR.never_near || []), ...nearWords((NEAR.never_near || []).join(' '))])
+// last-reset 4 (hhtech-final-run, For builder 3): "window" after context, contex, token (a context window) is not the
+// app's window, so it is no shared word there: "whats a contex window" was offered Closing / Bringing the app window
+const CONTEXT_WINDOW = /(^|[^a-z0-9])(?:cont[a-z]*|token)\s+windows?($|[^a-z0-9])/
+const WINDOW_WORDS = new Set(nearWords('window windows'))
 function nearLines(text, st) {
-  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w)))
+  const cw = CONTEXT_WINDOW.test(talkNorm(text))
+  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w) && !(cw && WINDOW_WORDS.has(w))))
   const sc = []
   const os = namesWindowsOs(text) // loom-fixes-2 part B 2: the Windows line is not near an app's window or a context window
   TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
@@ -24785,7 +24790,7 @@ function pressNearSteps(gives, st) {
 // rmText: the message that led to "Do you mean me, or your own Hermes?", for the answer to it.
 // wants: the wants steps are on (row 5); false only for replaying route2.py, which has none.
 // changes-14/15: met, the mark that Helper has said hello (its own storage key, keeps.met; it outlives the
-// visit and no Forget removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
+// visit; since last-reset Forget all removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
 // note_last), for ordinary talk and for never saying the same line twice; rejected: the lines the person
 // called wrong in this visit (no_repeat.rejected_rule), never stored.
 // live-v2 changes-3: lastAnswer, lastAnswerKey, lastByAgain: this visit's last answer line, for "again"
@@ -26172,6 +26177,8 @@ function forgetAnswerSteps(what, yes, st) {
   if (what === 'work') delete st.kept.told_work // changes-4: told again when kept anew
   if (what === 'all' || !hasKeptValues(st.kept)) for (const k of Object.keys(st.kept)) delete st.kept[k]
   if (what === 'all' || what === 'name') st.name = null
+  // last-reset (Lead, 11 Nov 15:41): Forget all is a full reset; the page then removes the met mark too (src/page.js)
+  if (what === 'all') st.resetAll = true
   return { kind: 'A-yes', what }
 }
 
@@ -31720,9 +31727,9 @@ function makePage(ctx, opts = {}) {
   const remembered = () => {
     if (!memory) {
       const kept = readKept()
-      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (no Forget removes
-      // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
-      // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
+      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (since last-reset, Forget
+      // all removes it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
+      // counts as met too (src/talk.js laterVisit); met is then written.
       const metStored = readMet()
       memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null', forgotUpTo: 0 }
       // loom-fixes (Lead's point 17b): the conversation of earlier visits, the last 50 lines, shown above this visit's
@@ -31795,6 +31802,9 @@ function makePage(ctx, opts = {}) {
     const m = remembered()
     // loom-fixes: Forget all on Helper's settings page removes the kept conversation too: it goes from the window
     if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) forgetTalk()
+    // last-reset: Forget all on Helper's settings page removes the met mark too (a full reset); the name said in this
+    // visit is not used again either (as after the typed Forget all), and the mark is not written again in this visit
+    if (m.metStored && !readMet()) m.visit.name = null
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
@@ -31807,7 +31817,17 @@ function makePage(ctx, opts = {}) {
   // After everything the person does: the record is written when it changed, and removed whole
   // when nothing is left in it (told with it). A storage that fails is not kept from answering.
   const writeKept = () => {
-    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); never removed
+    // last-reset (Lead, 11 Nov 15:41; Pēteris: "is there a way to full reset the plugin"): Forget all typed to Helper
+    // (Yes) removes the met mark too, so the next visit is a first visit and asks the name again. It is not written
+    // again in this visit (metStored stays true: "written once"); a later visit writes it when its opening ends.
+    if (memory.visit.resetAll) {
+      memory.visit.resetAll = false
+      try {
+        ctx.storage.remove('met')
+      } catch {}
+      memory.metStored = true
+    }
+    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); removed only by Forget all
     if (memory.visit.met && !memory.metStored) {
       try {
         ctx.storage.set('met', true)
@@ -31966,7 +31986,8 @@ function makePage(ctx, opts = {}) {
     w.failed = true
     v.aiFails = (v.aiFails || 0) + 1
     if (v.aiFails < 2) return
-    v.aiOff = true
+    // last-reset (Lead, 11 Nov 15:41, his answer to the Builder's question 2): a slow or failed call no longer turns the
+    // AI step off for the visit; two failed tries in a row only make SLOW_A owed, as before
     if (!v.slow) v.slow = slow && (live.waiting === w || w.answeredNow) ? 'due' : 'dropped'
   }
   const slowFail = w => aiFailed(w, true)
@@ -32364,7 +32385,7 @@ function makePage(ctx, opts = {}) {
           counted = true
           visit.aiFails = (visit.aiFails || 0) + 1
           if (visit.aiFails < 2) return
-          visit.aiOff = true
+          // last-reset: no longer turns the AI step off for the visit
           if (!visit.slow) visit.slow = 'dropped'
         }
         let ended = false
@@ -32525,7 +32546,10 @@ function makePage(ctx, opts = {}) {
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
-      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes, off: visit.aiOff === true })
+      // last-reset (hhtech-final-run, For builder 1): a slow reply costs only its own message. One call of Helper's still
+      // in Hermes past its 12 s (its message already has its written line) does not hold the next question back; two
+      // or more do (the pile-up stays at most two such calls; host.request ends each after 90 s)
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes - (live.stuck === 1 ? 1 : 0), off: visit.aiOff === true })
       // find-v1 part 3: the page knows no model: no call and no dots, and the model is looked for again for a later message
       if (why === 'model not ready') lookAgain()
       // find-v1 part 3: this message cannot be asked because an earlier call of Helper's has been in Hermes for over 12 s:
@@ -33108,6 +33132,9 @@ function makeSettingsPage(ctx) {
       ctx.storage.remove('kept')
       // loom-fixes (Lead's point 17b): the kept conversation with Helper goes with it
       ctx.storage.remove('talk')
+      // last-reset (Lead, 11 Nov 15:41): a full reset: the met mark goes too, so after a restart Helper greets as on a
+      // first visit and asks the name again. What stays is the page's layout (tab, helperWidth, helperHidden).
+      ctx.storage.remove('met')
       showStored()
       setSaid(null)
       setForget('done')
@@ -33227,7 +33254,17 @@ function makeSettingsPage(ctx) {
     // Hermes's underlined bold text action, textStrong), not a filled button. The Yes / No question keeps its
     // place under the row. Hermes's own memory row stays out: its address is not in the plugin docs.
     const FA = SETTINGS_WORDS.forget_all
-    const forgetRow = hasKept(stored)
+    // last-reset (hhtech-final-run, For builder 2): the row shows whenever anything of the person is stored, also when
+    // only the conversation (talk) or the met mark is there and nothing is kept yet. Read at each drawing: Forget all
+    // draws the page again (showStored), and the done line then takes the row's place.
+    const anyStored = () => {
+      try {
+        return ctx.storage.get('talk', null) != null || ctx.storage.get('met', false) === true
+      } catch {
+        return false
+      }
+    }
+    const forgetRow = hasKept(stored) || anyStored()
       ? jsxs('div', {
           className: K.settingsRule,
           'data-hh': 'settings-forget',

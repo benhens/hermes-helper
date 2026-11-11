@@ -38,7 +38,7 @@ test('one slow call (no answer in 12 s): the written line at 12 s, no slow-AI li
   assert.equal(count(view, 'SLOW_A'), 0)
 })
 
-test('two slow messages in a row: the AI is off for the visit and the slow-AI line is said once, after the second answer, never in its place', async () => {
+test('two slow messages in a row: the slow-AI line is said once, after the second answer, never in its place; the AI stays on (last-reset)', async () => {
   const d1 = deferred()
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? d1.promise : never()) } })
   send(view, TOKENS)
@@ -58,17 +58,20 @@ test('two slow messages in a row: the AI is off for the visit and the slow-AI li
   await settle()
   assert.deepEqual(allLines(view).slice(-2), ['use0', 'SLOW_A'], 'the answer first, then the slow-AI line')
   finish(view)
-  for (const m of [TOKENS + ' 3', FOLLOW, 'can it fly a kite', 'thanks']) {
-    send(view, m)
-    assert.equal(dots(view), null, m + ': no dots')
-    await settle()
-    finish(view)
-  }
-  assert.equal(host.asks.length, 2, 'no call for the rest of the visit')
+  // last-reset (Lead, 11 Nov 15:41): the AI is not off for the visit; the next question is asked again (the second
+  // call, still in Hermes past its 12 s, does not hold it back); the slow-AI line stays once per visit
+  send(view, TOKENS + ' 3')
+  send(view, FOLLOW)
+  assert.ok(dots(view), 'asked again, with the dots')
+  await settle()
+  assert.equal(host.asks.length, 3)
+  timers.fire(12000)
+  await settle()
+  finish(view)
   assert.equal(count(view, 'SLOW_A'), 1, 'once')
 })
 
-test('an AI that never answers, twice in a row: the second message finds the first call still in Hermes after its 12 s, so it is the second slow one: its answer at once, then the slow-AI line', async () => {
+test('an AI that never answers, twice in a row: the second message finds the first call still in Hermes after its 12 s and still makes its own call (last-reset); slow too, its answer, then the slow-AI line; a third waits for neither', async () => {
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: never } })
   send(view, TOKENS)
   send(view, FOLLOW)
@@ -81,13 +84,17 @@ test('an AI that never answers, twice in a row: the second message finds the fir
   send(view, TOKENS + ' 2')
   assert.equal(count(view, 'SLOW_A'), 0, 'a message code answers by itself is no try')
   send(view, FOLLOW)
-  assert.equal(dots(view), null, 'no second call while the first is still in Hermes')
+  // last-reset (Lead, 11 Nov 15:41): one call still in Hermes past its 12 s no longer holds the next message back
+  assert.ok(dots(view), 'its own call, with the dots')
   await settle()
-  assert.equal(host.asks.length, 1)
+  assert.equal(host.asks.length, 2)
+  timers.fire(12000)
+  await settle()
   assert.deepEqual(allLines(view).slice(-2), ['use0', 'SLOW_A'])
+  finish(view)
   send(view, 'can it fly a kite')
   await settle()
-  assert.equal(host.asks.length, 1, 'off for the visit')
+  assert.equal(host.asks.length, 2, 'two calls still in Hermes past their 12 s: no third one (the pile-up stays bounded)')
   assert.equal(count(view, 'SLOW_A'), 1)
 })
 
@@ -115,7 +122,7 @@ test('a slow call, then a good one, then a slow one: never two in a row, so the 
   assert.equal(count(view, 'SLOW_A'), 0)
 })
 
-test('one failed call (no provider) does not end the AI: the model is checked again, and the next message is tried; a second failure in a row ends it, with no line about slowness (it was not slow)', async () => {
+test('one failed call (no provider) does not end the AI: the model is checked again, and the next message is tried; since last-reset neither does a second failure in a row; no line about slowness (it was not slow)', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: NO_PROVIDER } })
   const checksAtStart = host.checks
   send(view, 'can it fly a kite')
@@ -128,13 +135,13 @@ test('one failed call (no provider) does not end the AI: the model is checked ag
   await settle()
   assert.equal(host.asks.length, 2, 'tried again at the next message')
   finish(view)
+  // last-reset (Lead, 11 Nov 15:41: a failed call does not switch the AI step off for the visit): still tried
   for (const m of ['does it juggle', 'do goats like it']) {
     send(view, m)
-    assert.equal(dots(view), null, m)
     await settle()
     finish(view)
   }
-  assert.equal(host.asks.length, 2, 'two in a row: off for the visit')
+  assert.equal(host.asks.length, 4, 'every message is still tried')
   assert.equal(count(view, 'SLOW_A'), 0)
 })
 
@@ -191,7 +198,7 @@ test('thinking text twice in a row: the answer, then the slow-AI line after the 
 // Builder (review): the list call came back, but so late that the writer is not started (under 4 s of the 12 left).
 // The person waited and got code's line: that is a slow try too, or an AI that always takes 9 s on the list would
 // show the dots for 9 s at every message of the visit
-test('a list call that leaves no time for the writer is a slow try: two in a row end the AI for the visit', async () => {
+test('a list call that leaves no time for the writer is a slow try: two in a row owe the slow-AI line but (last-reset) do not end the AI for the visit', async () => {
   const real = Date.now
   let skew = 0
   Date.now = () => real() + skew
@@ -208,9 +215,8 @@ test('a list call that leaves no time for the writer is a slow try: two in a row
     finish(view)
     assert.equal(host.asks.length, 2)
     send(view, 'do goats like it')
-    assert.equal(dots(view), null, 'no dots: the AI is off for the visit')
     await settle()
-    assert.equal(host.asks.length, 2, 'no third call')
+    assert.equal(host.asks.length, 3, 'a third call: the AI is not off for the visit (last-reset)')
   } finally {
     Date.now = real
   }

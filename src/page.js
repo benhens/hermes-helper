@@ -113,9 +113,9 @@ export function makePage(ctx, opts = {}) {
   const remembered = () => {
     if (!memory) {
       const kept = readKept()
-      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (no Forget removes
-      // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
-      // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
+      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (since last-reset, Forget
+      // all removes it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
+      // counts as met too (src/talk.js laterVisit); met is then written.
       const metStored = readMet()
       memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null', forgotUpTo: 0 }
       // loom-fixes (Lead's point 17b): the conversation of earlier visits, the last 50 lines, shown above this visit's
@@ -188,6 +188,9 @@ export function makePage(ctx, opts = {}) {
     const m = remembered()
     // loom-fixes: Forget all on Helper's settings page removes the kept conversation too: it goes from the window
     if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) forgetTalk()
+    // last-reset: Forget all on Helper's settings page removes the met mark too (a full reset); the name said in this
+    // visit is not used again either (as after the typed Forget all), and the mark is not written again in this visit
+    if (m.metStored && !readMet()) m.visit.name = null
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
@@ -200,7 +203,17 @@ export function makePage(ctx, opts = {}) {
   // After everything the person does: the record is written when it changed, and removed whole
   // when nothing is left in it (told with it). A storage that fails is not kept from answering.
   const writeKept = () => {
-    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); never removed
+    // last-reset (Lead, 11 Nov 15:41; Pēteris: "is there a way to full reset the plugin"): Forget all typed to Helper
+    // (Yes) removes the met mark too, so the next visit is a first visit and asks the name again. It is not written
+    // again in this visit (metStored stays true: "written once"); a later visit writes it when its opening ends.
+    if (memory.visit.resetAll) {
+      memory.visit.resetAll = false
+      try {
+        ctx.storage.remove('met')
+      } catch {}
+      memory.metStored = true
+    }
+    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); removed only by Forget all
     if (memory.visit.met && !memory.metStored) {
       try {
         ctx.storage.set('met', true)
@@ -359,7 +372,8 @@ export function makePage(ctx, opts = {}) {
     w.failed = true
     v.aiFails = (v.aiFails || 0) + 1
     if (v.aiFails < 2) return
-    v.aiOff = true
+    // last-reset (Lead, 11 Nov 15:41, his answer to the Builder's question 2): a slow or failed call no longer turns the
+    // AI step off for the visit; two failed tries in a row only make SLOW_A owed, as before
     if (!v.slow) v.slow = slow && (live.waiting === w || w.answeredNow) ? 'due' : 'dropped'
   }
   const slowFail = w => aiFailed(w, true)
@@ -757,7 +771,7 @@ export function makePage(ctx, opts = {}) {
           counted = true
           visit.aiFails = (visit.aiFails || 0) + 1
           if (visit.aiFails < 2) return
-          visit.aiOff = true
+          // last-reset: no longer turns the AI step off for the visit
           if (!visit.slow) visit.slow = 'dropped'
         }
         let ended = false
@@ -918,7 +932,10 @@ export function makePage(ctx, opts = {}) {
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       // hhtech-weak-ai: visit.aiOff, set below when a call gave no answer in 12 s or gave thinking text
-      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes, off: visit.aiOff === true })
+      // last-reset (hhtech-final-run, For builder 1): a slow reply costs only its own message. One call of Helper's still
+      // in Hermes past its 12 s (its message already has its written line) does not hold the next question back; two
+      // or more do (the pile-up stays at most two such calls; host.request ends each after 90 s)
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes - (live.stuck === 1 ? 1 : 0), off: visit.aiOff === true })
       // find-v1 part 3: the page knows no model: no call and no dots, and the model is looked for again for a later message
       if (why === 'model not ready') lookAgain()
       // find-v1 part 3: this message cannot be asked because an earlier call of Helper's has been in Hermes for over 12 s:

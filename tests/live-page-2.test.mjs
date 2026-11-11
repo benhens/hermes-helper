@@ -101,7 +101,7 @@ test('the work line: kept at What do you do?, sent in the writer\'s instructions
 
 // find-v1 part 3 (Lead, 11 Nov): one slow or failed try no longer ends the AI for the visit; two in a row do, and SLOW_A
 // follows the second one's answer (tests/find-ai-rule.test.mjs). The tests below are brought to that rule.
-test('thinking text: the no-AI line after the dots; after two such messages in a row no more calls in this visit', async () => {
+test('thinking text: the no-AI line after the dots; after two such messages in a row the next is still asked (last-reset)', async () => {
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => THINKING } })
   send(view, 'can it fly a kite')
   assert.ok(dots(view))
@@ -118,13 +118,14 @@ test('thinking text: the no-AI line after the dots; after two such messages in a
   // find-v2 part 5: the second failed try owes the slow-AI line, said between the don't-know and its picks
   assert.equal(line(view), 'SLOW_A')
   finish(view)
+  // last-reset (Lead, 11 Nov 15:41): a failed or slow try does not switch the AI step off for the visit
   send(view, 'do goats like it')
-  assert.equal(dots(view), null, 'no dots: no call')
+  assert.ok(dots(view), 'asked again')
   await settle()
-  assert.equal(host.asks.length, 2, 'two in a row: no further call in this visit')
+  assert.equal(host.asks.length, 3)
 })
 
-test('no answer in 12 s: the no-AI line at 12 s; after two such messages in a row no more calls in this visit, also once the calls have ended', async () => {
+test('no answer in 12 s: the no-AI line at 12 s; after two such messages in a row the next is still asked (last-reset: never off for the visit)', async () => {
   const ds = [deferred(), deferred()]
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => ds[n - 1].promise } })
   send(view, 'can it fly a kite')
@@ -142,13 +143,13 @@ test('no answer in 12 s: the no-AI line at 12 s; after two such messages in a ro
   ds[1].resolve('mod')
   await settle()
   finish(view)
+  // last-reset (Lead, 11 Nov 15:41): a slow call does not switch the AI step off for the visit
   send(view, 'do goats like it')
   await settle()
-  assert.equal(host.asks.length, 2, 'off for the visit, though Hermes has no call of Helper\'s any more')
-  assert.equal(dots(view), null)
+  assert.equal(host.asks.length, 3, 'asked again')
 })
 
-test('review: a call with no answer 12 s after it started is a failed try, also when the person moved on before; two such in a row turn the AI step off', async () => {
+test('review: a call with no answer 12 s after it started is a failed try, also when the person moved on before; two such in a row no longer turn the AI step off (last-reset)', async () => {
   const ds = [deferred(), deferred()]
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => ds[n - 1].promise } })
   for (const [n, typed] of [[1, 'can it fly a kite'], [2, 'can it fly a plane']]) {
@@ -164,7 +165,7 @@ test('review: a call with no answer 12 s after it started is a failed try, also 
   }
   send(view, 'do goats like it')
   await settle()
-  assert.equal(host.asks.length, 2, 'off for the visit')
+  assert.equal(host.asks.length, 3, 'asked again: not off for the visit (last-reset)')
 })
 
 test('the AI step off for a visit comes back when Hermes starts again (a new visit)', async () => {

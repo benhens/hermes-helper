@@ -78,6 +78,9 @@ export function makeSettingsPage(ctx) {
       ctx.storage.remove('kept')
       // loom-fixes (Lead's point 17b): the kept conversation with Helper goes with it
       ctx.storage.remove('talk')
+      // last-reset (Lead, 11 Nov 15:41): a full reset: the met mark goes too, so after a restart Helper greets as on a
+      // first visit and asks the name again. What stays is the page's layout (tab, helperWidth, helperHidden).
+      ctx.storage.remove('met')
       showStored()
       setSaid(null)
       setForget('done')
@@ -197,7 +200,17 @@ export function makeSettingsPage(ctx) {
     // Hermes's underlined bold text action, textStrong), not a filled button. The Yes / No question keeps its
     // place under the row. Hermes's own memory row stays out: its address is not in the plugin docs.
     const FA = SETTINGS_WORDS.forget_all
-    const forgetRow = hasKept(stored)
+    // last-reset (hhtech-final-run, For builder 2): the row shows whenever anything of the person is stored, also when
+    // only the conversation (talk) or the met mark is there and nothing is kept yet. Read at each drawing: Forget all
+    // draws the page again (showStored), and the done line then takes the row's place.
+    const anyStored = () => {
+      try {
+        return ctx.storage.get('talk', null) != null || ctx.storage.get('met', false) === true
+      } catch {
+        return false
+      }
+    }
+    const forgetRow = hasKept(stored) || anyStored()
       ? jsxs('div', {
           className: K.settingsRule,
           'data-hh': 'settings-forget',

@@ -66,6 +66,8 @@ const said = view => (offerUp(view) ? text(lastOld(view)).replace(/^Helper said:
 const dots = view => byData(helper(view), 'busy-dots')
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
 const finish = view => byData(view.tree, 'page').props.onPointerDownCapture({})
+// last-reset: every line of the window in order (older lines, then the bubble)
+const allLines = view => [...all(byData(view.tree, 'helper'), n => n.props['data-hh'] === 'old').map(n => n.props['data-line']), bubble(view) ? bubble(view).props['data-line'] : null].filter(Boolean)
 const mine = view => all(helper(view), n => n.props['data-hh'] === 'me').map(n => text(n).replace(/^You said: /, '').trim())
 const expression = view => (all(view.tree, n => n.props['data-expression'])[0] || { props: {} }).props['data-expression']
 function send(view, words) {
@@ -114,7 +116,7 @@ test('ai_writes: a message code is not sure of shows at once, with the three dot
   assert.equal(byData(bubble(view), 'source'), null, 'no docs source under a written reply')
 })
 
-test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes still works on that call, the next message gets its no-AI line with no new call', async () => {
+test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes still works on that call, the next message still makes its own call (last-reset)', async () => {
   const d = deferred()
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
   send(view, 'send me a summary')
@@ -123,23 +125,25 @@ test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes s
   timers.fire(12000)
   assert.equal(line(view), 'N1')
   assert.equal(said(view), N1)
-  // the next message, while Hermes still has the dropped call: no request, its own line at once
+  // last-reset (Lead, 11 Nov 15:41; hhtech-final-run For builder 1): a slow reply costs only its own message: the next
+  // message, while Hermes still has the dropped call, makes its own call (before: no request, its own line at once)
   send(view, 'tell me a joke')
-  // find-v2 part 5: this is the second slow try (the first call is still in Hermes after its 12 s), so the slow-AI line
-  // follows the don't-know, between it and its picks
-  assert.equal(line(view), 'SLOW_A')
   await settle()
-  assert.equal(host.asks.length, 1, 'no second call while the first is still in Hermes')
-  // the late reply is dropped: nothing changes
+  assert.equal(host.asks.length, 2, 'the next message makes its own call')
+  // it is slow too: the second slow try in a row, so the slow-AI line follows its written answer (find-v2 part 5)
+  timers.fire(12000)
+  await settle()
+  finish(view)
+  assert.ok(allLines(view).includes('SLOW_A'), allLines(view).join(' '))
+  // the late replies are dropped: nothing changes
   const before = JSON.stringify(view.tree)
   d.resolve(goodReply('sch1'))
   await settle()
   assert.equal(JSON.stringify(view.tree), before)
-  // find-v1 part 3: that second message met the first call still in Hermes after its 12 s, so it was the second slow
-  // try in a row: the AI step is off for the rest of this visit, also with Hermes free again
+  // last-reset: the AI step is not off for the visit: with Hermes free again the next message is asked
   send(view, 'do goats like it')
   await settle()
-  assert.equal(host.asks.length, 1)
+  assert.equal(host.asks.length, 3)
 })
 
 test('a second message while Helper waits: the waiting one gets its no-AI line at once, then the new one is answered (by code: the first call is still in Hermes)', async () => {

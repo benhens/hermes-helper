@@ -735,7 +735,8 @@ test('his complaint (changes-14): Skip on the first visit is remembered; after H
     assert.equal(said(v), TALK_DATA.fixed.CUT.text)
     v.unmount()
   }
-  // Forget all on the settings page side (the record removed): met stays, still no name question
+  // the record alone removed (a Save that empties the box; Forget all also removes met since last-reset): met stays,
+  // still no name question
   storage.data.delete('kept')
   const third = await registerPlugin(storage, fakeTimers())
   const v3 = mount(third.Page)

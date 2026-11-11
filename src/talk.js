@@ -362,8 +362,13 @@ export function fullHit(text, singleOk) {
 // that is in the title; most shared first, ties in the data's order; never the line Helper said last
 // find-v2 (live-v2 changes-13, near_rule): the words of near.never_near never count as shared (home, file, turn ...)
 const NEVER_NEAR = new Set([...(NEAR.never_near || []), ...nearWords((NEAR.never_near || []).join(' '))])
+// last-reset 4 (hhtech-final-run, For builder 3): "window" after context, contex, token (a context window) is not the
+// app's window, so it is no shared word there: "whats a contex window" was offered Closing / Bringing the app window
+const CONTEXT_WINDOW = /(^|[^a-z0-9])(?:cont[a-z]*|token)\s+windows?($|[^a-z0-9])/
+const WINDOW_WORDS = new Set(nearWords('window windows'))
 export function nearLines(text, st) {
-  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w)))
+  const cw = CONTEXT_WINDOW.test(talkNorm(text))
+  const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w) && !(cw && WINDOW_WORDS.has(w))))
   const sc = []
   const os = namesWindowsOs(text) // loom-fixes-2 part B 2: the Windows line is not near an app's window or a context window
   TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
@@ -431,7 +436,7 @@ function pressNearSteps(gives, st) {
 // rmText: the message that led to "Do you mean me, or your own Hermes?", for the answer to it.
 // wants: the wants steps are on (row 5); false only for replaying route2.py, which has none.
 // changes-14/15: met, the mark that Helper has said hello (its own storage key, keeps.met; it outlives the
-// visit and no Forget removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
+// visit; since last-reset Forget all removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
 // note_last), for ordinary talk and for never saying the same line twice; rejected: the lines the person
 // called wrong in this visit (no_repeat.rejected_rule), never stored.
 // live-v2 changes-3: lastAnswer, lastAnswerKey, lastByAgain: this visit's last answer line, for "again"
@@ -1818,6 +1823,8 @@ function forgetAnswerSteps(what, yes, st) {
   if (what === 'work') delete st.kept.told_work // changes-4: told again when kept anew
   if (what === 'all' || !hasKeptValues(st.kept)) for (const k of Object.keys(st.kept)) delete st.kept[k]
   if (what === 'all' || what === 'name') st.name = null
+  // last-reset (Lead, 11 Nov 15:41): Forget all is a full reset; the page then removes the met mark too (src/page.js)
+  if (what === 'all') st.resetAll = true
   return { kind: 'A-yes', what }
 }
 
