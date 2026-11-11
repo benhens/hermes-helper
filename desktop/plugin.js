@@ -16117,18 +16117,18 @@ function resultOfRow(id) {
 // pyRegExp. tests/live-checks.test.mjs gives every recorded reply the flags check_live.py gives it.
 // The person is never told a check failed: a failure only means the pre-written line is shown.
 
-const C = LIVE_DATA.checks
+const LC = LIVE_DATA.checks
 const SUBJECT_IDS = LIVE_DATA.subjects.map(s => s.id)
-const R9 = pyRegExp(C.r9_pattern, 'i')
-const R6 = pyRegExp(C.r6_pattern, 'gi')
-const R8 = new RegExp('\\b(?:' + C.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i')
-const R5 = C.r5_patterns.map(p => pyRegExp(p, 'i'))
-const GLOSS_RX = C.gloss.map(g => [pyRegExp(g.term, g.ignore_case ? 'i' : ''), pyRegExp(g.explained_by, 'i')])
-const OK_CAPS = new Set(C.ok_caps)
+const LC_R9 = pyRegExp(LC.r9_pattern, 'i')
+const LC_R6 = pyRegExp(LC.r6_pattern, 'gi')
+const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i')
+const LC_R5 = LC.r5_patterns.map(p => pyRegExp(p, 'i'))
+const GLOSS_RX = LC.gloss.map(g => [pyRegExp(g.term, g.ignore_case ? 'i' : ''), pyRegExp(g.explained_by, 'i')])
+const OK_CAPS = new Set(LC.ok_caps)
 const liveEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const SKILL_RX = C.skills.map(s => [s.toLowerCase(), new RegExp('(^|[^a-z0-9-])' + liveEsc(s.toLowerCase()) + '($|[^a-z0-9-])')])
-const NOT_RX = Object.fromEntries(Object.entries(C.not_words).map(([cls, ws]) => [cls, ws.map(w => new RegExp("(^|[^a-z'])" + liveEsc(w) + "($|[^a-z'])", 'g'))]))
-const MONEY_RX = C.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
+const SKILL_RX = LC.skills.map(s => [s.toLowerCase(), new RegExp('(^|[^a-z0-9-])' + liveEsc(s.toLowerCase()) + '($|[^a-z0-9-])')])
+const NOT_RX = Object.fromEntries(Object.entries(LC.not_words).map(([cls, ws]) => [cls, ws.map(w => new RegExp("(^|[^a-z'])" + liveEsc(w) + "($|[^a-z'])", 'g'))]))
+const MONEY_RX = LC.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
 const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
 
 // <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
@@ -16176,7 +16176,7 @@ function replyWord(text) {
 
 function notClasses(text) {
   let t = String(text).toLowerCase()
-  for (const p of C.not_cut_first) t = t.split(p).join(' ')
+  for (const p of LC.not_cut_first) t = t.split(p).join(' ')
   const found = new Set()
   for (const cls of ['no_have', 'cannot', 'does_not', 'is_not', 'not']) {
     for (const re of NOT_RX[cls]) {
@@ -16192,7 +16192,7 @@ function notClasses(text) {
 }
 const moneyCut = s => {
   let t = String(s).toLowerCase()
-  for (const p of C.money_cut_first) t = t.split(p).join(' ')
+  for (const p of LC.money_cut_first) t = t.split(p).join(' ')
   return t
 }
 // c23's "the same words": lower case, marks dropped, spaces squeezed
@@ -16210,10 +16210,10 @@ function replyFlags(reply, rows, used, talk = {}) {
   if (used && used.some(u => !ids.includes(u) && u.toLowerCase() !== 'none')) out.push('c3 USED not handed')
   const nw = (reply.match(/\S+/g) || []).length
   const ns = reply.trim().split(/(?<=[.!?])\s+/).filter(s => s.trim()).length
-  if (nw > C.max_words) out.push(`c4 words ${nw}`)
-  if (ns > C.max_sentences) out.push(`c5 sentences ${ns}`)
+  if (nw > LC.max_words) out.push(`c4 words ${nw}`)
+  if (ns > LC.max_sentences) out.push(`c5 sentences ${ns}`)
   if (reply.split('?').length - 1 > 1) out.push('c6 two ?')
-  if (R9.test(reply)) out.push('c7 offer')
+  if (LC_R9.test(reply)) out.push('c7 offer')
   for (const n of reply.match(/\b\d[\d.,:]*\b/g) || []) if (!hand.includes(n.toLowerCase())) out.push('c8 number ' + n)
   for (const m of reply.matchAll(/"([^"]{2,40})"/g)) if (!hand.includes(m[1].toLowerCase())) out.push('c9 quoted ' + m[1])
   for (const m of reply.matchAll(/`([^`]+)`|(?:^|\s)(\/[a-z][a-z-]+)|\b(hermes [a-z]+ [a-z-]+)/g)) {
@@ -16223,20 +16223,20 @@ function replyFlags(reply, rows, used, talk = {}) {
   const low = reply.toLowerCase()
   for (const [s, re] of SKILL_RX) if (re.test(low) && !hand.includes(s)) out.push('c11 skill ' + s)
   for (const m of reply.matchAll(/(?<![.!?]\s)(?<!^)\b([A-Z][A-Za-z0-9]+)/g)) if (!OK_CAPS.has(m[1]) && !hand.includes(m[1].toLowerCase())) out.push('c12 name ' + m[1])
-  R6.lastIndex = 0
-  for (const m of reply.matchAll(R6)) if (!hand.includes(m[0].toLowerCase())) out.push('c13 jargon ' + m[0])
+  LC_R6.lastIndex = 0
+  for (const m of reply.matchAll(LC_R6)) if (!hand.includes(m[0].toLowerCase())) out.push('c13 jargon ' + m[0])
   const hc = notClasses(hand)
   for (const cls of [...notClasses(reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
   if (/http|www\.|\(/.test(reply)) out.push('c15 link or (')
-  if (R8.test(reply)) out.push('c16 product word')
-  if (C.test_phrases.some(p => low.includes(p))) out.push('c17 test')
+  if (LC_R8.test(reply)) out.push('c16 product word')
+  if (LC.test_phrases.some(p => low.includes(p))) out.push('c17 test')
   if (reply.includes('?') && /\?\s*$/.test(talk.lastLine || '')) out.push('c18 a second question')
   const mc = moneyCut(reply)
   for (const [m, re] of MONEY_RX) if (re.test(mc) && !hand.includes(m)) out.push('c19 money ' + m)
   const uh = (used || []).filter(u => ids.includes(u)).map(u => textOf[u]).join(' ').toLowerCase()
   if (/\b(only|never)\b/.test(uh) && !/\b(only|never)\b/.test(low)) out.push('c20 dropped only/never')
   if (!ids.length || !used || !used.length || (used.length === 1 && used[0].toLowerCase() === 'none')) {
-    if (/\d/.test(reply) || reply.includes('"') || R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
+    if (/\d/.test(reply) || reply.includes('"') || LC_R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
   }
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
@@ -16283,10 +16283,13 @@ const pickText = ids => fillList(LIVE_DATA.pick_only.text, 'rows', rowLines(ids)
 //   left out: a pasted key (K1), "remember that ..." and its RM line, what Helper keeps asked about by typing
 //   (A1, A2, A4 and their Yes and No), the person's line that gave the name (the answer at "What's your
 //   name?", a name typed later, a name given with a question) and Helper's line that holds that name as typed
+//   (review) and an answer Helper keeps (the AI, the chat app, the service: picked or typed) with the line that
+//   answers it, and a line said from what is kept ("From what I keep: ..."), which shows the kept answer
 const LV_NEVER = /^(?:K1|RM\d|A1|A2|A4|A-none|A-yes|A-no|NAME_AGAIN|NAME_NEW)$/
 function sendable(result) {
   const k = (result && result.kind) || ''
   if (LV_NEVER.test(k)) return { you: false, helper: false }
+  if ((result.kept || []).some(x => x !== 'name') || result.used === 'kept') return { you: false, helper: false }
   return { you: !(k === 'F1' || result.name_taken), helper: true }
 }
 
@@ -16308,7 +16311,8 @@ function lastLines(log, names = []) {
   for (const e of log) {
     if (e.send === false) continue
     const text = e.who === 'you' ? e.text : helperText(e)
-    if (!text || nameRes.some(re => re.test(text))) continue
+    // (review) a line that looks like a secret by Helper's secret rule is never sent, also later
+    if (!text || nameRes.some(re => re.test(text)) || looksSecret(text)) continue
     out.push(`${e.who === 'you' ? 'Person' : 'Helper'}: ${Array.from(text.replace(/\s+/g, ' ').trim()).slice(0, LV_LINE_CHARS).join('')}`)
   }
   return out.slice(-LV_LAST_LINES)
@@ -16317,8 +16321,10 @@ function lastLines(log, names = []) {
 // The input of every call: the lines, then the newest message (as the person typed it, apart from a name given
 // in the same message, which the page cuts off first), cut at 1500 characters.
 function inputText(message, lines) {
-  const t = lines.length ? LV_IN.text.replace('{last_lines}', () => lines.join('\n')) : LV_IN.text_no_lines
-  return Array.from(t.replace('{message}', () => String(message).trim())).slice(0, LV_IN.cut_at_chars).join('')
+  // both slots filled in one pass, so a typed "{message}" in a line is left as typed (review)
+  const fill = { last_lines: lines.join('\n'), message: String(message).trim() }
+  const t = (lines.length ? LV_IN.text : LV_IN.text_no_lines).replace(/\{(last_lines|message)\}/g, (m, k) => fill[k])
+  return Array.from(t).slice(0, LV_IN.cut_at_chars).join('')
 }
 
 // llm.oneshot's params for one call (src/model-call.js: task helping_hand, no session, no profile)
@@ -16378,9 +16384,11 @@ function isHowQuestion(text) {
 //   line as it was before this message ({ last, lastKey, liveRows }); lines: src/live-request.js lastLines;
 //   lastLine: Helper's last line as shown; request: host.request; msLeft(): ms left of the 12 s
 //   onCall(name): told before each call (for the tests' log)
-async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, onCall = () => {} }) {
+//   alive(): false once the page has closed this turn (12 s, or the next message): no further call starts
+async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {} }) {
   const input = inputText(message, lines)
   const call = async (name, instructions, maxTokens) => {
+    if (!alive()) return null
     onCall(name)
     try {
       const res = await request('llm.oneshot', liveParams(instructions, input, maxTokens), ONESHOT_TIMEOUT_MS)
@@ -16391,7 +16399,8 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
   }
   let ids = null
   if (isFollowUp(text, pre, before)) ids = followRows(before)
-  else {
+  if (!ids || !ids.length) {
+    ids = null
     const w = byWords(message)
     if (w.length) ids = withNext(w)
   }
@@ -16443,7 +16452,8 @@ function liveApply(st, got, out, before, text) {
   st.lastq = false
   noteLast(st, r)
   if (r.kind === 'written') {
-    st.last = 'written'
+    // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
+    st.last = (r.used || []).some(u => u.toLowerCase() !== 'none') ? 'written' : 'written-talk'
     st.lastKey = writtenKey(r.text)
   }
   st.liveRows = got.rows && got.rows.length ? { key: st.lastKey, ids: got.rows } : null
@@ -18775,7 +18785,7 @@ function makePage(ctx, opts = {}) {
   // call starts until it is 0, so at most one Helper call is ever in Hermes), the model status the page checked
   // last, and the mounted page's setters (null while the page is off screen: a turn that ends then still adds its
   // line to the conversation kept in memory).
-  const live = { n: 0, waiting: null, inHermes: 0, status: { state: 'checking' }, view: null, log: [] }
+  const live = { n: 0, waiting: null, inHermes: 0, status: { state: 'checking' }, view: null }
   // The values a line sent to the AI must not hold (input.never_sent, name_check): the kept name and this
   // visit's name, the kept answers in Helper's words and as stored, and what the person asked Helper to keep.
   const keptValues = () => {
@@ -18799,7 +18809,6 @@ function makePage(ctx, opts = {}) {
     writeKept()
     const entry = { ...helperEntry(said), send: w.sendHelper }
     memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
-    live.log.push({ n: w.n, how: final ? 'ai' : 'fallback', why: w.why || null })
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -18902,8 +18911,16 @@ function makePage(ctx, opts = {}) {
     const [modelStatus, recheck] = useModelStatus()
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
-    live.view = { setLog, setFocusAsk }
-    useEffect(() => () => (live.view = null), [])
+    // (review) the page drawn last holds the view; a page that leaves lets go only of its own
+    const mineView = useRef(null)
+    mineView.current = { setLog, setFocusAsk }
+    live.view = mineView.current
+    useEffect(
+      () => () => {
+        if (live.view === mineView.current) live.view = null
+      },
+      []
+    )
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
     // The conversation's scrolling area: kept at the bottom, where the newest words are.
@@ -19081,10 +19098,7 @@ function makePage(ctx, opts = {}) {
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes })
-      if (why) {
-        live.log.push({ how: 'code', why })
-        return answer(result, result.kind === 'K1' ? null : shown, typed)
-      }
+      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
       // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
@@ -19093,10 +19107,7 @@ function makePage(ctx, opts = {}) {
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      w.stopTimer = ctx.setTimeout(() => {
-        w.why = '12 seconds'
-        liveFinish(w, null)
-      }, LIVE_SECONDS * 1000)
+      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
       const request = (method, params, timeout) => {
         live.inHermes++
@@ -19110,10 +19121,9 @@ function makePage(ctx, opts = {}) {
           live.inHermes--
         })
       }
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started) })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w })
         .then(got => {
           if (live.waiting !== w) return
-          w.why = got.fallback || null
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })
         .catch(() => liveFinish(w, null))

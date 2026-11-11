@@ -110,7 +110,7 @@ test('what may be sent of the conversation: the last 4 lines, the name\'s lines 
   assert.deepEqual(got, ["Helper: Hi, I'm Helper. What's your name?", 'Helper: Nice to meet you. What do you do?', 'Helper: Glad to help.'])
   assert.doesNotMatch(got.join('\n'), /peter|whatsapp|six courts/i)
   // each line cut at 200 characters, at most 4
-  const long = Array.from({ length: 6 }, (_, i) => ({ who: 'you', text: String(i).repeat(300) }))
+  const long = Array.from({ length: 6 }, (_, i) => ({ who: 'you', text: `line ${i} `.repeat(40) }))
   const cut = lastLines(long)
   assert.equal(cut.length, 4)
   assert.ok(cut.every(l => l.length === 'Person: '.length + 200))

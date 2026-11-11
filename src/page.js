@@ -160,7 +160,7 @@ export function makePage(ctx, opts = {}) {
   // call starts until it is 0, so at most one Helper call is ever in Hermes), the model status the page checked
   // last, and the mounted page's setters (null while the page is off screen: a turn that ends then still adds its
   // line to the conversation kept in memory).
-  const live = { n: 0, waiting: null, inHermes: 0, status: { state: 'checking' }, view: null, log: [] }
+  const live = { n: 0, waiting: null, inHermes: 0, status: { state: 'checking' }, view: null }
   // The values a line sent to the AI must not hold (input.never_sent, name_check): the kept name and this
   // visit's name, the kept answers in Helper's words and as stored, and what the person asked Helper to keep.
   const keptValues = () => {
@@ -184,7 +184,6 @@ export function makePage(ctx, opts = {}) {
     writeKept()
     const entry = { ...helperEntry(said), send: w.sendHelper }
     memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
-    live.log.push({ n: w.n, how: final ? 'ai' : 'fallback', why: w.why || null })
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -287,8 +286,16 @@ export function makePage(ctx, opts = {}) {
     const [modelStatus, recheck] = useModelStatus()
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
-    live.view = { setLog, setFocusAsk }
-    useEffect(() => () => (live.view = null), [])
+    // (review) the page drawn last holds the view; a page that leaves lets go only of its own
+    const mineView = useRef(null)
+    mineView.current = { setLog, setFocusAsk }
+    live.view = mineView.current
+    useEffect(
+      () => () => {
+        if (live.view === mineView.current) live.view = null
+      },
+      []
+    )
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
     // The conversation's scrolling area: kept at the bottom, where the newest words are.
@@ -466,10 +473,7 @@ export function makePage(ctx, opts = {}) {
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
       const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes })
-      if (why) {
-        live.log.push({ how: 'code', why })
-        return answer(result, result.kind === 'K1' ? null : shown, typed)
-      }
+      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
       // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
@@ -478,10 +482,7 @@ export function makePage(ctx, opts = {}) {
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      w.stopTimer = ctx.setTimeout(() => {
-        w.why = '12 seconds'
-        liveFinish(w, null)
-      }, LIVE_SECONDS * 1000)
+      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
       const request = (method, params, timeout) => {
         live.inHermes++
@@ -495,10 +496,9 @@ export function makePage(ctx, opts = {}) {
           live.inHermes--
         })
       }
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started) })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w })
         .then(got => {
           if (live.waiting !== w) return
-          w.why = got.fallback || null
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })
         .catch(() => liveFinish(w, null))

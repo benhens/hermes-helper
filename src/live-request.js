@@ -6,6 +6,7 @@ import { LIVE_DATA } from './live-data.js'
 import { LIVE_ROW } from './live-rows.js'
 import { TALK_DATA } from './talk-data.js'
 import { oneshotParams } from './model-call.js'
+import { looksSecret } from './secret-rule.js'
 
 const LV_IN = LIVE_DATA.input
 const LV_FIXED = TALK_DATA.fixed
@@ -29,10 +30,13 @@ export const pickText = ids => fillList(LIVE_DATA.pick_only.text, 'rows', rowLin
 //   left out: a pasted key (K1), "remember that ..." and its RM line, what Helper keeps asked about by typing
 //   (A1, A2, A4 and their Yes and No), the person's line that gave the name (the answer at "What's your
 //   name?", a name typed later, a name given with a question) and Helper's line that holds that name as typed
+//   (review) and an answer Helper keeps (the AI, the chat app, the service: picked or typed) with the line that
+//   answers it, and a line said from what is kept ("From what I keep: ..."), which shows the kept answer
 const LV_NEVER = /^(?:K1|RM\d|A1|A2|A4|A-none|A-yes|A-no|NAME_AGAIN|NAME_NEW)$/
 export function sendable(result) {
   const k = (result && result.kind) || ''
   if (LV_NEVER.test(k)) return { you: false, helper: false }
+  if ((result.kept || []).some(x => x !== 'name') || result.used === 'kept') return { you: false, helper: false }
   return { you: !(k === 'F1' || result.name_taken), helper: true }
 }
 
@@ -54,7 +58,8 @@ export function lastLines(log, names = []) {
   for (const e of log) {
     if (e.send === false) continue
     const text = e.who === 'you' ? e.text : helperText(e)
-    if (!text || nameRes.some(re => re.test(text))) continue
+    // (review) a line that looks like a secret by Helper's secret rule is never sent, also later
+    if (!text || nameRes.some(re => re.test(text)) || looksSecret(text)) continue
     out.push(`${e.who === 'you' ? 'Person' : 'Helper'}: ${Array.from(text.replace(/\s+/g, ' ').trim()).slice(0, LV_LINE_CHARS).join('')}`)
   }
   return out.slice(-LV_LAST_LINES)
@@ -63,8 +68,10 @@ export function lastLines(log, names = []) {
 // The input of every call: the lines, then the newest message (as the person typed it, apart from a name given
 // in the same message, which the page cuts off first), cut at 1500 characters.
 export function inputText(message, lines) {
-  const t = lines.length ? LV_IN.text.replace('{last_lines}', () => lines.join('\n')) : LV_IN.text_no_lines
-  return Array.from(t.replace('{message}', () => String(message).trim())).slice(0, LV_IN.cut_at_chars).join('')
+  // both slots filled in one pass, so a typed "{message}" in a line is left as typed (review)
+  const fill = { last_lines: lines.join('\n'), message: String(message).trim() }
+  const t = (lines.length ? LV_IN.text : LV_IN.text_no_lines).replace(/\{(last_lines|message)\}/g, (m, k) => fill[k])
+  return Array.from(t).slice(0, LV_IN.cut_at_chars).join('')
 }
 
 // llm.oneshot's params for one call (src/model-call.js: task helping_hand, no session, no profile)

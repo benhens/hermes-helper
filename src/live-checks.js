@@ -9,18 +9,18 @@ import { pyRegExp } from './secret-rule.js'
 import { TALK_DATA } from './talk-data.js'
 import { talkNorm, whichOf } from './talk.js'
 
-const C = LIVE_DATA.checks
+const LC = LIVE_DATA.checks
 const SUBJECT_IDS = LIVE_DATA.subjects.map(s => s.id)
-const R9 = pyRegExp(C.r9_pattern, 'i')
-const R6 = pyRegExp(C.r6_pattern, 'gi')
-const R8 = new RegExp('\\b(?:' + C.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i')
-const R5 = C.r5_patterns.map(p => pyRegExp(p, 'i'))
-const GLOSS_RX = C.gloss.map(g => [pyRegExp(g.term, g.ignore_case ? 'i' : ''), pyRegExp(g.explained_by, 'i')])
-const OK_CAPS = new Set(C.ok_caps)
+const LC_R9 = pyRegExp(LC.r9_pattern, 'i')
+const LC_R6 = pyRegExp(LC.r6_pattern, 'gi')
+const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i')
+const LC_R5 = LC.r5_patterns.map(p => pyRegExp(p, 'i'))
+const GLOSS_RX = LC.gloss.map(g => [pyRegExp(g.term, g.ignore_case ? 'i' : ''), pyRegExp(g.explained_by, 'i')])
+const OK_CAPS = new Set(LC.ok_caps)
 const liveEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const SKILL_RX = C.skills.map(s => [s.toLowerCase(), new RegExp('(^|[^a-z0-9-])' + liveEsc(s.toLowerCase()) + '($|[^a-z0-9-])')])
-const NOT_RX = Object.fromEntries(Object.entries(C.not_words).map(([cls, ws]) => [cls, ws.map(w => new RegExp("(^|[^a-z'])" + liveEsc(w) + "($|[^a-z'])", 'g'))]))
-const MONEY_RX = C.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
+const SKILL_RX = LC.skills.map(s => [s.toLowerCase(), new RegExp('(^|[^a-z0-9-])' + liveEsc(s.toLowerCase()) + '($|[^a-z0-9-])')])
+const NOT_RX = Object.fromEntries(Object.entries(LC.not_words).map(([cls, ws]) => [cls, ws.map(w => new RegExp("(^|[^a-z'])" + liveEsc(w) + "($|[^a-z'])", 'g'))]))
+const MONEY_RX = LC.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
 const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
 
 // <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
@@ -68,7 +68,7 @@ export function replyWord(text) {
 
 function notClasses(text) {
   let t = String(text).toLowerCase()
-  for (const p of C.not_cut_first) t = t.split(p).join(' ')
+  for (const p of LC.not_cut_first) t = t.split(p).join(' ')
   const found = new Set()
   for (const cls of ['no_have', 'cannot', 'does_not', 'is_not', 'not']) {
     for (const re of NOT_RX[cls]) {
@@ -84,7 +84,7 @@ function notClasses(text) {
 }
 const moneyCut = s => {
   let t = String(s).toLowerCase()
-  for (const p of C.money_cut_first) t = t.split(p).join(' ')
+  for (const p of LC.money_cut_first) t = t.split(p).join(' ')
   return t
 }
 // c23's "the same words": lower case, marks dropped, spaces squeezed
@@ -102,10 +102,10 @@ export function replyFlags(reply, rows, used, talk = {}) {
   if (used && used.some(u => !ids.includes(u) && u.toLowerCase() !== 'none')) out.push('c3 USED not handed')
   const nw = (reply.match(/\S+/g) || []).length
   const ns = reply.trim().split(/(?<=[.!?])\s+/).filter(s => s.trim()).length
-  if (nw > C.max_words) out.push(`c4 words ${nw}`)
-  if (ns > C.max_sentences) out.push(`c5 sentences ${ns}`)
+  if (nw > LC.max_words) out.push(`c4 words ${nw}`)
+  if (ns > LC.max_sentences) out.push(`c5 sentences ${ns}`)
   if (reply.split('?').length - 1 > 1) out.push('c6 two ?')
-  if (R9.test(reply)) out.push('c7 offer')
+  if (LC_R9.test(reply)) out.push('c7 offer')
   for (const n of reply.match(/\b\d[\d.,:]*\b/g) || []) if (!hand.includes(n.toLowerCase())) out.push('c8 number ' + n)
   for (const m of reply.matchAll(/"([^"]{2,40})"/g)) if (!hand.includes(m[1].toLowerCase())) out.push('c9 quoted ' + m[1])
   for (const m of reply.matchAll(/`([^`]+)`|(?:^|\s)(\/[a-z][a-z-]+)|\b(hermes [a-z]+ [a-z-]+)/g)) {
@@ -115,20 +115,20 @@ export function replyFlags(reply, rows, used, talk = {}) {
   const low = reply.toLowerCase()
   for (const [s, re] of SKILL_RX) if (re.test(low) && !hand.includes(s)) out.push('c11 skill ' + s)
   for (const m of reply.matchAll(/(?<![.!?]\s)(?<!^)\b([A-Z][A-Za-z0-9]+)/g)) if (!OK_CAPS.has(m[1]) && !hand.includes(m[1].toLowerCase())) out.push('c12 name ' + m[1])
-  R6.lastIndex = 0
-  for (const m of reply.matchAll(R6)) if (!hand.includes(m[0].toLowerCase())) out.push('c13 jargon ' + m[0])
+  LC_R6.lastIndex = 0
+  for (const m of reply.matchAll(LC_R6)) if (!hand.includes(m[0].toLowerCase())) out.push('c13 jargon ' + m[0])
   const hc = notClasses(hand)
   for (const cls of [...notClasses(reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
   if (/http|www\.|\(/.test(reply)) out.push('c15 link or (')
-  if (R8.test(reply)) out.push('c16 product word')
-  if (C.test_phrases.some(p => low.includes(p))) out.push('c17 test')
+  if (LC_R8.test(reply)) out.push('c16 product word')
+  if (LC.test_phrases.some(p => low.includes(p))) out.push('c17 test')
   if (reply.includes('?') && /\?\s*$/.test(talk.lastLine || '')) out.push('c18 a second question')
   const mc = moneyCut(reply)
   for (const [m, re] of MONEY_RX) if (re.test(mc) && !hand.includes(m)) out.push('c19 money ' + m)
   const uh = (used || []).filter(u => ids.includes(u)).map(u => textOf[u]).join(' ').toLowerCase()
   if (/\b(only|never)\b/.test(uh) && !/\b(only|never)\b/.test(low)) out.push('c20 dropped only/never')
   if (!ids.length || !used || !used.length || (used.length === 1 && used[0].toLowerCase() === 'none')) {
-    if (/\d/.test(reply) || reply.includes('"') || R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
+    if (/\d/.test(reply) || reply.includes('"') || LC_R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
   }
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')

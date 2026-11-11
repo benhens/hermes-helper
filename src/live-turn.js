@@ -60,9 +60,11 @@ function isHowQuestion(text) {
 //   line as it was before this message ({ last, lastKey, liveRows }); lines: src/live-request.js lastLines;
 //   lastLine: Helper's last line as shown; request: host.request; msLeft(): ms left of the 12 s
 //   onCall(name): told before each call (for the tests' log)
-export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, onCall = () => {} }) {
+//   alive(): false once the page has closed this turn (12 s, or the next message): no further call starts
+export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {} }) {
   const input = inputText(message, lines)
   const call = async (name, instructions, maxTokens) => {
+    if (!alive()) return null
     onCall(name)
     try {
       const res = await request('llm.oneshot', liveParams(instructions, input, maxTokens), ONESHOT_TIMEOUT_MS)
@@ -73,7 +75,8 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
   }
   let ids = null
   if (isFollowUp(text, pre, before)) ids = followRows(before)
-  else {
+  if (!ids || !ids.length) {
+    ids = null
     const w = byWords(message)
     if (w.length) ids = withNext(w)
   }
@@ -125,7 +128,8 @@ export function liveApply(st, got, out, before, text) {
   st.lastq = false
   noteLast(st, r)
   if (r.kind === 'written') {
-    st.last = 'written'
+    // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
+    st.last = (r.used || []).some(u => u.toLowerCase() !== 'none') ? 'written' : 'written-talk'
     st.lastKey = writtenKey(r.text)
   }
   st.liveRows = got.rows && got.rows.length ? { key: st.lastKey, ids: got.rows } : null

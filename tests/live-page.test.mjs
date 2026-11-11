@@ -47,7 +47,7 @@ async function open(mode, { storage = fakeStorage(), host = {} } = {}) {
   const { Page } = await registerPlugin(storage, timers, {}, src => aiModeSource(src, mode))
   const view = mount(Page)
   await settle()
-  return { view, timers, host: h, storage }
+  return { view, timers, host: h, storage, Page }
 }
 const helper = view => byData(view.tree, 'helper')
 const bubble = view => byData(helper(view), 'bubble')
@@ -253,4 +253,91 @@ test('the waiting dots: still and all alike under reduce motion; the label is sa
   assert.deepEqual(all(node, n => n.type === 'i').map(n => n.props.className), [undefined, undefined, undefined])
   d.resolve('NONE')
   await settle()
+})
+
+/* ---------- review fixes (the reviewer's findings 1 to 4 and 12, each reproduced first) ---------- */
+const answers = view => all(view.tree, n => n.props['data-hh'] === 'answer')
+const pickLabel = (view, label) => {
+  finish(view)
+  const a = answers(view).find(x => text(x).trim() === label)
+  if (!a) throw new Error(`no pick ${label}: ${answers(view).map(x => text(x).trim())}`)
+  a.props.onClick({ preventDefault() {} })
+}
+
+test('a kept answer is never sent: the picked "Claude" and Helper\'s line for it stay out of every later request', async () => {
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => 'NONE' } })
+  send(view, 'what can I ask')
+  pickLabel(view, 'Which AI to use')
+  const labels = answers(view).map(x => text(x).trim())
+  const paid = labels.find(l => /claude/i.test(l)) || labels[0]
+  pickLabel(view, paid)
+  finish(view)
+  const answerLine = said(view).replace(/[\u201c\u201d]/g, '"').replace(/\u2019/g, "'")
+  for (const m of ['tell me a joke', 'is it safe']) {
+    send(view, m)
+    await settle()
+    finish(view)
+  }
+  assert.ok(host.asks.length >= 2)
+  // the person's pick and Helper's line that answers it (which shows the kept answer) are never sent; Helper's own
+  // question before it ("Do you already pay for ChatGPT or Claude?") is no kept value and may be
+  const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  for (const p of host.asks) {
+    assert.doesNotMatch(p.input, new RegExp('Person: ' + esc(paid) + '$', 'm'), p.input)
+    assert.ok(!p.input.includes(answerLine.slice(0, 40)), p.input)
+  }
+})
+
+test('a message that looked secret is never sent later as one of the last lines', async () => {
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => 'NONE' } })
+  send(view, 'my password is hunter2, now what')
+  await settle()
+  assert.equal(host.asks.length, 0)
+  send(view, 'tell me a joke')
+  await settle()
+  assert.equal(host.asks.length, 1)
+  assert.doesNotMatch(host.asks[0].input, /hunter2|password/i)
+})
+
+test('a turn closed by the next message starts no second call when its first call comes back', async () => {
+  const d = deferred()
+  const { view, host } = await pastOpening('ai_writes', { host: { oneshot: (p, n) => (n === 1 ? d.promise : goodReply('mem0')) } })
+  send(view, 'tell me a joke')
+  await settle()
+  assert.equal(host.asks.length, 1)
+  send(view, 'what is a skill')
+  d.resolve('mem')
+  await settle()
+  assert.equal(host.asks.length, 1, 'no writer call for a turn that is closed')
+  assert.equal(line(view), 'term-skill')
+})
+
+test('the page off screen and back during the wait: the line still lands, also when the new page was drawn before the old one let go', async () => {
+  const d = deferred()
+  const o = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+  send(o.view, 'how do I update hermes')
+  await settle()
+  // a second page drawn first, then the first one leaves (React may do it in this order)
+  const second = mount(o.Page)
+  o.view.unmount()
+  d.resolve(goodReply('sch1'))
+  await settle()
+  assert.equal(line(second), 'written')
+  assert.equal(dots(second), null)
+})
+
+test('the waiting dots under reduce motion: all three still and alike (hh-still), no moving dot', async () => {
+  const setting = { matches: true, addEventListener() {}, removeEventListener() {} }
+  globalThis.matchMedia = () => setting
+  try {
+    const d = deferred()
+    const { view } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
+    send(view, 'how do I update hermes')
+    assert.match(dots(view).props.className, /hh-still/)
+    assert.doesNotMatch(dots(view).props.className, /hh-wait/)
+    d.resolve('NONE')
+    await settle()
+  } finally {
+    delete globalThis.matchMedia
+  }
 })
