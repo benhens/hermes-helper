@@ -30,11 +30,15 @@ test('every selector is one of our own hhd- classes (in the light theme, under H
     "@property --hhd-arc{syntax:'<angle>';inherits:false;initial-value:0deg}",
     '@keyframes hhd-arc-turn{to{--hhd-arc:360deg}}',
     // look-fix: a banner narrower than 600 px draws no character, only the dot field at 30%
-    `@container (max-width:599px){.${D.bannerChar}{display:none}.${D.bannerArt}{width:100%;opacity:.3}.${D.bannerTitle},.${D.bannerLine},.${D.bannerOpen}{max-width:100%}}`,
+    // (a container query measures the content box: 600 less the banner's 2 x 20 px padding)
+    `@container (max-width:559px){.${D.bannerChar}{display:none}.${D.bannerArt}{width:100%;opacity:.3}.${D.bannerTitle},.${D.bannerLine},.${D.bannerOpen}{max-width:100%}}`,
     `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`,
     // look-fix (PICK.md way 3): the card's sign 96 px (140 x .686) at .5 under 300 px of card, gone under 240 px
-    `@container (max-width:299px){.${D.scardSign}{transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
-    `@container (max-width:239px){.${D.scardSign}{display:none}.${D.scardWhy}{max-width:none}}`
+    // (content box: 300 and 240 less 2 x 20 px padding and 2 x 1 px border; the compact card's padding is 2 x 12 px)
+    `@container (max-width:257px){.${D.scardSign}{transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
+    `@container (max-width:197px){.${D.scardSign}{display:none}.${D.scardWhy}{max-width:none}}`,
+    `@container (max-width:273px){.${D.compact} .${D.scardSign}{transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
+    `@container (max-width:213px){.${D.compact} .${D.scardSign}{display:none}.${D.compact} .${D.scardWhy}{max-width:none}}`
   ])
   for (const rule of rules.filter(r => !r.startsWith('@'))) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
   for (const c of classesIn(rules.map(r => r.slice(0, r.indexOf('{'))).join('\n'))) assert.ok(c.startsWith('hhd-') || c === 'dark', c)
@@ -153,7 +157,7 @@ test('look-fix: the banner (mockup dash-look-r8): 20 px padding, 12 px gap, at l
   assert.match(rule(`.${D.bannerChar}`), /position:absolute;right:5%;bottom:0;z-index:-1;pointer-events:none/)
   assert.doesNotMatch(DASH_CSS, /bottom:-/)
   // narrow: the container rule (checked whole in the at-rules test)
-  assert.ok(rules.some(r => r.startsWith('@container (max-width:599px){') && r.includes(`.${D.bannerChar}{display:none}`) && r.includes(`.${D.bannerArt}{width:100%;opacity:.3}`)))
+  assert.ok(rules.some(r => r.startsWith('@container (max-width:559px){') && r.includes(`.${D.bannerChar}{display:none}`) && r.includes(`.${D.bannerArt}{width:100%;opacity:.3}`)))
 })
 
 /* ---------- dash-v2: hhdesign's review of 65b108b (design/dash-r7/review-65b108b.md, "For builder") ---------- */
