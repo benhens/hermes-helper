@@ -261,8 +261,10 @@ test('buttons are Hermes Button components; bare <button>s only where Hermes use
   const own = [...src('talk-view.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (T\.\w+|cx\(T\.\w+, a\.more && T\.more\)),/g)].map(m => m[1])
   // (talk v2: and the links in the faint lines, "See what I keep" and "Change", wearing T.link;
   // talk v2 look: "More" among the answers also wears T.more)
-  assert.deepEqual(own.sort(), ['T.button', 'T.link', 'T.link', 'T.oldLink', 'cx(T.answer, a.more && T.more)'])
-  assert.equal([...src('talk-view.js').matchAll(/jsxs?\(\s*'button'/g)].length, 5)
+  // (chat-fix: a quick reply under the model's reply wears T.answer, as the things to pick do; an older reply's link
+  // to its card wears T.oldLink, as an older line's other links do)
+  assert.deepEqual(own.sort(), ['T.answer', 'T.button', 'T.link', 'T.link', 'T.oldLink', 'T.oldLink', 'cx(T.answer, a.more && T.more)'])
+  assert.equal([...src('talk-view.js').matchAll(/jsxs?\(\s*'button'/g)].length, 7)
   // Helper's settings page uses Hermes's Button only
   assert.doesNotMatch(src('settings-page.js'), /jsxs?\(\s*'button'/)
 })

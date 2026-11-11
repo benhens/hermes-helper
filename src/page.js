@@ -23,7 +23,7 @@ import { prefersReducedMotion, watchReducedMotion } from './motion.js'
 import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS, NO_MODEL_LINE } from './model-status.js'
 import { askModel, failLines, FAIL_LINES } from './model-call.js'
-import { chatCall, chatHello, chatBack, chatHoldsBack } from './chat.js'
+import { chatCall, chatHello, chatBack, chatHoldsBack, chatParts } from './chat.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { typedAboutKept, laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor, noteLast } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
@@ -46,6 +46,8 @@ const GRIP_KEY_PX = 16
 const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
+// chat-fix: how far under the conversation's top edge a long reply's first line is shown (the edge fades over 20 px)
+const CHAT_TOP_PX = 24
 
 // loom2 (his Loom of 11 Nov, 1:51 "take out the learn and just have this set up"): no tabs. With only the Dashboard
 // left there is no tab row: the page is the Dashboard. A stored tab ('learn', or an older name) is not read.
@@ -301,8 +303,10 @@ export function makePage(ctx, opts = {}) {
       .then(() => askModel({ request, call, recheck: () => checkModel(request, { sleep }), sleep }))
       .catch(() => ({ ok: false, kind: 'other' }))
       .then(r => {
-        const text = r && r.ok ? chatClean(r.text) : ''
-        if (text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', text, { md: true })), send: true })
+        // chat-fix: the reply's marks in double square brackets are taken out of its words (src/chat.js chatParts): the
+        // choices and the card they name are drawn under it; a reply with no words left counts as no reply
+        const parts = chatParts(r && r.ok ? chatClean(r.text) : '')
+        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick, card: parts.card })), send: true })
         lookAgain()
         const kind = r && !r.ok ? r.kind : 'other'
         const f = FAIL_LINES[kind] || FAIL_LINES.other
@@ -683,9 +687,17 @@ export function makePage(ctx, opts = {}) {
     // (By the newest entry's id, not the count: the count stops changing once the log is full.
     // The style sheet keeps it at its newest when the window or the message box changes size.)
     const newestId = log.length ? log[log.length - 1].id : 0
+    // chat-fix (his words on build 11f4eda: the end of a long reply was what he saw, cut off): a reply of the model is
+    // the last line of the part that scrolls. When it is higher than the room, the conversation shows it from its
+    // first line, CHAT_TOP_PX under the top edge (the edge fades over 20 px), and the person scrolls down through it.
     const scrollToNewest = () => {
       const el = helperScroll.current
-      if (el) el.scrollTop = el.scrollHeight
+      if (!el) return
+      el.scrollTop = el.scrollHeight
+      const reply = typeof el.querySelector === 'function' ? el.querySelector('[data-hh="bubble"]') : null
+      if (!reply || typeof reply.getBoundingClientRect !== 'function') return
+      const top = reply.getBoundingClientRect().top - el.getBoundingClientRect().top
+      if (top < CHAT_TOP_PX) el.scrollTop += top - CHAT_TOP_PX
     }
     useEffect(scrollToNewest, [newestId, helperShown])
     // loom-fixes (Lead's point 17b): every change of the conversation is kept (the last 50 lines)
@@ -967,6 +979,11 @@ export function makePage(ctx, opts = {}) {
       const typed = draft
       if (!typed.trim()) return
       setDraft('')
+      sendText(typed)
+    }
+    // chat-fix: a quick reply under Helper's reply is sent the same way, as the person's message
+    function sendText(typed) {
+      if (!String(typed).trim()) return
       const chars = Array.from(typed.trim())
       const shown = chars.length > 2000 ? chars.slice(0, 2000).join('') + '…' : chars.join('')
       if (chatHoldsBack(typed)) {
@@ -1301,8 +1318,10 @@ export function makePage(ctx, opts = {}) {
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
             winBar,
-            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
-            inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { reduced }, 'bubble'),
+            // chat-fix: a reply of the model (md) is drawn inside the part that scrolls, as its last line; Helper's own
+            // short lines and the waiting dots stay in the bubble over the character
+            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, last: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard }, 'bubble') : null }, 'conversation'),
+            inBubble ? (inBubble.md ? null : jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble')) : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer
           ]

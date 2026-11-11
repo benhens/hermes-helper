@@ -18,7 +18,7 @@
 //     used:    null | { text, link, topic }   the faint "From what I keep: ..." line, the same place
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
-import { Codicon, CopyButton } from '@hermes/plugin-sdk'
+import { Button, Codicon, CopyButton } from '@hermes/plugin-sdk'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, T, cx } from './look.js'
@@ -28,7 +28,8 @@ import { columnsFor, linesAllowed } from './layout.js'
 import { noteForgotten } from './talk.js'
 import { curlyQuotes } from './quotes.js'
 import { mdBlocks } from './md.js'
-import { isHermesDocsUrl } from './dash.js'
+import { isHermesDocsUrl, CardVideo } from './dash.js'
+import { DASH_DATA } from './dash-data.js'
 // A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js), and
 // (talk-live-3) text to type in the paste box's code style (src/reveal.js drawnWords)
 const drawn = (text, asTyped) => drawnWords(curlyQuotes(text, asTyped))
@@ -168,7 +169,9 @@ function notesOf(entry, onNote, kept) {
 // notes-wants.md rule C point 3, settled by Lead): steps or text to paste opened under it close when the
 // line moves up into the older lines (src/page.js), and its link stays, so one click opens them again
 // here; no wall of text. Text to paste that came with the line itself (H1's) stays.
-function OldLine({ entry, onNext }) {
+function OldLine({ entry, onNext, onCard }) {
+  // chat-fix: a reply about a card keeps a small link to that card once it is an older line (no video place there)
+  const cardOf = entry.md && entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
@@ -184,6 +187,7 @@ function OldLine({ entry, onNext }) {
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
       entry.md ? jsx(Markdown, { text: entry.text, old: true }, 'md') : drawn(entry.text, entry.asTyped),
+      cardOf ? jsxs('button', { type: 'button', className: T.oldLink, 'data-hh': 'old-card-open', 'data-card': cardOf.id, onClick: () => onCard && onCard(cardOf.id), children: [`Open ${cardOf.name} on the Dashboard`, jsx(Codicon, { name: 'arrow-right' }, 'icon')] }, 'card') : null,
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
@@ -221,7 +225,7 @@ function convFade(el) {
   const v = above && below ? 'both' : above ? 'top' : below ? 'bottom' : ''
   if (el.dataset.fade !== v) el.dataset.fade = v
 }
-export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef }) {
+export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, last = null, onCard }) {
   // talk v2 look (hhdesign's notes-wants.md rule C point 1): an edge of the conversation fades out over
   // 20 px, as Hermes's own FadeScroll does, but only an edge that has something hidden behind it. The
   // conversation stacks from its bottom (column-reverse), so in Chromium its scrollTop is 0 at the newest
@@ -244,10 +248,13 @@ export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef 
     if (e.who === 'you') items.push(jsxs('div', { className: T.me, 'data-hh': 'me', children: [jsx('span', { className: K.srOnly, children: 'You said: ' }, 'who'), e.text] }, e.id))
     else {
       items.push(...notesOf(e, onNote, kept))
-      items.push(jsx(OldLine, { entry: e, onNext }, e.id))
+      items.push(jsx(OldLine, { entry: e, onNext, onCard }, e.id))
     }
   }
   if (newest) items.push(...notesOf(newest, onNote, kept))
+  // chat-fix: a reply of the model is the last line of the part that scrolls (the page hands its bubble in), so a long
+  // one can be scrolled and pushes nothing out of the window
+  if (last) items.push(last)
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,
@@ -268,7 +275,42 @@ export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef 
 // is kept, a faint hint, a button or text to paste sit inside the bubble under a thin line; their
 // room is held too, and they show (and can be reached with the keyboard) when the line is said.
 //   said: every word of the line is on screen
-export function Bubble({ entry, clock, fresh, said, onNext }) {
+// chat-fix: what the model's marks become, under its reply. A card: that card's video place exactly as the Dashboard's
+// opened card shows it (src/dash.js CardVideo) and a button that opens the card there. Quick replies: up to three
+// small buttons; a click sends that text as the person's message. An id that is no card shows nothing.
+export function ChatExtras({ entry, onQuick, onCard }) {
+  const it = entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
+  const quick = Array.isArray(entry.quick) ? entry.quick : []
+  return [
+    it
+      ? jsxs(
+          'div',
+          {
+            className: T.chatCard,
+            'data-hh': 'chat-card',
+            'data-card': it.id,
+            children: [jsx(CardVideo, { it }, 'video'), jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'chat-card-open', onClick: () => onCard && onCard(it.id), children: `Open ${it.name} on the Dashboard` }, 'open')]
+          },
+          'card'
+        )
+      : null,
+    quick.length
+      ? jsx(
+          'div',
+          {
+            className: T.quick,
+            role: 'group',
+            'aria-label': 'Quick replies',
+            'data-hh': 'quick',
+            children: quick.map(q => jsx('button', { type: 'button', className: T.answer, 'data-hh': 'quick-reply', onClick: () => onQuick && onQuick(q), children: q }, q))
+          },
+          'quick'
+        )
+      : null
+  ]
+}
+
+export function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
@@ -304,6 +346,7 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
     'aria-live': 'polite',
     children: [
       entry.md ? jsx(Markdown, { text: entry.text }, entry.key) : jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
+      ...(entry.md ? ChatExtras({ entry, onQuick, onCard }) : []),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,

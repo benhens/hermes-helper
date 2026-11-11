@@ -174,3 +174,16 @@
 .hh-md li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}
 .hh-md a{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}
 .hh-md.hh-md-old{font-size:13px;line-height:19px;gap:5px;color:var(--ui-text-secondary)}
+/* chat-fix (his words on build 11f4eda: "I can't move the chat anymore. I can't see him"): a long reply filled the
+   whole window, because the newest bubble sat under the part that scrolls and never shrank. A reply of the model is
+   now drawn inside the part that scrolls, as its last line (src/page.js), 14 px under the line before it as before.
+   And no bubble left under the conversation can push the character or the message box out: it shrinks and scrolls
+   inside itself before that. */
+.hh-conv-in>.hh-bubble{margin-top:5px}
+.hh-win>.hh-bubble{flex:0 1 auto;min-height:0;overflow:hidden auto}
+/* chat-fix: the choices under a reply (the model's quick replies): the look of the things to pick, a size smaller */
+.hh-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.hh-quick .hh-answer{min-height:27px;padding:3px 11px;font-size:13px;line-height:19px}
+/* chat-fix: a card's video place under a reply, as the Dashboard's opened card shows it, and its Open button.
+   --hhd-round: the Dashboard's sheet takes its corners from it, and it is set on the Dashboard only. */
+.hh-chat-card{--hhd-round:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px;min-width:0;width:100%}

@@ -329,7 +329,10 @@ export const T = {
   gripPill: 'hh-grip-pill',
   // normal-chat: the model's reply, drawn from its markdown (src/talk-view.js Markdown); smaller in an older line
   md: 'hh-md',
-  mdOld: 'hh-md-old'
+  mdOld: 'hh-md-old',
+  // chat-fix: under a reply, the choices the model gave (buttons) and a card's video place with its Open button
+  quick: 'hh-quick',
+  chatCard: 'hh-chat-card'
 }
 
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
