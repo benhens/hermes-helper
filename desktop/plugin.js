@@ -19183,7 +19183,10 @@ function setupPress(action, st) {
   const [kind, id] = action.split(':')
   // "What did you look at?": the six short lines, under the look's own opening sentence (Decided myself: the data has
   // no sentence for above the list)
-  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint })]) : null
+  // While a recommendation waits for its answer, its four answers stay under the list, so the person is not left
+  // with nothing to pick.
+  if (action === 'lookwhat')
+    return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: s.stage === 'rec' ? suREC_PICKS(SU_L.REC.answers) : null })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
   if (kind === 'goal' && s.stage === 'goal') return suMove(true, seen => suAnswerGoal(st, id, null, seen))
   if (kind === 'rec' && s.stage === 'rec') {

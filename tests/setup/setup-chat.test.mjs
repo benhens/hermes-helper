@@ -404,4 +404,8 @@ test('"What did you look at?": the six short lines of the last look', opt, () =>
   assert.equal(l.line, 'LOOK_LIST')
   assert.deepEqual(l.rows, ['Hermes installed: yes', 'A model that answers: yes', 'Its own personality text: no', 'Scheduled jobs: 0', 'Bots: 3', "I can't see: first chat, chat apps, tools, memory, safety."])
   assert.equal(p.looks.length, 1, 'no new read for it')
+  // the recommendation's four answers stay under the list, and still work
+  assert.deepEqual(p.labels(), REC4)
+  p.press('Show me the steps')
+  assert.match(p.last().text, /^Step 1 of 5: /)
 })
