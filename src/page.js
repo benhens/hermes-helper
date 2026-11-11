@@ -271,7 +271,10 @@ export function makePage(ctx, opts = {}) {
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
   const liveClose = () => {
     if (live.waiting) liveFinish(live.waiting, null)
-    // setup-chat: a recommendation that still waits for the AI's sentence gets its written one at once
+    // setup-chat: a move of the set-up conversation that still waits for the look is answered at once from what was
+    // read last (or as "couldn't check"), and a recommendation that still waits for the AI's sentence gets its
+    // written one at once: every message is answered, in order, before the next thing the person does
+    if (memory && memory.lookWait) memory.lookWait()
     if (memory && memory.recWait) memory.recWait(null)
   }
   // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
@@ -538,11 +541,9 @@ export function makePage(ctx, opts = {}) {
     // move needs the look, Hermes is read first (no AI call; the character shows busy meanwhile), then Helper's lines.
     function runSetup(mv, shown) {
       liveClose()
-      const n = (memory.setupTurn = (memory.setupTurn || 0) + 1)
       memory.opening = null
       if (shown) addToLog([{ ...youEntry(shown), send: false }])
       const finish = seen => {
-        if (memory.setupTurn !== n) return // the person did something else meanwhile
         const says = mv.go(seen)
         writeKept()
         const put = list => {
@@ -604,11 +605,20 @@ export function makePage(ctx, opts = {}) {
           })
       }
       if (!mv.look) return finish(memory.seen || LOOK_UNSEEN)
-      const end = busy.begin()
-      look().then(seen => {
-        end()
-        memory.seen = seen
+      const endLook = busy.begin()
+      let looked = false
+      const once = seen => {
+        if (looked) return
+        looked = true
+        memory.lookWait = null
+        endLook()
         finish(seen)
+      }
+      // the person does something else before the reads are back (see liveClose)
+      memory.lookWait = () => once(memory.seen || LOOK_UNSEEN)
+      look().then(seen => {
+        memory.seen = seen
+        once(seen)
       })
     }
     // setup-chat: "Ask me the set-up questions again" was pressed on Helper's settings page (see rereadKept)

@@ -210,7 +210,11 @@ test('the pick "Set up Hermes" under an offer, and "where do I start" typed, bri
   await press(view, 'Not now')
   await send(view, 'where do I start')
   assert.equal(bubbleLine(view), 'REC')
-  for (const p of host.asks) assert.doesNotMatch(p.input, /Set up Hermes|Not now|I know it well/, 'nothing of the set-up conversation is sent to the AI')
+  // neither what the person pressed in it, nor Helper's own lines of it, are among the lines sent with a later message
+  // (the line that opens it, F2 or F3, is the ordinary talk's and may be sent as Helper's lines always could)
+  const live = host.asks.filter(p => /newest message/.test(p.input))
+  assert.ok(live.length >= 1, 'a later message did go to the AI')
+  for (const p of live) assert.doesNotMatch(p.input.replace(/’/g, "'"), /Set up Hermes|Not now|I know it well|keep your place|Want the steps|I looked at your Hermes|Do you want jobs/, 'nothing of the set-up conversation after its opening line is sent to the AI')
 })
 
 test('an ordinary question in the middle is answered as before, and the set-up conversation is still there after it', opt, async () => {
@@ -235,4 +239,26 @@ test('with the switch off (the first file), the same page has no set-up conversa
   assert.equal(oldText(olds(view).at(-1)), 'Thanks, Peter.')
   assert.deepEqual(labels(view), ['What Hermes can do', 'Which AI to use'])
   assert.equal(lookCalls(host).length, 0)
+})
+
+test('the person types again before the reads are back: the first message is answered at once ("couldn\'t check", never a guess), then the second, in order', opt, async () => {
+  const { view, host } = await open({ mode: 'no_ai_step' })
+  finish(view)
+  byData(view.tree, 'skip').props.onClick({ preventDefault() {} })
+  finish(view)
+  await press(view, 'I know it well')
+  // the reads never come back
+  host.profiles = () => new Promise(() => {})
+  answers(view).find(n => text(n).trim() === 'Do things at set times').props.onClick({ preventDefault() {} })
+  finish(view)
+  assert.equal(all(helper(view), n => n.props['data-line'] === 'SEEN').length, 0, 'still waiting for the look')
+  box(view).props.onChange({ target: { value: "what's a skill?" } })
+  box(view).props.onKeyDown({ key: 'Enter', shiftKey: false, preventDefault() {} })
+  await settle()
+  finish(view)
+  const lines = all(helper(view), n => n.props['data-hh'] === 'old' || n.props['data-hh'] === 'bubble').map(n => n.props['data-line'])
+  assert.ok(lines.indexOf('SEEN') >= 0 && lines.indexOf('SEEN') < lines.indexOf('REC') && lines.indexOf('REC') < lines.lastIndexOf('term-skill'), lines.join(' '))
+  const seen = olds(view).find(n => n.props['data-line'] === 'SEEN')
+  assert.match(oldText(seen).replace(/’/g, "'"), /I couldn't check your model this time\. I couldn't read that part this time\./)
+  assert.deepEqual(mine(view).slice(-2).map(x => x.replace(/’/g, "'")), ['Do things at set times', "what's a skill?"])
 })
