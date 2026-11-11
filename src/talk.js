@@ -493,8 +493,8 @@ export function asksTopics(text) {
   return !(strongTopics(tc).length || anyTerm(tc))
 }
 
-// changes-7: N1a, a skill named in a clear pattern and on no official list; N1b, a left-out skill;
-// N1, everything else. null: an official skill named that way.
+// changes-7: N1a, a skill named in a clear pattern and on no official list; N1, everything else.
+// null: an official skill named that way (changes-19: all 186 are answered, N1b is gone).
 const SKILL_PATTERNS = [/skills? (?:called|named) "?([a-z0-9][a-z0-9 -]{0,40}?)"?(?=$|[^a-z0-9 -])/, /"([a-z0-9][a-z0-9 -]{0,40})" skills?/]
 export function dontKnow(text) {
   const t = talkNorm(text)
@@ -503,7 +503,6 @@ export function dontKnow(text) {
     if (m) {
       const n = m[1].trim().replace(/ /g, '-')
       if (!SKILL_NAMES.has(n)) return 'N1a'
-      if (SKILL_NAMES.get(n).left_out) return 'N1b'
       return null
     }
   }
@@ -646,6 +645,8 @@ export function serviceIn(text, st, answered) {
 
 /* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
 const ST = TALK_DATA.small_talk
+// live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
+const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
 const NR = TALK_DATA.no_repeat
 const LETTER = /\p{L}/u
 const ONE_WORD = /^(?:\p{L}|['-]){2,30}$/u
@@ -703,7 +704,9 @@ export function smallTalk(text, st) {
     if (!letters || (one && t.length === 1)) kind = 'cut' // rules a and b
     else if (!opening && saysWrong(t) && !known) kind = 'wrong' // changes-17 wrong_rule_17
     else if (!opening && !st.pending && !known) {
-      if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
+      // live-v2 changes-1: "how" right after a line from rows is kind mean (checked just before rule c)
+      if (one && ST.how_after_rows.words.includes(t) && HOW_AFTER.includes(st.last)) kind = 'mean'
+      else if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
       else if (ws.length <= 4 && ST.cut_dangling.includes(ws[ws.length - 1])) kind = 'cut' // rule d
       else if (ws.length <= 3 && ws.length > 1 && OPENING.question_starts.includes(ws[0]) && ws.slice(1).every(w => ST.cut_small_words.includes(w))) kind = 'cut' // changes-17 rule e
     }
@@ -862,8 +865,8 @@ function turnSteps(text, st) {
     st.lastq = false
   }
   // a skill by its name, next to "skill" (changes-6 fix 3): before the topics, so "is there a
-  // github skill" gets the skill, not the service question. A row for that skill wins; a skill
-  // marked left out gets N1b; else S1 (built in) or S2 (optional, with the clicks to add it).
+  // github skill" gets the skill, not the service question. A row for that skill wins; else S1
+  // (built in) or S2 (optional, with the clicks to add it); changes-19: no skill is left out.
   if (st.wants !== false) {
     // The Builder's rule, in the reference since wants fixes v1 (wants_fixes_step.py c): a group's own label typed as it is on its
     // button ("pictures and video") is that group, as if picked; else "I don't know that one" (N2).
@@ -876,13 +879,12 @@ function turnSteps(text, st) {
     if (sk.length === 1) {
       const row = rowOfSkill(sk[0])
       if (row) return done('want', { row: row.id })
-      if (WSKILLS.get(sk[0]).left_out) return done('N1b')
       return done('skill', { skill: sk[0] })
     }
   }
   // a skill named in a clear pattern is looked up before the terms
   const dk = dontKnow(text)
-  if (dk === 'N1a' || dk === 'N1b') return done(dk)
+  if (dk === 'N1a') return done(dk)
   // changes-11, in route2.py's order: a name on a later visit, "what is ...", cost, where
   if (st.stage === 'open') {
     const nl = nameLater(text, st, out)
@@ -1270,7 +1272,6 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('TP', FIXED.TP.text, { answers: topicPicks() })
     case 'N1':
     case 'N1a':
-    case 'N1b':
     case 'N1_AGAIN': // changes-15: in place of a second don't-know line, the faint hint under it as under N1
       return dontKnowLine(result.kind)
     case 'skill by name':

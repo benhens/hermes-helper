@@ -287,17 +287,17 @@ test('the don\'t-know lines show no topics, and the small grey line under each t
     assert.equal(said.answers, null)
     assert.equal(said.hint, hint)
   }
-  // N1b: a skill the list marks as left out (the file's mark is followed until hhcontent changes it)
-  const out = TALK_DATA.skills.find(s => s.left_out)
-  assert.ok(out, 'the skills list marks some skills as left out')
-  const st = freshVisit()
-  assert.equal(lineFor(turn(`is there a skill called "${out.name}"`, st), st).line, 'N1b')
-  assert.equal(TALK_DATA.skills.filter(s => s.left_out).length, 5)
-  // the same skill named the wants' way ("the NAME skill") is left out too
-  const st3 = freshVisit()
-  assert.equal(lineFor(turn(`what does the ${out.name} skill do`, st3), st3).line, 'N1b')
+  // changes-19: N1b is gone; the five once left out get their skill line (S2), both ways of naming them
+  assert.equal(TALK_DATA.fixed.N1b, undefined)
+  assert.equal(TALK_DATA.skills.filter(s => s.left_out).length, 0)
+  for (const name of ['godmode', 'obliteratus', 'scrapling', 'sherlock', 'web-pentest']) {
+    const st = freshVisit()
+    assert.deepEqual((o => [o.kind, o.skill])(turn(`is there a skill called "${name}"`, st)), ['skill', name])
+    const st3 = freshVisit()
+    assert.equal(lineFor(turn(`what does the ${name} skill do`, st3), st3).line, 'S2', name)
+  }
   // an official skill named that way: S1 or S2 (the skills by name, tests/talk-wants.test.mjs)
-  const ok = TALK_DATA.skills.find(s => !s.left_out)
+  const ok = TALK_DATA.skills[0]
   const st2 = freshVisit()
   const o = turn(`the skill named "${ok.name}" please`, st2)
   assert.deepEqual([o.kind, o.skill], ['skill', ok.name])

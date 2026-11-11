@@ -1,7 +1,8 @@
 // The team's files this build was made from, pinned at the checksums the team named (Lead, talk v2 wants
 // fixes: "if the files on disk no longer match the checksums this job names, take them at the checksums
 // this job names"). builder-qs + changes-14 to -18 (11 Nov 2026): each file at the newest checksum the team
-// named for it; the talk data at changes-18's. A test compares the plugin's copy with the pin, checks that
+// named for it; the talk data at changes-18's. talk-live (11 Nov 2026): the talk data, the live data,
+// route2.py and check.py at live-v2 changes-1's; the wants and the skills list at changes-19's. A test compares the plugin's copy with the pin, checks that
 // the pin is a checksum the team named (in its note, or its own "before" copy), and only reports when the
 // team's file on disk has moved on since.
 import fs from 'node:fs'
@@ -13,12 +14,13 @@ const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).di
 
 // file (in the team's folder) -> [the pinned sha256, where the team names it]
 export const PINS = {
-  'content/helper-talk-v2.json': ['4899a0ae3643d9efc67308e5dde65c77c0be04506ef067344597650107e45f57', 'content/helper-talk-v2-changes-18.md'],
-  'content/helper-wants-v1.json': ['bb195263a1d70d2f468ed2de691ec872f39deac841e3c948eca13b84f8277956', 'content/helper-talk-v2-changes-16.md'],
-  'content/skills-list-v1.json': ['b4102198861acf29e663a6afbc63fd4a473d876d616ada84891dcbf05a6b53d0', 'content/helper-skill-lines-v1.md'],
-  'dev/checks/hhcontent-talk-v2/route2.py': ['3af440269b7f405d1e56136bd8b76597451b19955f41d52956cb14cf153af95c', 'content/helper-talk-v2-changes-17.md'],
+  'content/helper-talk-v2.json': ['575105bec6781282d63b7f9ee681a298ffc834ca1e415601f945d16d8773aa72', 'content/helper-talk-live-v2-changes-1.md'],
+  'content/helper-talk-live-v2.json': ['c4545b896e4e372844d736cccd3e3f48724cf58b97a91be6a902d78ba10ca38f', 'content/helper-talk-live-v2-changes-1.md'],
+  'content/helper-wants-v1.json': ['96530c154849c2dd34397eeadf74748620a45e21589b52be8aafe92800dbd4ac', 'content/helper-talk-v2-changes-19.md'],
+  'content/skills-list-v1.json': ['678667bfa3277f54885b530297a782b7b297c823e0ce4583e6cf5bfe656d7eb9', 'content/helper-talk-v2-changes-19.md'],
+  'dev/checks/hhcontent-talk-v2/route2.py': ['55160e1e72b692d2d3dbe7f9c970eeae1eb9845e72d90b97c276eac07dc17c3c', 'content/helper-talk-live-v2-changes-1.md'],
   'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e', 'content/helper-talk-v2-changes-16.md'],
-  'dev/checks/hhcontent-talk-v2/check.py': ['73aabccdeb8f7540e3699ef377ccfb74cf0366c5541f38dcf01f06beab146623', 'content/helper-talk-v2-changes-14.md'],
+  'dev/checks/hhcontent-talk-v2/check.py': ['0eb598430d47d77857013a8017f57cffacbf69bc16d5e5aa478a77909790afac', 'content/helper-talk-live-v2-changes-1.md'],
   // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs)
   'content/helper-keeps-v1.md': ['0b2563a8e2772d5b918af6bef73cb53af74ce0840b359151a3689c5168a311f4', 'content/helper-talk-live-v2.md'],
   // changes-12 and -13 (the secret rule), ported in the look job: settings_read.py and tests.json at

@@ -23,12 +23,12 @@ const copy = o => JSON.parse(JSON.stringify(o))
 const problems = (w = W, t = TALK, s = SKILLS, d = DOCS) => wantsProblems(w, t, s, d)
 const row = (w, id) => w.wants.find(r => r.id === id)
 
-test('the team\'s wants data passes every check: 26 rows in four groups (changes-16: w_stt, w_meme), 186 skills, five of them left out', () => {
+test('the team\'s wants data passes every check: 26 rows in four groups (changes-16: w_stt, w_meme), 186 skills, none left out (changes-19)', () => {
   assert.deepEqual(problems(), [])
   assert.equal(W.wants.length, 26)
   assert.deepEqual(W.groups.map(g => [g.id, W.wants.filter(r => r.group === g.id).length]), [['web', 8], ['files', 7], ['pics', 7], ['voice', 4]])
   assert.equal(W.skills.length, 186)
-  assert.deepEqual(WANTS_DATA.skills.filter(s => s.left_out).map(s => s.name).sort(), ['godmode', 'obliteratus', 'scrapling', 'sherlock', 'web-pentest'])
+  assert.deepEqual(WANTS_DATA.skills.filter(s => 'left_out' in s).map(s => s.name), [])
   assert.equal(WANTS_DATA.rows.length, 26)
 })
 

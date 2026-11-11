@@ -247,23 +247,14 @@
    "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
    "under": "the grey line N_HINT. No topic picks.",
    "answers": "none",
-   "when": "The message names a skill with skill called NAME, skill named NAME, or a quoted \"NAME\" skill, and NAME is not on content/skills-list-v1.json. Only skills: Helper has no full list of official plugins, so a plugin name gets N1.",
+   "when": "The message names a skill with skill called NAME, skill named NAME, or a quoted \"NAME\" skill, and NAME is not on content/skills-list-v1.json. Only skills: Helper has no full list of official plugins, so a plugin name gets N1. A name that is on the list (all 186 official skills, the five once proposed for leaving out included, changes-19) gets the skill line S1 or S2 of content/helper-wants-v1.json, never a don't-know line.",
    "note": "His reason (not official), kept true by using it only when the name is on no official list. His words, 10 Nov 19:30, ended with \"we're working on expanding it\": left out here because it promises updates after the hackathon. His call (Questions for Pēteris)."
-  },
-  {
-   "id": "N1b",
-   "kind": "reply",
-   "text": "Sorry, I leave that one out for now. It is not meant for getting started.",
-   "under": "the grey line N_HINT. No topic picks.",
-   "answers": "none",
-   "status": "ONLY IF HE LEAVES SOME OFFICIAL SKILLS OUT. If he confirms that all official skills stay in, this line is not used.",
-   "when": "The message names, in the same patterns as N1a, a skill whose left_out is true in content/skills-list-v1.json."
   },
   {
    "id": "N_HINT",
    "kind": "grey",
    "text": "To see what I can help with, type \"what can I ask you\".",
-   "when": "Small and grey under N1, N1a and N1b, every time. Not a question and nothing to press: the person types it if they want the topics."
+   "when": "Small and grey under N1 and N1a, every time. Not a question and nothing to press: the person types it if they want the topics."
   },
   {
    "id": "TP",
@@ -516,7 +507,7 @@
    "text": "Sorry, I don't have checked information on that one either.",
    "answers": "none",
    "under": "the grey line N_HINT, as under N1. No topic picks.",
-   "when": "no_repeat: in place of N1, N1a or N1b when the line just before was a don't-know line of the same id. True in every case, because it gives no reason.",
+   "when": "no_repeat: in place of N1 or N1a when the line just before was a don't-know line of the same id. True in every case, because it gives no reason.",
    "added": "changes-15"
   }
  ],
@@ -4538,7 +4529,23 @@
    "use_now": "no_ai_step",
    "use_now_note": "Must say the same as keeps.disclosure_point_11.use_now. A build that calls a model for typed messages must switch both. live-v2: also must equal helper-talk-live-v2.json mode.use_now."
   },
-  "cut_rule": "Kind cut, checked after the lists: (a) the message has no letter and no digit at all (?, ..., ??); (b) it is one letter; (c) stage open and nothing pending: it is one word of 2 or 3 letters, or one of cut_question_words, and it is in no list of this block, and no topic key word, misspelling or term key word matches it; (d) stage open and nothing pending: it has at most 4 words and its last word is one of cut_dangling. At stage name, (c) and (d) do not apply: Al, Bo, Eva and Max are names.",
+  "cut_rule": "Kind cut, checked after the lists: (a) the message has no letter and no digit at all (?, ..., ??); (b) it is one letter; (c) stage open and nothing pending: it is one word of 2 or 3 letters, or one of cut_question_words, and it is in no list of this block, and no topic key word, misspelling or term key word matches it; (d) stage open and nothing pending: it has at most 4 words and its last word is one of cut_dangling. At stage name, (c) and (d) do not apply: Al, Bo, Eva and Max are names. Before (c): how_after_rows (how right after a line from rows is kind mean).",
+  "how_after_rows": {
+   "words": [
+    "how"
+   ],
+   "after": [
+    "row",
+    "plain",
+    "term",
+    "wants",
+    "COST",
+    "WHERE",
+    "written"
+   ],
+   "rule": "live-v2 changes-1 (Lead's job of 11 Nov 02:45; the Builder's talk-live-plan finding 3). Checked just before cut rule (c), under the same conditions (stage open, nothing pending, no topic key word, misspelling or term key word): when the whole message, after the usual cuts (so how? and how?? too), is one of words, and Helper's last line in this visit is one of after, the kind is mean, not cut. It then gets what mean_rule gives: after a topic's row, that topic's plain line with its next; after its plain line, a term line, COST, WHERE or a wants row, MEAN_NONE. In a build with an AI step it is a follow-up (helper-talk-live-v2.json follow_up). After any other line (BACK, OK, CUT, N1, a skill line ...), how stays cut, as before.",
+   "after_note": "The same list as helper-talk-live-v2.json follow_up.rule. wants: a row of helper-wants-v1.json (the plugin's kind want). written: a reply written by the person's AI that used rows (AI builds only)."
+  },
   "cut_question_words": [
    "how",
    "why",
@@ -4580,7 +4587,6 @@
    "WHERE",
    "N1",
    "N1a",
-   "N1b",
    "N1_AGAIN",
    "H1",
    "skill by name",
@@ -4665,7 +4671,6 @@
    "dont_know": [
     "N1",
     "N1a",
-    "N1b",
     "N1_AGAIN"
    ]
   },
@@ -4746,6 +4751,7 @@
  },
  "changed_15": "11 Nov 2026, Lead's job of 00:45: build.make_words (make me ... reaches H1); no_repeat and fixed lines WRONG, AGAIN, N1_AGAIN, small_talk kind wrong and no_rule; keeps.met and rule 1: the name and met written at F1. Account: content/helper-talk-v2-changes-15.md.",
  "changed_live_v2": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2.md): nothing kept is sent to any AI, not even the name (keeps.rules 1 and 5, things.name.used_by, disclosure_point_11, tell.first_time, settings_file.top_line_2); AI_PICK and AI_WRITES reworded; no_repeat.asked_again.",
+ "changed_19": "hhcontent, 11 Nov 2026 (content/helper-talk-v2-changes-19.md): his words \"Include all skills\" (inputs/pb-words-11nov-decisions-2-6.md). Line N1b (\"Sorry, I leave that one out for now. It is not meant for getting started.\") removed, and its id taken out of small_talk.no_means_wrong_after and no_repeat.groups.dont_know; N_HINT and N1_AGAIN no longer name it; N1a's when says a listed skill always gets S1 or S2. All 186 official skills are answered by name, godmode, obliteratus, scrapling, web-pentest and sherlock included. Mentions of N1b in changed_7 are history.",
  "lonely_words": {
   "about": "changes-16, hhtech-wants-run.md section 2 (nos. 15, 25, 29). A word listed here counts as a key word (in any list: topics, needs, weak words, wants rows) only when one of its needs_one_of phrases is also in the message (when it has that list), and none of its not_with words. phone has no needs_one_of: how do I connect my phone and can I get my email on my phone must still reach msg (hhtech's 56). Longer keys that hold the word (google drive, one drive, chat app) are not affected: they are their own keys. Answers typed under Helper's own question (service names) are not affected.",
   "words": {

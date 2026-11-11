@@ -166,7 +166,7 @@ test('what goes into the public built file: only what the code reads, and each l
   for (const t of TALK_DATA.terms) assert.ok(t.source, t.id)
   assert.deepEqual(Object.keys(TALK_DATA.fixed), FIXED_USED)
   // of the skills list, only the names and which are left out
-  for (const s of TALK_DATA.skills) assert.deepEqual(Object.keys(s).filter(k => k !== 'left_out'), ['name'])
+  for (const s of TALK_DATA.skills) assert.deepEqual(Object.keys(s), ['name'])
   // more than half of the team's file stays out
   const whole = fs.statSync(path.join(ROOT, 'content/helper-talk-v2.json')).size
   assert.ok(JSON.stringify(TALK_DATA).length < whole * 0.6, `${JSON.stringify(TALK_DATA).length} of ${whole}`)
