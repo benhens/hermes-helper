@@ -15,9 +15,15 @@ import { TALK_DATA } from './talk-data.js'
 import { K } from './look.js'
 import { cleanKept, hasKept, keptToStore } from './kept.js'
 import { renderKept, saveBox } from './settings-file.js'
+import { curlyQuotes } from './quotes.js'
 
 const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
 const SETTINGS_BOX_ROWS = 7
+// The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
+const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')
+// The action word of the Forget row: Lead's job and hhdesign's review name it "Forget"; it is not in the
+// talk data (Questions for Lead). The row's title is the data's label.
+const FORGET_ACTION = 'Forget'
 
 export function makeSettingsPage(ctx) {
   const read = () => cleanKept(ctx.storage.get('kept', null))
@@ -67,6 +73,21 @@ export function makeSettingsPage(ctx) {
       setForget('done')
     }
 
+    // After Save (hhdesign's review of e86b410, section 3 point 3): a refusal in three rows. Row 1, the line's
+    // number, in the page's own text (the one that catches the eye; no warning colour, no icon); row 2, the line itself as
+    // the box holds it, with no quote marks, small mono in a chip that wraps anywhere; row 3, the fix, in the
+    // caption size. A secret: row 1 only, the line is never shown again. The words are the data's
+    // (keeps.settings_file.read.messages and why), so they are the same as settings_read.py's.
+    const refusalRows = lines => {
+      const [first, quoted, fix] = lines
+      const [pre, post] = SETTINGS_QUOTE
+      const line = quoted != null && quoted.startsWith(pre) && quoted.endsWith(post) ? quoted.slice(pre.length, quoted.length - post.length) : quoted
+      return [
+        jsx('p', { className: K.settingsText, 'data-hh': 'refused-first', children: curlyQuotes(first) }, 'first'),
+        line != null ? jsx('code', { className: K.settingsRefusedLine, 'data-hh': 'refused-line', children: line }, 'line') : null,
+        fix != null ? jsx('p', { className: K.settingsRefusedFix, 'data-hh': 'refused-fix', children: curlyQuotes(fix) }, 'fix') : null
+      ]
+    }
     const message = said
       ? said.kind === 'ask'
         ? jsxs('div', {
@@ -74,17 +95,19 @@ export function makeSettingsPage(ctx) {
             'data-hh': 'settings-ask',
             children: [
               // read out when it comes; the keyboard goes to No, the answer that changes nothing
-              jsx('p', { className: K.settingsText, role: 'status', children: said.question }, 'q'),
+              jsx('p', { className: K.settingsText, role: 'status', children: curlyQuotes(said.question) }, 'q'),
               jsx(Button, { size: 'sm', onClick: () => save('yes'), 'data-hh': 'settings-yes', children: SETTINGS_WORDS.would_delete.answers[0].label }, 'yes'),
               jsx(Button, { size: 'sm', variant: 'text', autoFocus: true, onClick: () => save('no'), 'data-hh': 'settings-no', children: SETTINGS_WORDS.would_delete.answers[1].label }, 'no')
             ]
           })
-        : jsx('div', { className: K.settingsMessage, role: 'status', 'data-hh': `settings-${said.kind}`, children: said.lines.map((l, i) => jsx('p', { children: l }, i)) })
+        : said.kind === 'refused'
+          ? jsx('div', { className: K.settingsRefused, role: 'status', 'data-hh': 'settings-refused', children: refusalRows(said.lines) })
+          : jsx('div', { className: K.settingsMessage, role: 'status', 'data-hh': `settings-${said.kind}`, children: said.lines.map((l, i) => jsx('p', { children: curlyQuotes(l) }, i)) })
       : null
 
     const boxRow = jsx(ListRow, {
       wide: true,
-      title: SETTINGS_WORDS.top_line,
+      title: curlyQuotes(SETTINGS_WORDS.top_line),
       below: jsxs('div', {
         className: K.settingsBelow,
         children: [
@@ -107,50 +130,67 @@ export function makeSettingsPage(ctx) {
               if (e.key === 'Escape') e.stopPropagation()
             }
           }, 'box'),
-          ...SETTINGS_WORDS.under_box.map((l, i) => jsx('p', { className: K.settingsHint, children: l }, `u${i}`)),
-          message,
-          said && said.kind === 'ask'
-            ? null
-            : jsxs('div', {
-                className: K.settingsButtons,
-                children: [
-                  // as Hermes's own plugin settings form: Save and Undo wait for a change
-                  jsx(Button, { size: 'sm', disabled: !changed, onClick: () => save(undefined), 'data-hh': 'settings-save', children: SETTINGS_WORDS.buttons[0] }, 'save'),
-                  jsx(Button, { size: 'sm', variant: 'text', disabled: !changed, onClick: undo, 'data-hh': 'settings-undo', children: SETTINGS_WORDS.buttons[1] }, 'undo')
-                ]
-              }, 'buttons')
+          ...SETTINGS_WORDS.under_box.map((l, i) => jsx('p', { className: K.settingsHint, children: curlyQuotes(l) }, `u${i}`)),
+          // the message after Save and the buttons: 8 px above the message (the column's gap), 4 px under it
+          jsxs('div', {
+            className: K.settingsSaveGroup,
+            children: [
+              message,
+              said && said.kind === 'ask'
+                ? null
+                : jsxs('div', {
+                    className: K.settingsButtons,
+                    children: [
+                      // as Hermes's own plugin settings form: Save and Undo wait for a change
+                      jsx(Button, { size: 'sm', disabled: !changed, onClick: () => save(undefined), 'data-hh': 'settings-save', children: SETTINGS_WORDS.buttons[0] }, 'save'),
+                      jsx(Button, { size: 'sm', variant: 'text', disabled: !changed, onClick: undo, 'data-hh': 'settings-undo', children: SETTINGS_WORDS.buttons[1] }, 'undo')
+                    ]
+                  }, 'buttons')
+            ]
+          }, 'save-group')
         ]
       })
     })
 
-    const facts = jsxs('div', { className: K.settingsFacts, 'data-hh': 'settings-facts', children: [jsx('p', { children: SETTINGS_WORDS.also_tell }, 'tell'), ...SETTINGS_WORDS.facts.map((f, i) => jsx('p', { children: f }, i))] })
+    const facts = jsxs('div', { className: K.settingsFacts, 'data-hh': 'settings-facts', children: [jsx('p', { children: curlyQuotes(SETTINGS_WORDS.also_tell) }, 'tell'), ...SETTINGS_WORDS.facts.map((f, i) => jsx('p', { children: curlyQuotes(f) }, i))] })
 
+    // "Forget all of this" (hhdesign's review of e86b410, section 1 point 1): under a thin divider, one of
+    // Hermes's own settings rows (ListRow: the title, its one faint line under it, the action on the right as
+    // Hermes's underlined bold text action, textStrong), not a filled button. The Yes / No question keeps its
+    // place under the row. Hermes's own memory row stays out: its address is not in the plugin docs.
     const FA = SETTINGS_WORDS.forget_all
     const forgetRow = hasKept(stored)
       ? jsxs('div', {
-          className: K.settingsForget,
+          className: K.settingsRule,
           'data-hh': 'settings-forget',
-          children:
+          children: [
+            jsx(ListRow, {
+              title: curlyQuotes(FA.label),
+              description: curlyQuotes(FA.under),
+              action: jsx(Button, { size: 'sm', variant: 'textStrong', onClick: () => setForget('ask'), 'aria-label': FA.label, 'data-hh': 'settings-forget-all', children: FORGET_ACTION }, 'f')
+            }, 'row'),
             forget === 'ask'
-              ? [
-                  jsx('p', { className: K.settingsText, role: 'status', children: FA.question }, 'q'),
-                  // (FA.with_question, "What was already sent to your AI cannot be taken back.", is
-                  // left out: in this build nothing is ever sent to an AI)
-                  jsxs('div', {
-                    className: K.settingsButtons,
-                    children: [
-                      jsx(Button, { size: 'sm', variant: 'secondary', onClick: forgetAll, 'data-hh': 'settings-forget-yes', children: FA.answers[0].label }, 'yes'),
-                      jsx(Button, { size: 'sm', variant: 'text', autoFocus: true, onClick: () => setForget(null), 'data-hh': 'settings-forget-no', children: FA.answers[1].label }, 'no')
-                    ]
-                  }, 'b')
-                ]
-              : [
-                  jsx(Button, { size: 'sm', variant: 'secondary', onClick: () => setForget('ask'), 'data-hh': 'settings-forget-all', children: FA.label }, 'f'),
-                  jsx('p', { className: K.settingsHint, children: FA.under }, 'u')
-                ]
+              ? jsxs('div', {
+                  className: K.settingsForgetAsk,
+                  'data-hh': 'settings-forget-ask',
+                  children: [
+                    jsx('p', { className: K.settingsText, role: 'status', children: curlyQuotes(FA.question) }, 'q'),
+                    // (FA.with_question, "What was already sent to your AI cannot be taken back.", is
+                    // left out: in this build nothing is ever sent to an AI)
+                    jsxs('div', {
+                      className: K.settingsButtons,
+                      children: [
+                        jsx(Button, { size: 'sm', variant: 'secondary', onClick: forgetAll, 'data-hh': 'settings-forget-yes', children: FA.answers[0].label }, 'yes'),
+                        jsx(Button, { size: 'sm', variant: 'text', autoFocus: true, onClick: () => setForget(null), 'data-hh': 'settings-forget-no', children: FA.answers[1].label }, 'no')
+                      ]
+                    }, 'b')
+                  ]
+                }, 'ask')
+              : null
+          ]
         })
       : forget === 'done'
-        ? jsx('p', { className: K.settingsMessage, role: 'status', 'data-hh': 'settings-forgot', children: FA.after_yes })
+        ? jsx('div', { className: K.settingsRule, 'data-hh': 'settings-forget', children: jsx('p', { className: K.settingsMessage, role: 'status', 'data-hh': 'settings-forgot', children: curlyQuotes(FA.after_yes) }) })
         : null
 
     return jsxs('div', { className: K.settingsPage, 'data-hh': 'settings-page', children: [boxRow, facts, forgetRow] })

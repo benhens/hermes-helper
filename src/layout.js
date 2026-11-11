@@ -29,6 +29,14 @@ export const CHARACTER_PX = 168
 export const CHARACTER_SMALL_PX = 132
 export const SMALL_UNDER_WIDE_PX = 420
 export const SMALL_UNDER_HIGH_PX = 600
+// The things to pick (src/talk-view.js Picks): how many columns a list takes (talk-r5): four are two rows
+// of two, three or two one row, so no row is ever half empty; one column (stacked) when a label would wrap.
+// talk v2 look (hhdesign's review of e86b410, section 3 point 1): four picks in a window 420 px or wider
+// stay two by two when a label wraps to two lines inside its pick; only a label that would need three
+// lines stacks them. Under 420 px, and for two or three, one line as before.
+export const columnsFor = (count, stacked) => (stacked || count < 2 ? 1 : count === 4 ? 2 : count)
+export const FOUR_TWO_LINES_PX = 420
+export const linesAllowed = (count, width) => (count === 4 && width >= FOUR_TWO_LINES_PX ? 2 : 1)
 // The open step's own padding is 24 px a side, so 520 leaves two facts of about 226 px each.
 export const TWO_COLUMNS_PX = 520
 // Two cards of about 270 px each, after the padding and the 12 px gap.

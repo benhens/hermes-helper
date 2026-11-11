@@ -24,14 +24,20 @@ async function openSettings(initial = {}) {
   const view = mount(page.render().type)
   return { view, storage, page, reg }
 }
-// Hermes's ListRow takes the box in its `below` prop, which the stand-in leaves as it is: the
-// searches look there too.
-const inside = view => [view.tree, ...all(view.tree, n => n.type === 'sdk:ListRow').map(r => r.props.below)]
+// Hermes's ListRow takes the box in its `below` prop, and the Forget row its title, line and action in
+// props, which the stand-in leaves as they are: the searches look there too.
+const rowParts = r => [r.props.below, r.props.action, r.props.description].filter(Boolean)
+const inside = view => [view.tree, ...all(view.tree, n => n.type === 'sdk:ListRow').flatMap(rowParts)]
 const find = (view, what) => byData(inside(view), `settings-${what}`)
 const box = view => find(view, 'box')
 const type = (view, value) => box(view).props.onChange({ target: { value } })
 const press = (view, what) => find(view, what).props.onClick({ preventDefault() {} })
 const shown = (view, what) => text(find(view, what))
+// the text of a part, with what its ListRows hold in their props (title, line, action)
+const shownAll = (view, what) => {
+  const node = find(view, what)
+  return [text(node), ...all(node, n => n.type === 'sdk:ListRow').flatMap(r => [r.props.title, ...rowParts(r)].map(p => (typeof p === 'string' ? p : text(p))))].join(' ')
+}
 const PETER = { name: 'Peter', msg: 'WhatsApp', asked: ['my club has six courts'], told: true }
 
 test('registered under Settings, Plugins: one page called Helper with the compass icon; on an older Hermes the plugin still loads without it', async () => {
@@ -128,7 +134,7 @@ test('Undo changes puts the box back as stored; Save and Undo wait for a change,
   press(view, 'forget-all')
   type(view, 'Name: Pete')
   press(view, 'undo')
-  assert.ok(!shown(view, 'forget').includes(SF.forget_all.question))
+  assert.ok(!shownAll(view, 'forget').includes(SF.forget_all.question))
 })
 
 test('the questions are read out when they come, and the keyboard goes to No, the answer that changes nothing', async () => {
@@ -147,10 +153,10 @@ test('the questions are read out when they come, and the keyboard goes to No, th
 
 test('"Forget all of this" asks first; Yes removes the record whole and says so; No keeps it', async () => {
   const { view, storage } = await openSettings({ kept: PETER })
-  assert.equal(shown(view, 'forget-all'), SF.forget_all.label)
-  assert.ok(shown(view, 'forget').includes(SF.forget_all.under))
+  assert.ok(shownAll(view, 'forget').includes(SF.forget_all.label))
+  assert.ok(shownAll(view, 'forget').includes(SF.forget_all.under))
   press(view, 'forget-all')
-  assert.ok(shown(view, 'forget').includes(SF.forget_all.question))
+  assert.ok(shownAll(view, 'forget').includes(SF.forget_all.question))
   press(view, 'forget-no')
   assert.deepEqual(storage.data.get('kept'), PETER)
   press(view, 'forget-all')
@@ -158,6 +164,64 @@ test('"Forget all of this" asks first; Yes removes the record whole and says so;
   assert.equal(storage.data.has('kept'), false)
   assert.equal(shown(view, 'forgot'), SF.forget_all.after_yes)
   assert.equal(box(view).props.value, '')
+})
+
+// talk v2 look (hhdesign's review of e86b410, section 1 point 1)
+test('the bottom of the page: a thin divider, then "Forget all of this" as one of Hermes\'s own rows (title, its line under it, "Forget" as Hermes\'s underlined bold text action); the question under the row; no memory row', async () => {
+  const { view } = await openSettings({ kept: PETER })
+  const part = find(view, 'forget')
+  assert.equal(part.props.className, 'mt-3 border-t border-(--ui-stroke-tertiary) pt-3')
+  const rows = all(part, n => n.type === 'sdk:ListRow')
+  assert.equal(rows.length, 1, 'one row: Hermes\'s own memory row stays out (its address is not in the plugin docs)')
+  const row = rows[0].props
+  assert.equal(row.title, SF.forget_all.label)
+  assert.equal(row.description, SF.forget_all.under)
+  assert.equal(row.wide, undefined, 'Hermes\'s ordinary row: the action beside the words on a wide page, under them on a narrow one')
+  assert.equal(row.action.type, 'sdk:Button')
+  assert.equal(row.action.props.variant, 'textStrong')
+  assert.equal(text(row.action), 'Forget')
+  assert.equal(row.action.props['aria-label'], SF.forget_all.label)
+  // no filled button for Forget any more
+  assert.equal(all(part, n => n.type === 'sdk:Button' && n.props.variant === 'secondary').length, 0)
+  press(view, 'forget-all')
+  const after = find(view, 'forget').props.children
+  assert.equal(after[0].type, 'sdk:ListRow', 'the row stays first')
+  assert.equal(after[1].props['data-hh'], 'settings-forget-ask', 'the question under it')
+  assert.doesNotMatch(shownAll(view, 'forget'), /Memory & Context|Hermes's own memory/)
+})
+
+// talk v2 look (hhdesign's review, section 3 point 3; the words are the data's)
+test('a refusal after Save: three rows (which line, the line itself in a mono chip with no quote marks, the fix); a secret gets the first row only', async () => {
+  const { view } = await openSettings({ kept: PETER })
+  type(view, 'Name: Peter\nPaying for an AI: "maybe" later')
+  press(view, 'save')
+  const part = find(view, 'refused')
+  assert.equal(part.props.className, 'flex min-w-0 flex-col items-start gap-1')
+  const [first, line, fix] = part.props.children
+  assert.equal(first.props['data-hh'], 'refused-first')
+  assert.equal(text(first), SF.read.messages.cannot_read.replace('{n}', '2'))
+  assert.equal(first.props.className, 'text-[length:var(--conversation-text-font-size)] font-medium text-foreground')
+  assert.equal(line.type, 'code')
+  // exactly as the box holds it: no quote marks around it, and its own straight quotes stay straight
+  assert.equal(text(line), 'Paying for an AI: "maybe" later')
+  assert.match(line.props.className, /font-mono text-xs/)
+  assert.match(line.props.className, /wrap-anywhere/)
+  assert.match(line.props.className, /bg-\(--ui-bg-quinary\) px-1\.5 py-0\.5/)
+  assert.equal(text(fix), SF.why.mod_value)
+  assert.match(fix.props.className, /text-\(--ui-text-secondary\)/)
+  // a secret: row 1 only, and the line is not on the page
+  type(view, 'Name: Peter\nRemember: my password is hunter22')
+  press(view, 'save')
+  const s = find(view, 'refused').props.children.filter(Boolean)
+  assert.equal(s.length, 1)
+  assert.match(text(s[0]), /^Nothing was saved\. Line 2 looks like a password/)
+  assert.doesNotMatch(text(inside(view).filter(n => n !== box(view))), /hunter/)
+})
+
+test('the settings page\'s facts include changes-12\'s "Do not type passwords here." (the data\'s words)', async () => {
+  const { view } = await openSettings({ kept: PETER })
+  assert.ok(SF.facts.includes('Do not type passwords here.'))
+  assert.ok(shown(view, 'facts').includes('Do not type passwords here.'))
 })
 
 test('Esc inside the box does not reach Hermes (Hermes closes Settings on Esc, and what was typed would be lost)', async () => {

@@ -59,14 +59,22 @@
    reached, and it stays at its newest when the bubble or the message box grows and its room
    shrinks: nothing scrolls it frame by frame while the box grows. The lines themselves are one
    inner column in reading order. */
-.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain}
+.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}
+/* talk v2 look (hhdesign's notes-wants.md rule C point 1): never a hard cut through letters. An edge with
+   something hidden behind it fades out over 20 px, as Hermes's own FadeScroll (1.25rem); the page sets
+   data-fade from the scroll position (src/talk-view.js). The gradient's colour only carries its alpha. */
+.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-text-primary) 20px)}
+.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-text-primary) 20px)}
+.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-text-primary) 20px,var(--ui-text-primary) calc(100% - 20px),transparent 100%)}
 .hh-conv-in{display:flex;flex-direction:column;gap:9px}
 .hh-conv-in>*{flex:none}
 .hh-me{overflow-wrap:anywhere}
 /* The faint lines (what was kept, what is used) hold a link that is a real button: it looks like
    the text around it. The first-time line goes on a line of its own under "Kept: ...". */
 .hh-note .hh-link{padding:0;border:0;background:none;font:inherit}
-.hh-note-first{display:block}
+.hh-note-first{display:block;text-wrap:pretty}
+/* talk v2 look (hhdesign's review of e86b410, point 3): no word alone on the last line of a faint line */
+.hh-note{text-wrap:pretty}
 /* The list of what Helper keeps, inside the bubble (and small in an older line). */
 .hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}
 .hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}
@@ -76,12 +84,13 @@
 .hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}
 /* What waits for the line's last word (a button in the bubble): its room is held. */
 .hh-wait{visibility:hidden}
-/* A button's text to paste, or the list of what is kept, opens under the line, inside the bubble. */
-.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:8px}
+/* A button's text to paste, or the list of what is kept, opens under the line, inside the bubble; 10 px
+   apart (notes-wants.md rule B). */
+.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}
 /* In place of a button, for a screen no button can open: one line that says where it is; and the
    small faint hint under a don't-know line. Under an older line they are as small as its link. */
 .hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}
-.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}
+.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}
 /* The cell between bubble and character (src/bubble-link.js draws inside it): hhdesign's .hh-tail
    of talk-r5, as a cell, plus the character's inset. It hangs 1 px into the bubble, in front of it,
    22 by 24 px, one fixed size: never stretched, never measured. */
@@ -104,18 +113,30 @@
 .hh-grip::before{content:"";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}
 .hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}
 .hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}
-/* Talk v2 row 5, not drawn by hhdesign yet (helper-wants-v1.md: "For hhdesign (3)"). The box "From
-   the Hermes docs": the docs page's own words, set off from Helper's line by a rule on its left
-   and a small heading, in the secondary text colour, so it reads as quoted, not as Helper. */
-.hh-docs{margin:0;padding:1px 0 1px 10px;border-left:2px solid var(--ui-text-tertiary)}
+/* Talk v2 row 5, look by hhdesign's notes-wants.md rule A. The box "From the Hermes docs": the docs page's
+   own words, in Hermes's own quote look (markdown-text.tsx: a 2 px line on its left, 12 px in, italic),
+   directly under Helper's line, 8 px apart; its line one step stronger than the divider. */
+.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-stroke-secondary)}
 .hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}
-.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}
+.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}
 .hh-old .hh-docs{margin-top:4px}
 .hh-old .hh-docs-words{font-size:12.5px;line-height:17px}
-/* The clicks to add an optional skill: a numbered list in the line's secondary text. */
+/* The clicks to add an optional skill: Hermes's own numbered list (rule B), the numbers quieter than the
+   words, 6 px between steps; the faint line after them. */
 .hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}
-.hh-steps li+li{margin-top:3px}
+.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}
+.hh-steps li+li{margin-top:6px}
 .hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}
+.hh-old .hh-steps li+li{margin-top:4px}
+.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}
+/* talk v2 look (notes-wants.md item 3): the arrow of a button that opens something points up while its
+   part is open, as Hermes's own open/close rows do. */
+.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}
+/* talk v2 look (notes-wants.md item 7): "More" is no answer: the same size and place, quieter. Under the
+   cursor and pressed as the others. */
+.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}
+.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}
+.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}
 /* talk v2 fixes: a faint "Kept: ..." or "From what I keep: ..." line whose thing was forgotten or
    replaced since: its words stay, struck through, in the same faint colour (no new words). */
 .hh-gone{text-decoration:line-through}

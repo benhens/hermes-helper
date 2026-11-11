@@ -16,6 +16,7 @@ import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spok
 import { TALK_DATA } from '../src/talk-data.js'
 import { WANTS_DATA } from '../src/wants-data.js'
 import { T, K } from '../src/look.js'
+import { curlyQuotes } from '../src/quotes.js'
 
 function useHost({ runtime = { ok: true, model: 'mock-small' } } = {}) {
   const calls = []
@@ -379,8 +380,11 @@ test('the picked service fills the text to paste: "Notion" → "Show me what to 
   const copy = all(bubble(view), n => n.type === 'sdk:CopyButton')
   assert.equal(copy.length, 1)
   assert.equal(copy[0].props.text, 'Please connect Notion. If there is a ready-made MCP for it, add that. Ask me before you change anything.')
-  const shown = all(bubble(view), n => n.type === 'span' && n.props.className === K.cardPasteText)
+  // talk v2 look: inside the bubble, Hermes's own small code card (notes-wants.md item 4), the words
+  // exactly as they will be pasted
+  const shown = all(bubble(view), n => n.type === 'span' && n.props.className === K.bubblePasteText)
   assert.equal(text(shown[0]), copy[0].props.text)
+  assert.equal(byData(bubble(view), 'paste').props.className, K.bubblePaste)
   assert.equal(byData(bubble(view), 'in-bubble').props.className, `${T.inBubble} ${T.inBubbleColumn}`)
   assert.equal(line(view), 'svc1', 'Helper says nothing new for it')
   click(button(view))
@@ -442,7 +446,9 @@ test('Bots: no button. In its place, under the thin line, Helper says where the 
   const where = byData(bubble(view), 'where')
   assert.equal(where.type, 'p')
   assert.equal(where.props.className, T.where)
-  assert.equal(text(where), 'In the Hermes app, "Bots" is the tab next to "Sessions", top left.')
+  // talk v2 look, point 4: drawn with curly quote marks; the data keeps its straight ones
+  assert.equal(text(where), 'In the Hermes app, “Bots” is the tab next to “Sessions”, top left.')
+  assert.equal(TALK_DATA.parts.bots.where_line.text, 'In the Hermes app, "Bots" is the tab next to "Sessions", top left.')
   assert.equal(byData(bubble(view), 'in-bubble').props['aria-hidden'], true, 'not read out before the line is said')
   finish(view)
   assert.equal(byData(bubble(view), 'in-bubble').props['aria-hidden'], undefined)
@@ -458,7 +464,7 @@ test('a button that makes Helper say one more line: "How to add one" becomes the
   assert.equal(text(button(view)).trim(), 'How to add one')
   click(button(view))
   assert.equal(line(view), 'bot1-next')
-  assert.match(said(view), /^Open "Bots", press "\+", then "New bot"\./)
+  assert.match(said(view), /^Open “Bots”, press “\+”, then “New bot”\./)
   assert.deepEqual(lines(view).slice(-2).map(c => [c.props['data-hh'], c.props['data-line'] || words(c)]), [['old', 'bot1'], ['me', 'How to add one']])
 })
 
@@ -491,16 +497,26 @@ test('an older line keeps its button as a small link, and it still works: text t
   assert.deepEqual(globalThis.__hhHost.navigated, ['/capabilities'])
 })
 
-test('text to paste that was opened stays open when its line moves up', async () => {
+test('talk v2 look (rule C point 3, settled by Lead): text to paste that was opened closes when its line moves up; its link stays, and one click opens it again under the older line', async () => {
   const { view } = await atTopics()
   click(answer(view, 'What Hermes remembers'))
   send(view, 'what we talked about')
   assert.equal(line(view), 'mem2')
   finish(view)
   click(button(view))
+  assert.equal(all(bubble(view), n => n.type === 'sdk:CopyButton').length, 1, 'open in the newest bubble')
   send(view, 'what is a plugin')
-  const old = lines(view).find(c => c.props['data-line'] === 'mem2')
-  assert.equal(all(old, n => n.type === 'sdk:CopyButton').length, 1)
+  const old = () => lines(view).find(c => c.props['data-line'] === 'mem2')
+  assert.equal(all(old(), n => n.type === 'sdk:CopyButton').length, 0, 'closed once the line moved up')
+  const link = byData(old(), 'old-link')
+  assert.equal(link.props['aria-expanded'], false)
+  click(link)
+  assert.equal(all(old(), n => n.type === 'sdk:CopyButton').length, 1, 'one click opens it again')
+  assert.equal(byData(old(), 'old-link').props['aria-expanded'], true)
+  assert.equal(byData(old(), 'paste-text').props.className, K.bubblePasteTextOld)
+  // and it closes again when the next line comes
+  send(view, 'what is a skill')
+  assert.equal(all(old(), n => n.type === 'sdk:CopyButton').length, 0)
 })
 
 test('a request to do it: "your own Hermes can", with the person\'s own words to paste shown at once (no button to press first)', async () => {
@@ -563,7 +579,8 @@ test('a message nobody has an answer for: the fixed line and, small under it, th
   const hint = byData(bubble(view), 'hint')
   assert.equal(hint.type, 'p')
   assert.equal(hint.props.className, T.where)
-  assert.equal(text(hint), TALK_DATA.fixed.N_HINT.text)
+  assert.equal(text(hint), curlyQuotes(TALK_DATA.fixed.N_HINT.text))
+  assert.equal(text(hint), 'To see what I can help with, type “what can I ask you”.')
 })
 
 test('a long message is shown back cut to 500 characters; Helper still reads all of it', async () => {
@@ -649,7 +666,7 @@ test('"See what I keep" opens Helper\'s settings page; "what do you know about m
   assert.equal(line(view), 'A1')
   assert.equal(said(view), 'This is all I keep about you.')
   assert.deepEqual(all(byData(bubble(view), 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter'])
-  assert.equal(text(byData(bubble(view), 'hint')), 'By hand: open "Settings", then "Plugins", then "Helper".')
+  assert.equal(text(byData(bubble(view), 'hint')), 'By hand: open “Settings”, then “Plugins”, then “Helper”.')
   finish(view)
   assert.equal(text(button(view)).trim(), 'Open Helper settings')
   click(button(view))
@@ -739,7 +756,8 @@ test('Helper\'s lines hold no link out of the page and no model\'s words: every 
   for (const w of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work', 'what can I ask', 'can it read pdfs', 'can it edit my videos', 'is there a github skill', 'what does the dspy skill do', 'is there a skill called sdlc-review']) {
     send(view, w)
     const now = said(view).replace('Thanks, Peter.', 'Thanks, {name}.')
-    assert.ok(pre.has(now), `${w} → ${now}`)
+    // (drawn with curly quote marks: talk v2 look, point 4)
+    assert.ok(pre.has(now) || [...pre].some(p => curlyQuotes(p) === now), `${w} → ${now}`)
     assert.equal(all(helper(view), n => n.type === 'a').length, 0)
   }
 })
@@ -861,7 +879,7 @@ test('an optional skill\'s row: "Show me how to add it" opens the app\'s clicks,
     'Click "Source", then pick "Optional".',
     'Find the card "reddit-reading". If it is not there, scroll down and click "Show more". Do it again until you see it.',
     'Click the card, then click "Install".'
-  ])
+  ].map(curlyQuotes))
   assert.equal(stepsList(view).type, 'ol')
   assert.equal(text(byData(bubble(view), 'steps-after')).trim(), 'It works from your next new chat, not this one.')
   assert.doesNotMatch(text(bubble(view)), /hermes skills install/)
@@ -875,7 +893,7 @@ test('a skill by its name: Helper\'s fixed line, and under it a box headed "From
   send(view, 'is there a github skill')
   assert.equal(line(view), 'S1')
   // skill lines v1 (content/helper-skill-lines-v1.md section 2, its own examples, word for word)
-  assert.equal(said(view), 'Hermes comes with a skill called "github". It teaches Hermes to work with GitHub: issues, pull requests, reviews and code folders.')
+  assert.equal(said(view), curlyQuotes('Hermes comes with a skill called "github". It teaches Hermes to work with GitHub: issues, pull requests, reviews and code folders.'))
   finish(view)
   const box1 = docsBox(view)
   assert.equal(box1.props.className, T.docs)
@@ -885,16 +903,16 @@ test('a skill by its name: Helper\'s fixed line, and under it a box headed "From
   // a skill with no plain words (say is null) keeps the old sentence, text_fixed
   send(view, 'is there a skill called sdlc-review')
   assert.equal(line(view), 'S1')
-  assert.equal(said(view), 'Hermes comes with a skill called "sdlc-review". Skills are written steps that teach Hermes one task. The docs say this.')
+  assert.equal(said(view), curlyQuotes('Hermes comes with a skill called "sdlc-review". Skills are written steps that teach Hermes one task. The docs say this.'))
   finish(view)
   assert.equal(text(byData(docsBox(view), 'docs-words')).trim(), 'Review Kanban handoffs and route verified outcomes.')
   send(view, 'what does the dspy skill do')
   assert.equal(line(view), 'S2')
-  assert.equal(said(view), 'The skill "dspy" must be added first. It teaches Hermes to build AI programs that improve their own instructions by themselves.')
+  assert.equal(said(view), curlyQuotes('The skill "dspy" must be added first. It teaches Hermes to build AI programs that improve their own instructions by themselves.'))
   finish(view)
   assert.ok(docsBox(view))
   click(button(view))
-  assert.match(all(stepsList(view), n => n.type === 'li').map(n => text(n)).join(' '), /Find the card "dspy"\. If it is not there, scroll down and click "Show more"\./)
+  assert.match(all(stepsList(view), n => n.type === 'li').map(n => text(n)).join(' '), /Find the card “dspy”\. If it is not there, scroll down and click “Show more”\./)
   // the older line keeps its docs box, small
   send(view, 'thanks')
   const older = lines(view).filter(c => c.props['data-hh'] === 'old').at(-1)
@@ -931,7 +949,7 @@ test('Gmail picked under "Which service": the Connectors line (CN1) in place of 
   pickNow(view, 'Gmail and other services')
   pickNow(view, 'Gmail')
   assert.equal(line(view), 'CN1')
-  assert.equal(said(view), 'The Hermes app links apps such as Gmail through its "Connectors" page. Click "Capabilities", then the "Connectors" tab.')
+  assert.equal(said(view), curlyQuotes('The Hermes app links apps such as Gmail through its "Connectors" page. Click "Capabilities", then the "Connectors" tab.'))
   assert.equal(storage.get('kept').svc, 'Gmail')
 })
 

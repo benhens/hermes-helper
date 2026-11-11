@@ -18,36 +18,55 @@
 //     used:    null | { text, link, topic }   the faint "From what I keep: ..." line, the same place
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
-import { Codicon } from '@hermes/plugin-sdk'
+import { Codicon, CopyButton } from '@hermes/plugin-sdk'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, T, cx } from './look.js'
 import { Said } from './reveal.js'
 import { BubbleLink } from './bubble-link.js'
-import { PasteBox } from './setup-tab.js'
+import { columnsFor, linesAllowed } from './layout.js'
 import { noteForgotten } from './talk.js'
+import { curlyQuotes } from './quotes.js'
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
+// (talk v2 look: once its part is open, the style sheet turns the down arrow up.)
 export const nextIcon = next => (next.kind === 'paste' || next.kind === 'steps' ? 'chevron-down' : 'arrow-right')
 export const ANSWERS_LABEL = 'Answers to pick'
 // A button that opens something under its line, and closes it again.
 const opens = next => next.kind === 'paste' || next.kind === 'steps'
 
-// The list of what Helper keeps, one row per thing (A1).
+// The list of what Helper keeps, one row per thing (A1). Its rows hold what the person typed: drawn as
+// they are, quote marks included.
 const Rows = ({ rows }) => jsx('ul', { className: T.rows, 'data-hh': 'kept-rows', children: rows.map((r, i) => jsx('li', { children: r }, i)) })
-// The box "From the Hermes docs" (S1, S2): the docs page's own words, set apart from Helper's line
-// so it is plainly not Helper speaking (helper-wants-v1.md 1.2).
-const DocsBox = ({ docs }) =>
+// The box "From the Hermes docs" (S1, S2): the docs page's own words, set apart from Helper's line so
+// it is plainly not Helper speaking (helper-wants-v1.md 1.2), in Hermes's own quote look (hhdesign's
+// notes-wants.md rule A: a 2 px line on its left, 12 px in, italic), directly under Helper's line.
+const DocsBox = ({ docs, wait }) =>
   jsxs('div', {
-    className: T.docs,
+    className: cx(T.docs, wait && T.wait),
+    'aria-hidden': wait ? true : undefined,
     'data-hh': 'docs',
-    children: [jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: docs.head }, 'h'), jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: docs.words }, 'w')]
+    children: [
+      jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: curlyQuotes(docs.head) }, 'h'),
+      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: curlyQuotes(docs.words) }, 'w')
+    ]
   })
-// The clicks to add an optional skill, numbered, and the line after them.
+// The clicks to add an optional skill: Hermes's own numbered list (rule B), and the faint line after them.
 const Steps = ({ next }) => [
-  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: s }, i)) }, 'steps'),
-  next.after ? jsx('p', { className: T.where, 'data-hh': 'steps-after', children: next.after }, 'after') : null
+  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: curlyQuotes(s) }, i)) }, 'steps'),
+  next.after ? jsx('p', { className: T.after, 'data-hh': 'steps-after', children: curlyQuotes(next.after) }, 'after') : null
 ]
+// Text to paste inside a Helper line (notes-wants.md item 4): Hermes's own small code card with Copy at its
+// top right; smaller in an older line. Drawn exactly as it will be pasted.
+const BubblePaste = ({ text, old }) =>
+  jsxs('div', {
+    className: K.bubblePaste,
+    'data-hh': 'paste',
+    children: [
+      jsx('span', { className: old ? K.bubblePasteTextOld : K.bubblePasteText, 'data-hh': 'paste-text', children: text }, 't'),
+      jsx(CopyButton, { text, label: 'Copy', appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
+    ]
+  })
 
 // The faint lines that go with a Helper line: "Kept: ..." with its link, the first-time line under
 // it once, and "From what I keep: ..." with Change. Small faint text on Helper's side, never a
@@ -87,8 +106,11 @@ function notesOf(entry, onNote, kept) {
   return out
 }
 
-// Helper's older line, small, on its side. A button it had stays as a small underlined link; text
-// to paste that was opened stays open; a line about where a screen is stays under it.
+// Helper's older line, small, on its side. A button it had stays as a small underlined link; a line
+// about where a screen is stays under it, and so does the docs quote. talk v2 look (hhdesign's
+// notes-wants.md rule C point 3, settled by Lead): steps or text to paste opened under it close when the
+// line moves up into the older lines (src/page.js), and its link stays, so one click opens them again
+// here; no wall of text. Text to paste that came with the line itself (H1's) stays.
 function OldLine({ entry, onNext }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
@@ -98,11 +120,11 @@ function OldLine({ entry, onNext }) {
     'data-line': entry.line,
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
-      entry.text,
+      curlyQuotes(entry.text),
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
-      entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: entry.hint }, 'hint') : null,
-      next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: next.text }, 'where') : null,
+      entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: curlyQuotes(entry.hint) }, 'hint') : null,
+      next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: curlyQuotes(next.text) }, 'where') : null,
       next && next.kind !== 'where'
         ? jsxs(
             'button',
@@ -118,7 +140,7 @@ function OldLine({ entry, onNext }) {
             'next'
           )
         : null,
-      pasteText ? jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste') : null,
+      pasteText ? jsx(BubblePaste, { text: pasteText, old: true }, 'paste') : null,
       next && next.kind === 'steps' && entry.opened ? Steps({ next }) : null
     ]
   })
@@ -128,7 +150,31 @@ function OldLine({ entry, onNext }) {
 // lines of the newest sentence. It scrolls when it is full and stays at its newest when its room
 // changes (the style sheet does that: the outer box stacks from its bottom). A screen reader hears
 // who said each line; the eye sees it by the side.
+// Which edges of the conversation have something hidden behind them (rule C point 1), as data-fade.
+function convFade(el) {
+  const above = el.scrollHeight - el.clientHeight + el.scrollTop > 1
+  const below = el.scrollTop < -1
+  const v = above && below ? 'both' : above ? 'top' : below ? 'bottom' : ''
+  if (el.dataset.fade !== v) el.dataset.fade = v
+}
 export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef }) {
+  // talk v2 look (hhdesign's notes-wants.md rule C point 1): an edge of the conversation fades out over
+  // 20 px, as Hermes's own FadeScroll does, but only an edge that has something hidden behind it. The
+  // conversation stacks from its bottom (column-reverse), so in Chromium its scrollTop is 0 at the newest
+  // end and below 0 when scrolled up. Set on our own element, at each draw, scroll and size change.
+  useLayoutEffect(() => {
+    const el = scrollRef && scrollRef.current
+    if (!el || !el.dataset) return
+    convFade(el)
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => convFade(el)) : null
+    if (ro) {
+      ro.observe(el)
+      if (el.firstElementChild) ro.observe(el.firstElementChild)
+    }
+    return () => {
+      if (ro) ro.disconnect()
+    }
+  }, [scrollRef])
   const items = []
   for (const e of entries) {
     if (e.who === 'you') items.push(jsxs('div', { className: T.me, 'data-hh': 'me', children: [jsx('span', { className: K.srOnly, children: 'You said: ' }, 'who'), e.text] }, e.id))
@@ -141,6 +187,7 @@ export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef 
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,
+    onScroll: e => convFade(e.currentTarget),
     role: 'group',
     'aria-label': 'Conversation so far',
     'data-hh': 'conversation',
@@ -157,10 +204,9 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
-  if (entry.docs) inside.push(jsx(DocsBox, { docs: entry.docs }, 'docs'))
   if (entry.rows) inside.push(jsx(Rows, { rows: entry.rows }, 'rows'))
-  if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: entry.hint }, 'hint'))
-  if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: next.text }, 'where'))
+  if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: curlyQuotes(entry.hint) }, 'hint'))
+  if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: curlyQuotes(next.text) }, 'where'))
   else if (next)
     inside.push(
       jsxs(
@@ -178,10 +224,10 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
         'next'
       )
     )
-  if (pasteText) inside.push(jsx(PasteBox, { text: pasteText, label: 'Copy' }, 'paste'))
+  if (pasteText) inside.push(jsx(BubblePaste, { text: pasteText }, 'paste'))
   const steps = next && next.kind === 'steps' && entry.opened
   if (steps) inside.push(...Steps({ next }).filter(Boolean))
-  const column = pasteText || entry.rows || entry.hint || entry.docs || steps
+  const column = pasteText || entry.rows || entry.hint || steps
   return jsxs('div', {
     className: T.bubble,
     'data-hh': 'bubble',
@@ -189,7 +235,10 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
     'data-said': said,
     'aria-live': 'polite',
     children: [
-      jsx(Said, { clock, id: entry.key, text: entry.text, className: T.line, fresh }, entry.key),
+      jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text), className: T.line, fresh }, entry.key),
+      // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
+      // the thin divider comes after it, and only when something follows
+      entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,
       inside.length
         ? jsx('div', { className: cx(T.inBubble, column && T.inBubbleColumn, !said && T.wait), 'aria-hidden': said ? undefined : true, 'data-hh': 'in-bubble', children: inside }, 'in')
         : null
@@ -210,11 +259,14 @@ export function BusyDots({ lit = 0 }) {
 }
 
 // How many columns a list of things to pick takes (talk-r5): four are two rows of two, three or two
-// are one row, so no row is ever half empty; one column when a label would wrap.
-export const columnsFor = (count, stacked) => (stacked || count < 2 ? 1 : count === 4 ? 2 : count)
-// A label wraps when its text is taller than one line of 19 px.
+// are one row, so no row is ever half empty; one column when a label would wrap. talk v2 look
+// (hhdesign's review of e86b410, section 3 point 1): four picks in a window 420 px or wider stay two by
+// two when a label wraps to two lines inside its pick (the grid gives the other pick in its row the same
+// height); only a label that would need three lines puts them in one column. Under 420 px as before.
+// (columnsFor, linesAllowed and FOUR_TWO_LINES_PX live in src/layout.js, which tests can load alone.)
+// A label is taller than that many lines of 19 px.
 const LINE_PX = 19
-const wraps = el => [...el.querySelectorAll('[data-hh="answer-label"]')].some(s => s.getBoundingClientRect().height > LINE_PX * 1.5)
+const wraps = (el, lines) => [...el.querySelectorAll('[data-hh="answer-label"]')].some(s => s.getBoundingClientRect().height > LINE_PX * (lines + 0.5))
 
 // The things to pick, inside the message box above the line where the person types. The box grows
 // to its rows' height in 0.3 s (a CSS transition on an explicit height, measured from the rows),
@@ -223,7 +275,7 @@ const wraps = el => [...el.querySelectorAll('[data-hh="answer-label"]')].some(s 
 // the old labels stay, so nothing jumps; the next list comes in when it has shrunk. Under reduce
 // motion Hermes's own rule cuts the transition to nothing, so it changes at once.
 //   answers: the newest line's things to pick (or null); open: show them now; width: of the window
-export function Picks({ answers, open, onPick, width }) {
+export function Picks({ answers, open, onPick, width, onSettled }) {
   const rows = useRef(null)
   const [shown, setShown] = useState(open ? answers : null)
   const [height, setHeight] = useState(0)
@@ -238,7 +290,7 @@ export function Picks({ answers, open, onPick, width }) {
   useLayoutEffect(() => {
     const el = rows.current
     if (!el) return
-    if (cols > 1 && stacked !== key && wraps(el)) return setStacked(key)
+    if (cols > 1 && stacked !== key && wraps(el, linesAllowed(list.items.length, width))) return setStacked(key)
     const next = open ? el.scrollHeight : 0
     if (next !== height) setHeight(next)
   })
@@ -250,7 +302,11 @@ export function Picks({ answers, open, onPick, width }) {
     'data-open': open,
     'aria-hidden': open ? undefined : true,
     onTransitionEnd: e => {
-      if (e.target === e.currentTarget && !open) setShown(null)
+      if (e.target !== e.currentTarget) return
+      if (!open) setShown(null)
+      // talk v2 look: once the box has its new height, the conversation above shows its newest end
+      // (hhdesign's notes-wants.md item 1), once per change
+      if (onSettled) onSettled()
     },
     children: jsx('div', {
       className: T.answers,
@@ -262,7 +318,7 @@ export function Picks({ answers, open, onPick, width }) {
       'data-kind': list.kind,
       'data-columns': cols,
       children: list.items.map(a =>
-        jsx('button', { type: 'button', className: T.answer, 'data-hh': 'answer', 'data-answer': a.id, tabIndex: open ? 0 : -1, onClick: () => open && onPick(a), children: jsx('span', { 'data-hh': 'answer-label', children: a.label }) }, a.id)
+        jsx('button', { type: 'button', className: cx(T.answer, a.more && T.more), 'data-hh': 'answer', 'data-answer': a.id, 'data-more': a.more ? true : undefined, tabIndex: open ? 0 : -1, onClick: () => open && onPick(a), children: jsx('span', { 'data-hh': 'answer-label', children: a.label }) }, a.id)
       )
     })
   })

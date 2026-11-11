@@ -171,7 +171,24 @@ export const K = {
   settingsAsk: 'flex flex-wrap items-center gap-2',
   settingsButtons: 'flex flex-wrap items-center gap-2',
   settingsFacts: 'flex flex-col gap-1 py-3 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)',
-  settingsForget: 'flex flex-col items-start gap-2 py-3'
+  // talk v2 look (hhdesign's review of e86b410): the bottom of the page under a thin divider, as Hermes's own
+  // settings rows; the Forget question under its row
+  settingsRule: 'mt-3 border-t border-(--ui-stroke-tertiary) pt-3',
+  settingsForgetAsk: 'flex flex-wrap items-center gap-2 pb-3',
+  // the message after Save and the buttons under it, 4 px apart
+  settingsSaveGroup: 'flex min-w-0 flex-col items-start gap-1',
+  // a line that cannot be read: three rows, 4 px apart; row 2 is the line in a mono chip that wraps anywhere
+  // (Hermes's own code chip: --ui-bg-quinary, 2.5 px corners), row 3 the fix in the caption size
+  settingsRefused: 'flex min-w-0 flex-col items-start gap-1',
+  settingsRefusedLine: 'w-fit max-w-full wrap-anywhere rounded-[2.5px] bg-(--ui-bg-quinary) px-1.5 py-0.5 font-mono text-xs',
+  settingsRefusedFix: 'text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-secondary)',
+
+  // ---- Helper's conversation window: text to paste inside the bubble (hhdesign's notes-wants.md item 4),
+  // Hermes's own small code card (components/chat/compact-markdown.tsx): an edge, readable 12 px mono, Copy at
+  // the top right. The setup card's text to paste (cardPaste) stays as it is ----
+  bubblePaste: 'flex w-full min-w-0 items-start gap-2 rounded-md border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) py-1.5 pl-2.5 pr-1.5',
+  bubblePasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
+  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-[11px] leading-4 text-(--ui-text-secondary)'
 }
 
 // Joins class names, skipping empty ones. Only K and T values go in.
@@ -230,8 +247,11 @@ export const T = {
   docs: 'hh-docs',
   docsHead: 'hh-docs-head',
   docsWords: 'hh-docs-words',
-  // the numbered clicks to add an optional skill
+  // the numbered clicks to add an optional skill, and the faint line after them
   steps: 'hh-steps',
+  after: 'hh-after',
+  // "More" among the things to pick: quieter than an answer (talk v2 look)
+  more: 'hh-more',
   // held room: there, not seen yet
   wait: 'hh-wait',
   skip: 'hh-link hh-skip',

@@ -329,15 +329,41 @@ export function makePage(ctx, opts = {}) {
     // (By the newest entry's id, not the count: the count stops changing once the log is full.
     // The style sheet keeps it at its newest when the window or the message box changes size.)
     const newestId = log.length ? log[log.length - 1].id : 0
-    useEffect(() => {
+    const scrollToNewest = () => {
       const el = helperScroll.current
       if (el) el.scrollTop = el.scrollHeight
-    }, [newestId, helperShown])
+    }
+    useEffect(scrollToNewest, [newestId, helperShown])
+    // talk v2 look, point 9 (hhdesign's notes-wants.md item 1): the person's newest message must stay whole
+    // above the bubble. When the bubble's height changes after its line is said (steps or text to paste
+    // opened or closed under it), the conversation goes to its newest end, once per change: a
+    // ResizeObserver on our own bubble, made once for each bubble element. A change of the bubble's width
+    // (the window resized) is left alone; the style sheet keeps the newest end in place then.
+    const bubbleWatch = useRef({ node: null, ro: null, last: null })
+    useEffect(() => {
+      const w = bubbleWatch.current
+      const conv = helperScroll.current
+      const node = conv && conv.parentNode ? conv.parentNode.querySelector(':scope > [data-hh="bubble"]') : null
+      if (node === w.node) return
+      if (w.ro) w.ro.disconnect()
+      Object.assign(w, { node, ro: null, last: null })
+      if (!node || typeof ResizeObserver !== 'function') return
+      w.ro = new ResizeObserver(() => {
+        const r = node.getBoundingClientRect()
+        if (w.last && r.width === w.last.width && r.height !== w.last.height && node.dataset.said === 'true') scrollToNewest()
+        w.last = { width: r.width, height: r.height }
+      })
+      w.ro.observe(node)
+    })
+    useEffect(() => () => bubbleWatch.current.ro && bubbleWatch.current.ro.disconnect(), [])
 
     /* ---------- the conversation: what the person does, what Helper says back ---------- */
     const visit = remembered().visit
     function addToLog(entries) {
-      setLog(old => (memory.log = [...old, ...entries].slice(-LOG_MAX)))
+      // talk v2 look (hhdesign's notes-wants.md rule C point 3, settled by Lead): only the newest line keeps
+      // its opened part; the line that moves up into the older lines closes its steps or text to paste, and
+      // its link stays, so one click opens them again. No wall of text.
+      setLog(old => (memory.log = [...old.map(e => (e.opened ? { ...e, opened: false } : e)), ...entries].slice(-LOG_MAX)))
     }
     // Helper's answer to something the person did. shown: the person's side of it, as their message.
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
@@ -842,7 +868,7 @@ export function makePage(ctx, opts = {}) {
           children: [
             jsx('div', { 'aria-hidden': true, className: composerInputBacking }, 'backing'),
             // the things to pick (talk-r5, option 4): above the line where the person types
-            jsx(Picks, { answers: toPick, open: !!toPick && said, onPick: pickAnswer, width: fit.helperPx }, 'picks'),
+            jsx(Picks, { answers: toPick, open: !!toPick && said, onPick: pickAnswer, width: fit.helperPx, onSettled: scrollToNewest }, 'picks'),
             jsxs(
               'div',
               {
