@@ -1,6 +1,6 @@
 {
  "about": "Written by dev/checks/talk-v2/dump_set2.py: single messages through hhcontent's route2.py, keeping on. Do not edit: make it again.",
- "json_sha256": "06eda70cdbf3a667f455c8a0e93f6bfd2eae509d473cdd8d533e3abdf7d5879f",
+ "json_sha256": "cd2c4d54992939b44f2ef36d6b6b532dd884073fea372f9bd0b643d57d400b4c",
  "messages": [
   {
    "after": "",
@@ -650,12 +650,12 @@
   {
    "after": "",
    "n": 31,
-   "shown": "W1 buttons msg+bot",
+   "shown": "fact d_bot_silent",
    "state": {
     "asked": [],
     "found": {},
     "kept": {},
-    "lastq": true,
+    "lastq": false,
     "met": false,
     "name": null,
     "pending": null,
@@ -1000,7 +1000,7 @@
   {
    "after": "",
    "n": 48,
-   "shown": "N1",
+   "shown": "want w_image",
    "state": {
     "asked": [],
     "found": {},
@@ -1020,7 +1020,7 @@
   {
    "after": "",
    "n": 49,
-   "shown": "N1",
+   "shown": "fact d_passwords",
    "state": {
     "asked": [],
     "found": {},
@@ -1278,5 +1278,5 @@
    ]
   }
  ],
- "route2_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9"
+ "route2_sha256": "8862ec3aeee840a82a958bc674c5dd108eab5576358136d9f5a0708409f0f56e"
 }

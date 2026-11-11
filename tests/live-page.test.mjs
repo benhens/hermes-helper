@@ -171,7 +171,7 @@ test('no call when: code is sure, the model check is not ok, the message looks l
     send(view, 'my password is hunter2, now what')
     await settle()
     assert.equal(host.asks.length, 0)
-    assert.equal(line(view), 'N1')
+    assert.equal(line(view), 'd_passwords') // find-v1: code's own fact line about passwords (it was N1), still no call
   }
   {
     const { view, host } = await pastOpening('ai_writes', { host: { runtime: { ok: false } } })
@@ -200,7 +200,7 @@ test('nothing Helper keeps is ever sent, not even the name: a kept name, answers
   const storage = fakeStorage({ met: true, kept: { name: 'Peter', mod: 'mod1', msg: 'WhatsApp', svc: 'Gmail', asked: ['my club has six courts'], told: true } })
   const { view, host } = await open('ai_writes', { storage, host: { oneshot: () => 'NONE' } })
   finish(view)
-  for (const m of ['Hi, I\'m Peter', 'what do you know about me', 'remember that my coach is called Zanda', 'I use WhatsApp now', 'send me a summary', 'tell me a joke', 'is it safe', 'ok and then?']) {
+  for (const m of ['Hi, I\'m Peter', 'what do you know about me', 'remember that my coach is called Zanda', 'I use WhatsApp now', 'send me a summary', 'tell me a joke', 'do goats like it', 'is it safe', 'ok and then?']) {
     send(view, m)
     await settle()
     finish(view)
@@ -314,7 +314,8 @@ test('a message that looked secret is never sent later as one of the last lines'
   send(view, 'tell me a joke')
   await settle()
   assert.equal(host.asks.length, 1)
-  assert.doesNotMatch(host.asks[0].input, /hunter2|password/i)
+  // find-v1: Helper's own answer is now its fact line about passwords, which may be sent; the person's message never
+  assert.doesNotMatch(host.asks[0].input, /hunter2|my password|now what/i)
 })
 
 test('a turn closed by the next message starts no second call when its first call comes back', async () => {

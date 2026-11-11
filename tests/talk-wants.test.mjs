@@ -36,6 +36,7 @@ function show(o) {
     BACK: () => `BACK name=${py(o.name)}`,
     HELLO: () => `HELLO name=${py(o.name)}`,
     term: () => 'term line ' + o.term,
+    fact: () => 'fact ' + o.need, // find-v1 (breadth-t1): a fact line
     W1: () => 'W1 buttons ' + o.buttons.slice(0, 4).join('+'),
     // changes-11 (route2.py show)
     W2: () => 'W2 buttons ' + o.buttons.join('+'),
@@ -71,7 +72,9 @@ function ours(m) {
 // Where the plugin differs from the reference on purpose: message -> [the plugin's result, why].
 const TYPED_ABOUT_KEPT = 'keeps.typed (A2 and A4: "forget my name", "forget everything", changes-8 not_when): the plugin\'s own step from the talk v2 job, not in route2.py and switched off in the reference (SETTINGS_ON False, its word lists are older than the data); in a fresh visit nothing is kept, so Helper says there is nothing like that to forget'
 const KEEPS_WORK = 'live-v2 changes-4: what the person does is kept; the reference keeps nothing at What do you do?'
+const TITLES_FIRST = 'live changes-11 (near.first_step): a full hit by a phrase of a fact line comes first, before the topics and the plugin\'s wants step, as in route2.py; the wants layers of the reference are older than that step'
 const KNOWN = {
+  'can I speak to it instead of typing': ['fact d_voice_app', TITLES_FIRST],
   'forget everything': ['A-none', TYPED_ABOUT_KEPT],
   'please forget my name': ['A-none', TYPED_ABOUT_KEPT],
   'delete everything you know about me': ['A-none', TYPED_ABOUT_KEPT],

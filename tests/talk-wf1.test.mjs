@@ -25,6 +25,7 @@ function show(o) {
     question: () => 'question ' + o.topic,
     plain: () => 'plain line ' + o.topic + '0',
     term: () => 'term line ' + o.term,
+    fact: () => 'fact ' + o.need, // find-v1 (breadth-t1): a fact line
     W1: () => 'W1 buttons ' + o.buttons.slice(0, 4).join('+'),
     want: () => 'ROW ' + o.row,
     skill: () => 'SKILL ' + o.skill,

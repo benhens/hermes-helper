@@ -1,8 +1,8 @@
 {
  "about": "Written by dev/checks/builder-qs/dump_qs_sets.py. Do not edit: make it again.",
- "route2_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9",
- "json_sha256": "06eda70cdbf3a667f455c8a0e93f6bfd2eae509d473cdd8d533e3abdf7d5879f",
- "wants_json_sha256": "96530c154849c2dd34397eeadf74748620a45e21589b52be8aafe92800dbd4ac",
+ "route2_sha256": "8862ec3aeee840a82a958bc674c5dd108eab5576358136d9f5a0708409f0f56e",
+ "json_sha256": "cd2c4d54992939b44f2ef36d6b6b532dd884073fea372f9bd0b643d57d400b4c",
+ "wants_json_sha256": "fe9f0d567550b7ed2517d54ae5a15481f19ce747b0d0f2a5246058c8eaaf9024",
  "wants_fixes_step_sha256": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e",
  "cases": [
   {
@@ -46,10 +46,10 @@
     "i want it to make pictures for my instagram posts"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_image",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_image"
     ],
     "name": null,
     "topic": null,
@@ -78,10 +78,10 @@
     "can it talk out loud to me like siri"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "fact d_siri",
+    "kind": "fact",
     "all": [
-     "N1"
+     "fact d_siri"
     ],
     "name": null,
     "topic": null,
@@ -110,10 +110,10 @@
     "can it go on websites and fill in forms for me"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_browser",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_browser"
     ],
     "name": null,
     "topic": null,
@@ -174,10 +174,10 @@
     "turn my voice notes into text pls"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_stt",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_stt"
     ],
     "name": null,
     "topic": null,
@@ -206,10 +206,10 @@
     "can it make powerpoint slides"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_office",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_office"
     ],
     "name": null,
     "topic": null,
@@ -238,10 +238,10 @@
     "help me clean up the messy downloads folder on my computer"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "fact d_download",
+    "kind": "fact",
     "all": [
-     "N1"
+     "fact d_download"
     ],
     "name": null,
     "topic": null,
@@ -302,10 +302,10 @@
     "can it help me write songs"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_music",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_music"
     ],
     "name": null,
     "topic": null,
@@ -718,10 +718,10 @@
     "can it make a video of me dancing"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_video",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_video"
     ],
     "name": null,
     "topic": null,
@@ -750,10 +750,10 @@
     "can it make memes"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_meme",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_meme"
     ],
     "name": null,
     "topic": null,
@@ -878,10 +878,10 @@
     "can it copy my voice"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "fact d_voice_app",
+    "kind": "fact",
     "all": [
-     "N1"
+     "fact d_voice_app"
     ],
     "name": null,
     "topic": null,
@@ -1439,13 +1439,13 @@
     "I keep hitting the rate limit"
    ],
    "route2": {
-    "shown": "line use3",
-    "kind": "row",
+    "shown": "fact d_rate",
+    "kind": "fact",
     "all": [
-     "line use3"
+     "fact d_rate"
     ],
     "name": null,
-    "topic": "use",
+    "topic": null,
     "repeat_of": null,
     "rejected": false
    },
@@ -2694,13 +2694,13 @@
     "my chats get too long and it slows down"
    ],
    "route2": {
-    "shown": "line use4",
-    "kind": "row",
+    "shown": "fact d_too_long",
+    "kind": "fact",
     "all": [
-     "line use4"
+     "fact d_too_long"
     ],
     "name": null,
-    "topic": "use",
+    "topic": null,
     "repeat_of": null,
     "rejected": false
    },
@@ -3004,10 +3004,10 @@
     "can it write code for me?"
    ],
    "route2": {
-    "shown": "N1",
-    "kind": "N1",
+    "shown": "want w_code",
+    "kind": "want",
     "all": [
-     "N1"
+     "want w_code"
     ],
     "name": null,
     "topic": null,

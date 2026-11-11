@@ -76,7 +76,9 @@ export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N_HINT', 'TP'
   'OK_SAME', 'THANKS_SAME', 'HOW_SAME', 'BYE_SAME', 'CUT_SAME', 'WRONG_SAME', 'STUCK', 'STUCK_SAME',
   // live changes-6 (PRIV, POWER, HVC), offer-t1 (changes-8) and ask-fix-t1 (changes-10): the new lines from the docs
   'PRIV', 'POWER', 'HVC', 'MIG', 'MIG_APP', 'MIG_NOT_LISTED', 'MIG_PC', 'HERMES', 'START', 'KEY', 'UPDATE', 'SAFE', 'PERSONALITY', 'KEY_WHAT',
-  'MIG_CHATGPT', 'AGENT', 'KEY_WHERE', 'FREE', 'MODEL_FOR', 'MODEL_CHANGE', 'SKILL_ADD', 'PLUGIN_WHICH', 'PLUGIN_ADD', 'CODING', 'PICK_FIRST', 'HOW_PASTE', 'HOW_PART', 'START_2']
+  'MIG_CHATGPT', 'AGENT', 'KEY_WHERE', 'FREE', 'MODEL_FOR', 'MODEL_CHANGE', 'SKILL_ADD', 'PLUGIN_WHICH', 'PLUGIN_ADD', 'CODING', 'PICK_FIRST', 'HOW_PASTE', 'HOW_PART', 'START_2',
+  // find-v1 (live changes-11, breadth-t1): how / why / and then alone after a line with no next step
+  'NO_MORE']
 // live-v2 changes-3: what no_repeat.in_place may name besides fixed lines: a topic's plain line, the "are you an
 // AI" line of this build (ai_line) and HELLO with the name (src/talk.js noRepeat)
 const IN_PLACE_ALSO = ['plain', 'ai_line']
@@ -84,7 +86,8 @@ const IN_PLACE_ALSO = ['plain', 'ai_line']
 // two-terms rule is lifted; each term must still be explained in the line.
 // live changes-9: msg1-then is the set-up list's Chat apps steps 3 and 4 word for word ("Hermes makes the bot"); the
 // team's own check passes it, so the bot gloss is lifted for this one line (told to Lead in the report)
-const LIFTED = { W2: ['2 Hermes terms in one line'], 'msg1-then': ['term not explained: bot'] }
+// find-v1 (breadth-t1, facts_t1.duo_exempt): d_mem_vs_skill compares memory and skills, as W2 compares its two words
+const LIFTED = { W2: ['2 Hermes terms in one line'], 'msg1-then': ['term not explained: bot'], d_mem_vs_skill: ['2 Hermes terms in one line'] }
 // The parts a fixed line's "Open ..." button may name (src/talk.js PARTS has these; a test keeps
 // the two lists equal).
 export const FIXED_PARTS = ['model', 'messaging', 'capabilities', 'bots']
@@ -207,6 +210,11 @@ export function talkLines(d) {
   }
   const where = d.parts && d.parts.bots && d.parts.bots.where_line
   if (where) add(where.id, where.text, 'reply', !!where.source)
+  // find-v1 (breadth-t1): the fact lines from the docs, each with its button's line if it has one
+  for (const f of (d.facts_t1 || {}).lines || []) {
+    add(f.id, f.text, 'reply', !!(f.sources && f.sources.length))
+    next(f.next)
+  }
   return lines
 }
 
@@ -428,9 +436,11 @@ function slimKeeps(K) {
 }
 
 // skills: content/skills-list-v1.json (the official skills), for the don't-know line N1a (changes-19: none left out).
+// Lead, 11 Nov 08:35: the bubble above the four fixed picks under a don't-know with nothing near
+export const START_FOUR_TEXT = 'Do you want one of these instead?'
 export function slimTalkData(d, skills = { skills: [] }) {
   const fixed = {}
-  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source', 'offer']), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
+  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source', 'offer', 'title', 'phrases']), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
   return {
     docs_version: d.docs_version,
     limits: pickKeys(d.limits, ['request_chars_in_paste', 'service_chars_in_paste']),
@@ -448,7 +458,9 @@ export function slimTalkData(d, skills = { skills: [] }) {
     key_patterns: d.key_patterns.patterns,
     // changes-15 (make me ...), changes-16 (H2: can it build ...?), changes-17 (write/code a script ...)
     build: pickKeys(d.build, ['skip_starts', 'how_phrases', 'build_words', 'build_pair', 'make_words', 'make_not_followed_by', 'make_not_when_starts', 'build_question_words',
-      'software_lead_ins', 'software_verbs', 'software_things', 'software_between_max', 'software_between_not']),
+      'software_lead_ins', 'software_verbs', 'software_things', 'software_between_max', 'software_between_not',
+      // find-v1 (live changes-12, titles-t2 build.can_question_rule): a message that starts so is never a request to build
+      'can_question_starts']),
     // live changes-9 (build.model_pick_rule): when the first call's pick build may be taken
     model_pick_not_when_starts: d.build.model_pick_rule.not_when_starts,
     // changes-14 (ordinary talk, with changes-15 and -17), changes-15 (never the same line twice), changes-16/17 (a word that needs a second word)
@@ -461,7 +473,8 @@ export function slimTalkData(d, skills = { skills: [] }) {
     offers: {
       hint: d.offers.hint,
       things: Object.fromEntries(Object.entries(d.offers.things).map(([k, v]) => [k, { ...pickKeys(v, ['label', 'say']), gives: pickKeys(v.gives, ['kind', 'id']) }])),
-      sets: Object.fromEntries(Object.entries(d.offers.sets).map(([k, v]) => [k, pickKeys(v, ['text', 'picks', 'text_no_setup', 'picks_no_setup', 'instead', 'template', 'by_topic'])]))
+      // find-v1: the bubble above the four fixed picks (start_four) says Lead's words (11 Nov 08:35), not hhcontent's guess
+      sets: Object.fromEntries(Object.entries(d.offers.sets).map(([k, v]) => [k, { ...pickKeys(v, ['text', 'picks', 'text_no_setup', 'picks_no_setup', 'instead', 'template', 'by_topic']), ...(k === 'start_four' ? { text: START_FOUR_TEXT } : {}) }]))
     },
     offer_words: Object.fromEntries(Object.entries(d.offer_words).filter(([, v]) => Array.isArray(v))),
     about_rule: { rows: d.about_rule.rows },
@@ -486,19 +499,23 @@ export function slimTalkData(d, skills = { skills: [] }) {
       ...pickKeys(t, ['id', 'part', 'part_if_no_memory_part', 'key_words', 'misspellings', 'weak_key_words', 'weak_only_in_question_about_hermes', 'typed_only']),
       pick: pickKeys(t.pick, ['label']),
       question: { id: t.question.id, text: t.question.text, answers: (t.question.answers || []).map(a => pickKeys(a, ['label', 'gives', 'service'])) },
-      plain: { ...pickKeys(t.plain, ['id', 'text', 'source']), next: slimNext(t.plain.next), ...(t.plain.then ? { then: slimLine(t.plain.then) } : {}) },
+      plain: { ...pickKeys(t.plain, ['id', 'text', 'source', 'title', 'phrases']), next: slimNext(t.plain.next), ...(t.plain.then ? { then: slimLine(t.plain.then) } : {}) },
       needs: t.needs.map(n => ({
-        ...pickKeys(n, ['id', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'wins_over_other_needs', 'service_names', 'text', 'source']),
+        ...pickKeys(n, ['id', 'key_words', 'only_when_answering', 'only_if_no_other_need', 'wins_over_other_needs', 'service_names', 'text', 'source', 'title', 'phrases']),
         next: slimNext(n.next),
         ...(n.then ? { then: slimLine(n.then) } : {})
       }))
     })),
-    terms: d.terms.map(t => ({ ...pickKeys(t, ['id', 'label', 'key_words', 'text', 'source']), next: slimNext(t.next), ...(t.mean ? { mean: slimLine(t.mean) } : {}) })),
+    terms: d.terms.map(t => ({ ...pickKeys(t, ['id', 'label', 'key_words', 'text', 'source', 'title', 'phrases']), next: slimNext(t.next), ...(t.mean ? { mean: slimLine(t.mean) } : {}) })),
     parts: {
       model: { navigate: d.parts.model.hermes_button.navigate },
       messaging: { navigate: d.parts.messaging.hermes_button.navigate },
       bots: { where_line: pickKeys(d.parts.bots.where_line, ['id', 'text', 'source']) }
     },
+    // find-v1 (live changes-11 and -12, breadth-t1 and titles-t2): the fact lines from the docs (kind fact), and the
+    // lists of the titles rule (near): full hits by phrase, the near offer under a don't-know, how / why alone
+    facts: d.facts_t1.lines.map(f => ({ ...pickKeys(f, ['id', 'title', 'phrases', 'text']), sources: f.sources.map(x => pickKeys(x, ['file', 'line'])), next: slimNext(f.next) })),
+    near: pickKeys(d.near, ['stop_words', 'filler', 'first_step_old', 'keep_caps', 'want_say', 'template', 'template_1', 'template_3', 'nothing_near_set', 'bare_follow']),
     keeps: slimKeeps(d.keeps),
     skills: (skills.skills || []).map(s => ({ name: s.name }))
   }

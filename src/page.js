@@ -23,7 +23,7 @@ import { prefersReducedMotion, watchReducedMotion } from './motion.js'
 import { readState, TAB_IDS } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
-import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
 import { recInstructions, judgeRec, askRec } from './setup-rec.js'
@@ -754,6 +754,7 @@ export function makePage(ctx, opts = {}) {
       else if (item.group) result = pickGroup(item.group, visit)
       else if (item.want) result = pickWant(item.want, visit)
       else if (item.offer) result = pressOffer(item.offer, visit) // offer-t1: a thing picked under an offer, by its id
+      else if (item.near) result = pressNear(item.near, visit) // breadth-t1: a line picked under the near offer
       else result = pickTopic(item.topic, visit)
       answer(result, item.label, '', true)
     }

@@ -282,7 +282,7 @@ export function slimWantsData(W, skillsList) {
     question: { text: W.topic.question.text, answers: W.topic.question.answers.map(a => pickKeys(a, ['label', 'gives_group'])) },
     groups: W.groups.map(g => pickKeys(g, ['id', 'label', 'subject_words'])),
     rows: W.wants.map(w => ({
-      ...pickKeys(w, ['id', 'group', 'label', 'kind', 'thing', 'key_words', 'things', 'actions', 'text', 'sources']),
+      ...pickKeys(w, ['id', 'group', 'label', 'kind', 'thing', 'key_words', 'things', 'actions', 'text', 'sources', 'title', 'phrases']),
       next: pickKeys(w.next, ['kind', 'label', 'paste_text', 'steps', 'after'])
     })),
     fixed,

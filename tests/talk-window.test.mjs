@@ -596,8 +596,9 @@ test('"Which one do you mean?": the matches to pick, at most four; the pick answ
   assert.deepEqual(labels(view), ['What Hermes remembers', 'Which AI to use', 'Phone and chat apps', 'Daily jobs and reminders'])
 })
 
-// offer-t1 (changes-8): the hint N_HINT (type "what can I ask you") is gone; the offer dont_know takes its place
-test('a message nobody has an answer for: the fixed line with no hint under it, then the offer with two things to pick; no topics', async () => {
+// offer-t1 (changes-8): the hint N_HINT (type "what can I ask you") is gone. find-v1 (live changes-12, Lead 11 Nov): with nothing
+// near, the four starting things to pick under Lead's words
+test('a message nobody has an answer for: the fixed line with no hint under it, then "Do you want one of these instead?" with the four starting things to pick', async () => {
   const { view } = await pastOpening()
   send(view, 'what is the weather in Riga')
   await settle() // talk-live: in an AI mode the line comes after the (failing) call; with no AI step at once
@@ -605,9 +606,9 @@ test('a message nobody has an answer for: the fixed line with no hint under it, 
   finish(view)
   assert.equal(byData(lastOld(view), 'hint'), null)
   assert.doesNotMatch(text(helper(view)), /what can I ask you/)
-  assert.match(offerLine(view), /^offer-/)
-  assert.equal(labels(view).length, 2)
-  assert.equal(labels(view).includes('What Hermes is'), true)
+  assert.equal(offerLine(view), 'offer-start_four')
+  assert.deepEqual(labels(view), ['What Hermes can do', 'Which AI to use', 'Phone and chat apps', 'What Hermes remembers'])
+  assert.match(text(helper(view)), /Do you want one of these instead\?/)
 })
 
 test('a long message is shown back cut to 500 characters; Helper still reads all of it', async () => {

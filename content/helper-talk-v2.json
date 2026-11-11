@@ -297,7 +297,13 @@
    "source": "user-guide/features/tools.md line 17 (web search, file editing); user-guide/features/image-generation.md line 10 (pictures); user-guide/features/cron.md line 15; user-guide/features/mcp.md line 13 (the sources of can0, w_image, sch0, svc0). More than one Hermes is not in the line, only in the picks: user-guide/profiles.md lines 7 and 11 (bot0).",
    "depends_on_his_answer": "which way for the topics",
    "text_without_wants": "Hermes can do jobs on a schedule and use services like Gmail. You can also have more than one Hermes. Pick one.",
-   "changed_9": "Was three picks and the text now in text_without_wants. The wants file's five groups sat under the same pick; now they are one tap further, under Web, files, pictures and voice, as four groups."
+   "changed_9": "Was three picks and the text now in text_without_wants. The wants file's five groups sat under the same pick; now they are one tap further, under Web, files, pictures and voice, as four groups.",
+   "title": "What Hermes can do",
+   "phrases": [
+    "what can it do",
+    "what can hermes do",
+    "abilities"
+   ]
   },
   {
    "id": "H1",
@@ -348,7 +354,14 @@
    },
    "when": "The message is a question (question form), has one of cost.words, and no topic matched by a full key word and no term. Checked after what_is, before topics. Nothing kept is used.",
    "source": "getting-started/official-domains.md line 61 (Hermes Agent is MIT-licensed and free to self-host); user-guide/configuring-models.md lines 13 to 15 (a subscription, token-billed providers); integrations/providers.md rows Claude Max + OAuth (extra paid credits); user-guide/local-models.md lines 9 to 15 (an AI on your own computer, no account)",
-   "added": "changes-11, hhtech-run-e86b410 section 3 item 5"
+   "added": "changes-11, hhtech-run-e86b410 section 3 item 5",
+   "title": "What Hermes costs",
+   "phrases": [
+    "cost",
+    "price",
+    "how much",
+    "per month"
+   ]
   },
   {
    "id": "WHERE",
@@ -363,7 +376,14 @@
    "when": "The message has one of where.words, and no topic matched by a full key word and no term. Checked after cost, before topics.",
    "source": "index.mdx line 115 (it lives wherever you put it: a $5 VPS, a GPU cluster or serverless; not tied to your laptop) and line 144 (runs anywhere, not just your laptop); user-guide/features/cron.md lines 313 to 315 and 423 (jobs run inside the gateway, which must be running); start-v1.md g2 and g3 with user-guide/desktop.md line 668 (it answers only while its computer is on; the line of msg3). R6: server and VPS are said as a computer that stays on (r6_say_instead).",
    "next_note": "Open Messaging, because that part's facts g2 and g3 say the same thing about a computer that stays on. No part is about where to run Hermes.",
-   "added": "changes-11, hhtech-run-e86b410 section 3 item 10"
+   "added": "changes-11, hhtech-run-e86b410 section 3 item 10",
+   "title": "Running Hermes on your computer or the cloud",
+   "phrases": [
+    "my computer or the cloud",
+    "where to run it",
+    "do i need a server"
+   ],
+   "title_was_t2": "Your computer or the cloud"
   },
   {
    "id": "W2",
@@ -373,7 +393,13 @@
    "answers": "pair",
    "when": "In place of W1 when the two matched terms are a pair in w1_pairs (any order). Each pick then shows that term's line, as under W1.",
    "source": "getting-started/quickstart.md line 295 (skills are instruction documents that teach Hermes how to do a specific task); user-guide/features/plugins.md line 10 (a plugin system for adding custom tools, hooks and integrations); the two term lines skill and plugin",
-   "added": "changes-11, hhtech-run-e86b410 section 3 item 6"
+   "added": "changes-11, hhtech-run-e86b410 section 3 item 6",
+   "title": "Skills and plugins compared",
+   "phrases": [
+    "skill and a plugin",
+    "skill vs plugin",
+    "difference between a skill and a plugin"
+   ]
   },
   {
    "id": "NAME_AGAIN",
@@ -652,7 +678,15 @@
     "text": "Before a risky command, like deleting files, Hermes asks you to approve it first.",
     "source": "the line SAFE, word for word (/hermes-docs/user-guide/security.md lines 16 and 26)",
     "added": "ask-fix-t1: is my data safe gets what leaves the computer, and the approval one press away"
-   }
+   },
+   "title": "Privacy: who sees your messages",
+   "phrases": [
+    "privacy",
+    "private",
+    "is my data safe",
+    "who can read"
+   ],
+   "title_was_t2": "Who sees your messages"
   },
   {
    "id": "POWER",
@@ -660,7 +694,13 @@
    "source": "user-guide/local-models.md line 202: \"A GPU with 8 GB+ of memory runs the small catalog models comfortably;\" and line 65: \"**Memory fit** — green (*Fits your GPU*: runs entirely in GPU memory),\". No docs line says an AI from a company needs no strong computer, so the line does not say it.",
    "added": "live changes-6",
    "kind": "reply",
-   "when": "A question about what computer is needed (live_c6.power_words)."
+   "when": "A question about what computer is needed (live_c6.power_words).",
+   "title": "What computer a local AI needs",
+   "phrases": [
+    "how strong a computer",
+    "graphics card",
+    "8 gb"
+   ]
   },
   {
    "id": "HVC",
@@ -669,7 +709,13 @@
    "added": "live changes-6",
    "note": "The docs' word \"agent\" is on r6_never, so the line says what the docs say an agent does here, without the word.",
    "kind": "reply",
-   "when": "Hermes compared with ChatGPT, Claude and the like (live_c6.vs_rule)."
+   "when": "Hermes compared with ChatGPT, Claude and the like (live_c6.vs_rule).",
+   "title": "Hermes compared with ChatGPT",
+   "phrases": [
+    "instead of chatgpt",
+    "better than chatgpt",
+    "hermes vs chatgpt"
+   ]
   },
   {
    "id": "MIG",
@@ -678,7 +724,13 @@
    "source": "Helper's own lead-in; the two kinds are the offer move",
    "added": "offer-t1",
    "offer": "move",
-   "when": "offer_words.migrate, and neither a listed app, a not-listed app nor a computer word in the message"
+   "when": "offer_words.migrate, and neither a listed app, a not-listed app nor a computer word in the message",
+   "title": "Moving to Hermes or to a new computer",
+   "phrases": [
+    "migrate",
+    "move over",
+    "switch over"
+   ]
   },
   {
    "id": "MIG_APP",
@@ -693,7 +745,17 @@
     "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 15 (\"Already set up? Run `hermes migrate` for the same offer\") and line 9 (\"You always see a per-item plan before anything is written\")",
     "not_checked": "Not seen run: whether a person's Hermes can run hermes migrate for them from a chat (it asks to confirm)."
    },
-   "when": "offer_words.migrate with a listed app; or the pick From another AI app"
+   "when": "offer_words.migrate with a listed app; or the pick From another AI app",
+   "title": "Moving from Cursor, Claude Code, Codex or OpenClaw",
+   "phrases": [
+    "moving from cursor",
+    "from claude code",
+    "from openclaw",
+    "from codex",
+    "take my rules",
+    "bring my setup"
+   ],
+   "title_was_t2": "Moving from another AI app"
   },
   {
    "id": "MIG_NOT_LISTED",
@@ -702,7 +764,14 @@
    "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 9 (the list of six); no other app is named on that page",
    "added": "offer-t1",
    "offer": "general",
-   "when": "offer_words.migrate with a not-listed app (chatgpt and the like)"
+   "when": "offer_words.migrate with a not-listed app (chatgpt and the like)",
+   "title": "Moving from an app the docs don't name",
+   "phrases": [
+    "move from another app",
+    "other apps",
+    "from windsurf"
+   ],
+   "title_was_t2": "Apps the docs do not name"
   },
   {
    "id": "MIG_PC",
@@ -713,12 +782,28 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is.",
+    "paste_text": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is. Then tell me how to restore it on my new computer with hermes import.",
     "then_on_new_computer": "Install Hermes there, then: Please restore my Hermes from <the zip file> with hermes import.",
     "source": "dev/hermes-src/website/docs/reference/cli-commands.md lines 1110 to 1123 (hermes backup, default ~/hermes-backup-<timestamp>.zip) and 1186 to 1192 (hermes import <zipfile>)",
-    "not_checked": "Not seen run. A key kept in the vault travels without its unlock code (user-guide/features/credential-vault.md line 128), so a key may need entering again: not checked."
+    "not_checked": "Not seen run. A key kept in the vault travels without its unlock code (user-guide/features/credential-vault.md line 128), so a key may need entering again: not checked.",
+    "paste_text_was_breadth_t1": "Please make a full backup of my Hermes with hermes backup and tell me where the zip file is.",
+    "source_breadth_t1": {
+     "file": "reference/cli-commands.md",
+     "line": 84,
+     "quote": "Restore a Hermes backup from a zip file."
+    }
    },
-   "when": "offer_words.migrate or move/moving with a computer word; or the pick To another computer"
+   "when": "offer_words.migrate or move/moving with a computer word; or the pick To another computer",
+   "title": "Moving Hermes to a new computer or Mac",
+   "phrases": [
+    "new mac",
+    "new computer",
+    "new laptop",
+    "take hermes with me",
+    "move hermes",
+    "another computer"
+   ],
+   "title_was_t2": "Moving Hermes to another computer"
   },
   {
    "id": "HERMES",
@@ -728,7 +813,17 @@
    "added": "offer-t1",
    "offer": "general",
    "word_note": "agent said as AI helper (r6_say_instead agent: Hermes, or bot); 'helper' is a plain word here, not the product name",
-   "when": "offer_words.what_hermes is the whole message (after cuts and end marks); or the pick What Hermes is"
+   "when": "offer_words.what_hermes is the whole message (after cuts and end marks); or the pick What Hermes is",
+   "title": "What Hermes is and who made it",
+   "phrases": [
+    "what is hermes",
+    "what is this app",
+    "who made hermes",
+    "who made this",
+    "who made it",
+    "who makes hermes"
+   ],
+   "title_was_t2": "What Hermes is"
   },
   {
    "id": "START",
@@ -737,7 +832,16 @@
    "source": "dev/hermes-src/website/docs/getting-started/quickstart.md line 105 (\"**Quick Setup (Nous Portal)** — OAuth login, no API keys to manage ... The recommended fast path.\")",
    "added": "offer-t1",
    "offer": "general",
-   "when": "offer_words.start in the message, no topic or term key word (a build with the set-up conversation takes these as setup_ask instead)"
+   "when": "offer_words.start in the message, no topic or term key word (a build with the set-up conversation takes these as setup_ask instead)",
+   "title": "Where to start as a newcomer",
+   "phrases": [
+    "where do i start",
+    "get started",
+    "totally new",
+    "new here",
+    "where to begin"
+   ],
+   "title_was_t2": "Where to start"
   },
   {
    "id": "KEY",
@@ -750,7 +854,14 @@
     "label": "Open Model",
     "part": "model"
    },
-   "when": "offer_words.key in the message (before the terms and topics)"
+   "when": "offer_words.key in the message (before the terms and topics)",
+   "title": "Whether you need a key (API key)",
+   "phrases": [
+    "need a key",
+    "need an api key",
+    "do i need a key"
+   ],
+   "title_was_t2": "Whether you need a key"
   },
   {
    "id": "UPDATE",
@@ -759,7 +870,13 @@
    "source": "dev/hermes-src/website/docs/user-guide/desktop.md line 526 (\"The app checks for updates in the background and offers a one-click update when one is ready.\")",
    "added": "offer-t1",
    "applies_to": "the Hermes desktop app only; other installs are updated another way (reference/cli-commands.md line 2073, not said)",
-   "when": "offer_words.update in the message, no topic key word"
+   "when": "offer_words.update in the message, no topic key word",
+   "title": "Updating Hermes",
+   "phrases": [
+    "update",
+    "new version",
+    "upgrade"
+   ]
   },
   {
    "id": "SAFE",
@@ -776,7 +893,16 @@
     "text": "With an AI on your own computer, nothing leaves your computer. An AI from a company, free ones too, gets your messages.",
     "source": "the line PRIV, word for word (its source)",
     "added": "ask-fix-t1"
-   }
+   },
+   "title": "Permission: Hermes asks you to approve risky commands",
+   "phrases": [
+    "without asking",
+    "asking me first",
+    "ask before it acts",
+    "ask me first",
+    "does it ask first"
+   ],
+   "title_was_t2": "What Hermes asks before it acts"
   },
   {
    "id": "PERSONALITY",
@@ -789,7 +915,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please show me my SOUL.md and help me change how you talk. Ask me before you save anything."
    },
-   "when": "offer_words.personality in the message"
+   "when": "offer_words.personality in the message",
+   "title": "Changing its personality and tone",
+   "phrases": [
+    "personality",
+    "how it talks",
+    "change its tone"
+   ],
+   "title_was_t2": "Changing its personality"
   },
   {
    "id": "KEY_WHAT",
@@ -802,7 +935,14 @@
     "kind": "part",
     "label": "Open Model",
     "part": "model"
-   }
+   },
+   "title": "What a key (API key) is",
+   "phrases": [
+    "what is a key",
+    "what is an api key",
+    "api key"
+   ],
+   "title_was_t2": "What a key is"
   },
   {
    "id": "MIG_CHATGPT",
@@ -816,7 +956,14 @@
     "kind": "part",
     "label": "Open Model",
     "part": "model"
-   }
+   },
+   "title": "Moving chats or settings from ChatGPT",
+   "phrases": [
+    "from chatgpt",
+    "import chatgpt chats",
+    "chatgpt history"
+   ],
+   "title_was_t2": "Moving from ChatGPT"
   },
   {
    "id": "AGENT",
@@ -827,23 +974,39 @@
    "when": "what is / what's / whats / what are + one of offer_words.agent_what",
    "status": "not_run",
    "offer": "general",
-   "word_note": "agent is on r6_never, so the line explains the word without saying it, as the profile term line does. The docs give no one-sentence meaning of agent; 'works by itself' is hhcontent's plain wording of autonomous."
+   "word_note": "agent is on r6_never, so the line explains the word without saying it, as the profile term line does. The docs give no one-sentence meaning of agent; 'works by itself' is hhcontent's plain wording of autonomous.",
+   "title": "What an agent is",
+   "phrases": [
+    "agent",
+    "what is an agent",
+    "ai agent"
+   ]
   },
   {
    "id": "KEY_WHERE",
    "kind": "reply",
-   "text": "A key is a secret code. In the Hermes app it goes in Settings, never in a chat.",
+   "text": "A key is a secret code. Open Settings, then \"Providers\", the AI companies, then \"API keys\". Find your row, such as \"OpenAI API\".",
    "source": "/hermes-docs/user-guide/desktop.md line 447 (\"**Providers settings pane** — a dedicated place to manage inference providers, with an Accounts / API-keys UX for signing in and storing credentials per provider\"). First sentence: line K1, word for word. Seen: the Settings list has a row Providers (docs/answers/hhtech-helper-settings.md line 15, hhtech ran the app v0.23.0).",
    "added": "ask-fix-t1",
    "when": "offer_words.key with one of offer_words.key_where in the message",
    "status": "not_run",
-   "next": {
+   "not_checked": "Nobody on the team has reported what the Providers screen shows for an OpenAI key.",
+   "not_said": "The row inside Settings is called Providers (seen by hhtech, docs/answers/hhtech-helper-settings.md line 15; docs desktop.md line 447). Provider is on r6_never, so the line stops at Settings. If Lead wants the row named, the text would end: open Settings, then Providers.",
+   "title": "Where to put your API key",
+   "phrases": [
+    "where do i put my key",
+    "enter my key",
+    "paste my key",
+    "openai key"
+   ],
+   "text_was_breadth_t1": "A key is a secret code. In the Hermes app it goes in Settings, never in a chat.",
+   "next_was_breadth_t1": {
     "kind": "part",
     "label": "Open Model",
     "part": "model"
    },
-   "not_checked": "Nobody on the team has reported what the Providers screen shows for an OpenAI key.",
-   "not_said": "The row inside Settings is called Providers (seen by hhtech, docs/answers/hhtech-helper-settings.md line 15; docs desktop.md line 447). Provider is on r6_never, so the line stops at Settings. If Lead wants the row named, the text would end: open Settings, then Providers."
+   "seen_breadth_t1": "hhtech saw Settings, Providers, API keys, row OpenAI API in the running app (hhtech-ask-run2.md section 4). No button: Open Model lands on Settings, Model.",
+   "title_was_t2": "Where a key goes"
   },
   {
    "id": "FREE",
@@ -858,7 +1021,13 @@
     "label": "Open Model",
     "part": "model"
    },
-   "not_said": "What a fresh install switches on by itself: no docs line says it (hhtech saw a free Nous model switch on in a run; that is a run, not a docs line)."
+   "not_said": "What a fresh install switches on by itself: no docs line says it (hhtech saw a free Nous model switch on in a run; that is a run, not a docs line).",
+   "title": "Using Hermes for free",
+   "phrases": [
+    "free",
+    "without paying",
+    "no money"
+   ]
   },
   {
    "id": "MODEL_FOR",
@@ -868,12 +1037,19 @@
    "added": "ask-fix-t1",
    "when": "one of offer_words.model_for and the word for in the message",
    "status": "not_run",
-   "offer": "pay"
+   "offer": "pay",
+   "title": "Which AI is best for which work",
+   "phrases": [
+    "best model for",
+    "which ai for",
+    "model for writing"
+   ],
+   "title_was_t2": "Which AI for which work"
   },
   {
    "id": "MODEL_CHANGE",
    "kind": "reply",
-   "text": "In a Hermes chat, the message box shows the AI's name. Click it to choose another.",
+   "text": "In a Hermes chat, click the button left of the microphone. There you choose another AI.",
    "source": "/hermes-docs/user-guide/desktop.md line 283 (\"The model picker lives in the **composer**, just left of the microphone. Click it to switch the model\")",
    "added": "ask-fix-t1",
    "when": "offer_words.model_change in the message",
@@ -883,7 +1059,17 @@
     "label": "Open Model",
     "part": "model"
    },
-   "not_checked": "From the docs and the app's source (docs/answers/hhtech-model-display-name.md line 9). hhcontent has not seen it in the running app, so the line names no button."
+   "not_checked": "From the docs and the app's source (docs/answers/hhtech-model-display-name.md line 9). hhcontent has not seen it in the running app, so the line names no button.",
+   "title": "Switching to another AI (model) in a chat",
+   "phrases": [
+    "change the model",
+    "switch model",
+    "another ai",
+    "different model"
+   ],
+   "text_was_breadth_t1": "In a Hermes chat, the message box shows the AI's name. Click it to choose another.",
+   "seen_breadth_t1": "hhtech (docs/answers/hhtech-ask-run2.md section 4): the button is there and opens a list; it showed a spinner, not a name.",
+   "title_was_t2": "Switching to another AI"
   },
   {
    "id": "SKILL_ADD",
@@ -898,7 +1084,13 @@
     "label": "Open Capabilities",
     "part": "capabilities"
    },
-   "after": "It works from your next new chat, not this one."
+   "after": "It works from your next new chat, not this one.",
+   "title": "Adding a skill",
+   "phrases": [
+    "add a skill",
+    "install a skill",
+    "get a skill"
+   ]
   },
   {
    "id": "PLUGIN_WHICH",
@@ -913,7 +1105,13 @@
     "label": "Open Capabilities",
     "part": "capabilities"
    },
-   "not_said": "Which plugins suit this person: Helper has no checked list of plugins to advise from."
+   "not_said": "Which plugins suit this person: Helper has no checked list of plugins to advise from.",
+   "title": "Which plugins you need",
+   "phrases": [
+    "which plugins",
+    "plugins should i install",
+    "need plugins"
+   ]
   },
   {
    "id": "PLUGIN_ADD",
@@ -928,7 +1126,14 @@
     "label": "Show me what to ask",
     "paste_text": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on."
    },
-   "not_checked": "Not seen run: whether a person's Hermes can run hermes plugins install from a chat. The app's own clicks for plugins were not seen by hhcontent."
+   "not_checked": "Not seen run: whether a person's Hermes can run hermes plugins install from a chat. The app's own clicks for plugins were not seen by hhcontent.",
+   "title": "Adding a plugin (an add-on)",
+   "phrases": [
+    "install a plugin",
+    "add a plugin",
+    "get a plugin"
+   ],
+   "title_was_t2": "Adding a plugin"
   },
   {
    "id": "CODING",
@@ -938,7 +1143,14 @@
    "added": "ask-fix-t1",
    "when": "offer_words.coding_ask in the message; checked before the wants step, so the row w_code (Write and run code) is not shown for it",
    "status": "not_run",
-   "offer": "general"
+   "offer": "general",
+   "title": "Whether you need to know coding",
+   "phrases": [
+    "know coding",
+    "need to code",
+    "programming"
+   ],
+   "title_was_t2": "Whether you need to code"
   },
   {
    "id": "PICK_FIRST",
@@ -975,7 +1187,22 @@
    "added": "ask-fix-t1",
    "offer": "general_2",
    "status": "not_run",
-   "when": "no_repeat: START would show twice in a row (what should I do first, right after how do I set this up); group start"
+   "when": "no_repeat: START would show twice in a row (what should I do first, right after how do I set this up); group start",
+   "title": "The first two steps",
+   "phrases": [
+    "what first",
+    "first step",
+    "set up first"
+   ]
+  },
+  {
+   "id": "NO_MORE",
+   "kind": "reply",
+   "text": "That is all I have checked on that.",
+   "answers": "none",
+   "when": "near.bare_follow_rule: how / why / and then alone, and the last line has no next step",
+   "added": "breadth-t1",
+   "offer": "general"
   }
  ],
  "keeps": {
@@ -2823,7 +3050,26 @@
    "extra",
    "hermes"
   ],
-  "software_rule": "changes-17 (hhtech-c14.md: write me a script, code a game, create a discord bot). After the lead-ins are cut from the start (again and again), the message starts with one of software_verbs, and one of software_things follows with at most software_between_max words between them, none of them software_between_not. Then H1. A message that starts with can it, can hermes ... (make_not_when_starts) never starts with a software verb, so it is not caught: can it write code keeps the wants row w_code. Checked after the how-rule (a how-question is never a request) and after build_words, build_pair and make_words. make and build are not in software_verbs: make_words and build_words have them, with their own exceptions (can you make my bot remember things). A poem, a story or an email is no software thing, so can you write me a poem keeps the don't-know line; write my bot a SOUL.md has my between and is no request."
+  "software_rule": "changes-17 (hhtech-c14.md: write me a script, code a game, create a discord bot). After the lead-ins are cut from the start (again and again), the message starts with one of software_verbs, and one of software_things follows with at most software_between_max words between them, none of them software_between_not. Then H1. A message that starts with can it, can hermes ... (make_not_when_starts) never starts with a software verb, so it is not caught: can it write code keeps the wants row w_code. Checked after the how-rule (a how-question is never a request) and after build_words, build_pair and make_words. make and build are not in software_verbs: make_words and build_words have them, with their own exceptions (can you make my bot remember things). A poem, a story or an email is no software thing, so can you write me a poem keeps the don't-know line; write my bot a SOUL.md has my between and is no request.",
+  "can_question_starts": [
+   "can it",
+   "could it",
+   "will it",
+   "would it",
+   "does it",
+   "is it able",
+   "can hermes",
+   "could hermes",
+   "will hermes",
+   "would hermes",
+   "does hermes",
+   "is hermes able",
+   "can i",
+   "could i",
+   "can my hermes",
+   "can the bot"
+  ],
+  "can_question_rule": "titles-t2: a message that starts with one of can_question_starts asks what Hermes can do. It is never read as a request to build, so it never gets H1, whatever comes after (for me, make, install). It goes on to the fact lines, the 'what Hermes can do' rows and the topics like any question. The one exception stays: build_question_rule gives H2 for can it build an app and the like. 'can you ...' is said to Helper and keeps the old rules."
  },
  "ignore_phrases": [
   "i don't remember",
@@ -3060,7 +3306,13 @@
      "label": "Try it",
      "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
     },
-    "next_note_10": "Was the part button, which with no Memory part fell back to Bots and showed the line where Hermes's Bots tab is. That line answers a question the person did not ask. Changed in changes-10 to mem1's Try it: the person sees memory work in their own Hermes. part_if_no_memory_part still holds for the topic's own part, not for this line."
+    "next_note_10": "Was the part button, which with no Memory part fell back to Bots and showed the line where Hermes's Bots tab is. That line answers a question the person did not ask. Changed in changes-10 to mem1's Try it: the person sees memory work in their own Hermes. part_if_no_memory_part still holds for the topic's own part, not for this line.",
+    "title": "What memory is",
+    "phrases": [
+     "what is memory",
+     "memory",
+     "how does memory work"
+    ]
    },
    "needs": [
     {
@@ -3086,7 +3338,14 @@
       "label": "Try it",
       "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
      },
-     "how_to_tell": "Start a new chat and ask for it (memory.md line 86)."
+     "how_to_tell": "Start a new chat and ask for it (memory.md line 86).",
+     "title": "Hermes remembering things about you",
+     "phrases": [
+      "remember me",
+      "remember things about me",
+      "know my name",
+      "my preferences"
+     ]
     },
     {
      "id": "mem2",
@@ -3115,7 +3374,15 @@
       "kind": "paste",
       "label": "Try it",
       "paste_text": "What did we talk about last time about <topic>?"
-     }
+     },
+     "title": "Finding and searching old chats",
+     "phrases": [
+      "old chats",
+      "remember yesterday",
+      "search my chats",
+      "past conversations"
+     ],
+     "title_was_t2": "Finding old chats"
     },
     {
      "id": "mem3",
@@ -3145,7 +3412,14 @@
       "label": "Show me what to ask",
       "paste_text": "What do you have in your memory about me? List it."
      },
-     "next_note": "Was a line naming \"Memory Graph\". Changed: that name has no button a newcomer can see (hhtech, ran in the app)."
+     "next_note": "Was a line naming \"Memory Graph\". Changed: that name has no button a newcomer can see (hhtech, ran in the app).",
+     "title": "When Hermes forgot something you told it",
+     "phrases": [
+      "it forgot",
+      "does not remember",
+      "forgot what i said"
+     ],
+     "title_was_t2": "When Hermes forgot something"
     },
     {
      "id": "mem4",
@@ -3164,7 +3438,13 @@
       "kind": "part",
       "label": "Open Bots",
       "part": "bots"
-     }
+     },
+     "title": "Separate notes for each Hermes",
+     "phrases": [
+      "separate memory",
+      "separate notes",
+      "notes per bot"
+     ]
     }
    ]
   },
@@ -3280,7 +3560,13 @@
     "next": {
      "kind": "part",
      "label": "Open Model"
-    }
+    },
+    "title": "What a model is",
+    "phrases": [
+     "what is a model",
+     "model",
+     "which ai"
+    ]
    },
    "needs": [
     {
@@ -3301,7 +3587,15 @@
       "kind": "part",
       "label": "Open Model",
       "part": "model"
-     }
+     },
+     "title": "Using your ChatGPT plan with Hermes",
+     "phrases": [
+      "chatgpt plan",
+      "chatgpt plus",
+      "pay for chatgpt",
+      "use chatgpt"
+     ],
+     "title_was_t2": "Using your ChatGPT plan"
     },
     {
      "id": "mod2",
@@ -3317,7 +3611,15 @@
       "kind": "part",
       "label": "Open Model",
       "part": "model"
-     }
+     },
+     "title": "Using your Claude plan with Hermes",
+     "phrases": [
+      "claude pro",
+      "claude max",
+      "claude plan",
+      "pay for claude"
+     ],
+     "title_was_t2": "Using your Claude plan"
     },
     {
      "id": "mod3",
@@ -3355,7 +3657,15 @@
       "kind": "part",
       "label": "Open Model",
       "part": "model"
-     }
+     },
+     "title": "An AI on your own computer (local)",
+     "phrases": [
+      "own computer",
+      "local ai",
+      "on my laptop",
+      "no account"
+     ],
+     "title_was_t2": "An AI on your own computer"
     },
     {
      "id": "mod4",
@@ -3382,7 +3692,13 @@
       "kind": "part",
       "label": "Open Model",
       "part": "model"
-     }
+     },
+     "title": "The quickest way to get an AI",
+     "phrases": [
+      "quickest start",
+      "nous plan",
+      "easiest ai"
+     ]
     }
    ],
    "weak_note_16": "changes-16: pay and money alone were weak key words; can it make me money on the stock market and can it pay my bills got the AI-cost question (hhtech-wants-run.md nos. 21, 22). They now count only in the phrases above. cost, costs, free, subscription and the rest are unchanged."
@@ -3488,7 +3804,13 @@
      "text": "In the Hermes app, open Messaging and pick your chat app. For Telegram, press Create with QR.",
      "source": "user-guide/desktop.md line 451 (msg1 and msg2's source); content/dash-setup-list-v2.json, Chat apps steps",
      "added": "live changes-6: said for and then / what next / how right after msg0, with no AI; handed as a row to the AI as a follow-up"
-    }
+    },
+    "title": "Chatting from your phone",
+    "phrases": [
+     "chat apps",
+     "from my phone",
+     "which chat apps"
+    ]
    },
    "needs": [
     {
@@ -3516,7 +3838,13 @@
       "source": "user-guide/desktop.md line 487 in /hermes-docs (\"scan the code (or open the link) in Telegram, and Hermes creates the bot, detects your user ID for the allowlist, saves the credentials, and restarts the gateway for you\"); the same two sentences as content/dash-setup-list-v2.json, chat_apps steps 3 and 4",
       "added": "live changes-9: said for and then / what next / how right after msg1, with no AI, as msg0-then is after msg0; handed as a row to the AI as a follow-up. Right after msg0-then it is also the next step (msg0-then ends at Create with QR).",
       "status": "not_run"
-     }
+     },
+     "title": "Connecting Telegram",
+     "phrases": [
+      "connect telegram",
+      "set up telegram",
+      "telegram setup"
+     ]
     },
     {
      "id": "msg2",
@@ -3547,7 +3875,15 @@
       "kind": "part",
       "label": "Open Messaging",
       "part": "messaging"
-     }
+     },
+     "title": "Connecting WhatsApp, Discord, Slack or Signal",
+     "phrases": [
+      "whatsapp",
+      "discord",
+      "slack",
+      "signal"
+     ],
+     "title_was_t2": "Connecting another chat app"
     },
     {
      "id": "msg3",
@@ -3571,7 +3907,15 @@
       "kind": "part",
       "label": "Open Messaging",
       "part": "messaging"
-     }
+     },
+     "title": "Answers while your computer is off or closed",
+     "phrases": [
+      "laptop closed",
+      "computer off",
+      "answer any time",
+      "always on"
+     ],
+     "title_was_t2": "Answers while your computer is off"
     }
    ]
   },
@@ -3716,7 +4060,13 @@
     "next": {
      "kind": "part",
      "label": "Open Capabilities"
-    }
+    },
+    "title": "Jobs on a schedule",
+    "phrases": [
+     "schedule",
+     "scheduled jobs",
+     "every morning"
+    ]
    },
    "needs": [
     {
@@ -3749,7 +4099,13 @@
       "label": "Show me what to ask",
       "paste_text": "Every morning at 8, send me a short summary of <what>."
      },
-     "key_words_note_c5": "live changes-5: plain \"update\" removed (\"how do I update hermes\" got this row). It counts only next to every, daily, weekly, morning or each."
+     "key_words_note_c5": "live changes-5: plain \"update\" removed (\"how do I update hermes\" got this row). It counts only next to every, daily, weekly, morning or each.",
+     "title": "A job every day or week",
+     "phrases": [
+      "daily job",
+      "every day",
+      "every week"
+     ]
     },
     {
      "id": "sch2",
@@ -3769,7 +4125,13 @@
       "kind": "paste",
       "label": "Show me what to ask",
       "paste_text": "Remind me <when> to <what>."
-     }
+     },
+     "title": "Reminders",
+     "phrases": [
+      "remind me",
+      "reminder",
+      "set a reminder"
+     ]
     },
     {
      "id": "sch3",
@@ -3791,7 +4153,14 @@
       "kind": "paste",
       "label": "Show me what to ask",
       "paste_text": "Every <how often>, check <what> and tell me what you find."
-     }
+     },
+     "title": "Checking or watching something regularly",
+     "phrases": [
+      "check regularly",
+      "watch something",
+      "monitor"
+     ],
+     "title_was_t2": "A regular check"
     },
     {
      "id": "sch4",
@@ -3813,7 +4182,14 @@
       "kind": "part",
       "label": "Open Messaging",
       "part": "messaging"
-     }
+     },
+     "title": "Why a scheduled job did not run",
+     "phrases": [
+      "jobs not running",
+      "job did not run",
+      "when do jobs run"
+     ],
+     "title_was_t2": "When scheduled jobs run"
     },
     {
      "id": "sch5",
@@ -3838,7 +4214,14 @@
       "paste_text": "Every morning at 8, check my email and send me a short summary."
      },
      "where_note": "The right place is the paste box: a job is made by asking Hermes (cron.md line 24). Open Capabilities opens our own page's part, whose schedule fact sits under More. The app's sidebar row Scheduled jobs (desktop.md line 449: view and manage scheduled jobs) is where the job shows afterwards, but Simple mode hides that row (desktop.md line 292), so the line does not send the person there.",
-     "added": "changes-11, hhtech-run-e86b410 section 3 item 3"
+     "added": "changes-11, hhtech-run-e86b410 section 3 item 3",
+     "title": "A summary of your email every morning",
+     "phrases": [
+      "email every morning",
+      "check my email",
+      "mail summary"
+     ],
+     "title_was_t2": "Your email every morning"
     }
    ]
   },
@@ -3930,7 +4313,14 @@
     "next": {
      "kind": "part",
      "label": "Open Capabilities"
-    }
+    },
+    "title": "Linking a service like GitHub (MCP)",
+    "phrases": [
+     "connect a service",
+     "link a service",
+     "link github"
+    ],
+    "title_was_t2": "Linking a service"
    },
    "needs": [
     {
@@ -4009,7 +4399,14 @@
       "label": "Show me what to ask",
       "paste_text": "Please connect {service}. If there is a ready-made MCP for it, add that. Ask me before you change anything."
      },
-     "also_any_answer_note_ask_fix_t1": "Also not when the message is in question form (it starts with a question word): how do I give it a personality, typed while the service question was open, got this row (hhtech-ask-run.md #29)."
+     "also_any_answer_note_ask_fix_t1": "Also not when the message is in question form (it starts with a question word): how do I give it a personality, typed while the service question was open, got this row (hhtech-ask-run.md #29).",
+     "title": "Adding Gmail, Notion or another service",
+     "phrases": [
+      "connect gmail",
+      "connect notion",
+      "add a service"
+     ],
+     "title_was_t2": "Adding your service"
     },
     {
      "id": "svc2",
@@ -4030,7 +4427,13 @@
       "kind": "part",
       "label": "Open Capabilities",
       "part": "capabilities"
-     }
+     },
+     "title": "Is it safe to connect a service",
+     "phrases": [
+      "safe to connect",
+      "limit what it can use",
+      "is it safe to link"
+     ]
     }
    ]
   },
@@ -4126,7 +4529,14 @@
     "next": {
      "kind": "part",
      "label": "Open Bots"
-    }
+    },
+    "title": "What a bot (a separate Hermes) is",
+    "phrases": [
+     "second bot",
+     "another hermes",
+     "what is a bot"
+    ],
+    "title_was_t2": "What a separate Hermes is"
    },
    "needs": [
     {
@@ -4159,7 +4569,14 @@
       "id": "bot1-next",
       "text": "Open \"Bots\", press \"+\", then \"New bot\". It asks for a name, a title and a description.",
       "source": "Seen in the running app by hhtech and Lead: dev/checks/hhtech-talk-v2/shots/more-7b-bots-plus-menu.png and more-8-bots-new-dialog.png. App text: apps/desktop/src/plugins/hermes-bots/i18n.ts line 179. The docs page bot-mode.md line 61 says New Agent, which the app does not show."
-     }
+     },
+     "title": "A second Hermes for work or home",
+     "phrases": [
+      "one for work and one for home",
+      "second hermes",
+      "new bot"
+     ],
+     "title_was_t2": "One more Hermes"
     },
     {
      "id": "bot2",
@@ -4179,7 +4596,13 @@
       "kind": "part",
       "label": "Open Bots",
       "part": "bots"
-     }
+     },
+     "title": "Two Hermes working together",
+     "phrases": [
+      "work together",
+      "hand work over",
+      "team of bots"
+     ]
     },
     {
      "id": "bot3",
@@ -4198,7 +4621,13 @@
       "kind": "part",
       "label": "Open Bots",
       "part": "bots"
-     }
+     },
+     "title": "Many chats in one Hermes",
+     "phrases": [
+      "many chats",
+      "several chats at once",
+      "more than one chat"
+     ]
     }
    ]
   },
@@ -4343,7 +4772,13 @@
      "text": "When a chat gets long, start a fresh one. Click \"New session\" at the top left.",
      "source": "reference/faq.md line 547 (\"Cause: Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)",
      "text_was_17": "Each message also carries a list of Hermes's actions. Switch off the ones you never use."
-    }
+    },
+    "title": "What tokens are",
+    "phrases": [
+     "tokens",
+     "what are tokens",
+     "what is a token"
+    ]
    },
    "needs": [
     {
@@ -4402,7 +4837,13 @@
       "label_was_17": "What helps",
       "text_was_17": "Start a new chat when one gets long. Also switch off actions you never use."
      },
-     "text_was_17": "Each message to your AI uses tokens, small pieces of words. Long chats and many switched-on actions use the most."
+     "text_was_17": "Each message to your AI uses tokens, small pieces of words. Long chats and many switched-on actions use the most.",
+     "title": "Using fewer tokens",
+     "phrases": [
+      "use less",
+      "save tokens",
+      "fewer tokens"
+     ]
     },
     {
      "id": "use2",
@@ -4438,7 +4879,14 @@
       "kind": "part",
       "label": "Open Model"
      },
-     "text_was_17": "Long chats cost the most. Start a new chat when one gets long, or choose a cheaper AI."
+     "text_was_17": "Long chats cost the most. Start a new chat when one gets long, or choose a cheaper AI.",
+     "title": "Spending less money on the AI",
+     "phrases": [
+      "too expensive",
+      "costs too much",
+      "cheaper"
+     ],
+     "title_was_t2": "Spending less"
     },
     {
      "id": "use3",
@@ -4480,7 +4928,14 @@
       "label_was_17": "What helps",
       "text_was_17": "Each message also carries a list of Hermes's actions. Switch off the ones you never use."
      },
-     "text_was_17": "Each message uses part of your limit, and long chats use more. Start a new chat when one gets long."
+     "text_was_17": "Each message uses part of your limit, and long chats use more. Start a new chat when one gets long.",
+     "title": "Hitting your usage limit",
+     "phrases": [
+      "limit reached",
+      "out of messages",
+      "usage limit"
+     ],
+     "title_was_t2": "Hitting your limit"
     },
     {
      "id": "use4",
@@ -4517,7 +4972,13 @@
      "next": {
       "kind": "part",
       "label": "Open Model"
-     }
+     },
+     "title": "Slow answers and what helps",
+     "phrases": [
+      "too slow",
+      "slow answers",
+      "make it faster"
+     ]
     }
    ],
    "not_said": "Left out on purpose (changes-18). /compress and the \"Compact conversation\" button: on a short chat /compress said \"No changes from compression\"; on a long chat nobody has seen it, and the button was not pressed (hhtech-desk-usage.md section 2). The context meter: seen, but off until the person right-clicks the bar at the bottom and picks \"Context meter\" from a list of 18, and its reading changes form (\"19%\" or \"128 tok\"); /usage shows the same breakdown with nothing to switch on, so it is one step too many for a newcomer. Switching off actions (tool groups): the \"Tools\" tab was not opened, so no line says to switch actions off (was use-more, use1-next, use3-next). Skill switches under \"Capabilities\", \"Skills\": seen, but whether a switch acts for one bot or all is not checked, and how much skills add was not seen; left out. No line gives a number, a share or a price: the 59% for Tool definitions was one three-message chat on one small model.",
@@ -4541,7 +5002,13 @@
     "kind": "part",
     "label": "Open Capabilities",
     "part": "capabilities"
-   }
+   },
+   "title": "What tools are",
+   "phrases": [
+    "tools",
+    "what is a tool",
+    "what are tools"
+   ]
   },
   {
    "id": "skill",
@@ -4564,7 +5031,13 @@
     "source": "the same as the skill line: getting-started/quickstart.md line 295 (\"on-demand instruction documents that teach Hermes how to do a specific task ... a step-by-step procedure\"). 'recipe' is hhcontent's own everyday comparison, not a docs word.",
     "added": "ask-fix-t1",
     "status": "not_run"
-   }
+   },
+   "title": "What a skill is",
+   "phrases": [
+    "skill",
+    "what is a skill",
+    "what are skills"
+   ]
   },
   {
    "id": "plugin",
@@ -4591,7 +5064,13 @@
     "source": "the same as the plugin line: user-guide/features/plugins.md line 10. 'like an app on your phone' is hhcontent's own everyday comparison, not a docs word.",
     "added": "ask-fix-t1",
     "status": "not_run"
-   }
+   },
+   "title": "What a plugin is",
+   "phrases": [
+    "plugin",
+    "what is a plugin",
+    "what are plugins"
+   ]
   },
   {
    "id": "mcp",
@@ -4607,7 +5086,13 @@
     "kind": "part",
     "label": "Open Capabilities",
     "part": "capabilities"
-   }
+   },
+   "title": "What MCP is",
+   "phrases": [
+    "mcp",
+    "what is mcp",
+    "model context protocol"
+   ]
   },
   {
    "id": "soul",
@@ -4623,7 +5108,13 @@
    "source": "user-guide/features/personality.md line 10",
    "next": {
     "kind": "none"
-   }
+   },
+   "title": "What SOUL.md is",
+   "phrases": [
+    "soul.md",
+    "soul file",
+    "what is soul.md"
+   ]
   },
   {
    "id": "profile",
@@ -4641,7 +5132,13 @@
     "kind": "part",
     "label": "Open Bots",
     "part": "bots"
-   }
+   },
+   "title": "What a profile is",
+   "phrases": [
+    "profile",
+    "profiles",
+    "what is a profile"
+   ]
   }
  ],
  "screen_names": [
@@ -6406,6 +6903,19 @@
     ],
     "instead": "general",
     "note": "ask-fix-t1: the model topic's own question and answers, shown as an offer under MODEL_FOR. A pick gives the row and is kept as a picked answer to that question is."
+   },
+   "start_four": {
+    "text": "I can explain these four. Pick one.",
+    "picks": [
+     "can",
+     "mod",
+     "msg",
+     "mem"
+    ],
+    "fixed": true,
+    "note": "titles-t2: shown under a don't-know with nothing near, every time, never swapped by the no-repeat rule. The picks are the TP four (topic_picks). The text is hhcontent's wording, not Lead's or his.",
+    "instead": "general",
+    "instead_note": "never used: this set is fixed and is shown every time (near.nothing_near_rule)"
    }
   },
   "on_lines": {
@@ -6851,5 +7361,2185 @@
   "added": "ask-fix-t1",
   "status": "ran in route2.py (no AI); not run in the app"
  },
- "changed_ask_fix_t1": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2-changes-10.md): about_rule (new); fixed lines MIG_CHATGPT, AGENT, KEY_WHERE, FREE, MODEL_FOR, MODEL_CHANGE, SKILL_ADD, PLUGIN_WHICH, PLUGIN_ADD, CODING, PICK_FIRST, HOW_PASTE, HOW_PART; next on PRIV and SAFE; offer set pay; mean on terms skill and plugin; small_talk.how_that; offer_words extended. Nothing of changes-8 or changes-9 removed."
+ "changed_ask_fix_t1": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2-changes-10.md): about_rule (new); fixed lines MIG_CHATGPT, AGENT, KEY_WHERE, FREE, MODEL_FOR, MODEL_CHANGE, SKILL_ADD, PLUGIN_WHICH, PLUGIN_ADD, CODING, PICK_FIRST, HOW_PASTE, HOW_PART; next on PRIV and SAFE; offer set pay; mean on terms skill and plugin; small_talk.how_that; offer_words extended. Nothing of changes-8 or changes-9 removed.",
+ "facts_t1": {
+  "about": "breadth-t1: one fact line per thing a page of the docs answers for a newcomer. Chosen page by page, not by test misses. Each: title (at most eight words), phrases (other ways to say it), text (R1 to R9), sources (file under /hermes-docs, line, quoted words that are on that line), next (button or copy box) where a step needs doing.",
+  "shown_as": "kind fact: the text, then its next button if it has one. No offer under it.",
+  "duo_exempt": [
+   "d_mem_vs_skill"
+  ],
+  "lines": [
+   {
+    "id": "d_windows",
+    "title": "Hermes on Windows",
+    "phrases": [
+     "windows",
+     "on a pc",
+     "windows 11"
+    ],
+    "text": "Yes. Hermes runs on Windows 10 and 11. It also runs on Mac and Linux.",
+    "sources": [
+     {
+      "file": "getting-started/platform-support.md",
+      "line": 20,
+      "quote": "**Windows 10 / 11**"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_mac",
+    "title": "Hermes on a Mac",
+    "phrases": [
+     "work on mac",
+     "on a mac",
+     "on my mac",
+     "macbook"
+    ],
+    "text": "Yes. The docs list Macs with Apple chips, and the Hermes app runs there.",
+    "sources": [
+     {
+      "file": "getting-started/platform-support.md",
+      "line": 19,
+      "quote": "**macOS** (Apple Silicon)"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_linux",
+    "title": "Hermes on Linux",
+    "phrases": [
+     "linux",
+     "ubuntu",
+     "on linux"
+    ],
+    "text": "Yes. Hermes runs on Linux. Its makers test it on the newest Ubuntu.",
+    "sources": [
+     {
+      "file": "getting-started/platform-support.md",
+      "line": 21,
+      "quote": "We test on the latest Ubuntu"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_android",
+    "title": "Hermes on an Android phone",
+    "phrases": [
+     "android",
+     "termux",
+     "install on my phone"
+    ],
+    "text": "Hermes can run on Android phones, inside an app called Termux.",
+    "sources": [
+     {
+      "file": "getting-started/installation.md",
+      "line": 71,
+      "quote": "Use the [Termux APT package](./termux.md) on aarch64 Android devices."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_download",
+    "title": "Getting the Hermes app",
+    "phrases": [
+     "download",
+     "where do i get hermes",
+     "install hermes",
+     "how do i install it"
+    ],
+    "text": "You download the Hermes app from the Hermes website. Pick the one for your computer.",
+    "sources": [
+     {
+      "file": "getting-started/installation.md",
+      "line": 24,
+      "quote": "Download the package for your platform from the"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_uninstall",
+    "title": "Uninstalling (removing) Hermes",
+    "phrases": [
+     "uninstall",
+     "remove hermes",
+     "delete hermes",
+     "get rid of hermes"
+    ],
+    "text": "The docs name a place in the Hermes app: Settings, About, Danger zone. There you pick how much to remove.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 587,
+      "quote": "open **Settings → About → Danger zone** and pick how much to remove"
+     },
+     {
+      "file": "getting-started/updating.md",
+      "line": 627,
+      "quote": "hermes uninstall"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Show me what to ask",
+     "paste_text": "Please show me what hermes uninstall would remove. Change nothing until I say yes."
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Removing Hermes"
+   },
+   {
+    "id": "d_uninstall_keep",
+    "title": "What stays after removing the app",
+    "phrases": [
+     "after uninstall",
+     "uninstall only the app",
+     "keep my chats when i uninstall"
+    ],
+    "text": "You can remove only the app. Then Hermes itself, your settings and your chats stay.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 589,
+      "quote": "the Hermes agent, your config, and your chats stay"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_update_chat",
+    "title": "Updating from a chat app",
+    "phrases": [
+     "update from telegram",
+     "update from my phone",
+     "/update"
+    ],
+    "text": "You can update Hermes from Telegram, Discord, Slack, WhatsApp or Teams. Send it /update.",
+    "sources": [
+     {
+      "file": "getting-started/updating.md",
+      "line": 546,
+      "quote": "You can also update directly from Telegram, Discord, Slack, WhatsApp, or Teams by sending:"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_version",
+    "title": "Which version you have",
+    "phrases": [
+     "version",
+     "which version",
+     "what version"
+    ],
+    "text": "Your own Hermes can tell you which version it is.",
+    "sources": [
+     {
+      "file": "getting-started/updating.md",
+      "line": 539,
+      "quote": "hermes --version"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Show me what to ask",
+     "paste_text": "Please run hermes --version and tell me which version I have."
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_provider",
+    "title": "What a provider is",
+    "phrases": [
+     "provider",
+     "providers",
+     "what is a provider",
+     "ai provider"
+    ],
+    "text": "\"Provider\" is the app's word for the company that runs the AI. OpenAI and Anthropic are two.",
+    "sources": [
+     {
+      "file": "getting-started/quickstart.md",
+      "line": 13,
+      "quote": "Install, choose a provider, verify a working chat"
+     },
+     {
+      "file": "getting-started/quickstart.md",
+      "line": 118,
+      "quote": "**Anthropic**"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_first_chat",
+    "title": "Checking that Hermes answers",
+    "phrases": [
+     "first message",
+     "test that it works",
+     "check it works"
+    ],
+    "text": "After you pick an AI, send Hermes one message. Make it something easy to check.",
+    "sources": [
+     {
+      "file": "getting-started/quickstart.md",
+      "line": 189,
+      "quote": "Use a prompt that's specific and easy to verify"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_does",
+    "title": "What Hermes does, in short",
+    "phrases": [
+     "what does hermes do",
+     "what does it do",
+     "like alexa",
+     "what is it for",
+     "what is hermes for"
+    ],
+    "text": "You talk to it like other AIs. Hermes also works by itself, and the docs say it gets better over time.",
+    "sources": [
+     {
+      "file": "index.mdx",
+      "line": 115,
+      "quote": "It's an **autonomous agent** that gets more capable the longer it runs."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "What Hermes does"
+   },
+   {
+    "id": "d_not_laptop",
+    "title": "Hermes away from your laptop",
+    "phrases": [
+     "tied to my laptop",
+     "run it somewhere else",
+     "cloud computer"
+    ],
+    "text": "Hermes need not run on your laptop. You can talk to it from Telegram while it works elsewhere.",
+    "sources": [
+     {
+      "file": "index.mdx",
+      "line": 115,
+      "quote": "It's not tied to your laptop."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_data_sent",
+    "title": "Where your messages go",
+    "phrases": [
+     "is my data sent",
+     "send my data",
+     "who sees my chats",
+     "telemetry",
+     "tracking me"
+    ],
+    "text": "Your messages go only to the AI company you choose. Hermes itself collects no usage data.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 58,
+      "quote": "Hermes Agent does not collect telemetry, usage data, or analytics."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_stored_local",
+    "title": "Where Hermes keeps your things",
+    "phrases": [
+     "where is my data stored",
+     "stored on my computer",
+     "where are my files kept"
+    ],
+    "text": "Your chats and its notes stay on your own computer, in the Hermes folder.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 58,
+      "quote": "stored locally in `~/.hermes/`"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_offline",
+    "title": "Using Hermes with no internet",
+    "phrases": [
+     "offline",
+     "without internet",
+     "no internet"
+    ],
+    "text": "Yes, with an AI on your own computer. After its download, that AI needs no internet.",
+    "sources": [
+     {
+      "file": "user-guide/local-models.md",
+      "line": 14,
+      "quote": "no network access"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_many_people",
+    "title": "Other people using your Hermes",
+    "phrases": [
+     "wife use",
+     "husband use",
+     "someone else use",
+     "family use",
+     "share it with",
+     "friend use",
+     "multiple people",
+     "other people use"
+    ],
+    "text": "Yes. Other people can talk to your Hermes from a chat app. You choose who is allowed.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 100,
+      "quote": "lets multiple users interact with the same Hermes Agent instance"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Messaging",
+     "part": "messaging"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_mem_vs_skill",
+    "title": "Memory and skills compared",
+    "phrases": [
+     "difference between memory and skill",
+     "diffrence between memory and skill",
+     "memory vs skill",
+     "memory or a skill"
+    ],
+    "text": "Memory is short notes with facts about you. A skill is written steps for one task. Hermes keeps both.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 104,
+      "quote": "**Memory** stores **facts**"
+     },
+     {
+      "file": "reference/faq.md",
+      "line": 105,
+      "quote": "**Skills** store **procedures**"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_key_bad",
+    "title": "When a key does not work",
+    "phrases": [
+     "key not working",
+     "key doesnt work",
+     "invalid key",
+     "key rejected",
+     "wrong key"
+    ],
+    "text": "A key is a secret code. If it fails, it is missing, too old, typed wrong, or from another company.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 286,
+      "quote": "Key is missing, expired, incorrectly set, or for the wrong provider."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_rate",
+    "title": "Rate limit: too many requests at once",
+    "phrases": [
+     "rate limit",
+     "429",
+     "too many requests"
+    ],
+    "text": "That means you passed the limit of your AI company. Wait a moment and try again.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 322,
+      "quote": "You've exceeded your provider's rate limits."
+     },
+     {
+      "file": "reference/faq.md",
+      "line": 324,
+      "quote": "Wait a moment and retry."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Too many requests at once"
+   },
+   {
+    "id": "d_too_long",
+    "title": "When a chat gets too long",
+    "phrases": [
+     "chat too long",
+     "context length",
+     "conversation too long"
+    ],
+    "text": "A very long chat can grow past what the AI can read. Start a fresh chat.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 331,
+      "quote": "The conversation has grown too long for the model's context window"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_blocked",
+    "title": "Why a command was blocked",
+    "phrases": [
+     "command blocked",
+     "blocked as dangerous",
+     "why did it block"
+    ],
+    "text": "Hermes stops commands that could destroy things. It shows you the command, and you approve or refuse.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 383,
+      "quote": "Hermes detected a potentially destructive command"
+     },
+     {
+      "file": "reference/faq.md",
+      "line": 385,
+      "quote": "When prompted, review the command"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "A command was blocked"
+   },
+   {
+    "id": "d_bot_silent",
+    "title": "When your chat app bot does not reply",
+    "phrases": [
+     "bot not responding",
+     "bot doesnt reply",
+     "bot not replying",
+     "bot doesnt answer",
+     "whatsapp not replying",
+     "discord not replying",
+     "no reply in my chat app"
+    ],
+    "text": "The docs give three causes. Hermes is not running, not linked, or you are not on its allowed list.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 425,
+      "quote": "The bot isn't running, isn't authorized, or your user isn't in the allowlist."
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Messaging",
+     "part": "messaging"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "When your chat app gets no answer"
+   },
+   {
+    "id": "d_slow",
+    "title": "Why answers are slow: three causes",
+    "phrases": [
+     "so slow",
+     "why is it slow",
+     "answers take long"
+    ],
+    "text": "Three causes are named. A big AI, a far-away AI company, or many actions switched on.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 537,
+      "quote": "Large model, distant API server, or heavy system prompt with many tools."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Slow answers"
+   },
+   {
+    "id": "d_share_notes",
+    "title": "Do separate Hermes share notes",
+    "phrases": [
+     "share memory between",
+     "share notes between",
+     "do they share chats"
+    ],
+    "text": "No. Each separate Hermes keeps its own notes and its own chats. Nothing is shared.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 674,
+      "quote": "Each profile has its own memory store, session database, and skills directory."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_backup_vs",
+    "title": "Backup and export compared",
+    "phrases": [
+     "backup or export",
+     "difference between backup and export",
+     "full backup"
+    ],
+    "text": "A full backup packs everything, your sign-ins too. An export packs one Hermes and leaves those out.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 848,
+      "quote": "**Included** (`.env` and `auth.json`)"
+     },
+     {
+      "file": "reference/faq.md",
+      "line": 848,
+      "quote": "**Excluded** (stripped for safe sharing)"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Two ways to pack Hermes"
+   },
+   {
+    "id": "d_stop",
+    "title": "Stopping Hermes while it works",
+    "phrases": [
+     "stop it",
+     "how do i stop",
+     "make it stop",
+     "stop hermes",
+     "cancel what it is doing",
+     "stuck thinking",
+     "thinking forever"
+    ],
+    "text": "The docs say: press Stop in the chat, or Esc on your keyboard.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 236,
+      "quote": "Pressing Stop (or Esc"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_stop_chat",
+    "title": "Stopping Hermes from a chat app",
+    "phrases": [
+     "stop it from telegram",
+     "stop from my phone",
+     "stop in whatsapp"
+    ],
+    "text": "In a chat app, send /stop. That stops what Hermes is doing.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/index.md",
+      "line": 252,
+      "quote": "`/stop` | Stop the running agent"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_keep_open",
+    "title": "Closing the app window while Hermes runs",
+    "phrases": [
+     "keep the app open",
+     "close the app",
+     "close the window",
+     "app stay open",
+     "leave it open"
+    ],
+    "text": "Closing the window can hide the app while Hermes keeps running. That setting is off at first.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 342,
+      "quote": "hides it without stopping Hermes"
+     },
+     {
+      "file": "user-guide/desktop.md",
+      "line": 340,
+      "quote": "The setting is off by default"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Closing the app window"
+   },
+   {
+    "id": "d_tray",
+    "title": "Bringing the app window back",
+    "phrases": [
+     "bring the window back",
+     "app disappeared",
+     "where did the window go"
+    ],
+    "text": "The docs say: use Show Hermes in the tray, the small icons by the clock.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 342,
+      "quote": "Use **Show Hermes** in the system tray"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_export",
+    "title": "Packing one Hermes into a file to share",
+    "phrases": [
+     "export profile",
+     "share my setup",
+     "send my setup to a friend"
+    ],
+    "text": "You can pack one Hermes into a single file to share. Your sign-ins are left out.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 558,
+      "quote": "share a whole setup as a single file"
+     },
+     {
+      "file": "user-guide/desktop.md",
+      "line": 558,
+      "quote": "API keys are stripped"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "One Hermes as a single file"
+   },
+   {
+    "id": "d_drag",
+    "title": "Giving Hermes a file",
+    "phrases": [
+     "attach a file",
+     "send it a file",
+     "upload a file",
+     "give it a file",
+     "drag a file"
+    ],
+    "text": "Drag a file into the chat. It is attached to your next message.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 229,
+      "quote": "anywhere in the chat area to attach them to your next message"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_find",
+    "title": "Searching inside a chat",
+    "phrases": [
+     "search in chat",
+     "find in chat",
+     "find a word"
+    ],
+    "text": "Press Ctrl+F, or Cmd+F on a Mac. A find bar searches the chat on screen.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 240,
+      "quote": "press **Cmd/Ctrl+F** to open a find bar"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_default_ai",
+    "title": "Setting the AI for new chats",
+    "phrases": [
+     "default model",
+     "default ai",
+     "main model",
+     "ai for every chat"
+    ],
+    "text": "Open Settings, then \"Model\". Choose the company and the AI, then click \"Apply\".",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 288,
+      "quote": "**Set the default in Settings → Model → Main model.**"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_voice_app",
+    "title": "Talking to Hermes in the app",
+    "phrases": [
+     "voice",
+     "speak to it",
+     "microphone",
+     "dictate"
+    ],
+    "text": "You can talk to Hermes and hear it answer. On a Mac, you allow the microphone once.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 386,
+      "quote": "Talk to Hermes and hear it back"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_lang",
+    "title": "Changing the language of the app",
+    "phrases": [
+     "language",
+     "change language",
+     "in german",
+     "in spanish",
+     "language of the app",
+     "change the language"
+    ],
+    "text": "The app's own text comes in English, Chinese, Japanese, Arabic and Russian.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 551,
+      "quote": "English, Simplified Chinese (zh-Hans), Traditional Chinese (zh-Hant), Japanese, Arabic (RTL), and Russian"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "The app in other languages"
+   },
+   {
+    "id": "d_shortcuts",
+    "title": "Jumping around with the keyboard",
+    "phrases": [
+     "keyboard shortcuts",
+     "shortcut",
+     "command palette"
+    ],
+    "text": "Press Ctrl+K, or Cmd+K on a Mac. A box opens where you type where to go.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 548,
+      "quote": "press **Cmd+K** or **Cmd+P** (Ctrl+K / Ctrl+P on Windows/Linux)"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_mem_graph",
+    "title": "A map of what Hermes learned",
+    "phrases": [
+     "see what it learned",
+     "memory graph",
+     "what has it learned"
+    ],
+    "text": "The docs name a \"Memory Graph\". It is a map of what Hermes has learned for you.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 378,
+      "quote": "is an interactive map of what Hermes has learned for you"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_restart_note",
+    "title": "Hermes stopped in the background",
+    "phrases": [
+     "stopped working in the background",
+     "hermes stopped working",
+     "hermes restarted",
+     "started again by itself"
+    ],
+    "text": "The app starts Hermes again by itself and shows a notice. The chat comes back after that.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 864,
+      "quote": "Desktop restarts it on its own"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_gateway",
+    "title": "What a gateway is",
+    "phrases": [
+     "gateway",
+     "what is a gateway",
+     "the gateway"
+    ],
+    "text": "\"Gateway\" is the docs' word for one part of Hermes. It links Hermes to your chat apps.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/index.md",
+      "line": 7,
+      "quote": "# Messaging Gateway"
+     },
+     {
+      "file": "user-guide/messaging/index.md",
+      "line": 9,
+      "quote": "Chat with Hermes from Telegram, Discord, Slack, WhatsApp, Signal"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Messaging",
+     "part": "messaging"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_allowed",
+    "title": "Who may talk to your Hermes",
+    "phrases": [
+     "who can talk to",
+     "allowed users",
+     "strangers message",
+     "anyone message"
+    ],
+    "text": "At first, nobody else can. Hermes answers only people on its allowed list.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/index.md",
+      "line": 392,
+      "quote": "By default, the gateway denies all users who are not in an allowlist or paired via DM."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_pairing",
+    "title": "Letting a new person in",
+    "phrases": [
+     "pairing",
+     "pairing code",
+     "let someone in",
+     "add a person"
+    ],
+    "text": "A new person who writes to it gets a one-time code. You approve that code.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/index.md",
+      "line": 418,
+      "quote": "unknown users receive a one-time pairing code when they DM the bot"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_chat_cmds",
+    "title": "Short commands in a chat app",
+    "phrases": [
+     "commands in telegram",
+     "slash commands",
+     "commands in chat"
+    ],
+    "text": "In a chat app, /new starts a fresh chat. /stop stops Hermes.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/index.md",
+      "line": 245,
+      "quote": "`/new` or `/reset` | Start a fresh conversation"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_redirect",
+    "title": "Correcting Hermes while it works",
+    "phrases": [
+     "correct it while",
+     "tell it something while it works",
+     "change the job midway"
+    ],
+    "text": "Send a message while Hermes works. It takes your correction into the same job.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/index.md",
+      "line": 481,
+      "quote": "Send a message while the agent is working to correct the active turn"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_tg_silent",
+    "title": "Telegram gives no answer at all",
+    "phrases": [
+     "telegram doesnt reply",
+     "telegram not replying",
+     "telegram not answering",
+     "telegram bot doesnt reply",
+     "no reply on telegram",
+     "telegram silent"
+    ],
+    "text": "For Telegram the docs say: check that its secret code is right. Then look at the log Hermes keeps.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/telegram.md",
+      "line": 1477,
+      "quote": "Verify `TELEGRAM_BOT_TOKEN` is correct. Check `hermes gateway` logs for errors."
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Messaging",
+     "part": "messaging"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_tg_unauth",
+    "title": "Telegram says unauthorized",
+    "phrases": [
+     "unauthorized",
+     "not authorized",
+     "telegram unauthorized"
+    ],
+    "text": "That means your Telegram user number is not on the allowed list.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/telegram.md",
+      "line": 1478,
+      "quote": "Your user ID is not in `TELEGRAM_ALLOWED_USERS`."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_tg_group",
+    "title": "Telegram group messages ignored",
+    "phrases": [
+     "ignores group",
+     "group messages",
+     "telegram group"
+    ],
+    "text": "The docs say privacy mode is likely on. Turn it off, or make Hermes a group admin.",
+    "sources": [
+     {
+      "file": "user-guide/messaging/telegram.md",
+      "line": 1479,
+      "quote": "Privacy mode is likely on."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_passwords",
+    "title": "Hermes and your passwords",
+    "phrases": [
+     "passwords",
+     "password",
+     "read my secrets"
+    ],
+    "text": "Hermes is blocked from changing the places where secret codes are kept. I have nothing checked on passwords in other files.",
+    "sources": [
+     {
+      "file": "user-guide/security.md",
+      "line": 400,
+      "quote": "These categories are always denied"
+     },
+     {
+      "file": "user-guide/security.md",
+      "line": 405,
+      "quote": "Hermes secret stores"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_modes",
+    "title": "How often Hermes asks for permission",
+    "phrases": [
+     "approval mode",
+     "ask less",
+     "ask every time",
+     "stop asking me"
+    ],
+    "text": "There are three settings for how Hermes asks first: smart, manual and off.",
+    "sources": [
+     {
+      "file": "user-guide/security.md",
+      "line": 34,
+      "quote": "# smart | manual | off"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "How often Hermes asks you"
+   },
+   {
+    "id": "d_yolo",
+    "title": "YOLO mode: no approval questions in one chat",
+    "phrases": [
+     "yolo",
+     "never ask",
+     "skip approval"
+    ],
+    "text": "The docs name a YOLO mode. It skips every such question for the current chat.",
+    "sources": [
+     {
+      "file": "user-guide/security.md",
+      "line": 69,
+      "quote": "YOLO mode bypasses **all** dangerous command approval prompts for the current session."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Turning the asking off"
+   },
+   {
+    "id": "d_never",
+    "title": "Commands Hermes always refuses",
+    "phrases": [
+     "always refuse",
+     "never run",
+     "wipe my disk",
+     "destroy my computer"
+    ],
+    "text": "Some commands Hermes never runs, whatever the settings. Wiping a whole disk is one.",
+    "sources": [
+     {
+      "file": "user-guide/security.md",
+      "line": 143,
+      "quote": "Hermes refuses to run them **regardless** of"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_timeout",
+    "title": "When you do not answer its approval question",
+    "phrases": [
+     "dont answer in time",
+     "if i dont approve",
+     "no response to approval"
+    ],
+    "text": "If you do not answer in time, Hermes does not run the command.",
+    "sources": [
+     {
+      "file": "user-guide/security.md",
+      "line": 196,
+      "quote": "If no response is given within the timeout, the command is **denied** by default"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "When you do not answer its question"
+   },
+   {
+    "id": "d_chats_where",
+    "title": "Where your chats are saved",
+    "phrases": [
+     "where are my chats",
+     "chats saved",
+     "chat history stored",
+     "where is my history"
+    ],
+    "text": "Every chat is saved on the computer Hermes runs on. It is one file in its folder.",
+    "sources": [
+     {
+      "file": "user-guide/sessions.md",
+      "line": 17,
+      "quote": "**SQLite database** (`~/.hermes/state.db`)"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_titles",
+    "title": "Names for your chats",
+    "phrases": [
+     "rename a chat",
+     "name a chat",
+     "chat title"
+    ],
+    "text": "Hermes names each chat by itself after the first answer. You can change the name.",
+    "sources": [
+     {
+      "file": "user-guide/sessions.md",
+      "line": 310,
+      "quote": "Hermes automatically generates a short descriptive title (3–7 words) for each session after the first exchange."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_delete_chat",
+    "title": "Deleting a chat",
+    "phrases": [
+     "delete a chat",
+     "delete my chats",
+     "remove a chat",
+     "erase history",
+     "clear history"
+    ],
+    "text": "Your own Hermes can delete a chat for you. It asks you to confirm first.",
+    "sources": [
+     {
+      "file": "user-guide/sessions.md",
+      "line": 505,
+      "quote": "# Delete a specific session (with confirmation)"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Show me what to ask",
+     "paste_text": "Please list my recent chats and help me delete one. Ask me before you delete anything."
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_chats_kept",
+    "title": "How long chats are kept",
+    "phrases": [
+     "how long are chats kept",
+     "do chats expire",
+     "old chats deleted"
+    ],
+    "text": "Hermes keeps old chats. Clearing them out by itself is off unless you turn it on.",
+    "sources": [
+     {
+      "file": "user-guide/sessions.md",
+      "line": 1195,
+      "quote": "Auto-pruning (**off by default**; opt in)"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_copy_hermes",
+    "title": "Copying a Hermes",
+    "phrases": [
+     "copy my bot",
+     "clone",
+     "duplicate hermes"
+    ],
+    "text": "A copy takes the settings, personality and notes along. Old chats are not copied.",
+    "sources": [
+     {
+      "file": "user-guide/profiles.md",
+      "line": 102,
+      "quote": "Copies **everything**"
+     },
+     {
+      "file": "user-guide/profiles.md",
+      "line": 102,
+      "quote": "Per-profile history is excluded"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_delete_hermes",
+    "title": "Deleting one separate Hermes",
+    "phrases": [
+     "delete a bot",
+     "delete a profile",
+     "remove a bot"
+    ],
+    "text": "Your own Hermes can delete one of your separate Hermes. Ask it to check with you first.",
+    "sources": [
+     {
+      "file": "user-guide/profiles.md",
+      "line": 378,
+      "quote": "hermes profile delete coder"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Show me what to ask",
+     "paste_text": "Please list my profiles and help me delete one. Ask me before you delete anything."
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_mem_size",
+    "title": "How much Hermes remembers",
+    "phrases": [
+     "memory limit",
+     "how much can it remember",
+     "memory full"
+    ],
+    "text": "Its notes are kept short on purpose. About 2,200 letters of its own, and 1,375 about you.",
+    "sources": [
+     {
+      "file": "user-guide/features/memory.md",
+      "line": 17,
+      "quote": "2,200 chars"
+     },
+     {
+      "file": "user-guide/features/memory.md",
+      "line": 18,
+      "quote": "1,375 chars"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_mem_change",
+    "title": "Changing or removing what Hermes remembers",
+    "phrases": [
+     "remove a memory",
+     "change what it remembers",
+     "edit memory",
+     "wrong memory",
+     "change a note"
+    ],
+    "text": "Hermes can add, change or remove its own notes. Ask it in plain words.",
+    "sources": [
+     {
+      "file": "user-guide/features/memory.md",
+      "line": 20,
+      "quote": "it can add, patch, or remove entries"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Try it",
+     "paste_text": "Please show me what you have saved about me, and remove the parts I tell you."
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Changing what Hermes remembers"
+   },
+   {
+    "id": "d_mem_approve",
+    "title": "Approving what Hermes saves",
+    "phrases": [
+     "approve memory",
+     "ask before saving",
+     "stop it saving"
+    ],
+    "text": "Hermes saves notes freely at first. A setting makes it ask you before each save.",
+    "sources": [
+     {
+      "file": "user-guide/features/memory.md",
+      "line": 331,
+      "quote": "By default the agent saves memory freely"
+     },
+     {
+      "file": "user-guide/features/memory.md",
+      "line": 333,
+      "quote": "set `memory.write_approval: true`"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_skill_use",
+    "title": "Using a skill",
+    "phrases": [
+     "use a skill",
+     "run a skill",
+     "how do i use skills"
+    ],
+    "text": "A skill is written steps for one task. Type / and its name in a chat to use it.",
+    "sources": [
+     {
+      "file": "user-guide/features/skills.md",
+      "line": 75,
+      "quote": "Every installed skill is automatically available as a slash command"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_skill_own",
+    "title": "Hermes writes its own skills",
+    "phrases": [
+     "does it learn",
+     "make its own skills",
+     "create skills itself",
+     "self improving"
+    ],
+    "text": "A skill is written steps for one task. Hermes can write new ones itself after it solves something.",
+    "sources": [
+     {
+      "file": "user-guide/features/skills.md",
+      "line": 608,
+      "quote": "The agent can create, update, and delete its own skills"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_skill_learn",
+    "title": "Teaching Hermes from your material",
+    "phrases": [
+     "/learn",
+     "teach it",
+     "learn from my documents"
+    ],
+    "text": "The docs name /learn. It turns what you know into a skill, written steps for one task.",
+    "sources": [
+     {
+      "file": "user-guide/features/skills.md",
+      "line": 119,
+      "quote": "`/learn` is the fast way to turn something you already know"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_plugin_off",
+    "title": "Add-ons start switched off",
+    "phrases": [
+     "plugin not working",
+     "enable a plugin",
+     "turn on a plugin",
+     "plugin disabled"
+    ],
+    "text": "A plugin is an add-on. One you add yourself stays off until you switch it on.",
+    "sources": [
+     {
+      "file": "user-guide/features/plugins.md",
+      "line": 175,
+      "quote": "**General plugins and user-installed backends are disabled by default**"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_plugin_find",
+    "title": "Finding add-ons",
+    "phrases": [
+     "find plugins",
+     "search plugins",
+     "plugin list",
+     "what plugins are there"
+    ],
+    "text": "A plugin is an add-on. Your own Hermes can search the official list for you.",
+    "sources": [
+     {
+      "file": "user-guide/features/plugins.md",
+      "line": 428,
+      "quote": "# search the Hermes plugin catalog"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Show me what to ask",
+     "paste_text": "Please search the Hermes plugin catalog for <what you want> and show me what you find. Install nothing yet."
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_job_change",
+    "title": "Pausing or removing a job",
+    "phrases": [
+     "pause a job",
+     "remove a job",
+     "delete a job",
+     "stop a job",
+     "cancel a reminder",
+     "edit a job"
+    ],
+    "text": "You can pause, change or remove a job by asking Hermes in plain words.",
+    "sources": [
+     {
+      "file": "user-guide/features/cron.md",
+      "line": 24,
+      "quote": "you can create, pause, edit, and remove jobs by asking in plain language"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_job_where",
+    "title": "Where a job's result goes",
+    "phrases": [
+     "where do results go",
+     "where does it send",
+     "job output"
+    ],
+    "text": "A job's result comes back to the chat where you made the job.",
+    "sources": [
+     {
+      "file": "user-guide/features/cron.md",
+      "line": 651,
+      "quote": "Back to where the job was created"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_job_all_stop",
+    "title": "Stopping every job at once",
+    "phrases": [
+     "stop all jobs",
+     "pause everything",
+     "emergency stop"
+    ],
+    "text": "The docs name one stop for every job at once. It is called hermes pause.",
+    "sources": [
+     {
+      "file": "user-guide/features/cron.md",
+      "line": 322,
+      "quote": "is the global emergency stop"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Show me what to ask",
+     "paste_text": "Please pause all my scheduled jobs with hermes pause and tell me when it is done."
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_pers_ready",
+    "title": "Ready-made ways of talking",
+    "phrases": [
+     "personalities",
+     "ready made personality",
+     "make it brief"
+    ],
+    "text": "Hermes comes with ready-made ways of talking, such as helpful and concise. /personality switches for one chat.",
+    "sources": [
+     {
+      "file": "user-guide/features/personality.md",
+      "line": 175,
+      "quote": "Hermes ships with built-in personalities you can switch to with `/personality`."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_soul_where",
+    "title": "Where SOUL.md lives",
+    "phrases": [
+     "where is soul.md",
+     "find soul.md",
+     "where is the soul file"
+    ],
+    "text": "SOUL.md is the file that says who your Hermes is. It sits in the folder Hermes keeps.",
+    "sources": [
+     {
+      "file": "user-guide/features/personality.md",
+      "line": 57,
+      "quote": "~/.hermes/SOUL.md"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_tools_list",
+    "title": "Actions Hermes has built in",
+    "phrases": [
+     "built in tools",
+     "what tools",
+     "out of the box"
+    ],
+    "text": "Tools are actions Hermes can take. Built in are web search, browsing, files, notes and jobs on a schedule.",
+    "sources": [
+     {
+      "file": "user-guide/features/tools.md",
+      "line": 17,
+      "quote": "Hermes ships with a broad built-in tool registry covering web search, browser automation, terminal execution, file editing, memory, delegation, scheduled tasks"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_voice_tg",
+    "title": "Spoken answers in Telegram",
+    "phrases": [
+     "voice reply",
+     "voice message back",
+     "speak in telegram"
+    ],
+    "text": "In Telegram and Discord, Hermes can send its answer as sound with the text.",
+    "sources": [
+     {
+      "file": "user-guide/features/voice-mode.md",
+      "line": 36,
+      "quote": "Agent sends spoken audio alongside text responses"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_local_how",
+    "title": "Setting up an AI on your computer",
+    "phrases": [
+     "local model",
+     "run locally",
+     "run it locally",
+     "local ai setup"
+    ],
+    "text": "The docs say: Settings, \"Providers\", Local Models. Install, pick an AI, download it, then click Use.",
+    "sources": [
+     {
+      "file": "user-guide/local-models.md",
+      "line": 42,
+      "quote": "Open **Settings → Providers → Local Models**"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_local_fit",
+    "title": "Hermes fits the AI to your computer",
+    "phrases": [
+     "which local ai fits",
+     "do i need a gpu",
+     "which build",
+     "fits my computer",
+     "right version of the ai"
+    ],
+    "text": "Hermes picks the right build of each AI for your computer. You only pick the AI.",
+    "sources": [
+     {
+      "file": "user-guide/local-models.md",
+      "line": 12,
+      "quote": "You pick a model; Hermes does the rest."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_local_where",
+    "title": "Computers that can run a local AI",
+    "phrases": [
+     "local on windows",
+     "local on mac",
+     "local on linux"
+    ],
+    "text": "An AI on your own computer works on Mac, Windows and Linux.",
+    "sources": [
+     {
+      "file": "user-guide/local-models.md",
+      "line": 19,
+      "quote": "Local Models is on by default in the desktop app on macOS, Windows, and Linux"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_nous",
+    "title": "Nous Portal: one sign-in for many AIs",
+    "phrases": [
+     "nous portal",
+     "what is nous",
+     "nous"
+    ],
+    "text": "Nous Portal is from the makers of Hermes. One sign-in covers more than 300 AIs.",
+    "sources": [
+     {
+      "file": "integrations/providers.md",
+      "line": 74,
+      "quote": "One OAuth login covers 300+"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "Nous Portal"
+   },
+   {
+    "id": "d_plans",
+    "title": "Paying with a plan you already have",
+    "phrases": [
+     "use my plan",
+     "sign in with my plan",
+     "supergrok"
+    ],
+    "text": "Some AI companies let you sign in with a plan you already pay for.",
+    "sources": [
+     {
+      "file": "integrations/providers.md",
+      "line": 134,
+      "quote": "Several providers let you sign in to Hermes with a **consumer subscription**"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_openrouter",
+    "title": "OpenRouter: one service for many AIs",
+    "phrases": [
+     "openrouter",
+     "what is openrouter",
+     "open router"
+    ],
+    "text": "OpenRouter is one service that reaches many AIs from many companies.",
+    "sources": [
+     {
+      "file": "getting-started/quickstart.md",
+      "line": 119,
+      "quote": "Multi-provider routing across many models"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "OpenRouter"
+   },
+   {
+    "id": "d_ollama",
+    "title": "Ollama and LM Studio",
+    "phrases": [
+     "ollama",
+     "lm studio",
+     "use ollama"
+    ],
+    "text": "Both run AIs on your own computer, and Hermes can use them.",
+    "sources": [
+     {
+      "file": "integrations/providers.md",
+      "line": 728,
+      "quote": "runs open-weight models locally"
+     },
+     {
+      "file": "integrations/providers.md",
+      "line": 920,
+      "quote": "is a desktop app for running local models"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "breadth-t1"
+   },
+   {
+    "id": "d_any_ai",
+    "title": "Other AI companies that work with Hermes",
+    "phrases": [
+     "which ai companies",
+     "which ai work with",
+     "supported ai",
+     "other ai companies"
+    ],
+    "text": "Hermes works with many AI companies. The docs list them, and I have not checked each one.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 21,
+      "quote": "Hermes Agent works with any OpenAI-compatible API."
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "breadth-t1",
+    "title_was_t2": "AI companies that work with Hermes"
+   },
+   {
+    "id": "d_undo",
+    "title": "Undoing something Hermes did or deleted",
+    "phrases": [
+     "undo",
+     "get it back",
+     "deleted something",
+     "roll back",
+     "rollback",
+     "restore my files"
+    ],
+    "text": "Hermes can copy your work before a risky change and restore it later. This is off unless you turn it on.",
+    "sources": [
+     {
+      "file": "user-guide/checkpoints-and-rollback.md",
+      "line": 10,
+      "quote": "automatically snapshot your project before **destructive operations** and restore it with a single command"
+     },
+     {
+      "file": "user-guide/checkpoints-and-rollback.md",
+      "line": 10,
+      "quote": "so the default is off"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "titles-t2"
+   },
+   {
+    "id": "d_open_source",
+    "title": "Whether Hermes is open source",
+    "phrases": [
+     "open source",
+     "opensource",
+     "mit license",
+     "source code",
+     "is the code public"
+    ],
+    "text": "Yes. Hermes is open source, which means its code is public. Hermes itself is free.",
+    "sources": [
+     {
+      "file": "reference/faq.md",
+      "line": 96,
+      "quote": "**free and open-source** (MIT license)"
+     },
+     {
+      "file": "getting-started/official-domains.md",
+      "line": 61,
+      "quote": "Hermes Agent is MIT-licensed and free to self-host."
+     }
+    ],
+    "seen_in_app": false,
+    "added": "titles-t2"
+   },
+   {
+    "id": "d_gemini",
+    "title": "Using Gemini (Google's AI) with Hermes",
+    "phrases": [
+     "use gemini",
+     "gemini",
+     "google gemini",
+     "gemini key",
+     "googles ai"
+    ],
+    "text": "Yes. Hermes can use Gemini with a key, a secret code from Google. A paid Gemini plan does not sign you in.",
+    "sources": [
+     {
+      "file": "integrations/providers.md",
+      "line": 48,
+      "quote": "**Google / Gemini**"
+     },
+     {
+      "file": "integrations/providers.md",
+      "line": 152,
+      "quote": "There is currently no way to sign in to Hermes with a consumer Gemini subscription"
+     }
+    ],
+    "next": {
+     "kind": "part",
+     "label": "Open Model",
+     "part": "model"
+    },
+    "seen_in_app": false,
+    "added": "titles-t2"
+   },
+   {
+    "id": "d_forget",
+    "title": "Making Hermes forget something about you",
+    "phrases": [
+     "forget something about me",
+     "forget something",
+     "make it forget",
+     "forget that",
+     "delete what it knows about me"
+    ],
+    "text": "Yes. Ask your own Hermes to remove that note about you. It can remove any of its own notes.",
+    "sources": [
+     {
+      "file": "user-guide/features/memory.md",
+      "line": 20,
+      "quote": "it can add, patch, or remove entries"
+     },
+     {
+      "file": "user-guide/features/memory.md",
+      "line": 96,
+      "quote": "Remove an entry that's no longer relevant"
+     }
+    ],
+    "next": {
+     "kind": "paste",
+     "label": "Try it",
+     "paste_text": "Please show me what you have saved about me, and remove the parts I tell you."
+    },
+    "seen_in_app": false,
+    "added": "titles-t2"
+   },
+   {
+    "id": "d_meter",
+    "title": "What the \"% full\" meter shows",
+    "phrases": [
+     "percent full",
+     "full meter",
+     "context usage",
+     "how full"
+    ],
+    "text": "The docs name a \"% full\" meter in the chat. It shows how much of what the AI can read is used. Click it for details.",
+    "sources": [
+     {
+      "file": "user-guide/desktop.md",
+      "line": 249,
+      "quote": "a live \"% full\" meter of the session's context window"
+     },
+     {
+      "file": "user-guide/desktop.md",
+      "line": 249,
+      "quote": "Click it to open the **Context Usage** popover"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "titles-t2"
+   },
+   {
+    "id": "d_two",
+    "title": "Doing two things at once",
+    "phrases": [
+     "two things at once",
+     "several things at once",
+     "multitask",
+     "in parallel",
+     "two jobs at the same time",
+     "split work between helpers",
+     "split a job",
+     "split work"
+    ],
+    "text": "Yes. Hermes can start helpers of its own that work side by side. You can keep chatting meanwhile.",
+    "sources": [
+     {
+      "file": "user-guide/features/delegation.md",
+      "line": 4,
+      "quote": "Spawn isolated child agents for parallel workstreams"
+     },
+     {
+      "file": "user-guide/features/delegation.md",
+      "line": 11,
+      "quote": "so the conversation can continue"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "titles-t2"
+   },
+   {
+    "id": "d_approve_off",
+    "title": "Turning approvals (permission questions) off",
+    "phrases": [
+     "turn off the asking",
+     "turn off approvals",
+     "turn off asking for permission",
+     "stop asking for permission",
+     "disable approvals",
+     "turn off permission"
+    ],
+    "text": "You can set how Hermes asks to off. The docs warn that this removes every safety question. Then risky commands run unasked.",
+    "sources": [
+     {
+      "file": "user-guide/security.md",
+      "line": 34,
+      "quote": "# smart | manual | off"
+     },
+     {
+      "file": "user-guide/security.md",
+      "line": 61,
+      "quote": "Disable all approval checks"
+     },
+     {
+      "file": "user-guide/security.md",
+      "line": 64,
+      "quote": "disables all safety prompts. Use only in trusted environments"
+     }
+    ],
+    "seen_in_app": false,
+    "added": "titles-t2"
+   },
+   {
+    "id": "d_siri",
+    "title": "Hermes compared with Siri: a wake word",
+    "phrases": [
+     "like siri",
+     "siri",
+     "alexa",
+     "wake word",
+     "hey hermes",
+     "say its name"
+    ],
+    "text": "With one setting on, Hermes listens for a spoken phrase and answers. The docs compare that to \"Hey Siri\".",
+    "sources": [
+     {
+      "file": "user-guide/features/wake-word.md",
+      "line": 10,
+      "quote": "with one setting on, Hermes listens in the background for a spoken"
+     },
+     {
+      "file": "user-guide/features/wake-word.md",
+      "line": 13,
+      "quote": "exactly like \"Hey Siri\" or \"Alexa\""
+     }
+    ],
+    "seen_in_app": false,
+    "added": "titles-t2"
+   }
+  ]
+ },
+ "near": {
+  "about": "breadth-t1: titles and phrases for every fact line, and what they are used for.",
+  "titles_rule": "Every fact line has a title (at most eight words, a newcomer's words) and three to six phrases. The title is the only thing the person's AI sees of the line in the list call, so it names the thing the line is about, with the names that matter in it (the apps, a new computer, permission, stopping). No two titles are the same. Use 1: the person's AI is handed the list id = title and picks. Use 2, no AI: the word matching below.",
+  "words_rule": "Words of a message or phrase: lower case, apostrophes dropped, letters digits / . + kept. A word in stop_words or filler stays as it is; any other word over 4 letters loses a final ing, else over 3 letters a final s (not ss). Filler words are dropped from the message. Content words: the words not in stop_words.",
+  "full_hit_rule": "A phrase hits when its words are in the message in the same order side by side, or when it has two or more content words and these are side by side, in order, among the message's content words. The line with the longest hit phrase (content words, then words) wins; a tie goes to the line first in the data.",
+  "first_step": "Stage open, the message is not a build request: a full hit by a phrase of two or more words gives that line. It runs after the small talk and before the topic list, the offer words, the topics and any AI call. It runs while things to pick are showing too: a typed message of three or more words wins over them and drops the open question. Only the new fact lines (facts_t1) and the older lines in first_step_old take part in this step: the other older lines keep their own word lists, and their phrases count at the last step and for the near offer.",
+  "last_step": "Where Helper would say it does not know: a full hit by any phrase, one-word phrases too, gives that line instead.",
+  "near_rule": "Still no line: show the don't-know line, and under it up to three lines near the message. A line is near when it shares two or more content words with the message (title and phrases counted), or one content word that is in its title. Most shared first; ties in data order; never the line Helper said last. The question names them by title: template (every line, a 'what Hermes can do' row too, is said by its title with a small first letter, see say_rule). A pick gives that line.",
+  "template": "Do you want to know about {a}, or about {b}?",
+  "template_3": "Do you want to know about {a}, {b}, or {c}?",
+  "template_1": "Do you want to know about {a}?",
+  "say_rule": "In the question a title starts with a small letter unless its first word is in keep_caps.",
+  "keep_caps": [
+   "Hermes",
+   "Telegram",
+   "SOUL.md",
+   "MCP",
+   "Nous",
+   "OpenRouter",
+   "Ollama",
+   "AI",
+   "ChatGPT",
+   "Claude",
+   "I"
+  ],
+  "nothing_near_rule": "Nothing near: under the don't-know line, the same four starting things to pick every time (nothing_near_picks, the four of the line TP), with the text nothing_near_text. No general question that changes. (Lead's decision, 11 Nov.)",
+  "never_offer_unknown": "A line whose phrase is hit in full is answered, so it is never offered under a don't-know.",
+  "bare_follow": [
+   "how",
+   "why",
+   "and then",
+   "then",
+   "then what",
+   "what then",
+   "and after that",
+   "after that",
+   "and"
+  ],
+  "bare_follow_rule": "One of bare_follow as the whole message (end marks and a leading ok / so cut), where CUT or the don't-know line would have shown: handled like 'ok and how do I do that' (small_talk.how_that): the last line's then line, next line, button, or the things to pick stay. When the last line has none of these: NO_MORE. Where an older rule already answers how / and then (after a row, after a plain line with a then line), that rule stays. Only after an answer line (a row, a plain line, a word line, a fact line, or a fixed line that has a title); after anything else CUT stays.",
+  "filler": [
+   "actually",
+   "really",
+   "even",
+   "exactly",
+   "just",
+   "well",
+   "ok",
+   "okay",
+   "so",
+   "please",
+   "totally"
+  ],
+  "stop_words": [
+   "a",
+   "about",
+   "am",
+   "an",
+   "and",
+   "any",
+   "app",
+   "are",
+   "as",
+   "at",
+   "be",
+   "by",
+   "can",
+   "change",
+   "could",
+   "did",
+   "do",
+   "does",
+   "doesnt",
+   "doing",
+   "dont",
+   "for",
+   "from",
+   "get",
+   "go",
+   "got",
+   "had",
+   "has",
+   "have",
+   "he",
+   "here",
+   "hermes",
+   "how",
+   "i",
+   "if",
+   "im",
+   "in",
+   "into",
+   "is",
+   "it",
+   "its",
+   "just",
+   "keep",
+   "know",
+   "like",
+   "look",
+   "make",
+   "me",
+   "my",
+   "name",
+   "need",
+   "new",
+   "no",
+   "not",
+   "of",
+   "on",
+   "one",
+   "or",
+   "our",
+   "out",
+   "say",
+   "see",
+   "she",
+   "should",
+   "so",
+   "some",
+   "stuff",
+   "that",
+   "the",
+   "them",
+   "then",
+   "there",
+   "these",
+   "they",
+   "thing",
+   "this",
+   "those",
+   "to",
+   "too",
+   "up",
+   "us",
+   "use",
+   "using",
+   "want",
+   "we",
+   "what",
+   "whats",
+   "when",
+   "which",
+   "who",
+   "why",
+   "will",
+   "with",
+   "work",
+   "would",
+   "yes",
+   "you",
+   "your"
+  ],
+  "first_step_old": [
+   "SAFE",
+   "MIG_APP",
+   "MIG_PC",
+   "START"
+  ],
+  "want_say": "{label}",
+  "nothing_near_rule_was_t2": "Nothing near: one general offer set, taken in the order nothing_near_order, skipping any set shown in Helper's last three offers. So the same general offer comes back at the earliest on the fourth don't-know, and never under a question about what Hermes is or does (those have their own lines now).",
+  "nothing_near_order_was_t2": [
+   "dont_know",
+   "general_2",
+   "words",
+   "general"
+  ],
+  "nothing_near_set": "start_four",
+  "want_say_was_t2": "how to {label}"
+ },
+ "changed_breadth_t1": "breadth-t1: facts_t1 (new fact lines by docs page), near (titles, phrases, the three rules), title and phrases on every older fact line, MIG_PC copy box, MODEL_CHANGE and KEY_WHERE texts, NO_MORE.",
+ "changed_titles_t2": "changes-12 (11 Nov): titles rewritten to name the thing (titles_rule), every line has three or more phrases, 26 hand-written titles and phrases in helper-wants-v1.json, 8 new fact lines (d_undo, d_open_source, d_gemini, d_forget, d_meter, d_two, d_approve_off, d_siri), build.can_question_rule, near.nothing_near_rule (the four fixed picks)."
 }

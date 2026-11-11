@@ -101,8 +101,8 @@ test('the opening of a later visit carries the offer; the don\'t-know line carri
   send(view, 'can it fly a plane')
   await settle()
   assert.equal(olds(view).at(-1).props['data-line'], 'N1')
-  assert.equal(bubbleLine(view), 'offer-dont_know')
-  assert.deepEqual(labels(view), ['What Hermes is', 'What Hermes can do'])
+  assert.equal(bubbleLine(view), 'offer-start_four') // find-v1: nothing near, the four starting things
+  assert.deepEqual(labels(view), ['What Hermes can do', 'Which AI to use', 'Phone and chat apps', 'What Hermes remembers'])
 })
 
 test('"ok and how do I do that" while things to pick show: "Choose one, and I will show you how." and the same things to pick stay', async () => {

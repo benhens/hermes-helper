@@ -1,8 +1,8 @@
 {
  "about": "Written by dev/checks/talk-v2-wants/dump_oracle.py. Do not edit: make it again.",
- "route2_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9",
+ "route2_sha256": "8862ec3aeee840a82a958bc674c5dd108eab5576358136d9f5a0708409f0f56e",
  "route2_run": "route2.py",
- "route2_run_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9",
+ "route2_run_sha256": "8862ec3aeee840a82a958bc674c5dd108eab5576358136d9f5a0708409f0f56e",
  "wants_step_sha256": "491b7f75865c4d61219476632e5d56270081ef6146f77c5fbd5323fed420a23f",
  "fixes6_step_sha256": "cd6d53f51b1bcac27fc2436c1ac0431199a650d6cb6c5a120c47e02d02ba9142",
  "wants_fixes_step_sha256": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e",
@@ -3433,17 +3433,14 @@
       "which"
      ],
      "route2": {
-      "shown": "W1 buttons msg+bot",
-      "kind": "W1",
+      "shown": "fact d_bot_silent",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
-      "buttons": [
-       "msg",
-       "bot"
-      ],
+      "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "d_bot_silent",
       "why": null
      },
      "oracle": {
@@ -4148,14 +4145,14 @@
       "none"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_image",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_image",
       "why": null
      },
      "oracle": {
@@ -4189,14 +4186,14 @@
       "none"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "fact d_passwords",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "d_passwords",
       "why": null
      },
      "oracle": {
@@ -4850,14 +4847,14 @@
       "mem"
      ],
      "route2": {
-      "shown": "question mem",
-      "kind": "question",
+      "shown": "fact d_keep_open",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mem",
-      "need": null,
+      "topic": null,
+      "need": "d_keep_open",
       "why": null
      },
      "oracle": {
@@ -5148,14 +5145,14 @@
       "word:tool"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_web",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_web",
       "why": null
      },
      "oracle": {
@@ -5189,14 +5186,14 @@
       "word:skill"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "fact d_skill_learn",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "d_skill_learn",
       "why": null
      },
      "oracle": {
@@ -5435,14 +5432,14 @@
       "mod"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "line mod3",
+      "kind": "row",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": null,
-      "need": null,
+      "topic": "mod",
+      "need": "mod3",
       "why": null
      },
      "oracle": {
@@ -7255,14 +7252,14 @@
       "w_xpost"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_xpost",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_xpost",
       "why": null
      },
      "oracle": {
@@ -7338,14 +7335,14 @@
       "build"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_office",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_office",
       "why": null
      },
      "oracle": {
@@ -7544,14 +7541,14 @@
       "w_voice"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "fact d_voice_app",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "d_voice_app",
       "why": null
      },
      "oracle": {
@@ -9205,14 +9202,14 @@
       "mem"
      ],
      "route2": {
-      "shown": "question mem",
-      "kind": "question",
+      "shown": "fact d_keep_open",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mem",
-      "need": null,
+      "topic": null,
+      "need": "d_keep_open",
       "why": null
      },
      "oracle": {
@@ -9499,14 +9496,14 @@
       "?"
      ],
      "route2": {
-      "shown": "question mem",
-      "kind": "question",
+      "shown": "fact d_keep_open",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mem",
-      "need": null,
+      "topic": null,
+      "need": "d_keep_open",
       "why": null
      },
      "oracle": {
@@ -9625,14 +9622,14 @@
       "mem"
      ],
      "route2": {
-      "shown": "question mem",
-      "kind": "question",
+      "shown": "fact d_forget",
+      "kind": "fact",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mem",
-      "need": null,
+      "topic": null,
+      "need": "d_forget",
       "why": null
      },
      "oracle": {
@@ -10506,14 +10503,14 @@
      "text": "can it read PDFs",
      "hhcontent_expects": "w_docs",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_docs",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_docs",
       "why": null
      },
      "oracle": {
@@ -10584,14 +10581,14 @@
      "text": "can it search the web",
      "hhcontent_expects": "w_web",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_web",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_web",
       "why": null
      },
      "oracle": {
@@ -10740,14 +10737,14 @@
      "text": "can it fill in a form on a website",
      "hhcontent_expects": "w_browser",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_browser",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_browser",
       "why": null
      },
      "oracle": {
@@ -10779,14 +10776,14 @@
      "text": "can it post on twitter for me",
      "hhcontent_expects": "w_xpost",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_xpost",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_xpost",
       "why": null
      },
      "oracle": {
@@ -10818,14 +10815,14 @@
      "text": "does it read reddit",
      "hhcontent_expects": "w_reddit",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_reddit",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_reddit",
       "why": null
      },
      "oracle": {
@@ -10857,14 +10854,14 @@
      "text": "can it summarize a word document",
      "hhcontent_expects": "w_docs",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_office",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_office",
       "why": null
      },
      "oracle": {
@@ -10935,14 +10932,14 @@
      "text": "can it make a powerpoint",
      "hhcontent_expects": "w_office",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_office",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_office",
       "why": null
      },
      "oracle": {
@@ -11013,14 +11010,14 @@
      "text": "turn my meeting notes into action items",
      "hhcontent_expects": "w_meeting",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_meeting",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_meeting",
       "why": null
      },
      "oracle": {
@@ -11052,14 +11049,14 @@
      "text": "can it write code",
      "hhcontent_expects": "w_code",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_code",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_code",
       "why": null
      },
      "oracle": {
@@ -11208,14 +11205,14 @@
      "text": "make an animated explainer",
      "hhcontent_expects": "w_anim",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_anim",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_anim",
       "why": null
      },
      "oracle": {
@@ -11286,14 +11283,14 @@
      "text": "can I use voice mode",
      "hhcontent_expects": "w_voice",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_voice",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_voice",
       "why": null
      },
      "oracle": {
@@ -11325,14 +11322,14 @@
      "text": "can it read aloud its answers",
      "hhcontent_expects": "w_aloud",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_aloud",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_aloud",
       "why": null
      },
      "oracle": {
@@ -11364,14 +11361,14 @@
      "text": "can it write a song",
      "hhcontent_expects": "w_music",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_music",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_music",
       "why": null
      },
      "oracle": {
@@ -11403,14 +11400,14 @@
      "text": "find research papers about sleep",
      "hhcontent_expects": "w_papers",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_papers",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_papers",
       "why": null
      },
      "oracle": {
@@ -11442,14 +11439,14 @@
      "text": "can it get directions to the airport",
      "hhcontent_expects": "w_maps",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_maps",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_maps",
       "why": null
      },
      "oracle": {
@@ -11520,14 +11517,14 @@
      "text": "watch the price of a flight",
      "hhcontent_expects": "w_prices",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_prices",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_prices",
       "why": null
      },
      "oracle": {
@@ -11793,14 +11790,14 @@
      "text": "can it make a video of me talking",
      "hhcontent_expects": "w_video",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "want w_video",
+      "kind": "want",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
-      "need": null,
+      "need": "w_video",
       "why": null
      },
      "oracle": {
