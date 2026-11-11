@@ -77,7 +77,8 @@ const usesWants = c => c.steps.some(s => s.do === 'topic' && s.topic === 'wants'
 // "What do you do?" (tests/talk-live-2.test.mjs has that rule's own cases)
 // setup-chat: and live changes-9's two no-AI rules (msg1-then after the Telegram line, the second wording of the /usage
 // line), which hhcontent left out of route2.py (tests/offers.test.mjs has their cases)
-const asRoute2 = st => Object.assign(st, { wants: false, keepWork: false, c9: false })
+// find-v1 part 5: and the Builder's two rules for typed messages while things to pick show (fullWins)
+const asRoute2 = st => Object.assign(st, { wants: false, keepWork: false, c9: false, fullWins: false })
 
 function replay(conv) {
   let st = asRoute2(freshVisit(conv.stage, conv.kept ? { ...conv.kept } : {}))

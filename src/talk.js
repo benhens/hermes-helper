@@ -971,6 +971,11 @@ function howThat(text, st) {
   t = t.replace(HT_CUT, '').trim() || t
   // breadth-t1 (near.bare_follow_rule): how / why / and then alone after an answer line, only where CUT would show
   const bare = NEAR.bare_follow.includes(t) && st.stage === 'open' && (BARE_AFTER.includes(st.last) || !!(FIXED[st.last] && FIXED[st.last].title)) && ['cut', null].includes(smallTalk(text, st))
+  // find-v1 part 5 (Lead, 11 Nov; ask-run 2 "For builder" 3; not in route2.py, st.fullWins false only for replaying
+  // it): one of those words alone while things to pick show (a question's answers, an offer, the picks under a
+  // don't-know) goes to that line too: the things to pick stay, never "that looks cut off" with other picks in their place
+  const picksShow = st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)
+  if (st.fullWins !== false && picksShow && NEAR.bare_follow.includes(t) && st.stage === 'open' && ['cut', null].includes(smallTalk(text, st))) return { kind: 'PICK_FIRST', same_picks: true }
   if (!HT.phrases.includes(t) && !bare) return null
   // (1) the things to pick stay
   if (st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)) return { kind: 'PICK_FIRST', same_picks: true }
@@ -1177,6 +1182,8 @@ export function turnParts(text, st) {
   else delete out.near_lines
   return { pre, out }
 }
+// find-v1 part 5: the results that are no line of their own (see turnSteps, a full typed message while a question is open)
+const FULL_NOT_FOR = ['N1', 'N1a', 'N1_AGAIN', 'N2', 'skill by name', 'CUT', 'MEAN_NONE', 'AGAIN']
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
   const out = {}
@@ -1209,6 +1216,26 @@ function turnSteps(text, st) {
   if (st.stage === 'open') {
     const hw = howThat(text, st)
     if (hw) return Object.assign(out, hw)
+  }
+  // find-v1 part 5 (Lead, 11 Nov; ask-run 2 "For builder" 2; not in route2.py): a full typed question wins over the
+  // things to pick on screen. While a topic's question is open, a message of three or more words that is no answer to
+  // it (none of that topic's rows is found in it) drops the open
+  // question and is read as if nothing were on screen: always when it is in question form; a statement ("something is
+  // broken") only when, read so, it gets a line of its own and not a don't-know (an answer in the person's own words
+  // that no row catches keeps the open question's own line, as before). One or two words, and any answer, as before.
+  if (st.pending && st.fullWins !== false && talkNorm(text).split(' ').length >= 3) {
+    const tt = cutIgnored(talkNorm(text))
+    const answers = needsFor(tt, st.pending, true).length > 0
+    let fresh = !answers && questionForm(tt)
+    if (!answers && !fresh) {
+      // read on a copy of the visit with nothing open: what the message would get
+      const probe = { ...JSON.parse(JSON.stringify(st)), pending: null, lastq: false }
+      fresh = !FULL_NOT_FOR.includes(turnSteps(text, probe).kind)
+    }
+    if (fresh) {
+      st.pending = null
+      st.lastq = false
+    }
   }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)

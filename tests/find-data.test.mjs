@@ -120,7 +120,7 @@ test('on the built page: the near offer is a second bubble with its picks, and a
   assert.doesNotMatch(bubbleLine(view), /^N1/)
 })
 
-test('"how", "why", "and then" alone after an answer line: its button or copy box, its then line, or "That is all I have checked on that."; after a don\'t-know still cut off', () => {
+test('"how", "why", "and then" alone after an answer line: its button or copy box, its then line, or "That is all I have checked on that."', () => {
   const st = visit()
   assert.equal(say(st, 'does it work on windows').line, 'd_windows')
   assert.equal(say(st, 'how').line, 'NO_MORE')
@@ -134,7 +134,7 @@ test('"how", "why", "and then" alone after an answer line: its button or copy bo
   assert.equal(say(st3, 'and then').line, 'HOW_PART')
   const st4 = visit()
   say(st4, 'what is the weather in Riga')
-  assert.equal(turn('how', st4).kind, 'CUT', 'near.bare_follow_rule: only after an answer line')
+  assert.equal(turn('how', st4).kind, 'PICK_FIRST', 'find-v1 part 5: the don\'t-know\'s things to pick stay (tests/find-typed.test.mjs)')
 })
 
 test('a typed question of three or more words wins over an open question; one or two words still answer it', () => {

@@ -223,7 +223,9 @@ test('a typed service replaces the kept one too: "I use gmail" with Notion kept 
   assert.deepEqual(st.kept, { svc: 'Gmail', told: true })
 })
 
-test('Builder rule, the edge: while Helper\'s own question is open and the message is no question, the rows are not looked at, so the where line stands as in route2.py', () => {
+// find-v1 part 5 (Lead, 11 Nov): a full typed message wins over the open question, so this edge is gone: the message
+// gets the row it gets with nothing on screen; route2.py, which has no rows, still gives the where line
+test('a full typed message while Helper\'s own question is open is read as with nothing on screen: the price-watch row (find-v1; it was the where line, as in route2.py)', () => {
   const st = freshVisit()
   say(st, 'how does memory work')
   assert.equal(st.pending, 'mem')
@@ -231,7 +233,8 @@ test('Builder rule, the edge: while Helper\'s own question is open and the messa
   const route2 = Object.assign(freshVisit(), { wants: false })
   turn('how does memory work', route2)
   assert.equal(turn(typed, route2).kind, 'WHERE')
-  assert.equal(turn(typed, st).kind, 'WHERE')
+  assert.deepEqual((o => [o.kind, o.row])(turn(typed, st)), (o => [o.kind, o.row])(turn(typed, freshVisit())))
+  assert.equal(turn(typed, freshVisit()).kind, 'want')
 })
 
 test('"what is ..." is looked for at the start only, as Python\'s re.match does', () => {
