@@ -66,12 +66,12 @@ test('the docs lines file could not have been made to fit: a moved line points a
 
 // loom-fixes (dash-setup-list-v2 eb3aeba8): 10 stops on the path (Install off it), every one counted; the stops the page
 // sees are exactly those the code has a rule for, First chat among them by hhtech's rule (the data marks it person)
-test('the path: 10 stops, Install off it; the page sees exactly the stops the code has a rule for (First chat by hhtech\'s rule); a stop the data gives to the page with no rule is refused', () => {
+test('the path in the data: 10 stops, Install off it (the team\'s checks still run on the file); loom2: the page builds 9 cards, Scheduled jobs out, with no seen marks', () => {
   assert.deepEqual(DATA.items.filter(i => i.on_path).map(i => i.id), ['model', 'first_chat', 'personality', 'chat_apps', 'tools_apps', 'skills', 'memory', 'scheduled_job', 'second_bot', 'safety'])
   assert.equal(DATA.items.find(i => i.id === 'install').on_path, false)
-  assert.deepEqual(DASH_DATA.items.filter(i => i.seen).map(i => i.id).sort(), [...SEEN_IDS].sort())
-  assert.deepEqual(DASH_DATA.items.filter(i => !i.seen).map(i => i.id), ['tools_apps', 'skills', 'memory', 'safety'])
-  assert.equal(DASH_DATA.total, 10)
+  assert.deepEqual(DASH_DATA.items.map(i => i.id), ['model', 'first_chat', 'personality', 'chat_apps', 'tools_apps', 'skills', 'memory', 'second_bot', 'safety'])
+  assert.equal(DASH_DATA.items.some(i => 'seen' in i), false)
+  assert.equal(DASH_DATA.total, 9)
   const b = copy()
   b.items.find(i => i.id === 'memory').marked_by = 'page'
   assert.match(dashProblems(b, DOCS).join('\n'), /the code has rules for exactly/)
@@ -81,7 +81,7 @@ test('the path: 10 stops, Install off it; the page sees exactly the stops the co
 })
 
 test('every word on the tab is in the file: one missing stops the build; marks fit (at most 15 letters); routes go only where hhtech ran', () => {
-  for (const [part, key] of [['setup', 'you_are_here'], ['activity', 'last_used_today'], ['stats', 'plugins'], ['tabs', 'learn'], ['setup', 'mark_done'], ['setup', 'mark_undo'], ['setup', 'person_note'], ['helper_window', 'hide'], ['helper_window', 'clear_ask']]) {
+  for (const [part, key] of [['setup', 'you_are_here'], ['stats', 'plugins'], ['tabs', 'learn'], ['setup', 'mark_done'], ['setup', 'mark_undo'], ['setup', 'person_note'], ['helper_window', 'hide'], ['helper_window', 'clear_ask']]) {
     const a = copy()
     delete a.page_words[part][key]
     assert.match(dashProblems(a, DOCS).join('\n'), new RegExp(`page_words\\.${part}\\.${key} missing`))
@@ -101,6 +101,32 @@ test('every word on the tab is in the file: one missing stops the build; marks f
   const t = copy()
   t.page_words.tabs.my_setup = 'My setup'
   assert.match(dashProblems(t, DOCS).join('\n'), /not exactly Dashboard and Learn/)
+})
+
+test('loom2: content/videos.json has every card and only https:// addresses; all empty now; a bad one stops the build; an address becomes the card\'s video', () => {
+  const file = read('content/videos.json')
+  assert.deepEqual(Object.keys(file.videos), DASH_DATA.items.map(i => i.id))
+  for (const v of Object.values(file.videos)) assert.deepEqual(v, { url: '', poster: '', captions: '' })
+  assert.ok(DASH_DATA.items.every(i => i.video === null))
+  for (const [k, bad] of [['url', 'http://example.com/a.mp4'], ['url', 'javascript:alert(1)'], ['poster', 'https://example.com/a b.jpg'], ['captions', 'data:text/vtt,x'], ['url', 'https://example.com/"a.mp4']]) {
+    const d = copy()
+    d.videos.model = { url: 'https://example.com/a.mp4', poster: '', captions: '', [k]: bad }
+    assert.match(dashProblems(d, DOCS).join('\n'), new RegExp(`videos\\.json: model\\.${k} is not an https:// address`), bad)
+  }
+  const missing = copy()
+  delete missing.videos.safety
+  assert.match(dashProblems(missing, DOCS).join('\n'), /no entry for safety/)
+  const extra = copy()
+  extra.videos.scheduled_job = { url: '', poster: '', captions: '' }
+  assert.match(dashProblems(extra, DOCS).join('\n'), /scheduled_job is no card/)
+  const orphan = copy()
+  orphan.videos.memory = { url: '', poster: 'https://example.com/p.jpg', captions: '' }
+  assert.match(dashProblems(orphan, DOCS).join('\n'), /memory has a poster or captions but no url/)
+  const good = copy()
+  good.videos.memory = { url: 'https://example.com/memory.mp4', poster: 'https://example.com/memory.jpg', captions: '' }
+  assert.deepEqual(dashProblems(good, DOCS), [])
+  assert.deepEqual(slimDashData(good).items.find(i => i.id === 'memory').video, { url: 'https://example.com/memory.mp4', poster: 'https://example.com/memory.jpg', captions: '' })
+  assert.equal(slimDashData(good).items.find(i => i.id === 'model').video, null)
 })
 
 test('the words he took out are not in the file: no "chats in 30 days", no "days with a chat", no "streak"', () => {
@@ -164,7 +190,12 @@ test('the built data: "No chats with this bot yet" is not in it (Lead: not shown
   assert.equal(DATA.page_words.activity.no_chats, 'No chats with this bot yet', 'the team\'s file has the line')
   const built = JSON.stringify(DASH_DATA)
   assert.doesNotMatch(built, /No chats with this bot yet|not_seen|docs words, not seen|seen_note|"note"/)
-  assert.equal(DASH_DATA.words.activity.title, "This bot's activity")
+  // loom2: Activity is out (his Loom, 0:05): none of its words are built in
+  assert.equal(DASH_DATA.words.activity, undefined)
+  // loom2: no tabs: neither the tab names nor Learn's line are built in
+  for (const k of ['tabs', 'tabListLabel', 'notBuilt']) assert.equal(DASH_DATA.words[k], undefined, k)
+  assert.doesNotMatch(built, /"Learn"|Nothing here yet/)
+  assert.doesNotMatch(built, /This bot's activity|Last used/)
   const personality = DATA.items.find(i => i.id === 'personality')
   assert.deepEqual(personality.steps.map(s => s.src === null), [false, false, true, false, true])
   assert.deepEqual(DASH_DATA.items.find(i => i.id === 'personality').steps.map(s => Object.keys(s)), [['text'], ['text'], ['text'], ['text'], ['text']])
@@ -172,9 +203,9 @@ test('the built data: "No chats with this bot yet" is not in it (Lead: not shown
   // every step carries one of the team's two marks (seen in the app, or docs words not seen)
   for (const it of DATA.items) for (const s of it.steps) assert.equal(Boolean(s.seen) !== Boolean(s.not_seen), true, `${it.id}: ${s.text}`)
   // the stop's names as hhcontent has them now
-  assert.deepEqual(DASH_DATA.items.map(i => i.name), ['A model', 'First chat', 'Its personality', 'Chat apps', 'Tools and apps', 'Skills', 'Memory', 'Scheduled jobs', 'A second bot', 'Safety'])
-  // the route buttons stay on the steps hhcontent names: model 3, first_chat 1, chat_apps 1, scheduled_job 3
-  assert.deepEqual(DASH_DATA.items.flatMap(i => i.steps.map((s, k) => (s.route ? `${i.id} ${k + 1}` : null)).filter(Boolean)), ['model 3', 'first_chat 1', 'chat_apps 1', 'scheduled_job 3'])
+  assert.deepEqual(DASH_DATA.items.map(i => i.name), ['A model', 'First chat', 'Its personality', 'Chat apps', 'Tools and apps', 'Skills', 'Memory', 'A second bot', 'Safety'])
+  // the route buttons stay on the steps hhcontent names: model 3, first_chat 1, chat_apps 1 (loom2: Scheduled jobs is no card)
+  assert.deepEqual(DASH_DATA.items.flatMap(i => i.steps.map((s, k) => (s.route ? `${i.id} ${k + 1}` : null)).filter(Boolean)), ['model 3', 'first_chat 1', 'chat_apps 1'])
 })
 
 test('the plugins tile\'s short word for the narrow size is hhcontent\'s variant 3 ("plugins, this bot"), taken from the words file; without it the build stops', () => {

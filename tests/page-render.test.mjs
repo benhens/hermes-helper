@@ -9,7 +9,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { registerPlugin, fakeStorage, mount, settle, all, text, byData, byLabel, click } from './lib/render.mjs'
 import { NO_MODEL_LINE, NO_MODEL_BOX, CANT_CHECK_LINE } from '../src/model-status.js'
-import { K, T, TAB_LOOK, TAB_LOOKS } from '../src/look.js'
+import { K, T } from '../src/look.js'
 import { TALK_CSS } from '../src/talk-css.js'
 import { DASH_CSS } from '../src/dash-css.js'
 
@@ -96,9 +96,6 @@ test('Helper\'s style sheet is one <style> element inside our own page, holding 
   assert.equal(dash.length, 1)
   assert.equal(dash[0].props.children, DASH_CSS)
   assert.equal(all(view.tree, n => n.type === 'style').length, 2)
-  // on Learn: Helper's sheet only, the same element (same key), never added twice
-  click(all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')[1])
-  assert.deepEqual(all(view.tree, n => n.type === 'style').map(n => n.props['data-hh']), ['talk-css'])
 })
 
 test('the old helper header is gone: no Chat log switch, no Move, Hide, Close or "Show helper", no "On step" line; in a wide window nothing puts Helper away', async () => {
@@ -166,118 +163,33 @@ test('a failed check is asked again on the next open; a good one within 30 s is 
   assert.equal(helperCalls().length, 1)
 })
 
-const tabButtons = view => all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')
-
-test('header: no page title, three text tabs in a tablist (Capabilities\' look), the open one underlined; nothing else in it', async () => {
-  const { view } = await open()
-  const head = byData(view.tree, 'header')
-  assert.equal(all(head, n => /^h[1-6]$/.test(n.type)).length, 0)
-  assert.doesNotMatch(text(head), /\bHelper\b/)
-  assert.equal(all(head, n => n.type === 'sdk:Button').length, 0)
-  assert.equal(byData(view.tree, 'tabs').props['aria-label'], 'Helper tabs')
-  assert.equal(all(view.tree, n => n.type === 'sdk:SegmentedControl').length, 0)
-  assert.equal(byData(view.tree, 'tabs').props.role, 'tablist')
-  // dash-v1: the tabs' names from the Dashboard's data; the first build's two are gone. loom-fixes: Dashboard and Learn
-  // (My setup is out: his words, Loom 3:22)
-  assert.deepEqual(tabButtons(view).map(t => text(t).trim()), ['Dashboard', 'Learn'])
-  assert.doesNotMatch(text(view.tree), /My setup/)
-  const [dashTab, learnTab] = tabButtons(view)
-  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false])
-  assert.deepEqual(tabButtons(view).map(t => t.props.tabIndex), [0, -1])
-  // dash-v2: the tab names' look sits behind one value (src/look.js TAB_LOOK); as committed it is the look as built
-  assert.equal(TAB_LOOK, 'capabilities')
-  assert.deepEqual(TAB_LOOKS.capabilities, { tab: K.textTab, idle: K.textTabIdle, on: K.textTabOn, label: K.textTabLabel, labelOn: K.textTabLabelOn })
-  assert.equal(dashTab.props.className, `${K.textTab} ${K.textTabOn}`)
-  for (const t of [learnTab]) assert.equal(t.props.className, `${K.textTab} ${K.textTabIdle}`)
-  assert.equal(dashTab.props.children.props.className, K.textTabLabelOn)
-  assert.equal(learnTab.props.children.props.className, K.textTabLabel)
-  assert.doesNotMatch(text(view.tree), /Your setup|\bSetup\b/)
-  assert.match(K.textTabLabelOn, /(^|\s)underline(\s|$)/)
-  assert.doesNotMatch(K.textTabLabel, /(^|\s)underline(\s|$)/)
-})
-
-test('the tab names as Hermes\'s own tabs (capitals, a blue line under the open one) are one line away: TAB_LOOK \'hermes\' in place of \'capabilities\', nothing else changed', async () => {
-  const line = "const TAB_LOOK = 'capabilities'"
-  const built = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'desktop', 'plugin.js'), 'utf8')
-  assert.equal(built.split(line).length - 1, 1, 'the value is on one line of the built file')
-  useHost()
-  const { Page } = await registerPlugin(fakeStorage(), undefined, {}, src => src.replace(line, "const TAB_LOOK = 'hermes'"))
-  const view = mount(Page)
-  await settle()
-  const [dashTab, learnTab] = tabButtons(view)
-  const H = TAB_LOOKS.hermes
-  assert.equal(dashTab.props.className, `${H.tab} ${H.on}`)
-  for (const t of [learnTab]) assert.equal(t.props.className, `${H.tab} ${H.idle}`)
-  for (const t of [dashTab, learnTab]) assert.equal(t.props.children.props.className, H.label)
-  // Hermes's own SESSIONS | BOTS tabs (components/ui/pane-tab.tsx): 11 px capitals; under the open one a 2 px line
-  // in the theme's primary blue, drawn by Hermes's own class
-  assert.match(H.label, /(^|\s)uppercase(\s|$)/)
-  assert.match(H.tab, /text-\[0\.6875rem\]/)
-  assert.match(H.on, /shadow-\[inset_0_-2px_0_var\(--pane-tab-active-accent,var\(--theme-primary\)\)\]/)
-  assert.doesNotMatch(H.idle, /shadow/)
-  assert.doesNotMatch(`${H.label} ${H.labelOn}`, /underline/)
-  // the names, the roles and the keys are the same
-  assert.deepEqual(tabButtons(view).map(t => text(t).trim()), ['Dashboard', 'Learn'])
-  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false])
-  click(learnTab)
-  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [false, true])
-})
-
-test('tabs: Learn shows one quiet line and nothing else; the tab is remembered; arrow keys move between the tabs; Helper stays where it is', async () => {
+test('no tabs (loom2: his Loom of 11 Nov, 1:51 "take out the learn and just have this set up"): the header holds nothing, the page is the Dashboard; a stored Learn tab opens it too', async () => {
   const { view, storage } = await open()
-  assert.ok(byData(view.tree, 'dashboard'))
-  assert.equal(byData(view.tree, 'steps'), null, 'no step list on any tab')
-  for (const [i, id] of [[1, 'learn']]) {
-    click(tabButtons(view)[i])
-    assert.equal(storage.data.get('tab'), id)
-    assert.equal(byData(view.tree, 'dashboard'), null)
-    const panel = byData(view.tree, 'detail')
-    assert.equal(text(panel).trim(), 'Nothing here yet. What is ready is on Dashboard.')
-    assert.equal(byData(panel, 'not-built').props.className, K.notBuilt)
-    assert.equal(all(panel, n => typeof n.type === 'string' && n.type.startsWith('sdk:')).length, 0, 'no button, no icon')
-    assert.deepEqual(helper(view).props.style, { width: '460px' })
-  }
-  let focused = null
-  tabButtons(view)[0].props.ref({ focus: () => (focused = 'dashboard') })
-  tabButtons(view)[1].props.onKeyDown({ key: 'ArrowRight', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'dashboard')
-  assert.equal(focused, 'dashboard')
-  tabButtons(view)[0].props.onKeyDown({ key: 'ArrowLeft', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'learn')
-  tabButtons(view)[1].props.onKeyDown({ key: 'a', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'learn')
-  // the first build's stored tab names, and My setup (out since loom-fixes), open the Dashboard
-  for (const old of ['setup', 'yours', 'my_setup']) {
+  const head = byData(view.tree, 'header')
+  assert.equal(head.props.className, K.head)
+  assert.ok(!head.props.children)
+  assert.equal(byData(view.tree, 'tabs'), null)
+  assert.equal(all(view.tree, n => n.props && (n.props.role === 'tab' || n.props.role === 'tablist' || n.props.role === 'tabpanel')).length, 0)
+  assert.doesNotMatch(text(view.tree), /\bLearn\b|Nothing here yet|My setup/)
+  assert.ok(byData(byData(view.tree, 'detail'), 'dashboard'))
+  assert.equal(storage.data.get('tab'), undefined, 'no tab is stored')
+  for (const old of ['learn', 'setup', 'yours', 'my_setup']) {
     const again = await open(fakeStorage({ tab: old }))
     assert.ok(byData(again.view.tree, 'dashboard'), old)
+    assert.doesNotMatch(text(again.view.tree), /Nothing here yet/)
   }
-})
-
-test('tabs: Home and End; each tab points at the one tab panel, which names its tab', async () => {
-  const { view, storage } = await open()
-  tabButtons(view)[0].props.onKeyDown({ key: 'End', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'learn')
-  tabButtons(view)[1].props.onKeyDown({ key: 'Home', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'dashboard')
-  const panel = byData(view.tree, 'detail')
-  assert.equal(panel.props.role, 'tabpanel')
-  for (const t of tabButtons(view)) assert.equal(t.props['aria-controls'], panel.props.id)
-  assert.equal(panel.props['aria-labelledby'], tabButtons(view)[0].props.id)
 })
 
 // Hermes's look: one primary (blue) button per screen; Send is the composer's own icon button.
 const primaries = tree => all(tree, n => n.type === 'sdk:Button' && (!n.props.variant || n.props.variant === 'default') && n.props['aria-label'] !== 'Send').map(n => text(n).trim())
 
-test('one primary button per screen at most: the Dashboard with and without a model, the failed check, Learn; Helper\'s window adds none', async () => {
+test('one primary button per screen at most: the Dashboard with and without a model, the failed check; Helper\'s window adds none', async () => {
   // dash-v1: the Dashboard has none (its buttons are secondary, ghost or link); the first build's step had one
   for (const runtime of [{ ok: true, model: 'm' }, { ok: false }, new Error('down')]) {
     const { view } = await open(fakeStorage(), { runtime })
     assert.deepEqual(primaries(view.tree), [], JSON.stringify(runtime))
     assert.deepEqual(primaries(helper(view)), [])
   }
-  const { view } = await open(fakeStorage({ tab: 'learn' }))
-  await settle()
-  assert.deepEqual(primaries(view.tree), [])
 })
 
 test('message box: one line that grows, no resize grip; the box, "Skip" while the opening asks, and a round send button (no model name, no microphone)', async () => {
@@ -519,17 +431,6 @@ test('over the page: Escape folds it and the keyboard goes back to the strip; br
   assert.equal(helper(view).props.onKeyDown, undefined)
 })
 
-test('switching tabs never moves Helper between its column and over the page (one threshold for both tabs)', async () => {
-  const { view } = await openMeasured()
-  for (const [width, over] of [[700, true], [727, true], [728, false], [900, false]]) {
-    resize(view, width)
-    click(tabButtons(view)[0])
-    assert.equal(helper(view).props['data-over'], over, `setup at ${width}`)
-    click(tabButtons(view)[1])
-    assert.equal(helper(view).props['data-over'], over, `your setup at ${width}`)
-  }
-})
-
 test('the smallest window, 400 x 620 with Hermes\'s sidebar hidden: Helper 372 px wide over the page plus the strip, the small character, the tight padding', async () => {
   const { view } = await openMeasured()
   resize(view, 400, 620)
@@ -549,10 +450,9 @@ test('the page measures its own outer element, width and height; unmount: React 
 
 test('the page\'s ref functions stay the same between renders (React would detach and re-attach new ones)', async () => {
   const { view } = await openMeasured()
-  const before = [page(view).props.ref, ...tabButtons(view).map(b => b.props.ref)]
+  const before = [page(view).props.ref]
   resize(view, 900)
-  click(tabButtons(view)[1])
-  const after = [page(view).props.ref, ...tabButtons(view).map(b => b.props.ref)]
+  const after = [page(view).props.ref]
   before.forEach((r, i) => assert.equal(after[i], r, `ref ${i}`))
 })
 

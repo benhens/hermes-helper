@@ -70,7 +70,6 @@ const eyesNow = view => face(view).props['data-eyes']
 const lines = view => all(helper(view), n => n.props['data-hh'] === 'said')
 const shownWords = view => lines(view).map(l => l.props['data-shown'])
 const box = view => all(view.tree, n => n.type === 'sdk:Textarea')[0]
-const tabs = view => all(byData(view.tree, 'tabs'), n => n.props.role === 'tab')
 const wordClock = timers => [...timers.intervals].filter(e => e.ms === 120)
 // The page itself is drawn again only when talking starts or stops, never for a single word (each
 // line redraws itself: tests/reveal.test.mjs). To read a half-shown line here, the page is drawn
@@ -215,15 +214,15 @@ test('typing or pressing the mouse while words appear shows the rest at once and
 })
 
 
-test('a line is revealed once: a tab change, and folding Helper away and bringing it back, do not replay it', async () => {
+test('a line is revealed once: a redraw of the page (a tab change before loom2), and folding Helper away and bringing it back, do not replay it', async () => {
   const { view, timers } = await open({ measured: true })
   resize(view, 540)
   for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
   assert.deepEqual(shownWords(view), [OPENING_WORDS])
-  click(tabs(view)[1])
+  redraw(view)
   await settle()
   assert.deepEqual(shownWords(view), [OPENING_WORDS])
-  click(tabs(view)[0])
+  redraw(view)
   click(strip(view))
   assert.equal(helper(view), null)
   click(strip(view))
@@ -245,15 +244,15 @@ test('folded away half way through a line: the line is whole when Helper comes b
   assert.notEqual(expression(view), 'talking')
 })
 
-test('rising happens once each time Helper comes on screen: not on a tab change or a new line; again after it was folded away', async () => {
+test('rising happens once each time Helper comes on screen: not on a redraw of the page or a new line; again after it was folded away', async () => {
   const { view, timers } = await open({ settleFirst: false, measured: true })
   resize(view, 540)
   assert.equal(face(view).props['data-rising'], true)
   await settle() // 0.7 s have passed (the host's timer)
-  click(tabs(view)[1])
+  redraw(view)
   await settle()
-  assert.equal(face(view).props['data-rising'], undefined, 'a tab change: no rising')
-  click(tabs(view)[0])
+  assert.equal(face(view).props['data-rising'], undefined, 'a redraw of the page: no rising')
+  redraw(view)
   assert.equal(face(view).props['data-rising'], undefined)
   for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
   send(view, 'Peter')
@@ -264,7 +263,7 @@ test('rising happens once each time Helper comes on screen: not on a tab change 
   assert.equal(face(view).props['data-rising'], true)
   assert.equal(wordClock(timers).length, 1, 'the words wait again while it comes up')
   await settle()
-  click(tabs(view)[1])
+  redraw(view)
   assert.equal(face(view).props['data-rising'], undefined)
 })
 
@@ -339,7 +338,7 @@ test('reduce motion switched off later: Helper rises again the next time it come
   assert.equal(face(view).props['data-rising'], true)
   await settle()
   for (let i = 0; i < RISE_TICKS; i++) timers.tick()
-  click(tabs(view)[1])
+  redraw(view)
   assert.equal(face(view).props['data-rising'], undefined)
 })
 

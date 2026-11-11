@@ -92,6 +92,8 @@ export function dashProblems(data, docs) {
   const seen = [...new Set([...byPage, ...SEEN_OVER_DATA])]
   if (seen.slice().sort().join() !== SEEN_IDS.slice().sort().join()) fails.push(`stops the page sees are ${seen.join(', ')}; the code has rules for exactly ${SEEN_IDS.join(', ')}`)
 
+  // loom2: the cards' videos (content/videos.json)
+  fails.push(...videoProblems(data.videos, path.filter(i => !CARDS_OUT.includes(i.id)).map(i => i.id)))
   const w = data.page_words
   if (!w || typeof w !== 'object') return [...fails, 'page_words missing']
   const need = (obj, keys, where) => keys.forEach(k => isText(obj && obj[k]) || fails.push(`page_words.${where}${k} missing`))
@@ -104,13 +106,7 @@ export function dashProblems(data, docs) {
   need(w.stats, ['bots', 'bots_one', 'skills', 'skills_one', 'plugins', 'plugins_one', 'not_known', 'waiting'], 'stats.')
   // the plugins label's short variant, for the narrow size (hhcontent's variant 3; Lead, 11 Nov)
   if (!shortPlugins(data)) fails.push('word_variants: no short variant (n: 3) of the plugins label with its word for one and for many')
-  need(w.activity, ['title', 'last_used_today', 'last_used_one', 'last_used_n', 'less', 'more'], 'activity.')
   need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_known', 'mark_done', 'mark_undo', 'person_note', 'state_said_done'], 'setup.')
-  if (w.activity) {
-    if (!Array.isArray(w.activity.months) || w.activity.months.length !== 12 || !w.activity.months.every(isText)) fails.push('page_words.activity.months: not 12 names')
-    if (!Array.isArray(w.activity.days) || w.activity.days.length !== 7 || !w.activity.days.every(d => typeof d === 'string')) fails.push('page_words.activity.days: not 7 (Sunday first; empty for no label)')
-    if (isText(w.activity.last_used_n) && !w.activity.last_used_n.includes('{n}')) fails.push('page_words.activity.last_used_n has no {n}')
-  }
   if (w.setup) {
     if (isText(w.setup.count) && !(w.setup.count.includes('{n}') && w.setup.count.includes('{total}'))) fails.push('page_words.setup.count needs {n} and {total}')
     if (isText(w.setup.source) && !(w.setup.source.includes('{file}') && w.setup.source.includes('{line}'))) fails.push('page_words.setup.source needs {file} and {line}')
@@ -137,35 +133,78 @@ export function dashProblems(data, docs) {
   return fails
 }
 
-// What src/dash.js reads: the 11 things (no done rules or reads: those are code) and the page words.
+// loom2 (Lead's job builder-loom2-dash, his second Loom of 11 Nov): the cards are the stops on the path less Scheduled
+// jobs ("scheduled jobs are not part of the setup", 2:13): 9 cards. The data keeps its 10; the cut is made here.
+export const CARDS_OUT = ['scheduled_job']
+// Lead's words for this job, not yet in hhcontent's words file (a line Lead rules on goes in here, not into the plugin's
+// copy, which is pinned to the team's checksum): the label on the first card not marked, in place of "You are here";
+// the word on a card the person marked; the button that marks it (his words, 17:10 UTC: "only if the person clicks
+// Done"), in place of "I've done this". Once the team's file has them, these are the same words and change nothing.
+export const LOOM2_WORDS = { start_here: 'Start here', state_done: 'Done', mark_done: 'Done' }
+// loom2 point 4 (his Loom, 0:20 "why is it just saying Plugins, Skills, Bots? Why?"): one plain line under each tile, as
+// Lead wrote them: bots from the second-bot card's sentence, skills from the skills card's, plugins from
+// content/helper-talk-v2.json fixed_lines 63 ("A plugin is an add-on.")
+// loom2 point 6: the words of a card whose video is not there yet (Lead's words)
+export const VIDEO_WORDS = { video_soon: 'Video coming soon' }
+// A video's address, its poster and its captions file (content/videos.json): empty, or an https:// address that reads
+// back exactly as written, with no space, quote or angle bracket in it.
+export function videoUrlOk(v) {
+  if (v === '') return true
+  if (typeof v !== 'string' || !v.startsWith('https://') || /[\s"'<>\\]/.test(v)) return false
+  try {
+    return new URL(v).href === v
+  } catch {
+    return false
+  }
+}
+export function videoProblems(videos, cardIds) {
+  const fails = []
+  if (!videos || typeof videos !== 'object' || Array.isArray(videos)) return ['videos.json: no "videos" object']
+  for (const id of Object.keys(videos)) if (!cardIds.includes(id)) fails.push(`videos.json: ${id} is no card`)
+  for (const id of cardIds) {
+    const v = videos[id]
+    if (!v || typeof v !== 'object') {
+      fails.push(`videos.json: no entry for ${id}`)
+      continue
+    }
+    for (const k of Object.keys(v)) if (!['url', 'poster', 'captions'].includes(k)) fails.push(`videos.json: ${id}.${k} is not url, poster or captions`)
+    for (const k of ['url', 'poster', 'captions']) if (!videoUrlOk(v[k] === undefined ? '' : v[k])) fails.push(`videos.json: ${id}.${k} is not an https:// address`)
+    if (v.url === '' && (v.poster || v.captions)) fails.push(`videos.json: ${id} has a poster or captions but no url`)
+  }
+  return fails
+}
+export const TILE_LINES = { bots: 'Each bot is a separate Hermes.', skills: 'Each skill teaches Hermes one task.', plugins: 'Each plugin is an add-on for Hermes.' }
+
+// What src/dash.js reads: the cards (no done rules or reads: since loom2 nothing is read for them) and the page words.
 export function slimDashData(data) {
   const w = data.page_words
   const routes = Array.isArray(w.routes) ? w.routes : []
   return {
-    // loom-fixes: only the 10 stops on the path; seen: the page has a rule for it (SEEN_IDS), else the person marks it
-    items: data.items.filter(it => it.on_path === true).map(it => ({
+    // loom2: the 9 cards (the path's stops less Scheduled jobs), in the data's order; every one is marked by the person
+    items: data.items.filter(it => it.on_path === true && !CARDS_OUT.includes(it.id)).map(it => ({
       id: it.id,
-      seen: SEEN_IDS.includes(it.id),
       name: it.card_name,
-      mark: w.marks[it.id],
       why: it.why,
       steps: it.steps.map((s, k) => {
         const r = routes.find(x => x.item === it.id && x.step === k + 1)
         return r ? { text: s.text, route: { label: r.label, to: r.to } } : { text: s.text }
       }),
       terminal: it.terminal ? { when: it.terminal.when, paste: it.terminal.paste.map(p => ({ for: p.for, text: p.text })) } : null,
-      sources: it.sources.map(s => ({ file: s.file, line: s.line }))
+      sources: it.sources.map(s => ({ file: s.file, line: s.line })),
+      // loom2: its video (content/videos.json), or null while it has no address
+      video: data.videos && data.videos[it.id] && data.videos[it.id].url ? { url: data.videos[it.id].url, poster: data.videos[it.id].poster || '', captions: data.videos[it.id].captions || '' } : null
     })),
-    total: data.items.filter(i => i.on_path === true).length,
+    total: data.items.filter(i => i.on_path === true && !CARDS_OUT.includes(i.id)).length,
+    // the path's 10 stops in order, for Helper's set-up conversation only (src/setup-chat.js: its "next" stop, as before
+    // loom2; that conversation does not run in this build)
+    path: data.items.filter(i => i.on_path === true).map(i => i.id),
     words: {
-      tabs: w.tabs,
-      tabListLabel: w.tab_list_label,
-      notBuilt: w.not_built,
-      stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
+      // loom2: no tabs (Learn is out, his Loom of 11 Nov, 1:51): the tab names and Learn's line are not built in
+      stats: { ...w.stats, lines: TILE_LINES, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
       helperWindow: pickWords(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no']),
-      // activity.no_chats (hhcontent's optional line for an empty Activity) is not shown (Lead, 11 Nov): left out
-      activity: Object.fromEntries(Object.entries(w.activity).filter(([k]) => k !== 'no_chats')),
-      setup: pickWords(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_known', 'mark_done', 'mark_undo', 'person_note', 'state_said_done'])
+      // loom2: Activity is out (his Loom of 11 Nov, 0:05 "just take it out"): its words are not built in
+      // loom2: no path, so no "You are here", Next, Open, all done line or seen states; no "Helper can't see this one"
+      setup: { ...pickWords(w.setup, ['title', 'count', 'close', 'copy', 'copied', 'source', 'mark_undo']), ...LOOM2_WORDS, ...VIDEO_WORDS }
     }
   }
 }

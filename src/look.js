@@ -12,27 +12,8 @@ export const K = {
   root: 'relative flex h-full min-h-0 w-full min-w-0 overflow-hidden',
   left: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
   // The header clears Hermes's title-bar band (its window buttons float there), as Capabilities does.
-  // No page title: like Capabilities, the sidebar row names the page and the header holds the tabs.
+  // No page title: like Capabilities, the sidebar row names the page. loom2: no tabs, so the header holds nothing.
   head: 'flex shrink-0 items-center gap-3 px-6 pb-2 pt-[calc(var(--titlebar-height)+1.5rem)]',
-  // Page tabs: Capabilities' text tabs (components/ui/tab-dropdown.tsx ResponsiveTabs row,
-  // components/ui/text-tab.tsx TextTab). The colour is split off so the open tab doesn't carry two.
-  tabs: 'flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1',
-  textTab:
-    'group/text-tab inline-flex h-7 items-center gap-1 bg-transparent px-1 text-[length:var(--conversation-caption-font-size)] font-medium transition-colors hover:bg-transparent hover:text-foreground focus-visible:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
-  textTabIdle: 'text-(--ui-text-tertiary)',
-  textTabOn: 'text-foreground',
-  textTabLabel: 'underline-offset-4 decoration-current/25 group-hover/text-tab:underline',
-  textTabLabelOn: 'underline-offset-4 decoration-current/25 underline',
-  // dash-v2: the tab names as Hermes's own SESSIONS | BOTS tabs, for TAB_LOOK 'hermes' below. Every class is one
-  // Hermes's own tab wears (components/ui/pane-tab.tsx: TAB, TAB_IDLE, TAB_ACTIVE, TAB_ACTIVE_UNDERLINE, PaneTabLabel),
-  // on the same 28 px row as today's tabs: 11 px capitals, and under the open one a 2 px line in the theme's primary
-  // colour (Hermes draws that line as an inset shadow of its own class). Its hover wash and tab fills are left out: they
-  // belong to Hermes's tab strip, which our header is not.
-  paneTab:
-    'group/text-tab inline-flex h-7 items-center gap-1 bg-transparent px-2 text-[0.6875rem] font-medium transition-colors hover:bg-transparent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ui-accent)',
-  paneTabIdle: 'text-(--ui-text-tertiary) hover:text-(--ui-text-secondary)',
-  paneTabOn: 'text-foreground shadow-[inset_0_-2px_0_var(--pane-tab-active-accent,var(--theme-primary))]',
-  paneTabLabel: 'block min-w-0 truncate font-medium tracking-wide uppercase',
   body: 'flex min-h-0 flex-1',
 
   // ---- step list (app/master-detail.tsx ListColumn + CapRow; app/overlays/panel.tsx) ----
@@ -213,21 +194,7 @@ export const K = {
   mono: 'font-mono',
   icon14: 'size-3.5',
   icon16: 'size-4',
-  icon20: 'size-5',
-  // Learn and My setup are not built: one quiet line, in the caption tone, at the open step's text edge
-  notBuilt: 'px-6 py-4 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)'
-}
-
-// ---- the tab names' look, behind ONE value (dash-v2; Lead's point 7: Pēteris's decision, not made yet) ----
-//   'capabilities'  as built and as he has seen it: Capabilities' text tabs, sentence case, a thin faint underline
-//                   under the open one
-//   'hermes'        as Hermes's own tabs (SESSIONS | BOTS): capitals, a line in the theme's primary colour under the open one. Tested, and
-//                   measured once in the app; no person has looked at it.
-// To change the look, change the word on the next line.
-export const TAB_LOOK = 'capabilities'
-export const TAB_LOOKS = {
-  capabilities: { tab: K.textTab, idle: K.textTabIdle, on: K.textTabOn, label: K.textTabLabel, labelOn: K.textTabLabelOn },
-  hermes: { tab: K.paneTab, idle: K.paneTabIdle, on: K.paneTabOn, label: K.paneTabLabel, labelOn: K.paneTabLabel }
+  icon20: 'size-5'
 }
 
 // dash-v1: every class of the Dashboard tab's sheet (src/dash.css, from hhdesign's design/dash-r7/build.js), in one
@@ -236,7 +203,6 @@ export const TAB_LOOKS = {
 export const D = {
   main: 'hhd-main',
   compact: 'hhd-compact',
-  card: 'hhd-card',
   title: 'hhd-title',
   // the top box
   stats: 'hhd-stats',
@@ -248,61 +214,30 @@ export const D = {
   // loom-fixes: a tile that opens Hermes's own screen, and the plugins tile's name in place of a number
   tileBtn: 'hhd-tile-btn',
   tileName: 'hhd-tile-name',
+  // loom2: the one plain line under each tile
+  tileLine: 'hhd-tile-line',
   wait: 'hhd-wait',
-  // Activity
-  act: 'hhd-act',
-  actWords: 'hhd-act-words',
-  lastUsed: 'hhd-lu',
-  key: 'hhd-key',
-  keySq: 'hhd-key-sq',
-  keyFirst: 'hhd-key-first',
-  keyLast: 'hhd-key-last',
-  gridWrap: 'hhd-gridwrap',
-  dayNames: 'hhd-daynames',
-  months: 'hhd-months',
-  month: 'hhd-month',
-  grid: 'hhd-grid',
-  sq: 'hhd-sq',
-  l0: 'hhd-l0',
-  l1: 'hhd-l1',
-  l2: 'hhd-l2',
-  l3: 'hhd-l3',
-  today: 'hhd-today',
-  // Set up
+  // Set up (loom2): the heading and count over a grid of cards; a card wears a tile's surface, edge, corners and icon
   head: 'hhd-head',
   count: 'hhd-count',
   countN: 'hhd-count-n',
-  road: 'hhd-road',
-  lines: 'hhd-lines',
-  line: 'hhd-line',
-  stop: 'hhd-stop',
-  dot: 'hhd-dot',
+  setup: 'hhd-setup',
+  cards: 'hhd-cards',
+  scard: 'hhd-scard',
+  scardTop: 'hhd-scard-top',
+  scardHead: 'hhd-scard-head',
+  scardName: 'hhd-scard-name',
+  scardWhy: 'hhd-scard-why',
   done: 'hhd-done',
-  todo: 'hhd-todo',
-  here: 'hhd-here',
-  quiet: 'hhd-quiet',
+  doneLine: 'hhd-done-line',
+  start: 'hhd-start',
   sel: 'hhd-sel',
-  up: 'hhd-up',
-  down: 'hhd-down',
-  label: 'hhd-label',
-  name: 'hhd-name',
-  you: 'hhd-you',
-  next: 'hhd-next',
-  nextWords: 'hhd-next-words',
-  nextLine: 'hhd-next-line',
-  nextLabel: 'hhd-next-label',
-  nextName: 'hhd-next-name',
-  nextWhy: 'hhd-next-why',
-  allDone: 'hhd-alldone',
-  // dash-v2: the small down arrow after "Open"
-  openChev: 'hhd-open-chev',
-  openWord: 'hhd-open-word',
+  // what an opened card holds, full width under its row; loom2 point 6: its video, or the quiet box until there is one
+  video: 'hhd-video',
+  videoSoon: 'hhd-video-soon',
+  videoName: 'hhd-video-name',
   steps: 'hhd-steps',
   caret: 'hhd-caret',
-  stepsHead: 'hhd-steps-head',
-  stepsIcon: 'hhd-steps-icon',
-  stepsName: 'hhd-steps-name',
-  stepsWhy: 'hhd-steps-why',
   ol: 'hhd-ol',
   li: 'hhd-li',
   route: 'hhd-route',
@@ -313,7 +248,6 @@ export const D = {
   pasteBox: 'hhd-paste-box',
   word: 'hhd-word',
   pasteFor: 'hhd-paste-for',
-  quietLine: 'hhd-quietline',
   foot: 'hhd-foot',
   // dash-v2: a source tag (worn with Hermes's chip classes), quieter than the steps
   src: 'hhd-src',

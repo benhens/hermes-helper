@@ -5,9 +5,7 @@ export const DASH_DATA = {
   "items": [
     {
       "id": "model",
-      "seen": true,
       "name": "A model",
-      "mark": "Model",
       "why": "The AI that does the thinking. Your app may already have a free one.",
       "steps": [
         {
@@ -44,13 +42,12 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 84
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "first_chat",
-      "seen": true,
       "name": "First chat",
-      "mark": "First chat",
       "why": "Ask Hermes one small thing, to see that it works.",
       "steps": [
         {
@@ -79,13 +76,12 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 182
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "personality",
-      "seen": true,
       "name": "Its personality",
-      "mark": "Personality",
       "why": "A short text that tells your Hermes who it is and how to talk.",
       "steps": [
         {
@@ -114,13 +110,12 @@ export const DASH_DATA = {
           "file": "user-guide/features/personality.md",
           "line": 33
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "chat_apps",
-      "seen": true,
       "name": "Chat apps",
-      "mark": "Chat apps",
       "why": "Talk to your Hermes from Telegram or another chat app on your phone.",
       "steps": [
         {
@@ -157,13 +152,12 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 45
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "tools_apps",
-      "seen": false,
       "name": "Tools and apps",
-      "mark": "Tools and apps",
       "why": "Actions Hermes can take, and outside apps like Gmail it can use.",
       "steps": [
         {
@@ -189,13 +183,12 @@ export const DASH_DATA = {
           "file": "user-guide/features/tool-gateway.md",
           "line": 124
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "skills",
-      "seen": false,
       "name": "Skills",
-      "mark": "Skills",
       "why": "Written know-how that teaches Hermes one task. Many come already installed.",
       "steps": [
         {
@@ -218,13 +211,12 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 297
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "memory",
-      "seen": false,
       "name": "Memory",
-      "mark": "Memory",
       "why": "Short notes Hermes keeps about you, so it remembers between chats.",
       "steps": [
         {
@@ -246,46 +238,12 @@ export const DASH_DATA = {
           "file": "user-guide/features/memory.md",
           "line": 9
         }
-      ]
-    },
-    {
-      "id": "scheduled_job",
-      "seen": true,
-      "name": "Scheduled jobs",
-      "mark": "Scheduled jobs",
-      "why": "Hermes does a job for you at set times, like every morning.",
-      "steps": [
-        {
-          "text": "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary."
-        },
-        {
-          "text": "Check: open Scheduled jobs. The job Hermes made is there."
-        },
-        {
-          "text": "No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
-          "route": {
-            "label": "Open Scheduled jobs",
-            "to": "/cron"
-          }
-        }
       ],
-      "terminal": null,
-      "sources": [
-        {
-          "file": "getting-started/learning-path.md",
-          "line": 80
-        },
-        {
-          "file": "getting-started/quickstart.md",
-          "line": 273
-        }
-      ]
+      "video": null
     },
     {
       "id": "second_bot",
-      "seen": true,
       "name": "A second bot",
-      "mark": "Second bot",
       "why": "A bot is one separate Hermes, with its own name, memory and skills.",
       "steps": [
         {
@@ -318,13 +276,12 @@ export const DASH_DATA = {
           "file": "getting-started/learning-path.md",
           "line": 83
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "safety",
-      "seen": false,
       "name": "Safety",
-      "mark": "Safety",
       "why": "Hermes asks you first before it runs anything risky on your computer.",
       "steps": [
         {
@@ -353,17 +310,24 @@ export const DASH_DATA = {
           "file": "getting-started/learning-path.md",
           "line": 163
         }
-      ]
+      ],
+      "video": null
     }
   ],
-  "total": 10,
+  "total": 9,
+  "path": [
+    "model",
+    "first_chat",
+    "personality",
+    "chat_apps",
+    "tools_apps",
+    "skills",
+    "memory",
+    "scheduled_job",
+    "second_bot",
+    "safety"
+  ],
   "words": {
-    "tabs": {
-      "dashboard": "Dashboard",
-      "learn": "Learn"
-    },
-    "tabListLabel": "Helper tabs",
-    "notBuilt": "Nothing here yet. What is ready is on Dashboard.",
     "stats": {
       "bots_one": "bot",
       "bots": "bots",
@@ -373,6 +337,11 @@ export const DASH_DATA = {
       "plugins": "plugins on in this bot",
       "not_known": "Helper could not read this number just now.",
       "waiting": "Counting",
+      "lines": {
+        "bots": "Each bot is a separate Hermes.",
+        "skills": "Each skill teaches Hermes one task.",
+        "plugins": "Each plugin is an add-on for Hermes."
+      },
       "plugins_short_one": "plugin, this bot",
       "plugins_short": "plugins, this bot",
       "plugins_title": "Plugins",
@@ -386,55 +355,18 @@ export const DASH_DATA = {
       "clear_yes": "Yes",
       "clear_no": "No"
     },
-    "activity": {
-      "title": "This bot's activity",
-      "last_used_today": "Last used today",
-      "last_used_one": "Last used yesterday",
-      "last_used_n": "Last used {n} days ago",
-      "less": "Less",
-      "more": "More",
-      "months": [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ],
-      "days": [
-        "",
-        "Mon",
-        "",
-        "Wed",
-        "",
-        "Fri",
-        ""
-      ]
-    },
     "setup": {
       "title": "Set up",
       "count": "{n} of {total}",
-      "you_are_here": "You are here",
-      "next": "Next",
-      "open": "Open",
-      "all_done": "All 10 are set up.",
       "close": "Close",
       "copy": "Copy",
       "copied": "Copied",
       "source": "{file}, line {line}",
-      "state_done": "done",
-      "state_not_done": "to do",
-      "state_not_known": "Helper could not check this one just now",
-      "mark_done": "I've done this",
       "mark_undo": "Not done yet",
-      "person_note": "Helper can't see this one, so it takes your word.",
-      "state_said_done": "done, you said so"
+      "start_here": "Start here",
+      "state_done": "Done",
+      "mark_done": "Done",
+      "video_soon": "Video coming soon"
     }
   }
 }

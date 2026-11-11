@@ -24362,8 +24362,8 @@ function chatCall(message, log, names = []) {
 
 // ---- src/state.js ----
 // What the page keeps in ctx.storage on the person's computer.
-// Keys the page reads back: tab (dashboard | learn | my_setup), helperWidth (the width Helper's window was dragged
-// to, 360 to 600 px). Anything unexpected in storage falls back to the default.
+// Keys the page reads back: helperWidth (the width Helper's window was dragged to, 360 to 600 px). loom2: no tabs
+// (his Loom of 11 Nov, 1:51: Learn is out, the page is the Dashboard), so 'tab' is no longer read or written. Anything unexpected in storage falls back to the default.
 // dash-v1: the first build's tabs (Setup, Your setup) left the page; their keys step, answers and remember are no
 // longer read or written by the page (their parked files, src/steps.js and src/setup-tab.js, still name them).
 // About the person, the record of what Helper keeps (talk v2 row 3) and, since loom-fixes, the last 50 lines of the
@@ -24375,15 +24375,9 @@ function chatCall(message, log, names = []) {
 // visit; Forget all removes it since last-reset (a full reset: the next visit asks the name again).
 // loom-fixes (Lead's point 17): 'talk', the last 50 lines of the conversation with Helper (src/talk-keep.js), and
 // 'helperHidden', whether the person put Helper's window away with Hide Helper (true, or nothing)
-const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met', 'talk', 'helperHidden']
-// dash-v1: the three tabs, Dashboard first (only it is built)
-// loom-fixes: My setup is out (his words, Loom 3:22); a stored 'my_setup' opens the Dashboard
-const TAB_IDS = ['dashboard', 'learn']
-
+const STORED_KEYS = ['helperWidth', 'kept', 'met', 'talk', 'helperHidden']
 function readState(get) {
-  const tab = get('tab', TAB_IDS[0])
   return {
-    tab: TAB_IDS.includes(tab) ? tab : TAB_IDS[0],
     helperWidth: clampHelperWidth(get('helperWidth', HELPER_PX))
   }
 }
@@ -24421,6 +24415,9 @@ const keptPlain = (v, max) => typeof v === 'string' && v.trim() !== '' && Array.
 const KEPT_SETUP_NEW = SETUP_DATA.questions.Q_NEW.answers.filter(a => a.kept_as).map(a => a.id)
 const KEPT_SETUP_GOALS = SETUP_DATA.questions.Q_GOAL.answers.map(a => a.id)
 const KEPT_SETUP_ITEMS = SETUP_DATA.rule_order
+// loom2: every set-up card on the Dashboard is marked by the person (his words, 11 Nov 17:10 UTC: "only if the person
+// clicks Done"), A model too, which the set-up conversation's rule_order leaves out (the page saw it): a mark of it is kept
+const KEPT_MARKS = [...KEPT_SETUP_ITEMS, 'model']
 
 function cleanKept(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
@@ -24442,7 +24439,7 @@ function cleanKept(v) {
     out.setup_goal_id = v.setup_goal_id
   }
   if (Array.isArray(v.setup_done_said)) {
-    const said = [...new Set(v.setup_done_said.filter(x => KEPT_SETUP_ITEMS.includes(x)))]
+    const said = [...new Set(v.setup_done_said.filter(x => KEPT_MARKS.includes(x)))]
     if (said.length) out.setup_done_said = said
   }
   if (KEPT_SETUP_ITEMS.includes(v.setup_current) || v.setup_current === 'model') out.setup_current = v.setup_current
@@ -26932,7 +26929,9 @@ function makeReader(ctx) {
 // label or the typed text) with setup_goal_id, setup_done_said (the things the person said are done), setup_current
 // (the thing last recommended). Not kept: Skip, Not sure yet, what the look saw, Something else.
 // the path's stops in order (the Dashboard's), for the one "You are here" rule
-const SU_PATH_OF = () => DASH_DATA.items.map(it => it.id)
+// loom2: the path's 10 stops as before (the Dashboard's cards are 9 now, Scheduled jobs out); this conversation does not
+// run in this build (normal-chat), and its order is unchanged
+const SU_PATH_OF = () => DASH_DATA.path
 
 const SU = SETUP_DATA
 const SU_L = SU.lines
@@ -28641,27 +28640,8 @@ const K = {
   root: 'relative flex h-full min-h-0 w-full min-w-0 overflow-hidden',
   left: 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
   // The header clears Hermes's title-bar band (its window buttons float there), as Capabilities does.
-  // No page title: like Capabilities, the sidebar row names the page and the header holds the tabs.
+  // No page title: like Capabilities, the sidebar row names the page. loom2: no tabs, so the header holds nothing.
   head: 'flex shrink-0 items-center gap-3 px-6 pb-2 pt-[calc(var(--titlebar-height)+1.5rem)]',
-  // Page tabs: Capabilities' text tabs (components/ui/tab-dropdown.tsx ResponsiveTabs row,
-  // components/ui/text-tab.tsx TextTab). The colour is split off so the open tab doesn't carry two.
-  tabs: 'flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1',
-  textTab:
-    'group/text-tab inline-flex h-7 items-center gap-1 bg-transparent px-1 text-[length:var(--conversation-caption-font-size)] font-medium transition-colors hover:bg-transparent hover:text-foreground focus-visible:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-ring',
-  textTabIdle: 'text-(--ui-text-tertiary)',
-  textTabOn: 'text-foreground',
-  textTabLabel: 'underline-offset-4 decoration-current/25 group-hover/text-tab:underline',
-  textTabLabelOn: 'underline-offset-4 decoration-current/25 underline',
-  // dash-v2: the tab names as Hermes's own SESSIONS | BOTS tabs, for TAB_LOOK 'hermes' below. Every class is one
-  // Hermes's own tab wears (components/ui/pane-tab.tsx: TAB, TAB_IDLE, TAB_ACTIVE, TAB_ACTIVE_UNDERLINE, PaneTabLabel),
-  // on the same 28 px row as today's tabs: 11 px capitals, and under the open one a 2 px line in the theme's primary
-  // colour (Hermes draws that line as an inset shadow of its own class). Its hover wash and tab fills are left out: they
-  // belong to Hermes's tab strip, which our header is not.
-  paneTab:
-    'group/text-tab inline-flex h-7 items-center gap-1 bg-transparent px-2 text-[0.6875rem] font-medium transition-colors hover:bg-transparent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ui-accent)',
-  paneTabIdle: 'text-(--ui-text-tertiary) hover:text-(--ui-text-secondary)',
-  paneTabOn: 'text-foreground shadow-[inset_0_-2px_0_var(--pane-tab-active-accent,var(--theme-primary))]',
-  paneTabLabel: 'block min-w-0 truncate font-medium tracking-wide uppercase',
   body: 'flex min-h-0 flex-1',
 
   // ---- step list (app/master-detail.tsx ListColumn + CapRow; app/overlays/panel.tsx) ----
@@ -28842,21 +28822,7 @@ const K = {
   mono: 'font-mono',
   icon14: 'size-3.5',
   icon16: 'size-4',
-  icon20: 'size-5',
-  // Learn and My setup are not built: one quiet line, in the caption tone, at the open step's text edge
-  notBuilt: 'px-6 py-4 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)'
-}
-
-// ---- the tab names' look, behind ONE value (dash-v2; Lead's point 7: Pēteris's decision, not made yet) ----
-//   'capabilities'  as built and as he has seen it: Capabilities' text tabs, sentence case, a thin faint underline
-//                   under the open one
-//   'hermes'        as Hermes's own tabs (SESSIONS | BOTS): capitals, a line in the theme's primary colour under the open one. Tested, and
-//                   measured once in the app; no person has looked at it.
-// To change the look, change the word on the next line.
-const TAB_LOOK = 'capabilities'
-const TAB_LOOKS = {
-  capabilities: { tab: K.textTab, idle: K.textTabIdle, on: K.textTabOn, label: K.textTabLabel, labelOn: K.textTabLabelOn },
-  hermes: { tab: K.paneTab, idle: K.paneTabIdle, on: K.paneTabOn, label: K.paneTabLabel, labelOn: K.paneTabLabel }
+  icon20: 'size-5'
 }
 
 // dash-v1: every class of the Dashboard tab's sheet (src/dash.css, from hhdesign's design/dash-r7/build.js), in one
@@ -28865,7 +28831,6 @@ const TAB_LOOKS = {
 const D = {
   main: 'hhd-main',
   compact: 'hhd-compact',
-  card: 'hhd-card',
   title: 'hhd-title',
   // the top box
   stats: 'hhd-stats',
@@ -28877,61 +28842,30 @@ const D = {
   // loom-fixes: a tile that opens Hermes's own screen, and the plugins tile's name in place of a number
   tileBtn: 'hhd-tile-btn',
   tileName: 'hhd-tile-name',
+  // loom2: the one plain line under each tile
+  tileLine: 'hhd-tile-line',
   wait: 'hhd-wait',
-  // Activity
-  act: 'hhd-act',
-  actWords: 'hhd-act-words',
-  lastUsed: 'hhd-lu',
-  key: 'hhd-key',
-  keySq: 'hhd-key-sq',
-  keyFirst: 'hhd-key-first',
-  keyLast: 'hhd-key-last',
-  gridWrap: 'hhd-gridwrap',
-  dayNames: 'hhd-daynames',
-  months: 'hhd-months',
-  month: 'hhd-month',
-  grid: 'hhd-grid',
-  sq: 'hhd-sq',
-  l0: 'hhd-l0',
-  l1: 'hhd-l1',
-  l2: 'hhd-l2',
-  l3: 'hhd-l3',
-  today: 'hhd-today',
-  // Set up
+  // Set up (loom2): the heading and count over a grid of cards; a card wears a tile's surface, edge, corners and icon
   head: 'hhd-head',
   count: 'hhd-count',
   countN: 'hhd-count-n',
-  road: 'hhd-road',
-  lines: 'hhd-lines',
-  line: 'hhd-line',
-  stop: 'hhd-stop',
-  dot: 'hhd-dot',
+  setup: 'hhd-setup',
+  cards: 'hhd-cards',
+  scard: 'hhd-scard',
+  scardTop: 'hhd-scard-top',
+  scardHead: 'hhd-scard-head',
+  scardName: 'hhd-scard-name',
+  scardWhy: 'hhd-scard-why',
   done: 'hhd-done',
-  todo: 'hhd-todo',
-  here: 'hhd-here',
-  quiet: 'hhd-quiet',
+  doneLine: 'hhd-done-line',
+  start: 'hhd-start',
   sel: 'hhd-sel',
-  up: 'hhd-up',
-  down: 'hhd-down',
-  label: 'hhd-label',
-  name: 'hhd-name',
-  you: 'hhd-you',
-  next: 'hhd-next',
-  nextWords: 'hhd-next-words',
-  nextLine: 'hhd-next-line',
-  nextLabel: 'hhd-next-label',
-  nextName: 'hhd-next-name',
-  nextWhy: 'hhd-next-why',
-  allDone: 'hhd-alldone',
-  // dash-v2: the small down arrow after "Open"
-  openChev: 'hhd-open-chev',
-  openWord: 'hhd-open-word',
+  // what an opened card holds, full width under its row; loom2 point 6: its video, or the quiet box until there is one
+  video: 'hhd-video',
+  videoSoon: 'hhd-video-soon',
+  videoName: 'hhd-video-name',
   steps: 'hhd-steps',
   caret: 'hhd-caret',
-  stepsHead: 'hhd-steps-head',
-  stepsIcon: 'hhd-steps-icon',
-  stepsName: 'hhd-steps-name',
-  stepsWhy: 'hhd-steps-why',
   ol: 'hhd-ol',
   li: 'hhd-li',
   route: 'hhd-route',
@@ -28942,7 +28876,6 @@ const D = {
   pasteBox: 'hhd-paste-box',
   word: 'hhd-word',
   pasteFor: 'hhd-paste-for',
-  quietLine: 'hhd-quietline',
   foot: 'hhd-foot',
   // dash-v2: a source tag (worn with Hermes's chip classes), quieter than the steps
   src: 'hhd-src',
@@ -29762,8 +29695,21 @@ function Said({ clock, id, text, className, fresh = false }) {
 // its own for as long as it runs, also while it waits, and the whole drawing was then soft at its
 // edges. So the blink changes the eye's own height (ry) and the hole's own path (d), the fingers
 // their y and height, the mouth its path: with those the drawing stayed sharp.
+// loom2 (his second Loom of 11 Nov, 2:28-2:50: "a bunch of dots ... this doesn't really fit the Hermes whole vibe"; his
+// reference: a portrait made only of squares on one strict grid, big where it is dark, small toward the edges): the
+// shapes are the same, but their accent fill is drawn as squares on one fixed grid by one SVG filter on the whole
+// drawing (DOTS below). The filter reads how deep inside the shapes each point is (their outline, blurred), and on
+// every cell of the grid draws a square that size: full inside, smaller toward the edges, none outside, so the edges
+// dissolve. No outline. One colour, the theme's accent, in dark and light. The grid does not move with the drawing (it
+// is fixed to the drawing's own space), and no square is an element of its own: a glide costs one filter pass a frame,
+// not one element a square. The pupils stay real holes: around a hole the squares shrink as at any edge.
 
 const ACCENT = { fill: 'var(--ui-accent)' }
+// The dots (loom2): cell: the grid's step in the drawing's units (6 = 5 px at 168 px wide, 4 px at 132 px); blur: how
+// far in from an edge the squares are still shrinking; gain: how soon inside a shape they reach full size; fill: a
+// full square's side as a share of its cell (the rest is the gap between squares). area: the filter's region, all the
+// body can reach (it rises 10 units and starts 101 units down when it comes up from behind the box).
+const DOTS = { cell: 6, blur: 4, gain: 1.5, fill: 0.75, area: { x: -30, y: -40, width: 260, height: 240 } }
 const SIDES = ['left', 'right']
 const FINGER_COUNT = EXPRESSIONS.resting.fingers.length
 // A blink, piece by piece: [piece, what changes, open, shut] (src/expressions.js).
@@ -29914,6 +29860,57 @@ function Character({ size = CHARACTER_PX, expression = 'resting', rising = false
   }, [comesUp])
 
   const view = FACE.view
+  // The dots: two ramps across one cell (0 at its edges, 1 in its middle), sideways and downwards, laid over the whole
+  // area as a pattern on the drawing's fixed grid; the filter adds each ramp to how deep the point is in the shapes
+  // and keeps what passes half way: a square per cell whose side grows with the depth.
+  const A = DOTS.area
+  const ramp = dir =>
+    jsxs(
+      'linearGradient',
+      {
+        id: `${uid}-ramp-${dir}`,
+        x1: 0,
+        y1: 0,
+        x2: dir === 'x' ? 1 : 0,
+        y2: dir === 'y' ? 1 : 0,
+        children: [0, 0.5, 1].map(offset => jsx('stop', { offset, style: { stopColor: ACCENT.fill, stopOpacity: offset === 0.5 ? 1 : 0 } }, offset))
+      },
+      `ramp-${dir}`
+    )
+  const grid = dir => [
+    jsx(
+      'pattern',
+      { id: `${uid}-cells-${dir}`, patternUnits: 'userSpaceOnUse', x: 0, y: 0, width: DOTS.cell, height: DOTS.cell, children: jsx('rect', { width: DOTS.cell, height: DOTS.cell, fill: `url(#${uid}-ramp-${dir})` }) },
+      `cells-${dir}`
+    ),
+    jsx('rect', { id: `${uid}-grid-${dir}`, ...A, fill: `url(#${uid}-cells-${dir})` }, `grid-${dir}`)
+  ]
+  const half = dir => [
+    jsx('feImage', { href: `#${uid}-grid-${dir}`, ...A, result: `ramp${dir}` }, `img-${dir}`),
+    jsx('feComposite', { in: `ramp${dir}`, in2: 'deep', operator: 'arithmetic', k1: 0, k2: 0.5, k3: 0.5 * DOTS.fill, k4: 0, result: `sum${dir}` }, `sum-${dir}`),
+    jsx('feComponentTransfer', { in: `sum${dir}`, result: `keep${dir}`, children: jsx('feFuncA', { type: 'discrete', tableValues: '0 1' }) }, `keep-${dir}`)
+  ]
+  const dots = jsxs(
+    'filter',
+    {
+      id: `${uid}-dots`,
+      'data-hh': 'dots',
+      filterUnits: 'userSpaceOnUse',
+      primitiveUnits: 'userSpaceOnUse',
+      ...A,
+      colorInterpolationFilters: 'sRGB',
+      children: [
+        jsx('feGaussianBlur', { in: 'SourceAlpha', stdDeviation: DOTS.blur, result: 'soft' }, 'blur'),
+        jsx('feComponentTransfer', { in: 'soft', result: 'deep', children: jsx('feFuncA', { type: 'linear', slope: DOTS.gain, intercept: 0 }) }, 'gain'),
+        ...half('x'),
+        ...half('y'),
+        jsx('feComposite', { in: 'keepx', in2: 'keepy', operator: 'in', result: 'squares' }, 'squares'),
+        jsx('feFlood', { style: { floodColor: ACCENT.fill }, result: 'ink' }, 'ink'),
+        jsx('feComposite', { in: 'ink', in2: 'squares', operator: 'in' }, 'paint')
+      ]
+    },
+    'dots'
+  )
   const pupilMask = (side, i) => {
     const eye = FACE.eyes[i]
     return jsx(
@@ -29997,27 +29994,38 @@ function Character({ size = CHARACTER_PX, expression = 'resting', rising = false
     // mouse presses pass through it to the message box.
     style: { display: 'block', flex: 'none', width: size, maxWidth: '100%', height: 'auto', overflow: 'visible', pointerEvents: 'none', visibility: comesUp && !armed ? 'hidden' : undefined },
     children: [
-      jsxs('defs', { children: [jsx('clipPath', { id: `${uid}-above`, children: jsx('rect', { ...FACE.above }) }, 'above'), ...SIDES.map(pupilMask)] }, 'defs'),
-      // The body shows only above the edge, so on rising it comes out from behind the message box.
-      jsx(
+      jsxs('defs', { children: [jsx('clipPath', { id: `${uid}-above`, children: jsx('rect', { ...FACE.above }) }, 'above'), ...SIDES.map(pupilMask), ramp('x'), ramp('y'), ...grid('x'), ...grid('y'), dots] }, 'defs'),
+      // loom2: everything is drawn through the dots filter, as one picture
+      jsxs(
         'g',
         {
-          clipPath: `url(#${uid}-above)`,
-          children: jsxs('g', {
-            ref: ref('body'),
-            'data-hh': 'body',
-            style: { transform: `translateY(${-x.rise}px)`, transition: glide('transform') },
-            children: [
-              ...SIDES.map(eyeShape),
-              jsx('path', { ref: ref('mouth'), 'data-hh': 'mouth', d: x.mouth, style: { ...ACCENT, d: `path("${x.mouth}")`, transition: glide('d') } }, 'mouth')
-            ]
-          })
+          filter: `url(#${uid}-dots)`,
+          'data-hh': 'dotted',
+          children: [
+            // The body shows only above the edge, so on rising it comes out from behind the message box.
+            jsx(
+              'g',
+              {
+                clipPath: `url(#${uid}-above)`,
+                children: jsxs('g', {
+                  ref: ref('body'),
+                  'data-hh': 'body',
+                  style: { transform: `translateY(${-x.rise}px)`, transition: glide('transform') },
+                  children: [
+                    ...SIDES.map(eyeShape),
+                    jsx('path', { ref: ref('mouth'), 'data-hh': 'mouth', d: x.mouth, style: { ...ACCENT, d: `path("${x.mouth}")`, transition: glide('d') } }, 'mouth')
+                  ]
+                })
+              },
+              'body'
+            ),
+            // The fingers are drawn last, in front, and reach 7 units below the edge, over the message
+            // box's top border.
+            ...SIDES.flatMap((side, hand) => x.fingers.map((h, i) => finger(side, hand, i)))
+          ]
         },
-        'body'
-      ),
-      // The fingers are drawn last, in front, and reach 7 units below the edge, over the message
-      // box's top border.
-      ...SIDES.flatMap((side, hand) => x.fingers.map((h, i) => finger(side, hand, i)))
+        'dotted'
+      )
     ]
   })
 }
@@ -30030,9 +30038,7 @@ const DASH_DATA = {
   "items": [
     {
       "id": "model",
-      "seen": true,
       "name": "A model",
-      "mark": "Model",
       "why": "The AI that does the thinking. Your app may already have a free one.",
       "steps": [
         {
@@ -30069,13 +30075,12 @@ const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 84
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "first_chat",
-      "seen": true,
       "name": "First chat",
-      "mark": "First chat",
       "why": "Ask Hermes one small thing, to see that it works.",
       "steps": [
         {
@@ -30104,13 +30109,12 @@ const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 182
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "personality",
-      "seen": true,
       "name": "Its personality",
-      "mark": "Personality",
       "why": "A short text that tells your Hermes who it is and how to talk.",
       "steps": [
         {
@@ -30139,13 +30143,12 @@ const DASH_DATA = {
           "file": "user-guide/features/personality.md",
           "line": 33
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "chat_apps",
-      "seen": true,
       "name": "Chat apps",
-      "mark": "Chat apps",
       "why": "Talk to your Hermes from Telegram or another chat app on your phone.",
       "steps": [
         {
@@ -30182,13 +30185,12 @@ const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 45
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "tools_apps",
-      "seen": false,
       "name": "Tools and apps",
-      "mark": "Tools and apps",
       "why": "Actions Hermes can take, and outside apps like Gmail it can use.",
       "steps": [
         {
@@ -30214,13 +30216,12 @@ const DASH_DATA = {
           "file": "user-guide/features/tool-gateway.md",
           "line": 124
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "skills",
-      "seen": false,
       "name": "Skills",
-      "mark": "Skills",
       "why": "Written know-how that teaches Hermes one task. Many come already installed.",
       "steps": [
         {
@@ -30243,13 +30244,12 @@ const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 297
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "memory",
-      "seen": false,
       "name": "Memory",
-      "mark": "Memory",
       "why": "Short notes Hermes keeps about you, so it remembers between chats.",
       "steps": [
         {
@@ -30271,46 +30271,12 @@ const DASH_DATA = {
           "file": "user-guide/features/memory.md",
           "line": 9
         }
-      ]
-    },
-    {
-      "id": "scheduled_job",
-      "seen": true,
-      "name": "Scheduled jobs",
-      "mark": "Scheduled jobs",
-      "why": "Hermes does a job for you at set times, like every morning.",
-      "steps": [
-        {
-          "text": "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary."
-        },
-        {
-          "text": "Check: open Scheduled jobs. The job Hermes made is there."
-        },
-        {
-          "text": "No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
-          "route": {
-            "label": "Open Scheduled jobs",
-            "to": "/cron"
-          }
-        }
       ],
-      "terminal": null,
-      "sources": [
-        {
-          "file": "getting-started/learning-path.md",
-          "line": 80
-        },
-        {
-          "file": "getting-started/quickstart.md",
-          "line": 273
-        }
-      ]
+      "video": null
     },
     {
       "id": "second_bot",
-      "seen": true,
       "name": "A second bot",
-      "mark": "Second bot",
       "why": "A bot is one separate Hermes, with its own name, memory and skills.",
       "steps": [
         {
@@ -30343,13 +30309,12 @@ const DASH_DATA = {
           "file": "getting-started/learning-path.md",
           "line": 83
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "safety",
-      "seen": false,
       "name": "Safety",
-      "mark": "Safety",
       "why": "Hermes asks you first before it runs anything risky on your computer.",
       "steps": [
         {
@@ -30378,17 +30343,24 @@ const DASH_DATA = {
           "file": "getting-started/learning-path.md",
           "line": 163
         }
-      ]
+      ],
+      "video": null
     }
   ],
-  "total": 10,
+  "total": 9,
+  "path": [
+    "model",
+    "first_chat",
+    "personality",
+    "chat_apps",
+    "tools_apps",
+    "skills",
+    "memory",
+    "scheduled_job",
+    "second_bot",
+    "safety"
+  ],
   "words": {
-    "tabs": {
-      "dashboard": "Dashboard",
-      "learn": "Learn"
-    },
-    "tabListLabel": "Helper tabs",
-    "notBuilt": "Nothing here yet. What is ready is on Dashboard.",
     "stats": {
       "bots_one": "bot",
       "bots": "bots",
@@ -30398,6 +30370,11 @@ const DASH_DATA = {
       "plugins": "plugins on in this bot",
       "not_known": "Helper could not read this number just now.",
       "waiting": "Counting",
+      "lines": {
+        "bots": "Each bot is a separate Hermes.",
+        "skills": "Each skill teaches Hermes one task.",
+        "plugins": "Each plugin is an add-on for Hermes."
+      },
       "plugins_short_one": "plugin, this bot",
       "plugins_short": "plugins, this bot",
       "plugins_title": "Plugins",
@@ -30411,180 +30388,42 @@ const DASH_DATA = {
       "clear_yes": "Yes",
       "clear_no": "No"
     },
-    "activity": {
-      "title": "This bot's activity",
-      "last_used_today": "Last used today",
-      "last_used_one": "Last used yesterday",
-      "last_used_n": "Last used {n} days ago",
-      "less": "Less",
-      "more": "More",
-      "months": [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ],
-      "days": [
-        "",
-        "Mon",
-        "",
-        "Wed",
-        "",
-        "Fri",
-        ""
-      ]
-    },
     "setup": {
       "title": "Set up",
       "count": "{n} of {total}",
-      "you_are_here": "You are here",
-      "next": "Next",
-      "open": "Open",
-      "all_done": "All 10 are set up.",
       "close": "Close",
       "copy": "Copy",
       "copied": "Copied",
       "source": "{file}, line {line}",
-      "state_done": "done",
-      "state_not_done": "to do",
-      "state_not_known": "Helper could not check this one just now",
-      "mark_done": "I've done this",
       "mark_undo": "Not done yet",
-      "person_note": "Helper can't see this one, so it takes your word.",
-      "state_said_done": "done, you said so"
+      "start_here": "Start here",
+      "state_done": "Done",
+      "mark_done": "Done",
+      "video_soon": "Video coming soon"
     }
   }
 }
 
 // ---- src/dash-rules.js ----
-// The Dashboard tab's fixed rules (dash-v1). Pure code, no React, no Hermes: src/dash.js reads Hermes and hands
-// the answers here. No AI anywhere. What each rule reads (content/dash-setup-list-v2.json, docs/answers/
-// hhtech-dash-reads.md and -reads2.md, "For builder:"):
-//   install        always done: this page runs only inside an installed Hermes
-//   (dash-v2: bot = the bot the app has open; Lead, 11 Nov)
-//   model          setup.runtime_check { profile: bot } says ok: true (Hermes's own free plan counts)
-//   personality    profiles.describe { name: bot }: soul is not empty and not one of Hermes's starter texts
-//   chat_apps      host.status(): gateway_platforms names at least one chat app (switched on, with its key)
-//   scheduled_job  cron.manage { action: 'list', profile: bot, include_disabled: true }: at least one job
-//   second_bot     profiles.list: two or more bots
-// A read that failed or has not come back is "not known" (null): never shown as done, never "You are here".
-// dash-v2 (the two branches joined): the starter personality texts, which bot, and the six rules (doneFlags) are in
-// src/setup-reads.js, the one copy the Dashboard and Helper's set-up conversation both use.
+// The Dashboard's fixed rules (dash-v1; loom2: the set-up cards). Pure code, no React, no Hermes: src/dash.js reads
+// Hermes and hands the answers here. No AI anywhere.
 
-/* ---------- the path ---------- */
-// loom-fixes (dash-setup-list-v2 eb3aeba8): the 10 stops on the path (Install is off it), every one counted. A stop the
-// page sees (it.seen) is done when its read says so; a stop the person marks is done when they said so ("I've done this"
-// here, or "I've done this already" / "It worked" in Helper's set-up conversation: the same kept list, said). A
-// stop the page sees and the person said is done too (Helper's "Count it as done").
-// The state of one stop: true, false, or null (its read failed or is still out). selfMarked(it): the person marks it.
-function stopState(it, flags, said, selfMarked) {
-  if (said.includes(it.id)) return true
-  if (selfMarked(it)) return false
-  const f = flags[it.id]
-  return f === true ? true : f === false ? false : null
+/* ---------- loom2: the set-up cards ---------- */
+// His words (17:10 UTC, on Lead's plan): "By default no card should be shown as done, only if the person clicks Done.
+// Otherwise it doesn't show." So nothing is read to decide it: a card is 'done' when the person marked it (the kept
+// list setup_done_said), else 'todo'. start: the first card not marked ("Start here"), -1 when all are marked.
+// done: how many are marked; total: how many cards (the count "{n} of {total}").
+function cardStates(said, items = DASH_DATA.items) {
+  const marked = new Set(Array.isArray(said) ? said : [])
+  const states = items.map(it => (marked.has(it.id) ? 'done' : 'todo'))
+  return { states, start: states.indexOf('todo'), done: states.filter(x => x === 'done').length, total: items.length }
 }
-// Each stop: 'done' (filled), 'todo', 'here' ("You are here", by the one shared rule, src/setup-reads.js hereStop),
-// 'unknown' (its read failed or is still out: drawn as not done, never "here"). The line itself has no state.
-function pathStates(stateOf, items = DASH_DATA.items, current = null) {
-  const states = items.map(it => {
-    const v = stateOf(it.id)
-    return v === true ? 'done' : v === false ? 'todo' : 'unknown'
-  })
-  const at = hereStop(items.map(it => it.id), stateOf, current)
-  const here = at ? items.findIndex(it => it.id === at) : -1
-  if (here >= 0) states[here] = 'here'
-  const done = states.filter(s => s === 'done').length
-  return { states, here, done, total: items.length, allDone: done === items.length }
-}
-
-/* ---------- Activity: the days the open bot was used ---------- */
-// Rows of host.listPersistedSessions that are Hermes's own work, left out: scheduled jobs (cron), the task board
-// (kanban), tool and helper-agent runs. Chats with no message are left out too.
-// loom-fixes (hhtech-loom-n1 3, its correction): 'local' is no longer left out: a chat the person typed in a fresh home
-// came back as local. Hermes's own first-run chat is left out by its title (below).
-const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent']
-// dash-v2: while Hermes is still writing that first-run chat it is not 'local' yet. Read in three brand-new homes on
-// the first opening (dev/checks/dash-v2/fresh-probe-65b108b.out): source 'gui', 1 to 3 messages, title "Getting
-// started"; some seconds later 'local' with 4 messages. So a fresh install showed "Last used today" (hhtech-dash-run,
-// 2 of 3 homes). The field that tells it apart at once is its title (Hermes's CHAT_TITLE, agent/onboarding_text.py;
-// a repeated run is "Getting started #2"): a chat with that title and no more than Hermes's own four messages is
-// left out. With more messages the person has gone on in it, and it is a chat of theirs.
-const FIRST_RUN_TITLE = /^Getting started( #\d+)?$/
-const FIRST_RUN_MAX_MESSAGES = 4
-const isFirstRunChat = s => typeof s.title === 'string' && FIRST_RUN_TITLE.test(s.title.trim()) && s.message_count <= FIRST_RUN_MAX_MESSAGES
-// A time from a row as a Date: seconds (Hermes writes seconds); a number above 1e11 is read as milliseconds.
-const dashTime = v => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? new Date(v > 1e11 ? v : v * 1000) : null)
-// The person's own calendar day of a Date (their computer's clock), as 'YYYY-MM-DD'.
-const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-
-// The days with a chat, each with how many chats touched it: a chat marks the day it started and the day it was
-// last used (rows have no per-message dates, so the days between are not marked).
-function chatDays(sessions) {
-  const days = new Map()
-  for (const s of Array.isArray(sessions) ? sessions : []) {
-    if (!s || typeof s !== 'object') continue
-    if (NOT_THE_PERSON.includes(String(s.source || '').toLowerCase())) continue
-    if (!(typeof s.message_count === 'number' && s.message_count > 0)) continue
-    if (isFirstRunChat(s)) continue
-    const first = dashTime(s.started_at)
-    const last = dashTime(s.last_active) || dashTime(s.last_activity_at) || first
-    const keys = new Set([first, last].filter(Boolean).map(dayKey))
-    for (const k of keys) days.set(k, (days.get(k) || 0) + 1)
-  }
-  return days
-}
-
-// How bright a day's square is: no chat, 1, 2, 3 or more.
-const dayLevel = n => (n >= 3 ? 3 : n > 0 ? n : 0)
-
-// The grid: `weeks` columns, Sunday on top, the last column holds today; days after today are not drawn.
-// months: a month's name over the first column whose Sunday is in it (not over the first or the last column).
-function activityGrid(days, today, weeks) {
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - (weeks - 1) * 7)
-  const cells = []
-  const months = []
-  let prev = -1
-  for (let w = 0; w < weeks; w++) {
-    const sunday = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7)
-    if (sunday.getMonth() !== prev && w > 0 && w < weeks - 1) months.push({ week: w, month: sunday.getMonth() })
-    prev = sunday.getMonth()
-    for (let d = 0; d < 7; d++) {
-      const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7 + d)
-      if (day > today && dayKey(day) !== dayKey(today)) continue
-      const key = dayKey(day)
-      cells.push({ week: w, day: d, key, level: dayLevel(days.get(key) || 0), today: key === dayKey(today) })
-    }
-  }
-  return { cells, months }
-}
-
-// "Last used": whole calendar days between the newest day with a chat and today. null = no chat at all.
-function daysSinceUsed(days, today) {
-  if (!days.size) return null
-  const newest = [...days.keys()].sort().pop()
-  const [y, m, d] = newest.split('-').map(Number)
-  const then = new Date(y, m - 1, d)
-  const now = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  return Math.max(0, Math.round((now - then) / 86400000))
-}
-
-function lastUsedLine(n, words = DASH_DATA.words.activity) {
-  if (n === null) return null
-  if (n === 0) return words.last_used_today
-  if (n === 1) return words.last_used_one
-  return words.last_used_n.replace('{n}', String(n))
-}
-
-// How many weeks fit a width: squares of `cell` px with `gap` px between, after the room the day names take.
-const weeksThatFit = (width, cell, gap, maxWeeks = 52) => Math.max(1, Math.min(maxWeeks, Math.floor((width + gap) / (cell + gap))))
+// As many columns as fit with each card at least CARD_MIN_PX wide, CARD_GAP_PX apart; at least one.
+const CARD_MIN_PX = 260
+const CARD_GAP_PX = 10
+const cardColumns = (width, min = CARD_MIN_PX, gap = CARD_GAP_PX) => Math.max(1, Math.floor((width + gap) / (min + gap)))
+// An opened card's panel goes after the last card of its row (index of that card), full width.
+const panelAfter = (index, columns, count) => Math.min(count, (Math.floor(index / columns) + 1) * columns) - 1
 
 /* ---------- the top box ---------- */
 // Skills: the different skill names across all bots (one read per bot, host.skills.list). One failed read: not
@@ -30610,27 +30449,23 @@ function tileWord(key, n, words = DASH_DATA.words.stats, narrow = false) {
 // ---- src/dash-css.js ----
 // Generated by scripts/build.mjs from src/dash.css (the style sheet of the Dashboard tab).
 // Edit the CSS, then build; tests/dash-css.test.mjs checks it.
-const DASH_CSS = ".hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}\n.hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}\n.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:18px 22px}\n.hhd-compact .hhd-card{padding:14px 16px}\nhtml:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}\n.hhd-compact .hhd-stats{gap:8px}\n.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}\n.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}\nhtml:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}\n.hhd-compact .hhd-tile-icon{width:32px;height:32px}\n.hhd-tile-words{display:flex;flex-direction:column;min-width:0}\n.hhd-tile-btn{width:100%;border:0;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}\n.hhd-tile-btn:hover{background:var(--ui-bg-tertiary)}\n.hhd-tile-btn:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}\n.hhd-tile-name{font-size:15px;line-height:22px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}\n.hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}\n.hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-compact .hhd-tile-label{white-space:normal}\n.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}\n.hhd-compact .hhd-wait{margin:4px 0}\n.hhd-act{flex-direction:row;align-items:stretch;gap:24px;padding:12px 22px}\n.hhd-compact .hhd-act{gap:16px;padding:10px 16px}\n.hhd-act-words{flex:none;display:flex;flex-direction:column;gap:1px;min-width:0}\n.hhd-act-words .hhd-title{margin-bottom:3px}\n.hhd-lu{font-size:12px;line-height:17px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-key{margin-top:auto;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;line-height:14px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-key-sq{width:8px;height:8px;border-radius:2px}\n.hhd-key-first{margin-left:4px}\n.hhd-key-last{margin-right:4px}\n.hhd-gridwrap{flex:1;min-width:0;display:flex;align-items:flex-end;justify-content:flex-end;gap:6px}\n.hhd-daynames{flex:none;display:grid;grid-template-rows:repeat(7,8px);gap:2px;width:22px;font-size:9.5px;line-height:8px;color:var(--ui-text-tertiary)}\n.hhd-months{position:relative;height:13px;font-size:10px;line-height:12px;color:var(--ui-text-tertiary)}\n.hhd-month{position:absolute;top:0;white-space:nowrap}\n.hhd-grid{display:grid;grid-template-rows:repeat(7,8px);grid-auto-columns:8px;gap:2px}\n.hhd-sq{width:8px;height:8px;border-radius:2px}\n.hhd-l0{background:var(--ui-bg-tertiary)}\n.hhd-l1{background:color-mix(in srgb,var(--ui-accent) 35%,transparent)}\n.hhd-l2{background:color-mix(in srgb,var(--ui-accent) 65%,transparent)}\n.hhd-l3{background:var(--ui-accent)}\n.hhd-today{outline:1px solid var(--ui-text-secondary);outline-offset:1px}\n.hhd-head{display:flex;align-items:baseline;gap:12px;min-width:0}\n.hhd-count{font-size:13px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-count-n{font-size:15px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-road{position:relative;margin:4px 0 0;width:100%}\n.hhd-compact .hhd-road{margin-top:2px}\n.hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}\n.hhd-line{fill:none;stroke:var(--ui-text-quaternary);stroke-width:1;stroke-linecap:round}\n.hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}\n.hhd-stop:focus-visible{outline:none}\n.hhd-dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;box-sizing:border-box}\n.hhd-compact .hhd-dot{width:32px;height:32px}\n.hhd-done .hhd-dot{background:var(--ui-accent);color:var(--background)}\n.hhd-todo .hhd-dot{background:var(--ui-bg-tertiary);color:var(--ui-text-tertiary)}\n.hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}\n.hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}\n.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-text-quaternary);color:var(--ui-text-quaternary)}\n.hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}\n.hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}\n.hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}\n.hhd-up .hhd-label{bottom:calc(100% + 6px);flex-direction:column-reverse}\n.hhd-down .hhd-label{top:calc(100% + 6px)}\n.hhd-here.hhd-up .hhd-label{bottom:calc(100% + 9px)}\n.hhd-here.hhd-down .hhd-label{top:calc(100% + 9px)}\n.hhd-name{display:block;font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}\n.hhd-compact .hhd-name{font-size:11px;line-height:15px;white-space:normal}\n.hhd-done .hhd-name{color:var(--ui-text-secondary)}\n.hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}\n.hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}\n.hhd-you{display:block;font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}\n.hhd-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--ui-stroke-tertiary);min-width:0}\n.hhd-compact .hhd-next{margin-top:8px;padding-top:10px}\n.hhd-next-words{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}\n.hhd-next-line{display:flex;align-items:baseline;gap:10px;min-width:0}\n.hhd-next-label{font-size:11px;line-height:14px;letter-spacing:.8px;text-transform:uppercase;color:var(--ui-accent);font-weight:600}\n.hhd-next-name{font-size:13px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-alldone{color:var(--ui-accent)}\n.hhd-open-word{display:inline-flex;align-items:center}\n.hhd-open-chev{display:inline-flex;margin-left:4px}\n.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}\n.hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}\n.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}\n.hhd-compact .hhd-caret{display:none}\n.hhd-steps-head{display:flex;align-items:center;gap:10px;min-width:0}\n.hhd-steps-icon{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--ui-accent) 18%,transparent);color:var(--ui-accent)}\n.hhd-steps-name{font-size:14px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-steps-why{font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}\n.hhd-compact .hhd-ol{line-height:19px}\n.hhd-ol li::marker{color:var(--ui-accent);font-weight:600}\n.hhd-li{margin:0 0 2px}\n.hhd-route{margin:4px 0 2px}\n.hhd-term{display:flex;flex-direction:column;gap:6px;min-width:0}\n.hhd-term-when{font-size:12px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-paste{display:flex;flex-direction:column;gap:4px;min-width:0}\n.hhd-paste-text{min-width:0;flex:1 1 auto;overflow-x:auto;font-size:12px;line-height:18px;color:var(--ui-text-secondary)}\n.hhd-paste-box{flex-wrap:wrap}\n.hhd-word{white-space:nowrap}\n.hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-quietline{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}\n.hhd-foot .hhd-src{font-size:10.5px;color:var(--ui-text-quaternary)}\n.hhd-close{position:absolute;right:10px;top:10px}"
+const DASH_CSS = ".hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}\n.hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}\n.hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}\n.hhd-compact .hhd-stats{gap:8px}\n.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}\n.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}\nhtml:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}\n.hhd-compact .hhd-tile-icon{width:32px;height:32px}\n.hhd-tile-words{display:flex;flex-direction:column;min-width:0}\n.hhd-tile-btn{width:100%;border:0;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}\n.hhd-tile-btn:hover{background:var(--ui-bg-tertiary)}\n.hhd-tile-btn:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}\n.hhd-tile-name{font-size:15px;line-height:22px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}\n.hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}\n.hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-compact .hhd-tile-label{white-space:normal}\n.hhd-tile-line{margin-top:4px;font-size:12px;line-height:16px;color:var(--ui-text-secondary)}\n.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}\n.hhd-compact .hhd-wait{margin:4px 0}\n.hhd-setup{display:flex;flex-direction:column;gap:10px;min-width:0}\n.hhd-head{display:flex;align-items:baseline;gap:12px;min-width:0;padding:4px 2px 0}\n.hhd-count{font-size:13px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-count-n{font-size:15px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-cards{display:grid;align-items:stretch;min-width:0}\n.hhd-scard{display:flex;flex-direction:column;gap:10px;min-width:0;width:100%;margin:0;border:0;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}\n.hhd-compact .hhd-scard{padding:12px}\nhtml:not(.dark) .hhd-scard{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-scard:hover{background:var(--ui-bg-tertiary)}\n.hhd-scard:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}\n.hhd-scard.hhd-sel{outline:2px solid var(--ui-accent);outline-offset:-2px}\n.hhd-scard-top{display:flex;align-items:center;gap:12px;min-width:0}\n.hhd-scard-head{display:flex;flex-direction:column;gap:2px;min-width:0}\n.hhd-scard-name{font-size:14px;line-height:20px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-scard-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-done .hhd-tile-icon{background:var(--ui-accent);color:var(--background)}\n.hhd-done-line{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:16px;font-weight:600;color:var(--ui-accent)}\n.hhd-start{font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:4px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}\n.hhd-compact .hhd-steps{gap:8px;padding:12px 34px 12px 14px}\n.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}\n.hhd-video{display:block;width:100%;max-width:560px;aspect-ratio:16/9;border-radius:calc(8px*var(--hhd-round));background:var(--ui-bg-elevated)}\n.hhd-video-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;max-width:560px;aspect-ratio:16/9;border-radius:calc(8px*var(--hhd-round));background:var(--ui-bg-elevated);font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-video-name{font-size:13px;font-weight:600;color:var(--ui-text-secondary)}\n.hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}\n.hhd-compact .hhd-ol{line-height:19px}\n.hhd-ol li::marker{color:var(--ui-accent);font-weight:600}\n.hhd-li{margin:0 0 2px}\n.hhd-route{margin:4px 0 2px}\n.hhd-term{display:flex;flex-direction:column;gap:6px;min-width:0}\n.hhd-term-when{font-size:12px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-paste{display:flex;flex-direction:column;gap:4px;min-width:0}\n.hhd-paste-text{min-width:0;flex:1 1 auto;overflow-x:auto;font-size:12px;line-height:18px;color:var(--ui-text-secondary)}\n.hhd-paste-box{flex-wrap:wrap}\n.hhd-word{white-space:nowrap}\n.hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}\n.hhd-foot .hhd-src{font-size:10.5px;color:var(--ui-text-quaternary)}\n.hhd-close{position:absolute;right:10px;top:10px}"
 
 // ---- src/dash.js ----
-// The Dashboard tab (dash-v1, as Pēteris picked it: design/dash-r5 way (ii), r6 Activity, r7 tiles, icons and line).
-// Three parts, top to bottom: the top box (three numbers: bots and skills for the whole Hermes, plugins for the open
-// bot), Activity (the open bot's days with a chat, GitHub's grid), Set up (the path of 11 stops). Every word comes
-// from the team's content/dash-setup-list-v2.json and content/dash-words-v1.json (src/dash-data.js); every rule from
-// src/dash-rules.js and src/setup-reads.js; every class from the K and D tables (src/look.js).
-// No AI call, no warning colours, nothing stored: the reads run each time the tab is put on screen.
-// Reads, all read-only, always naming the bot (hhtech-dash-reads.md and -reads2.md, "For builder:"):
-//   first   profiles.list (the bots: the bots number, and A second bot)
-//   then    setup.runtime_check, profiles.describe, cron.manage list, host.status() and host.listPersistedSessions
-//           (not in the SDK docs: feature-checked), all for the bot the app has open
-//           (dash-v2; Lead, 11 Nov: "The count must not mix two bots. Every per-bot rule on the path (A model, Its
-//           personality, Chat apps, Scheduled jobs) reads the bot the app has open, the same bot as the plugins tile
-//           and Activity; it rereads when the open bot changes. Install and A second bot are for the whole Hermes.")
+// The Dashboard (dash-v1; loom2, his second Loom of 11 Nov: the page is the Dashboard, no tabs). Two parts, top to
+// bottom: the top box (three tiles: bots and skills for the whole Hermes with their numbers, plugins with none) and
+// Set up: a heading "SET UP {n} of {m}" over a grid of cards, one per thing to set up (content/dash-setup-list-v2.json,
+// in its order, Install and Scheduled jobs left out: 9 cards). Every word comes from the team's
+// content/dash-setup-list-v2.json and content/dash-words-v1.json, or from Lead's job words where the build says so
+// (scripts/dash-data.mjs LOOM2_WORDS); every class from the K and D tables (src/look.js).
+// loom2 (his words, 17:10 UTC: "By default no card should be shown as done, only if the person clicks Done"): nothing is
+// read to decide what is done. A card is done only when the person pressed its Done button (the kept list
+// setup_done_said, as before); the count counts those marks; "Start here" sits on the first card not marked.
+// Activity is out (his Loom, 0:05): no chats read. Reads, all read-only, for the tiles only:
+//   first   profiles.list (the bots number)
 //   then    host.skills.list for each bot (the skills number)
-// loom-fixes: no plugins read any more (hhtech-loom-n1 1: no read gives the number Hermes's Plugins screen shows); the
-// plugins tile has no number and opens that screen. The skills tile opens Capabilities, Skills; the bots tile stays
-// plain (no address opens the Bots tab). The path: 10 stops (Install is off it), each counted; the stops the page cannot
-// see are marked by the person ("I've done this"), in the same kept list as Helper's set-up conversation's "done".
+// No AI call, no warning colours, nothing stored but the person's marks: the reads run each time the page is put on
+// screen, and again when the app opens another bot.
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -30656,7 +30491,7 @@ const DASH_ICONS = {
   // the small down arrow after "Open" on the Next row: the steps open below (hhdesign's review of 65b108b, point 5)
   open: { codicon: 'chevron-down', hermes: 'components/ui/select.tsx:38' }
 }
-const stopIcon = id => DASH_ICONS[id === 'skills' ? 'skills_stop' : id]
+const cardIcon = id => DASH_ICONS[id === 'skills' ? 'skills_stop' : id]
 
 // Icon sizes (px) at the places Hermes draws them: 16 in its sidebar and Settings rows, 14 in Settings' sub-rows
 // (hhtech-dash-icons.md point 1); 20 on the tiles (hhdesign's r7 size).
@@ -30702,36 +30537,10 @@ function useDashWidth() {
   return [width, holder.current.ref]
 }
 
-// The path's shape (r5/r7 build.js setup()): 11 points across the road, high and low in turn, joined by soft curves.
-function roadShape(width, compact, here, count = DASH_DATA.items.length) {
-  const A = compact ? 16 : 20
-  // the name's row: one line of 16 px, or at the narrow size up to two lines of 15 px
-  const NAMEH = compact ? 37 : 22
-  const YOUH = compact ? 18 : 19
-  const RB = compact ? 22 : 26
-  const pad = compact ? 16 : 30
-  const yu = here >= 0 && here % 2 === 0
-  const yd = here >= 0 && here % 2 === 1
-  const top = RB + NAMEH + (yu ? YOUH : 0) + 2
-  const height = top + 2 * A + RB + NAMEH + (yd ? YOUH : 0) + 2
-  const points = Array.from({ length: count }, (_, i) => [pad + (i * (width - 2 * pad)) / (count - 1), top + (i % 2 ? 2 * A : 0)])
-  const segments = points.slice(1).map((b, i) => {
-    const a = points[i]
-    const dx = (b[0] - a[0]) / 2
-    return `M ${a[0]} ${a[1]} C ${a[0] + dx} ${a[1]} ${b[0] - dx} ${b[1]} ${b[0]} ${b[1]}`
-  })
-  // the width a name may take at the narrow size: the room between the stops on its side, less a gap
-  const nameRoom = Math.max(40, Math.floor((2 * (width - 2 * pad)) / (count - 1)) - 8)
-  return { points, segments, height, nameRoom }
-}
-// Before the road is measured (and in the tests, which have no layout): this width.
-const ROAD_WIDTH_UNMEASURED = 560
+// Before the cards' row is measured (and in the tests, which have no layout): this width (2 columns).
+const CARDS_WIDTH_UNMEASURED = 560
 // The left side's width under which the tab takes hhdesign's narrow sizes (r5-r7: 720 px wide side at 1180, 580 at 940).
 const DASH_COMPACT_UNDER_PX = 640
-// Activity's squares: 8 px, 2 px apart; until the grid is measured, 16 weeks (the job's number).
-const SQ = 8
-const SQ_GAP = 2
-const WEEKS_UNMEASURED = 16
 
 const fill = (s, map) => s.replace(/\{(\w+)\}/g, (m, k) => (k in map ? String(map[k]) : m))
 
@@ -30757,9 +30566,19 @@ function openHermesDocs(ctx, url) {
   } catch {}
 }
 
+// loom2: a video's address from content/videos.json, checked again where it is used: an https:// address that reads
+// back exactly as written (the build has checked it too)
+function isVideoUrl(url) {
+  if (typeof url !== 'string' || !url.startsWith('https://') || /[\s"'<>\\]/.test(url)) return false
+  try {
+    return new URL(url).href === url
+  } catch {
+    return false
+  }
+}
+
 function makeDashboard(ctx) {
   const read = makeReader(ctx)
-  const request = (method, params, ms = DASH_READ_MS) => read(() => host.request(method, params, ms), ms)
 
   // Opens a docs page in the person's browser (the SDK's door to the OS; only the official docs).
   const docsHref = file => HERMES_DOCS_BASE + String(file).replace(/\.(md|mdx)$/, '').replace(/(^|\/)index$/, '$1')
@@ -30791,46 +30610,18 @@ function makeDashboard(ctx) {
       let alive = true
       setReads({})
       const put = patch => alive && setReads(r => ({ ...r, ...patch }))
-      // A host door that is missing or throws when looked at counts as missing (not every Hermes has every door).
-      const door = get => {
-        try {
-          const fn = get()
-          return typeof fn === 'function' ? fn : null
-        } catch {
-          return null
-        }
-      }
       ;(async () => {
         const bots = await read(() => host.profiles.list(), DASH_READ_MS)
         if (!alive) return
         const rows = bots.ok ? botRows(bots.value) : null
         put({ bots: rows ? bots : { ok: false } })
-        // the bot every per-bot read names: the open one by the app's own name; with no name given, the one Hermes
-        // marks as default in its list of bots (else Hermes's own name for it, "default")
-        const bot = nameGiven ? openBot : mainBotName(rows) || openBot
-        const listSessions = door(() => host.listPersistedSessions)
-        const getStatus = door(() => host.status)
-        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve(undefined)
-        const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
-        const [model, soul, cron, st, ses] = await Promise.all([
-          // the open bot, by the name the app itself gives (never a guessed bot): so these are read also when the
-          // bots read failed
-          request('setup.runtime_check', { profile: bot }),
-          request('profiles.describe', { name: bot }),
-          request('cron.manage', { action: 'list', profile: bot, include_disabled: true }),
-          status,
-          sessions
-        ])
-        if (!alive) return
-        // sessionsDoor: whether this Hermes has the sessions read at all (without it First chat is marked by the person)
-        put({ model, soul, cron, status: st, sessions: ses, sessionsDoor: !!listSessions, pathRead: true })
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
         put({ skills: skills || [{ ok: false }] })
       })().catch(() => {})
       return () => {
         alive = false
-        // the tab was left (or another bot opened): what was read goes
+        // the page was left (or another bot opened): what was read goes
         setReads({})
       }
     }, [active, openBot, nameGiven])
@@ -30840,37 +30631,32 @@ function makeDashboard(ctx) {
       kept.open = next
       setOpenNow(next)
     }
-    const [roadWidth, roadRef] = useDashWidth()
-    const [gridWidth, gridRef] = useDashWidth()
+    const [cardsWidth, cardsRef] = useDashWidth()
     const stepsBox = useRef(null)
-    // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
-    // (a stop found open on coming back is brought into view the same way)
+    // a card just opened: what it holds is brought into view (the page scrolls to it when it is below the fold)
+    // (a card found open on coming back is brought into view the same way)
     const [reveal, setReveal] = useState(() => kept.open !== null)
-    // It waits until the steps are on screen and the path's reads are back (Activity arrives with them and moves
-    // what is under it), so a stop found open on coming back, also to another tab first, is not missed.
-    const settled = !!reads.pathRead
     useEffect(() => {
-      if (!reveal || !active || !settled) return
+      if (!reveal || !active) return
       const el = stepsBox.current
       if (!el) return
       setReveal(false)
       if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' })
-    }, [reveal, active, settled, open])
+    }, [reveal, active, open])
     const toggle = id => {
       setOpen(o => (o === id ? null : id))
       if (open !== id) setReveal(true)
     }
     // given: the app's own name for the open bot (loom-fixes: Helper's look reads the same bot, src/page.js)
-    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox, given }
+    return { reads, open, setOpen, toggle, cardsWidth, cardsRef, stepsBox, given }
   }
 
-  // The tab, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
-  // kept: the record Helper keeps (src/kept.js; its setup_done_said is the person's marks, its setup_current the stop
-  // Helper recommended last); onMark(id, done): the person pressed "I've done this" or "Not done yet" (src/page.js
-  // writes the kept record)
+  // The Dashboard, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
+  // kept: the record Helper keeps (src/kept.js; its setup_done_said is the person's marks); onMark(id, done): the person
+  // pressed Done or Not done yet (src/page.js writes the kept record)
   function renderDashboard(state, { compact = false, kept = {}, onMark = () => {} } = {}) {
     const W = DASH_DATA.words
-    const { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox } = state
+    const { reads, open, setOpen, toggle, cardsWidth, cardsRef, stepsBox } = state
 
     /* ---------- the top box: three tiles ---------- */
     const rows = reads.bots && reads.bots.ok ? botRows(reads.bots.value) : null
@@ -30881,9 +30667,11 @@ function makeDashboard(ctx) {
     }
     // loom-fixes (Lead's points 14 and 15, hhtech-loom-n1 1 and 2): a tile with a screen of Hermes's own that lists the
     // same things is a button to that screen; the bots tile stays plain. The plugins tile has no number.
+    // loom2 point 4: one plain line under each tile, what the thing is
+    const tileLine = key => jsx('span', { className: D.tileLine, 'data-hh': 'tile-line', children: W.stats.lines[key] }, 'line')
     const tileWords = key =>
       key === 'plugins'
-        ? [jsx('b', { className: D.tileName, 'data-hh': 'tile-name', children: W.stats.plugins_title }, 'n'), jsx('span', { className: D.tileLabel, children: W.stats.plugins_line }, 'l')]
+        ? [jsx('b', { className: D.tileName, 'data-hh': 'tile-name', children: W.stats.plugins_title }, 'n'), jsx('span', { className: D.tileLabel, children: W.stats.plugins_line }, 'l'), tileLine(key)]
         : [
             numbers[key] === undefined
               ? jsx('i', { className: D.wait, 'data-hh': 'wait', 'aria-hidden': true }, 'n')
@@ -30898,7 +30686,8 @@ function makeDashboard(ctx) {
                 ? jsx('span', { className: K.srOnly, children: W.stats.not_known }, 'sr')
                 : null,
             // a tile that opens Hermes's screen says where it goes (the plugins tile says it on screen)
-            TILE_GO[key] ? jsx('span', { className: K.srOnly, children: '. ' + W.stats.plugins_line }, 'go') : null
+            TILE_GO[key] ? jsx('span', { className: K.srOnly, children: '. ' + W.stats.plugins_line }, 'go') : null,
+            tileLine(key)
           ]
     const tile = key => {
       const inner = [jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'), jsxs('span', { className: D.tileWords, children: tileWords(key) }, 'w')]
@@ -30907,206 +30696,130 @@ function makeDashboard(ctx) {
     }
     const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
 
-    /* ---------- Activity: shown only when the read worked ---------- */
-    let activity = null
-    const ses = reads.sessions
-    if (ses && ses.ok && ses.value && Array.isArray(ses.value.sessions)) {
-      const today = new Date()
-      const days = chatDays(ses.value.sessions)
-      const weeks = gridWidth ? weeksThatFit(gridWidth - 22 - 6, SQ, SQ_GAP) : WEEKS_UNMEASURED
-      const grid = activityGrid(days, today, weeks)
-      const last = lastUsedLine(daysSinceUsed(days, today))
-      const level = n => [D.l0, D.l1, D.l2, D.l3][n]
-      activity = jsxs(
-        'section',
-        {
-          className: cx(D.card, D.act),
-          'data-hh': 'activity',
-          children: [
-            jsxs(
-              'div',
-              {
-                className: D.actWords,
-                children: [
-                  jsx('span', { className: D.title, children: W.activity.title }, 't'),
-                  last ? jsx('span', { className: D.lastUsed, 'data-hh': 'last-used', children: last }, 'lu') : null,
-                  jsxs(
-                    'span',
-                    {
-                      className: D.key,
-                      'aria-hidden': true,
-                      children: [
-                        W.activity.less,
-                        ...[0, 1, 2, 3].map(n => jsx('i', { className: cx(D.keySq, level(n), n === 0 && D.keyFirst, n === 3 && D.keyLast) }, n)),
-                        W.activity.more
-                      ]
-                    },
-                    'k'
-                  )
-                ]
-              },
-              'w'
-            ),
-            jsxs(
-              'div',
-              {
-                className: D.gridWrap,
-                ref: gridRef,
-                'aria-hidden': true,
-                children: [
-                  jsx('div', { className: D.dayNames, children: W.activity.days.map((d, i) => jsx('span', { children: d }, i)) }, 'd'),
-                  jsxs(
-                    'div',
-                    {
-                      children: [
-                        jsx('div', { className: D.months, children: grid.months.map(m => jsx('span', { className: D.month, style: { left: `${m.week * (SQ + SQ_GAP)}px` }, children: W.activity.months[m.month] }, m.week)) }, 'm'),
-                        jsx(
-                          'div',
-                          {
-                            className: D.grid,
-                            'data-hh': 'grid',
-                            'data-weeks': weeks,
-                            children: grid.cells.map(c =>
-                              jsx('i', { className: cx(D.sq, level(c.level), c.today && D.today), 'data-day': c.key, 'data-level': c.level, style: { gridColumn: c.week + 1, gridRow: c.day + 1 } }, c.key)
-                            )
-                          },
-                          'g'
-                        )
-                      ]
-                    },
-                    'mg'
-                  )
-                ]
-              },
-              'gw'
-            )
-          ]
-        },
-        'activity'
-      )
-    }
-
-    /* ---------- Set up: the path ---------- */
+    /* ---------- Set up: the cards (loom2) ---------- */
     const items = DASH_DATA.items
-    const ready = !!reads.pathRead
-    const flags = ready ? doneFlags(reads) : {}
     const said = Array.isArray(kept.setup_done_said) ? kept.setup_done_said : []
-    // the person marks a stop the page cannot see; First chat too when this Hermes has no sessions read (hhtech's rule)
-    const selfMarked = it => !it.seen || (it.id === 'first_chat' && ready && !reads.sessionsDoor)
-    const stateOf = id => stopState(items.find(it => it.id === id), flags, said, selfMarked)
-    const path = pathStates(stateOf, items, kept.setup_current || null)
-    // before the path's reads are back: a stop the person marked shows it, every other one waits as not done, nobody is
-    // "here", no count
-    const states = ready ? path.states : items.map(it => (said.includes(it.id) ? 'done' : 'todo'))
-    const here = ready ? path.here : -1
-    const width = roadWidth || ROAD_WIDTH_UNMEASURED
-    const shape = roadShape(width, compact, here)
-    const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here }
-    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_known, here: W.setup.you_are_here }
-    // a stop done because the person said so (not seen by a read): "done, you said so"
-    const wordOf = (it, s) => (s === 'done' && said.includes(it.id) && flags[it.id] !== true ? W.setup.state_said_done : stateWord[s])
-    const stops = items.map((it, i) => {
-      const s = states[i]
-      const size = 16
+    // done only by the person's own mark; the first card not marked is "Start here"
+    const cards = cardStates(said, items)
+    const isDone = id => cards.states[items.findIndex(it => it.id === id)] === 'done'
+    // as many columns as fit with each card at least CARD_MIN_PX wide
+    const columns = cardColumns(cardsWidth || CARDS_WIDTH_UNMEASURED)
+    const openAt = open ? items.findIndex(it => it.id === open) : -1
+    const openItem = openAt >= 0 ? items[openAt] : null
+
+    const card = (it, i) => {
+      const done = cards.states[i] === 'done'
+      const start = i === cards.start
       return jsxs(
         'button',
         {
           type: 'button',
-          className: cx(D.stop, stateClass[s], i % 2 ? D.down : D.up, open === it.id && D.sel),
-          style: { left: `${shape.points[i][0]}px`, top: `${shape.points[i][1]}px` },
-          'aria-label': `${it.mark}: ${wordOf(it, s)}`,
-          'aria-expanded': open === it.id,
-          'aria-controls': open === it.id ? 'helper-dash-steps' : undefined,
-          'data-hh': 'stop',
-          'data-stop': it.id,
-          'data-state': s,
+          className: cx(D.scard, done && D.done, openAt === i && D.sel),
+          'aria-expanded': openAt === i,
+          'aria-controls': openAt === i ? 'helper-dash-steps' : undefined,
+          'data-hh': 'card',
+          'data-card': it.id,
+          'data-state': done ? 'done' : 'todo',
           onClick: () => toggle(it.id),
           children: [
-            jsx('span', { className: D.dot, children: jsx(DashIcon, { icon: stopIcon(it.id), size }) }, 'd'),
-            // the name, and under it (outward from the line) "You are here"; at the narrow size a long name may take
-            // two lines, no wider than the room to the next stop on its side
             jsxs(
               'span',
               {
-                className: D.label,
-                'aria-hidden': true,
-                style: compact ? { width: `${shape.nameRoom}px` } : undefined,
+                className: D.scardTop,
                 children: [
-                  jsx('span', { className: D.name, children: it.mark }, 'n'),
-                  s === 'here' ? jsx('span', { className: D.you, 'data-hh': 'you-are-here', children: W.setup.you_are_here }, 'y') : null
+                  jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: cardIcon(it.id), size: 20 }) }, 'i'),
+                  jsxs(
+                    'span',
+                    {
+                      className: D.scardHead,
+                      children: [
+                        jsx('span', { className: D.scardName, 'data-hh': 'card-name', children: it.name }, 'n'),
+                        // a marked card says Done; the first card not marked carries "Start here"; any other card: nothing
+                        done
+                          ? jsxs('span', { className: D.doneLine, 'data-hh': 'card-done', children: [jsx(DashIcon, { icon: DASH_ICONS.check, size: 14 }, 'c'), W.setup.state_done] }, 'd')
+                          : start
+                            ? jsx('span', { className: D.start, 'data-hh': 'start-here', children: W.setup.start_here }, 's')
+                            : null
+                      ]
+                    },
+                    'h'
+                  )
                 ]
               },
-              'l'
-            )
+              'top'
+            ),
+            jsx('span', { className: D.scardWhy, 'data-hh': 'card-why', children: it.why }, 'w')
           ]
         },
         it.id
       )
-    })
-    const road = jsxs(
-      'div',
-      {
-        className: D.road,
-        ref: roadRef,
-        style: { height: `${shape.height}px` },
-        'data-hh': 'road',
-        children: [
-          jsx(
-            'svg',
-            {
-              className: D.lines,
-              width,
-              height: shape.height,
-              'aria-hidden': true,
-              children: shape.segments.map((d, i) => jsx('path', { d, className: D.line, 'data-hh': 'line' }, i))
-            },
-            'svg'
-          ),
-          ...stops
-        ]
-      },
-      'road'
-    )
+    }
 
-    let under = null
-    const openItem = open ? items.find(it => it.id === open) : null
+    // loom2 point 6: the card's video at the top of the opened card (content/videos.json). With an address: the browser's
+    // own player, nothing loaded before Play, no Download and no Picture-in-picture, captions when given. Without: a
+    // quiet 16:9 box with the card's name and "Video coming soon", and no play button that does nothing.
+    const cardVideo = it =>
+      it.video && isVideoUrl(it.video.url)
+        ? jsx(
+            'video',
+            {
+              className: D.video,
+              'data-hh': 'video',
+              src: it.video.url,
+              poster: isVideoUrl(it.video.poster) ? it.video.poster : undefined,
+              controls: true,
+              preload: 'none',
+              controlsList: 'nodownload',
+              disablePictureInPicture: true,
+              playsInline: true,
+              'aria-label': it.name,
+              children: isVideoUrl(it.video.captions) ? jsx('track', { kind: 'captions', src: it.video.captions, srcLang: 'en', label: 'English', default: true }) : null
+            },
+            'video'
+          )
+        : jsxs(
+            'div',
+            {
+              className: D.videoSoon,
+              'data-hh': 'video-soon',
+              children: [jsx('span', { className: D.videoName, children: it.name }, 'n'), jsx('span', { children: W.setup.video_soon }, 's')]
+            },
+            'video'
+          )
+
+    // What an opened card holds, full width under its row: the steps (with their route buttons), the text to paste,
+    // the Done or Not done yet button, the sources, the close button.
+    let panel = null
     if (openItem) {
-      const i = items.indexOf(openItem)
-      under = jsxs(
+      const marked = isDone(openItem.id)
+      panel = jsxs(
         'div',
         {
           className: D.steps,
           id: 'helper-dash-steps',
           ref: stepsBox,
+          role: 'region',
+          'aria-label': openItem.name,
           'data-hh': 'steps',
           'data-stop': openItem.id,
+          style: { gridColumn: '1 / -1' },
           children: [
-            jsx('i', { className: D.caret, style: { left: `${shape.points[i][0] - 7}px` }, 'aria-hidden': true }, 'caret'),
-            jsxs(
-              'div',
-              {
-                className: D.stepsHead,
-                children: [
-                  jsx('span', { className: D.stepsIcon, children: jsx(DashIcon, { icon: stopIcon(openItem.id), size: 14 }) }, 'i'),
-                  jsx('h3', { className: D.stepsName, children: openItem.name }, 'n')
-                ]
-              },
-              'head'
-            ),
-            jsx('p', { className: D.stepsWhy, children: openItem.why }, 'why'),
+            // the pointer to the opened card: over the middle of its column
+            jsx('i', { className: D.caret, style: { left: `calc(${(((openAt % columns) + 0.5) * 100) / columns}% - 7px)` }, 'aria-hidden': true }, 'caret'),
+            cardVideo(openItem),
             jsx(
               'ol',
               {
                 className: D.ol,
-                children: openItem.steps.map((s, k) =>
+                children: openItem.steps.map((st, k) =>
                   jsxs(
                     'li',
                     {
                       className: D.li,
                       children: [
-                        jsx('span', { children: s.text }, 't'),
-                        s.route
-                          ? jsx('div', { className: D.route, children: jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'route', onClick: () => goTo(s.route.to), children: s.route.label }) }, 'r')
+                        jsx('span', { children: st.text }, 't'),
+                        st.route
+                          ? jsx('div', { className: D.route, children: jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'route', onClick: () => goTo(st.route.to), children: st.route.label }) }, 'r')
                           : null
                       ]
                     },
@@ -31124,13 +30837,13 @@ function makeDashboard(ctx) {
                     'data-hh': 'terminal',
                     children: [
                       jsx('p', { className: D.termWhen, children: openItem.terminal.when }, 'w'),
-                      ...openItem.terminal.paste.map((p, k) =>
+                      ...openItem.terminal.paste.map((pp, k) =>
                         jsxs(
                           'div',
                           {
                             className: D.paste,
                             children: [
-                              jsx('span', { className: D.pasteFor, children: p.for }, 'f'),
+                              jsx('span', { className: D.pasteFor, children: pp.for }, 'f'),
                               jsxs(
                                 'div',
                                 {
@@ -31146,11 +30859,11 @@ function makeDashboard(ctx) {
                                       {
                                         className: `${K.mono} ${D.pasteText}`,
                                         'data-hh': 'paste-text',
-                                        children: p.text.split(' ').flatMap((word, i) => [i ? ' ' : null, jsx('span', { className: D.word, children: pathBreak(word) }, i)])
+                                        children: pp.text.split(' ').flatMap((word, wi) => [wi ? ' ' : null, jsx('span', { className: D.word, children: pathBreak(word) }, wi)])
                                       },
                                       't'
                                     ),
-                                    jsx(CopyButton, { text: p.text, label: W.setup.copy, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
+                                    jsx(CopyButton, { text: pp.text, label: W.setup.copy, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
                                   ]
                                 },
                                 'p'
@@ -31165,26 +30878,22 @@ function makeDashboard(ctx) {
                   'term'
                 )
               : null,
-            // loom-fixes (dash-words rules.marks): a stop the person marks: the faint sentence and one button, I've done this
-            // or, once marked, Not done yet. A stop the page sees has neither.
-            selfMarked(openItem) ? jsx('p', { className: D.quietLine, 'data-hh': 'person-note', children: W.setup.person_note }, 'pn') : null,
-            selfMarked(openItem)
-              ? jsx(
-                  'div',
-                  {
-                    className: D.route,
-                    children: jsx(Button, {
-                      variant: 'secondary',
-                      size: 'xs',
-                      'data-hh': 'mark',
-                      'data-marked': said.includes(openItem.id),
-                      onClick: () => onMark(openItem.id, !said.includes(openItem.id)),
-                      children: said.includes(openItem.id) ? W.setup.mark_undo : W.setup.mark_done
-                    })
-                  },
-                  'mark'
-                )
-              : null,
+            // loom2 (his words, 17:10 UTC): every card has a Done button; once marked it reads Not done yet, to take it back
+            jsx(
+              'div',
+              {
+                className: D.route,
+                children: jsx(Button, {
+                  variant: 'secondary',
+                  size: 'xs',
+                  'data-hh': 'mark',
+                  'data-marked': marked,
+                  onClick: () => onMark(openItem.id, !marked),
+                  children: marked ? W.setup.mark_undo : W.setup.mark_done
+                })
+              },
+              'mark'
+            ),
             jsx(
               'div',
               {
@@ -31229,57 +30938,15 @@ function makeDashboard(ctx) {
         },
         'steps'
       )
-    } else if (ready && here >= 0) {
-      const it = items[here]
-      // the word and its arrow as one piece: Hermes's Button puts its own gap between its children, and the arrow
-      // stands 4 px after the word (seen: about 14 px when they were two children)
-      const openWord = jsx('span', { className: D.openWord, children: [W.setup.open, jsx('span', { className: D.openChev, children: jsx(DashIcon, { icon: DASH_ICONS.open, size: 12 }) }, 'c')] })
-      under = jsxs(
-        'div',
-        {
-          className: D.next,
-          'data-hh': 'next',
-          children: [
-            jsxs(
-              'span',
-              {
-                className: D.nextWords,
-                children: [
-                  jsxs(
-                    'span',
-                    {
-                      className: D.nextLine,
-                      children: [jsx('span', { className: D.nextLabel, children: W.setup.next }, 'l'), jsx('b', { className: D.nextName, children: it.name }, 'n')]
-                    },
-                    'a'
-                  ),
-                  jsx('span', { className: D.nextWhy, children: it.why }, 'w')
-                ]
-              },
-              'words'
-            ),
-            // "Open", then Hermes's small down arrow: the steps open below (hhdesign's review of 65b108b, point 5)
-            jsx(Button, { variant: 'link', size: 'inline', 'data-hh': 'open-next', onClick: () => toggle(it.id), children: openWord }, 'open')
-          ]
-        },
-        'next'
-      )
-    } else if (ready && path.allDone) {
-      under = jsxs(
-        'div',
-        {
-          className: D.next,
-          'data-hh': 'all-done',
-          children: [jsx('span', { className: D.allDone, children: jsx(DashIcon, { icon: DASH_ICONS.check, size: 16 }) }, 'i'), jsx('span', { className: D.nextWhy, children: W.setup.all_done }, 't')]
-        },
-        'done'
-      )
     }
+    // the cards, with the opened card's panel after the last card of its row
+    const after = openAt >= 0 ? panelAfter(openAt, columns, items.length) : -1
+    const grid = items.flatMap((it, i) => (i === after ? [card(it, i), panel] : [card(it, i)]))
 
     const setup = jsxs(
       'section',
       {
-        className: D.card,
+        className: D.setup,
         'data-hh': 'setup',
         children: [
           jsxs(
@@ -31288,26 +30955,34 @@ function makeDashboard(ctx) {
               className: D.head,
               children: [
                 jsx('h2', { className: D.title, children: W.setup.title }, 't'),
-                ready
-                  ? jsx(
-                      'span',
-                      {
-                        className: D.count,
-                        'data-hh': 'count',
-                        // "{n} of {total}": the number done in bold, as r5 to r7 draw it
-                        children: W.setup.count.split('{n}').flatMap((part, k) =>
-                          k === 0 ? fill(part, { total: path.total }) : [jsx('b', { className: D.countN, children: String(path.done) }, 'n'), fill(part, { total: path.total })]
-                        )
-                      },
-                      'c'
+                jsx(
+                  'span',
+                  {
+                    className: D.count,
+                    'data-hh': 'count',
+                    // "{n} of {total}": the number marked done in bold
+                    children: W.setup.count.split('{n}').flatMap((part, k) =>
+                      k === 0 ? fill(part, { total: cards.total }) : [jsx('b', { className: D.countN, children: String(cards.done) }, 'n'), fill(part, { total: cards.total })]
                     )
-                  : null
+                  },
+                  'c'
+                )
               ]
             },
             'head'
           ),
-          road,
-          under
+          jsx(
+            'div',
+            {
+              className: D.cards,
+              ref: cardsRef,
+              'data-hh': 'cards',
+              'data-columns': columns,
+              style: { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: `${CARD_GAP_PX}px` },
+              children: grid
+            },
+            'cards'
+          )
         ]
       },
       'setup'
@@ -31317,7 +30992,7 @@ function makeDashboard(ctx) {
       className: cx(D.main, compact && D.compact),
       'data-hh': 'dashboard',
       'data-compact': compact,
-      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, activity, setup]
+      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, setup]
     })
   }
 
@@ -31962,9 +31637,8 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-// dash-v1: the tabs, their names from the Dashboard's data (content/dash-words-v1.json page_words). loom-fixes: two,
-// Dashboard and Learn (My setup is out: his words, Loom 3:22). Only Dashboard is built: Learn shows one quiet line.
-const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
+// loom2 (his Loom of 11 Nov, 1:51 "take out the learn and just have this set up"): no tabs. With only the Dashboard
+// left there is no tab row: the page is the Dashboard. A stored tab ('learn', or an older name) is not read.
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
 // function is made once, so React doesn't detach and re-attach it on every render; React calls it
@@ -32421,7 +32095,6 @@ function makePage(ctx, opts = {}) {
 
   return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
-    const [tab, setTab] = useState(initial.tab)
     // The width the person dragged Helper's window to (remembered), and whether Helper is folded
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
@@ -32471,8 +32144,8 @@ function makePage(ctx, opts = {}) {
     const width = size.width
     const [modelStatus, recheckModel] = useModelStatus()
     live.recheck = () => recheckModel(true)
-    // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
-    const dashboard = useDashboard({ active: tab === 'dashboard' })
+    // dash-v1: the Dashboard's state, read again each time the page is put on screen (src/dash.js; loom2: no tabs)
+    const dashboard = useDashboard({ active: true })
     live.profile = dashboard.given
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
@@ -32492,20 +32165,7 @@ function makePage(ctx, opts = {}) {
     const stripButton = useRef(null)
     // Where a drag of Helper's edge began: { x, width }.
     const drag = useRef(null)
-    // One ref function per tab, made once (like useOwnSize's), kept with the tab buttons.
-    const tabRefs = useRef(null)
-    if (!tabRefs.current) {
-      const els = {}
-      tabRefs.current = { els, set: Object.fromEntries(TABS.map(t => [t.id, el => (els[t.id] = el)])) }
-    }
-
-    const fit = layoutFor({ width, height: size.height, tab, helperWidth, folded: folded || hidden })
-
-    const keep = (key, setter) => value => {
-      setter(value)
-      ctx.storage.set(key, value)
-    }
-    const saveTab = keep('tab', setTab)
+    const fit = layoutFor({ width, height: size.height, tab: 'dashboard', helperWidth, folded: folded || hidden })
 
     // The message box takes the keyboard when asked to (a pick, Helper
     // opened from its strip); a request that finds no box is dropped, so it can't steal focus later.
@@ -33071,67 +32731,17 @@ function makePage(ctx, opts = {}) {
       ctx.storage.set('helperWidth', final)
     }
 
-    /* ---------- header: the two text tabs ---------- */
-    // Arrow keys move between the tabs, Home and End go to the first and last (DESIGN.md,
-    // Keyboard: one entry point at the selected tab; WAI-ARIA tabs pattern).
-    function onTabKey(e, index) {
-      const last = TABS.length - 1
-      const to = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index === 0 ? last : index - 1, Home: 0, End: last }[e.key]
-      if (to === undefined) return
-      e.preventDefault()
-      const next = TABS[to].id
-      saveTab(next)
-      const el = tabRefs.current.els[next]
-      if (el) el.focus()
-    }
+    /* ---------- header: loom2, no tabs; the header keeps the room under Hermes's title bar ---------- */
+    const header = jsx('div', { className: K.head, 'data-hh': 'header' })
 
-    // the tab names' look: one value in src/look.js (TAB_LOOK)
-    const tabLook = TAB_LOOKS[TAB_LOOK]
-    const tabRow = jsx('div', {
-      className: K.tabs,
-      role: 'tablist',
-      'aria-label': DASH_DATA.words.tabListLabel,
-      'data-hh': 'tabs',
-      children: TABS.map((t, i) => {
-        const on = tab === t.id
-        return jsx(
-          'button',
-          {
-            type: 'button',
-            role: 'tab',
-            id: `hh-tab-${t.id}`,
-            'aria-selected': on,
-            'aria-controls': 'hh-tabpanel',
-            tabIndex: on ? 0 : -1,
-            'data-active': on,
-            className: cx(tabLook.tab, on ? tabLook.on : tabLook.idle),
-            ref: tabRefs.current.set[t.id],
-            onClick: () => saveTab(t.id),
-            onKeyDown: e => onTabKey(e, i),
-            children: jsx('span', { className: on ? tabLook.labelOn : tabLook.label, children: t.label })
-          },
-          t.id
-        )
-      })
-    })
-
-    const header = jsx('div', { className: K.head, 'data-hh': 'header', children: tabRow })
-
-    /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
-    const panel =
-      tab === 'dashboard'
-        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
-        : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
+    /* ---------- the page: the Dashboard ---------- */
+    const panel = renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
 
     const main = jsx(
       'main',
       {
         className: K.detail,
         'data-hh': 'detail',
-        // The tabs' panel (the tabs point here with aria-controls).
-        role: 'tabpanel',
-        id: 'hh-tabpanel',
-        'aria-labelledby': `hh-tab-${tab}`,
         children: jsx('div', { className: K.detailScroll, 'data-hh': 'scroll', children: panel })
       },
       'main'
@@ -33324,7 +32934,7 @@ function makePage(ctx, opts = {}) {
           )
         : null
 
-    // The left side: the tabs, and under them the open tab.
+    // The left side: the room under the title bar, and under it the Dashboard.
     const left = jsxs(
       'div',
       {

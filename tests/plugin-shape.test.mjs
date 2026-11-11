@@ -131,8 +131,9 @@ test('the page reads only through read-only calls (no set, configure, write or s
   // loom-fixes: the plugins read is gone (hhtech-loom-n1 1: no read gives the number Hermes's Plugins screen shows)
   assert.deepEqual([...new Set(methods)].sort(), ['cron.manage', 'free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
   for (const m of code.matchAll(/request\('(cron|plugins)\.manage', \{([^}]*)\}/g)) assert.match(m[2], /^\s*action: 'list',/, m[0])
-  // two: the Dashboard's scheduled jobs and the set-up conversation's look at them (loom-fixes: no plugins read)
-  assert.equal([...code.matchAll(/request\('(cron|plugins)\.manage'/g)].length, 2)
+  // one: the set-up conversation's look at the scheduled jobs (loom-fixes: no plugins read; loom2: the Dashboard reads
+  // nothing to decide what is done)
+  assert.equal([...code.matchAll(/request\('(cron|plugins)\.manage'/g)].length, 1)
   assert.doesNotMatch(code, /setEnabled|profiles\.configure|set_asset|config\.set|composer\.setDraft|\.write\(/)
   // host.newChat only in the Dashboard's route button, and only when the person presses it (goTo)
   assert.deepEqual([...code.matchAll(/\bnewChat\(/g)].length, 1)
@@ -231,23 +232,21 @@ test('every class comes from the two class tables (K: Hermes\'s own classes; T: 
   }
 })
 
-test('three text tabs, Dashboard, Learn and My setup (dash-v1), in Capabilities\' TextTab look (not the SegmentedControl pill)', () => {
+test('no tabs (loom2: his Loom of 11 Nov, 1:51 "just have this set up"): no tab list, no tab, no Learn; never the SegmentedControl pill', () => {
   assert.doesNotMatch(src('page.js'), /SegmentedControl/)
-  assert.match(src('page.js'), /export const TABS = TAB_IDS\.map\(id => \(\{ id, label: DASH_DATA\.words\.tabs\[id\] \}\)\)/)
+  assert.doesNotMatch(src('page.js'), /TABS|TAB_IDS|role: 'tablist'|role: 'tab'|tabpanel|notBuilt/)
   assert.doesNotMatch(src('page.js'), /'Your setup'|label: 'Setup'/)
-  assert.match(src('page.js'), /role: 'tablist'/)
-  assert.match(src('page.js'), /role: 'tab',/)
 })
 
 test('buttons are Hermes Button components; bare <button>s only where Hermes uses them too', () => {
-  // On the page: the text tabs (TextTab is a plain <button>), Helper's strip (PaneTab vertical / kanban rail are
-  // plain buttons) and "Skip" in the message box. (dash-v1: the step's choice cards left with the step.)
+  // On the page: Helper's strip (PaneTab vertical / kanban rail are plain buttons) and "Skip" in the message box.
+  // (dash-v1: the step's choice cards left with the step; loom2: the text tabs left with the tabs.)
   const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button',\s*\{\s*type: 'button',\s*(['\w-]+)/g)].map(m => m[1])
-  assert.deepEqual(bare.sort(), ['className', 'className', 'role'])
-  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 3)
-  // dash-v1: on the Dashboard the 11 stops of the path are our own shape from hhdesign's drawing (round marks with
-  // their names), one real <button type="button"> wearing D classes; every other button there is Hermes's
-  const stops = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.stop,[^\n]*\)),/g)].map(m => m[1])
+  assert.deepEqual(bare.sort(), ['className', 'className'])
+  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 2)
+  // loom2: on the Dashboard each set-up card is one real <button type="button"> wearing D classes (a whole card that
+  // opens; no Hermes component is a card that is a button); every other button there is Hermes's
+  const stops = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.scard,[^\n]*\)),/g)].map(m => m[1])
   assert.equal(stops.length, 1)
   // loom-fixes (Lead's point 15): a tile that opens Hermes's own screen is the whole tile as one real <button
   // type="button"> wearing D classes (no Hermes component is a card that is a button); the bots tile stays a <div>
@@ -322,7 +321,11 @@ test('the character is one swappable component, used only through <Character>', 
 test('the character is drawn, not loaded: no picture, no data URL, no sprite sheet anywhere in the built file', () => {
   assert.doesNotMatch(code, /data:image|base64|\.(png|webp|gif|jpe?g|svg)['"`)?#]/)
   assert.doesNotMatch(code, /maskImage|WebkitMask|background-image|backgroundImage/)
-  assert.doesNotMatch(code, /jsxs?\(\s*['"](img|image|canvas|picture|video|object|embed|use)['"]/)
+  assert.doesNotMatch(code, /jsxs?\(\s*['"](img|image|canvas|picture|object|embed|use)['"]/)
+  // loom2 point 6 (Lead's job): one <video>, the set-up card's own video in src/dash.js, never in the character
+  assert.equal([...code.matchAll(/jsxs?\(\s*['"]video['"]/g)].length, 1)
+  assert.equal([...src('dash.js').matchAll(/jsxs?\(\s*['"]video['"]/g)].length, 1)
+  assert.doesNotMatch(src('character.js'), /video/)
   // the 9 Nov sprite-sheet slot and the drawn hand's poses are gone (commit cff33f6 has them)
   assert.equal(fs.existsSync(path.join(ROOT, 'src', 'pet-sheet.js')), false)
   // (loom-fixes: the names from the Hermes docs hold "pets (petdex mascots)", a docs page's title, so the word is

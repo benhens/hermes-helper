@@ -7,11 +7,13 @@
 // commit cff33f6 still has them.)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
 import { mount, all, loadSrc } from './lib/render.mjs'
 import { useState } from './fakes/react.mjs'
 import { FACE, EXPRESSIONS, EXPRESSION_NAMES, RISE, eyeTransform, pupilScale, pupilHole, fingerRect, talkFrames, drumHeights } from '../src/expressions.js'
 
-const { Character } = await loadSrc('character.js')
+const { Character, DOTS } = await loadSrc('character.js')
 const { CHARACTER_PX } = await import('../src/layout.js')
 
 const ACCENT = 'var(--ui-accent)'
@@ -69,11 +71,21 @@ test('the drawing: an inline SVG of variation 2, 168 px wide, every shape filled
   const shapes = all(tree, n => ['ellipse', 'rect', 'path', 'circle'].includes(n.type) && n.props['data-hh'])
   assert.equal(shapes.length, 2 + 2 + 1 + 8, 'two eyes, two pupil holes, a mouth, eight fingers')
   for (const s of shapes) assert.equal(s.props.style.fill, ACCENT, s.props['data-hh'])
-  // no other colour, picture, link or sheet anywhere in it
+  // no other colour, picture, link or sheet anywhere in it. loom2: the dots filter adds the accent six times (the two
+  // ramps' stops, whose colour is never shown: only how see-through they are counts) and once as the dots' ink; and
+  // its two feImage elements name two of the drawing's own pattern rects ('#' + this drawing's id), nothing outside
   const flat = JSON.stringify(tree)
-  assert.equal(flat.split(ACCENT).length - 1, shapes.length)
-  assert.doesNotMatch(flat, /data:|url\((?!#)|href|<img|"image"|#[0-9a-fA-F]{3,8}\b|currentColor/)
-  assert.equal(all(tree, n => ['image', 'img', 'use', 'style', 'linearGradient'].includes(n.type)).length, 0)
+  assert.equal(flat.split(ACCENT).length - 1, shapes.length + 6 + 1)
+  const hrefs = all(tree, n => n.props && n.props.href !== undefined).map(n => [n.type, n.props.href])
+  assert.equal(hrefs.length, 2)
+  for (const [type, href] of hrefs) {
+    assert.equal(type, 'feImage')
+    const target = all(tree, n => n.props && n.props.id && '#' + n.props.id === href)
+    assert.equal(target.length, 1, href)
+    assert.equal(target[0].type, 'rect')
+  }
+  assert.doesNotMatch(flat.replace(/"href":"#hh-face-[\w-]+-grid-[xy]"/g, ''), /data:|url\((?!#)|href|<img|"image"|#[0-9a-fA-F]{3,8}\b|currentColor/)
+  assert.equal(all(tree, n => ['image', 'img', 'use', 'style'].includes(n.type)).length, 0)
   assert.equal(draw({ size: 96 }).props.width, 96)
   assert.equal(draw({ size: 96 }).props.height, 64.32)
 })
@@ -517,4 +529,56 @@ test('the glide into a loop starts from what is drawn at that moment, read from 
   } finally {
     delete globalThis.getComputedStyle
   }
+})
+
+/* ---------- loom2: the character as dots ---------- */
+// His second Loom of 11 Nov, 2:28-2:50 ("a bunch of dots"); his reference: a portrait made only of squares on one strict
+// grid, big where it is dark, small toward the edges, no outlines.
+
+test('the dots: every shape is drawn through one filter on one fixed grid (6 units = 5 px at 168, 4 px at 132): squares inside, smaller toward the edges, the accent as the ink', () => {
+  const tree = draw({})
+  const dotted = named(tree, 'dotted')
+  assert.ok(dotted)
+  const filter = named(tree, 'dots')
+  assert.equal(filter.type, 'filter')
+  assert.equal(dotted.props.filter, `url(#${filter.props.id})`)
+  // everything that is drawn sits inside the filtered group: the body (eyes, pupils, mouth) and the eight fingers
+  for (const name of ['body', 'eye-left', 'eye-right', 'mouth', ...FINGERS]) assert.ok(named(dotted, name), name)
+  // the grid: the drawing's own units, anchored at 0,0, the same in every expression (it does not move with the body)
+  const cells = all(tree, n => n.type === 'pattern')
+  assert.equal(cells.length, 2)
+  for (const c of cells) assert.deepEqual([c.props.patternUnits, c.props.x, c.props.y, c.props.width, c.props.height], ['userSpaceOnUse', 0, 0, DOTS.cell, DOTS.cell])
+  assert.equal(DOTS.cell, 6)
+  assert.deepEqual([168, 132].map(px => Math.round((DOTS.cell * px) / 200)), [5, 4])
+  for (const name of EXPRESSION_NAMES) assert.deepEqual(all(draw({ expression: name }), n => n.type === 'pattern').map(c => [c.props.x, c.props.y]), [[0, 0], [0, 0]], name)
+  // the steps: how deep a point is (the shapes' outline blurred), a square per cell that size, the accent as ink
+  const steps = filter.props.children.map(n => n.type)
+  assert.deepEqual(steps, ['feGaussianBlur', 'feComponentTransfer', 'feImage', 'feComposite', 'feComponentTransfer', 'feImage', 'feComposite', 'feComponentTransfer', 'feComposite', 'feFlood', 'feComposite'])
+  assert.equal(filter.props.children[0].props.in, 'SourceAlpha')
+  assert.equal(filter.props.children[9].props.style.floodColor, ACCENT)
+  assert.equal(filter.props.children.at(-1).props.operator, 'in')
+  // a full square leaves a gap to the next (the grid shows), and the area covers all the body can reach
+  assert.ok(DOTS.fill > 0.5 && DOTS.fill < 0.9)
+  const A = DOTS.area
+  // (the body never shows under the edge: it is cut there, also while it rises; the fingers reach 7 units under it)
+  assert.ok(A.y <= 14 - 10 - 20 && A.y + A.height >= FACE.edge + FACE.fingerOver + 20 && A.x < 0 && A.x + A.width > 200)
+  // no outline: nothing is stroked
+  assert.doesNotMatch(JSON.stringify(tree), /stroke/)
+})
+
+test('the dots cost no element per square: the drawing has the same handful of shapes in every expression, and no square is drawn by script', () => {
+  for (const name of EXPRESSION_NAMES) {
+    const tree = draw({ expression: name })
+    // the clip, two grid rects, two pattern cells and the eight fingers
+    assert.equal(all(tree, n => n.type === 'rect').length, 1 + 2 + 2 + 8, name)
+    assert.ok(all(tree, n => typeof n.type === 'string').length < 80, name)
+  }
+  const src = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', 'character.js'), 'utf8')
+  assert.doesNotMatch(src, /for \([^)]*DOTS|DOTS\.cell\)\.map|Array\.from\(\{ length/)
+})
+
+test('the dots in dark and light: one colour, the theme\'s accent variable, with nothing of a theme\'s own', () => {
+  const flat = JSON.stringify(draw({}))
+  assert.doesNotMatch(flat, /--background|--ui-bg|dark|light|#fff|white|black/i)
+  for (const name of EXPRESSION_NAMES) assert.equal(named(draw({ expression: name }), 'dots').props.children[9].props.style.floodColor, ACCENT)
 })
