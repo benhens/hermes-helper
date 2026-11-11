@@ -65,7 +65,9 @@ test('the page\'s frame: our one style sheet first, then the left side (tabs, th
   const { view } = await open()
   const kids = page(view).props.children.filter(Boolean)
   assert.deepEqual(kids.map(k => k.props['data-hh']), ['talk-css', 'left', 'helper'])
-  assert.equal(page(view).props.className, K.root)
+  // loom-fixes (Lead's point 16): and hh-root, which clips (src/talk.css), so the browser cannot scroll the page sideways
+  assert.equal(page(view).props.className, `${K.root} ${T.root}`)
+  assert.match(fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', 'talk.css'), 'utf8'), /\.hh-root\{overflow:clip\}/)
   assert.doesNotMatch(K.root, /(^|\s)flex-col(\s|$)/, 'a row: left side, then Helper')
   const left = kids[1]
   assert.equal(left.props.className, K.left)

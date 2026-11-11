@@ -381,6 +381,7 @@ export const T = {
   docsWhere: 'hh-docs-where',
   // loom-fixes: the strip at the top of Helper's window (Hide Helper, Clear chat) and its question
   bar: 'hh-bar',
+  root: 'hh-root',
   barAsk: 'hh-bar-ask',
   // the numbered clicks to add an optional skill, and the faint line after them
   steps: 'hh-steps',

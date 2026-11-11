@@ -1303,7 +1303,9 @@ export function makePage(ctx, opts = {}) {
       'left'
     )
     return jsxs('div', {
-      className: K.root,
+      // loom-fixes (Lead's point 16): our page's box also wears hh-root (src/talk.css): it clips, so nothing can scroll
+      // it sideways (an overflow-hidden box can still be scrolled by the browser, to keep a focused field in view)
+      className: cx(K.root, T.root),
       ref: measureRef,
       'data-hh': 'page',
       // The measured size, for the real-app checks (dev/checks/talk-v1).
