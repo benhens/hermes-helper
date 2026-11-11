@@ -25,7 +25,10 @@ export function seenFrom(reads) {
   const cron = reads.cron && reads.cron.ok ? reads.cron.value : null
   const jobs = cron && typeof cron === 'object' ? (Number.isInteger(cron.count) ? cron.count : Array.isArray(cron.jobs) ? cron.jobs.length : null) : null
   // chat, firstChat (loom-fixes): true, false, null (the read failed), undefined (no such read in this Hermes)
-  return { model: f.model === null ? 'unread' : f.model ? 'ok' : 'not', soul: f.personality, jobs, bots: rows ? rows.length : null, chat: reads.status === undefined ? undefined : f.chat_apps, firstChat: f.first_chat }
+  // find-v2 (changes-13 look.model_rule): the settings check says only that a model is set, never that it answers, so
+  // what is said of it is "couldn't check" until the page has seen an answer (modelSaid; src/page.js)
+  const model = f.model === null ? 'unread' : f.model ? 'ok' : 'not'
+  return { model, modelSaid: model === 'ok' ? 'unread' : model, soul: f.personality, jobs, bots: rows ? rows.length : null, chat: reads.status === undefined ? undefined : f.chat_apps, firstChat: f.first_chat }
 }
 
 // look() reads Hermes now and resolves with `seen`; it never rejects.

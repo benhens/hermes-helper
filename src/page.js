@@ -276,6 +276,10 @@ export function makePage(ctx, opts = {}) {
   // find-v2 part 1: the turn closes with no line from the AI (its 12 s, or the person moved on) after the list call
   // picked a line: that line itself, as code shows it (src/live-turn.js pickedResult), not the don't-know
   const pickedFinal = w => (w.picked && w.before ? liveApply(memory.visit, pickedResult(w.picked), w.out, w.before, w.typed) : null)
+  // find-v2 part 3 (changes-13 look.model_rule): the look's seen with what Helper saw the AI do in this visit: a model
+  // the settings check found set is said to answer only when one of Helper's calls got an answer in time; one that got
+  // none in 12 s is model_slow, one that failed for want of a provider model_not; else "couldn't check" (seenFrom)
+  const modelSaidOf = seen => (seen && seen.model === 'ok' && memory.visit.aiSeen ? { ...seen, modelSaid: memory.visit.aiSeen } : seen)
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
   // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
   // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
@@ -308,8 +312,10 @@ export function makePage(ctx, opts = {}) {
   // one was slow SLOW_A is owed to its answer: it shows right after that answer or, when it may not follow it, not at
   // all (Lead's points 15 and 16 stand). A try that failed without being slow owes no line: Helper has no checked words
   // for "your AI gave an error".
-  const aiFailed = (w, slow) => {
+  const aiFailed = (w, slow, err) => {
     const v = memory.visit
+    // find-v2 part 3: what Helper saw the AI do, for the set-up conversation's model part (modelSaidOf)
+    v.aiSeen = err && /no (llm )?provider|no usable credentials|provider is configured/i.test(String(err.message || err)) ? 'not' : slow ? 'slow' : v.aiSeen
     if (w.failed) return
     w.failed = true
     v.aiFails = (v.aiFails || 0) + 1
@@ -320,7 +326,10 @@ export function makePage(ctx, opts = {}) {
   const slowFail = w => aiFailed(w, true)
   // a message the AI answered in time (whatever it answered): the failed tries before it no longer count
   const aiAnswered = w => {
-    if (!w.failed) memory.visit.aiFails = 0
+    if (!w.failed) {
+      memory.visit.aiFails = 0
+      memory.visit.aiSeen = 'ok'
+    }
   }
   // The model is looked for again (setup.runtime_check, no model call): right after a try that failed, so the next
   // message knows whether a model is there now (ask-run 2 run D: Hermes switched its free model on after the failed
@@ -668,7 +677,7 @@ export function makePage(ctx, opts = {}) {
       memory.opening = null
       if (shown) addToLog([{ ...youEntry(shown), send: false }])
       const finish = seen => {
-        const says = mv.go(seen)
+        const says = mv.go(modelSaidOf(seen))
         writeKept()
         const put = list => {
           memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...list.flatMap(setupEntries)].slice(-LOG_MAX)
@@ -780,7 +789,7 @@ export function makePage(ctx, opts = {}) {
         Object.assign(visit.kept, JSON.parse(o.kept))
         visit.setup = undefined
         visit.lastOffer = null
-        const entries = setupOpening(visit, seen).flatMap(setupEntries)
+        const entries = setupOpening(visit, modelSaidOf(seen)).flatMap(setupEntries)
         writeKept()
         if (JSON.stringify(entries.map(e => [e.line, e.text])) === JSON.stringify(was)) return
         memory.log = entries
@@ -881,7 +890,7 @@ export function makePage(ctx, opts = {}) {
         return p
           .catch(err => {
             // find-v1 part 3: a call that failed is one failed try, and the model is looked for again
-            aiFailed(w, false)
+            aiFailed(w, false, err)
             lookAgain()
             throw err
           })

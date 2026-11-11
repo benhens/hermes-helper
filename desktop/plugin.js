@@ -14746,6 +14746,7 @@ const SETUP_DATA = {
       "model_ok": "You have a model, the AI that thinks, and it answered my check.",
       "model_not": "You have no model set up yet, the AI that thinks.",
       "model_unread": "I couldn't check your model this time.",
+      "model_slow": "You have a model, but it did not answer my check in time.",
       "scheduled_job_done": "You have {n} scheduled job.",
       "scheduled_job_done_plural": "You have {n} scheduled jobs.",
       "scheduled_job_not": "You have no scheduled jobs yet.",
@@ -26055,12 +26056,17 @@ const SU_REC_TAIL = SU_L.REC.text.match(/ (Want the steps\?)$/)[1]
 const suJobsPart = n => (n === null ? SU_P.read_failed : n === 0 ? SU_P.scheduled_job_not : suFill(n === 1 ? SU_P.scheduled_job_done : SU_P.scheduled_job_done_plural, { n }))
 const suBotsPart = n => (n === null ? SU_P.read_failed : n < 2 ? SU_P.second_bot_not : suFill(SU_P.second_bot_done, { n }))
 const suSoulPart = s => (s === null ? SU_P.read_failed : s ? SU_P.personality_done : SU_P.personality_not)
-const suModelPart = m => ({ ok: SU_P.model_ok, not: SU_P.model_not, unread: SU_P.model_unread })[m]
+const suModelPart = m => ({ ok: SU_P.model_ok, not: SU_P.model_not, unread: SU_P.model_unread, slow: SU_P.model_slow })[m]
+// find-v2 (live-v2 changes-13 look.model_rule; Lead, 11 Nov 11:40): what is said of the model. seen.model is what the
+// check of the settings found (ok, not, unread) and still drives the recommendation; seen.modelSaid, when the page
+// gives one, is what Helper saw the AI do: ok only when an answer came (src/page.js modelSaidOf). build.py's own lines
+// (no modelSaid) are said as before.
+const suModelSaid = seen => suModelPart(seen.modelSaid || seen.model)
 // SEEN: "I looked at your Hermes." + the model part + the goal part (build.py seen_line)
 function seenLine(seen, goal) {
   const g = SU.goal_item[goal] || 'personality'
   const part = g === 'chat_apps' ? SU_P.chat_apps_cannot : g === 'scheduled_job' ? suJobsPart(seen.jobs) : g === 'second_bot' ? suBotsPart(seen.bots) : suSoulPart(seen.soul)
-  return [SU_P.LOOK_OPEN, suModelPart(seen.model), part].join(' ')
+  return [SU_P.LOOK_OPEN, suModelSaid(seen), part].join(' ')
 }
 // What a read says about one thing: true (done), false (not done), null (the read failed), undefined (cannot be seen)
 function seenDone(item, seen) {
@@ -26078,7 +26084,7 @@ function seenDone(item, seen) {
 const SU_SEEN_ALSO = ['chat_apps', 'first_chat']
 const suSaysSeen = item => SU.seeable.includes(item)
 // "I can see it now. {seen_part}" (build.py seen_part)
-const suSeenPart = (item, seen) => (item === 'scheduled_job' ? suJobsPart(seen.jobs) : item === 'second_bot' ? suBotsPart(seen.bots) : item === 'personality' ? SU_P.personality_done : SU_P.model_ok)
+const suSeenPart = (item, seen) => (item === 'scheduled_job' ? suJobsPart(seen.jobs) : item === 'second_bot' ? suBotsPart(seen.bots) : item === 'personality' ? SU_P.personality_done : suModelSaid({ ...seen, model: 'ok' }))
 // The six lines behind "What did you look at?"
 function lookList(seen) {
   const yn = v => (v === null ? "couldn't check" : v ? 'yes' : 'no')
@@ -26604,7 +26610,10 @@ function seenFrom(reads) {
   const cron = reads.cron && reads.cron.ok ? reads.cron.value : null
   const jobs = cron && typeof cron === 'object' ? (Number.isInteger(cron.count) ? cron.count : Array.isArray(cron.jobs) ? cron.jobs.length : null) : null
   // chat, firstChat (loom-fixes): true, false, null (the read failed), undefined (no such read in this Hermes)
-  return { model: f.model === null ? 'unread' : f.model ? 'ok' : 'not', soul: f.personality, jobs, bots: rows ? rows.length : null, chat: reads.status === undefined ? undefined : f.chat_apps, firstChat: f.first_chat }
+  // find-v2 (changes-13 look.model_rule): the settings check says only that a model is set, never that it answers, so
+  // what is said of it is "couldn't check" until the page has seen an answer (modelSaid; src/page.js)
+  const model = f.model === null ? 'unread' : f.model ? 'ok' : 'not'
+  return { model, modelSaid: model === 'ok' ? 'unread' : model, soul: f.personality, jobs, bots: rows ? rows.length : null, chat: reads.status === undefined ? undefined : f.chat_apps, firstChat: f.first_chat }
 }
 
 // look() reads Hermes now and resolves with `seen`; it never rejects.
@@ -31033,6 +31042,10 @@ function makePage(ctx, opts = {}) {
   // find-v2 part 1: the turn closes with no line from the AI (its 12 s, or the person moved on) after the list call
   // picked a line: that line itself, as code shows it (src/live-turn.js pickedResult), not the don't-know
   const pickedFinal = w => (w.picked && w.before ? liveApply(memory.visit, pickedResult(w.picked), w.out, w.before, w.typed) : null)
+  // find-v2 part 3 (changes-13 look.model_rule): the look's seen with what Helper saw the AI do in this visit: a model
+  // the settings check found set is said to answer only when one of Helper's calls got an answer in time; one that got
+  // none in 12 s is model_slow, one that failed for want of a provider model_not; else "couldn't check" (seenFrom)
+  const modelSaidOf = seen => (seen && seen.model === 'ok' && memory.visit.aiSeen ? { ...seen, modelSaid: memory.visit.aiSeen } : seen)
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
   // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
   // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
@@ -31065,8 +31078,10 @@ function makePage(ctx, opts = {}) {
   // one was slow SLOW_A is owed to its answer: it shows right after that answer or, when it may not follow it, not at
   // all (Lead's points 15 and 16 stand). A try that failed without being slow owes no line: Helper has no checked words
   // for "your AI gave an error".
-  const aiFailed = (w, slow) => {
+  const aiFailed = (w, slow, err) => {
     const v = memory.visit
+    // find-v2 part 3: what Helper saw the AI do, for the set-up conversation's model part (modelSaidOf)
+    v.aiSeen = err && /no (llm )?provider|no usable credentials|provider is configured/i.test(String(err.message || err)) ? 'not' : slow ? 'slow' : v.aiSeen
     if (w.failed) return
     w.failed = true
     v.aiFails = (v.aiFails || 0) + 1
@@ -31077,7 +31092,10 @@ function makePage(ctx, opts = {}) {
   const slowFail = w => aiFailed(w, true)
   // a message the AI answered in time (whatever it answered): the failed tries before it no longer count
   const aiAnswered = w => {
-    if (!w.failed) memory.visit.aiFails = 0
+    if (!w.failed) {
+      memory.visit.aiFails = 0
+      memory.visit.aiSeen = 'ok'
+    }
   }
   // The model is looked for again (setup.runtime_check, no model call): right after a try that failed, so the next
   // message knows whether a model is there now (ask-run 2 run D: Hermes switched its free model on after the failed
@@ -31425,7 +31443,7 @@ function makePage(ctx, opts = {}) {
       memory.opening = null
       if (shown) addToLog([{ ...youEntry(shown), send: false }])
       const finish = seen => {
-        const says = mv.go(seen)
+        const says = mv.go(modelSaidOf(seen))
         writeKept()
         const put = list => {
           memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...list.flatMap(setupEntries)].slice(-LOG_MAX)
@@ -31537,7 +31555,7 @@ function makePage(ctx, opts = {}) {
         Object.assign(visit.kept, JSON.parse(o.kept))
         visit.setup = undefined
         visit.lastOffer = null
-        const entries = setupOpening(visit, seen).flatMap(setupEntries)
+        const entries = setupOpening(visit, modelSaidOf(seen)).flatMap(setupEntries)
         writeKept()
         if (JSON.stringify(entries.map(e => [e.line, e.text])) === JSON.stringify(was)) return
         memory.log = entries
@@ -31638,7 +31656,7 @@ function makePage(ctx, opts = {}) {
         return p
           .catch(err => {
             // find-v1 part 3: a call that failed is one failed try, and the model is looked for again
-            aiFailed(w, false)
+            aiFailed(w, false, err)
             lookAgain()
             throw err
           })

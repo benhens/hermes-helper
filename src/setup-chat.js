@@ -53,12 +53,17 @@ const SU_REC_TAIL = SU_L.REC.text.match(/ (Want the steps\?)$/)[1]
 const suJobsPart = n => (n === null ? SU_P.read_failed : n === 0 ? SU_P.scheduled_job_not : suFill(n === 1 ? SU_P.scheduled_job_done : SU_P.scheduled_job_done_plural, { n }))
 const suBotsPart = n => (n === null ? SU_P.read_failed : n < 2 ? SU_P.second_bot_not : suFill(SU_P.second_bot_done, { n }))
 const suSoulPart = s => (s === null ? SU_P.read_failed : s ? SU_P.personality_done : SU_P.personality_not)
-const suModelPart = m => ({ ok: SU_P.model_ok, not: SU_P.model_not, unread: SU_P.model_unread })[m]
+const suModelPart = m => ({ ok: SU_P.model_ok, not: SU_P.model_not, unread: SU_P.model_unread, slow: SU_P.model_slow })[m]
+// find-v2 (live-v2 changes-13 look.model_rule; Lead, 11 Nov 11:40): what is said of the model. seen.model is what the
+// check of the settings found (ok, not, unread) and still drives the recommendation; seen.modelSaid, when the page
+// gives one, is what Helper saw the AI do: ok only when an answer came (src/page.js modelSaidOf). build.py's own lines
+// (no modelSaid) are said as before.
+const suModelSaid = seen => suModelPart(seen.modelSaid || seen.model)
 // SEEN: "I looked at your Hermes." + the model part + the goal part (build.py seen_line)
 export function seenLine(seen, goal) {
   const g = SU.goal_item[goal] || 'personality'
   const part = g === 'chat_apps' ? SU_P.chat_apps_cannot : g === 'scheduled_job' ? suJobsPart(seen.jobs) : g === 'second_bot' ? suBotsPart(seen.bots) : suSoulPart(seen.soul)
-  return [SU_P.LOOK_OPEN, suModelPart(seen.model), part].join(' ')
+  return [SU_P.LOOK_OPEN, suModelSaid(seen), part].join(' ')
 }
 // What a read says about one thing: true (done), false (not done), null (the read failed), undefined (cannot be seen)
 export function seenDone(item, seen) {
@@ -76,7 +81,7 @@ export function seenDone(item, seen) {
 const SU_SEEN_ALSO = ['chat_apps', 'first_chat']
 const suSaysSeen = item => SU.seeable.includes(item)
 // "I can see it now. {seen_part}" (build.py seen_part)
-const suSeenPart = (item, seen) => (item === 'scheduled_job' ? suJobsPart(seen.jobs) : item === 'second_bot' ? suBotsPart(seen.bots) : item === 'personality' ? SU_P.personality_done : SU_P.model_ok)
+const suSeenPart = (item, seen) => (item === 'scheduled_job' ? suJobsPart(seen.jobs) : item === 'second_bot' ? suBotsPart(seen.bots) : item === 'personality' ? SU_P.personality_done : suModelSaid({ ...seen, model: 'ok' }))
 // The six lines behind "What did you look at?"
 export function lookList(seen) {
   const yn = v => (v === null ? "couldn't check" : v ? 'yes' : 'no')

@@ -18,7 +18,7 @@ export const SETUP_LINES = {
 }
 // setup-chat-2: BACK_SEEN's parts, one for each thing Helper can see done
 export const BACK_SEEN_PARTS = { scheduled_job: ['{n}'], scheduled_job_plural: ['{n}'], personality: [], second_bot: ['{n}'] }
-export const SETUP_PARTS = ['LOOK_OPEN', 'model_ok', 'model_not', 'model_unread', 'scheduled_job_done', 'scheduled_job_done_plural', 'scheduled_job_not', 'second_bot_done', 'second_bot_not', 'personality_done', 'personality_not', 'chat_apps_cannot', 'read_failed']
+export const SETUP_PARTS = ['LOOK_OPEN', 'model_ok', 'model_not', 'model_unread', 'model_slow', 'scheduled_job_done', 'scheduled_job_done_plural', 'scheduled_job_not', 'second_bot_done', 'second_bot_not', 'personality_done', 'personality_not', 'chat_apps_cannot', 'read_failed']
 const REASONS = ['R1', 'R2_new', 'R2_skip', 'R3_schedule', 'R3_phone', 'R3_bots', 'R4']
 
 export function setupProblems(setup, list) {

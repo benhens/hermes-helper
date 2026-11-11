@@ -156,6 +156,7 @@ export const SETUP_DATA = {
       "model_ok": "You have a model, the AI that thinks, and it answered my check.",
       "model_not": "You have no model set up yet, the AI that thinks.",
       "model_unread": "I couldn't check your model this time.",
+      "model_slow": "You have a model, but it did not answer my check in time.",
       "scheduled_job_done": "You have {n} scheduled job.",
       "scheduled_job_done_plural": "You have {n} scheduled jobs.",
       "scheduled_job_not": "You have no scheduled jobs yet.",
