@@ -18,6 +18,10 @@ export const PINS = {
   'content/helper-wants-v1.json': ['6cc374ef4d754e8b1e59d3206be946169e2413b887d04755565c2c83c0b82b4a', 'content/helper-skill-lines-v1.md'],
   'content/skills-list-v1.json': ['b4102198861acf29e663a6afbc63fd4a473d876d616ada84891dcbf05a6b53d0', 'content/helper-skill-lines-v1.md'],
   'dev/checks/hhcontent-talk-v2/route2.py': ['46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368', 'content/helper-wants-fixes-v1.md'],
+  'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a', 'content/helper-wants-fixes-v1.md'],
+  // hhcontent's changes-14 job (started 00:30 UTC) changes check.py too: kept as it was, hhcontent's own
+  // "before" copy of that job
+  'dev/checks/hhcontent-talk-v2/check.py': ['83c807fdac78a1579386e03a8006f2d3c3afcd87dd536b6f323b4d04dce2de2f', 'dev/checks/hhcontent-changes-14/before/check.py'],
   // changes-12 and -13 (the secret rule) are not ported here (Lead: point 8 of the look job): the two
   // settings files stay at hhcontent's own copies from before changes-12
   'dev/checks/hhcontent-settings-edit/settings_read.py': ['470c4c774a34d4fa95915495f1365e7e3cd4ecefe9e93b46bd3e31a8a55cefdf', 'dev/checks/hhcontent-changes-12/before/dev/checks/hhcontent-settings-edit/settings_read.py'],

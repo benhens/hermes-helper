@@ -82,7 +82,7 @@ test('the reference file was made from the team\'s scripts (when the team\'s fol
   assert.equal(O.route2_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/route2.py'), 'route2.py is not the pinned one: bash dev/checks/talk-v2-wf1/recopy-wf1.sh')
   assert.equal(O.wants_step_sha256, sha(path.join(ck, 'hhtech-wants-check', 'wants_step.py')))
   assert.equal(O.fixes6_step_sha256, sha(path.join(ck, 'hhtech-fixes-6', 'fixes6_step.py')))
-  assert.equal(O.wants_fixes_step_sha256, sha(path.join(ck, 'hhcontent-wants-fixes', 'wants_fixes_step.py')))
+  assert.equal(O.wants_fixes_step_sha256, pinned(t, 'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py'))
 })
 
 test('wants fixes v1: the reference ran hhcontent\'s third layer after fixes6_step.py, and on the 296 messages it changes only "is there a skill for knitting", to N1', () => {

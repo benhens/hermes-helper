@@ -137,11 +137,11 @@ test('the plugin\'s copies are the team\'s files at the checksums this job names
   for (const f of ['helper-talk-v2.json', 'skills-list-v1.json', 'helper-wants-v1.json']) assert.equal(sha(path.join(ROOT, 'content', f)), pinned(t, 'content/' + f), `content/${f} is not the team's at the pin: bash dev/checks/talk-v2-wf1/recopy-wf1.sh`)
 })
 
-test('the reference scripts the test files were made from are the team\'s (when the team\'s folder is there): route2.py and settings_read.py with its cases at the pins, check.py as it is now', t => {
+test('the reference scripts the test files were made from are the team\'s (when the team\'s folder is there): route2.py, check.py, settings_read.py and its cases, at the pins', t => {
   const checks = path.join(TEAM, 'dev', 'checks')
   if (!fs.existsSync(path.join(checks, 'hhcontent-talk-v2', 'route2.py'))) return t.skip('no team folder beside the plugin')
   assert.equal(TEAM_RUN.route2_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/route2.py'), 'route2.py is not the pinned one: bash dev/checks/talk-v2-wf1/recopy-wf1.sh')
-  assert.equal(fixture('check-py-lines.json').check_py_sha256, sha(path.join(checks, 'hhcontent-talk-v2', 'check.py')), 'check.py changed since the copy')
+  assert.equal(fixture('check-py-lines.json').check_py_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/check.py'), 'check.py is not the pinned one')
   const s = fixture('settings-read.json')
   assert.equal(s.settings_read_sha256, pinned(t, 'dev/checks/hhcontent-settings-edit/settings_read.py'), 'settings_read.py is not the pinned one')
   assert.equal(s.tests_sha256, pinned(t, 'dev/checks/hhcontent-settings-edit/tests.json'), 'tests.json is not the pinned one')
