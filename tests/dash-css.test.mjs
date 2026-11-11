@@ -223,3 +223,8 @@ test('look-fix (PICK.md way 3): each set-up card draws its sign large in dots at
   assert.match(ruleOf(`.${D.scard}`), /position:relative;isolation:isolate;overflow:hidden/)
   assert.match(ruleOf(`.${D.scardWhy}`), /max-width:64%/)
 })
+
+test('follow-up 19:47 (REVIEW.md 1 and 3): titles at the top of the icon square on every card; the sign font line thickened in its own colour', () => {
+  assert.match(DASH_CSS, /\.hhd-scard-top\{display:flex;align-items:flex-start;/)
+  assert.match(DASH_CSS, /\.hhd-scard-sign\{[^}]*-webkit-text-stroke:5px currentColor/)
+})
