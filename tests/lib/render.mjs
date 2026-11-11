@@ -5,6 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { H } from '../fakes/react.mjs'
+import { aiModeSource } from './mode-loader.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..')
 const FAKES = path.join(ROOT, 'tests', 'fakes')
@@ -16,7 +17,9 @@ export async function loadPlugin(change = null) {
   const reactUrl = pathToFileURL(path.join(FAKES, 'react.mjs')).href
   const sdkUrl = pathToFileURL(path.join(FAKES, 'sdk.mjs')).href
   const built = fs.readFileSync(path.join(ROOT, 'desktop', 'plugin.js'), 'utf8')
-  const src = (change ? change(built) : built)
+  // talk-live: HELPER_AI_MODE (scripts/test-modes.mjs) sets the switch in the copy that is loaded
+  const moded = process.env.HELPER_AI_MODE ? aiModeSource(built, process.env.HELPER_AI_MODE) : built
+  const src = (change ? change(moded) : moded)
     .replace("from '@hermes/plugin-sdk'", `from '${sdkUrl}'`)
     .replace("from 'react/jsx-runtime'", `from '${reactUrl}'`)
     .replace("from 'react'", `from '${reactUrl}'`)

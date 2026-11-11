@@ -17,6 +17,7 @@ import { TALK_DATA } from '../src/talk-data.js'
 import { WANTS_DATA } from '../src/wants-data.js'
 import { T, K } from '../src/look.js'
 import { curlyQuotes } from '../src/quotes.js'
+import { FIRST_TIME } from '../src/talk.js'
 
 function useHost({ runtime = { ok: true, model: 'mock-small' } } = {}) {
   const calls = []
@@ -148,7 +149,7 @@ test('the opening, played: the name, with the faint "Kept: Peter." line and its 
   assert.equal(link.type, 'button')
   assert.equal(link.props.className, T.link)
   assert.equal(text(link), 'See what I keep')
-  assert.equal(text(byData(note, 'kept-first')), TALK_DATA.keeps.tell.first_time_if_no_model_call)
+  assert.equal(text(byData(note, 'kept-first')), FIRST_TIME) // talk-live: the line of this build's AI mode
   assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
   finish(view)
   send(view, 'I run a tennis club')
@@ -582,6 +583,7 @@ test('"Which one do you mean?": the matches to pick, at most four; the pick answ
 test('a message nobody has an answer for: the fixed line and, small under it, the hint (N_HINT); no topics', async () => {
   const { view } = await pastOpening()
   send(view, 'what is the weather in Riga')
+  await settle() // talk-live: in an AI mode the line comes after the (failing) call; with no AI step at once
   assert.equal(line(view), 'N1')
   finish(view)
   assert.equal(picks(view), null)
@@ -802,6 +804,7 @@ test('Helper\'s lines hold no link out of the page and no model\'s words: every 
   ])
   for (const w of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work', 'what can I ask', 'can it read pdfs', 'can it edit my videos', 'is there a github skill', 'what does the dspy skill do', 'is there a skill called sdlc-review']) {
     send(view, w)
+    await settle() // talk-live: as above
     const now = said(view).replace('Thanks, Peter.', 'Thanks, {name}.')
     // (drawn with curly quote marks: talk v2 look, point 4)
     assert.ok(pre.has(now) || [...pre].some(p => curlyQuotes(p) === now), `${w} → ${now}`)

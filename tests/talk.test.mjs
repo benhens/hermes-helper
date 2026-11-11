@@ -11,6 +11,10 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import * as TALK from '../src/talk.js'
 import { TALK_DATA } from '../src/talk-data.js'
+import { AI_MODE } from '../src/ai-mode.js'
+import { LIVE_DATA } from '../src/live-data.js'
+// talk-live: route2.py's "are you an AI" line is the no-AI one (AI); in an AI mode the plugin says that mode's line
+const forMode = s => (s === 'AI' ? LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE] : s)
 import { pinned, PINS } from './lib/team-pins.mjs'
 
 const { freshVisit, laterVisit, opening, turn, pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, typedAboutKept, lineFor, openingLine, hintFor, buildHit, talkNorm, keptRows, PARTS, EXTRA_LINES, REPLY_HINT } = TALK
@@ -145,7 +149,7 @@ test('every conversation route2.py ran, keeping on, the wants steps off as route
     const got = replay(conv)
     conv.steps.forEach((step, i) => {
       if (step.do === 'visit') return
-      if (step.do !== 'forget_all') assert.equal(got[i].shown, step.shown, `${conv.name}, turn ${i + 1} (${step.text || step.do})`)
+      if (step.do !== 'forget_all') assert.equal(got[i].shown, forMode(step.shown), `${conv.name}, turn ${i + 1} (${step.text || step.do})`)
       assert.deepEqual(got[i].state, expectedState(step.state), `${conv.name}, turn ${i + 1}: the visit after it`)
       turns++
     })
@@ -236,7 +240,7 @@ test('the opening: greeting, name, what the person does, then a line with nothin
   assert.equal(f1.answers, null)
   // changes-15 (For builder 3 and 5): the name and met are written as soon as the name is given, with the faint
   // "Kept:" line and the first-time line under F1
-  assert.deepEqual(f1.note, { text: 'Kept: Peter.', link: 'See what I keep', first: 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.', items: [['name', 'Peter']] })
+  assert.deepEqual(f1.note, { text: 'Kept: Peter.', link: 'See what I keep', first: TALK.FIRST_TIME, items: [['name', 'Peter']] }) // talk-live: the line of this build's AI mode (tested on its own below)
   assert.equal(st.met, true)
   const f2 = lineFor(turn('I run a tennis club', st), st)
   assert.equal(f2.text, 'Thanks, Peter. Ask me anything about Hermes.')
@@ -432,7 +436,7 @@ test('the grey kept line: the values as kept, one line for one moment, the first
   const st = freshVisit()
   pickTopic('mod', st)
   let said = lineFor(pick('mod', 0, st), st)
-  assert.deepEqual(said.note, { text: 'Kept: you pay for ChatGPT.', link: 'See what I keep', first: TALK_DATA.keeps.tell.first_time_if_no_model_call, items: [['mod', 'mod1']] })
+  assert.deepEqual(said.note, { text: 'Kept: you pay for ChatGPT.', link: 'See what I keep', first: TALK.FIRST_TIME, items: [['mod', 'mod1']] })
   pickTopic('msg', st)
   said = lineFor(pick('msg', 1, st), st)
   assert.deepEqual(said.note, { text: 'Kept: you use WhatsApp.', link: 'See what I keep', first: null, items: [['msg', 'WhatsApp']] })
@@ -453,9 +457,12 @@ test('the grey kept line: the values as kept, one line for one moment, the first
   assert.ok(said.note.first)
 })
 
-test('the first-time line is the one for a build with no AI step: nothing about sending to an AI', () => {
+test('the first-time line is the one of this build\'s AI mode (talk-live); with no AI step it says nothing is sent to any AI', () => {
   const first = TALK_DATA.keeps.tell.first_time_if_no_model_call
   assert.equal(first, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
+  assert.equal(TALK.FIRST_TIME, LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE])
+  if (AI_MODE === 'no_ai_step') assert.equal(TALK.FIRST_TIME, first)
+  else assert.equal(TALK.FIRST_TIME, 'I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords.')
   assert.doesNotMatch(JSON.stringify(TALK_DATA), /Only your name goes to your AI/)
 })
 
