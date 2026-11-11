@@ -173,6 +173,20 @@ function notesOf(entry, onNote, kept) {
 function OldLine({ entry, onNext, onCard }) {
   // chat-fix: a reply about a card keeps a small link to that card once it is an older line (no video place there)
   const cardOf = entry.md && entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
+  // chat-fix part 3: an action under this reply that was started (the person typed on while it ran, or after it):
+  // one faint line says how it ended; an action never started shows nothing here
+  const actName = entry.act && Object.hasOwn(CHAT_AGENTS, entry.act.agent) ? CHAT_AGENTS[entry.act.agent] : null
+  const actEnd = !actName
+    ? null
+    : entry.act.state === 'done'
+      ? `Done: your ${actName} setup is in Hermes now.`
+      : entry.act.state === 'failed'
+        ? 'That step didn’t work. Ask me again and I’ll show you how to do it by hand.'
+        : entry.act.state === 'running'
+          ? 'Still working on that step…'
+          : entry.act.state === 'preview'
+            ? `I showed you a preview for ${actName}; nothing was changed. Ask me again to bring it over.`
+            : null
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
@@ -188,6 +202,7 @@ function OldLine({ entry, onNext, onCard }) {
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
       entry.md ? jsx(Markdown, { text: entry.text, old: true }, 'md') : drawn(entry.text, entry.asTyped),
+      actEnd ? jsx('p', { className: T.where, 'data-hh': 'old-act', 'data-state': entry.act.state, children: actEnd }, 'act') : null,
       cardOf ? jsxs('button', { type: 'button', className: T.oldLink, 'data-hh': 'old-card-open', 'data-card': cardOf.id, onClick: () => onCard && onCard(cardOf.id), children: [`Open ${cardOf.name} on the Dashboard`, jsx(Codicon, { name: 'arrow-right' }, 'icon')] }, 'card') : null,
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,

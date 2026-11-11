@@ -218,3 +218,28 @@ test('the instructions tell the model about Do it for me: the four agents, only 
   assert.match(CHAT_INSTRUCTIONS, /For every other step, give the step to do by hand, and never write \[\[do:\.\.\.\]\] for anything else\./)
   assert.match(CHAT_INSTRUCTIONS, /changes nothing until they press "Import it"/)
 })
+
+test('the person types on while a command runs: the action leaves the bubble, and its older line says how it ended; the import is not started by anything but its button', async () => {
+  let release
+  const gate = new Promise(r => (release = r))
+  const { view, host } = await page((p, n) => (n === 1 ? REPLY('claude-code') : 'Sure.'), async () => {
+    await gate
+    return OK('dry')
+  })
+  click(button(view))
+  await settle()
+  send(view, 'what is a skill?')
+  await settle()
+  assert.equal(all(helper(view), n => n.props['data-hh'] === 'act').length, 0, 'no action in the new bubble')
+  const older = () => all(helper(view), n => n.props['data-hh'] === 'old-act').map(n => [n.props['data-state'], shownText(n)])
+  assert.deepEqual(older(), [['running', 'Still working on that step…']])
+  release()
+  await settle(10)
+  assert.deepEqual(older(), [['preview', 'I showed you a preview for Claude Code; nothing was changed. Ask me again to bring it over.']])
+  assert.equal(all(helper(view), n => n.props['data-hh'] === 'act-button').length, 0, 'no Import it button on an older line')
+  assert.deepEqual(argvs(host), ['import-agent claude-code --dry-run'])
+  // the model is told the preview was shown, and that the import has not run
+  send(view, 'ok')
+  await settle()
+  assert.match(calls(host).at(-1).input, /\(Helper ran the preview for the person and showed what would come over; the import itself has not been run yet\.\)/)
+})
