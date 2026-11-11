@@ -1,5 +1,5 @@
 {
- "made_by": "dev/checks/talk-live/dump_live.py: hhtech's live.py on the pinned team copy team-root-c2b",
+ "made_by": "dev/checks/talk-live/dump_live.py: hhtech's live.py on the pinned team copy team-root-c5 (talk-live-3: part 1 only)",
  "facts": [
   "mem0",
   "mem1",
@@ -1918,9 +1918,7 @@
   },
   {
    "text": "how do I update hermes to the newest version",
-   "by_words": [
-    "sch1"
-   ],
+   "by_words": [],
    "rank_in": {
     "bot": [
      "bot0",
@@ -1967,8 +1965,8 @@
      "w_presenter"
     ],
     "sch": [
-     "sch1",
      "sch0",
+     "sch1",
      "sch2",
      "sch3",
      "sch4"
@@ -32224,9 +32222,7 @@
   },
   {
    "text": "how do I update hermes",
-   "by_words": [
-    "sch1"
-   ],
+   "by_words": [],
    "rank_in": {
     "bot": [
      "bot0",
@@ -32273,8 +32269,8 @@
      "w_presenter"
     ],
     "sch": [
-     "sch1",
      "sch0",
+     "sch1",
      "sch2",
      "sch3",
      "sch4"

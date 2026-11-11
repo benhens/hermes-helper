@@ -15,7 +15,7 @@ import { TALK_DATA } from './talk-data.js'
 import { looksSecret } from './secret-rule.js'
 import { talkNorm, cutIgnored, startsWith, whichOf, lineKey, noteLast } from './talk.js'
 import { LIVE_ROW, byWords, rankIn, withNext, isFollowUp, followRows, resultOfRow } from './live-rows.js'
-import { readSubject, readPick, judgeWritten, isThinking } from './live-checks.js'
+import { readSubject, readPick, judgeWritten, noReply } from './live-checks.js'
 import { firstCallText, writerText, pickText, inputText, liveParams } from './live-request.js'
 import { ONESHOT_TIMEOUT_MS } from './model-call.js'
 
@@ -25,6 +25,22 @@ export const LIVE_SECONDS = LIVE_DATA.seconds
 export const SECOND_CALL_MIN_MS = 4000
 const LV_GO = LIVE_DATA.go_to_ai
 const LV_DONT_KNOW = ['N1', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE']
+
+// live-v2 changes-5 slow_ai, Lead's pick SLOW_A (job talk-live-3, point 4): Helper's line right after the written
+// answer when the visit's first AI call gave no answer in 12 s or gave no_reply text; its text to paste shows at once
+// under it, as H1's. Said once per visit (src/page.js keeps visit.slow: 'due', then 'said'; never stored).
+export const SLOW_LINE = { line: LIVE_DATA.slow_ai.id, text: LIVE_DATA.slow_ai.text, source: null, answers: null, next: null, paste: LIVE_DATA.slow_ai.paste_text, note: null, used: null, hint: null, rows: null, docs: null }
+// Not after a don't-know line (hhcontent's gap: "I answered from my own notes" + "I don't have checked information"
+// read oddly together; Lead: it waits for the next written answer of the visit that is not one). The don't-know lines
+// are no_repeat's dont_know groups (N1, N1a, N1_AGAIN, and AGAIN in its place), N1-skill (N1's words for a skill asked
+// by name) and MEAN_NONE (this file's own don't-know list for TALK, LV_DONT_KNOW). Decided by the Builder (review):
+// also not after a line with things to pick, a line that asks a question or asks for more (STUCK), a goodbye (BYE),
+// or a line with its own text to paste (H1, H2: two boxes to paste in a row), since SLOW_A after it would take the
+// picks' place, leave the question above the newest line, or read as a second hand-over; it waits for the next answer.
+const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know, ...LV_DONT_KNOW, 'N1-skill', ...TALK_DATA.no_repeat.groups.stuck, ...TALK_DATA.no_repeat.groups.bye])
+export function slowFollows(visit, said) {
+  return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !said.paste && !/\?\s*$/.test(String(said.text || ''))
+}
 
 // Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a
 // plain line given for "what do you mean" keeps its why. N1_AGAIN and AGAIN are no_repeat's own lines in place
@@ -79,7 +95,7 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
     try {
       const res = await request('llm.oneshot', liveParams(instructions, input, maxTokens), ONESHOT_TIMEOUT_MS)
       const t = res && typeof res.text === 'string' ? res.text : null
-      if (t !== null && isThinking(t)) {
+      if (t !== null && noReply(t)) {
         thinking = true
         return null
       }

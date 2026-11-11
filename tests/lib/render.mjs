@@ -249,8 +249,8 @@ export function all(node, pred, out = []) {
 }
 
 // A name kept whole (src/reveal.js keepNamesWhole) is an inline span inside a line's words: on screen it joins
-// the text around it with no space, so it is joined that way here too.
-const inlineWhole = x => x != null && typeof x === 'object' && !Array.isArray(x) && x.props && x.props['data-hh'] === 'name-whole'
+// the text around it with no space, so it is joined that way here too. talk-live-3: so is text to type in code style.
+const inlineWhole = x => x != null && typeof x === 'object' && !Array.isArray(x) && x.props && (x.props['data-hh'] === 'name-whole' || x.props['data-hh'] === 'typed')
 const joinAll = (nodes, f) => nodes.reduce((out, x, i) => out + (i && !inlineWhole(x) && !inlineWhole(nodes[i - 1]) ? ' ' : '') + f(x), '')
 export function text(node) {
   if (node == null) return ''

@@ -67,7 +67,7 @@ async function pastOpening(mode, options) {
   return o
 }
 const N1 = curlyQuotes(TALK_DATA.fixed.N1.text)
-const WORK = 'What the person does (they told Helper): I run a tennis club'
+const WORK = 'About them: I run a tennis club'
 const THINKING = 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Task:**'
 
 test('the work line: kept at What do you do?, sent in the writer\'s instructions only, never the name; after Hermes starts again too', async () => {

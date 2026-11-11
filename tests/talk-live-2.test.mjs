@@ -17,7 +17,7 @@ import { AI_MODE } from '../src/ai-mode.js'
 import { cleanKept, keptToStore } from '../src/kept.js'
 import { renderKept, readBox, saveBox } from '../src/settings-file.js'
 import { writerText, pickText, firstCallText, workLine, sendable } from '../src/live-request.js'
-import { c24Fails, replyFlags, isThinking } from '../src/live-checks.js'
+import { c24Fails, replyFlags, noReply } from '../src/live-checks.js'
 import { askLive, goesToAi, liveWhyNot, liveApply } from '../src/live-turn.js'
 import { isFollowUp } from '../src/live-rows.js'
 
@@ -243,7 +243,7 @@ test('review: a typed change with a word of keeps.typed_change.not_words is not 
 test('review: a work value that holds the kept name is not sent; the c23 flag comes before the c24 flag', () => {
   assert.equal(workLine("Peter's bakery, I run it", ['Peter']), null)
   assert.equal(workLine("Peter's bakery, I run it", ['peter']), null)
-  assert.equal(workLine('I run a bakery', ['Peter']), 'What the person does (they told Helper): I run a bakery')
+  assert.equal(workLine('I run a bakery', ['Peter']), 'About them: I run a bakery')
   assert.doesNotMatch(writerText(['use1'], "Peter's bakery, I run it", ['Peter']), /bakery|Peter/)
   const rows = [{ id: 'use1', text: HAND_USE.slice(7) }]
   const f = replyFlags('As a coach, start a new chat.', rows, ['use1'], { message: 'x', lastLine: 'As a coach, start a new chat.' })
@@ -297,15 +297,15 @@ test('changes-4 settings page: the What you do line, its reason by mode; read ba
 
 /* ---------- changes-4: what is sent ---------- */
 test('changes-4 request: the work line sits right before Checked facts (writer) and before the lines (pick); none with nothing kept; never in the first call', () => {
-  const W = 'What the person does (they told Helper): I run a tennis club'
+  const W = 'About them: I run a tennis club'
   const w = writerText(['use1'], 'I run a tennis club')
   assert.ok(w.includes(W + '\nChecked facts:'), w)
   const p = pickText(['use1'], 'I run a tennis club')
   assert.ok(p.includes('\n' + W + '\n'), p)
   for (const t of [writerText(['use1']), pickText(['use1']), writerText(['use1'], null)]) {
-    assert.doesNotMatch(t, /work_line|What the person does \(|\n\n/)
+    assert.doesNotMatch(t, /work_line|What the person does \(|About them:|\n\n/)
   }
-  assert.doesNotMatch(firstCallText(), /What the person does|tennis/)
+  assert.doesNotMatch(firstCallText(), /What the person does|About them:|tennis/)
   // the guard: a value that fails the rule is left out
   for (const bad of ['my password is hunter2', 'sk-abcdefghijklmnopqrstuvwxyz123456', 'one two three four five six seven eight nine ten eleven twelve thirteen', 'x'.repeat(81)]) assert.equal(workLine(bad), null, bad)
   assert.equal(workLine('I run a tennis club'), W)
@@ -322,7 +322,7 @@ test('changes-4 request: with a kept name and work, the writer gets the work lin
   await askLive({ mode: 'ai_writes', text: 'what should I set up first', pre, out, before: { last: 'BACK', lastKey: null }, lines: ['Helper: Hi again. What would you like Hermes to help you with?'], request, work: st.kept.work })
   assert.equal(asks.length, 2)
   assert.doesNotMatch(asks[0].instructions, /tennis/)
-  assert.match(asks[1].instructions, /What the person does \(they told Helper\): I run a tennis club\nChecked facts:/)
+  assert.match(asks[1].instructions, /About them: I run a tennis club\nChecked facts:/)
   for (const a of asks) assert.doesNotMatch(JSON.stringify(a), /peter/i)
   assert.doesNotMatch(asks[1].input, /tennis/, 'the work value goes in the instructions only')
 })
@@ -371,12 +371,14 @@ test('review: when the AI\'s line replaces a fallback that was an answer line, "
   assert.deepEqual([back.kind, back.need], ['row', 'mem1'], 'the row shown before, not the plain line that never showed')
 })
 
-test('weak AI: an unclosed <think>, text starting \"Thinking Process\", or holding \"**Analyze\" is thinking; a closed block and a plain reply are not', () => {
+test('weak AI: an unclosed <think>, text starting \"Thinking Process\", or holding \"**Analyze\" is thinking; a plain reply is not', () => {
   for (const s of ['<think>Okay, the user', 'ok <think> hmm', 'Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Task:**', '  Thinking Process: 1.', 'Sure. 1. **Analyze the request', 'mem\n**Analyze**'])
-    assert.equal(isThinking(s), true, s)
-  // a closed block is cut first, whatever it holds (review)
-  for (const s of ['<think>hmm</think>mem', '<think>Thinking Process: 1. **Analyze**</think>Real answer.', 'mem', 'Long chats use the most tokens.\nUSED: use1', 'I was thinking process steps', ''])
-    assert.equal(isThinking(s), false, s)
+    assert.equal(noReply(s), true, s)
+  for (const s of ['a <think>hmm</think> mem', 'mem', 'Long chats use the most tokens.\nUSED: use1', 'I was thinking process steps', ''])
+    assert.equal(noReply(s), false, s)
+  // talk-live-3: changes-5's no_reply (check_c5.py) counts a reply that starts with <think> or holds \"**Analyze\" even
+  // when the block is closed; talk-live-2's review had cut a closed block first. The rule changed with the data.
+  for (const s of ['<think>hmm</think>mem', '<think>Thinking Process: 1. **Analyze**</think>Real answer.']) assert.equal(noReply(s), true, s)
 })
 
 test('weak AI: a first call or a writer that sends thinking text gives the fallback and says so (thinking)', async () => {

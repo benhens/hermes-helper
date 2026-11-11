@@ -300,9 +300,11 @@ function byCode(text, st) {
 // live-v2 changes-3: lastAnswer, lastAnswerKey, lastByAgain: this visit's last answer line, for "again"
 // (small_talk.again_rule). changes-4: keepWork, the keep rule of keeps.work (false only for replaying route2.py,
 // which keeps nothing at "What do you do?"); workLong, WORK_LONG was said once at this question. aiOff: the AI step is
-// off for the rest of this visit (hhtech-weak-ai; set by src/page.js).
+// off for the rest of this visit (hhtech-weak-ai; set by src/page.js). live-v2 changes-5 (set by src/page.js): aiTried,
+// the visit has made its first AI call; slow, the slow-AI line SLOW_A: null, 'due' (owed after the next answer that
+// may have it, src/live-turn.js slowFollows), 'said'.
 export function freshVisit(stage = 'open', kept = {}, met = false) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false, aiTried: false, slow: null }
 }
 // A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
 // earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,

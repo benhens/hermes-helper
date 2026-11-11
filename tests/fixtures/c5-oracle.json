@@ -1,0 +1,1439 @@
+{
+ "made_by": "dev/checks/talk-live-3/dump_c5.py: hhcontent's check_c5.py (checks, no_reply) as it is, on the pinned copy team-root-c5",
+ "recorded_checks": [
+  {
+   "reply": "Hermes can read your Gmail messages through its \"Connectors\" page, which links apps like Gmail. You can ask Hermes to add your Gmail account to this list.",
+   "message": "can it read my gmail",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes can search the web and read web pages using its built-in tool. You can also add the \"stocks\" skill to look up stock prices.",
+   "message": "can hermes look things up on the internet",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "I cannot check the weather for Riga tomorrow.",
+   "message": "what's the weather in Riga tomorrow",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "You can update Hermes by asking it to do so.",
+   "message": "how do I update hermes to the newest version",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes does not have a built-in skill to export chats to PDF. The available skills are for reading Word, Excel, PDF, Obsidian notes, and meeting tasks, but none handle chat data.",
+   "message": "how do I export all my chats to a pdf",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "You can't change how many tokens are used per question; tokens are fixed by the AI. However, you can choose a cheaper AI model to reduce costs.",
+   "message": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Thanks! How about you? What's on your mind?",
+   "message": "thanks",
+   "prev_person": "does hermes remember things",
+   "prev_helper": "Yes. Hermes keeps short notes about you and your work, and reads them at the start of each chat.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "I am not checking that yet. I have not checked what comes next.",
+   "message": "what do you mean?",
+   "prev_person": "what is a skill",
+   "prev_helper": "A skill is a set of written steps that teaches Hermes how to do one kind of job.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "message": "ok and then?",
+   "prev_person": "can I use it on telegram",
+   "prev_helper": "Yes. First you make a bot in Telegram with BotFather and copy its token.",
+   "talk": true,
+   "flags": [
+    "c27-next"
+   ]
+  },
+  {
+   "reply": "Hello! Welcome to Hermes. I'm here to help you learn about it. What would you like to know?",
+   "message": "hi there, I'm new to all this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "That's great to hear! You can also ask Hermes to remind you once or again and again. What else are you curious about?",
+   "message": "ok cool",
+   "prev_person": "can it send me reminders",
+   "prev_helper": "Yes. Hermes can run a job at a set time, like a reminder every morning.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "A skill is like a recipe book that teaches you exactly how to cook a specific dish step by step. It's a collection of written instructions designed to help you perform one task.",
+   "message": "what even is a skill?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "message": "can I talk to my hermes from my phone?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.",
+   "message": "do I need to pay for chatgpt to use this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c27-money"
+   ]
+  },
+  {
+   "reply": "Hermes saves every chat, so it can search your old chats when you ask.",
+   "message": "does it remember what I told it yesterday",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can do jobs on a schedule, such as a summary every morning. It can repeat a job every day or week.",
+   "message": "can it do something every morning for me automatically",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "You can use two separate Hermes bots for work and home. Each bot has its own settings and notes. You can also hand work to each other using @ and a name.",
+   "message": "can I have two different hermes bots, one for work and one for home",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "I cannot tell you how to reduce token usage based on the facts I have.",
+   "message": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "Hello! How can I help you understand Hermes today?",
+   "message": "hey",
+   "prev_person": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "It looks like your message got cut off. Could you ask a question about Hermes?",
+   "message": "he",
+   "prev_person": "hey",
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "You're welcome! Is there anything else you'd like to know about Hermes?",
+   "message": "thanks",
+   "prev_person": "does hermes remember things",
+   "prev_helper": "Yes. Hermes keeps short notes about you and your work, and reads them at the start of each chat.",
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "I meant that a skill is a collection of written instructions that teaches Hermes a specific task.",
+   "message": "what do you mean?",
+   "prev_person": "what is a skill",
+   "prev_helper": "A skill is a set of written steps that teaches Hermes how to do one kind of job.",
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "I have not checked what comes next yet.",
+   "message": "ok and then?",
+   "prev_person": "can I use it on telegram",
+   "prev_helper": "Yes. First you make a bot in Telegram with BotFather and copy its token.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "Hello! Welcome to Hermes. Is there anything specific about the app you'd like to know?",
+   "message": "hi there, I'm new to all this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "No problem! It just means you need an AI model to think for you. Do you have a question about how Hermes works?",
+   "message": "sorry I don't get it",
+   "prev_person": "which AI should I use",
+   "prev_helper": "Hermes needs a model, the AI that does the thinking. You can use a paid plan you already have, or a free one.",
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "That's great! Feel free to ask about any other features of Hermes.",
+   "message": "ok cool",
+   "prev_person": "can it send me reminders",
+   "prev_helper": "Yes. Hermes can run a job at a set time, like a reminder every morning.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "A skill is a set of written steps that teach Hermes one task.",
+   "message": "what even is a skill?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Yes, you can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "message": "can I talk to my hermes from my phone?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes itself is free, but the AI it uses can cost money depending on your choice.",
+   "message": "do I need to pay for chatgpt to use this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Yes, Hermes saves every chat and can search your old chats when you ask.",
+   "message": "does it remember what I told it yesterday",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Yes, Hermes can do jobs on a schedule, such as a summary every morning. Just ask it once in plain words.",
+   "message": "can it do something every morning for me automatically",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Yes, you can have two separate Hermes bots, one for work and one for home, as each has its own settings and notes.",
+   "message": "can I have two different hermes bots, one for work and one for home",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes needs a model to answer, but the facts do not say which one is best for beginners.",
+   "message": "what's the best AI model to pick if I'm a total beginner",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "Yes, you can connect Gmail to Hermes. Click \"Capabilities\" then the \"Connectors\" tab to link it.",
+   "message": "can it read my gmail",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Yes, Hermes can search the web and read web pages using a built-in tool.",
+   "message": "can hermes look things up on the internet",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "I do not have facts about running Hermes on a Raspberry Pi. NONE",
+   "message": "how do I run hermes on a raspberry pi",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "I don't have facts about weather in Riga. NONE",
+   "message": "what's the weather in Riga tomorrow",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "I do not have information on how to update Hermes.",
+   "message": "how do I update hermes to the newest version",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "A skill is a set of written steps that teaches Hermes one task.",
+   "message": "what even is a skill?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hi! What would you like to know about Hermes?",
+   "message": "hey",
+   "prev_person": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "Hi! What would you like to know about Hermes?",
+   "message": "he",
+   "prev_person": "hey",
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "You’re welcome! Feel free to ask a question about Hermes.",
+   "message": "thanks",
+   "prev_person": "does hermes remember things",
+   "prev_helper": "Yes. Hermes keeps short notes about you and your work, and reads them at the start of each chat.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "A skill is written steps that teach Hermes to do one task.",
+   "message": "what do you mean?",
+   "prev_person": "what is a skill",
+   "prev_helper": "A skill is a set of written steps that teaches Hermes how to do one kind of job.",
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "In Hermes, open Messaging and press Create with QR. I haven’t checked what comes after that.",
+   "message": "ok and then?",
+   "prev_person": "can I use it on telegram",
+   "prev_helper": "Yes. First you make a bot in Telegram with BotFather and copy its token.",
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hi! Feel free to ask a question about Hermes.",
+   "message": "hi there, I'm new to all this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "I mean Hermes needs an AI to do the thinking so it can answer you. That AI is called a model.",
+   "message": "sorry I don't get it",
+   "prev_person": "which AI should I use",
+   "prev_helper": "Hermes needs a model, the AI that does the thinking. You can use a paid plan you already have, or a free one.",
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Glad that helps! Any questions about Hermes?",
+   "message": "ok cool",
+   "prev_person": "can it send me reminders",
+   "prev_helper": "Yes. Hermes can run a job at a set time, like a reminder every morning.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "You can chat with Hermes through apps like Telegram, WhatsApp, or Slack.",
+   "message": "can I talk to my hermes from my phone?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes itself is free, but the AI it uses can cost money, depending on which one you choose. You can sign in with a ChatGPT plan, but the docs don’t say which plans work.",
+   "message": "do I need to pay for chatgpt to use this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes saves every chat and can search old chats when you ask.",
+   "message": "does it remember what I told it yesterday",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Yes. Hermes can do a job automatically every morning; ask once in plain words, such as for a summary every morning.",
+   "message": "can it do something every morning for me automatically",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Yes. Each bot is a separate Hermes with its own settings and notes, so you can have one for work and one for home.",
+   "message": "can I have two different hermes bots, one for work and one for home",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "I haven’t checked which model is best for beginners. A model is the AI that does the thinking, and Hermes needs one to answer.",
+   "message": "what's the best AI model to pick if I'm a total beginner",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes can connect to Gmail through its Connectors page, but I haven’t checked whether it can read your messages.",
+   "message": "can it read my gmail",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Yes. Hermes can search the web and read web pages.",
+   "message": "can hermes look things up on the internet",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "You can use the \"New session\" button to start a fresh chat, which resets the token count. You can also try asking more specific questions to get better results.",
+   "message": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "You can use fewer tokens by asking shorter questions or breaking long ones into smaller parts. This helps the AI process information more efficiently.",
+   "message": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "HELLO! I hope you're having a great day. What the person does is just \"hey,\" so I can't guess their plans or needs. I'd love to know what you're working on or how you're feeling.",
+   "message": "hey",
+   "prev_person": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "prev_helper": null,
+   "talk": true,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "HELLO name=None",
+   "message": "he",
+   "prev_person": "hey",
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "Thanks! How about you? What's on your mind?",
+   "message": "thanks",
+   "prev_person": "does hermes remember things",
+   "prev_helper": "Yes. Hermes keeps short notes about you and your work, and reads them at the start of each chat.",
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "I mean that a skill is a specific set of written steps designed to teach Hermes how to perform a single type of job.",
+   "message": "what do you mean?",
+   "prev_person": "what is a skill",
+   "prev_helper": "A skill is a set of written steps that teaches Hermes how to do one kind of job.",
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hello! Welcome to Hermes. I can help you learn about it. What would you like to know?",
+   "message": "hi there, I'm new to all this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "That sounds great! What else would you like to know about Hermes?",
+   "message": "ok cool",
+   "prev_person": "can it send me reminders",
+   "prev_helper": "Yes. Hermes can run a job at a set time, like a reminder every morning.",
+   "talk": true,
+   "flags": []
+  },
+  {
+   "reply": "A skill is a set of written steps that teach Hermes one task.\nWhat the person does is asking about the definition of a skill.",
+   "message": "what even is a skill?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "message": "can I talk to my hermes from my phone?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.",
+   "message": "do I need to pay for chatgpt to use this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c27-money"
+   ]
+  },
+  {
+   "reply": "Hermes saves every chat and can search your old chats when you ask.",
+   "message": "does it remember what I told it yesterday",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can do jobs on a schedule, such as a summary every morning. You can ask it once, in plain words.",
+   "message": "can it do something every morning for me automatically",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "You can create two separate Hermes bots, each with its own settings and notes. You can also assign work to one bot and let it hand it off to another.",
+   "message": "can I have two different hermes bots, one for work and one for home",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "A model is the AI that does the thinking.",
+   "message": "what's the best AI model to pick if I'm a total beginner",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c27-choice"
+   ]
+  },
+  {
+   "reply": "Hermes can read your Gmail messages if you connect your email account first. To do this, you need to use the \"Connectors\" page in the Hermes app to link your Gmail. Once connected, you can then ask Hermes to read your emails.",
+   "message": "can it read my gmail",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
+   "message": "can hermes look things up on the internet",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can repeat a job every day or week. Ask it once, in plain words.",
+   "message": "how do I update hermes to the newest version",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.",
+   "message": "how do I export all my chats to a pdf",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "I meant a skill is a set of written steps that teach Hermes how to do one kind of job.",
+   "message": "what do you mean?",
+   "prev_person": "what is a skill",
+   "prev_helper": "A skill is a set of written steps that teaches Hermes how to do one kind of job.",
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "message": "ok and then?",
+   "prev_person": "can I use it on telegram",
+   "prev_helper": "Yes. First you make a bot in Telegram with BotFather and copy its token.",
+   "talk": false,
+   "flags": [
+    "c27-next"
+   ]
+  },
+  {
+   "reply": "Hello! Welcome to Hermes. I can help you learn about it. What would you like to know?",
+   "message": "hi there, I'm new to all this",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
+   "message": "can hermes look things up on the internet",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can repeat a job every day or week. Ask it once, in plain words.",
+   "message": "how do I update hermes to the newest version",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.",
+   "message": "how do I export all my chats to a pdf",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  }
+ ],
+ "recorded_raw": [
+  {
+   "raw": "Hermes can read your Gmail messages through its \"Connectors\" page, which links apps like Gmail. You can ask Hermes to add your Gmail account to this list. USED: [CN1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can search the web and read web pages using its built-in tool. You can also add the \"stocks\" skill to look up stock prices. USED: [w_web]",
+   "no_reply": false
+  },
+  {
+   "raw": "I cannot check the weather for Riga tomorrow. USED: none.",
+   "no_reply": false
+  },
+  {
+   "raw": "You can update Hermes by asking it to do so. USED: [sch1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes does not have a built-in skill to export chats to PDF. The available skills are for reading Word, Excel, PDF, Obsidian notes, and meeting tasks, but none handle chat data. USED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "You can't change how many tokens are used per question; tokens are fixed by the AI. However, you can choose a cheaper AI model to reduce costs. USED: COST",
+   "no_reply": false
+  },
+  {
+   "raw": "Thanks! How about you? What's on your mind?\n\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "I am not checking that yet. I have not checked what comes next. USED: none.",
+   "no_reply": false
+  },
+  {
+   "raw": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "no_reply": false
+  },
+  {
+   "raw": "Hello! Welcome to Hermes. I'm here to help you learn about it. What would you like to know? USED: none.",
+   "no_reply": false
+  },
+  {
+   "raw": "That's great to hear! You can also ask Hermes to remind you once or again and again. What else are you curious about?",
+   "no_reply": false
+  },
+  {
+   "raw": "A skill is like a recipe book that teaches you exactly how to cook a specific dish step by step. It's a collection of written instructions designed to help you perform one task. USED: skill",
+   "no_reply": false
+  },
+  {
+   "raw": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack. USED: msg0",
+   "no_reply": false
+  },
+  {
+   "raw": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.\n\nUSED: [mod1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes saves every chat, so it can search your old chats when you ask. USED: [mem2]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can do jobs on a schedule, such as a summary every morning. It can repeat a job every day or week. USED: [sch0], [sch1]",
+   "no_reply": false
+  },
+  {
+   "raw": "You can use two separate Hermes bots for work and home. Each bot has its own settings and notes. You can also hand work to each other using @ and a name. USED: [bot1], [bot0], [mem4], [bot2]",
+   "no_reply": false
+  },
+  {
+   "raw": "I cannot tell you how to reduce token usage based on the facts I have.\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "Hello! How can I help you understand Hermes today?\n\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "It looks like your message got cut off. Could you ask a question about Hermes?\n\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "You're welcome! Is there anything else you'd like to know about Hermes?\nUSED: [mem0]",
+   "no_reply": false
+  },
+  {
+   "raw": "I meant that a skill is a collection of written instructions that teaches Hermes a specific task. USED: [skill]",
+   "no_reply": false
+  },
+  {
+   "raw": "I have not checked what comes next yet.\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "Hello! Welcome to Hermes. Is there anything specific about the app you'd like to know?\n\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "No problem! It just means you need an AI model to think for you. Do you have a question about how Hermes works?\nUSED: mod0",
+   "no_reply": false
+  },
+  {
+   "raw": "That's great! Feel free to ask about any other features of Hermes.\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "A skill is a set of written steps that teach Hermes one task. USED: [skill]",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes, you can chat with Hermes from apps like Telegram, WhatsApp or Slack. USED: [msg0]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes itself is free, but the AI it uses can cost money depending on your choice. USED: [COST]",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes, Hermes saves every chat and can search your old chats when you ask. USED: [mem2]",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes, Hermes can do jobs on a schedule, such as a summary every morning. Just ask it once in plain words.\nUSED: [sch0], [sch1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes, you can have two separate Hermes bots, one for work and one for home, as each has its own settings and notes. USED: [bot0], [mem4]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes needs a model to answer, but the facts do not say which one is best for beginners.\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes, you can connect Gmail to Hermes. Click \"Capabilities\" then the \"Connectors\" tab to link it. USED: [CN1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes, Hermes can search the web and read web pages using a built-in tool. USED: [w_web]",
+   "no_reply": false
+  },
+  {
+   "raw": "I do not have facts about running Hermes on a Raspberry Pi. NONE\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "I don't have facts about weather in Riga. NONE\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "I do not have information on how to update Hermes.\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "A skill is a set of written steps that teaches Hermes one task.\nUSED: skill",
+   "no_reply": false
+  },
+  {
+   "raw": "Hi! What would you like to know about Hermes? USED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "Hi! What would you like to know about Hermes?\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "You’re welcome! Feel free to ask a question about Hermes.\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "A skill is written steps that teach Hermes to do one task.\nUSED: [skill]",
+   "no_reply": false
+  },
+  {
+   "raw": "In Hermes, open Messaging and press Create with QR. I haven’t checked what comes after that.\n\nUSED: [msg1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hi! Feel free to ask a question about Hermes.\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "I mean Hermes needs an AI to do the thinking so it can answer you. That AI is called a model.  \nUSED: mod0",
+   "no_reply": false
+  },
+  {
+   "raw": "Glad that helps! Any questions about Hermes?\nUSED: none",
+   "no_reply": false
+  },
+  {
+   "raw": "You can chat with Hermes through apps like Telegram, WhatsApp, or Slack.\nUSED: [msg0]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes itself is free, but the AI it uses can cost money, depending on which one you choose. You can sign in with a ChatGPT plan, but the docs don’t say which plans work.\nUSED: COST, mod1",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes saves every chat and can search old chats when you ask. USED: mem2",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes. Hermes can do a job automatically every morning; ask once in plain words, such as for a summary every morning.\nUSED: sch0, sch1",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes. Each bot is a separate Hermes with its own settings and notes, so you can have one for work and one for home.\nUSED: bot0, mem4",
+   "no_reply": false
+  },
+  {
+   "raw": "I haven’t checked which model is best for beginners. A model is the AI that does the thinking, and Hermes needs one to answer.\nUSED: mod0",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can connect to Gmail through its Connectors page, but I haven’t checked whether it can read your messages.  \nUSED: CN1",
+   "no_reply": false
+  },
+  {
+   "raw": "Yes. Hermes can search the web and read web pages.\nUSED: w_web",
+   "no_reply": false
+  },
+  {
+   "raw": "You can use the \"New session\" button to start a fresh chat, which resets the token count. You can also try asking more specific questions to get better results. USED: [use0], [use1]",
+   "no_reply": false
+  },
+  {
+   "raw": "You can use fewer tokens by asking shorter questions or breaking long ones into smaller parts. This helps the AI process information more efficiently.\n\nUSED: [use0], [use1]",
+   "no_reply": false
+  },
+  {
+   "raw": "HELLO! I hope you're having a great day. What the person does is just \"hey,\" so I can't guess their plans or needs. I'd love to know what you're working on or how you're feeling.",
+   "no_reply": false
+  },
+  {
+   "raw": "HELLO name=None",
+   "no_reply": false
+  },
+  {
+   "raw": "Thanks! How about you? What's on your mind?\n\nUSED: mem0",
+   "no_reply": false
+  },
+  {
+   "raw": "I mean that a skill is a specific set of written steps designed to teach Hermes how to perform a single type of job.\n\nUSED: skill",
+   "no_reply": false
+  },
+  {
+   "raw": "Hello! Welcome to Hermes. I can help you learn about it. What would you like to know?",
+   "no_reply": false
+  },
+  {
+   "raw": "That sounds great! What else would you like to know about Hermes?",
+   "no_reply": false
+  },
+  {
+   "raw": "A skill is a set of written steps that teach Hermes one task.\nWhat the person does is asking about the definition of a skill.\nUSED: skill",
+   "no_reply": false
+  },
+  {
+   "raw": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack. USED: msg0",
+   "no_reply": false
+  },
+  {
+   "raw": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.\n\nUSED: mod1",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes saves every chat and can search your old chats when you ask. USED: [mem2]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can do jobs on a schedule, such as a summary every morning. You can ask it once, in plain words. USED: [sch0]",
+   "no_reply": false
+  },
+  {
+   "raw": "You can create two separate Hermes bots, each with its own settings and notes. You can also assign work to one bot and let it hand it off to another.\n\nUSED: [bot1], [bot0], [bot2]",
+   "no_reply": false
+  },
+  {
+   "raw": "USED: mod0\nA model is the AI that does the thinking.",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can read your Gmail messages if you connect your email account first. To do this, you need to use the \"Connectors\" page in the Hermes app to link your Gmail. Once connected, you can then ask Hermes to read your emails. USED: [CN1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.\n\nUSED: w_web",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can repeat a job every day or week. Ask it once, in plain words.\n\nUSED: sch1",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.\n\nUSED: w_docs, w_pdf",
+   "no_reply": false
+  },
+  {
+   "raw": "I meant a skill is a set of written steps that teach Hermes how to do one kind of job.\n\nUSED: skill",
+   "no_reply": false
+  },
+  {
+   "raw": "USED: msg1, msg0.\nYou can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "no_reply": false
+  },
+  {
+   "raw": "Hello! Welcome to Hermes. I can help you learn about it. What would you like to know? USED: [mem0]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.\n\nUSED: w_web",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can repeat a job every day or week. Ask it once, in plain words.\n\nUSED: [sch1]",
+   "no_reply": false
+  },
+  {
+   "raw": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.\n\nUSED: w_docs, w_pdf",
+   "no_reply": false
+  },
+  {
+   "raw": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Task:**",
+   "no_reply": true
+  },
+  {
+   "raw": "Thinking Process: 1. **Analyze the Request:**",
+   "no_reply": true
+  }
+ ],
+ "own_checks": [
+  {
+   "reply": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.",
+   "message": "do I need to pay for chatgpt",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c27-money"
+   ]
+  },
+  {
+   "reply": "Hermes itself is free. The AI it uses can cost money.",
+   "message": "do I need to pay for chatgpt",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "A model is the AI that does the thinking.",
+   "message": "what's the best AI model for a total beginner",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c27-choice"
+   ]
+  },
+  {
+   "reply": "If you already pay for ChatGPT, start with that.",
+   "message": "which model should I use?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "I have not checked that yet.",
+   "message": "Which one?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "message": "ok and then?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)",
+    "c27-next"
+   ]
+  },
+  {
+   "reply": "Then open Settings and add your key.",
+   "message": "ok and then?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can do jobs on a schedule.",
+   "message": "So, what next?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)",
+    "c27-next"
+   ]
+  },
+  {
+   "reply": "You can chat with Hermes from apps like Telegram.",
+   "message": "and then what about telegram",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "I haven't checked what comes next yet.",
+   "message": "Now what!",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Scan the code with your phone.",
+   "message": "then",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes itself is free.",
+   "message": "is it expensive",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Long chats use the most tokens.",
+   "message": "is it expensive",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)",
+    "c27-money"
+   ]
+  },
+  {
+   "reply": "It is free to use with a free model.",
+   "message": "can I use it for free?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "It costs nothing extra.",
+   "message": "how much does it cost",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes runs on your computer.",
+   "message": "how much does it cost",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)",
+    "c27-money"
+   ]
+  },
+  {
+   "reply": "The person asks what a skill is. A skill is a set of written steps.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "Checked facts say a skill is a set of written steps.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "About them: they run a club. A skill is a set of written steps.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "A skill is a set of written steps. USED tells which ones.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "A skill is a set of steps it has used before.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "From my notes, a skill is a set of written steps.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "What the person does is ask about skills.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "The rows say a skill is a set of written steps.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "From the facts given, a skill is a set of steps.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c26"
+   ]
+  },
+  {
+   "reply": "A skill is a set of written steps that teach Hermes one task.",
+   "message": "what is a skill",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "message": "can I talk to my hermes from my phone?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes saves every chat, so you can go back to it.",
+   "message": "does it remember what I told it yesterday",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Hermes can search the web and read pages.",
+   "message": "can hermes look things up on the internet",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "Pick the free plan first.",
+   "message": "I'd pay if it's good. Which plan?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": []
+  },
+  {
+   "reply": "Hermes is free.",
+   "message": "payment",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  },
+  {
+   "reply": "I have not checked that.",
+   "message": "Payday is when?",
+   "prev_person": null,
+   "prev_helper": null,
+   "talk": false,
+   "flags": [
+    "c25(not adopted)"
+   ]
+  }
+ ],
+ "own_raw": [
+  {
+   "raw": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   **Task:**",
+   "no_reply": true
+  },
+  {
+   "raw": "Thinking Process: 1. **Analyze the Request:**",
+   "no_reply": true
+  },
+  {
+   "raw": "  thinking process: the user",
+   "no_reply": true
+  },
+  {
+   "raw": "THOUGHT PROCESS here",
+   "no_reply": true
+  },
+  {
+   "raw": "Thought process: x",
+   "no_reply": true
+  },
+  {
+   "raw": "<think>hmm</think>mem",
+   "no_reply": true
+  },
+  {
+   "raw": "<think>Thinking Process: 1. **Analyze**</think>Real answer.",
+   "no_reply": true
+  },
+  {
+   "raw": "mem",
+   "no_reply": false
+  },
+  {
+   "raw": "ok <think> hmm",
+   "no_reply": true
+  },
+  {
+   "raw": "a <think>b</think> c",
+   "no_reply": false
+  },
+  {
+   "raw": "Sure. 1. **Analyze the request",
+   "no_reply": true
+  },
+  {
+   "raw": "Sure. **analysis below",
+   "no_reply": false
+  },
+  {
+   "raw": "**Analysis:** x",
+   "no_reply": true
+  },
+  {
+   "raw": "x **Task:** y",
+   "no_reply": true
+  },
+  {
+   "raw": "x **task:** y",
+   "no_reply": false
+  },
+  {
+   "raw": "Here **Request:** y",
+   "no_reply": true
+  },
+  {
+   "raw": "Long chats use the most tokens.\nUSED: use1",
+   "no_reply": false
+  },
+  {
+   "raw": "I was thinking process steps",
+   "no_reply": false
+  },
+  {
+   "raw": "",
+   "no_reply": false
+  },
+  {
+   "raw": "   ",
+   "no_reply": false
+  },
+  {
+   "raw": "Thinking about it, Hermes is free.",
+   "no_reply": false
+  },
+  {
+   "raw": "Thinking Process",
+   "no_reply": true
+  },
+  {
+   "raw": "<THINK>x",
+   "no_reply": true
+  }
+ ]
+}

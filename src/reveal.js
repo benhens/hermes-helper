@@ -9,13 +9,17 @@
 import { useEffect, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K } from './look.js'
-import { namesWhole } from './quotes.js'
+import { namesWhole, typedParts, TYPE_WORD, TYPED_PHRASE, NAME_WHOLE_MAX } from './quotes.js'
 
 // The pace: one word every 120 ms (a first number; Pēteris has not seen a pace yet).
 export const WORD_MS = 120
 
+// talk-live-3: in a line that says "type", a quoted phrase to type is one word (src/quotes.js typedParts), so it
+// appears whole in its code style and nothing jumps when its last word comes
 export function wordsOf(text) {
-  return String(text ?? '').trim().split(/\s+/).filter(Boolean)
+  const s = String(text ?? '')
+  const kept = TYPE_WORD.test(s) ? s.replace(TYPED_PHRASE, m => m.replace(/\s/g, '\u0000')) : s
+  return kept.trim().split(/\s+/).filter(Boolean).map(w => w.replace(/\u0000/g, ' '))
 }
 
 // setInterval is the host's (ctx.setInterval: it returns the function that stops it).
@@ -160,10 +164,22 @@ const UNSEEN = { visibility: 'hidden' }
 // A name in curly marks with no space in it is kept on one line with its marks (src/quotes.js namesWhole;
 // hhdesign's review of d1ceddc, 3.1). text is already drawn by curlyQuotes.
 const NAME_WHOLE = { whiteSpace: 'nowrap' }
-export function keepNamesWhole(text) {
+export function keepNamesWhole(text, keyAt = '') {
   const parts = namesWhole(text)
   if (!parts) return text
-  return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `n${i}`)))
+  return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `${keyAt}n${i}`)))
+}
+// talk-live-3 (Lead's call on question 5 of the c18 report): a line's words to read, with text to type in the paste
+// box's code style (an inline <code>, a phrase's quote marks around it; kept on one line unless longer than NAME_WHOLE_MAX)
+// and names kept whole. typeLine: whether the whole line says "type" (src/quotes.js typedParts).
+export function drawnWords(text, typeLine) {
+  const parts = typedParts(text, typeLine)
+  if (!parts) return keepNamesWhole(text)
+  return parts.flatMap((p, i) =>
+    typeof p === 'string'
+      ? [].concat(keepNamesWhole(p, `${i}-`))
+      : [jsx('code', { className: K.typed, style: Array.from(p.typed).length <= NAME_WHOLE_MAX ? NAME_WHOLE : undefined, 'data-hh': 'typed', children: p.typed }, `t${i}`)]
+  )
 }
 
 // One line Helper says. A screen reader gets the whole line once (Hermes's own sr-only class);
@@ -175,6 +191,8 @@ export function Said({ clock, id, text, className, fresh = false }) {
   useEffect(() => clock.watch(id, () => redraw(n => n + 1)), [clock, id])
   const n = clock.shown(id, words.length, fresh)
   const rest = words.slice(n).join(' ')
+  // talk-live-3: text to type in code style; whether the line says "type" is judged on the whole line
+  const typeLine = TYPE_WORD.test(String(text ?? ''))
   return jsxs('p', {
     className,
     'data-hh': 'said',
@@ -187,7 +205,7 @@ export function Said({ clock, id, text, className, fresh = false }) {
         {
           'aria-hidden': true,
           'data-hh': 'said-seen',
-          children: [keepNamesWhole(words.slice(0, n).join(' ')), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: keepNamesWhole((n ? ' ' : '') + rest) }, 'rest') : null]
+          children: [drawnWords(words.slice(0, n).join(' '), typeLine), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: drawnWords((n ? ' ' : '') + rest, typeLine) }, 'rest') : null]
         },
         'seen'
       )

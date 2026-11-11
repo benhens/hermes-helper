@@ -124,8 +124,29 @@ export function liveProblems(live, talk, wants, mode) {
   const fb = (live.order || {}).fallback || {}
   if (fb.seconds !== 12) problems.push(`order.fallback.seconds is ${fb.seconds}; the page's timer is built for 12`)
   if ((live.rows || {}).max_handed !== 5) problems.push('rows.max_handed is not 5')
+  // live-v2 changes-5: no_reply (before c0), c26 and c27 (after c24, adopted), c25 (adopted: false, never built), and the
+  // slow-AI line Lead picked (SLOW_A) with its text to paste
+  const c5 = live.checks_c5 || {}
+  const nr = c5.no_reply || {}
+  if (!(nr.starts || []).length || !(nr.holds || []).length) problems.push('checks_c5.no_reply has no starts or no holds')
+  const c5ids = (c5.list || []).map(c => c.id)
+  if (JSON.stringify(c5ids) !== JSON.stringify(['c25', 'c26', 'c27'])) problems.push(`checks_c5.list is ${c5ids.join(', ')}, not c25, c26, c27`)
+  for (const c of c5.list || []) if ((c.id === 'c25') === (c.adopted !== false)) problems.push(`checks_c5 ${c.id}: adopted is ${c.adopted}; this build runs c26 and c27 only`)
+  const c26 = (c5.list || []).find(c => c.id === 'c26') || {}
+  if (!(c26.words || []).length) problems.push('checks_c5 c26 has no words')
+  const c27 = (c5.list || []).find(c => c.id === 'c27') || {}
+  const cls = (c27.classes || []).map(c => c.id)
+  if (JSON.stringify(cls) !== JSON.stringify(['money', 'choice', 'next'])) problems.push(`checks_c5 c27 classes are ${cls.join(', ')}, not money, choice, next`)
+  for (const c of c27.classes || []) if (!(c.gives || []).length || !((c.asks || []).length || (c.asks_whole || []).length)) problems.push(`checks_c5 c27 ${c.id} has no asks or no gives`)
+  const slow = live.slow_ai || {}
+  const slowA = (slow.variants || []).find(v => v.id === SLOW_PICK)
+  if (!slowA || !slowA.text) problems.push(`slow_ai has no ${SLOW_PICK} (Lead's pick, 11 Nov 05:08)`)
+  else if (/\{\w+\}|\n/.test(slowA.text)) problems.push(`slow_ai ${SLOW_PICK} has a slot or a line break`)
+  if (!slow.paste_text || /\{\w+\}/.test(slow.paste_text)) problems.push('slow_ai.paste_text is missing or has a slot')
   return problems
 }
+// live-v2 changes-5: the slow-AI line Lead picked of the data's two (job talk-live-3, point 4)
+export const SLOW_PICK = 'SLOW_A'
 
 const pick = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undefined).map(k => [k, o[k]]))
 
@@ -156,8 +177,15 @@ export function slimLiveData(live, talk, wants) {
       r5_patterns: talk.r5_terms.map(r => r.pattern),
       skills: wants.skills.map(s => s.name).filter(n => n.length > 3),
       // live-v2 changes-4: c24, a claim about the person beyond what was kept
-      c24: pick(live.checks.list.find(c => c.id === 'c24'), ['person_pattern', 'person_ok'])
+      c24: pick(live.checks.list.find(c => c.id === 'c24'), ['person_pattern', 'person_ok']),
+      // live-v2 changes-5: c26 (the model's notes shown) and c27 (the asked kind not given), after c24; c25 is not built
+      c26: live.checks_c5.list.find(c => c.id === 'c26').words,
+      c27: live.checks_c5.list.find(c => c.id === 'c27').classes.map(c => pick(c, ['id', 'asks', 'asks_whole', 'gives']))
     },
+    // live-v2 changes-5: no reply (thinking text), checked before anything else on every call
+    no_reply: { starts: live.checks_c5.no_reply.starts, holds: live.checks_c5.no_reply.holds },
+    // live-v2 changes-5: the slow-AI line (Lead's pick) and its text to paste
+    slow_ai: { id: SLOW_PICK, text: live.slow_ai.variants.find(v => v.id === SLOW_PICK).text, paste_text: live.slow_ai.paste_text },
     lines_by_mode: {
       are_you_an_ai: byMode(m => lm.are_you_an_ai[m].id),
       first_time_grey: byMode(m => lm.first_time_grey[m].text),
