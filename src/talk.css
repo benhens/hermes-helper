@@ -187,3 +187,6 @@
 /* chat-fix: a card's video place under a reply, as the Dashboard's opened card shows it, and its Open button.
    --hhd-round: the Dashboard's sheet takes its corners from it, and it is set on the Dashboard only. */
 .hh-chat-card{--hhd-round:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px;min-width:0;width:100%}
+/* (review of chat-fix 1, finding 7) in the bubble the video place (the first thing in the box) has the bubble's own
+   fill, so it gets a hairline */
+.hh-chat-card>:first-child{box-sizing:border-box;border:1px solid var(--ui-stroke-tertiary)}

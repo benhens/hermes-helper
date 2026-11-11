@@ -103,3 +103,10 @@ export function layoutFor({ width, height, tab, helperWidth, folded = false }) {
     tight
   }
 }
+
+// chat-fix: a reply of the model is the last line of the conversation's scrolling part. When its top would be above
+// the room, or closer than REPLY_TOP_PX to the room's top edge (the edge fades over 20 px), the conversation is
+// scrolled back by the difference, so the reply shows from its first line. Returns what to add to scrollTop (0 or
+// less), from the reply's top and the room's top as the screen has them at the newest end.
+export const REPLY_TOP_PX = 24
+export const replyScrollShift = (replyTop, roomTop, clear = REPLY_TOP_PX) => Math.min(0, replyTop - roomTop - clear)

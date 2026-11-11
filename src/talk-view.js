@@ -225,7 +225,7 @@ function convFade(el) {
   const v = above && below ? 'both' : above ? 'top' : below ? 'bottom' : ''
   if (el.dataset.fade !== v) el.dataset.fade = v
 }
-export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, last = null, onCard }) {
+export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, reply = null, onCard }) {
   // talk v2 look (hhdesign's notes-wants.md rule C point 1): an edge of the conversation fades out over
   // 20 px, as Hermes's own FadeScroll does, but only an edge that has something hidden behind it. The
   // conversation stacks from its bottom (column-reverse), so in Chromium its scrollTop is 0 at the newest
@@ -254,7 +254,7 @@ export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef,
   if (newest) items.push(...notesOf(newest, onNote, kept))
   // chat-fix: a reply of the model is the last line of the part that scrolls (the page hands its bubble in), so a long
   // one can be scrolled and pushes nothing out of the window
-  if (last) items.push(last)
+  if (reply) items.push(reply)
   return jsx('div', {
     className: T.conv,
     ref: scrollRef,
@@ -278,7 +278,7 @@ export function Conversation({ entries, newest, kept, onNext, onNote, scrollRef,
 // chat-fix: what the model's marks become, under its reply. A card: that card's video place exactly as the Dashboard's
 // opened card shows it (src/dash.js CardVideo) and a button that opens the card there. Quick replies: up to three
 // small buttons; a click sends that text as the person's message. An id that is no card shows nothing.
-export function ChatExtras({ entry, onQuick, onCard }) {
+export function ReplyExtras({ entry, onQuick, onCard }) {
   const it = entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
   const quick = Array.isArray(entry.quick) ? entry.quick : []
   return [
@@ -346,7 +346,7 @@ export function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard }) {
     'aria-live': 'polite',
     children: [
       entry.md ? jsx(Markdown, { text: entry.text }, entry.key) : jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
-      ...(entry.md ? ChatExtras({ entry, onQuick, onCard }) : []),
+      ...(entry.md ? ReplyExtras({ entry, onQuick, onCard }) : []),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,
