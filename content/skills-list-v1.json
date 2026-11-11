@@ -7,15 +7,15 @@
   "for": "what it is for, plain, at most 14 words, passes the R rules; or exactly 'not clear from the docs', and then Helper shows only docs_words",
   "for_from": "page = written using the skill's own page; line = from the catalog line only; unclear",
   "needs": "what the first lines of its own page say it needs, plus the Platforms row of that page",
-  "left_out": "true: Helper answers a question about it with its don't-know line (his words, 10 Nov 19:30). Approved by him: not yet",
+  "left_out": "always false since changes-19, 11 Nov 2026: his words \"Include all skills\" (inputs/pb-words-11nov-decisions-2-6.md). Kept so old code that reads it finds false. left_out_was = the reason it was proposed for leaving out (10 Nov), for the record only; never shown",
   "alike_groups": "ids of groups in alike_groups",
   "found_by": "built-in only: want_row id, or things and actions, or none with the reason",
   "say": "Said by Helper after 'It teaches Hermes to' in S1/S2 (content/helper-skill-lines-v1.md). Says no more than docs_words. null = Helper keeps the fixed sentence",
   "say_from": "for = the 'for' with a small first letter; rewritten = changed so it says no more than docs_words or fits the line; fixed: reason",
   "say_judged": "where the plain words were checked against docs_words by reading, not by rule: what was judged"
  },
- "left_out_criterion": "A skill is left out when its purpose is to get around safety or security, or when it can do real harm to the person or to others in a beginner's hands.",
- "left_out_status": "proposal, waiting for his approval",
+ "left_out_criterion": "Dropped (changes-19, 11 Nov 2026: his words \"Include all skills\" (inputs/pb-words-11nov-decisions-2-6.md)). Was: Dropped (changes-19, 11 Nov 2026: his words \"Include all skills\" (inputs/pb-words-11nov-decisions-2-6.md)). Was: Dropped (changes-19, 11 Nov 2026: his words \"Include all skills\" (inputs/pb-words-11nov-decisions-2-6.md)). Was: A skill is left out when its purpose is to get around safety or security, or when it can do real harm to the person or to others in a beginner's hands.",
+ "left_out_status": "dropped: all 186 official skills are in",
  "pair_rule": "Looked at only after the topics and the want rows found nothing, and only on a message the person typed. A skill is named when one of its things and one of its actions are both in the message as whole words. Two or more skills found: show them as picks, at most four. Never named out of nowhere.",
  "counts": {
   "built_in": 44,
@@ -24,7 +24,7 @@
   "from_page": 172,
   "from_line": 3,
   "not_clear": 11,
-  "left_out": 5,
+  "left_out": 0,
   "with_platform_limit": 38,
   "with_needs": 80,
   "builtin_with_pairs": 23,
@@ -3750,12 +3750,13 @@
    "for": "Remove the safety refusals built into open AI models.",
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows, and a graphics card",
-   "left_out": true,
-   "left_out_why": "Its purpose is to remove the safety refusals from AI models.",
+   "left_out": false,
    "alike_groups": [],
-   "say": "remove the safety refusals built into open AIs.",
+   "say": "remove an AI's refusals, so it stops saying no to requests.",
    "say_from": "rewritten",
-   "say_judged": "abliterate refusals said as remove safety refusals"
+   "say_judged": "abliterate LLM refusals said as remove an AI's refusals, so it stops saying no to requests",
+   "left_out_was": "Its purpose is to remove the safety refusals from AI models.",
+   "say_was_18": "remove an AI's refusals, so it stops saying no to requests."
   },
   {
    "name": "peft",
@@ -4605,12 +4606,13 @@
    "for": "Copy data from websites, also ones that try to block robots.",
    "for_from": "page",
    "needs": "",
-   "left_out": true,
-   "left_out_why": "Its page sells getting past sites that block robots, Cloudflare bypass in the docs' words.",
+   "left_out": false,
    "alike_groups": [],
-   "say": "copy data from websites, also ones that try to block robots.",
-   "say_from": "for",
-   "say_judged": "stealth, Cloudflare bypass said as sites that try to block robots"
+   "say": "copy data from websites while staying hidden, and get past their robot blocks.",
+   "say_from": "rewritten",
+   "say_judged": "stealth browsing said as while staying hidden; Cloudflare bypass said as get past their robot blocks",
+   "left_out_was": "Its page sells getting past sites that block robots, Cloudflare bypass in the docs' words.",
+   "say_was_18": "copy data from websites while staying hidden, and get past their robot blocks."
   },
   {
    "name": "1password",
@@ -4652,12 +4654,12 @@
    "for": "Get around the safety rules of AI models.",
    "for_from": "page",
    "needs": "",
-   "left_out": true,
-   "left_out_why": "Its purpose is to get around the safety rules of AI models. The page calls it jailbreaking.",
+   "left_out": false,
    "alike_groups": [],
    "say": "get around the safety rules of AIs.",
    "say_from": "rewritten",
-   "say_judged": "jailbreak said as get around the safety rules"
+   "say_judged": "jailbreak said as get around the safety rules",
+   "left_out_was": "Its purpose is to get around the safety rules of AI models. The page calls it jailbreaking."
   },
   {
    "name": "oss-forensics",
@@ -4699,12 +4701,12 @@
    "for": "Find which websites have an account with a given username.",
    "for_from": "page",
    "needs": "",
-   "left_out": true,
-   "left_out_why": "It finds a person's accounts across 400 sites from one username. Easy to misuse on others.",
+   "left_out": false,
    "alike_groups": [],
    "say": "find which websites have an account with a given username.",
    "say_from": "for",
-   "say_judged": null
+   "say_judged": null,
+   "left_out_was": "It finds a person's accounts across 400 sites from one username. Easy to misuse on others."
   },
   {
    "name": "unbroker",
@@ -4746,12 +4748,13 @@
    "for": "Attack a website you are allowed to test, to find its security holes.",
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
-   "left_out": true,
-   "left_out_why": "It attacks websites. Pointed at a site you may not test, it breaks the law.",
+   "left_out": false,
    "alike_groups": [],
-   "say": "attack a website you are allowed to test, to find its security holes.",
-   "say_from": "for",
-   "say_judged": null
+   "say": "attack a website you have permission to test, and report its security holes.",
+   "say_from": "rewritten",
+   "say_judged": "authorized said as you have permission; proof-based exploits said as attack",
+   "left_out_was": "It attacks websites. Pointed at a site you may not test, it breaks the law.",
+   "say_was_18": "attack a website you have permission to test, and report its security holes."
   },
   {
    "name": "openhue",

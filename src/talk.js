@@ -18,6 +18,8 @@
 // settings_step and hhcontent's changes-8 rule, and come straight after the remember step.
 import { TALK_DATA } from './talk-data.js'
 import { WANTS_DATA } from './wants-data.js'
+import { AI_MODE } from './ai-mode.js'
+import { LIVE_DATA } from './live-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
 import { hasKept } from './kept.js'
@@ -63,10 +65,10 @@ function lonelyOk(t, p) {
   if (!r) return true
   return (!r.needs_one_of || r.needs_one_of.some(q => hits(t, q))) && !(r.not_with || []).some(q => hits(t, q))
 }
-const whichOf = (t, list) => list.filter(p => hits(t, p) && lonelyOk(t, p))
+export const whichOf = (t, list) => list.filter(p => hits(t, p) && lonelyOk(t, p))
 // A start counts when it is the whole message, or the next character is not a to z, 0 to 9 or '.
-const startsWith = (t, list) => list.some(p => t === p || (t.startsWith(p) && /[^a-z0-9']/.test(t[p.length])))
-function cutIgnored(t) {
+export const startsWith = (t, list) => list.some(p => t === p || (t.startsWith(p) && /[^a-z0-9']/.test(t[p.length])))
+export function cutIgnored(t) {
   for (const p of TALK_DATA.ignore_phrases) t = t.replace(wordRe(p, 'g'), '$1 $2')
   return talkNorm(t)
 }
@@ -322,8 +324,8 @@ export function opening(st) {
 }
 // route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
 // wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
-const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
-function noteLast(st, o) {
+export const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
+export function noteLast(st, o) {
   if (!o) return o
   st.last = o.kind
   st.lastKey = lineKey(o)
@@ -493,8 +495,8 @@ export function asksTopics(text) {
   return !(strongTopics(tc).length || anyTerm(tc))
 }
 
-// changes-7: N1a, a skill named in a clear pattern and on no official list; N1b, a left-out skill;
-// N1, everything else. null: an official skill named that way.
+// changes-7: N1a, a skill named in a clear pattern and on no official list; N1, everything else.
+// null: an official skill named that way (changes-19: all 186 are answered, N1b is gone).
 const SKILL_PATTERNS = [/skills? (?:called|named) "?([a-z0-9][a-z0-9 -]{0,40}?)"?(?=$|[^a-z0-9 -])/, /"([a-z0-9][a-z0-9 -]{0,40})" skills?/]
 export function dontKnow(text) {
   const t = talkNorm(text)
@@ -503,7 +505,6 @@ export function dontKnow(text) {
     if (m) {
       const n = m[1].trim().replace(/ /g, '-')
       if (!SKILL_NAMES.has(n)) return 'N1a'
-      if (SKILL_NAMES.get(n).left_out) return 'N1b'
       return null
     }
   }
@@ -545,7 +546,7 @@ function codeNameRaw(text, strongOnly) {
 }
 
 // A reply to "What's your name?" that holds a name and a question of its own: [name, the rest], or [null, null].
-function nameWithMore(text) {
+export function nameWithMore(text) {
   const more = OPENING.name_with_more
   let m = strongMatch(text)
   if (!m) {
@@ -646,6 +647,10 @@ export function serviceIn(text, st, answered) {
 
 /* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
 const ST = TALK_DATA.small_talk
+// talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
+export const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
+// live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
+const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
 const NR = TALK_DATA.no_repeat
 const LETTER = /\p{L}/u
 const ONE_WORD = /^(?:\p{L}|['-]){2,30}$/u
@@ -703,7 +708,10 @@ export function smallTalk(text, st) {
     if (!letters || (one && t.length === 1)) kind = 'cut' // rules a and b
     else if (!opening && saysWrong(t) && !known) kind = 'wrong' // changes-17 wrong_rule_17
     else if (!opening && !st.pending && !known) {
-      if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
+      // live-v2 changes-1 and -2: "how", "and", "and then" right after a line from rows is kind mean (checked just
+      // before rule c; the whole message after the usual cuts, so an entry may have two words)
+      if (ST.how_after_rows.words.includes(t) && HOW_AFTER.includes(st.last)) kind = 'mean'
+      else if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
       else if (ws.length <= 4 && ST.cut_dangling.includes(ws[ws.length - 1])) kind = 'cut' // rule d
       else if (ws.length <= 3 && ws.length > 1 && OPENING.question_starts.includes(ws[0]) && ws.slice(1).every(w => ST.cut_small_words.includes(w))) kind = 'cut' // changes-17 rule e
     }
@@ -719,7 +727,7 @@ export function smallTalk(text, st) {
 function smallLine(kind, st) {
   const name = st.name || st.kept.name || null
   if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
-  if (kind === 'ai') return [ST.ai_line, null]
+  if (kind === 'ai') return [LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE], null] // talk-live: AI, AI_PICK or AI_WRITES
   if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
   return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG' }[kind], null]
 }
@@ -766,10 +774,17 @@ function noRepeat(out, st, text) {
 // One typed message -> a result (route2.py turn, changes-14's wrapper): the steps below, then no_repeat; met
 // is set when the opening ends here, and the line is noted as Helper's last.
 export function turn(text, st) {
+  return turnParts(text, st).out
+}
+// talk-live: the same, with the result before no_repeat as well (pre, a copy), which decides whether the AI
+// step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
+export function turnParts(text, st) {
   const wasOpening = st.stage === 'name' || st.stage === 'work'
-  const out = noRepeat(turnSteps(text, st), st, text)
+  const steps = turnSteps(text, st)
+  const pre = { ...steps }
+  const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
-  return noteLast(st, out)
+  return { pre, out: noteLast(st, out) }
 }
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
@@ -862,8 +877,8 @@ function turnSteps(text, st) {
     st.lastq = false
   }
   // a skill by its name, next to "skill" (changes-6 fix 3): before the topics, so "is there a
-  // github skill" gets the skill, not the service question. A row for that skill wins; a skill
-  // marked left out gets N1b; else S1 (built in) or S2 (optional, with the clicks to add it).
+  // github skill" gets the skill, not the service question. A row for that skill wins; else S1
+  // (built in) or S2 (optional, with the clicks to add it); changes-19: no skill is left out.
   if (st.wants !== false) {
     // The Builder's rule, in the reference since wants fixes v1 (wants_fixes_step.py c): a group's own label typed as it is on its
     // button ("pictures and video") is that group, as if picked; else "I don't know that one" (N2).
@@ -876,13 +891,12 @@ function turnSteps(text, st) {
     if (sk.length === 1) {
       const row = rowOfSkill(sk[0])
       if (row) return done('want', { row: row.id })
-      if (WSKILLS.get(sk[0]).left_out) return done('N1b')
       return done('skill', { skill: sk[0] })
     }
   }
   // a skill named in a clear pattern is looked up before the terms
   const dk = dontKnow(text)
-  if (dk === 'N1a' || dk === 'N1b') return done(dk)
+  if (dk === 'N1a') return done(dk)
   // changes-11, in route2.py's order: a name on a later visit, "what is ...", cost, where
   if (st.stage === 'open') {
     const nl = nameLater(text, st, out)
@@ -1183,7 +1197,7 @@ function keptNote(result, st) {
   // items: what this line says was kept, [key, value] each, so the page can mark the line once
   // that is no longer kept (forgotten, or replaced by a newer one)
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null, items }
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, items }
 }
 // Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
 // as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
@@ -1214,13 +1228,20 @@ export function openingLine(st = null) {
 // result: what turn, pick, pickTopic, press, skip, sayLine, change, rmPick or forgetAnswer
 // returned. typed: the person's words (for the text to paste under "your own Hermes can").
 // opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it). opts.keptShown: the
-// conversation already shows a "Kept:" or "From what I keep:" line (A1 with nothing kept then says it was deleted).
+// conversation shows that something was kept (keptWasShown; A1 with nothing kept then says it was deleted).
 // Returns { line, text, source, answers, next, paste, note, used, hint, rows, docs }:
 //   docs: the box "From the Hermes docs" { head, words, source } (S1, S2), the page's own words;
 //   next may also be { kind: 'steps', label, steps, after } (the clicks to add an optional skill);
 //   an answer to pick may be { more: [the next ones] } ("More", three at a time, src/page.js).
 //   note: the faint "Kept: ..." line { text, link, first }; used: "From what I keep: ..." { text,
 //   link, topic }; hint: a small faint line (N_HINT); rows: the list of kept things (A1).
+// live-v2 changes-2 (keeps.tell.see.see_line_deleted_when): whether this conversation shows that something was kept:
+// a faint "Kept:" or "From what I keep:" line, a kept row in the list, or the "Done." line of a delete (all, or one
+// thing). Only what this conversation shows counts, never the met mark, so every visit answers alike.
+export function keptWasShown(log) {
+  const done = [KEEPS.tell.see.delete_all.after_yes, KEEP_TYPED.forget_one.after_yes]
+  return log.some(e => e.who === 'helper' && !!(e.note || e.used || (e.rows && e.rows.length) || done.includes(e.text)))
+}
 export function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
@@ -1254,6 +1275,8 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'HOW':
     case 'WHO':
     case 'AI':
+    case 'AI_PICK':
+    case 'AI_WRITES':
     case 'BYE':
     case 'CUT':
     case 'MEAN_NONE':
@@ -1270,7 +1293,6 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('TP', FIXED.TP.text, { answers: topicPicks() })
     case 'N1':
     case 'N1a':
-    case 'N1b':
     case 'N1_AGAIN': // changes-15: in place of a second don't-know line, the faint hint under it as under N1
       return dontKnowLine(result.kind)
     case 'skill by name':
@@ -1301,6 +1323,12 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('G1', WANTS_DATA.fixed.G1.text, { answers: rowPicks(result.buttons, 'rows') })
     case 'N2':
       return said('N2', WANTS_DATA.fixed.N2.text, { answers: rowPicks(WROWS.filter(r => r.group === result.group).map(r => r.id), 'rows') })
+    // talk-live: a reply the person's AI wrote (ai_writes): its words only, no source, nothing to pick
+    case 'written':
+      return said('written', result.text)
+    // talk-live: the Connectors line picked by the person's AI (ai_picks_line), as a row shows it
+    case 'CN1':
+      return said('CN1', WANTS_DATA.fixed.CN1.text, { source: sourceText(WANTS_DATA.fixed.CN1.sources) })
     case 'want': {
       const r = WANT_ROWS[result.row]
       return said(r.id, r.text, { source: sourceText(r.sources), next: wantNext(r.next, r.thing) })
@@ -1346,8 +1374,8 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('RM2', RM.RM2.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: RM.RM2.answers.map(a => ({ id: `rm-${a.gives}`, label: a.label, rm: a.gives === 'RM3' ? 'helper' : 'hermes' })) } })
     case 'A1': {
       const rows = keptRows(st.kept)
-      // helper-builder-qs-v1.md point 3: nothing kept, and this conversation already shows a "Kept:" or "From
-      // what I keep:" line (opts.keptShown, from the page): it was deleted. Else nothing was kept yet.
+      // live-v2 changes-2: nothing kept, and this conversation shows something was kept (opts.keptShown, from the
+      // page's keptWasShown): it was deleted. Else nothing was kept yet.
       if (!rows.length) return opts.keptShown ? said('A1-deleted', KEEPS.tell.see.see_line_deleted) : said('A1-none', KEEPS.tell.see.see_line_nothing)
       // with Helper's settings page: its button, and under the list the way there by hand
       const next = opts.settingsPage ? { kind: 'settings', label: KEEPS.after_settings_page_exists.button_under_see } : { kind: 'forget-all', label: ALL.label }

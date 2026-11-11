@@ -1,0 +1,1453 @@
+{
+ "made_by": "dev/checks/talk-live/dump_live.py: hhcontent's check_live.py (fix, run_checks) on hhtech's recorded replies, pinned copy team-root-c2b",
+ "check_live_summary": [
+  "      reply: A skill is written steps that teach Hermes to do one task.",
+  "      reply: A skill is a set of written steps that teaches Hermes one task.",
+  "      reply: A skill is written instructions that teach Hermes how to do one task.",
+  "      reply: A skill is a set of written steps that teach Hermes one task.",
+  "      reply: A skill is like a recipe book that teaches you exactly how to cook a specific dish step by step. It's a collection of written instructions designed to help you perform one task.",
+  "free way c   written 17 | good 16, wrongly flagged 0 | not good  1, caught 0",
+  "free way b   written 17 | good 17, wrongly flagged 1 | not good  0, caught 0",
+  "2b way c     written 17 | good  5, wrongly flagged 2 | not good 12, caught 7",
+  "data problems: 0"
+ ],
+ "cases": [
+  {
+   "key": "free|c|1",
+   "message": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    },
+    {
+     "id": "WHERE",
+     "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|2",
+   "message": "hey",
+   "raw": "Hi! What would you like to know about Hermes? USED: none",
+   "rows": [],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hi. What would you like to know about Hermes?",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|3",
+   "message": "he",
+   "raw": "Hi! What would you like to know about Hermes?\nUSED: none",
+   "rows": [],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hi. What would you like to know about Hermes?",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|4",
+   "message": "thanks",
+   "raw": "You’re welcome! Feel free to ask a question about Hermes.\nUSED: none",
+   "rows": [
+    {
+     "id": "mem0",
+     "text": "Memory is short notes Hermes keeps about you and your work."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "You're welcome. Feel free to ask a question about Hermes.",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|5",
+   "message": "what do you mean?",
+   "raw": "A skill is written steps that teach Hermes to do one task.\nUSED: [skill]",
+   "rows": [
+    {
+     "id": "skill",
+     "text": "A skill is a set of written steps that teach Hermes one task."
+    }
+   ],
+   "used": [
+    "skill"
+   ],
+   "word": null,
+   "reply": "A skill is written steps that teach Hermes to do one task.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|6",
+   "message": "ok and then?",
+   "raw": "In Hermes, open Messaging and press Create with QR. I haven’t checked what comes after that.\n\nUSED: [msg1]",
+   "rows": [
+    {
+     "id": "msg1",
+     "text": "Telegram has a quick setup. In the app, open Messaging and press Create with QR."
+    },
+    {
+     "id": "msg0",
+     "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack."
+    }
+   ],
+   "used": [
+    "msg1"
+   ],
+   "word": null,
+   "reply": "In Hermes, open Messaging and press Create with QR. I haven't checked what comes after that.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|7",
+   "message": "hi there, I'm new to all this",
+   "raw": "Hi! Feel free to ask a question about Hermes.\nUSED: none",
+   "rows": [],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hi. Feel free to ask a question about Hermes.",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|8",
+   "message": "sorry I don't get it",
+   "raw": "I mean Hermes needs an AI to do the thinking so it can answer you. That AI is called a model.  \nUSED: mod0",
+   "rows": [
+    {
+     "id": "mod0",
+     "text": "A model is the AI that does the thinking. Hermes needs one to answer."
+    }
+   ],
+   "used": [
+    "mod0"
+   ],
+   "word": null,
+   "reply": "I mean Hermes needs an AI to do the thinking so it can answer you. That AI is called a model.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|9",
+   "message": "ok cool",
+   "raw": "Glad that helps! Any questions about Hermes?\nUSED: none",
+   "rows": [
+    {
+     "id": "sch2",
+     "text": "Hermes can remind you once, or again and again. Just ask it in plain words."
+    },
+    {
+     "id": "sch0",
+     "text": "Hermes can do jobs on a schedule, such as a summary every morning."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Glad that helps. Any questions about Hermes?",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|10",
+   "message": "what even is a skill?",
+   "raw": "A skill is a set of written steps that teaches Hermes one task.\nUSED: skill",
+   "rows": [
+    {
+     "id": "skill",
+     "text": "A skill is a set of written steps that teach Hermes one task."
+    }
+   ],
+   "used": [
+    "skill"
+   ],
+   "word": null,
+   "reply": "A skill is a set of written steps that teaches Hermes one task.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|11",
+   "message": "can I talk to my hermes from my phone?",
+   "raw": "You can chat with Hermes through apps like Telegram, WhatsApp, or Slack.\nUSED: [msg0]",
+   "rows": [
+    {
+     "id": "msg0",
+     "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack."
+    }
+   ],
+   "used": [
+    "msg0"
+   ],
+   "word": null,
+   "reply": "You can chat with Hermes through apps like Telegram, WhatsApp, or Slack.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|12",
+   "message": "do I need to pay for chatgpt to use this",
+   "raw": "Hermes itself is free, but the AI it uses can cost money, depending on which one you choose. You can sign in with a ChatGPT plan, but the docs don’t say which plans work.\nUSED: COST, mod1",
+   "rows": [
+    {
+     "id": "mod1",
+     "text": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work."
+    },
+    {
+     "id": "mod0",
+     "text": "A model is the AI that does the thinking. Hermes needs one to answer."
+    },
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    }
+   ],
+   "used": [
+    "COST",
+    "mod1"
+   ],
+   "word": null,
+   "reply": "Hermes itself is free, but the AI it uses can cost money, depending on which one you choose. You can sign in with a ChatGPT plan, but the docs don't say which plans work.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|13",
+   "message": "does it remember what I told it yesterday",
+   "raw": "Hermes saves every chat and can search old chats when you ask. USED: mem2",
+   "rows": [
+    {
+     "id": "mem0",
+     "text": "Memory is short notes Hermes keeps about you and your work."
+    },
+    {
+     "id": "mem2",
+     "text": "Hermes saves every chat. It can search your old chats when you ask."
+    }
+   ],
+   "used": [
+    "mem2"
+   ],
+   "word": null,
+   "reply": "Hermes saves every chat and can search old chats when you ask.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|14",
+   "message": "can it do something every morning for me automatically",
+   "raw": "Yes. Hermes can do a job automatically every morning; ask once in plain words, such as for a summary every morning.\nUSED: sch0, sch1",
+   "rows": [
+    {
+     "id": "sch0",
+     "text": "Hermes can do jobs on a schedule, such as a summary every morning."
+    },
+    {
+     "id": "sch1",
+     "text": "Hermes can repeat a job every day or week. Ask it once, in plain words."
+    }
+   ],
+   "used": [
+    "sch0",
+    "sch1"
+   ],
+   "word": null,
+   "reply": "Yes. Hermes can do a job automatically every morning, ask once in plain words, such as for a summary every morning.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|15",
+   "message": "can I have two different hermes bots, one for work and one for home",
+   "raw": "Yes. Each bot is a separate Hermes with its own settings and notes, so you can have one for work and one for home.\nUSED: bot0, mem4",
+   "rows": [
+    {
+     "id": "bot1",
+     "text": "That fits a second bot. Each bot is a separate Hermes with its own settings and notes."
+    },
+    {
+     "id": "bot0",
+     "text": "Each bot is a separate Hermes with its own settings and notes."
+    },
+    {
+     "id": "mem4",
+     "text": "Each bot keeps its own notes. For separate notes, use a separate bot."
+    },
+    {
+     "id": "bot2",
+     "text": "Each bot is a separate Hermes. They can hand work to each other with @ and a name."
+    }
+   ],
+   "used": [
+    "bot0",
+    "mem4"
+   ],
+   "word": null,
+   "reply": "Yes. Each bot is a separate Hermes with its own settings and notes, so you can have one for work and one for home.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|16",
+   "message": "what's the best AI model to pick if I'm a total beginner",
+   "raw": "I haven’t checked which model is best for beginners. A model is the AI that does the thinking, and Hermes needs one to answer.\nUSED: mod0",
+   "rows": [
+    {
+     "id": "mod0",
+     "text": "A model is the AI that does the thinking. Hermes needs one to answer."
+    }
+   ],
+   "used": [
+    "mod0"
+   ],
+   "word": null,
+   "reply": "I haven't checked which model is best for beginners. A model is the AI that does the thinking, and Hermes needs one to answer.",
+   "flags": [],
+   "judge": "T"
+  },
+  {
+   "key": "free|c|17",
+   "message": "can it read my gmail",
+   "raw": "Hermes can connect to Gmail through its Connectors page, but I haven’t checked whether it can read your messages.  \nUSED: CN1",
+   "rows": [
+    {
+     "id": "svc1",
+     "text": "Hermes has a list of ready-made links to services. Ask your own Hermes to add yours."
+    },
+    {
+     "id": "CN1",
+     "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. Click \"Capabilities\", then the \"Connectors\" tab."
+    },
+    {
+     "id": "svc0",
+     "text": "MCP links Hermes to a service you already use, such as GitHub."
+    },
+    {
+     "id": "sch5",
+     "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words."
+    }
+   ],
+   "used": [
+    "CN1"
+   ],
+   "word": null,
+   "reply": "Hermes can connect to Gmail through its Connectors page, but I haven't checked whether it can read your messages.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|18",
+   "message": "can hermes look things up on the internet",
+   "raw": "Yes. Hermes can search the web and read web pages.\nUSED: w_web",
+   "rows": [
+    {
+     "id": "w_web",
+     "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_stocks",
+     "text": "There is an optional skill, \"stocks\". You add it first. Its written steps teach Hermes to look up stock and crypto prices."
+    },
+    {
+     "id": "w_browser",
+     "text": "Hermes can open a website, click, type and fill in forms. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_xpost",
+     "text": "Hermes comes with a skill called \"xurl\". Its written steps teach Hermes to search and post on X."
+    },
+    {
+     "id": "w_reddit",
+     "text": "There is an optional skill, \"reddit-reading\". You add it first. Its written steps teach Hermes to read and search Reddit."
+    }
+   ],
+   "used": [
+    "w_web"
+   ],
+   "word": null,
+   "reply": "Yes. Hermes can search the web and read web pages.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|c|19",
+   "message": "how do I run hermes on a raspberry pi",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    },
+    {
+     "id": "WHERE",
+     "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|20",
+   "message": "what's the weather in Riga tomorrow",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "sch2",
+     "text": "Hermes can remind you once, or again and again. Just ask it in plain words."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|21",
+   "message": "how do I update hermes to the newest version",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "sch1",
+     "text": "Hermes can repeat a job every day or week. Ask it once, in plain words."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|c|22",
+   "message": "how do I export all my chats to a pdf",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "w_docs",
+     "text": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty."
+    },
+    {
+     "id": "w_pdf",
+     "text": "Hermes comes with a skill called \"pdf\". Its written steps teach Hermes to make, merge, fill in and edit PDF files."
+    },
+    {
+     "id": "w_office",
+     "text": "Hermes comes with a skill called \"microsoft-office\". Its written steps teach Hermes to make and edit Word, PowerPoint and Excel files."
+    },
+    {
+     "id": "w_notes",
+     "text": "Hermes comes with a skill called \"obsidian\". Its written steps teach Hermes to read, search and edit your Obsidian notes."
+    },
+    {
+     "id": "w_meeting",
+     "text": "Hermes comes with a skill called \"meeting-action-items\". Its written steps teach Hermes to turn meeting notes into decisions and tasks."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|1",
+   "message": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    },
+    {
+     "id": "WHERE",
+     "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|2",
+   "message": "hey",
+   "raw": "Hi! What would you like to know about Hermes?\nUSED: none",
+   "rows": [],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hi. What would you like to know about Hermes?",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|3",
+   "message": "he",
+   "raw": "Hi! What would you like to know about Hermes?\nUSED: none",
+   "rows": [],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hi. What would you like to know about Hermes?",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|4",
+   "message": "thanks",
+   "raw": "You’re welcome! Ask me if you have a question about Hermes.\nUSED: none",
+   "rows": [
+    {
+     "id": "mem0",
+     "text": "Memory is short notes Hermes keeps about you and your work."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "You're welcome. Ask me if you have a question about Hermes.",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|5",
+   "message": "what do you mean?",
+   "raw": "A skill is written instructions that teach Hermes how to do one task.\nUSED: [skill]",
+   "rows": [
+    {
+     "id": "skill",
+     "text": "A skill is a set of written steps that teach Hermes one task."
+    }
+   ],
+   "used": [
+    "skill"
+   ],
+   "word": null,
+   "reply": "A skill is written instructions that teach Hermes how to do one task.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|6",
+   "message": "ok and then?",
+   "raw": "In Hermes, open Messaging and press Create with QR for Telegram’s quick setup.\nUSED: msg1",
+   "rows": [
+    {
+     "id": "msg1",
+     "text": "Telegram has a quick setup. In the app, open Messaging and press Create with QR."
+    },
+    {
+     "id": "msg0",
+     "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack."
+    }
+   ],
+   "used": [
+    "msg1"
+   ],
+   "word": null,
+   "reply": "In Hermes, open Messaging and press Create with QR for Telegram's quick setup.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|7",
+   "message": "hi there, I'm new to all this",
+   "raw": "Hi there! What would you like to know about Hermes?\nUSED: none",
+   "rows": [],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hi there. What would you like to know about Hermes?",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|8",
+   "message": "sorry I don't get it",
+   "raw": "Sorry—by “model,” I mean the AI that does the thinking. Hermes needs one to answer.\nUSED: mod0",
+   "rows": [
+    {
+     "id": "mod0",
+     "text": "A model is the AI that does the thinking. Hermes needs one to answer."
+    }
+   ],
+   "used": [
+    "mod0"
+   ],
+   "word": null,
+   "reply": "Sorry, by \"model,\" I mean the AI that does the thinking. Hermes needs one to answer.",
+   "flags": [
+    "c9 quoted model,"
+   ],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|9",
+   "message": "ok cool",
+   "raw": "Glad that helps! Ask me anything about Hermes.\nUSED: none",
+   "rows": [
+    {
+     "id": "sch2",
+     "text": "Hermes can remind you once, or again and again. Just ask it in plain words."
+    },
+    {
+     "id": "sch0",
+     "text": "Hermes can do jobs on a schedule, such as a summary every morning."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Glad that helps. Ask me anything about Hermes.",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|10",
+   "message": "what even is a skill?",
+   "raw": "A skill is a set of written steps that teach Hermes one task.\nUSED: [skill]",
+   "rows": [
+    {
+     "id": "skill",
+     "text": "A skill is a set of written steps that teach Hermes one task."
+    },
+    {
+     "id": "tool",
+     "text": "Tools are actions Hermes can take, like searching the web or editing files."
+    },
+    {
+     "id": "plugin",
+     "text": "A plugin is an add-on that gives Hermes a new feature."
+    },
+    {
+     "id": "mcp",
+     "text": "MCP links Hermes to a service you already use, such as GitHub."
+    },
+    {
+     "id": "soul",
+     "text": "SOUL.md is the file that says who your Hermes is."
+    }
+   ],
+   "used": [
+    "skill"
+   ],
+   "word": null,
+   "reply": "A skill is a set of written steps that teach Hermes one task.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|11",
+   "message": "can I talk to my hermes from my phone?",
+   "raw": "Yes, you can chat with Hermes from your phone using apps like Telegram, WhatsApp, or Slack. USED: msg0",
+   "rows": [
+    {
+     "id": "msg0",
+     "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack."
+    },
+    {
+     "id": "msg2",
+     "text": "Hermes works with that app. In the Hermes app, open Messaging to set it up."
+    },
+    {
+     "id": "msg1",
+     "text": "Telegram has a quick setup. In the app, open Messaging and press Create with QR."
+    },
+    {
+     "id": "msg3",
+     "text": "It answers only while its computer is on. For answers at any time, that computer must stay on."
+    }
+   ],
+   "used": [
+    "msg0"
+   ],
+   "word": null,
+   "reply": "Yes, you can chat with Hermes from your phone using apps like Telegram, WhatsApp, or Slack.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|12",
+   "message": "do I need to pay for chatgpt to use this",
+   "raw": "Hermes itself is free, but the AI it uses can cost money depending on which one you choose. USED: COST",
+   "rows": [
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    },
+    {
+     "id": "WHERE",
+     "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on."
+    }
+   ],
+   "used": [
+    "COST"
+   ],
+   "word": null,
+   "reply": "Hermes itself is free, but the AI it uses can cost money depending on which one you choose.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|13",
+   "message": "does it remember what I told it yesterday",
+   "raw": "Hermes saves every chat and can search old chats when you ask.  \nUSED: mem2",
+   "rows": [
+    {
+     "id": "mem0",
+     "text": "Memory is short notes Hermes keeps about you and your work."
+    },
+    {
+     "id": "mem2",
+     "text": "Hermes saves every chat. It can search your old chats when you ask."
+    },
+    {
+     "id": "mem3",
+     "text": "New notes show up in the next chat, not this one. Start a new chat and ask again."
+    },
+    {
+     "id": "mem1",
+     "text": "Hermes does that by itself. It keeps short notes about you and reads them in each new chat."
+    },
+    {
+     "id": "mem4",
+     "text": "Each bot keeps its own notes. For separate notes, use a separate bot."
+    }
+   ],
+   "used": [
+    "mem2"
+   ],
+   "word": null,
+   "reply": "Hermes saves every chat and can search old chats when you ask.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|14",
+   "message": "can it do something every morning for me automatically",
+   "raw": "Yes—Hermes can do a job every morning; just ask once in plain words. It runs only while Hermes is running on a computer that’s on.  \nUSED: sch0, sch1, sch4",
+   "rows": [
+    {
+     "id": "sch0",
+     "text": "Hermes can do jobs on a schedule, such as a summary every morning."
+    },
+    {
+     "id": "sch1",
+     "text": "Hermes can repeat a job every day or week. Ask it once, in plain words."
+    },
+    {
+     "id": "sch3",
+     "text": "Hermes can check something on a schedule and tell you what it found."
+    },
+    {
+     "id": "sch2",
+     "text": "Hermes can remind you once, or again and again. Just ask it in plain words."
+    },
+    {
+     "id": "sch4",
+     "text": "Jobs run only while Hermes is running on a computer that is on."
+    }
+   ],
+   "used": [
+    "sch0",
+    "sch1",
+    "sch4"
+   ],
+   "word": null,
+   "reply": "Yes, Hermes can do a job every morning, just ask once in plain words. It runs only while Hermes is running on a computer that's on.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|15",
+   "message": "can I have two different hermes bots, one for work and one for home",
+   "raw": "Yes. Each bot is a separate Hermes with its own settings and notes, so you can have one for work and one for home.\nUSED: bot0",
+   "rows": [
+    {
+     "id": "bot1",
+     "text": "That fits a second bot. Each bot is a separate Hermes with its own settings and notes."
+    },
+    {
+     "id": "bot0",
+     "text": "Each bot is a separate Hermes with its own settings and notes."
+    },
+    {
+     "id": "bot2",
+     "text": "Each bot is a separate Hermes. They can hand work to each other with @ and a name."
+    },
+    {
+     "id": "bot3",
+     "text": "You may not need a second, separate Hermes. One Hermes can hold many chats at once."
+    }
+   ],
+   "used": [
+    "bot0"
+   ],
+   "word": null,
+   "reply": "Yes. Each bot is a separate Hermes with its own settings and notes, so you can have one for work and one for home.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|16",
+   "message": "what's the best AI model to pick if I'm a total beginner",
+   "raw": "I haven’t checked which specific AI model is best for a beginner. The quickest start is a paid Nous plan, which gives you many AIs to choose from.  \nUSED: mod4",
+   "rows": [
+    {
+     "id": "mod0",
+     "text": "A model is the AI that does the thinking. Hermes needs one to answer."
+    },
+    {
+     "id": "mod1",
+     "text": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work."
+    },
+    {
+     "id": "mod2",
+     "text": "A Claude Max plan works only with extra paid credits. Claude Pro does not work."
+    },
+    {
+     "id": "mod3",
+     "text": "Hermes can run an AI on your own computer. No account, and nothing leaves your computer."
+    },
+    {
+     "id": "mod4",
+     "text": "The quickest start is a paid Nous plan. One sign-in gives you many AIs to choose from."
+    }
+   ],
+   "used": [
+    "mod4"
+   ],
+   "word": null,
+   "reply": "I haven't checked which specific AI model is best for a beginner. The quickest start is a paid Nous plan, which gives you many AIs to choose from.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|17",
+   "message": "can it read my gmail",
+   "raw": "Hermes can link Gmail through its Connectors page, but the checked information doesn’t say whether it can read your messages. USED: CN1",
+   "rows": [
+    {
+     "id": "svc1",
+     "text": "Hermes has a list of ready-made links to services. Ask your own Hermes to add yours."
+    },
+    {
+     "id": "CN1",
+     "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. Click \"Capabilities\", then the \"Connectors\" tab."
+    },
+    {
+     "id": "svc0",
+     "text": "MCP links Hermes to a service you already use, such as GitHub."
+    },
+    {
+     "id": "svc2",
+     "text": "Nothing is linked until you add it. You can also limit what Hermes may use there."
+    }
+   ],
+   "used": [
+    "CN1"
+   ],
+   "word": null,
+   "reply": "Hermes can link Gmail through its Connectors page, but the checked information doesn't say whether it can read your messages.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|18",
+   "message": "can hermes look things up on the internet",
+   "raw": "Yes. Hermes can search the web and read web pages.\nUSED: w_web",
+   "rows": [
+    {
+     "id": "w_web",
+     "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_stocks",
+     "text": "There is an optional skill, \"stocks\". You add it first. Its written steps teach Hermes to look up stock and crypto prices."
+    },
+    {
+     "id": "w_browser",
+     "text": "Hermes can open a website, click, type and fill in forms. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_xpost",
+     "text": "Hermes comes with a skill called \"xurl\". Its written steps teach Hermes to search and post on X."
+    },
+    {
+     "id": "w_reddit",
+     "text": "There is an optional skill, \"reddit-reading\". You add it first. Its written steps teach Hermes to read and search Reddit."
+    }
+   ],
+   "used": [
+    "w_web"
+   ],
+   "word": null,
+   "reply": "Yes. Hermes can search the web and read web pages.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "free|b|19",
+   "message": "how do I run hermes on a raspberry pi",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    },
+    {
+     "id": "WHERE",
+     "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|20",
+   "message": "what's the weather in Riga tomorrow",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "w_web",
+     "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_browser",
+     "text": "Hermes can open a website, click, type and fill in forms. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_xpost",
+     "text": "Hermes comes with a skill called \"xurl\". Its written steps teach Hermes to search and post on X."
+    },
+    {
+     "id": "w_reddit",
+     "text": "There is an optional skill, \"reddit-reading\". You add it first. Its written steps teach Hermes to read and search Reddit."
+    },
+    {
+     "id": "w_papers",
+     "text": "Hermes comes with a skill called \"arxiv\". Its written steps teach Hermes to search research papers on arXiv."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "free|b|22",
+   "message": "how do I export all my chats to a pdf",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "w_docs",
+     "text": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty."
+    },
+    {
+     "id": "w_pdf",
+     "text": "Hermes comes with a skill called \"pdf\". Its written steps teach Hermes to make, merge, fill in and edit PDF files."
+    },
+    {
+     "id": "w_office",
+     "text": "Hermes comes with a skill called \"microsoft-office\". Its written steps teach Hermes to make and edit Word, PowerPoint and Excel files."
+    },
+    {
+     "id": "w_notes",
+     "text": "Hermes comes with a skill called \"obsidian\". Its written steps teach Hermes to read, search and edit your Obsidian notes."
+    },
+    {
+     "id": "w_meeting",
+     "text": "Hermes comes with a skill called \"meeting-action-items\". Its written steps teach Hermes to turn meeting notes into decisions and tasks."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "R"
+  },
+  {
+   "key": "2b|c|1",
+   "message": "How can I make it so I use less usage? Whenever I ask a question it doesn't take as many tokens",
+   "raw": "You can't change how many tokens are used per question; tokens are fixed by the AI. However, you can choose a cheaper AI model to reduce costs. USED: COST",
+   "rows": [
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    },
+    {
+     "id": "WHERE",
+     "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on."
+    }
+   ],
+   "used": [
+    "COST"
+   ],
+   "word": null,
+   "reply": "You can't change how many tokens are used per question, tokens are fixed by the AI. However, you can choose a cheaper AI model to reduce costs.",
+   "flags": [
+    "c14 no-claim cannot",
+    "c19 money costs",
+    "c19 money cheaper",
+    "c22 term unexplained \\btokens?\\b"
+   ],
+   "judge": "X"
+  },
+  {
+   "key": "2b|c|4",
+   "message": "thanks",
+   "raw": "Thanks! How about you? What's on your mind?\n\nUSED: none",
+   "rows": [
+    {
+     "id": "mem0",
+     "text": "Memory is short notes Hermes keeps about you and your work."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Thanks. How about you? What's on your mind?",
+   "flags": [
+    "c5 sentences 3",
+    "c6 two ?"
+   ],
+   "judge": "F"
+  },
+  {
+   "key": "2b|c|5",
+   "message": "what do you mean?",
+   "raw": "I am not checking that yet. I have not checked what comes next. USED: none.",
+   "rows": [
+    {
+     "id": "skill",
+     "text": "A skill is a set of written steps that teach Hermes one task."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "I am not checking that yet. I have not checked what comes next.",
+   "flags": [
+    "c14 no-claim not"
+   ],
+   "judge": "T"
+  },
+  {
+   "key": "2b|c|6",
+   "message": "ok and then?",
+   "raw": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "rows": [
+    {
+     "id": "msg1",
+     "text": "Telegram has a quick setup. In the app, open Messaging and press Create with QR."
+    },
+    {
+     "id": "msg0",
+     "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack."
+    }
+   ],
+   "used": null,
+   "word": null,
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "flags": [],
+   "judge": "T"
+  },
+  {
+   "key": "2b|c|7",
+   "message": "hi there, I'm new to all this",
+   "raw": "Hello! Welcome to Hermes. I'm here to help you learn about it. What would you like to know? USED: none.",
+   "rows": [
+    {
+     "id": "plugin",
+     "text": "A plugin is an add-on that gives Hermes a new feature."
+    },
+    {
+     "id": "tool",
+     "text": "Tools are actions Hermes can take, like searching the web or editing files."
+    },
+    {
+     "id": "skill",
+     "text": "A skill is a set of written steps that teach Hermes one task."
+    },
+    {
+     "id": "mcp",
+     "text": "MCP links Hermes to a service you already use, such as GitHub."
+    },
+    {
+     "id": "soul",
+     "text": "SOUL.md is the file that says who your Hermes is."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hello. Welcome to Hermes. I'm here to help you learn about it. What would you like to know?",
+   "flags": [
+    "c5 sentences 4"
+   ],
+   "judge": "F"
+  },
+  {
+   "key": "2b|c|9",
+   "message": "ok cool",
+   "raw": "That's great to hear! You can also ask Hermes to remind you once or again and again. What else are you curious about?",
+   "rows": [
+    {
+     "id": "sch2",
+     "text": "Hermes can remind you once, or again and again. Just ask it in plain words."
+    },
+    {
+     "id": "sch0",
+     "text": "Hermes can do jobs on a schedule, such as a summary every morning."
+    }
+   ],
+   "used": null,
+   "word": null,
+   "reply": "That's great to hear. You can also ask Hermes to remind you once or again and again. What else are you curious about?",
+   "flags": [
+    "c5 sentences 3"
+   ],
+   "judge": "F"
+  },
+  {
+   "key": "2b|c|10",
+   "message": "what even is a skill?",
+   "raw": "A skill is like a recipe book that teaches you exactly how to cook a specific dish step by step. It's a collection of written instructions designed to help you perform one task. USED: skill",
+   "rows": [
+    {
+     "id": "skill",
+     "text": "A skill is a set of written steps that teach Hermes one task."
+    }
+   ],
+   "used": [
+    "skill"
+   ],
+   "word": null,
+   "reply": "A skill is like a recipe book that teaches you exactly how to cook a specific dish step by step. It's a collection of written instructions designed to help you perform one task.",
+   "flags": [],
+   "judge": "X"
+  },
+  {
+   "key": "2b|c|11",
+   "message": "can I talk to my hermes from my phone?",
+   "raw": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack. USED: msg0",
+   "rows": [
+    {
+     "id": "msg0",
+     "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack."
+    }
+   ],
+   "used": [
+    "msg0"
+   ],
+   "word": null,
+   "reply": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "2b|c|12",
+   "message": "do I need to pay for chatgpt to use this",
+   "raw": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.\n\nUSED: [mod1]",
+   "rows": [
+    {
+     "id": "mod1",
+     "text": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work."
+    },
+    {
+     "id": "mod0",
+     "text": "A model is the AI that does the thinking. Hermes needs one to answer."
+    },
+    {
+     "id": "COST",
+     "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose."
+    }
+   ],
+   "used": [
+    "mod1"
+   ],
+   "word": null,
+   "reply": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.",
+   "flags": [],
+   "judge": "T"
+  },
+  {
+   "key": "2b|c|13",
+   "message": "does it remember what I told it yesterday",
+   "raw": "Hermes saves every chat, so it can search your old chats when you ask. USED: [mem2]",
+   "rows": [
+    {
+     "id": "mem0",
+     "text": "Memory is short notes Hermes keeps about you and your work."
+    },
+    {
+     "id": "mem2",
+     "text": "Hermes saves every chat. It can search your old chats when you ask."
+    }
+   ],
+   "used": [
+    "mem2"
+   ],
+   "word": null,
+   "reply": "Hermes saves every chat, so it can search your old chats when you ask.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "2b|c|14",
+   "message": "can it do something every morning for me automatically",
+   "raw": "Hermes can do jobs on a schedule, such as a summary every morning. It can repeat a job every day or week. USED: [sch0], [sch1]",
+   "rows": [
+    {
+     "id": "sch0",
+     "text": "Hermes can do jobs on a schedule, such as a summary every morning."
+    },
+    {
+     "id": "sch1",
+     "text": "Hermes can repeat a job every day or week. Ask it once, in plain words."
+    }
+   ],
+   "used": [
+    "sch0",
+    "sch1"
+   ],
+   "word": null,
+   "reply": "Hermes can do jobs on a schedule, such as a summary every morning. It can repeat a job every day or week.",
+   "flags": [],
+   "judge": "G"
+  },
+  {
+   "key": "2b|c|15",
+   "message": "can I have two different hermes bots, one for work and one for home",
+   "raw": "You can use two separate Hermes bots for work and home. Each bot has its own settings and notes. You can also hand work to each other using @ and a name. USED: [bot1], [bot0], [mem4], [bot2]",
+   "rows": [
+    {
+     "id": "bot1",
+     "text": "That fits a second bot. Each bot is a separate Hermes with its own settings and notes."
+    },
+    {
+     "id": "bot0",
+     "text": "Each bot is a separate Hermes with its own settings and notes."
+    },
+    {
+     "id": "mem4",
+     "text": "Each bot keeps its own notes. For separate notes, use a separate bot."
+    },
+    {
+     "id": "bot2",
+     "text": "Each bot is a separate Hermes. They can hand work to each other with @ and a name."
+    }
+   ],
+   "used": [
+    "bot1",
+    "bot0",
+    "mem4",
+    "bot2"
+   ],
+   "word": null,
+   "reply": "You can use two separate Hermes bots for work and home. Each bot has its own settings and notes. You can also hand work to each other using @ and a name.",
+   "flags": [
+    "c5 sentences 3"
+   ],
+   "judge": "F"
+  },
+  {
+   "key": "2b|c|16",
+   "message": "what's the best AI model to pick if I'm a total beginner",
+   "raw": "NONE",
+   "rows": [
+    {
+     "id": "mod0",
+     "text": "A model is the AI that does the thinking. Hermes needs one to answer."
+    }
+   ],
+   "used": null,
+   "word": "NONE",
+   "reply": "NONE",
+   "flags": [],
+   "judge": "DK"
+  },
+  {
+   "key": "2b|c|17",
+   "message": "can it read my gmail",
+   "raw": "Hermes can read your Gmail messages through its \"Connectors\" page, which links apps like Gmail. You can ask Hermes to add your Gmail account to this list. USED: [CN1]",
+   "rows": [
+    {
+     "id": "svc1",
+     "text": "Hermes has a list of ready-made links to services. Ask your own Hermes to add yours."
+    },
+    {
+     "id": "CN1",
+     "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. Click \"Capabilities\", then the \"Connectors\" tab."
+    },
+    {
+     "id": "svc0",
+     "text": "MCP links Hermes to a service you already use, such as GitHub."
+    },
+    {
+     "id": "sch5",
+     "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words."
+    }
+   ],
+   "used": [
+    "CN1"
+   ],
+   "word": null,
+   "reply": "Hermes can read your Gmail messages through its \"Connectors\" page, which links apps like Gmail. You can ask Hermes to add your Gmail account to this list.",
+   "flags": [],
+   "judge": "X"
+  },
+  {
+   "key": "2b|c|18",
+   "message": "can hermes look things up on the internet",
+   "raw": "Hermes can search the web and read web pages using its built-in tool. You can also add the \"stocks\" skill to look up stock prices. USED: [w_web]",
+   "rows": [
+    {
+     "id": "w_web",
+     "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_stocks",
+     "text": "There is an optional skill, \"stocks\". You add it first. Its written steps teach Hermes to look up stock and crypto prices."
+    },
+    {
+     "id": "w_browser",
+     "text": "Hermes can open a website, click, type and fill in forms. That is a built-in tool, an action it can take."
+    },
+    {
+     "id": "w_xpost",
+     "text": "Hermes comes with a skill called \"xurl\". Its written steps teach Hermes to search and post on X."
+    },
+    {
+     "id": "w_reddit",
+     "text": "There is an optional skill, \"reddit-reading\". You add it first. Its written steps teach Hermes to read and search Reddit."
+    }
+   ],
+   "used": [
+    "w_web"
+   ],
+   "word": null,
+   "reply": "Hermes can search the web and read web pages using its built-in tool. You can also add the \"stocks\" skill to look up stock prices.",
+   "flags": [
+    "c22 term unexplained \\bskills?\\b",
+    "c22 term unexplained \\btools?\\b"
+   ],
+   "judge": "G"
+  },
+  {
+   "key": "2b|c|20",
+   "message": "what's the weather in Riga tomorrow",
+   "raw": "I cannot check the weather for Riga tomorrow. USED: none.",
+   "rows": [
+    {
+     "id": "sch2",
+     "text": "Hermes can remind you once, or again and again. Just ask it in plain words."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "I cannot check the weather for Riga tomorrow.",
+   "flags": [
+    "c12 name Riga",
+    "c14 no-claim cannot"
+   ],
+   "judge": "R"
+  },
+  {
+   "key": "2b|c|21",
+   "message": "how do I update hermes to the newest version",
+   "raw": "You can update Hermes by asking it to do so. USED: [sch1]",
+   "rows": [
+    {
+     "id": "sch1",
+     "text": "Hermes can repeat a job every day or week. Ask it once, in plain words."
+    }
+   ],
+   "used": [
+    "sch1"
+   ],
+   "word": null,
+   "reply": "You can update Hermes by asking it to do so.",
+   "flags": [],
+   "judge": "X"
+  },
+  {
+   "key": "2b|c|22",
+   "message": "how do I export all my chats to a pdf",
+   "raw": "Hermes does not have a built-in skill to export chats to PDF. The available skills are for reading Word, Excel, PDF, Obsidian notes, and meeting tasks, but none handle chat data. USED: none",
+   "rows": [
+    {
+     "id": "w_docs",
+     "text": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty."
+    },
+    {
+     "id": "w_pdf",
+     "text": "Hermes comes with a skill called \"pdf\". Its written steps teach Hermes to make, merge, fill in and edit PDF files."
+    },
+    {
+     "id": "w_office",
+     "text": "Hermes comes with a skill called \"microsoft-office\". Its written steps teach Hermes to make and edit Word, PowerPoint and Excel files."
+    },
+    {
+     "id": "w_notes",
+     "text": "Hermes comes with a skill called \"obsidian\". Its written steps teach Hermes to read, search and edit your Obsidian notes."
+    },
+    {
+     "id": "w_meeting",
+     "text": "Hermes comes with a skill called \"meeting-action-items\". Its written steps teach Hermes to turn meeting notes into decisions and tasks."
+    }
+   ],
+   "used": [
+    "none"
+   ],
+   "word": null,
+   "reply": "Hermes does not have a built-in skill to export chats to PDF. The available skills are for reading Word, Excel, PDF, Obsidian notes, and meeting tasks, but none handle chat data.",
+   "flags": [
+    "c14 no-claim no_have",
+    "c21 talk with a fact word",
+    "c22 term unexplained \\bskills?\\b"
+   ],
+   "judge": "X"
+  }
+ ]
+}

@@ -265,10 +265,11 @@ export function skillLineProblems(W) {
   return out
 }
 
-// What src/talk.js reads. Each skill carries left_out from the skills list (the five marked left
-// out get N1b, as before); a skill's own words are shown only in the box "From the Hermes docs".
+// What src/talk.js reads. changes-19: no skill is left out any more (N1b is gone); a skill's own
+// words are shown only in the box "From the Hermes docs".
 export function slimWantsData(W, skillsList) {
-  const left = new Set(((skillsList && skillsList.skills) || []).filter(s => s.left_out).map(s => s.name))
+  const left = ((skillsList && skillsList.skills) || []).filter(s => s.left_out).map(s => s.name)
+  if (left.length) throw new Error(`skills-list-v1.json marks ${left.join(', ')} as left out; Helper answers every skill (changes-19)`)
   const fixed = Object.fromEntries(
     W.fixed_lines
       .filter(f => ['N2', 'G1', 'S1', 'S2', 'box-head', 'CN1', 'CN2'].includes(f.id))
@@ -293,6 +294,6 @@ export function slimWantsData(W, skillsList) {
       skill_for_pattern: wf1.skill_for_pattern || null,
       skill_for_not_after: wf1.skill_for_not_after || []
     },
-    skills: W.skills.map(s => ({ ...pickKeys(s, ['name', 'kind', 'say', 'docs_words', 'page', 'line']), ...(left.has(s.name) ? { left_out: true } : {}) }))
+    skills: W.skills.map(s => ({ ...pickKeys(s, ['name', 'kind', 'say', 'docs_words', 'page', 'line']) }))
   }
 }

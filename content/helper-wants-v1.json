@@ -3010,7 +3010,7 @@
    "add_id": "official/mlops/obliteratus",
    "add_id_certain": true,
    "passes_r_rules": false,
-   "say": "remove the safety refusals built into open AIs."
+   "say": "remove an AI's refusals, so it stops saying no to requests."
   },
   {
    "name": "peft",
@@ -3442,7 +3442,7 @@
    "add_id": "official/research/scrapling",
    "add_id_certain": true,
    "passes_r_rules": true,
-   "say": "copy data from websites, also ones that try to block robots."
+   "say": "copy data from websites while staying hidden, and get past their robot blocks."
   },
   {
    "name": "1password",
@@ -3514,7 +3514,7 @@
    "add_id": "official/security/web-pentest",
    "add_id_certain": true,
    "passes_r_rules": true,
-   "say": "attack a website you are allowed to test, to find its security holes."
+   "say": "attack a website you have permission to test, and report its security holes."
   },
   {
    "name": "openhue",

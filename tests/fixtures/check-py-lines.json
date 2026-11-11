@@ -1,6 +1,6 @@
 {
  "about": "Written by dev/checks/talk-v1/dump_check.py: what hhcontent's check.py finds wrong with each line. Do not edit: make it again.",
- "check_py_sha256": "73aabccdeb8f7540e3699ef377ccfb74cf0366c5541f38dcf01f06beab146623",
+ "check_py_sha256": "0eb598430d47d77857013a8017f57cffacbf69bc16d5e5aa478a77909790afac",
  "lines": [
   {
    "id": "OPEN",
@@ -62,13 +62,6 @@
    "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use.",
    "kind": "reply",
    "words": 16,
-   "found": []
-  },
-  {
-   "id": "N1b",
-   "text": "Sorry, I leave that one out for now. It is not meant for getting started.",
-   "kind": "reply",
-   "words": 15,
    "found": []
   },
   {
@@ -233,6 +226,20 @@
    "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs.",
    "kind": "reply",
    "words": 22,
+   "found": []
+  },
+  {
+   "id": "AI_PICK",
+   "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits.",
+   "kind": "reply",
+   "words": 21,
+   "found": []
+  },
+  {
+   "id": "AI_WRITES",
+   "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong.",
+   "kind": "reply",
+   "words": 24,
    "found": []
   },
   {
@@ -1195,7 +1202,7 @@
    "kind": "reply",
    "words": 6,
    "found": [
-    "term not explained: mcp"
+    "term not explained: MCP"
    ]
   },
   {

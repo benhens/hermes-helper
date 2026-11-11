@@ -178,8 +178,8 @@ test('the order of steps: a skill by name before the topics; a row takes svc off
   assert.deepEqual([turn('is there a github skill', freshVisit()).kind, turn('is there a github skill', freshVisit()).skill], ['skill', 'github'])
   // a hand-written row for that skill wins
   assert.deepEqual(['want', 'w_pdf'], (o => [o.kind, o.row])(turn('what does the pdf skill do', freshVisit())))
-  // a left-out skill stays left out, by the wants' pattern too
-  assert.equal(turn('is there a godmode skill', freshVisit()).kind, 'N1b')
+  // changes-19: no skill is left out any more; godmode gets its skill line, by the wants' pattern too
+  assert.deepEqual((o => [o.kind, o.skill])(turn('is there a godmode skill', freshVisit())), ['skill', 'godmode'])
   // ordinary words that are skill names, with no article before "skill": nothing named
   for (const t of ['my sketch skills are terrible', 'I have no canvas skills', 'can it read a map']) assert.notEqual(turn(t, freshVisit()).kind, 'skill', t)
   // fix 2: youtube is w_youtube's own word, so the row wins over the service topic; dropbox is not,
@@ -237,10 +237,7 @@ test('S1 and S2 for every skill on the two pages: Helper\'s fixed line with the 
   for (const s of WANTS_DATA.skills) {
     const st = freshVisit()
     const o = turn(`is there a skill called "${s.name}"`, st)
-    if (s.left_out) {
-      assert.equal(o.kind, 'N1b', s.name)
-      continue
-    }
+    assert.equal(s.left_out, undefined, s.name) // changes-19: all 186 answered
     const row = WANTS_DATA.rows.find(r => r.thing === s.name)
     if (row) {
       assert.deepEqual([o.kind, o.row], ['want', row.id], s.name)
@@ -260,10 +257,10 @@ test('S1 and S2 for every skill on the two pages: Helper\'s fixed line with the 
       assert.equal(said.next, null)
     }
   }
-  // 186 skills: 5 left out, 15 with a row of their own (changes-16 added w_meme for meme-generation), the rest by S1 or S2
+  // 186 skills (changes-19: none left out), 15 with a row of their own (changes-16 added w_meme for meme-generation), the rest by S1 or S2
   const withRow = WANTS_DATA.rows.filter(r => WANTS_DATA.skills.some(s => s.name === r.thing)).length
   assert.equal(withRow, 15)
-  assert.equal(s1 + s2, 186 - 5 - withRow)
+  assert.equal(s1 + s2, 186 - withRow)
   assert.ok(s1 > 25 && s2 > 120, `${s1} built in, ${s2} optional`)
   // skill lines v1 section 3: 174 of 186 skills have a plain line, 12 keep the fixed sentence
   assert.deepEqual([WANTS_DATA.skills.filter(s => s.say != null).length, WANTS_DATA.skills.filter(s => s.say == null).length], [174, 12])
@@ -341,7 +338,7 @@ test('nothing Helper says for the wants shows an unfilled {slot}: every row, eve
   const words = said => [said.text, ...(said.answers ? said.answers.items.map(a => a.label) : []), ...(said.next ? [said.next.label, said.next.text, ...(said.next.steps || []), said.next.after] : [])].filter(Boolean)
   const all = []
   for (const r of WANTS_DATA.rows) { const st = freshVisit(); all.push(...words(lineFor(pickWant(r.id, st), st))) }
-  for (const s of WANTS_DATA.skills.filter(x => !x.left_out)) { const st = freshVisit(); all.push(...words(lineFor(turn(`is there a ${s.name} skill`, st), st))) }
+  for (const s of WANTS_DATA.skills) { const st = freshVisit(); all.push(...words(lineFor(turn(`is there a ${s.name} skill`, st), st))) }
   for (const g of WANTS_DATA.groups) { const st = freshVisit(); all.push(...words(lineFor(pickGroup(g.id, st), st)), ...words(lineFor({ kind: 'N2', group: g.id }, st))) }
   { const st = freshVisit(); all.push(...words(lineFor(pickTopic('wants', st), st))) }
   assert.ok(all.length > 1000, `${all.length} texts`)

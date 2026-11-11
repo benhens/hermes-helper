@@ -224,6 +224,8 @@ export const T = {
   where: 'hh-where',
   dots: 'hh-dots',
   dotOn: 'hh-on',
+  dotsWait: 'hh-wait',
+  dotsStill: 'hh-still',
   // under the bubble: the piece between bubble and character, the character, the answers to pick
   under: 'hh-under',
   linkCell: 'hh-linkcell',

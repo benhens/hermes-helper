@@ -33,9 +33,6 @@ export const TALK_DATA = {
     "N1a": {
       "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use."
     },
-    "N1b": {
-      "text": "Sorry, I leave that one out for now. It is not meant for getting started."
-    },
     "N_HINT": {
       "text": "To see what I can help with, type \"what can I ask you\"."
     },
@@ -114,6 +111,12 @@ export const TALK_DATA = {
     },
     "AI": {
       "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs."
+    },
+    "AI_PICK": {
+      "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits."
+    },
+    "AI_WRITES": {
+      "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong."
     },
     "BYE": {
       "text": "Bye. Come back any time you have a question about Hermes."
@@ -981,7 +984,6 @@ export const TALK_DATA = {
       "WHERE",
       "N1",
       "N1a",
-      "N1b",
       "N1_AGAIN",
       "H1",
       "skill by name",
@@ -1003,6 +1005,22 @@ export const TALK_DATA = {
       "buddy",
       "x"
     ],
+    "how_after_rows": {
+      "words": [
+        "how",
+        "and",
+        "and then"
+      ],
+      "after": [
+        "row",
+        "plain",
+        "term",
+        "wants",
+        "COST",
+        "WHERE",
+        "written"
+      ]
+    },
     "ai_line": "AI"
   },
   "no_repeat": {
@@ -1042,7 +1060,6 @@ export const TALK_DATA = {
       "dont_know": [
         "N1",
         "N1a",
-        "N1b",
         "N1_AGAIN"
       ]
     },
@@ -4296,8 +4313,7 @@ export const TALK_DATA = {
       "name": "nemo-curator"
     },
     {
-      "name": "obliteratus",
-      "left_out": true
+      "name": "obliteratus"
     },
     {
       "name": "peft"
@@ -4405,29 +4421,25 @@ export const TALK_DATA = {
       "name": "rss-feeds"
     },
     {
-      "name": "scrapling",
-      "left_out": true
+      "name": "scrapling"
     },
     {
       "name": "1password"
     },
     {
-      "name": "godmode",
-      "left_out": true
+      "name": "godmode"
     },
     {
       "name": "oss-forensics"
     },
     {
-      "name": "sherlock",
-      "left_out": true
+      "name": "sherlock"
     },
     {
       "name": "unbroker"
     },
     {
-      "name": "web-pentest",
-      "left_out": true
+      "name": "web-pentest"
     },
     {
       "name": "openhue"

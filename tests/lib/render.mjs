@@ -5,6 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { H } from '../fakes/react.mjs'
+import { aiModeSource } from './mode-loader.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..')
 const FAKES = path.join(ROOT, 'tests', 'fakes')
@@ -16,7 +17,9 @@ export async function loadPlugin(change = null) {
   const reactUrl = pathToFileURL(path.join(FAKES, 'react.mjs')).href
   const sdkUrl = pathToFileURL(path.join(FAKES, 'sdk.mjs')).href
   const built = fs.readFileSync(path.join(ROOT, 'desktop', 'plugin.js'), 'utf8')
-  const src = (change ? change(built) : built)
+  // talk-live: HELPER_AI_MODE (scripts/test-modes.mjs) sets the switch in the copy that is loaded
+  const moded = process.env.HELPER_AI_MODE ? aiModeSource(built, process.env.HELPER_AI_MODE) : built
+  const src = (change ? change(moded) : moded)
     .replace("from '@hermes/plugin-sdk'", `from '${sdkUrl}'`)
     .replace("from 'react/jsx-runtime'", `from '${reactUrl}'`)
     .replace("from 'react'", `from '${reactUrl}'`)
@@ -39,17 +42,35 @@ export function fakeStorage(initial = {}) {
 // passes at once. A long one (the 30 s read limits) waits until the test calls timers.fireLong().
 // setInterval never fires by itself: timers.tick() fires every live interval once.
 // Every delay is recorded in timers.delays.
-export function fakeTimers() {
+// talk-live: hold: delays that also wait, until timers.fire(ms) (the AI step's 12 s).
+export function fakeTimers({ hold = [] } = {}) {
   const delays = []
   const intervals = new Set()
   const long = new Set()
+  const held = new Set()
   return {
     delays,
     intervals,
     long,
+    held,
+    fire(ms) {
+      for (const e of [...held]) {
+        if (e.ms !== ms) continue
+        held.delete(e)
+        e.run()
+      }
+    },
     setTimeout(fn, ms) {
       delays.push(ms)
       let live = true
+      if (hold.includes(ms)) {
+        const entry = { ms, run: () => live && fn() }
+        held.add(entry)
+        return () => {
+          live = false
+          held.delete(entry)
+        }
+      }
       if (ms >= 30000) {
         const entry = () => live && fn()
         long.add(entry)

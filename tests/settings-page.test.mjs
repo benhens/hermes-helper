@@ -11,6 +11,7 @@ import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, byDa
 import { TALK_DATA } from '../src/talk-data.js'
 import { renderKept } from '../src/settings-file.js'
 import { curlyQuotes } from '../src/quotes.js'
+import { AI_MODE } from '../src/ai-mode.js'
 
 const SF = TALK_DATA.keeps.settings_file
 
@@ -57,6 +58,8 @@ test('the page: hhcontent\'s top line, the box drawn from the stored record with
   const row = all(view.tree, n => n.type === 'sdk:ListRow')[0]
   assert.equal(row.props.title, SF.top_line)
   assert.equal(row.props.wide, true)
+  // talk-live: a second top line only in a build with an AI step (lines_by_mode.settings_top_line_2)
+  assert.equal(row.props.description, AI_MODE === 'no_ai_step' ? undefined : 'Nothing on this page is sent to any AI.')
   assert.equal(box(view).type, 'sdk:Textarea')
   assert.equal(box(view).props.value, renderKept(PETER))
   assert.match(box(view).props.value, /^Name: Peter \(Helper greets you with it\)$/m)

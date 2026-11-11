@@ -2458,11 +2458,10 @@ export const WANTS_DATA = {
     {
       "name": "obliteratus",
       "kind": "optional",
-      "say": "remove the safety refusals built into open AIs.",
+      "say": "remove an AI's refusals, so it stops saying no to requests.",
       "docs_words": "OBLITERATUS: abliterate LLM refusals (diff-in-means).",
       "page": "reference/optional-skills-catalog.md",
-      "line": 180,
-      "left_out": true
+      "line": 180
     },
     {
       "name": "peft",
@@ -2747,11 +2746,10 @@ export const WANTS_DATA = {
     {
       "name": "scrapling",
       "kind": "optional",
-      "say": "copy data from websites, also ones that try to block robots.",
+      "say": "copy data from websites while staying hidden, and get past their robot blocks.",
       "docs_words": "Scrape sites with stealth browsing and Cloudflare bypass.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 231,
-      "left_out": true
+      "line": 231
     },
     {
       "name": "1password",
@@ -2767,8 +2765,7 @@ export const WANTS_DATA = {
       "say": "get around the safety rules of AIs.",
       "docs_words": "Jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 238,
-      "left_out": true
+      "line": 238
     },
     {
       "name": "oss-forensics",
@@ -2784,8 +2781,7 @@ export const WANTS_DATA = {
       "say": "find which websites have an account with a given username.",
       "docs_words": "Find accounts for a username across 400+ platforms.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 240,
-      "left_out": true
+      "line": 240
     },
     {
       "name": "unbroker",
@@ -2798,11 +2794,10 @@ export const WANTS_DATA = {
     {
       "name": "web-pentest",
       "kind": "optional",
-      "say": "attack a website you are allowed to test, to find its security holes.",
+      "say": "attack a website you have permission to test, and report its security holes.",
       "docs_words": "Authorized web pentest: recon, proof-based exploits, report.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 242,
-      "left_out": true
+      "line": 242
     },
     {
       "name": "openhue",

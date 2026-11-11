@@ -10,26 +10,21 @@
 // checkLine is hhcontent's check.py (dev/checks/hhcontent-talk-v2), ported;
 // tests/talk-data.test.mjs compares the two on every line and on lines broken on purpose.
 
+import fs from 'node:fs'
+import path from 'node:path'
+
 const MAX_WORDS = 25
 const MAX_Q_WORDS = 12
 const MAX_SENT = 14
 const MAX_SENTS = 3
 const MAX_LETTERS = 12
-// term -> words one of which must be in the same line
-const GLOSS = [
-  [/\bmodels?\b/i, /\bAIs?\b/i],
-  [/\bmemory\b/i, /\bnotes?\b|\bremembers?\b/i],
-  [/\bskills?\b/i, /\bsteps\b|\bteach/i],
-  [/\btools?\b/i, /\bactions?\b/i],
-  [/\bplugins?\b/i, /\badd-on/i],
-  [/\bMCP\b/, /\bservices?\b/i],
-  [/\bbots?\b/i, /separate Hermes|\b(?:its|their) own\b/i],
-  [/\bkeys?\b/i, /\bsecret\b/i],
-  [/\bsubscriptions?\b/i, /\bplan\b/i],
-  [/SOUL\.md/i, /\bfile\b/i],
-  // changes-14 (check.py): token is a term now, explained in the line that uses it (it was banned)
-  [/\btokens?\b/i, /pieces of words|word pieces/i]
-]
+// term -> words one of which must be in the same line. talk-live (live-v2 changes-1): the list is data
+// now, content/helper-talk-live-v2.json checks.gloss.list, read by check.py (R5) and check_live.py (c22)
+// alike. ignore_case false: the term counts only as written (MCP); explained_by in any case. The 11
+// patterns are plain enough to mean the same in JavaScript (tests/talk-data.test.mjs runs check.py's own
+// findings against these on every line).
+export const GLOSS_LIST = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'content', 'helper-talk-live-v2.json'), 'utf8')).checks.gloss.list
+const GLOSS = GLOSS_LIST.map(g => [new RegExp(g.term, g.ignore_case ? 'i' : ''), new RegExp(g.explained_by, 'i')])
 const BANNED = /\b(?:profiles?|providers?|gateways?|toolsets?|cron|sessions?|agents?|API|config\w*|yaml|CLI|terminal|command line|OAuth|LLMs?|servers?|VPS|context|prompts?|webhooks?|endpoints?|backend|daemon|runtime)\b/i
 const PRODUCT = /\b(?:course|tutor|teacher|academy|chatbot|assistant|wizard|guide|lesson|quiz)\b/i
 const PROMISE = /\bI(?:'ll| will| can)?\s+(?:set up|install|connect|build|create)\b/i
@@ -59,7 +54,7 @@ export function checkLine(line, kind = 'reply') {
   const banned = bare.match(BANNED)
   if (banned) found.push('banned term ' + banned[0])
   const used = GLOSS.filter(([term]) => term.test(bare))
-  for (const [term, plain] of used) if (!plain.test(bare)) found.push('term not explained: ' + bare.match(new RegExp(term.source, 'i'))[0])
+  for (const [term, plain] of used) if (!plain.test(bare)) found.push('term not explained: ' + bare.match(term)[0])
   if (used.length > 1) found.push(`${used.length} Hermes terms in one line`)
   if (PRODUCT.test(bare)) found.push('product word')
   if (PROMISE.test(bare)) found.push('promises to do it')
@@ -71,8 +66,10 @@ const NEXT_KINDS = ['part', 'paste', 'line', 'none']
 // W2 (skill and plugin compared), NAME_AGAIN and NAME_NEW (a name typed on a later visit).
 // builder-qs (changes-14 to 16): BACK (a later visit), the ordinary-talk lines, the "are you an AI" line of this
 // build with no AI step (AI; the lines for builds that call a model stay out), WRONG, AGAIN and N1_AGAIN (no_repeat), H2.
-export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'H2', 'K1', 'COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW',
-  'BACK', 'HELLO', 'HELLO_SAME', 'THANKS', 'OK', 'HOW', 'WHO', 'AI', 'BYE', 'CUT', 'MEAN_NONE', 'WRONG', 'AGAIN', 'N1_AGAIN']
+// the kinds small_talk.how_after_rows.after may name (src/talk.js HOW_AFTER maps wants to want)
+const HOW_AFTER_KINDS = ['row', 'plain', 'term', 'wants', 'COST', 'WHERE', 'written']
+export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'H2', 'K1', 'COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW',
+  'BACK', 'HELLO', 'HELLO_SAME', 'THANKS', 'OK', 'HOW', 'WHO', 'AI', 'AI_PICK', 'AI_WRITES', 'BYE', 'CUT', 'MEAN_NONE', 'WRONG', 'AGAIN', 'N1_AGAIN']
 // changes-11 (check_json.py): W2 compares the two terms the person typed, so for W2 alone the
 // two-terms rule is lifted; each term must still be explained in the line.
 const LIFTED = { W2: ['2 Hermes terms in one line'] }
@@ -261,9 +258,13 @@ export function talkProblems(d) {
   const st = d.small_talk || {}
   for (const k of ['hello', 'thanks', 'ok', 'how', 'who', 'ai', 'bye', 'mean', 'wrong']) if (!((st.kinds || {})[k] || []).length) problems.push(`small_talk.kinds.${k} is empty`)
   for (const k of ['cut_question_words', 'cut_dangling', 'cut_small_words', 'no_words', 'no_means_wrong_after', 'thanks_tail']) if (!(st[k] || []).length) problems.push(`small_talk.${k} is empty`)
+  // live-v2 changes-1: how_after_rows (src/talk.js reads words and after; the data's "wants" is the plugin's want)
+  const har = st.how_after_rows || {}
+  if (!(har.words || []).length) problems.push('small_talk.how_after_rows.words is empty')
+  for (const k of har.after || []) if (!HOW_AFTER_KINDS.includes(k)) problems.push(`small_talk.how_after_rows.after names a kind the plugin does not have: ${k}`)
+  if (!(har.after || []).length) problems.push('small_talk.how_after_rows.after is empty')
   const ab = st.ai_line_by_build || {}
   if (!(ab.use_now in ab) || !(d.fixed_lines || []).some(f => f.id === ab[ab.use_now])) problems.push(`small_talk.ai_line_by_build.use_now names no line: ${ab.use_now}`)
-  if (ab.use_now !== 'no_ai_step') problems.push(`small_talk.ai_line_by_build.use_now is ${ab.use_now}: this build has no AI step`)
   const nr = d.no_repeat || {}
   for (const k of ['exempt', 'wrong_starts', 'wrong_anywhere']) if (!(nr[k] || []).length) problems.push(`no_repeat.${k} is empty`)
   // two lines that are not 'plain' (a line with no topic has no plain one), so noRepeat in src/talk.js always has another
@@ -359,7 +360,7 @@ function slimKeeps(K) {
   }
 }
 
-// skills: content/skills-list-v1.json (the official skills), for the don't-know lines N1a and N1b.
+// skills: content/skills-list-v1.json (the official skills), for the don't-know line N1a (changes-19: none left out).
 export function slimTalkData(d, skills = { skills: [] }) {
   const fixed = {}
   for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source']), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
@@ -384,7 +385,7 @@ export function slimTalkData(d, skills = { skills: [] }) {
     // changes-14 (ordinary talk, with changes-15 and -17), changes-15 (never the same line twice), changes-16/17 (a word that needs a second word)
     // small_talk.ai_line: the one line this build says to "are you an AI" (ai_line_by_build[use_now]; the build
     // stops unless use_now is the no-AI one), so neither the other builds' lines nor the note go public
-    small_talk: { ...pickKeys(d.small_talk, ['cut_end_words', 'cut_start_words', 'kinds', 'cut_question_words', 'cut_dangling', 'cut_small_words', 'no_words', 'no_means_wrong_after', 'thanks_tail']), ai_line: d.small_talk.ai_line_by_build[d.small_talk.ai_line_by_build.use_now] },
+    small_talk: { ...pickKeys(d.small_talk, ['cut_end_words', 'cut_start_words', 'kinds', 'cut_question_words', 'cut_dangling', 'cut_small_words', 'no_words', 'no_means_wrong_after', 'thanks_tail']), how_after_rows: pickKeys(d.small_talk.how_after_rows, ['words', 'after']), ai_line: d.small_talk.ai_line_by_build[d.small_talk.ai_line_by_build.use_now] },
     no_repeat: { ...pickKeys(d.no_repeat, ['exempt', 'groups', 'in_place', 'wrong_starts', 'wrong_anywhere']), asked_again: d.no_repeat.asked_again.words },
     lonely_words: Object.fromEntries(Object.entries(d.lonely_words.words).map(([w, r]) => [w, pickKeys(r, ['needs_one_of', 'not_with'])])),
     ignore_phrases: d.ignore_phrases,
@@ -418,6 +419,6 @@ export function slimTalkData(d, skills = { skills: [] }) {
       bots: { where_line: pickKeys(d.parts.bots.where_line, ['id', 'text', 'source']) }
     },
     keeps: slimKeeps(d.keeps),
-    skills: (skills.skills || []).map(s => (s.left_out ? { name: s.name, left_out: true } : { name: s.name }))
+    skills: (skills.skills || []).map(s => ({ name: s.name }))
   }
 }

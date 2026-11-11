@@ -24,8 +24,10 @@ import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { laterVisit, turn, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
+import { liveWhyNot, askLive, liveApply, LIVE_SECONDS } from './live-turn.js'
+import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
 import { makeSetupCards, renderYourSetup } from './setup-tab.js'
 import { layoutFor, clampHelperWidth, RAIL_PX, RAIL_NUMBERS_PX, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
@@ -151,6 +153,47 @@ export function makePage(ctx, opts = {}) {
     return { id, key: `h${id}`, who: 'helper', opened: false, ...said }
   }
   const youEntry = text => ({ id: memory.nextId++, who: 'you', text })
+
+  /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
+  // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
+  // time), how many of Helper's calls Hermes still works on (also after the page stopped waiting for one: no new
+  // call starts until it is 0, so at most one Helper call is ever in Hermes), the model status the page checked
+  // last, and the mounted page's setters (null while the page is off screen: a turn that ends then still adds its
+  // line to the conversation kept in memory).
+  const live = { n: 0, waiting: null, inHermes: 0, status: { state: 'checking' }, view: null }
+  // The values a line sent to the AI must not hold (input.never_sent, name_check): the kept name and this
+  // visit's name, the kept answers in Helper's words and as stored, and what the person asked Helper to keep.
+  const keptValues = () => {
+    const v = memory.visit
+    const out = [v.name, v.kept.name]
+    for (const [k, x] of Object.entries(v.kept)) {
+      if (k === 'told' || k === 'name') continue
+      if (k === 'asked') out.push(...(Array.isArray(x) ? x : []))
+      else if (typeof x === 'string') out.push(x, keptWords(k, x))
+    }
+    return out.filter(s => typeof s === 'string' && s.trim())
+  }
+  // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
+  const liveFinish = (w, final) => {
+    if (live.waiting !== w) return
+    live.waiting = null
+    w.stopTimer()
+    w.endBusy()
+    const result = final || w.out
+    const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
+    writeKept()
+    const entry = { ...helperEntry(said), send: w.sendHelper }
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
+    if (live.view) {
+      live.view.setLog(memory.log)
+      live.view.setFocusAsk(true)
+    }
+  }
+  // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
+  // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
+  const liveClose = () => {
+    if (live.waiting) liveFinish(live.waiting, null)
+  }
   // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
   const openDocs = url => {
     if (!isDocsUrl(url)) return
@@ -241,6 +284,18 @@ export function makePage(ctx, opts = {}) {
     const [size, measureRef] = useOwnSize()
     const width = size.width
     const [modelStatus, recheck] = useModelStatus()
+    // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
+    live.status = modelStatus
+    // (review) the page drawn last holds the view; a page that leaves lets go only of its own
+    const mineView = useRef(null)
+    mineView.current = { setLog, setFocusAsk }
+    live.view = mineView.current
+    useEffect(
+      () => () => {
+        if (live.view === mineView.current) live.view = null
+      },
+      []
+    )
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
     // The conversation's scrolling area: kept at the bottom, where the newest words are.
@@ -388,29 +443,65 @@ export function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     function answer(result, shown, typed = '') {
       if (!result) return
-      // helper-builder-qs-v1.md point 3: the conversation already shows a "Kept:" or "From what I keep:" line
-      const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
-      const said = lineFor(result, visit, typed, { settingsPage, keptShown })
+      // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
+      const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
-      addToLog([shown ? youEntry(shown) : null, helperEntry(said)].filter(Boolean))
+      // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
+      const may = sendable(result)
+      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }].filter(Boolean))
       setFocusAsk(true)
     }
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
     // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
-    // Nothing is sent anywhere: there is no AI step (tests/talk-window.test.mjs, "no AI step").
+    // talk-live: with an AI step (src/ai-mode.js), a message code is not sure of may go to the person's AI
+    // (src/live-turn.js liveWhyNot says when not); then the message shows at once, Helper's bubble is the three
+    // dots until the AI's line or, at the latest after 12 s, the no-AI line comes. With no_ai_step nothing is sent.
     function send() {
       const typed = draft
       if (!typed.trim()) return
       setDraft('')
-      const result = turn(typed, visit)
+      liveClose()
+      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null }
+      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper')
+      const lines = lastLines(memory.log, keptValues())
+      const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
       // pick that answers it. A message
       // with a key in it never gets that line, so a key is never kept here.
       memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
-      answer(result, result.kind === 'K1' ? null : shown, typed)
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes })
+      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
+      // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
+      const message = pre.name_taken ? nameWithMore(typed)[1] : typed
+      const may = sendable(result)
+      writeKept()
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {} }
+      live.waiting = w
+      addToLog([{ ...youEntry(shown), send: may.you }])
+      const started = Date.now()
+      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
+      // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
+      const request = (method, params, timeout) => {
+        live.inHermes++
+        let p
+        try {
+          p = Promise.resolve(host.request(method, params, timeout))
+        } catch (err) {
+          p = Promise.reject(err)
+        }
+        return p.finally(() => {
+          live.inHermes--
+        })
+      }
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w })
+        .then(got => {
+          if (live.waiting !== w) return
+          liveFinish(w, liveApply(visit, got, result, before, typed))
+        })
+        .catch(() => liveFinish(w, null))
     }
 
     // Something picked in the message box: it becomes the person's message, and Helper answers at
@@ -424,6 +515,7 @@ export function makePage(ctx, opts = {}) {
         setFocusPick(true)
         return setLog(old => (memory.log = old.map((e, i) => (i === old.length - 1 && e.answers ? { ...e, answers: { ...e.answers, items } } : e))))
       }
+      liveClose()
       let result
       if (item.answer) result = pick(item.answer[0], item.answer[1], visit)
       else if (item.which) result = press(item.which, memory.typed, visit)
@@ -449,6 +541,7 @@ export function makePage(ctx, opts = {}) {
       const next = entry.next
       if (!next) return
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
+      if (next.kind === 'line' || next.kind === 'forget-all') liveClose()
       if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)
@@ -458,14 +551,19 @@ export function makePage(ctx, opts = {}) {
     // The links in the faint lines: "See what I keep" opens Helper's settings page (or, where that
     // page cannot open, shows the list in the conversation); "Change" asks the question again.
     function pressNote(entry, which) {
-      if (which === 'change' && entry.used) return answer(change(entry.used.topic, visit), entry.used.link)
+      if (which === 'change' && entry.used) {
+        liveClose()
+        return answer(change(entry.used.topic, visit), entry.used.link)
+      }
       if (which !== 'see' || !entry.note) return
       if (settingsPage) return go(settingsHref)
+      liveClose()
       answer(seeKept(visit), entry.note.link)
     }
 
     // Skip, at "What's your name?" and "What do you do?".
     function skipOpening() {
+      liveClose()
       answer(skip(visit), 'Skip')
     }
 
@@ -965,7 +1063,7 @@ export function makePage(ctx, opts = {}) {
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
             jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
-            inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { lit: 0 }, 'bubble'),
+            inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer
           ]

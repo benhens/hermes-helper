@@ -423,9 +423,6 @@ const TALK_DATA = {
     "N1a": {
       "text": "Sorry, I don't have that information. It is not on the official Hermes lists I use."
     },
-    "N1b": {
-      "text": "Sorry, I leave that one out for now. It is not meant for getting started."
-    },
     "N_HINT": {
       "text": "To see what I can help with, type \"what can I ask you\"."
     },
@@ -504,6 +501,12 @@ const TALK_DATA = {
     },
     "AI": {
       "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs."
+    },
+    "AI_PICK": {
+      "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits."
+    },
+    "AI_WRITES": {
+      "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong."
     },
     "BYE": {
       "text": "Bye. Come back any time you have a question about Hermes."
@@ -1371,7 +1374,6 @@ const TALK_DATA = {
       "WHERE",
       "N1",
       "N1a",
-      "N1b",
       "N1_AGAIN",
       "H1",
       "skill by name",
@@ -1393,6 +1395,22 @@ const TALK_DATA = {
       "buddy",
       "x"
     ],
+    "how_after_rows": {
+      "words": [
+        "how",
+        "and",
+        "and then"
+      ],
+      "after": [
+        "row",
+        "plain",
+        "term",
+        "wants",
+        "COST",
+        "WHERE",
+        "written"
+      ]
+    },
     "ai_line": "AI"
   },
   "no_repeat": {
@@ -1432,7 +1450,6 @@ const TALK_DATA = {
       "dont_know": [
         "N1",
         "N1a",
-        "N1b",
         "N1_AGAIN"
       ]
     },
@@ -4686,8 +4703,7 @@ const TALK_DATA = {
       "name": "nemo-curator"
     },
     {
-      "name": "obliteratus",
-      "left_out": true
+      "name": "obliteratus"
     },
     {
       "name": "peft"
@@ -4795,29 +4811,25 @@ const TALK_DATA = {
       "name": "rss-feeds"
     },
     {
-      "name": "scrapling",
-      "left_out": true
+      "name": "scrapling"
     },
     {
       "name": "1password"
     },
     {
-      "name": "godmode",
-      "left_out": true
+      "name": "godmode"
     },
     {
       "name": "oss-forensics"
     },
     {
-      "name": "sherlock",
-      "left_out": true
+      "name": "sherlock"
     },
     {
       "name": "unbroker"
     },
     {
-      "name": "web-pentest",
-      "left_out": true
+      "name": "web-pentest"
     },
     {
       "name": "openhue"
@@ -7337,11 +7349,10 @@ const WANTS_DATA = {
     {
       "name": "obliteratus",
       "kind": "optional",
-      "say": "remove the safety refusals built into open AIs.",
+      "say": "remove an AI's refusals, so it stops saying no to requests.",
       "docs_words": "OBLITERATUS: abliterate LLM refusals (diff-in-means).",
       "page": "reference/optional-skills-catalog.md",
-      "line": 180,
-      "left_out": true
+      "line": 180
     },
     {
       "name": "peft",
@@ -7626,11 +7637,10 @@ const WANTS_DATA = {
     {
       "name": "scrapling",
       "kind": "optional",
-      "say": "copy data from websites, also ones that try to block robots.",
+      "say": "copy data from websites while staying hidden, and get past their robot blocks.",
       "docs_words": "Scrape sites with stealth browsing and Cloudflare bypass.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 231,
-      "left_out": true
+      "line": 231
     },
     {
       "name": "1password",
@@ -7646,8 +7656,7 @@ const WANTS_DATA = {
       "say": "get around the safety rules of AIs.",
       "docs_words": "Jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 238,
-      "left_out": true
+      "line": 238
     },
     {
       "name": "oss-forensics",
@@ -7663,8 +7672,7 @@ const WANTS_DATA = {
       "say": "find which websites have an account with a given username.",
       "docs_words": "Find accounts for a username across 400+ platforms.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 240,
-      "left_out": true
+      "line": 240
     },
     {
       "name": "unbroker",
@@ -7677,11 +7685,10 @@ const WANTS_DATA = {
     {
       "name": "web-pentest",
       "kind": "optional",
-      "say": "attack a website you are allowed to test, to find its security holes.",
+      "say": "attack a website you have permission to test, and report its security holes.",
       "docs_words": "Authorized web pentest: recon, proof-based exploits, report.",
       "page": "reference/optional-skills-catalog.md",
-      "line": 242,
-      "left_out": true
+      "line": 242
     },
     {
       "name": "openhue",
@@ -7828,6 +7835,5400 @@ const WANTS_DATA = {
       "line": 285
     }
   ]
+}
+
+// ---- src/ai-mode.js ----
+// The one switch for Helper's AI step (talk-live row 1). Pēteris picks the way; until then the commit holds
+// no_ai_step, which is what Helper did before: no call is ever made.
+//   no_ai_step     Helper answers with its pre-written lines only. Nothing is sent to any AI.
+//   ai_picks_line  when code is not sure, the person's own AI picks which of Helper's checked lines to show
+//   ai_writes      when code is not sure, the person's own AI writes the reply from Helper's checked lines,
+//                  and fixed checks (src/live-checks.js) decide whether it is shown
+// It alone picks: whether a typed message can ever be sent, the "are you an AI" line, the first-time faint
+// line under the first "Kept:", the settings page's second top line, and (at build) README's lines by mode.
+// The build stops when the data's own switches (use_now) say otherwise (scripts/live-data.mjs).
+const AI_MODES = ['no_ai_step', 'ai_picks_line', 'ai_writes']
+const AI_MODE = 'no_ai_step'
+
+// ---- src/live-data.js ----
+// Generated by scripts/build.mjs from content/helper-talk-live-v2.json (hhcontent's data for Helper's AI step),
+// with the rows made from content/helper-talk-v2.json and content/helper-wants-v1.json. Edit the JSON, then build.
+const LIVE_DATA = {
+  "seconds": 12,
+  "code_answers": [
+    "K1",
+    "HELLO",
+    "HELLO_SAME",
+    "THANKS",
+    "OK",
+    "HOW",
+    "WHO",
+    "AI",
+    "AI_PICK",
+    "AI_WRITES",
+    "BYE",
+    "CUT",
+    "WRONG",
+    "RM1",
+    "RM2",
+    "RM3",
+    "RM4",
+    "RM5",
+    "RM6",
+    "TP",
+    "H1",
+    "F1",
+    "F2",
+    "F3",
+    "N1a",
+    "NAME_AGAIN",
+    "NAME_NEW",
+    "COST",
+    "WHERE",
+    "W1",
+    "W2",
+    "term",
+    "row",
+    "question",
+    "plain",
+    "skill",
+    "wants"
+  ],
+  "go_to_ai": [
+    "N1",
+    "N1_AGAIN",
+    "MEAN_NONE",
+    "AGAIN",
+    "plain with why \"what do you mean\""
+  ],
+  "follow_up": {
+    "phrases": [
+      "and then",
+      "then what",
+      "what then",
+      "what next",
+      "what's next",
+      "whats next",
+      "next",
+      "and next",
+      "what now",
+      "now what",
+      "then",
+      "how",
+      "how?",
+      "what do you mean",
+      "what does that mean",
+      "meaning",
+      "i don't get it",
+      "i dont get it",
+      "explain",
+      "explain that",
+      "tell me more",
+      "more",
+      "go on",
+      "and",
+      "like what",
+      "for example",
+      "such as"
+    ]
+  },
+  "rows": [
+    {
+      "id": "mem0",
+      "subject": "mem",
+      "title": "Memory",
+      "text": "Memory is short notes Hermes keeps about you and your work.",
+      "kw": [
+        "memory",
+        "memories",
+        "remember",
+        "remembers",
+        "remembering",
+        "forget",
+        "forgets",
+        "forgot",
+        "forgetting",
+        "talked about",
+        "we talked",
+        "told it",
+        "told hermes",
+        "losing track",
+        "lost track",
+        "recall",
+        "recalls",
+        "know who i am",
+        "knows who i am",
+        "who i am",
+        "know me",
+        "knows me",
+        "know about me",
+        "knows about me",
+        "learned about me",
+        "learn about me",
+        "learns about me",
+        "notes about me",
+        "keep in mind",
+        "keep track",
+        "repeat myself",
+        "tell it again",
+        "explain again",
+        "left off",
+        "what i said",
+        "what i told",
+        "chat history",
+        "old chats",
+        "past chats",
+        "earlier chats",
+        "previous chats",
+        "memorize",
+        "memorise",
+        "rember",
+        "remeber",
+        "rememeber",
+        "remmber",
+        "memmory",
+        "memorry",
+        "memroy",
+        "memeory"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "plain",
+        "topic": "mem"
+      }
+    },
+    {
+      "id": "mem1",
+      "subject": "mem",
+      "title": "Memory: things about me and how I like things",
+      "text": "Hermes does that by itself. It keeps short notes about you and reads them in each new chat.",
+      "kw": [
+        "about me",
+        "my name",
+        "i like",
+        "i prefer",
+        "how i",
+        "who i am",
+        "know me",
+        "knows me",
+        "my preferences",
+        "keep in mind"
+      ],
+      "weak": [
+        "memory",
+        "memories",
+        "remember",
+        "remembers",
+        "remembering",
+        "forget",
+        "forgets",
+        "forgot",
+        "forgetting",
+        "talked about",
+        "we talked",
+        "told it",
+        "told hermes",
+        "losing track",
+        "lost track",
+        "recall",
+        "recalls",
+        "know who i am",
+        "knows who i am",
+        "who i am",
+        "know me",
+        "knows me",
+        "know about me",
+        "knows about me",
+        "learned about me",
+        "learn about me",
+        "learns about me",
+        "notes about me",
+        "keep in mind",
+        "keep track",
+        "repeat myself",
+        "tell it again",
+        "explain again",
+        "left off",
+        "what i said",
+        "what i told",
+        "chat history",
+        "old chats",
+        "past chats",
+        "earlier chats",
+        "previous chats",
+        "memorize",
+        "memorise"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mem",
+        "need": "mem1"
+      }
+    },
+    {
+      "id": "mem2",
+      "subject": "mem",
+      "title": "Memory: what we talked about before",
+      "text": "Hermes saves every chat. It can search your old chats when you ask.",
+      "kw": [
+        "talked",
+        "said",
+        "last week",
+        "last time",
+        "yesterday",
+        "earlier",
+        "old chats",
+        "past chats",
+        "conversation",
+        "conversations",
+        "left off",
+        "chat history",
+        "previous chats",
+        "earlier chats",
+        "what i said"
+      ],
+      "weak": [
+        "memory",
+        "memories",
+        "remember",
+        "remembers",
+        "remembering",
+        "forget",
+        "forgets",
+        "forgot",
+        "forgetting",
+        "talked about",
+        "we talked",
+        "told it",
+        "told hermes",
+        "losing track",
+        "lost track",
+        "recall",
+        "recalls",
+        "know who i am",
+        "knows who i am",
+        "who i am",
+        "know me",
+        "knows me",
+        "know about me",
+        "knows about me",
+        "learned about me",
+        "learn about me",
+        "learns about me",
+        "notes about me",
+        "keep in mind",
+        "keep track",
+        "repeat myself",
+        "tell it again",
+        "explain again",
+        "left off",
+        "what i said",
+        "what i told",
+        "chat history",
+        "old chats",
+        "past chats",
+        "earlier chats",
+        "previous chats",
+        "memorize",
+        "memorise"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mem",
+        "need": "mem2"
+      }
+    },
+    {
+      "id": "mem3",
+      "subject": "mem",
+      "title": "Memory: it forgot what I told it",
+      "text": "New notes show up in the next chat, not this one. Start a new chat and ask again.",
+      "kw": [
+        "forgot",
+        "forgets",
+        "forgetting",
+        "does not remember",
+        "doesn't remember",
+        "doesnt remember",
+        "lost",
+        "losing track",
+        "lost track",
+        "keeps losing",
+        "not working",
+        "repeat myself",
+        "tell it again",
+        "explain again",
+        "every time"
+      ],
+      "weak": [
+        "memory",
+        "memories",
+        "remember",
+        "remembers",
+        "remembering",
+        "forget",
+        "forgets",
+        "forgot",
+        "forgetting",
+        "talked about",
+        "we talked",
+        "told it",
+        "told hermes",
+        "losing track",
+        "lost track",
+        "recall",
+        "recalls",
+        "know who i am",
+        "knows who i am",
+        "who i am",
+        "know me",
+        "knows me",
+        "know about me",
+        "knows about me",
+        "learned about me",
+        "learn about me",
+        "learns about me",
+        "notes about me",
+        "keep in mind",
+        "keep track",
+        "repeat myself",
+        "tell it again",
+        "explain again",
+        "left off",
+        "what i said",
+        "what i told",
+        "chat history",
+        "old chats",
+        "past chats",
+        "earlier chats",
+        "previous chats",
+        "memorize",
+        "memorise"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mem",
+        "need": "mem3"
+      }
+    },
+    {
+      "id": "mem4",
+      "subject": "mem",
+      "title": "Memory: keep two things apart",
+      "text": "Each bot keeps its own notes. For separate notes, use a separate bot.",
+      "kw": [
+        "separate",
+        "apart",
+        "private",
+        "work and",
+        "different"
+      ],
+      "weak": [
+        "memory",
+        "memories",
+        "remember",
+        "remembers",
+        "remembering",
+        "forget",
+        "forgets",
+        "forgot",
+        "forgetting",
+        "talked about",
+        "we talked",
+        "told it",
+        "told hermes",
+        "losing track",
+        "lost track",
+        "recall",
+        "recalls",
+        "know who i am",
+        "knows who i am",
+        "who i am",
+        "know me",
+        "knows me",
+        "know about me",
+        "knows about me",
+        "learned about me",
+        "learn about me",
+        "learns about me",
+        "notes about me",
+        "keep in mind",
+        "keep track",
+        "repeat myself",
+        "tell it again",
+        "explain again",
+        "left off",
+        "what i said",
+        "what i told",
+        "chat history",
+        "old chats",
+        "past chats",
+        "earlier chats",
+        "previous chats",
+        "memorize",
+        "memorise"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mem",
+        "need": "mem4"
+      }
+    },
+    {
+      "id": "mod0",
+      "subject": "mod",
+      "title": "Choosing a model",
+      "text": "A model is the AI that does the thinking. Hermes needs one to answer.",
+      "kw": [
+        "model",
+        "models",
+        "chatgpt",
+        "claude",
+        "gpt",
+        "openai",
+        "gemini",
+        "which ai",
+        "what ai",
+        "best ai",
+        "free one",
+        "free model",
+        "free ai",
+        "for free",
+        "llm",
+        "llms",
+        "ai model",
+        "ai models",
+        "language model",
+        "anthropic",
+        "ollama",
+        "deepseek",
+        "grok",
+        "mistral",
+        "llama",
+        "local ai",
+        "smartest",
+        "modle",
+        "modell",
+        "chat gpt",
+        "chatgtp"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "plain",
+        "topic": "mod"
+      }
+    },
+    {
+      "id": "mod1",
+      "subject": "mod",
+      "title": "Choosing a model: has ChatGPT",
+      "text": "You can sign in to Hermes with your ChatGPT plan. The docs do not say which plans work.",
+      "kw": [
+        "chatgpt",
+        "openai",
+        "gpt",
+        "codex",
+        "chat gpt",
+        "chatgtp"
+      ],
+      "weak": [
+        "model",
+        "models",
+        "chatgpt",
+        "claude",
+        "gpt",
+        "openai",
+        "gemini",
+        "which ai",
+        "what ai",
+        "best ai",
+        "free one",
+        "free model",
+        "free ai",
+        "for free",
+        "llm",
+        "llms",
+        "ai model",
+        "ai models",
+        "language model",
+        "anthropic",
+        "ollama",
+        "deepseek",
+        "grok",
+        "mistral",
+        "llama",
+        "local ai",
+        "smartest"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mod",
+        "need": "mod1"
+      }
+    },
+    {
+      "id": "mod2",
+      "subject": "mod",
+      "title": "Choosing a model: has Claude",
+      "text": "A Claude Max plan works only with extra paid credits. Claude Pro does not work.",
+      "kw": [
+        "claude",
+        "anthropic"
+      ],
+      "weak": [
+        "model",
+        "models",
+        "chatgpt",
+        "claude",
+        "gpt",
+        "openai",
+        "gemini",
+        "which ai",
+        "what ai",
+        "best ai",
+        "free one",
+        "free model",
+        "free ai",
+        "for free",
+        "llm",
+        "llms",
+        "ai model",
+        "ai models",
+        "language model",
+        "anthropic",
+        "ollama",
+        "deepseek",
+        "grok",
+        "mistral",
+        "llama",
+        "local ai",
+        "smartest"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mod",
+        "need": "mod2"
+      }
+    },
+    {
+      "id": "mod3",
+      "subject": "mod",
+      "title": "Choosing a model: free, or private",
+      "text": "Hermes can run an AI on your own computer. No account, and nothing leaves your computer.",
+      "kw": [
+        "free",
+        "private",
+        "offline",
+        "own computer",
+        "my computer",
+        "local",
+        "no account",
+        "don't want to pay",
+        "dont want to pay",
+        "do not want to pay",
+        "not pay",
+        "without paying",
+        "spend",
+        "any money",
+        "no money",
+        "cost nothing",
+        "costs nothing",
+        "cheap",
+        "cheapest",
+        "budget",
+        "my laptop",
+        "own laptop",
+        "ollama",
+        "local ai"
+      ],
+      "weak": [
+        "model",
+        "models",
+        "chatgpt",
+        "claude",
+        "gpt",
+        "openai",
+        "gemini",
+        "which ai",
+        "what ai",
+        "best ai",
+        "free one",
+        "free model",
+        "free ai",
+        "for free",
+        "llm",
+        "llms",
+        "ai model",
+        "ai models",
+        "language model",
+        "anthropic",
+        "ollama",
+        "deepseek",
+        "grok",
+        "mistral",
+        "llama",
+        "local ai",
+        "smartest"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mod",
+        "need": "mod3"
+      }
+    },
+    {
+      "id": "mod4",
+      "subject": "mod",
+      "title": "Choosing a model: pays for neither, or does not know",
+      "text": "The quickest start is a paid Nous plan. One sign-in gives you many AIs to choose from.",
+      "kw": [
+        "no",
+        "nope",
+        "neither",
+        "none",
+        "not sure",
+        "don't know",
+        "dont know",
+        "no idea",
+        "easy",
+        "quick",
+        "simple"
+      ],
+      "weak": [
+        "model",
+        "models",
+        "chatgpt",
+        "claude",
+        "gpt",
+        "openai",
+        "gemini",
+        "which ai",
+        "what ai",
+        "best ai",
+        "free one",
+        "free model",
+        "free ai",
+        "for free",
+        "llm",
+        "llms",
+        "ai model",
+        "ai models",
+        "language model",
+        "anthropic",
+        "ollama",
+        "deepseek",
+        "grok",
+        "mistral",
+        "llama",
+        "local ai",
+        "smartest"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "mod",
+        "need": "mod4"
+      }
+    },
+    {
+      "id": "msg0",
+      "subject": "msg",
+      "title": "From a phone or chat app",
+      "text": "You can chat with Hermes from apps like Telegram, WhatsApp or Slack.",
+      "kw": [
+        "phone",
+        "mobile",
+        "iphone",
+        "android",
+        "telegram",
+        "whatsapp",
+        "slack",
+        "discord",
+        "signal",
+        "sms",
+        "imessage",
+        "chat app",
+        "text me",
+        "text it",
+        "text hermes",
+        "texting",
+        "message me",
+        "message it",
+        "text message",
+        "text messages",
+        "send me a text",
+        "send a text",
+        "by text",
+        "not at my computer",
+        "away from my computer",
+        "not at my desk",
+        "away from my desk",
+        "not at home",
+        "away from home",
+        "on the go",
+        "from anywhere",
+        "reach it",
+        "reach hermes",
+        "when i'm out",
+        "when im out",
+        "while i'm out",
+        "while im out",
+        "tablet",
+        "ipad",
+        "smartphone",
+        "telegramm",
+        "telegrm",
+        "telgram",
+        "telegam",
+        "telegarm",
+        "whatsap",
+        "whats app",
+        "watsapp",
+        "whatsup",
+        "wattsapp",
+        "whatapp",
+        "discrod"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "plain",
+        "topic": "msg"
+      }
+    },
+    {
+      "id": "msg1",
+      "subject": "msg",
+      "title": "From a phone or chat app: Telegram",
+      "text": "Telegram has a quick setup. In the app, open Messaging and press Create with QR.",
+      "kw": [
+        "telegram",
+        "telegramm",
+        "telegrm",
+        "telgram",
+        "telegam",
+        "telegarm"
+      ],
+      "weak": [
+        "phone",
+        "mobile",
+        "iphone",
+        "android",
+        "telegram",
+        "whatsapp",
+        "slack",
+        "discord",
+        "signal",
+        "sms",
+        "imessage",
+        "chat app",
+        "text me",
+        "text it",
+        "text hermes",
+        "texting",
+        "message me",
+        "message it",
+        "text message",
+        "text messages",
+        "send me a text",
+        "send a text",
+        "by text",
+        "not at my computer",
+        "away from my computer",
+        "not at my desk",
+        "away from my desk",
+        "not at home",
+        "away from home",
+        "on the go",
+        "from anywhere",
+        "reach it",
+        "reach hermes",
+        "when i'm out",
+        "when im out",
+        "while i'm out",
+        "while im out",
+        "tablet",
+        "ipad",
+        "smartphone"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "msg",
+        "need": "msg1"
+      }
+    },
+    {
+      "id": "msg2",
+      "subject": "msg",
+      "title": "From a phone or chat app: another app Hermes lists",
+      "text": "Hermes works with that app. In the Hermes app, open Messaging to set it up.",
+      "kw": [
+        "whatsapp",
+        "whatsap",
+        "whats app",
+        "watsapp",
+        "whatsup",
+        "wattsapp",
+        "whatapp",
+        "slack",
+        "discord",
+        "discrod",
+        "signal",
+        "sms",
+        "email",
+        "teams",
+        "imessage",
+        "matrix",
+        "line"
+      ],
+      "weak": [
+        "phone",
+        "mobile",
+        "iphone",
+        "android",
+        "telegram",
+        "whatsapp",
+        "slack",
+        "discord",
+        "signal",
+        "sms",
+        "imessage",
+        "chat app",
+        "text me",
+        "text it",
+        "text hermes",
+        "texting",
+        "message me",
+        "message it",
+        "text message",
+        "text messages",
+        "send me a text",
+        "send a text",
+        "by text",
+        "not at my computer",
+        "away from my computer",
+        "not at my desk",
+        "away from my desk",
+        "not at home",
+        "away from home",
+        "on the go",
+        "from anywhere",
+        "reach it",
+        "reach hermes",
+        "when i'm out",
+        "when im out",
+        "while i'm out",
+        "while im out",
+        "tablet",
+        "ipad",
+        "smartphone"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "msg",
+        "need": "msg2"
+      }
+    },
+    {
+      "id": "msg3",
+      "subject": "msg",
+      "title": "From a phone or chat app: answers at any time",
+      "text": "It answers only while its computer is on. For answers at any time, that computer must stay on.",
+      "kw": [
+        "always",
+        "any time",
+        "anytime",
+        "at night",
+        "asleep",
+        "laptop closed",
+        "laptop is closed",
+        "turned off",
+        "when off",
+        "computer is off"
+      ],
+      "weak": [
+        "phone",
+        "mobile",
+        "iphone",
+        "android",
+        "telegram",
+        "whatsapp",
+        "slack",
+        "discord",
+        "signal",
+        "sms",
+        "imessage",
+        "chat app",
+        "text me",
+        "text it",
+        "text hermes",
+        "texting",
+        "message me",
+        "message it",
+        "text message",
+        "text messages",
+        "send me a text",
+        "send a text",
+        "by text",
+        "not at my computer",
+        "away from my computer",
+        "not at my desk",
+        "away from my desk",
+        "not at home",
+        "away from home",
+        "on the go",
+        "from anywhere",
+        "reach it",
+        "reach hermes",
+        "when i'm out",
+        "when im out",
+        "while i'm out",
+        "while im out",
+        "tablet",
+        "ipad",
+        "smartphone"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "msg",
+        "need": "msg3"
+      }
+    },
+    {
+      "id": "sch0",
+      "subject": "sch",
+      "title": "On a schedule",
+      "text": "Hermes can do jobs on a schedule, such as a summary every morning.",
+      "kw": [
+        "schedule",
+        "scheduled",
+        "scheduling",
+        "every day",
+        "every morning",
+        "each morning",
+        "every week",
+        "every night",
+        "every evening",
+        "every hour",
+        "each day",
+        "each week",
+        "daily",
+        "weekly",
+        "remind",
+        "reminder",
+        "reminders",
+        "automatically",
+        "automatic",
+        "morning job",
+        "every monday",
+        "every tuesday",
+        "every wednesday",
+        "every thursday",
+        "every friday",
+        "every saturday",
+        "every sunday",
+        "each monday",
+        "each tuesday",
+        "each wednesday",
+        "each thursday",
+        "each friday",
+        "each saturday",
+        "each sunday",
+        "mondays",
+        "tuesdays",
+        "wednesdays",
+        "thursdays",
+        "fridays",
+        "saturdays",
+        "sundays",
+        "every weekday",
+        "every weekend",
+        "every month",
+        "each month",
+        "monthly",
+        "every year",
+        "hourly",
+        "nightly",
+        "each night",
+        "each evening",
+        "every afternoon",
+        "every minute",
+        "every few",
+        "once a day",
+        "once a week",
+        "once a month",
+        "twice a day",
+        "twice a week",
+        "regularly",
+        "recurring",
+        "repeating",
+        "on its own",
+        "by itself",
+        "without me asking",
+        "without asking",
+        "while i sleep",
+        "overnight",
+        "at a set time",
+        "at a certain time",
+        "timer",
+        "alarm",
+        "shedule",
+        "schedual",
+        "scedule",
+        "automaticaly",
+        "automaticly"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "plain",
+        "topic": "sch"
+      }
+    },
+    {
+      "id": "sch1",
+      "subject": "sch",
+      "title": "On a schedule: a regular summary or report",
+      "text": "Hermes can repeat a job every day or week. Ask it once, in plain words.",
+      "kw": [
+        "summary",
+        "report",
+        "news",
+        "digest",
+        "list",
+        "update",
+        "every morning",
+        "daily",
+        "weekly"
+      ],
+      "weak": [
+        "schedule",
+        "scheduled",
+        "scheduling",
+        "every day",
+        "every morning",
+        "each morning",
+        "every week",
+        "every night",
+        "every evening",
+        "every hour",
+        "each day",
+        "each week",
+        "daily",
+        "weekly",
+        "remind",
+        "reminder",
+        "reminders",
+        "automatically",
+        "automatic",
+        "morning job",
+        "every monday",
+        "every tuesday",
+        "every wednesday",
+        "every thursday",
+        "every friday",
+        "every saturday",
+        "every sunday",
+        "each monday",
+        "each tuesday",
+        "each wednesday",
+        "each thursday",
+        "each friday",
+        "each saturday",
+        "each sunday",
+        "mondays",
+        "tuesdays",
+        "wednesdays",
+        "thursdays",
+        "fridays",
+        "saturdays",
+        "sundays",
+        "every weekday",
+        "every weekend",
+        "every month",
+        "each month",
+        "monthly",
+        "every year",
+        "hourly",
+        "nightly",
+        "each night",
+        "each evening",
+        "every afternoon",
+        "every minute",
+        "every few",
+        "once a day",
+        "once a week",
+        "once a month",
+        "twice a day",
+        "twice a week",
+        "regularly",
+        "recurring",
+        "repeating",
+        "on its own",
+        "by itself",
+        "without me asking",
+        "without asking",
+        "while i sleep",
+        "overnight",
+        "at a set time",
+        "at a certain time",
+        "timer",
+        "alarm"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "sch",
+        "need": "sch1"
+      }
+    },
+    {
+      "id": "sch2",
+      "subject": "sch",
+      "title": "On a schedule: a reminder",
+      "text": "Hermes can remind you once, or again and again. Just ask it in plain words.",
+      "kw": [
+        "remind",
+        "reminder",
+        "reminders",
+        "don't forget",
+        "tomorrow",
+        "in an hour"
+      ],
+      "weak": [
+        "schedule",
+        "scheduled",
+        "scheduling",
+        "every day",
+        "every morning",
+        "each morning",
+        "every week",
+        "every night",
+        "every evening",
+        "every hour",
+        "each day",
+        "each week",
+        "daily",
+        "weekly",
+        "remind",
+        "reminder",
+        "reminders",
+        "automatically",
+        "automatic",
+        "morning job",
+        "every monday",
+        "every tuesday",
+        "every wednesday",
+        "every thursday",
+        "every friday",
+        "every saturday",
+        "every sunday",
+        "each monday",
+        "each tuesday",
+        "each wednesday",
+        "each thursday",
+        "each friday",
+        "each saturday",
+        "each sunday",
+        "mondays",
+        "tuesdays",
+        "wednesdays",
+        "thursdays",
+        "fridays",
+        "saturdays",
+        "sundays",
+        "every weekday",
+        "every weekend",
+        "every month",
+        "each month",
+        "monthly",
+        "every year",
+        "hourly",
+        "nightly",
+        "each night",
+        "each evening",
+        "every afternoon",
+        "every minute",
+        "every few",
+        "once a day",
+        "once a week",
+        "once a month",
+        "twice a day",
+        "twice a week",
+        "regularly",
+        "recurring",
+        "repeating",
+        "on its own",
+        "by itself",
+        "without me asking",
+        "without asking",
+        "while i sleep",
+        "overnight",
+        "at a set time",
+        "at a certain time",
+        "timer",
+        "alarm"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "sch",
+        "need": "sch2"
+      }
+    },
+    {
+      "id": "sch3",
+      "subject": "sch",
+      "title": "On a schedule: keep an eye on something",
+      "text": "Hermes can check something on a schedule and tell you what it found.",
+      "kw": [
+        "check",
+        "checks",
+        "watch",
+        "monitor",
+        "alert",
+        "tell me when",
+        "price",
+        "prices"
+      ],
+      "weak": [
+        "schedule",
+        "scheduled",
+        "scheduling",
+        "every day",
+        "every morning",
+        "each morning",
+        "every week",
+        "every night",
+        "every evening",
+        "every hour",
+        "each day",
+        "each week",
+        "daily",
+        "weekly",
+        "remind",
+        "reminder",
+        "reminders",
+        "automatically",
+        "automatic",
+        "morning job",
+        "every monday",
+        "every tuesday",
+        "every wednesday",
+        "every thursday",
+        "every friday",
+        "every saturday",
+        "every sunday",
+        "each monday",
+        "each tuesday",
+        "each wednesday",
+        "each thursday",
+        "each friday",
+        "each saturday",
+        "each sunday",
+        "mondays",
+        "tuesdays",
+        "wednesdays",
+        "thursdays",
+        "fridays",
+        "saturdays",
+        "sundays",
+        "every weekday",
+        "every weekend",
+        "every month",
+        "each month",
+        "monthly",
+        "every year",
+        "hourly",
+        "nightly",
+        "each night",
+        "each evening",
+        "every afternoon",
+        "every minute",
+        "every few",
+        "once a day",
+        "once a week",
+        "once a month",
+        "twice a day",
+        "twice a week",
+        "regularly",
+        "recurring",
+        "repeating",
+        "on its own",
+        "by itself",
+        "without me asking",
+        "without asking",
+        "while i sleep",
+        "overnight",
+        "at a set time",
+        "at a certain time",
+        "timer",
+        "alarm"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "sch",
+        "need": "sch3"
+      }
+    },
+    {
+      "id": "sch4",
+      "subject": "sch",
+      "title": "On a schedule: does it run while I am away",
+      "text": "Jobs run only while Hermes is running on a computer that is on.",
+      "kw": [
+        "away",
+        "asleep",
+        "turned off",
+        "switched off",
+        "laptop closed",
+        "laptop is closed",
+        "when off",
+        "computer is off"
+      ],
+      "weak": [
+        "schedule",
+        "scheduled",
+        "scheduling",
+        "every day",
+        "every morning",
+        "each morning",
+        "every week",
+        "every night",
+        "every evening",
+        "every hour",
+        "each day",
+        "each week",
+        "daily",
+        "weekly",
+        "remind",
+        "reminder",
+        "reminders",
+        "automatically",
+        "automatic",
+        "morning job",
+        "every monday",
+        "every tuesday",
+        "every wednesday",
+        "every thursday",
+        "every friday",
+        "every saturday",
+        "every sunday",
+        "each monday",
+        "each tuesday",
+        "each wednesday",
+        "each thursday",
+        "each friday",
+        "each saturday",
+        "each sunday",
+        "mondays",
+        "tuesdays",
+        "wednesdays",
+        "thursdays",
+        "fridays",
+        "saturdays",
+        "sundays",
+        "every weekday",
+        "every weekend",
+        "every month",
+        "each month",
+        "monthly",
+        "every year",
+        "hourly",
+        "nightly",
+        "each night",
+        "each evening",
+        "every afternoon",
+        "every minute",
+        "every few",
+        "once a day",
+        "once a week",
+        "once a month",
+        "twice a day",
+        "twice a week",
+        "regularly",
+        "recurring",
+        "repeating",
+        "on its own",
+        "by itself",
+        "without me asking",
+        "without asking",
+        "while i sleep",
+        "overnight",
+        "at a set time",
+        "at a certain time",
+        "timer",
+        "alarm"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "sch",
+        "need": "sch4"
+      }
+    },
+    {
+      "id": "sch5",
+      "subject": "sch",
+      "title": "On a schedule: checking email on a schedule",
+      "text": "Yes. Connect your email to Hermes first. Then ask it once, in plain words.",
+      "kw": [
+        "email",
+        "emails",
+        "e-mail",
+        "mail",
+        "my mail",
+        "gmail",
+        "inbox",
+        "outlook"
+      ],
+      "weak": [
+        "schedule",
+        "scheduled",
+        "scheduling",
+        "every day",
+        "every morning",
+        "each morning",
+        "every week",
+        "every night",
+        "every evening",
+        "every hour",
+        "each day",
+        "each week",
+        "daily",
+        "weekly",
+        "remind",
+        "reminder",
+        "reminders",
+        "automatically",
+        "automatic",
+        "morning job",
+        "every monday",
+        "every tuesday",
+        "every wednesday",
+        "every thursday",
+        "every friday",
+        "every saturday",
+        "every sunday",
+        "each monday",
+        "each tuesday",
+        "each wednesday",
+        "each thursday",
+        "each friday",
+        "each saturday",
+        "each sunday",
+        "mondays",
+        "tuesdays",
+        "wednesdays",
+        "thursdays",
+        "fridays",
+        "saturdays",
+        "sundays",
+        "every weekday",
+        "every weekend",
+        "every month",
+        "each month",
+        "monthly",
+        "every year",
+        "hourly",
+        "nightly",
+        "each night",
+        "each evening",
+        "every afternoon",
+        "every minute",
+        "every few",
+        "once a day",
+        "once a week",
+        "once a month",
+        "twice a day",
+        "twice a week",
+        "regularly",
+        "recurring",
+        "repeating",
+        "on its own",
+        "by itself",
+        "without me asking",
+        "without asking",
+        "while i sleep",
+        "overnight",
+        "at a set time",
+        "at a certain time",
+        "timer",
+        "alarm"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "sch",
+        "need": "sch5"
+      }
+    },
+    {
+      "id": "svc0",
+      "subject": "svc",
+      "title": "A service you use",
+      "text": "MCP links Hermes to a service you already use, such as GitHub.",
+      "kw": [
+        "services",
+        "a service",
+        "which service",
+        "another service",
+        "gmail",
+        "google",
+        "calendar",
+        "github",
+        "notion",
+        "linear",
+        "drive",
+        "jira",
+        "spotify",
+        "outlook",
+        "inbox",
+        "dropbox",
+        "trello",
+        "asana",
+        "onedrive",
+        "sheets",
+        "excel",
+        "todoist",
+        "obsidian",
+        "zoom",
+        "shopify",
+        "airtable",
+        "youtube",
+        "my mail",
+        "mailbox",
+        "my apps",
+        "other apps",
+        "apps i use",
+        "my accounts",
+        "gmial",
+        "calender"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "plain",
+        "topic": "svc"
+      }
+    },
+    {
+      "id": "svc1",
+      "subject": "svc",
+      "title": "A service you use: a named service",
+      "text": "Hermes has a list of ready-made links to services. Ask your own Hermes to add yours.",
+      "kw": [
+        "google calendar",
+        "gmail",
+        "google drive",
+        "google sheets",
+        "google mail",
+        "google",
+        "calendar",
+        "github",
+        "notion",
+        "linear",
+        "one drive",
+        "drive",
+        "jira",
+        "spotify",
+        "outlook",
+        "gmial",
+        "calender",
+        "dropbox",
+        "trello",
+        "asana",
+        "onedrive",
+        "sheets",
+        "excel",
+        "todoist",
+        "obsidian",
+        "zoom",
+        "shopify",
+        "airtable",
+        "youtube"
+      ],
+      "weak": [
+        "services",
+        "a service",
+        "which service",
+        "another service",
+        "gmail",
+        "google",
+        "calendar",
+        "github",
+        "notion",
+        "linear",
+        "drive",
+        "jira",
+        "spotify",
+        "outlook",
+        "inbox",
+        "dropbox",
+        "trello",
+        "asana",
+        "onedrive",
+        "sheets",
+        "excel",
+        "todoist",
+        "obsidian",
+        "zoom",
+        "shopify",
+        "airtable",
+        "youtube",
+        "my mail",
+        "mailbox",
+        "my apps",
+        "other apps",
+        "apps i use",
+        "my accounts"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "svc",
+        "need": "svc1"
+      }
+    },
+    {
+      "id": "svc2",
+      "subject": "svc",
+      "title": "A service you use: is it safe, what can it see",
+      "text": "Nothing is linked until you add it. You can also limit what Hermes may use there.",
+      "kw": [
+        "safe",
+        "see",
+        "access",
+        "private",
+        "privacy",
+        "permission",
+        "permissions"
+      ],
+      "weak": [
+        "services",
+        "a service",
+        "which service",
+        "another service",
+        "gmail",
+        "google",
+        "calendar",
+        "github",
+        "notion",
+        "linear",
+        "drive",
+        "jira",
+        "spotify",
+        "outlook",
+        "inbox",
+        "dropbox",
+        "trello",
+        "asana",
+        "onedrive",
+        "sheets",
+        "excel",
+        "todoist",
+        "obsidian",
+        "zoom",
+        "shopify",
+        "airtable",
+        "youtube",
+        "my mail",
+        "mailbox",
+        "my apps",
+        "other apps",
+        "apps i use",
+        "my accounts"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "svc",
+        "need": "svc2"
+      }
+    },
+    {
+      "id": "bot0",
+      "subject": "bot",
+      "title": "More than one bot",
+      "text": "Each bot is a separate Hermes with its own settings and notes.",
+      "kw": [
+        "bots",
+        "second bot",
+        "another bot",
+        "two bots",
+        "more than one",
+        "several",
+        "multiple",
+        "one for work",
+        "one for personal",
+        "work and personal",
+        "second hermes",
+        "another hermes",
+        "two hermes",
+        "agents",
+        "separate agent",
+        "another agent",
+        "second agent",
+        "two agents",
+        "new agent",
+        "separate bot",
+        "separate hermes",
+        "separate one",
+        "a second one",
+        "second one",
+        "another one for",
+        "different bot",
+        "more bots",
+        "extra bot",
+        "new bot",
+        "a bot for",
+        "build a bot",
+        "make a bot",
+        "create a bot",
+        "add a bot",
+        "one for my",
+        "one for each",
+        "one for home",
+        "one per"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "plain",
+        "topic": "bot"
+      }
+    },
+    {
+      "id": "bot1",
+      "subject": "bot",
+      "title": "More than one bot: a different job",
+      "text": "That fits a second bot. Each bot is a separate Hermes with its own settings and notes.",
+      "kw": [
+        "work",
+        "personal",
+        "research",
+        "coding",
+        "writing",
+        "emails",
+        "different",
+        "another job",
+        "one for",
+        "business",
+        "job",
+        "clients",
+        "family",
+        "home",
+        "school",
+        "for my"
+      ],
+      "weak": [
+        "bots",
+        "second bot",
+        "another bot",
+        "two bots",
+        "more than one",
+        "several",
+        "multiple",
+        "one for work",
+        "one for personal",
+        "work and personal",
+        "second hermes",
+        "another hermes",
+        "two hermes",
+        "agents",
+        "separate agent",
+        "another agent",
+        "second agent",
+        "two agents",
+        "new agent",
+        "separate bot",
+        "separate hermes",
+        "separate one",
+        "a second one",
+        "second one",
+        "another one for",
+        "different bot",
+        "more bots",
+        "extra bot",
+        "new bot",
+        "a bot for",
+        "build a bot",
+        "make a bot",
+        "create a bot",
+        "add a bot",
+        "one for my",
+        "one for each",
+        "one for home",
+        "one per"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "bot",
+        "need": "bot1"
+      }
+    },
+    {
+      "id": "bot2",
+      "subject": "bot",
+      "title": "More than one bot: working together",
+      "text": "Each bot is a separate Hermes. They can hand work to each other with @ and a name.",
+      "kw": [
+        "together",
+        "team",
+        "hand over",
+        "pass",
+        "each other",
+        "help each other"
+      ],
+      "weak": [
+        "bots",
+        "second bot",
+        "another bot",
+        "two bots",
+        "more than one",
+        "several",
+        "multiple",
+        "one for work",
+        "one for personal",
+        "work and personal",
+        "second hermes",
+        "another hermes",
+        "two hermes",
+        "agents",
+        "separate agent",
+        "another agent",
+        "second agent",
+        "two agents",
+        "new agent",
+        "separate bot",
+        "separate hermes",
+        "separate one",
+        "a second one",
+        "second one",
+        "another one for",
+        "different bot",
+        "more bots",
+        "extra bot",
+        "new bot",
+        "a bot for",
+        "build a bot",
+        "make a bot",
+        "create a bot",
+        "add a bot",
+        "one for my",
+        "one for each",
+        "one for home",
+        "one per"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "bot",
+        "need": "bot2"
+      }
+    },
+    {
+      "id": "bot3",
+      "subject": "bot",
+      "title": "More than one bot: only a fresh chat",
+      "text": "You may not need a second, separate Hermes. One Hermes can hold many chats at once.",
+      "kw": [
+        "new chat",
+        "fresh chat",
+        "start over",
+        "another conversation",
+        "same job"
+      ],
+      "weak": [
+        "bots",
+        "second bot",
+        "another bot",
+        "two bots",
+        "more than one",
+        "several",
+        "multiple",
+        "one for work",
+        "one for personal",
+        "work and personal",
+        "second hermes",
+        "another hermes",
+        "two hermes",
+        "agents",
+        "separate agent",
+        "another agent",
+        "second agent",
+        "two agents",
+        "new agent",
+        "separate bot",
+        "separate hermes",
+        "separate one",
+        "a second one",
+        "second one",
+        "another one for",
+        "different bot",
+        "more bots",
+        "extra bot",
+        "new bot",
+        "a bot for",
+        "build a bot",
+        "make a bot",
+        "create a bot",
+        "add a bot",
+        "one for my",
+        "one for each",
+        "one for home",
+        "one per"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "bot",
+        "need": "bot3"
+      }
+    },
+    {
+      "id": "use0",
+      "subject": "use",
+      "title": "Using less",
+      "text": "Tokens are small pieces of words. Your AI counts them, and long chats use the most.",
+      "kw": [
+        "token",
+        "tokens",
+        "usage",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "costs too much",
+        "cost too much",
+        "costing too much",
+        "costs a lot",
+        "too expensive",
+        "so expensive",
+        "cheaper",
+        "save money",
+        "spend less",
+        "pay less",
+        "lower cost",
+        "lower the cost",
+        "reduce cost",
+        "reduce the cost",
+        "credits",
+        "quota",
+        "rate limit",
+        "usage limit",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached",
+        "so slow",
+        "too slow",
+        "is slow",
+        "slow answers",
+        "answers slowly",
+        "takes forever",
+        "takes so long",
+        "takes too long",
+        "faster answers",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much",
+        "bill",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up",
+        "slow",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation",
+        "tokns",
+        "toknes",
+        "tokenz",
+        "tokkens",
+        "useage",
+        "usuage"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "plain",
+        "topic": "use"
+      }
+    },
+    {
+      "id": "use1",
+      "subject": "use",
+      "title": "Using less: each message or question uses many tokens (his own question)",
+      "text": "Long chats use the most tokens, small pieces of words. For a fresh chat, click \"New session\" at the top left.",
+      "kw": [
+        "token",
+        "tokens",
+        "tokns",
+        "toknes",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "each message",
+        "every message",
+        "each question",
+        "every question",
+        "per message",
+        "per question",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation"
+      ],
+      "weak": [
+        "token",
+        "tokens",
+        "usage",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "costs too much",
+        "cost too much",
+        "costing too much",
+        "costs a lot",
+        "too expensive",
+        "so expensive",
+        "cheaper",
+        "save money",
+        "spend less",
+        "pay less",
+        "lower cost",
+        "lower the cost",
+        "reduce cost",
+        "reduce the cost",
+        "credits",
+        "quota",
+        "rate limit",
+        "usage limit",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached",
+        "so slow",
+        "too slow",
+        "is slow",
+        "slow answers",
+        "answers slowly",
+        "takes forever",
+        "takes so long",
+        "takes too long",
+        "faster answers",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much",
+        "bill",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up",
+        "slow",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "use",
+        "need": "use1"
+      }
+    },
+    {
+      "id": "use2",
+      "subject": "use",
+      "title": "Using less: it costs too much",
+      "text": "Long chats cost the most. For a fresh chat, click \"New session\" at the top left. A cheaper AI also helps.",
+      "kw": [
+        "cost",
+        "costs",
+        "costing",
+        "expensive",
+        "cheaper",
+        "cheap",
+        "money",
+        "save money",
+        "spend less",
+        "pay less",
+        "price",
+        "bill",
+        "costs too much",
+        "too expensive",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much"
+      ],
+      "weak": [
+        "token",
+        "tokens",
+        "usage",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "costs too much",
+        "cost too much",
+        "costing too much",
+        "costs a lot",
+        "too expensive",
+        "so expensive",
+        "cheaper",
+        "save money",
+        "spend less",
+        "pay less",
+        "lower cost",
+        "lower the cost",
+        "reduce cost",
+        "reduce the cost",
+        "credits",
+        "quota",
+        "rate limit",
+        "usage limit",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached",
+        "so slow",
+        "too slow",
+        "is slow",
+        "slow answers",
+        "answers slowly",
+        "takes forever",
+        "takes so long",
+        "takes too long",
+        "faster answers",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much",
+        "bill",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up",
+        "slow",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "use",
+        "need": "use2"
+      }
+    },
+    {
+      "id": "use3",
+      "subject": "use",
+      "title": "Using less: a usage limit runs out",
+      "text": "Each message uses part of your limit, and long chats use more. For a fresh chat, click \"New session\" at the top left.",
+      "kw": [
+        "limit",
+        "limits",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "quota",
+        "credits",
+        "rate limit",
+        "usage limit",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached"
+      ],
+      "weak": [
+        "token",
+        "tokens",
+        "usage",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "costs too much",
+        "cost too much",
+        "costing too much",
+        "costs a lot",
+        "too expensive",
+        "so expensive",
+        "cheaper",
+        "save money",
+        "spend less",
+        "pay less",
+        "lower cost",
+        "lower the cost",
+        "reduce cost",
+        "reduce the cost",
+        "credits",
+        "quota",
+        "rate limit",
+        "usage limit",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached",
+        "so slow",
+        "too slow",
+        "is slow",
+        "slow answers",
+        "answers slowly",
+        "takes forever",
+        "takes so long",
+        "takes too long",
+        "faster answers",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much",
+        "bill",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up",
+        "slow",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "use",
+        "need": "use3"
+      }
+    },
+    {
+      "id": "use4",
+      "subject": "use",
+      "title": "Using less: answers are slow",
+      "text": "Big AIs and long chats can make answers slow. A smaller, faster AI can help.",
+      "kw": [
+        "slow",
+        "slowly",
+        "so slow",
+        "too slow",
+        "takes forever",
+        "takes long",
+        "takes so long",
+        "takes too long",
+        "faster",
+        "speed",
+        "laggy",
+        "lag",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up"
+      ],
+      "weak": [
+        "token",
+        "tokens",
+        "usage",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "costs too much",
+        "cost too much",
+        "costing too much",
+        "costs a lot",
+        "too expensive",
+        "so expensive",
+        "cheaper",
+        "save money",
+        "spend less",
+        "pay less",
+        "lower cost",
+        "lower the cost",
+        "reduce cost",
+        "reduce the cost",
+        "credits",
+        "quota",
+        "rate limit",
+        "usage limit",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached",
+        "so slow",
+        "too slow",
+        "is slow",
+        "slow answers",
+        "answers slowly",
+        "takes forever",
+        "takes so long",
+        "takes too long",
+        "faster answers",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much",
+        "bill",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up",
+        "slow",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation"
+      ],
+      "shows": {
+        "kind": "row",
+        "topic": "use",
+        "need": "use4"
+      }
+    },
+    {
+      "id": "tool",
+      "subject": "words",
+      "title": "Tools",
+      "text": "Tools are actions Hermes can take, like searching the web or editing files.",
+      "kw": [
+        "tool",
+        "tools"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "term",
+        "term": "tool"
+      }
+    },
+    {
+      "id": "skill",
+      "subject": "words",
+      "title": "Skills",
+      "text": "A skill is a set of written steps that teach Hermes one task.",
+      "kw": [
+        "skill",
+        "skills"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "term",
+        "term": "skill"
+      }
+    },
+    {
+      "id": "plugin",
+      "subject": "words",
+      "title": "Plugins",
+      "text": "A plugin is an add-on that gives Hermes a new feature.",
+      "kw": [
+        "plugin",
+        "plugins",
+        "plug-in",
+        "plug-ins",
+        "add-on",
+        "add-ons"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "term",
+        "term": "plugin"
+      }
+    },
+    {
+      "id": "mcp",
+      "subject": "words",
+      "title": "MCP",
+      "text": "MCP links Hermes to a service you already use, such as GitHub.",
+      "kw": [
+        "mcp",
+        "mcps"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "term",
+        "term": "mcp"
+      }
+    },
+    {
+      "id": "soul",
+      "subject": "words",
+      "title": "SOUL.md",
+      "text": "SOUL.md is the file that says who your Hermes is.",
+      "kw": [
+        "soul.md",
+        "soul md",
+        "soul",
+        "soul file"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "term",
+        "term": "soul"
+      }
+    },
+    {
+      "id": "profile",
+      "subject": "words",
+      "title": "Profile",
+      "text": "That is one separate Hermes with its own settings and notes. The \"Bots\" tab lists them.",
+      "kw": [
+        "profile",
+        "profiles"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "term",
+        "term": "profile"
+      }
+    },
+    {
+      "id": "w_web",
+      "subject": "web",
+      "title": "Search the web",
+      "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
+      "kw": [
+        "web search",
+        "search engine",
+        "google things",
+        "google something",
+        "google it",
+        "webpages",
+        "webpage",
+        "search web",
+        "search internet",
+        "search online",
+        "search google",
+        "search news",
+        "searches web",
+        "searches internet",
+        "searches online",
+        "searches google",
+        "searches news",
+        "searching web",
+        "searching internet",
+        "searching online",
+        "searching google",
+        "searching news",
+        "look up web",
+        "look up internet",
+        "look up online",
+        "look up google",
+        "look up news",
+        "looks up web",
+        "looks up internet",
+        "looks up online",
+        "looks up google",
+        "looks up news",
+        "find web",
+        "find internet",
+        "find online",
+        "find google",
+        "find news",
+        "research web",
+        "research internet",
+        "research online",
+        "research google",
+        "research news",
+        "check web",
+        "check internet",
+        "check online",
+        "check google",
+        "check news",
+        "browse web",
+        "browse internet",
+        "browse online",
+        "browse google",
+        "browse news",
+        "look stuff up web",
+        "look stuff up internet",
+        "look stuff up online",
+        "look stuff up google",
+        "look stuff up news",
+        "looks stuff up web",
+        "looks stuff up internet",
+        "looks stuff up online",
+        "looks stuff up google",
+        "looks stuff up news",
+        "look things up web",
+        "look things up internet",
+        "look things up online",
+        "look things up google",
+        "look things up news",
+        "looks things up web",
+        "looks things up internet",
+        "looks things up online",
+        "looks things up google",
+        "looks things up news"
+      ],
+      "weak": [
+        "web",
+        "internet",
+        "online",
+        "google",
+        "news"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_web"
+      }
+    },
+    {
+      "id": "w_browser",
+      "subject": "web",
+      "title": "Use a website for me",
+      "text": "Hermes can open a website, click, type and fill in forms. That is a built-in tool, an action it can take.",
+      "kw": [
+        "browser automation",
+        "use a browser",
+        "use the browser",
+        "click website",
+        "click websites",
+        "click web page",
+        "click web pages",
+        "click site",
+        "click sites",
+        "click form",
+        "click forms",
+        "click browser",
+        "clicks website",
+        "clicks websites",
+        "clicks web page",
+        "clicks web pages",
+        "clicks site",
+        "clicks sites",
+        "clicks form",
+        "clicks forms",
+        "clicks browser",
+        "fill website",
+        "fill websites",
+        "fill web page",
+        "fill web pages",
+        "fill site",
+        "fill sites",
+        "fill form",
+        "fill forms",
+        "fill browser",
+        "fills website",
+        "fills websites",
+        "fills web page",
+        "fills web pages",
+        "fills site",
+        "fills sites",
+        "fills form",
+        "fills forms",
+        "fills browser",
+        "fill in website",
+        "fill in websites",
+        "fill in web page",
+        "fill in web pages",
+        "fill in site",
+        "fill in sites",
+        "fill in form",
+        "fill in forms",
+        "fill in browser",
+        "fill out website",
+        "fill out websites",
+        "fill out web page",
+        "fill out web pages",
+        "fill out site",
+        "fill out sites",
+        "fill out form",
+        "fill out forms",
+        "fill out browser",
+        "log in website",
+        "log in websites",
+        "log in web page",
+        "log in web pages",
+        "log in site",
+        "log in sites",
+        "log in form",
+        "log in forms",
+        "log in browser",
+        "sign in website",
+        "sign in websites",
+        "sign in web page",
+        "sign in web pages",
+        "sign in site",
+        "sign in sites",
+        "sign in form",
+        "sign in forms",
+        "sign in browser",
+        "open website",
+        "open websites",
+        "open web page",
+        "open web pages",
+        "open site",
+        "open sites",
+        "open form",
+        "open forms",
+        "open browser",
+        "opens website",
+        "opens websites",
+        "opens web page",
+        "opens web pages",
+        "opens site",
+        "opens sites",
+        "opens form",
+        "opens forms",
+        "opens browser",
+        "navigate website",
+        "navigate websites",
+        "navigate web page",
+        "navigate web pages",
+        "navigate site",
+        "navigate sites",
+        "navigate form",
+        "navigate forms",
+        "navigate browser",
+        "book website",
+        "book websites",
+        "book web page",
+        "book web pages",
+        "book site",
+        "book sites",
+        "book form",
+        "book forms",
+        "book browser",
+        "order website",
+        "order websites",
+        "order web page",
+        "order web pages",
+        "order site",
+        "order sites",
+        "order form",
+        "order forms",
+        "order browser",
+        "use website",
+        "use websites",
+        "use web page",
+        "use web pages",
+        "use site",
+        "use sites",
+        "use form",
+        "use forms",
+        "use browser",
+        "control website",
+        "control websites",
+        "control web page",
+        "control web pages",
+        "control site",
+        "control sites",
+        "control form",
+        "control forms",
+        "control browser"
+      ],
+      "weak": [
+        "website",
+        "websites",
+        "web page",
+        "web pages",
+        "site",
+        "sites",
+        "form",
+        "forms",
+        "browser"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_browser"
+      }
+    },
+    {
+      "id": "w_xpost",
+      "subject": "web",
+      "title": "Post on X for me",
+      "text": "Hermes comes with a skill called \"xurl\". Its written steps teach Hermes to search and post on X.",
+      "kw": [
+        "post twitter",
+        "post tweet",
+        "post tweets",
+        "post on x",
+        "post to x",
+        "post x account",
+        "post x.com",
+        "posts twitter",
+        "posts tweet",
+        "posts tweets",
+        "posts on x",
+        "posts to x",
+        "posts x account",
+        "posts x.com",
+        "posting twitter",
+        "posting tweet",
+        "posting tweets",
+        "posting on x",
+        "posting to x",
+        "posting x account",
+        "posting x.com",
+        "tweet twitter",
+        "tweet tweet",
+        "tweet tweets",
+        "tweet on x",
+        "tweet to x",
+        "tweet x account",
+        "tweet x.com",
+        "reply twitter",
+        "reply tweet",
+        "reply tweets",
+        "reply on x",
+        "reply to x",
+        "reply x account",
+        "reply x.com",
+        "publish twitter",
+        "publish tweet",
+        "publish tweets",
+        "publish on x",
+        "publish to x",
+        "publish x account",
+        "publish x.com",
+        "send twitter",
+        "send tweet",
+        "send tweets",
+        "send on x",
+        "send to x",
+        "send x account",
+        "send x.com",
+        "write twitter",
+        "write tweet",
+        "write tweets",
+        "write on x",
+        "write to x",
+        "write x account",
+        "write x.com",
+        "search twitter",
+        "search tweet",
+        "search tweets",
+        "search on x",
+        "search to x",
+        "search x account",
+        "search x.com",
+        "read twitter",
+        "read tweet",
+        "read tweets",
+        "read on x",
+        "read to x",
+        "read x account",
+        "read x.com",
+        "dm twitter",
+        "dm tweet",
+        "dm tweets",
+        "dm on x",
+        "dm to x",
+        "dm x account",
+        "dm x.com"
+      ],
+      "weak": [
+        "twitter",
+        "tweet",
+        "tweets",
+        "on x",
+        "to x",
+        "x account",
+        "x.com"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_xpost"
+      }
+    },
+    {
+      "id": "w_reddit",
+      "subject": "web",
+      "title": "Read Reddit",
+      "text": "There is an optional skill, \"reddit-reading\". You add it first. Its written steps teach Hermes to read and search Reddit.",
+      "kw": [
+        "read reddit",
+        "read subreddit",
+        "read subreddits",
+        "reads reddit",
+        "reads subreddit",
+        "reads subreddits",
+        "search reddit",
+        "search subreddit",
+        "search subreddits",
+        "check reddit",
+        "check subreddit",
+        "check subreddits",
+        "follow reddit",
+        "follow subreddit",
+        "follow subreddits",
+        "summarize reddit",
+        "summarize subreddit",
+        "summarize subreddits",
+        "summarise reddit",
+        "summarise subreddit",
+        "summarise subreddits",
+        "browse reddit",
+        "browse subreddit",
+        "browse subreddits",
+        "watch reddit",
+        "watch subreddit",
+        "watch subreddits",
+        "look at reddit",
+        "look at subreddit",
+        "look at subreddits",
+        "find reddit",
+        "find subreddit",
+        "find subreddits"
+      ],
+      "weak": [
+        "reddit",
+        "subreddit",
+        "subreddits"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_reddit"
+      }
+    },
+    {
+      "id": "w_docs",
+      "subject": "files",
+      "title": "Read my documents",
+      "text": "Hermes can read Word, Excel and PDF files. This is built in. Scanned pages come out empty.",
+      "kw": [
+        "read pdf",
+        "read pdfs",
+        "read word file",
+        "read word files",
+        "read word document",
+        "read word documents",
+        "read docx",
+        "read excel",
+        "read spreadsheet",
+        "read spreadsheets",
+        "read document",
+        "read documents",
+        "read file",
+        "read files",
+        "read contract",
+        "read contracts",
+        "reads pdf",
+        "reads pdfs",
+        "reads word file",
+        "reads word files",
+        "reads word document",
+        "reads word documents",
+        "reads docx",
+        "reads excel",
+        "reads spreadsheet",
+        "reads spreadsheets",
+        "reads document",
+        "reads documents",
+        "reads file",
+        "reads files",
+        "reads contract",
+        "reads contracts",
+        "open pdf",
+        "open pdfs",
+        "open word file",
+        "open word files",
+        "open word document",
+        "open word documents",
+        "open docx",
+        "open excel",
+        "open spreadsheet",
+        "open spreadsheets",
+        "open document",
+        "open documents",
+        "open file",
+        "open files",
+        "open contract",
+        "open contracts",
+        "summarize pdf",
+        "summarize pdfs",
+        "summarize word file",
+        "summarize word files",
+        "summarize word document",
+        "summarize word documents",
+        "summarize docx",
+        "summarize excel",
+        "summarize spreadsheet",
+        "summarize spreadsheets",
+        "summarize document",
+        "summarize documents",
+        "summarize file",
+        "summarize files",
+        "summarize contract",
+        "summarize contracts",
+        "summarise pdf",
+        "summarise pdfs",
+        "summarise word file",
+        "summarise word files",
+        "summarise word document",
+        "summarise word documents",
+        "summarise docx",
+        "summarise excel",
+        "summarise spreadsheet",
+        "summarise spreadsheets",
+        "summarise document",
+        "summarise documents",
+        "summarise file",
+        "summarise files",
+        "summarise contract",
+        "summarise contracts",
+        "summary pdf",
+        "summary pdfs",
+        "summary word file",
+        "summary word files",
+        "summary word document",
+        "summary word documents",
+        "summary docx",
+        "summary excel",
+        "summary spreadsheet",
+        "summary spreadsheets",
+        "summary document",
+        "summary documents",
+        "summary file",
+        "summary files",
+        "summary contract",
+        "summary contracts",
+        "go through pdf",
+        "go through pdfs",
+        "go through word file",
+        "go through word files",
+        "go through word document",
+        "go through word documents",
+        "go through docx",
+        "go through excel",
+        "go through spreadsheet",
+        "go through spreadsheets",
+        "go through document",
+        "go through documents",
+        "go through file",
+        "go through files",
+        "go through contract",
+        "go through contracts",
+        "look at pdf",
+        "look at pdfs",
+        "look at word file",
+        "look at word files",
+        "look at word document",
+        "look at word documents",
+        "look at docx",
+        "look at excel",
+        "look at spreadsheet",
+        "look at spreadsheets",
+        "look at document",
+        "look at documents",
+        "look at file",
+        "look at files",
+        "look at contract",
+        "look at contracts",
+        "understand pdf",
+        "understand pdfs",
+        "understand word file",
+        "understand word files",
+        "understand word document",
+        "understand word documents",
+        "understand docx",
+        "understand excel",
+        "understand spreadsheet",
+        "understand spreadsheets",
+        "understand document",
+        "understand documents",
+        "understand file",
+        "understand files",
+        "understand contract",
+        "understand contracts",
+        "extract pdf",
+        "extract pdfs",
+        "extract word file",
+        "extract word files",
+        "extract word document",
+        "extract word documents",
+        "extract docx",
+        "extract excel",
+        "extract spreadsheet",
+        "extract spreadsheets",
+        "extract document",
+        "extract documents",
+        "extract file",
+        "extract files",
+        "extract contract",
+        "extract contracts",
+        "analyze pdf",
+        "analyze pdfs",
+        "analyze word file",
+        "analyze word files",
+        "analyze word document",
+        "analyze word documents",
+        "analyze docx",
+        "analyze excel",
+        "analyze spreadsheet",
+        "analyze spreadsheets",
+        "analyze document",
+        "analyze documents",
+        "analyze file",
+        "analyze files",
+        "analyze contract",
+        "analyze contracts",
+        "analyse pdf",
+        "analyse pdfs",
+        "analyse word file",
+        "analyse word files",
+        "analyse word document",
+        "analyse word documents",
+        "analyse docx",
+        "analyse excel",
+        "analyse spreadsheet",
+        "analyse spreadsheets",
+        "analyse document",
+        "analyse documents",
+        "analyse file",
+        "analyse files",
+        "analyse contract",
+        "analyse contracts"
+      ],
+      "weak": [
+        "pdf",
+        "pdfs",
+        "word file",
+        "word files",
+        "word document",
+        "word documents",
+        "docx",
+        "excel",
+        "spreadsheet",
+        "spreadsheets",
+        "document",
+        "documents",
+        "file",
+        "files",
+        "contract",
+        "contracts"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_docs"
+      }
+    },
+    {
+      "id": "w_pdf",
+      "subject": "files",
+      "title": "Make or change a PDF",
+      "text": "Hermes comes with a skill called \"pdf\". Its written steps teach Hermes to make, merge, fill in and edit PDF files.",
+      "kw": [
+        "make pdf",
+        "make pdfs",
+        "create pdf",
+        "create pdfs",
+        "merge pdf",
+        "merge pdfs",
+        "combine pdf",
+        "combine pdfs",
+        "fill pdf",
+        "fill pdfs",
+        "fill in pdf",
+        "fill in pdfs",
+        "fill out pdf",
+        "fill out pdfs",
+        "edit pdf",
+        "edit pdfs",
+        "change pdf",
+        "change pdfs",
+        "split pdf",
+        "split pdfs",
+        "ocr pdf",
+        "ocr pdfs"
+      ],
+      "weak": [
+        "pdf",
+        "pdfs"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_pdf"
+      }
+    },
+    {
+      "id": "w_office",
+      "subject": "files",
+      "title": "Make Word or Excel files",
+      "text": "Hermes comes with a skill called \"microsoft-office\". Its written steps teach Hermes to make and edit Word, PowerPoint and Excel files.",
+      "kw": [
+        "make word",
+        "make powerpoint",
+        "make excel",
+        "make slides",
+        "make presentation",
+        "make presentations",
+        "make deck",
+        "make spreadsheet",
+        "make spreadsheets",
+        "make docx",
+        "make pptx",
+        "make xlsx",
+        "create word",
+        "create powerpoint",
+        "create excel",
+        "create slides",
+        "create presentation",
+        "create presentations",
+        "create deck",
+        "create spreadsheet",
+        "create spreadsheets",
+        "create docx",
+        "create pptx",
+        "create xlsx",
+        "write word",
+        "write powerpoint",
+        "write excel",
+        "write slides",
+        "write presentation",
+        "write presentations",
+        "write deck",
+        "write spreadsheet",
+        "write spreadsheets",
+        "write docx",
+        "write pptx",
+        "write xlsx",
+        "edit word",
+        "edit powerpoint",
+        "edit excel",
+        "edit slides",
+        "edit presentation",
+        "edit presentations",
+        "edit deck",
+        "edit spreadsheet",
+        "edit spreadsheets",
+        "edit docx",
+        "edit pptx",
+        "edit xlsx",
+        "change word",
+        "change powerpoint",
+        "change excel",
+        "change slides",
+        "change presentation",
+        "change presentations",
+        "change deck",
+        "change spreadsheet",
+        "change spreadsheets",
+        "change docx",
+        "change pptx",
+        "change xlsx",
+        "draft word",
+        "draft powerpoint",
+        "draft excel",
+        "draft slides",
+        "draft presentation",
+        "draft presentations",
+        "draft deck",
+        "draft spreadsheet",
+        "draft spreadsheets",
+        "draft docx",
+        "draft pptx",
+        "draft xlsx",
+        "prepare word",
+        "prepare powerpoint",
+        "prepare excel",
+        "prepare slides",
+        "prepare presentation",
+        "prepare presentations",
+        "prepare deck",
+        "prepare spreadsheet",
+        "prepare spreadsheets",
+        "prepare docx",
+        "prepare pptx",
+        "prepare xlsx"
+      ],
+      "weak": [
+        "word",
+        "powerpoint",
+        "excel",
+        "slides",
+        "presentation",
+        "presentations",
+        "deck",
+        "spreadsheet",
+        "spreadsheets",
+        "docx",
+        "pptx",
+        "xlsx"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_office"
+      }
+    },
+    {
+      "id": "w_notes",
+      "subject": "files",
+      "title": "Use my Obsidian notes",
+      "text": "Hermes comes with a skill called \"obsidian\". Its written steps teach Hermes to read, search and edit your Obsidian notes.",
+      "kw": [
+        "read obsidian",
+        "search obsidian",
+        "find obsidian",
+        "write obsidian",
+        "edit obsidian",
+        "create obsidian",
+        "add obsidian",
+        "make obsidian",
+        "use obsidian",
+        "open obsidian",
+        "notes obsidian",
+        "note obsidian",
+        "vault obsidian",
+        "work with obsidian",
+        "access obsidian"
+      ],
+      "weak": [
+        "obsidian"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_notes"
+      }
+    },
+    {
+      "id": "w_meeting",
+      "subject": "files",
+      "title": "Sort out meeting notes",
+      "text": "Hermes comes with a skill called \"meeting-action-items\". Its written steps teach Hermes to turn meeting notes into decisions and tasks.",
+      "kw": [
+        "action items meeting",
+        "action items meetings",
+        "action items meeting notes",
+        "action items minutes",
+        "action points meeting",
+        "action points meetings",
+        "action points meeting notes",
+        "action points minutes",
+        "tasks meeting",
+        "tasks meetings",
+        "tasks meeting notes",
+        "tasks minutes",
+        "decisions meeting",
+        "decisions meetings",
+        "decisions meeting notes",
+        "decisions minutes",
+        "to-do meeting",
+        "to-do meetings",
+        "to-do meeting notes",
+        "to-do minutes",
+        "to-dos meeting",
+        "to-dos meetings",
+        "to-dos meeting notes",
+        "to-dos minutes",
+        "todo meeting",
+        "todo meetings",
+        "todo meeting notes",
+        "todo minutes",
+        "todos meeting",
+        "todos meetings",
+        "todos meeting notes",
+        "todos minutes",
+        "owners meeting",
+        "owners meetings",
+        "owners meeting notes",
+        "owners minutes",
+        "tickets meeting",
+        "tickets meetings",
+        "tickets meeting notes",
+        "tickets minutes",
+        "who does what meeting",
+        "who does what meetings",
+        "who does what meeting notes",
+        "who does what minutes",
+        "follow-ups meeting",
+        "follow-ups meetings",
+        "follow-ups meeting notes",
+        "follow-ups minutes",
+        "follow ups meeting",
+        "follow ups meetings",
+        "follow ups meeting notes",
+        "follow ups minutes"
+      ],
+      "weak": [
+        "meeting",
+        "meetings",
+        "meeting notes",
+        "minutes"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_meeting"
+      }
+    },
+    {
+      "id": "w_code",
+      "subject": "files",
+      "title": "Write and run code",
+      "text": "Hermes can read, change and run code on your computer. This is built in.",
+      "kw": [
+        "coding",
+        "programming",
+        "write code",
+        "write script",
+        "write scripts",
+        "write program",
+        "write programs",
+        "write python",
+        "write javascript",
+        "writes code",
+        "writes script",
+        "writes scripts",
+        "writes program",
+        "writes programs",
+        "writes python",
+        "writes javascript",
+        "run code",
+        "run script",
+        "run scripts",
+        "run program",
+        "run programs",
+        "run python",
+        "run javascript",
+        "runs code",
+        "runs script",
+        "runs scripts",
+        "runs program",
+        "runs programs",
+        "runs python",
+        "runs javascript",
+        "fix code",
+        "fix script",
+        "fix scripts",
+        "fix program",
+        "fix programs",
+        "fix python",
+        "fix javascript",
+        "read code",
+        "read script",
+        "read scripts",
+        "read program",
+        "read programs",
+        "read python",
+        "read javascript",
+        "edit code",
+        "edit script",
+        "edit scripts",
+        "edit program",
+        "edit programs",
+        "edit python",
+        "edit javascript",
+        "debug code",
+        "debug script",
+        "debug scripts",
+        "debug program",
+        "debug programs",
+        "debug python",
+        "debug javascript",
+        "review code",
+        "review script",
+        "review scripts",
+        "review program",
+        "review programs",
+        "review python",
+        "review javascript",
+        "change code",
+        "change script",
+        "change scripts",
+        "change program",
+        "change programs",
+        "change python",
+        "change javascript",
+        "help code",
+        "help script",
+        "help scripts",
+        "help program",
+        "help programs",
+        "help python",
+        "help javascript"
+      ],
+      "weak": [
+        "code",
+        "script",
+        "scripts",
+        "program",
+        "programs",
+        "python",
+        "javascript"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_code"
+      }
+    },
+    {
+      "id": "w_computer",
+      "subject": "files",
+      "title": "Click and type for me",
+      "text": "Hermes can click and type in the apps on your computer. It is built in, and the docs call it Computer Use.",
+      "kw": [
+        "computer use",
+        "click mouse",
+        "click keyboard",
+        "click my screen",
+        "click my desktop",
+        "click my computer",
+        "click my mac",
+        "click my pc",
+        "click my laptop",
+        "click my apps",
+        "clicks mouse",
+        "clicks keyboard",
+        "clicks my screen",
+        "clicks my desktop",
+        "clicks my computer",
+        "clicks my mac",
+        "clicks my pc",
+        "clicks my laptop",
+        "clicks my apps",
+        "type mouse",
+        "type keyboard",
+        "type my screen",
+        "type my desktop",
+        "type my computer",
+        "type my mac",
+        "type my pc",
+        "type my laptop",
+        "type my apps",
+        "types mouse",
+        "types keyboard",
+        "types my screen",
+        "types my desktop",
+        "types my computer",
+        "types my mac",
+        "types my pc",
+        "types my laptop",
+        "types my apps",
+        "control mouse",
+        "control keyboard",
+        "control my screen",
+        "control my desktop",
+        "control my computer",
+        "control my mac",
+        "control my pc",
+        "control my laptop",
+        "control my apps",
+        "controls mouse",
+        "controls keyboard",
+        "controls my screen",
+        "controls my desktop",
+        "controls my computer",
+        "controls my mac",
+        "controls my pc",
+        "controls my laptop",
+        "controls my apps",
+        "drive mouse",
+        "drive keyboard",
+        "drive my screen",
+        "drive my desktop",
+        "drive my computer",
+        "drive my mac",
+        "drive my pc",
+        "drive my laptop",
+        "drive my apps",
+        "operate mouse",
+        "operate keyboard",
+        "operate my screen",
+        "operate my desktop",
+        "operate my computer",
+        "operate my mac",
+        "operate my pc",
+        "operate my laptop",
+        "operate my apps",
+        "take over mouse",
+        "take over keyboard",
+        "take over my screen",
+        "take over my desktop",
+        "take over my computer",
+        "take over my mac",
+        "take over my pc",
+        "take over my laptop",
+        "take over my apps",
+        "move mouse",
+        "move keyboard",
+        "move my screen",
+        "move my desktop",
+        "move my computer",
+        "move my mac",
+        "move my pc",
+        "move my laptop",
+        "move my apps"
+      ],
+      "weak": [
+        "mouse",
+        "keyboard",
+        "my screen",
+        "my desktop",
+        "my computer",
+        "my mac",
+        "my pc",
+        "my laptop",
+        "my apps"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_computer"
+      }
+    },
+    {
+      "id": "w_image",
+      "subject": "pics",
+      "title": "Make pictures",
+      "text": "Hermes can make pictures from your words. That is a built-in tool, an action it can take. The picture service costs money.",
+      "kw": [
+        "image generation",
+        "make image",
+        "make images",
+        "make picture",
+        "make pictures",
+        "make photo",
+        "make photos",
+        "make logo",
+        "make logos",
+        "make drawing",
+        "make drawings",
+        "make art",
+        "make illustration",
+        "make illustrations",
+        "makes image",
+        "makes images",
+        "makes picture",
+        "makes pictures",
+        "makes photo",
+        "makes photos",
+        "makes logo",
+        "makes logos",
+        "makes drawing",
+        "makes drawings",
+        "makes art",
+        "makes illustration",
+        "makes illustrations",
+        "create image",
+        "create images",
+        "create picture",
+        "create pictures",
+        "create photo",
+        "create photos",
+        "create logo",
+        "create logos",
+        "create drawing",
+        "create drawings",
+        "create art",
+        "create illustration",
+        "create illustrations",
+        "creates image",
+        "creates images",
+        "creates picture",
+        "creates pictures",
+        "creates photo",
+        "creates photos",
+        "creates logo",
+        "creates logos",
+        "creates drawing",
+        "creates drawings",
+        "creates art",
+        "creates illustration",
+        "creates illustrations",
+        "generate image",
+        "generate images",
+        "generate picture",
+        "generate pictures",
+        "generate photo",
+        "generate photos",
+        "generate logo",
+        "generate logos",
+        "generate drawing",
+        "generate drawings",
+        "generate art",
+        "generate illustration",
+        "generate illustrations",
+        "generates image",
+        "generates images",
+        "generates picture",
+        "generates pictures",
+        "generates photo",
+        "generates photos",
+        "generates logo",
+        "generates logos",
+        "generates drawing",
+        "generates drawings",
+        "generates art",
+        "generates illustration",
+        "generates illustrations",
+        "draw image",
+        "draw images",
+        "draw picture",
+        "draw pictures",
+        "draw photo",
+        "draw photos",
+        "draw logo",
+        "draw logos",
+        "draw drawing",
+        "draw drawings",
+        "draw art",
+        "draw illustration",
+        "draw illustrations",
+        "draws image",
+        "draws images",
+        "draws picture",
+        "draws pictures",
+        "draws photo",
+        "draws photos",
+        "draws logo",
+        "draws logos",
+        "draws drawing",
+        "draws drawings",
+        "draws art",
+        "draws illustration",
+        "draws illustrations",
+        "design image",
+        "design images",
+        "design picture",
+        "design pictures",
+        "design photo",
+        "design photos",
+        "design logo",
+        "design logos",
+        "design drawing",
+        "design drawings",
+        "design art",
+        "design illustration",
+        "design illustrations",
+        "paint image",
+        "paint images",
+        "paint picture",
+        "paint pictures",
+        "paint photo",
+        "paint photos",
+        "paint logo",
+        "paint logos",
+        "paint drawing",
+        "paint drawings",
+        "paint art",
+        "paint illustration",
+        "paint illustrations"
+      ],
+      "weak": [
+        "image",
+        "images",
+        "picture",
+        "pictures",
+        "photo",
+        "photos",
+        "logo",
+        "logos",
+        "drawing",
+        "drawings",
+        "art",
+        "illustration",
+        "illustrations"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_image"
+      }
+    },
+    {
+      "id": "w_see",
+      "subject": "pics",
+      "title": "Look at my pictures",
+      "text": "Hermes can look at a picture you give it. This is built in. If your AI reads only text, another AI describes it.",
+      "kw": [
+        "look at image",
+        "look at images",
+        "look at picture",
+        "look at pictures",
+        "look at photo",
+        "look at photos",
+        "look at screenshot",
+        "look at screenshots",
+        "looks at image",
+        "looks at images",
+        "looks at picture",
+        "looks at pictures",
+        "looks at photo",
+        "looks at photos",
+        "looks at screenshot",
+        "looks at screenshots",
+        "see image",
+        "see images",
+        "see picture",
+        "see pictures",
+        "see photo",
+        "see photos",
+        "see screenshot",
+        "see screenshots",
+        "sees image",
+        "sees images",
+        "sees picture",
+        "sees pictures",
+        "sees photo",
+        "sees photos",
+        "sees screenshot",
+        "sees screenshots",
+        "describe image",
+        "describe images",
+        "describe picture",
+        "describe pictures",
+        "describe photo",
+        "describe photos",
+        "describe screenshot",
+        "describe screenshots",
+        "read image",
+        "read images",
+        "read picture",
+        "read pictures",
+        "read photo",
+        "read photos",
+        "read screenshot",
+        "read screenshots",
+        "reads image",
+        "reads images",
+        "reads picture",
+        "reads pictures",
+        "reads photo",
+        "reads photos",
+        "reads screenshot",
+        "reads screenshots",
+        "analyze image",
+        "analyze images",
+        "analyze picture",
+        "analyze pictures",
+        "analyze photo",
+        "analyze photos",
+        "analyze screenshot",
+        "analyze screenshots",
+        "analyse image",
+        "analyse images",
+        "analyse picture",
+        "analyse pictures",
+        "analyse photo",
+        "analyse photos",
+        "analyse screenshot",
+        "analyse screenshots",
+        "understand image",
+        "understand images",
+        "understand picture",
+        "understand pictures",
+        "understand photo",
+        "understand photos",
+        "understand screenshot",
+        "understand screenshots",
+        "explain image",
+        "explain images",
+        "explain picture",
+        "explain pictures",
+        "explain photo",
+        "explain photos",
+        "explain screenshot",
+        "explain screenshots",
+        "what is in image",
+        "what is in images",
+        "what is in picture",
+        "what is in pictures",
+        "what is in photo",
+        "what is in photos",
+        "what is in screenshot",
+        "what is in screenshots",
+        "what's in image",
+        "what's in images",
+        "what's in picture",
+        "what's in pictures",
+        "what's in photo",
+        "what's in photos",
+        "what's in screenshot",
+        "what's in screenshots"
+      ],
+      "weak": [
+        "image",
+        "images",
+        "picture",
+        "pictures",
+        "photo",
+        "photos",
+        "screenshot",
+        "screenshots"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_see"
+      }
+    },
+    {
+      "id": "w_video",
+      "subject": "pics",
+      "title": "Make a video from text",
+      "text": "Hermes can make a video from text or from a picture. That tool, an action it can take, is switched off at first.",
+      "kw": [
+        "text to video",
+        "text-to-video",
+        "video generation",
+        "make video",
+        "make videos",
+        "make clip",
+        "make clips",
+        "makes video",
+        "makes videos",
+        "makes clip",
+        "makes clips",
+        "create video",
+        "create videos",
+        "create clip",
+        "create clips",
+        "creates video",
+        "creates videos",
+        "creates clip",
+        "creates clips",
+        "generate video",
+        "generate videos",
+        "generate clip",
+        "generate clips",
+        "generates video",
+        "generates videos",
+        "generates clip",
+        "generates clips",
+        "produce video",
+        "produce videos",
+        "produce clip",
+        "produce clips"
+      ],
+      "weak": [
+        "video",
+        "videos",
+        "clip",
+        "clips"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_video"
+      }
+    },
+    {
+      "id": "w_anim",
+      "subject": "pics",
+      "title": "Make an animated explainer",
+      "text": "Hermes comes with a skill called \"manim-video\". Its written steps teach Hermes to make animated maths videos.",
+      "kw": [
+        "make animation",
+        "make animations",
+        "make animated",
+        "make explainer",
+        "make explainers",
+        "make manim",
+        "makes animation",
+        "makes animations",
+        "makes animated",
+        "makes explainer",
+        "makes explainers",
+        "makes manim",
+        "create animation",
+        "create animations",
+        "create animated",
+        "create explainer",
+        "create explainers",
+        "create manim",
+        "creates animation",
+        "creates animations",
+        "creates animated",
+        "creates explainer",
+        "creates explainers",
+        "creates manim",
+        "generate animation",
+        "generate animations",
+        "generate animated",
+        "generate explainer",
+        "generate explainers",
+        "generate manim",
+        "produce animation",
+        "produce animations",
+        "produce animated",
+        "produce explainer",
+        "produce explainers",
+        "produce manim",
+        "video animation",
+        "video animations",
+        "video animated",
+        "video explainer",
+        "video explainers",
+        "video manim",
+        "videos animation",
+        "videos animations",
+        "videos animated",
+        "videos explainer",
+        "videos explainers",
+        "videos manim"
+      ],
+      "weak": [
+        "animation",
+        "animations",
+        "animated",
+        "explainer",
+        "explainers",
+        "manim"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_anim"
+      }
+    },
+    {
+      "id": "w_presenter",
+      "subject": "pics",
+      "title": "Make a presenter video",
+      "text": "There is an optional skill, \"ai-presenter-video\". You add it first. Its written steps teach Hermes to make a video of an AI presenter.",
+      "kw": [
+        "video presenter",
+        "video talking head",
+        "video avatar",
+        "video spokesperson",
+        "videos presenter",
+        "videos talking head",
+        "videos avatar",
+        "videos spokesperson",
+        "make presenter",
+        "make talking head",
+        "make avatar",
+        "make spokesperson",
+        "create presenter",
+        "create talking head",
+        "create avatar",
+        "create spokesperson",
+        "generate presenter",
+        "generate talking head",
+        "generate avatar",
+        "generate spokesperson"
+      ],
+      "weak": [
+        "presenter",
+        "talking head",
+        "avatar",
+        "spokesperson"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_presenter"
+      }
+    },
+    {
+      "id": "w_youtube",
+      "subject": "pics",
+      "title": "Sum up a YouTube video",
+      "text": "Hermes comes with a skill called \"youtube-content\". Its written steps teach Hermes to turn a YouTube video's words into a summary.",
+      "kw": [
+        "summarize youtube",
+        "summarize yt video",
+        "summarize yt videos",
+        "summarise youtube",
+        "summarise yt video",
+        "summarise yt videos",
+        "summary youtube",
+        "summary yt video",
+        "summary yt videos",
+        "summaries youtube",
+        "summaries yt video",
+        "summaries yt videos",
+        "sum up youtube",
+        "sum up yt video",
+        "sum up yt videos",
+        "transcript youtube",
+        "transcript yt video",
+        "transcript yt videos",
+        "transcripts youtube",
+        "transcripts yt video",
+        "transcripts yt videos",
+        "notes youtube",
+        "notes yt video",
+        "notes yt videos",
+        "tldr youtube",
+        "tldr yt video",
+        "tldr yt videos",
+        "key points youtube",
+        "key points yt video",
+        "key points yt videos",
+        "blog youtube",
+        "blog yt video",
+        "blog yt videos",
+        "thread youtube",
+        "thread yt video",
+        "thread yt videos"
+      ],
+      "weak": [
+        "youtube",
+        "yt video",
+        "yt videos"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_youtube"
+      }
+    },
+    {
+      "id": "w_meme",
+      "subject": "pics",
+      "title": "Make memes",
+      "text": "There is an optional skill, \"meme-generation\". You add it first. Its written steps teach Hermes to put text on known meme pictures.",
+      "kw": [
+        "meme",
+        "memes"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "want",
+        "row": "w_meme"
+      }
+    },
+    {
+      "id": "w_voice",
+      "subject": "voice",
+      "title": "Talk to it out loud",
+      "text": "You can talk to Hermes out loud and hear it answer. It is built in, and the docs call it Voice Mode.",
+      "kw": [
+        "voice mode",
+        "by voice",
+        "with my voice",
+        "use my voice",
+        "talk out loud",
+        "speak out loud",
+        "voice chat",
+        "voice conversation",
+        "voice conversations",
+        "microphone",
+        "talk to it out loud"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "want",
+        "row": "w_voice"
+      }
+    },
+    {
+      "id": "w_aloud",
+      "subject": "voice",
+      "title": "Read answers out loud",
+      "text": "Hermes can turn its answers into speech. This is built in, and the standard voice is free.",
+      "kw": [
+        "text to speech",
+        "text-to-speech",
+        "tts",
+        "read aloud",
+        "read it out",
+        "voice message",
+        "voice messages",
+        "read aloud answers",
+        "read aloud answer",
+        "read aloud replies",
+        "read aloud reply",
+        "read aloud text",
+        "read aloud messages",
+        "read out answers",
+        "read out answer",
+        "read out replies",
+        "read out reply",
+        "read out text",
+        "read out messages",
+        "aloud answers",
+        "aloud answer",
+        "aloud replies",
+        "aloud reply",
+        "aloud text",
+        "aloud messages",
+        "spoken answers",
+        "spoken answer",
+        "spoken replies",
+        "spoken reply",
+        "spoken text",
+        "spoken messages",
+        "audio answers",
+        "audio answer",
+        "audio replies",
+        "audio reply",
+        "audio text",
+        "audio messages"
+      ],
+      "weak": [
+        "answers",
+        "answer",
+        "replies",
+        "reply",
+        "text",
+        "messages"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_aloud"
+      }
+    },
+    {
+      "id": "w_stt",
+      "subject": "voice",
+      "title": "Turn voice notes into text",
+      "text": "Hermes turns voice messages from Telegram or WhatsApp into text by itself. This is built in.",
+      "kw": [
+        "voice note",
+        "voice notes",
+        "voice memo",
+        "voice memos",
+        "transcribe",
+        "transcription",
+        "speech to text",
+        "speech-to-text",
+        "into text voice note",
+        "into text voice notes",
+        "into text voice message",
+        "into text voice messages",
+        "into text voice memo",
+        "into text voice memos",
+        "into text recording",
+        "into text recordings",
+        "into text audio",
+        "to text voice note",
+        "to text voice notes",
+        "to text voice message",
+        "to text voice messages",
+        "to text voice memo",
+        "to text voice memos",
+        "to text recording",
+        "to text recordings",
+        "to text audio",
+        "transcribe voice note",
+        "transcribe voice notes",
+        "transcribe voice message",
+        "transcribe voice messages",
+        "transcribe voice memo",
+        "transcribe voice memos",
+        "transcribe recording",
+        "transcribe recordings",
+        "transcribe audio",
+        "transcribes voice note",
+        "transcribes voice notes",
+        "transcribes voice message",
+        "transcribes voice messages",
+        "transcribes voice memo",
+        "transcribes voice memos",
+        "transcribes recording",
+        "transcribes recordings",
+        "transcribes audio",
+        "write out voice note",
+        "write out voice notes",
+        "write out voice message",
+        "write out voice messages",
+        "write out voice memo",
+        "write out voice memos",
+        "write out recording",
+        "write out recordings",
+        "write out audio",
+        "type out voice note",
+        "type out voice notes",
+        "type out voice message",
+        "type out voice messages",
+        "type out voice memo",
+        "type out voice memos",
+        "type out recording",
+        "type out recordings",
+        "type out audio",
+        "write down voice note",
+        "write down voice notes",
+        "write down voice message",
+        "write down voice messages",
+        "write down voice memo",
+        "write down voice memos",
+        "write down recording",
+        "write down recordings",
+        "write down audio"
+      ],
+      "weak": [
+        "voice note",
+        "voice notes",
+        "voice message",
+        "voice messages",
+        "voice memo",
+        "voice memos",
+        "recording",
+        "recordings",
+        "audio"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_stt"
+      }
+    },
+    {
+      "id": "w_music",
+      "subject": "voice",
+      "title": "Write a song",
+      "text": "Hermes comes with a skill called \"songwriting-and-ai-music\". Its written steps teach Hermes songwriting, and how to brief Suno, a music AI.",
+      "kw": [
+        "write song",
+        "write songs",
+        "write music",
+        "write lyrics",
+        "writes song",
+        "writes songs",
+        "writes music",
+        "writes lyrics",
+        "make song",
+        "make songs",
+        "make music",
+        "make lyrics",
+        "create song",
+        "create songs",
+        "create music",
+        "create lyrics",
+        "compose song",
+        "compose songs",
+        "compose music",
+        "compose lyrics",
+        "generate song",
+        "generate songs",
+        "generate music",
+        "generate lyrics"
+      ],
+      "weak": [
+        "song",
+        "songs",
+        "music",
+        "lyrics"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_music"
+      }
+    },
+    {
+      "id": "w_papers",
+      "subject": "web",
+      "title": "Find research papers",
+      "text": "Hermes comes with a skill called \"arxiv\". Its written steps teach Hermes to search research papers on arXiv.",
+      "kw": [
+        "find paper",
+        "find papers",
+        "find arxiv",
+        "find studies",
+        "search paper",
+        "search papers",
+        "search arxiv",
+        "search studies",
+        "look up paper",
+        "look up papers",
+        "look up arxiv",
+        "look up studies",
+        "read paper",
+        "read papers",
+        "read arxiv",
+        "read studies",
+        "summarize paper",
+        "summarize papers",
+        "summarize arxiv",
+        "summarize studies",
+        "summarise paper",
+        "summarise papers",
+        "summarise arxiv",
+        "summarise studies",
+        "check paper",
+        "check papers",
+        "check arxiv",
+        "check studies"
+      ],
+      "weak": [
+        "paper",
+        "papers",
+        "arxiv",
+        "studies"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_papers"
+      }
+    },
+    {
+      "id": "w_maps",
+      "subject": "web",
+      "title": "Find places and routes",
+      "text": "Hermes comes with a skill called \"maps\". Its written steps teach Hermes to find places, routes and time zones.",
+      "kw": [
+        "find map",
+        "find maps",
+        "find route",
+        "find routes",
+        "find directions",
+        "find address",
+        "find addresses",
+        "find nearby",
+        "find time zone",
+        "find time zones",
+        "get map",
+        "get maps",
+        "get route",
+        "get routes",
+        "get directions",
+        "get address",
+        "get addresses",
+        "get nearby",
+        "get time zone",
+        "get time zones",
+        "look up map",
+        "look up maps",
+        "look up route",
+        "look up routes",
+        "look up directions",
+        "look up address",
+        "look up addresses",
+        "look up nearby",
+        "look up time zone",
+        "look up time zones",
+        "plan map",
+        "plan maps",
+        "plan route",
+        "plan routes",
+        "plan directions",
+        "plan address",
+        "plan addresses",
+        "plan nearby",
+        "plan time zone",
+        "plan time zones",
+        "show map",
+        "show maps",
+        "show route",
+        "show routes",
+        "show directions",
+        "show address",
+        "show addresses",
+        "show nearby",
+        "show time zone",
+        "show time zones",
+        "search map",
+        "search maps",
+        "search route",
+        "search routes",
+        "search directions",
+        "search address",
+        "search addresses",
+        "search nearby",
+        "search time zone",
+        "search time zones",
+        "check map",
+        "check maps",
+        "check route",
+        "check routes",
+        "check directions",
+        "check address",
+        "check addresses",
+        "check nearby",
+        "check time zone",
+        "check time zones",
+        "how far map",
+        "how far maps",
+        "how far route",
+        "how far routes",
+        "how far directions",
+        "how far address",
+        "how far addresses",
+        "how far nearby",
+        "how far time zone",
+        "how far time zones"
+      ],
+      "weak": [
+        "map",
+        "maps",
+        "route",
+        "routes",
+        "directions",
+        "address",
+        "addresses",
+        "nearby",
+        "time zone",
+        "time zones"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_maps"
+      }
+    },
+    {
+      "id": "w_stocks",
+      "subject": "web",
+      "title": "Check stock prices",
+      "text": "There is an optional skill, \"stocks\". You add it first. Its written steps teach Hermes to look up stock and crypto prices.",
+      "kw": [
+        "check stock",
+        "check stocks",
+        "check shares",
+        "check crypto",
+        "check bitcoin",
+        "look up stock",
+        "look up stocks",
+        "look up shares",
+        "look up crypto",
+        "look up bitcoin",
+        "compare stock",
+        "compare stocks",
+        "compare shares",
+        "compare crypto",
+        "compare bitcoin",
+        "follow stock",
+        "follow stocks",
+        "follow shares",
+        "follow crypto",
+        "follow bitcoin",
+        "quote stock",
+        "quote stocks",
+        "quote shares",
+        "quote crypto",
+        "quote bitcoin",
+        "quotes stock",
+        "quotes stocks",
+        "quotes shares",
+        "quotes crypto",
+        "quotes bitcoin",
+        "price stock",
+        "price stocks",
+        "price shares",
+        "price crypto",
+        "price bitcoin",
+        "prices stock",
+        "prices stocks",
+        "prices shares",
+        "prices crypto",
+        "prices bitcoin"
+      ],
+      "weak": [
+        "stock",
+        "stocks",
+        "shares",
+        "crypto",
+        "bitcoin"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_stocks"
+      }
+    },
+    {
+      "id": "w_prices",
+      "subject": "web",
+      "title": "Watch a price for me",
+      "text": "Hermes comes with a skill called \"product-price-monitor\". Its written steps teach Hermes to watch prices and alert you at your target.",
+      "kw": [
+        "watch price",
+        "watch prices",
+        "watch flight",
+        "watch flights",
+        "watch listing",
+        "watch listings",
+        "watch deal",
+        "watch deals",
+        "watches price",
+        "watches prices",
+        "watches flight",
+        "watches flights",
+        "watches listing",
+        "watches listings",
+        "watches deal",
+        "watches deals",
+        "track price",
+        "track prices",
+        "track flight",
+        "track flights",
+        "track listing",
+        "track listings",
+        "track deal",
+        "track deals",
+        "tracks price",
+        "tracks prices",
+        "tracks flight",
+        "tracks flights",
+        "tracks listing",
+        "tracks listings",
+        "tracks deal",
+        "tracks deals",
+        "monitor price",
+        "monitor prices",
+        "monitor flight",
+        "monitor flights",
+        "monitor listing",
+        "monitor listings",
+        "monitor deal",
+        "monitor deals",
+        "alert price",
+        "alert prices",
+        "alert flight",
+        "alert flights",
+        "alert listing",
+        "alert listings",
+        "alert deal",
+        "alert deals",
+        "alerts price",
+        "alerts prices",
+        "alerts flight",
+        "alerts flights",
+        "alerts listing",
+        "alerts listings",
+        "alerts deal",
+        "alerts deals",
+        "drops price",
+        "drops prices",
+        "drops flight",
+        "drops flights",
+        "drops listing",
+        "drops listings",
+        "drops deal",
+        "drops deals",
+        "tell me when price",
+        "tell me when prices",
+        "tell me when flight",
+        "tell me when flights",
+        "tell me when listing",
+        "tell me when listings",
+        "tell me when deal",
+        "tell me when deals",
+        "keep an eye price",
+        "keep an eye prices",
+        "keep an eye flight",
+        "keep an eye flights",
+        "keep an eye listing",
+        "keep an eye listings",
+        "keep an eye deal",
+        "keep an eye deals"
+      ],
+      "weak": [
+        "price",
+        "prices",
+        "flight",
+        "flights",
+        "listing",
+        "listings",
+        "deal",
+        "deals"
+      ],
+      "shows": {
+        "kind": "want",
+        "row": "w_prices"
+      }
+    },
+    {
+      "id": "COST",
+      "subject": "cost",
+      "title": "What Hermes costs",
+      "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose.",
+      "kw": [
+        "cost",
+        "costs",
+        "price",
+        "pay",
+        "free",
+        "money"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "COST"
+      }
+    },
+    {
+      "id": "WHERE",
+      "subject": "cost",
+      "title": "My computer or one that stays on",
+      "text": "Both work. Hermes answers and runs jobs only while its computer is on. For any time, use a computer that stays on.",
+      "kw": [
+        "cloud",
+        "server",
+        "vps",
+        "laptop",
+        "always on",
+        "24/7"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "WHERE"
+      }
+    },
+    {
+      "id": "CN1",
+      "subject": "svc",
+      "title": "Gmail and Google apps: Connectors",
+      "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. Click \"Capabilities\", then the \"Connectors\" tab.",
+      "kw": [
+        "gmail",
+        "google calendar",
+        "google drive",
+        "calendar",
+        "drive"
+      ],
+      "weak": [],
+      "shows": {
+        "kind": "CN1"
+      }
+    },
+    {
+      "id": "bot1-next",
+      "subject": "bot",
+      "title": "",
+      "text": "Open \"Bots\", press \"+\", then \"New bot\". It asks for a name, a title and a description.",
+      "kw": [],
+      "weak": [],
+      "next_of": "bot1",
+      "shows": {
+        "kind": "extra",
+        "line": "bot1-next"
+      }
+    },
+    {
+      "id": "use-more",
+      "subject": "use",
+      "title": "",
+      "text": "When a chat gets long, start a fresh one. Click \"New session\" at the top left.",
+      "kw": [],
+      "weak": [],
+      "next_of": "use0",
+      "shows": {
+        "kind": "extra",
+        "line": "use-more"
+      }
+    },
+    {
+      "id": "use1-next",
+      "subject": "use",
+      "title": "",
+      "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
+      "kw": [],
+      "weak": [],
+      "next_of": "use1",
+      "shows": {
+        "kind": "extra",
+        "line": "use1-next"
+      }
+    },
+    {
+      "id": "use3-next",
+      "subject": "use",
+      "title": "",
+      "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
+      "kw": [],
+      "weak": [],
+      "next_of": "use3",
+      "shows": {
+        "kind": "extra",
+        "line": "use3-next"
+      }
+    }
+  ],
+  "stop_words": [
+    "a",
+    "an",
+    "the",
+    "i",
+    "me",
+    "my",
+    "it",
+    "is",
+    "are",
+    "to",
+    "of",
+    "for",
+    "and",
+    "or",
+    "in",
+    "on",
+    "do",
+    "does",
+    "can",
+    "could",
+    "how",
+    "what",
+    "which",
+    "who",
+    "why",
+    "when",
+    "you",
+    "your",
+    "this",
+    "that",
+    "with",
+    "be",
+    "have",
+    "has",
+    "about",
+    "so",
+    "if",
+    "at",
+    "by",
+    "from",
+    "as",
+    "not",
+    "just",
+    "get",
+    "use",
+    "using",
+    "want",
+    "will",
+    "would",
+    "there",
+    "any",
+    "its",
+    "it's",
+    "i'm"
+  ],
+  "max_handed": 5,
+  "subjects": [
+    {
+      "id": "mem",
+      "title": "Memory"
+    },
+    {
+      "id": "mod",
+      "title": "Choosing a model"
+    },
+    {
+      "id": "msg",
+      "title": "From a phone or chat app"
+    },
+    {
+      "id": "sch",
+      "title": "On a schedule"
+    },
+    {
+      "id": "svc",
+      "title": "A service you use"
+    },
+    {
+      "id": "bot",
+      "title": "More than one bot"
+    },
+    {
+      "id": "use",
+      "title": "Using less: fewer tokens, limits, slow answers"
+    },
+    {
+      "id": "words",
+      "title": "What a word means: tools, skills, plugins, MCP, SOUL.md, bots"
+    },
+    {
+      "id": "web",
+      "title": "Search and use the web"
+    },
+    {
+      "id": "files",
+      "title": "Files and my computer"
+    },
+    {
+      "id": "pics",
+      "title": "Pictures and video"
+    },
+    {
+      "id": "voice",
+      "title": "Voice and sound"
+    },
+    {
+      "id": "cost",
+      "title": "Cost, and which computer"
+    },
+    {
+      "id": "talk",
+      "title": "ordinary talk: hello, thanks, ok, a cut-off word, \"what do you mean\", \"and then?\" about the conversation so far"
+    },
+    {
+      "id": "build",
+      "title": "the person asks Helper to make, build, install, connect or do something for them"
+    },
+    {
+      "id": "none",
+      "title": "anything else, or a question about Hermes that none of the words above covers"
+    }
+  ],
+  "input": {
+    "text": "Conversation so far:\n{last_lines}\n\nThe person's newest message: {message}",
+    "text_no_lines": "The person's newest message: {message}",
+    "cut_at_chars": 1500,
+    "temperature": 0.2
+  },
+  "first_call": {
+    "text": "You sort messages for Helper, a part of the Hermes app that explains Hermes to newcomers.\nRead the person's newest message (and the conversation before it, if any). Reply with ONE word from this list and nothing else:\n{subjects: one per line, as id = title}",
+    "max_tokens": 20
+  },
+  "writer": {
+    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
+    "max_tokens": 200
+  },
+  "pick_only": {
+    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{rows: one per line, as [id] text; or (no lines)}",
+    "max_tokens": 20
+  },
+  "checks": {
+    "ok_caps": [
+      "Hermes",
+      "Helper",
+      "I",
+      "Hi",
+      "Hello",
+      "Yes",
+      "No",
+      "You",
+      "It",
+      "That",
+      "This",
+      "Sure",
+      "Thanks",
+      "Ok",
+      "OK",
+      "Sorry",
+      "Glad",
+      "What",
+      "Which",
+      "Any",
+      "Feel",
+      "Ask",
+      "Happy",
+      "Nice",
+      "There",
+      "Then",
+      "First",
+      "Just",
+      "Let",
+      "Welcome",
+      "Great",
+      "So",
+      "In",
+      "If",
+      "For",
+      "To",
+      "The",
+      "A",
+      "Is",
+      "Do",
+      "Can",
+      "Hermes's",
+      "Of",
+      "Not",
+      "AI",
+      "Hey"
+    ],
+    "not_words": {
+      "cannot": [
+        "can't",
+        "cant",
+        "cannot",
+        "can not",
+        "unable"
+      ],
+      "does_not": [
+        "doesn't",
+        "doesnt",
+        "does not",
+        "don't",
+        "dont",
+        "do not",
+        "didn't",
+        "did not"
+      ],
+      "is_not": [
+        "isn't",
+        "is not",
+        "aren't",
+        "are not",
+        "won't",
+        "will not"
+      ],
+      "no_have": [
+        "no built-in",
+        "not have",
+        "has no",
+        "have no",
+        "there is no",
+        "there are no"
+      ],
+      "not": [
+        "not",
+        "never"
+      ]
+    },
+    "not_cut_first": [
+      "not checked",
+      "haven't checked",
+      "have not checked",
+      "don't have checked",
+      "doesn't say",
+      "does not say",
+      "don't say",
+      "do not say"
+    ],
+    "test_phrases": [
+      "do you know",
+      "what do you know",
+      "have you heard",
+      "can you tell me what",
+      "do you understand",
+      "can you guess",
+      "try to remember"
+    ],
+    "money_cut_first": [
+      "feel free",
+      "free to ask"
+    ],
+    "money_words": [
+      "free",
+      "paid",
+      "pay",
+      "price",
+      "prices",
+      "cost",
+      "costs",
+      "cheap",
+      "cheaper",
+      "expensive",
+      "subscription",
+      "plan",
+      "plans",
+      "$",
+      "€",
+      "£",
+      "dollar",
+      "euro"
+    ],
+    "max_words": 40,
+    "max_sentences": 2,
+    "gloss": [
+      {
+        "term": "\\bmodels?\\b",
+        "explained_by": "\\bAIs?\\b",
+        "ignore_case": true
+      },
+      {
+        "term": "\\bmemory\\b",
+        "explained_by": "\\bnotes?\\b|\\bremembers?\\b",
+        "ignore_case": true
+      },
+      {
+        "term": "\\bskills?\\b",
+        "explained_by": "\\bsteps\\b|\\bteach",
+        "ignore_case": true
+      },
+      {
+        "term": "\\btools?\\b",
+        "explained_by": "\\bactions?\\b",
+        "ignore_case": true
+      },
+      {
+        "term": "\\bplugins?\\b",
+        "explained_by": "\\badd-on",
+        "ignore_case": true
+      },
+      {
+        "term": "\\bMCP\\b",
+        "explained_by": "\\bservices?\\b",
+        "ignore_case": false
+      },
+      {
+        "term": "\\bbots?\\b",
+        "explained_by": "separate Hermes|\\b(?:its|their) own\\b",
+        "ignore_case": true
+      },
+      {
+        "term": "\\bkeys?\\b",
+        "explained_by": "\\bsecret\\b",
+        "ignore_case": true
+      },
+      {
+        "term": "\\bsubscriptions?\\b",
+        "explained_by": "\\bplan\\b",
+        "ignore_case": true
+      },
+      {
+        "term": "SOUL\\.md",
+        "explained_by": "\\bfile\\b",
+        "ignore_case": true
+      },
+      {
+        "term": "\\btokens?\\b",
+        "explained_by": "pieces of words|word pieces",
+        "ignore_case": true
+      }
+    ],
+    "r9_pattern": "\\bI(?:'ll| will| can)?\\s+(?:set up|install|connect|build|create)\\b",
+    "r6_pattern": "\\b(?:profiles?|providers?|gateways?|toolsets?|cron|sessions?|agents?|API|config\\w*|yaml|CLI|terminal|command line|OAuth|LLMs?|servers?|VPS|context|prompts?|webhooks?|endpoints?|backend|daemon|runtime)\\b",
+    "r8_never": [
+      "course",
+      "tutor",
+      "teacher",
+      "academy",
+      "chatbot",
+      "assistant",
+      "wizard",
+      "guide",
+      "lesson",
+      "quiz"
+    ],
+    "r5_patterns": [
+      "\\bmodels?\\b",
+      "\\bmemory\\b",
+      "\\bskills?\\b",
+      "\\btools?\\b",
+      "\\bplugins?\\b",
+      "\\bMCP\\b",
+      "\\bbots?\\b",
+      "\\bkeys?\\b",
+      "\\bsubscriptions?\\b",
+      "SOUL\\.md",
+      "\\btokens?\\b"
+    ],
+    "skills": [
+      "apple-notes",
+      "apple-reminders",
+      "findmy",
+      "imessage",
+      "claude-code",
+      "codex",
+      "computer-use",
+      "hermes-agent",
+      "architecture-diagram",
+      "ascii-video",
+      "baoyu-infographic",
+      "claude-design",
+      "humanizer",
+      "manim-video",
+      "p5js",
+      "popular-web-designs",
+      "songwriting-and-ai-music",
+      "sdlc-review",
+      "email-inbox-triage",
+      "himalaya",
+      "youtube-content",
+      "obsidian",
+      "document-to-action-items",
+      "google-workspace",
+      "maps",
+      "meeting-action-items",
+      "microsoft-office",
+      "product-price-monitor",
+      "teams-meeting-pipeline",
+      "weekly-review-planning",
+      "arxiv",
+      "competitor-news-monitor",
+      "grounded-citations",
+      "xurl",
+      "codebase-inspection",
+      "dogfood",
+      "github",
+      "requesting-code-review",
+      "simplify-code",
+      "spike",
+      "systematic-debugging",
+      "test-driven-development",
+      "blocked-page-recovery",
+      "agent-merge-conflict-arbiter",
+      "antigravity-cli",
+      "blackbox",
+      "dynamic-workflow",
+      "grok",
+      "opencode",
+      "openhands",
+      "hyperliquid",
+      "solana",
+      "one-three-one-rule",
+      "ai-presenter-video",
+      "anatomy",
+      "archify",
+      "ascii-art",
+      "auteur",
+      "baoyu-article-illustrator",
+      "baoyu-comic",
+      "brag",
+      "brag-slim",
+      "comfyui",
+      "concept-diagrams",
+      "creative-ideation",
+      "design-md",
+      "draw-your-font",
+      "dream-loop",
+      "excalidraw",
+      "heartmula",
+      "hyperframes",
+      "impeccable",
+      "ip-as-logo",
+      "kanban-video-orchestrator",
+      "meme-generation",
+      "mono-color",
+      "pixel-art",
+      "pretext",
+      "simple-english",
+      "sketch",
+      "social-media-content-calendar",
+      "system-atlas",
+      "tldraw-offline",
+      "unreal-mcp",
+      "jupyter-notebook",
+      "actual-setup",
+      "docker-management",
+      "hermes-s6-container-supervision",
+      "inference-sh-cli",
+      "pinggy-tunnel",
+      "setup-wizard-generator",
+      "watchers",
+      "adversarial-ux-test",
+      "agentmail",
+      "3-statement-model",
+      "comps-analysis",
+      "dcf-model",
+      "excel-author",
+      "lbo-model",
+      "merger-model",
+      "polymarket",
+      "pptx-author",
+      "stocks",
+      "minecraft-modpack-server",
+      "pokemon-player",
+      "fitness-nutrition",
+      "neuroskill-bci",
+      "fastmcp",
+      "mcp-oauth-remote-gateway",
+      "mcporter",
+      "gif-search",
+      "songsee",
+      "accelerate",
+      "axolotl",
+      "chroma",
+      "dspy",
+      "evaluating-llms-harness",
+      "faiss",
+      "flash-attention",
+      "lambda-labs",
+      "llama-cpp",
+      "modal",
+      "nemo-curator",
+      "obliteratus",
+      "peft",
+      "pytorch-fsdp",
+      "pytorch-lightning",
+      "saelens",
+      "segment-anything-model",
+      "serving-llms-vllm",
+      "simpo",
+      "slime",
+      "tensorrt-llm",
+      "torchtitan",
+      "unsloth",
+      "stripe-link-cli",
+      "stripe-projects",
+      "canvas",
+      "decision-questionnaire",
+      "here-now",
+      "live-dashboard",
+      "memento-flashcards",
+      "property-listings",
+      "shop",
+      "siyuan",
+      "telephony",
+      "bioinformatics",
+      "blogwatcher",
+      "darwinian-evolver",
+      "domain-intel",
+      "drug-discovery",
+      "gitnexus-explorer",
+      "llm-wiki",
+      "osint-investigation",
+      "parallel-cli",
+      "research-paper-writing",
+      "rss-feeds",
+      "scrapling",
+      "1password",
+      "godmode",
+      "oss-forensics",
+      "sherlock",
+      "unbroker",
+      "web-pentest",
+      "openhue",
+      "reddit-reading",
+      "ast-grep",
+      "code-wiki",
+      "grill-me",
+      "hermes-agent-skill-authoring",
+      "inspecting-hermes-desktop-dom",
+      "node-inspect-debugger",
+      "pr-lens",
+      "python-debugpy",
+      "rest-graphql-debug",
+      "subagent-driven-development",
+      "cloudflare-temporary-deploy",
+      "har-derived-api-client",
+      "page-agent",
+      "publish-site",
+      "scrollcraft",
+      "yuanbao"
+    ]
+  },
+  "lines_by_mode": {
+    "are_you_an_ai": {
+      "no_ai_step": "AI",
+      "ai_picks_line": "AI_PICK",
+      "ai_writes": "AI_WRITES"
+    },
+    "first_time_grey": {
+      "no_ai_step": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.",
+      "ai_picks_line": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords.",
+      "ai_writes": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords."
+    },
+    "settings_top_line_2": {
+      "no_ai_step": null,
+      "ai_picks_line": "Nothing on this page is sent to any AI.",
+      "ai_writes": "Nothing on this page is sent to any AI."
+    }
+  }
 }
 
 // ---- src/key-check.js ----
@@ -9686,8 +15087,8 @@ function asksTopics(text) {
   return !(strongTopics(tc).length || anyTerm(tc))
 }
 
-// changes-7: N1a, a skill named in a clear pattern and on no official list; N1b, a left-out skill;
-// N1, everything else. null: an official skill named that way.
+// changes-7: N1a, a skill named in a clear pattern and on no official list; N1, everything else.
+// null: an official skill named that way (changes-19: all 186 are answered, N1b is gone).
 const SKILL_PATTERNS = [/skills? (?:called|named) "?([a-z0-9][a-z0-9 -]{0,40}?)"?(?=$|[^a-z0-9 -])/, /"([a-z0-9][a-z0-9 -]{0,40})" skills?/]
 function dontKnow(text) {
   const t = talkNorm(text)
@@ -9696,7 +15097,6 @@ function dontKnow(text) {
     if (m) {
       const n = m[1].trim().replace(/ /g, '-')
       if (!SKILL_NAMES.has(n)) return 'N1a'
-      if (SKILL_NAMES.get(n).left_out) return 'N1b'
       return null
     }
   }
@@ -9839,6 +15239,10 @@ function serviceIn(text, st, answered) {
 
 /* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
 const ST = TALK_DATA.small_talk
+// talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
+const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
+// live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
+const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
 const NR = TALK_DATA.no_repeat
 const LETTER = /\p{L}/u
 const ONE_WORD = /^(?:\p{L}|['-]){2,30}$/u
@@ -9896,7 +15300,10 @@ function smallTalk(text, st) {
     if (!letters || (one && t.length === 1)) kind = 'cut' // rules a and b
     else if (!opening && saysWrong(t) && !known) kind = 'wrong' // changes-17 wrong_rule_17
     else if (!opening && !st.pending && !known) {
-      if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
+      // live-v2 changes-1 and -2: "how", "and", "and then" right after a line from rows is kind mean (checked just
+      // before rule c; the whole message after the usual cuts, so an entry may have two words)
+      if (ST.how_after_rows.words.includes(t) && HOW_AFTER.includes(st.last)) kind = 'mean'
+      else if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
       else if (ws.length <= 4 && ST.cut_dangling.includes(ws[ws.length - 1])) kind = 'cut' // rule d
       else if (ws.length <= 3 && ws.length > 1 && OPENING.question_starts.includes(ws[0]) && ws.slice(1).every(w => ST.cut_small_words.includes(w))) kind = 'cut' // changes-17 rule e
     }
@@ -9912,7 +15319,7 @@ function smallTalk(text, st) {
 function smallLine(kind, st) {
   const name = st.name || st.kept.name || null
   if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
-  if (kind === 'ai') return [ST.ai_line, null]
+  if (kind === 'ai') return [LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE], null] // talk-live: AI, AI_PICK or AI_WRITES
   if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
   return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG' }[kind], null]
 }
@@ -9959,10 +15366,17 @@ function noRepeat(out, st, text) {
 // One typed message -> a result (route2.py turn, changes-14's wrapper): the steps below, then no_repeat; met
 // is set when the opening ends here, and the line is noted as Helper's last.
 function turn(text, st) {
+  return turnParts(text, st).out
+}
+// talk-live: the same, with the result before no_repeat as well (pre, a copy), which decides whether the AI
+// step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
+function turnParts(text, st) {
   const wasOpening = st.stage === 'name' || st.stage === 'work'
-  const out = noRepeat(turnSteps(text, st), st, text)
+  const steps = turnSteps(text, st)
+  const pre = { ...steps }
+  const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
-  return noteLast(st, out)
+  return { pre, out: noteLast(st, out) }
 }
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
@@ -10055,8 +15469,8 @@ function turnSteps(text, st) {
     st.lastq = false
   }
   // a skill by its name, next to "skill" (changes-6 fix 3): before the topics, so "is there a
-  // github skill" gets the skill, not the service question. A row for that skill wins; a skill
-  // marked left out gets N1b; else S1 (built in) or S2 (optional, with the clicks to add it).
+  // github skill" gets the skill, not the service question. A row for that skill wins; else S1
+  // (built in) or S2 (optional, with the clicks to add it); changes-19: no skill is left out.
   if (st.wants !== false) {
     // The Builder's rule, in the reference since wants fixes v1 (wants_fixes_step.py c): a group's own label typed as it is on its
     // button ("pictures and video") is that group, as if picked; else "I don't know that one" (N2).
@@ -10069,13 +15483,12 @@ function turnSteps(text, st) {
     if (sk.length === 1) {
       const row = rowOfSkill(sk[0])
       if (row) return done('want', { row: row.id })
-      if (WSKILLS.get(sk[0]).left_out) return done('N1b')
       return done('skill', { skill: sk[0] })
     }
   }
   // a skill named in a clear pattern is looked up before the terms
   const dk = dontKnow(text)
-  if (dk === 'N1a' || dk === 'N1b') return done(dk)
+  if (dk === 'N1a') return done(dk)
   // changes-11, in route2.py's order: a name on a later visit, "what is ...", cost, where
   if (st.stage === 'open') {
     const nl = nameLater(text, st, out)
@@ -10376,7 +15789,7 @@ function keptNote(result, st) {
   // items: what this line says was kept, [key, value] each, so the page can mark the line once
   // that is no longer kept (forgotten, or replaced by a newer one)
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? KEEPS.tell.first_time_if_no_model_call : null, items }
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, items }
 }
 // Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
 // as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
@@ -10407,13 +15820,20 @@ function openingLine(st = null) {
 // result: what turn, pick, pickTopic, press, skip, sayLine, change, rmPick or forgetAnswer
 // returned. typed: the person's words (for the text to paste under "your own Hermes can").
 // opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it). opts.keptShown: the
-// conversation already shows a "Kept:" or "From what I keep:" line (A1 with nothing kept then says it was deleted).
+// conversation shows that something was kept (keptWasShown; A1 with nothing kept then says it was deleted).
 // Returns { line, text, source, answers, next, paste, note, used, hint, rows, docs }:
 //   docs: the box "From the Hermes docs" { head, words, source } (S1, S2), the page's own words;
 //   next may also be { kind: 'steps', label, steps, after } (the clicks to add an optional skill);
 //   an answer to pick may be { more: [the next ones] } ("More", three at a time, src/page.js).
 //   note: the faint "Kept: ..." line { text, link, first }; used: "From what I keep: ..." { text,
 //   link, topic }; hint: a small faint line (N_HINT); rows: the list of kept things (A1).
+// live-v2 changes-2 (keeps.tell.see.see_line_deleted_when): whether this conversation shows that something was kept:
+// a faint "Kept:" or "From what I keep:" line, a kept row in the list, or the "Done." line of a delete (all, or one
+// thing). Only what this conversation shows counts, never the met mark, so every visit answers alike.
+function keptWasShown(log) {
+  const done = [KEEPS.tell.see.delete_all.after_yes, KEEP_TYPED.forget_one.after_yes]
+  return log.some(e => e.who === 'helper' && !!(e.note || e.used || (e.rows && e.rows.length) || done.includes(e.text)))
+}
 function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
@@ -10447,6 +15867,8 @@ function lineFor(result, st, typed = '', opts = {}) {
     case 'HOW':
     case 'WHO':
     case 'AI':
+    case 'AI_PICK':
+    case 'AI_WRITES':
     case 'BYE':
     case 'CUT':
     case 'MEAN_NONE':
@@ -10463,7 +15885,6 @@ function lineFor(result, st, typed = '', opts = {}) {
       return said('TP', FIXED.TP.text, { answers: topicPicks() })
     case 'N1':
     case 'N1a':
-    case 'N1b':
     case 'N1_AGAIN': // changes-15: in place of a second don't-know line, the faint hint under it as under N1
       return dontKnowLine(result.kind)
     case 'skill by name':
@@ -10494,6 +15915,12 @@ function lineFor(result, st, typed = '', opts = {}) {
       return said('G1', WANTS_DATA.fixed.G1.text, { answers: rowPicks(result.buttons, 'rows') })
     case 'N2':
       return said('N2', WANTS_DATA.fixed.N2.text, { answers: rowPicks(WROWS.filter(r => r.group === result.group).map(r => r.id), 'rows') })
+    // talk-live: a reply the person's AI wrote (ai_writes): its words only, no source, nothing to pick
+    case 'written':
+      return said('written', result.text)
+    // talk-live: the Connectors line picked by the person's AI (ai_picks_line), as a row shows it
+    case 'CN1':
+      return said('CN1', WANTS_DATA.fixed.CN1.text, { source: sourceText(WANTS_DATA.fixed.CN1.sources) })
     case 'want': {
       const r = WANT_ROWS[result.row]
       return said(r.id, r.text, { source: sourceText(r.sources), next: wantNext(r.next, r.thing) })
@@ -10539,8 +15966,8 @@ function lineFor(result, st, typed = '', opts = {}) {
       return said('RM2', RM.RM2.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: RM.RM2.answers.map(a => ({ id: `rm-${a.gives}`, label: a.label, rm: a.gives === 'RM3' ? 'helper' : 'hermes' })) } })
     case 'A1': {
       const rows = keptRows(st.kept)
-      // helper-builder-qs-v1.md point 3: nothing kept, and this conversation already shows a "Kept:" or "From
-      // what I keep:" line (opts.keptShown, from the page): it was deleted. Else nothing was kept yet.
+      // live-v2 changes-2: nothing kept, and this conversation shows something was kept (opts.keptShown, from the
+      // page's keptWasShown): it was deleted. Else nothing was kept yet.
       if (!rows.length) return opts.keptShown ? said('A1-deleted', KEEPS.tell.see.see_line_deleted) : said('A1-none', KEEPS.tell.see.see_line_nothing)
       // with Helper's settings page: its button, and under the list the way there by hand
       const next = opts.settingsPage ? { kind: 'settings', label: KEEPS.after_settings_page_exists.button_under_see } : { kind: 'forget-all', label: ALL.label }
@@ -10569,6 +15996,469 @@ function lineFor(result, st, typed = '', opts = {}) {
 // data has no words for it.
 const REPLY_HINT = 'Reply to Helper'
 const hintFor = entry => (entry && entry.answers && entry.answers.items.length ? entry.answers.hint : REPLY_HINT)
+
+// ---- src/live-rows.js ----
+// Which of Helper's checked rows the person's AI is handed (talk-live row 2): hhtech's live.py score, by_words
+// and rank_in (dev/checks/hhtech-live-reply/live.py lines 45 to 57), the follow-up rule and the next lines of
+// content/helper-talk-live-v2.json (follow_up, rows). Never more than 5 rows, never a whole list.
+// No React, no requests: tests/live-rows.test.mjs compares the ids with live.py's on the same data.
+
+const LIVE_ROWS = LIVE_DATA.rows
+const LIVE_ROW = Object.fromEntries(LIVE_ROWS.map(r => [r.id, r]))
+// the rows word matching and the subjects rank (the next lines have no key words of their own)
+const SCORED = LIVE_ROWS.filter(r => !r.next_of)
+const NEXT_OF = Object.fromEntries(LIVE_ROWS.filter(r => r.next_of).map(r => [r.next_of, r.id]))
+const STOP = new Set(LIVE_DATA.stop_words)
+const MAX_HANDED = LIVE_DATA.max_handed
+
+// live.py words(): the words of 3 letters or more that are not stop words, lower case
+const liveWords = s => new Set((String(s).toLowerCase().match(/[a-z0-9']+/g) || []).filter(w => !STOP.has(w) && w.length > 2))
+
+// live.py score(): 2 for each key word found, 0.5 if any weak word is found, 0.5 for each word shared
+// with the row's text and title
+function rowScore(text, row) {
+  const t = talkNorm(text)
+  let s = 2 * whichOf(t, row.kw).length + 0.5 * Math.min(1, whichOf(t, row.weak).length)
+  const mine = liveWords(text)
+  for (const w of liveWords(row.text + ' ' + row.title)) if (mine.has(w)) s += 0.5
+  return s
+}
+
+// live.py by_words(): every row scored, best first (Python sorts the (score, id) pairs from the top, so of
+// two rows with the same score the greater id comes first), the first 4, those with 2 or more
+function byWords(text, k = 4) {
+  const scored = SCORED.map(r => [rowScore(text, r), r.id])
+  scored.sort((a, b) => b[0] - a[0] || (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0))
+  return scored.slice(0, k).filter(([s]) => s >= 2).map(([, id]) => id)
+}
+
+// live.py rank_in(): a subject's rows by the same score, best first, rows with the same score in the data's
+// order; the first 5, score 0 included
+function rankIn(text, subject, k = MAX_HANDED) {
+  const rows = SCORED.filter(r => r.subject === subject).map(r => [rowScore(text, r), r.id])
+  rows.sort((a, b) => b[0] - a[0])
+  return rows.slice(0, k).map(([, id]) => id)
+}
+
+// rows.from item 2: a next line is handed with its row, right after it; then cut at 5
+function withNext(ids) {
+  const out = []
+  for (const id of ids) {
+    if (!out.includes(id)) out.push(id)
+    const n = NEXT_OF[id]
+    if (n && !out.includes(n)) out.push(n)
+  }
+  return out.slice(0, MAX_HANDED)
+}
+
+// The row of a line code showed, from the visit's note of Helper's last line (src/talk.js lineKey: kind, topic,
+// need, term, buttons, row, ...). null: a line that came from no row.
+function rowOfKey(key) {
+  if (!key) return null
+  let k
+  try {
+    k = JSON.parse(key)
+  } catch {
+    return null
+  }
+  if (!Array.isArray(k)) return null
+  const [kind, topic, need, term, , row] = k
+  const id = kind === 'row' ? need : kind === 'plain' ? (LIVE_ROWS.find(r => r.shows.kind === 'plain' && r.shows.topic === topic) || {}).id : kind === 'term' ? term : kind === 'want' ? row : ['COST', 'WHERE', 'CN1'].includes(kind) ? kind : null
+  return id && LIVE_ROW[id] ? id : null
+}
+
+// follow_up.rule: the kinds of Helper's last line that came from rows. The data says wants; the plugin's kind
+// is want. written: a reply the AI wrote that used rows.
+const FROM_ROWS = ['row', 'plain', 'term', 'want', 'COST', 'WHERE', 'written']
+const FOLLOW_CUT = ['ok', 'okay', 'so', 'and', 'cool', 'right']
+const PHRASES = LIVE_DATA.follow_up.phrases
+// the whole message, end marks and the lead words ok, okay, so, and, cool, right cut, is one of the phrases
+function isFollowPhrase(text) {
+  const bare = s => s.replace(/[ ?!.,]+$/, '').trim()
+  let t = bare(talkNorm(text))
+  if (PHRASES.includes(t)) return true
+  for (;;) {
+    const w = FOLLOW_CUT.find(c => t.startsWith(c + ' ') || t.startsWith(c + ','))
+    if (!w) return false
+    t = t.slice(w.length).replace(/^[ ,]+/, '')
+    if (PHRASES.includes(bare(t))) return true
+  }
+}
+
+// Whether a message is a follow-up (follow_up.rule): Helper's last line came from rows, and the no-AI turn
+// found ordinary talk of kind mean (plain with why "what do you mean", or MEAN_NONE) or the message is a phrase.
+// before: the visit's note of Helper's last line as it was before this message ({ last, lastKey, liveRows }).
+function isFollowUp(text, pre, before) {
+  const fromRows = before.last === 'written' ? !!(before.liveRows && before.liveRows.ids.length) : FROM_ROWS.includes(before.last)
+  if (!fromRows) return false
+  const mean = pre.kind === 'MEAN_NONE' || (pre.kind === 'plain' && pre.why === 'what do you mean')
+  return mean || isFollowPhrase(text)
+}
+
+// follow_up.rows: the rows handed for the person's previous message, in the same order, each with its next
+// line; if that message got a line from code, the row of that line with its next line. At most 5.
+function followRows(before) {
+  if (before.liveRows && before.liveRows.key === before.lastKey) return withNext(before.liveRows.ids)
+  const id = rowOfKey(before.lastKey)
+  return id ? withNext([id]) : []
+}
+
+// What a handed row shows when the AI picks it (pick_only.read): the result code would give for that row.
+function resultOfRow(id) {
+  const r = LIVE_ROW[id]
+  return r ? { ...r.shows } : null
+}
+
+// ---- src/live-checks.js ----
+// Reading what the person's AI sent back, and the checks a written reply must pass before it is shown
+// (talk-live row 4). A port of hhcontent's check_live.py (fix and run_checks, dev/checks/hhcontent-live-v2),
+// with the checks c18 and c23 that need the conversation, which only the page has. The lists come from
+// content/helper-talk-live-v2.json checks (src/live-data.js); the Python patterns of the talk data go through
+// pyRegExp. tests/live-checks.test.mjs gives every recorded reply the flags check_live.py gives it.
+// The person is never told a check failed: a failure only means the pre-written line is shown.
+
+const LC = LIVE_DATA.checks
+const SUBJECT_IDS = LIVE_DATA.subjects.map(s => s.id)
+const LC_R9 = pyRegExp(LC.r9_pattern, 'i')
+const LC_R6 = pyRegExp(LC.r6_pattern, 'gi')
+const LC_R8 = new RegExp('\\b(?:' + LC.r8_never.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i')
+const LC_R5 = LC.r5_patterns.map(p => pyRegExp(p, 'i'))
+const GLOSS_RX = LC.gloss.map(g => [pyRegExp(g.term, g.ignore_case ? 'i' : ''), pyRegExp(g.explained_by, 'i')])
+const OK_CAPS = new Set(LC.ok_caps)
+const liveEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const SKILL_RX = LC.skills.map(s => [s.toLowerCase(), new RegExp('(^|[^a-z0-9-])' + liveEsc(s.toLowerCase()) + '($|[^a-z0-9-])')])
+const NOT_RX = Object.fromEntries(Object.entries(LC.not_words).map(([cls, ws]) => [cls, ws.map(w => new RegExp("(^|[^a-z'])" + liveEsc(w) + "($|[^a-z'])", 'g'))]))
+const MONEY_RX = LC.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
+const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
+
+// <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
+// while the model still thinks)
+const cutThink = s => String(s || '').replace(/<think>[\s\S]*?<\/think>/g, '').replace(/<think>[\s\S]*$/, '')
+
+// first_call.read: lower case, <think> cut, the first word that is a subject id; none found: none
+function readSubject(raw) {
+  const words = cutThink(raw).toLowerCase().match(/[a-z_]+/g) || []
+  return words.find(w => SUBJECT_IDS.includes(w)) || 'none'
+}
+
+// pick_only.read: <think> cut, then spaces, full stops, brackets, backticks and quote marks at both ends.
+// Returns { id } for a handed id, or { word: 'TALK' | 'BUILD' | 'NONE' }; anything else counts as NONE.
+function readPick(raw, ids) {
+  const a = cutThink(raw).replace(/^[\s.[\]`"']+|[\s.[\]`"']+$/g, '')
+  if (ids.includes(a)) return { id: a }
+  const up = a.toUpperCase()
+  if (up.startsWith('TALK')) return { word: 'TALK' }
+  if (up.startsWith('BUILD')) return { word: 'BUILD' }
+  return { word: 'NONE' }
+}
+
+// c0 and c1, the two fixes (check_live.py fix(), and writer.read for USED:). Returns { text, used }: used is
+// the ids after the last USED: (null when there is none: not a failure, as run).
+function readWritten(raw) {
+  let s = cutThink(raw).trim()
+  const usedAll = [...s.matchAll(/USED:\s*(.*)$/gm)]
+  const used = usedAll.length ? usedAll[usedAll.length - 1][1].match(/[A-Za-z_0-9-]+/g) || [] : null
+  s = s.replace(/\n?\s*USED:.*$/gm, '').trim()
+  // a code fence around the whole reply, then quote marks around the whole reply
+  s = s.replace(/^```\w*\s*|\s*```$/g, '').trim()
+  if (s.length > 1 && '"\'\u201c'.includes(s[0]) && '"\'\u201d'.includes(s[s.length - 1])) s = s.slice(1, -1).trim()
+  // c1: curly quotes straight, "!" to ".", a dash between words to ", ", ";" to ","
+  s = s.replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/!/g, '.')
+  s = s.replace(/\s*[\u2014\u2013]\s*/g, ', ').replace(/\s*;\s*/g, ', ')
+  return { text: s, used }
+}
+
+// c2: the whole reply is the word NONE or BUILD (as writer.read: a reply that starts with it, any case)
+function replyWord(text) {
+  const up = String(text).trim().toUpperCase()
+  return up.startsWith('NONE') ? 'NONE' : up.startsWith('BUILD') ? 'BUILD' : null
+}
+
+function notClasses(text) {
+  let t = String(text).toLowerCase()
+  for (const p of LC.not_cut_first) t = t.split(p).join(' ')
+  const found = new Set()
+  for (const cls of ['no_have', 'cannot', 'does_not', 'is_not', 'not']) {
+    for (const re of NOT_RX[cls]) {
+      re.lastIndex = 0
+      if (re.test(t)) {
+        found.add(cls)
+        re.lastIndex = 0
+        t = t.replace(re, ' ')
+      }
+    }
+  }
+  return found
+}
+const moneyCut = s => {
+  let t = String(s).toLowerCase()
+  for (const p of LC.money_cut_first) t = t.split(p).join(' ')
+  return t
+}
+// c23's "the same words": lower case, marks dropped, spaces squeezed
+const sameWords = s => talkNorm(s).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim()
+
+// The checks c3 to c23 on a reply after c0 and c1 (check_live.py run_checks, in the data's order). Every
+// failed check is listed (the turn shows the fallback when the list is not empty).
+//   rows: the rows handed, [{ id, text }]; used: the ids after USED: (or null)
+//   talk: { lastLine: Helper's last line as shown, message: the person's newest message } for c18 and c23
+function replyFlags(reply, rows, used, talk = {}) {
+  const ids = rows.map(r => r.id)
+  const textOf = Object.fromEntries(rows.map(r => [r.id, r.text]))
+  const hand = rows.map(r => r.text).join(' ').toLowerCase()
+  const out = []
+  if (used && used.some(u => !ids.includes(u) && u.toLowerCase() !== 'none')) out.push('c3 USED not handed')
+  const nw = (reply.match(/\S+/g) || []).length
+  const ns = reply.trim().split(/(?<=[.!?])\s+/).filter(s => s.trim()).length
+  if (nw > LC.max_words) out.push(`c4 words ${nw}`)
+  if (ns > LC.max_sentences) out.push(`c5 sentences ${ns}`)
+  if (reply.split('?').length - 1 > 1) out.push('c6 two ?')
+  if (LC_R9.test(reply)) out.push('c7 offer')
+  for (const n of reply.match(/\b\d[\d.,:]*\b/g) || []) if (!hand.includes(n.toLowerCase())) out.push('c8 number ' + n)
+  for (const m of reply.matchAll(/"([^"]{2,40})"/g)) if (!hand.includes(m[1].toLowerCase())) out.push('c9 quoted ' + m[1])
+  for (const m of reply.matchAll(/`([^`]+)`|(?:^|\s)(\/[a-z][a-z-]+)|\b(hermes [a-z]+ [a-z-]+)/g)) {
+    const c = m[1] || m[2] || m[3]
+    if (!hand.includes(c.toLowerCase())) out.push('c10 command ' + c)
+  }
+  const low = reply.toLowerCase()
+  for (const [s, re] of SKILL_RX) if (re.test(low) && !hand.includes(s)) out.push('c11 skill ' + s)
+  for (const m of reply.matchAll(/(?<![.!?]\s)(?<!^)\b([A-Z][A-Za-z0-9]+)/g)) if (!OK_CAPS.has(m[1]) && !hand.includes(m[1].toLowerCase())) out.push('c12 name ' + m[1])
+  LC_R6.lastIndex = 0
+  for (const m of reply.matchAll(LC_R6)) if (!hand.includes(m[0].toLowerCase())) out.push('c13 jargon ' + m[0])
+  const hc = notClasses(hand)
+  for (const cls of [...notClasses(reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
+  if (/http|www\.|\(/.test(reply)) out.push('c15 link or (')
+  if (LC_R8.test(reply)) out.push('c16 product word')
+  if (LC.test_phrases.some(p => low.includes(p))) out.push('c17 test')
+  if (reply.includes('?') && /\?\s*$/.test(talk.lastLine || '')) out.push('c18 a second question')
+  const mc = moneyCut(reply)
+  for (const [m, re] of MONEY_RX) if (re.test(mc) && !hand.includes(m)) out.push('c19 money ' + m)
+  const uh = (used || []).filter(u => ids.includes(u)).map(u => textOf[u]).join(' ').toLowerCase()
+  if (/\b(only|never)\b/.test(uh) && !/\b(only|never)\b/.test(low)) out.push('c20 dropped only/never')
+  if (!ids.length || !used || !used.length || (used.length === 1 && used[0].toLowerCase() === 'none')) {
+    if (/\d/.test(reply) || reply.includes('"') || LC_R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
+  }
+  for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
+  if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
+  return out
+}
+
+// The whole reading of a written reply: { word: 'NONE' | 'BUILD' } (c2), { fail } (empty after c0, or the
+// first failed check), or { text, used } that may be shown.
+function judgeWritten(raw, rows, talk = {}) {
+  const { text, used } = readWritten(raw)
+  if (!text) return { fail: 'c0 empty' }
+  const word = replyWord(text)
+  if (word) return { word }
+  const flags = replyFlags(text, rows, used, talk)
+  if (flags.length) return { fail: flags[0], flags }
+  return { text, used: used || [] }
+}
+
+// ---- src/live-request.js ----
+// What is sent to the person's AI (talk-live row 3): the instructions and the input of each call, made from
+// the texts of content/helper-talk-live-v2.json (src/live-data.js). Never anything Helper keeps, not even the
+// name (input.never_sent, input.name_check; Lead, 11 Nov 00:55). tests/live-request.test.mjs keeps a name,
+// answers and a "remember that ..." and finds none of them in any request, in any capitals.
+
+const LV_IN = LIVE_DATA.input
+const LV_FIXED = TALK_DATA.fixed
+const LV_LINE_CHARS = 200
+const LV_LAST_LINES = 4
+// A slot such as {rows: one per line, as [id] text; or (none)} is filled with the rows, or with what follows
+// "or " when there are none.
+function fillList(text, slot, lines) {
+  return text.replace(new RegExp('\\{' + slot + '[^}]*\\}'), m => {
+    const empty = (m.match(/or (\([^)]*\))\}$/) || [, ''])[1]
+    return lines.length ? lines.join('\n') : empty
+  })
+}
+const firstCallText = () => fillList(LIVE_DATA.first_call.text, 'subjects', LIVE_DATA.subjects.map(s => `${s.id} = ${s.title}`))
+const rowLines = ids => ids.filter(id => LIVE_ROW[id]).map(id => `[${id}] ${LIVE_ROW[id].text}`)
+const writerText = ids => fillList(LIVE_DATA.writer.text, 'rows', rowLines(ids))
+const pickText = ids => fillList(LIVE_DATA.pick_only.text, 'rows', rowLines(ids))
+
+// Which lines of the conversation may ever be sent, decided when they are said (the page notes it on the
+// log entries): { you, helper } for the person's message and Helper's answer.
+//   left out: a pasted key (K1), "remember that ..." and its RM line, what Helper keeps asked about by typing
+//   (A1, A2, A4 and their Yes and No), the person's line that gave the name (the answer at "What's your
+//   name?", a name typed later, a name given with a question) and Helper's line that holds that name as typed
+//   (review) and an answer Helper keeps (the AI, the chat app, the service: picked or typed) with the line that
+//   answers it, and a line said from what is kept ("From what I keep: ..."), which shows the kept answer
+const LV_NEVER = /^(?:K1|RM\d|A1|A2|A4|A-none|A-yes|A-no|NAME_AGAIN|NAME_NEW)$/
+function sendable(result) {
+  const k = (result && result.kind) || ''
+  if (LV_NEVER.test(k)) return { you: false, helper: false }
+  if ((result.kept || []).some(x => x !== 'name') || result.used === 'kept') return { you: false, helper: false }
+  return { you: !(k === 'F1' || result.name_taken), helper: true }
+}
+
+// Helper's line as it may be sent: its shown text, and for a line that greets by name its text with no name
+// (BACK and HELLO text_no_name, F2 without the name, F1 as "Nice to meet you. What do you do?").
+function helperText(entry) {
+  const f = LV_FIXED[entry.line]
+  if (f && ['BACK', 'HELLO', 'F1', 'F2'].includes(entry.line)) return f.text_no_name || f.text.replace(/,? ?\{name\}/g, '')
+  return entry.text || ''
+}
+const lvEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+// The last 4 lines of this visit that may be sent, oldest first, "Person: ..." or "Helper: ...", each cut at
+// 200 characters. names: the kept name and this visit's name; a line that still holds one of them as a whole
+// word, in any capitals, is left out (input.name_check).
+function lastLines(log, names = []) {
+  const nameRes = names.filter(n => typeof n === 'string' && n.trim()).map(n => new RegExp('(^|[^\\p{L}\\p{N}])' + lvEsc(n.trim()) + '($|[^\\p{L}\\p{N}])', 'iu'))
+  const out = []
+  for (const e of log) {
+    if (e.send === false) continue
+    const text = e.who === 'you' ? e.text : helperText(e)
+    // (review) a line that looks like a secret by Helper's secret rule is never sent, also later
+    if (!text || nameRes.some(re => re.test(text)) || looksSecret(text)) continue
+    out.push(`${e.who === 'you' ? 'Person' : 'Helper'}: ${Array.from(text.replace(/\s+/g, ' ').trim()).slice(0, LV_LINE_CHARS).join('')}`)
+  }
+  return out.slice(-LV_LAST_LINES)
+}
+
+// The input of every call: the lines, then the newest message (as the person typed it, apart from a name given
+// in the same message, which the page cuts off first), cut at 1500 characters.
+function inputText(message, lines) {
+  // both slots filled in one pass, so a typed "{message}" in a line is left as typed (review)
+  const fill = { last_lines: lines.join('\n'), message: String(message).trim() }
+  const t = (lines.length ? LV_IN.text : LV_IN.text_no_lines).replace(/\{(last_lines|message)\}/g, (m, k) => fill[k])
+  return Array.from(t).slice(0, LV_IN.cut_at_chars).join('')
+}
+
+// llm.oneshot's params for one call (src/model-call.js: task helping_hand, no session, no profile)
+const liveParams = (instructions, input, maxTokens) => oneshotParams({ instructions, input, temperature: LV_IN.temperature, max_tokens: maxTokens })
+
+// ---- src/live-turn.js ----
+// One typed message with the AI step (talk-live rows 5 and 6). No React, and every request and clock is passed
+// in, so the tests drive time (as src/model-call.js). The order is content/helper-talk-live-v2.json order.steps:
+//   1. the no-AI turn runs first, exactly as before (src/talk.js turnParts); its line is the fallback, and what
+//      it keeps is kept at once;
+//   2. code's own answers are shown with no call (liveWhyNot);
+//   3. a follow-up gets the rows of the person's previous message; 4. else word matching; 5. else the first
+//      call picks a subject;
+//   6. the writer call (ai_writes) or the pick call (ai_picks_line), then the checks;
+//   7. the chosen line is noted as Helper's last line (liveApply).
+// Any failure (a thrown request, no text, NONE, a failed check) gives null: the page shows the fallback and
+// says nothing about it. The 12 seconds and one call at a time are the page's (src/page.js).
+
+const LIVE_SECONDS = LIVE_DATA.seconds
+// The second call starts only when at least this much of the 12 s is left (decided: a call that cannot finish
+// in time is not started).
+const SECOND_CALL_MIN_MS = 4000
+const LV_GO = LIVE_DATA.go_to_ai
+const LV_DONT_KNOW = ['N1', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE']
+
+// Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a
+// plain line given for "what do you mean" keeps its why. N1_AGAIN and AGAIN are no_repeat's own lines in place
+// of an N1 or a repeat; they come only after a result this already sends.
+function goesToAi(pre) {
+  if (!pre) return false
+  if (pre.kind === 'plain') return pre.why === 'what do you mean'
+  return LV_GO.includes(pre.kind)
+}
+
+// Why this message makes no call (null: it may). In this order: the switch, code's own answer, the model the
+// page checked is not ready (still checking, none or an error), the message looks like a secret by Helper's
+// secret rule, or Hermes still works on an earlier call of Helper's (one call at a time).
+function liveWhyNot({ mode = AI_MODE, pre, text, status, inHermes = 0 }) {
+  if (mode === 'no_ai_step') return 'no AI step'
+  if (!goesToAi(pre)) return 'code answered'
+  if (!status || status.state !== 'ok') return 'model not ready'
+  if (looksSecret(text)) return 'looks secret'
+  if (inHermes > 0) return 'Hermes still works on a call'
+  return null
+}
+
+// build: a how-question is never a request (route2.py's guard, build.skip_starts and build.how_phrases)
+function isHowQuestion(text) {
+  const t = cutIgnored(talkNorm(text))
+  return startsWith(t, TALK_DATA.build.skip_starts) || whichOf(t, TALK_DATA.build.how_phrases).length > 0
+}
+
+// The steps 3 to 6 for one message. Returns { result, rows } (a line to show in place of the fallback), or
+// { fallback: why } (show the fallback).
+//   text: the message as typed; message: what may be sent of it (a name given with it cut off)
+//   pre, out: the no-AI turn's result before and after no_repeat; before: the visit's note of Helper's last
+//   line as it was before this message ({ last, lastKey, liveRows }); lines: src/live-request.js lastLines;
+//   lastLine: Helper's last line as shown; request: host.request; msLeft(): ms left of the 12 s
+//   onCall(name): told before each call (for the tests' log)
+//   alive(): false once the page has closed this turn (12 s, or the next message): no further call starts
+async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {} }) {
+  const input = inputText(message, lines)
+  const call = async (name, instructions, maxTokens) => {
+    if (!alive()) return null
+    onCall(name)
+    try {
+      const res = await request('llm.oneshot', liveParams(instructions, input, maxTokens), ONESHOT_TIMEOUT_MS)
+      return res && typeof res.text === 'string' ? res.text : null
+    } catch {
+      return null
+    }
+  }
+  let ids = null
+  if (isFollowUp(text, pre, before)) ids = followRows(before)
+  if (!ids || !ids.length) {
+    ids = null
+    const w = byWords(message)
+    if (w.length) ids = withNext(w)
+  }
+  if (!ids) {
+    const raw = await call('first', firstCallText(), LIVE_DATA.first_call.max_tokens)
+    if (raw === null) return { fallback: 'first call failed' }
+    const subject = readSubject(raw)
+    if (subject === 'none') return { fallback: 'first call: none' }
+    if (subject === 'build') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
+    ids = subject === 'talk' ? followRows(before) : withNext(rankIn(message, subject))
+  }
+  if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
+  const rows = ids.map(id => ({ id, text: LIVE_ROW[id].text }))
+  if (mode === 'ai_picks_line') {
+    const raw = await call('pick', pickText(ids), LIVE_DATA.pick_only.max_tokens)
+    if (raw === null) return { fallback: 'pick call failed' }
+    const p = readPick(raw, ids)
+    if (p.id) return { result: resultOfRow(p.id), rows: ids }
+    if (p.word === 'TALK') return LV_DONT_KNOW.includes(out.kind) ? { result: { kind: 'OK' }, rows: [] } : { fallback: 'talk: the no-AI line' }
+    if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
+    return { fallback: 'pick: none' }
+  }
+  const raw = await call('writer', writerText(ids), LIVE_DATA.writer.max_tokens)
+  if (raw === null) return { fallback: 'writer call failed' }
+  const j = judgeWritten(raw, rows, { lastLine, message: text })
+  if (j.word === 'NONE') return { fallback: 'writer: NONE' }
+  if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
+  if (j.fail) return { fallback: 'check ' + j.fail }
+  return { result: { kind: 'written', text: j.text, used: j.used }, rows: ids }
+}
+
+// The words a written reply is told apart by (its own key for no_repeat and c23)
+const writtenKey = text => JSON.stringify(['written', talkNorm(text).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim()])
+
+// Step 7, for a line from the AI step: never the same line twice in a row (a picked row that is Helper's last
+// line again, or a line the person called wrong in this visit, gives the fallback instead; a written repeat was
+// stopped by c23); what the no-AI turn kept is still told under it; the line is noted as Helper's last, and its
+// rows as this message's rows (for a follow-up). Returns the result to show, or null for the fallback.
+function liveApply(st, got, out, before, text) {
+  if (!got || !got.result) return null
+  const r = { ...got.result }
+  if (r.kind !== 'written') {
+    const asked = whichOf(talkNorm(text), TALK_DATA.no_repeat.asked_again).length > 0
+    const k = lineKey(r)
+    if (!asked && (k === before.lastKey || (st.rejected || []).includes(k))) return null
+  }
+  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) r[x] = out[x]
+  st.pending = null
+  st.lastq = false
+  noteLast(st, r)
+  if (r.kind === 'written') {
+    // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
+    st.last = (r.used || []).some(u => u.toLowerCase() !== 'none') ? 'written' : 'written-talk'
+    st.lastKey = writtenKey(r.text)
+  }
+  st.liveRows = got.rows && got.rows.length ? { key: st.lastKey, ids: got.rows } : null
+  return r
+}
 
 // ---- src/settings-file.js ----
 // Helper's settings page as a short file (content/helper-settings-edit-v1.md; JSON
@@ -10931,6 +16821,8 @@ const T = {
   where: 'hh-where',
   dots: 'hh-dots',
   dotOn: 'hh-on',
+  dotsWait: 'hh-wait',
+  dotsStill: 'hh-still',
   // under the bubble: the piece between bubble and character, the character, the answers to pick
   under: 'hh-under',
   linkCell: 'hh-linkcell',
@@ -10976,7 +16868,7 @@ const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arro
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-wait i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-wait i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-wait i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -12634,15 +18526,16 @@ function Bubble({ entry, clock, fresh, said, onNext }) {
   })
 }
 
-// While Helper works on an answer: a small bubble with three dots, one lit, sitting on the piece
-// below it. `lit` is which dot (0 to 2); the page moves it on.
-function BusyDots({ lit = 0 }) {
+// While Helper works on an answer: a small bubble with three dots, sitting on the piece below it.
+// talk-live row 7: the lit dot moves on by the style sheet alone (.hh-wait, src/talk.css), so the page is
+// not drawn again for it and the label is said once; reduced: all three dots the same and still.
+function BusyDots({ reduced = false }) {
   return jsx('div', {
-    className: cx(T.bubble, T.dots),
+    className: cx(T.bubble, T.dots, reduced ? T.dotsStill : T.dotsWait),
     'data-hh': 'busy-dots',
     role: 'status',
     'aria-label': 'Helper is working on an answer',
-    children: [0, 1, 2].map(i => jsx('i', { className: i === lit ? T.dotOn : undefined }, i))
+    children: [0, 1, 2].map(i => jsx('i', {}, i))
   })
 }
 
@@ -12885,6 +18778,47 @@ function makePage(ctx, opts = {}) {
     return { id, key: `h${id}`, who: 'helper', opened: false, ...said }
   }
   const youEntry = text => ({ id: memory.nextId++, who: 'you', text })
+
+  /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
+  // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
+  // time), how many of Helper's calls Hermes still works on (also after the page stopped waiting for one: no new
+  // call starts until it is 0, so at most one Helper call is ever in Hermes), the model status the page checked
+  // last, and the mounted page's setters (null while the page is off screen: a turn that ends then still adds its
+  // line to the conversation kept in memory).
+  const live = { n: 0, waiting: null, inHermes: 0, status: { state: 'checking' }, view: null }
+  // The values a line sent to the AI must not hold (input.never_sent, name_check): the kept name and this
+  // visit's name, the kept answers in Helper's words and as stored, and what the person asked Helper to keep.
+  const keptValues = () => {
+    const v = memory.visit
+    const out = [v.name, v.kept.name]
+    for (const [k, x] of Object.entries(v.kept)) {
+      if (k === 'told' || k === 'name') continue
+      if (k === 'asked') out.push(...(Array.isArray(x) ? x : []))
+      else if (typeof x === 'string') out.push(x, keptWords(k, x))
+    }
+    return out.filter(s => typeof s === 'string' && s.trim())
+  }
+  // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
+  const liveFinish = (w, final) => {
+    if (live.waiting !== w) return
+    live.waiting = null
+    w.stopTimer()
+    w.endBusy()
+    const result = final || w.out
+    const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
+    writeKept()
+    const entry = { ...helperEntry(said), send: w.sendHelper }
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
+    if (live.view) {
+      live.view.setLog(memory.log)
+      live.view.setFocusAsk(true)
+    }
+  }
+  // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
+  // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
+  const liveClose = () => {
+    if (live.waiting) liveFinish(live.waiting, null)
+  }
   // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
   const openDocs = url => {
     if (!isDocsUrl(url)) return
@@ -12975,6 +18909,18 @@ function makePage(ctx, opts = {}) {
     const [size, measureRef] = useOwnSize()
     const width = size.width
     const [modelStatus, recheck] = useModelStatus()
+    // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
+    live.status = modelStatus
+    // (review) the page drawn last holds the view; a page that leaves lets go only of its own
+    const mineView = useRef(null)
+    mineView.current = { setLog, setFocusAsk }
+    live.view = mineView.current
+    useEffect(
+      () => () => {
+        if (live.view === mineView.current) live.view = null
+      },
+      []
+    )
     const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
     // The conversation's scrolling area: kept at the bottom, where the newest words are.
@@ -13122,29 +19068,65 @@ function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     function answer(result, shown, typed = '') {
       if (!result) return
-      // helper-builder-qs-v1.md point 3: the conversation already shows a "Kept:" or "From what I keep:" line
-      const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
-      const said = lineFor(result, visit, typed, { settingsPage, keptShown })
+      // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
+      const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
-      addToLog([shown ? youEntry(shown) : null, helperEntry(said)].filter(Boolean))
+      // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
+      const may = sendable(result)
+      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }].filter(Boolean))
       setFocusAsk(true)
     }
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
     // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
-    // Nothing is sent anywhere: there is no AI step (tests/talk-window.test.mjs, "no AI step").
+    // talk-live: with an AI step (src/ai-mode.js), a message code is not sure of may go to the person's AI
+    // (src/live-turn.js liveWhyNot says when not); then the message shows at once, Helper's bubble is the three
+    // dots until the AI's line or, at the latest after 12 s, the no-AI line comes. With no_ai_step nothing is sent.
     function send() {
       const typed = draft
       if (!typed.trim()) return
       setDraft('')
-      const result = turn(typed, visit)
+      liveClose()
+      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null }
+      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper')
+      const lines = lastLines(memory.log, keptValues())
+      const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
       // pick that answers it. A message
       // with a key in it never gets that line, so a key is never kept here.
       memory.typed = result.kind === 'W1' || result.kind === 'W2' ? typed : ''
       const chars = Array.from(typed.trim())
       const shown = chars.length > MAX_INPUT_CHARS ? chars.slice(0, MAX_INPUT_CHARS).join('') + '…' : chars.join('')
-      answer(result, result.kind === 'K1' ? null : shown, typed)
+      const why = liveWhyNot({ pre, text: typed, status: live.status, inHermes: live.inHermes })
+      if (why) return answer(result, result.kind === 'K1' ? null : shown, typed)
+      // a name given in the same message is cut off: only the part after it is sent (Lead's answer 4)
+      const message = pre.name_taken ? nameWithMore(typed)[1] : typed
+      const may = sendable(result)
+      writeKept()
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {} }
+      live.waiting = w
+      addToLog([{ ...youEntry(shown), send: may.you }])
+      const started = Date.now()
+      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
+      // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
+      const request = (method, params, timeout) => {
+        live.inHermes++
+        let p
+        try {
+          p = Promise.resolve(host.request(method, params, timeout))
+        } catch (err) {
+          p = Promise.reject(err)
+        }
+        return p.finally(() => {
+          live.inHermes--
+        })
+      }
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w })
+        .then(got => {
+          if (live.waiting !== w) return
+          liveFinish(w, liveApply(visit, got, result, before, typed))
+        })
+        .catch(() => liveFinish(w, null))
     }
 
     // Something picked in the message box: it becomes the person's message, and Helper answers at
@@ -13158,6 +19140,7 @@ function makePage(ctx, opts = {}) {
         setFocusPick(true)
         return setLog(old => (memory.log = old.map((e, i) => (i === old.length - 1 && e.answers ? { ...e, answers: { ...e.answers, items } } : e))))
       }
+      liveClose()
       let result
       if (item.answer) result = pick(item.answer[0], item.answer[1], visit)
       else if (item.which) result = press(item.which, memory.typed, visit)
@@ -13183,6 +19166,7 @@ function makePage(ctx, opts = {}) {
       const next = entry.next
       if (!next) return
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
+      if (next.kind === 'line' || next.kind === 'forget-all') liveClose()
       if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)
@@ -13192,14 +19176,19 @@ function makePage(ctx, opts = {}) {
     // The links in the faint lines: "See what I keep" opens Helper's settings page (or, where that
     // page cannot open, shows the list in the conversation); "Change" asks the question again.
     function pressNote(entry, which) {
-      if (which === 'change' && entry.used) return answer(change(entry.used.topic, visit), entry.used.link)
+      if (which === 'change' && entry.used) {
+        liveClose()
+        return answer(change(entry.used.topic, visit), entry.used.link)
+      }
       if (which !== 'see' || !entry.note) return
       if (settingsPage) return go(settingsHref)
+      liveClose()
       answer(seeKept(visit), entry.note.link)
     }
 
     // Skip, at "What's your name?" and "What do you do?".
     function skipOpening() {
+      liveClose()
       answer(skip(visit), 'Skip')
     }
 
@@ -13699,7 +19688,7 @@ function makePage(ctx, opts = {}) {
           children: [
             fit.grip ? jsx(Grip, { width: fit.helperPx, min: HELPER_MIN_PX, max: HELPER_MAX_PX, onDown: gripDown, onMove: gripMove, onUp: gripUp, onCancel: gripCancel, onKey: gripKey }, 'grip') : null,
             jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll }, 'conversation'),
-            inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { lit: 0 }, 'bubble'),
+            inBubble ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble') : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer
           ]
@@ -13776,10 +19765,12 @@ function makePage(ctx, opts = {}) {
 // puts the box back as stored; "Forget all of this" deletes the record after a Yes.
 // It reads and writes the same stored record as Helper's conversation (storage key 'kept'), so
 // the conversation sees a change the next time it is put on screen. No model, nothing sent.
-// Left out: top_line_2 ("Only your name goes to your AI"), which is for a build that calls a
-// model; and a link to Hermes's own Memory & Context, whose address is not in the plugin docs.
+// talk-live: in a build with an AI step (src/ai-mode.js) the row has a second top line, "Nothing on this page is
+// sent to any AI." (lines_by_mode.settings_top_line_2); with no AI step none. Left out: a link to Hermes's own
+// Memory & Context, whose address is not in the plugin docs.
 
 const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
+const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode.settings_top_line_2[AI_MODE]
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')
@@ -13867,6 +19858,7 @@ function makeSettingsPage(ctx) {
     const boxRow = jsx(ListRow, {
       wide: true,
       title: curlyQuotes(SETTINGS_WORDS.top_line),
+      description: SETTINGS_TOP_LINE_2 ? curlyQuotes(SETTINGS_TOP_LINE_2) : undefined,
       below: jsxs('div', {
         className: K.settingsBelow,
         children: [
