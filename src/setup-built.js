@@ -5,4 +5,7 @@ export const SETUP_BUILT = true
 // Whether the AI step of the recommendation (the job's point 6, src/setup-rec.js) is in this build. true: the two
 // answers New to Hermes and What you want go to the person's AI for that one call, and the lines that say what is sent
 // (the first-time line under Kept:, the line on Helper's settings page) name them. Read only where SETUP_BUILT is true.
-export const SETUP_AI_BUILT = true
+// false since setup-chat-2 (Lead, 11 Nov 08:50, from docs/answers/hhtech-setup-run.md): on the free model 2 of 9 AI
+// sentences promised things nobody checked, a small model gave none that could be shown, each cost 2 to 12 s of dots.
+// The recommendation is then the written sentence only, and only What you do goes to the AI.
+export const SETUP_AI_BUILT = false

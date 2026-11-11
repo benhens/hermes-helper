@@ -155,14 +155,19 @@ function suRecommend(st, seen, lead = []) {
   // rec: what the AI step may reword (src/setup-rec.js): the written text stands unless a checked reply replaces it
   return [...lead, suSaid('REC', recText(item, rule, isNew, goal) + ' ' + SU_REC_TAIL, { answers: suREC_PICKS(SU_L.REC.answers), rec: { item, rule, isNew, goal } })]
 }
-function suStepLine(st) {
+// the open step's three answers (the last step's on the last step)
+function suStepPicks(st) {
   const s = suOf(st)
-  const steps = SU.items[s.item].steps
-  const last = s.step === steps.length - 1
-  s.stage = 'step'
+  const last = s.step === SU.items[s.item].steps.length - 1
   const labels = last ? SU_L.STEP.last_step_answers : SU_L.STEP.answers
   const acts = last ? ['step:worked', 'step:stuck', 'step:stop'] : ['step:done', 'step:stuck', 'step:stop']
-  return suSaid('STEP', suFill(SU_L.STEP.text, { n: s.step + 1, total: steps.length, step: steps[s.step] }), { answers: suPicks(acts.map((a, i) => [a, labels[i]])) })
+  return suPicks(acts.map((a, i) => [a, labels[i]]))
+}
+const suStepSlots = s => ({ n: s.step + 1, total: SU.items[s.item].steps.length, step: SU.items[s.item].steps[s.step] })
+function suStepLine(st) {
+  const s = suOf(st)
+  s.stage = 'step'
+  return suSaid('STEP', suFill(SU_L.STEP.text, suStepSlots(s)), { answers: suStepPicks(st) })
 }
 function suNotNow(st) {
   suOf(st).stage = null
@@ -188,7 +193,31 @@ function suWorked(st, seen) {
     return suRecommend(st, seen, [suSaid('READ_FAILED', SU_P.read_failed + ' ' + SU_L.DONE_SAID.text)])
   }
   s.stage = 'notseen'
-  return [suSaid('NOT_SEEN', SU_L.NOT_SEEN.text, { answers: suPicks(['notseen:steps', 'notseen:otherbot', 'notseen:notnow'].map((a, i) => [a, SU_L.NOT_SEEN.answers[i]])) })]
+  return [suSaid('NOT_SEEN', ...suNotSeenWords(item))]
+}
+// setup-chat-2 (changes-1 NOT_SEEN): bots are counted across the whole Hermes, so for A second bot "I only look at your
+// main bot" and "I did it on another bot" are untrue: its own line and two answers
+const suNotSeenActs = item => (item === 'second_bot' ? ['notseen:steps', 'notseen:notnow'] : ['notseen:steps', 'notseen:otherbot', 'notseen:notnow'])
+const suNotSeenLabels = item => (item === 'second_bot' ? SU_L.NOT_SEEN.answers_second_bot : SU_L.NOT_SEEN.answers)
+const suNotSeenWords = item => [item === 'second_bot' ? SU_L.NOT_SEEN.text_second_bot : SU_L.NOT_SEEN.text, { answers: suPicks(suNotSeenActs(item).map((a, i) => [a, suNotSeenLabels(item)[i]])) }]
+
+// setup-chat-2 (changes-1 ALREADY_SEEABLE): "I've done this already". Helper has just read again (the move's look). A
+// thing it cannot see: kept as said done (DONE_SAID). Seen done now: DONE_SEEN, not kept as said. The read failed:
+// Helper says so and takes the person's word (as after It worked). Not seen: "I can't see that yet." with the look's
+// own sentence and four answers (three for A second bot); nothing is kept until one of them says so.
+const suAlreadyActs = item => (item === 'second_bot' ? ['already:steps', 'already:count', 'already:notnow'] : ['already:steps', 'already:otherbot', 'already:count', 'already:notnow'])
+const suAlreadyLabels = item => (item === 'second_bot' ? SU_L.ALREADY_SEEABLE.answers_second_bot : SU_L.ALREADY_SEEABLE.answers)
+function suAlready(st, seen) {
+  const s = suOf(st)
+  const item = s.item
+  const d = SU.seeable.includes(item) ? seenDone(item, seen) : undefined
+  if (d === true) return suRecommend(st, seen, [suSaid('DONE_SEEN', suFill(SU_L.DONE_SEEN.text, { seen_part: suSeenPart(item, seen) }))])
+  if (d === undefined || d === null) {
+    suSaidDone(st, item)
+    return suRecommend(st, seen, [d === null ? suSaid('READ_FAILED', SU_P.read_failed + ' ' + SU_L.DONE_SAID.text) : suSaid('DONE_SAID', SU_L.DONE_SAID.text)])
+  }
+  s.stage = 'already'
+  return [suSaid('ALREADY_SEEABLE', suFill(SU_L.ALREADY_SEEABLE.text, { not_part: SU_L.ALREADY_SEEABLE.not_part[item] }), { answers: suPicks(suAlreadyActs(item).map((a, i) => [a, suAlreadyLabels(item)[i]])) })]
 }
 function suStuck(st) {
   const s = suOf(st)
@@ -278,11 +307,15 @@ export function setupPress(action, st) {
         s.other.push(s.item)
         return suRecommend(st, seen, [suSaid('SOMETHING_ELSE', SU_L.SOMETHING_ELSE.text)])
       })
-    if (id === 'already')
+    if (id === 'already') return suMove(true, seen => suAlready(st, seen))
+  }
+  if (kind === 'already' && s.stage === 'already') {
+    if (id === 'steps') return suMove(false, () => ((s.step = 0), [suStepLine(st)]))
+    if (id === 'notnow') return suMove(false, () => suNotNow(st))
+    if ((id === 'otherbot' && s.item !== 'second_bot') || id === 'count')
       return suMove(true, seen => {
-        const line = SU.seeable.includes(s.item) && seenDone(s.item, seen) !== true ? 'ALREADY_SEEABLE' : 'DONE_SAID'
         suSaidDone(st, s.item)
-        return suRecommend(st, seen, [suSaid(line, SU_L[line].text)])
+        return suRecommend(st, seen, [id === 'count' ? suSaid('ALREADY_COUNT', SU_L.ALREADY_COUNT.text) : suSaid('DONE_SAID', SU_L.DONE_SAID.text)])
       })
   }
   if (kind === 'step' && s.stage === 'step') {
@@ -298,7 +331,7 @@ export function setupPress(action, st) {
   if (kind === 'notseen' && s.stage === 'notseen') {
     if (id === 'steps') return suMove(false, () => ((s.step = 0), [suStepLine(st)]))
     if (id === 'notnow') return suMove(false, () => suNotNow(st))
-    if (id === 'otherbot')
+    if (id === 'otherbot' && s.item !== 'second_bot')
       return suMove(true, seen => {
         suSaidDone(st, s.item)
         return suRecommend(st, seen, [suSaid('DONE_SAID', SU_L.DONE_SAID.text)])
@@ -350,8 +383,12 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
     if (i >= 0) return setupPress(['stuck:works', 'stuck:stop'][i], st)
   }
   if (s.stage === 'notseen') {
-    const i = suLabelOf(SU_L.NOT_SEEN.answers, text)
-    if (i >= 0) return setupPress(['notseen:steps', 'notseen:otherbot', 'notseen:notnow'][i], st)
+    const i = suLabelOf(suNotSeenLabels(s.item), text)
+    if (i >= 0) return setupPress(suNotSeenActs(s.item)[i], st)
+  }
+  if (s.stage === 'already') {
+    const i = suLabelOf(suAlreadyLabels(s.item), text)
+    if (i >= 0) return setupPress(suAlreadyActs(s.item)[i], st)
   }
   if (isSetupAsk(text) && !hasTopicWord(text)) return suAsk(st)
   return null
@@ -369,9 +406,26 @@ export function setupAfter(st) {
     s.reasked.goal = true
     return suSaid('SETUP_REASK_GOAL', SU_L.SETUP_REASK_GOAL.text, { answers: suGOAL_PICKS() })
   }
+  // setup-chat-2 (changes-1 STEP_BACK; hhtech-setup-run 1.1: the step was gone after a typed question): while a step is
+  // open, after every answer, the step again with its own answers, so Done goes on to the next step. Not after I'm
+  // stuck or Stop for now (the stage is then another).
+  if (s.stage === 'step' && s.item && SU.items[s.item]) return suSaid('STEP_BACK', suFill(SU_L.STEP_BACK.text, suStepSlots(s)), { answers: suStepPicks(st) })
   return null
 }
 
+// setup-chat-2 (changes-1 BACK_SEEN): the one thing a return visit names as seen done: the goal's thing if it is, else
+// the first seen done in the order the data's BACK_SEEN gives (scheduled_job, personality, second_bot). What is there
+// now, not what changed since (Helper keeps nothing of what it read). null: nothing seen done.
+const SU_BACK_ORDER = ['scheduled_job', 'personality', 'second_bot']
+function suBackPart(st, seen) {
+  const goal = SU.goal_item[st.kept.setup_goal_id]
+  const item = [goal, ...SU_BACK_ORDER].find(it => it && SU_BACK_ORDER.includes(it) && seenDone(it, seen) === true)
+  const P = SU_L.BACK_SEEN.parts
+  if (item === 'scheduled_job') return suFill(seen.jobs === 1 ? P.scheduled_job : P.scheduled_job_plural, { n: seen.jobs })
+  if (item === 'second_bot') return suFill(P.second_bot, { n: seen.bots })
+  if (item === 'personality') return P.personality
+  return null
+}
 // The opening of a later visit (met is true), after Helper has read Hermes. Returns the lines.
 export function setupOpening(st, seen) {
   const s = suOf(st)
@@ -382,7 +436,11 @@ export function setupOpening(st, seen) {
     s.item = cur
     if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
     s.stage = 'rec'
-    return [suSaid('BACK_REC', suNamed(SU_L.BACK_REC, name, { card: SU.items[cur].name }), { answers: suREC_PICKS(SU_L.BACK_REC.answers) })]
+    const slots = { card: SU.items[cur].name, why: SU.items[cur].why }
+    // setup-chat-2 (changes-1): something else Helper can see is done now: say that, then where we stopped
+    const part = suBackPart(st, seen)
+    if (part) return [suSaid('BACK_SEEN', suNamed(SU_L.BACK_SEEN, name, { back_part: part })), suSaid('BACK_NEXT', suFill(SU_L.BACK_NEXT.text, slots), { answers: suREC_PICKS(SU_L.BACK_NEXT.answers) })]
+    return [suSaid('BACK_REC', suNamed(SU_L.BACK_REC, name, slots), { answers: suREC_PICKS(SU_L.BACK_REC.answers) })]
   }
   if (!st.kept.setup_new) {
     s.stage = 'new'

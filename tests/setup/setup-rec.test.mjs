@@ -94,7 +94,9 @@ function useHost(reply) {
   globalThis.__hhHost = host
   return host
 }
-async function open(reply, { mode = 'ai_writes', change = x => x, storage = fakeStorage() } = {}) {
+// setup-chat-2: the committed build has the AI step off (SETUP_AI_BUILT false, Lead from hhtech-setup-run); these tests
+// keep it working for a later build by switching it on in the copy that is loaded, unless a test says otherwise
+async function open(reply, { mode = 'ai_writes', change = src => setupAiSource(src, 'true'), storage = fakeStorage() } = {}) {
   const host = useHost(reply)
   const timers = fakeTimers({ hold: [12000] })
   const { Page } = await registerPlugin(storage, timers, {}, src => change(aiModeSource(src, mode)))
@@ -136,7 +138,7 @@ const WRITTEN_1 = "You're new, so first check that Hermes answers you. Next: Fir
 
 test('a good reply takes the place of the written sentence; "Want the steps?" and the four answers are written; one call, with what is handed and no name', opt, async () => {
   const { view, host } = await toRec(() => AI_1)
-  assert.equal(SETUP_AI_BUILT, true)
+  assert.equal(SETUP_AI_BUILT, false, 'off as committed; switched on in the copy loaded here')
   assert.equal(bubble(view).props['data-line'], 'REC')
   assert.equal(said(view), AI_1 + ' Want the steps?')
   assert.deepEqual(answers(view).map(a => text(a).trim().replace(/’/g, "'")), ['Show me the steps', "I've done this already", 'Something else', 'Not now'])
@@ -227,6 +229,8 @@ async function settingsLine(change) {
   return all(view.tree, n => n.type === 'sdk:ListRow')[0].props.description
 }
 test('the settings page\'s line about what goes to the AI: the three rows when the recommendation asks the AI; only What you do when it does not', opt, async () => {
-  assert.equal(await settingsLine(x => x), 'These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.')
-  assert.equal(await settingsLine(src => setupAiSource(src, 'false')), 'Only the What you do line is sent to your AI, when Helper asks it for help.')
+  assert.equal(await settingsLine(src => setupAiSource(src, 'true')), 'These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.')
+  // setup-chat-2: changes-1's settings_top_line_2_work_only, in place of was_c6 (a 17-word sentence)
+  assert.equal(await settingsLine(x => x), 'Only What you do goes to your AI. Only when Helper asks it for help.')
+  assert.equal(await settingsLine(src => setupAiSource(src, 'false')), 'Only What you do goes to your AI. Only when Helper asks it for help.')
 })

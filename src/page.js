@@ -705,7 +705,9 @@ export function makePage(ctx, opts = {}) {
         // no further call is tried and no dots show. Why the model check let them through is NOT found: the page already
         // makes no call unless setup.runtime_check said ok (liveWhyNot), so in hhtech's home D that check must have
         // said ok while llm.oneshot had no provider; what it answered there is in no record the Builder can read.
-        // So the first call of a visit is still tried (dots once); asked of Lead in the report.
+        // So the first call of a visit is still tried (dots once). Lead (setup-chat-2): it stays so; hhtech found that
+        // setup.runtime_check answers the same in a home where the call works and in one where it fails, so it cannot
+        // gate the call.
         return p
           .catch(err => {
             visit.aiOff = true

@@ -94,7 +94,7 @@ export function generatedSources() {
     [SETUP_JS, setupDataSource(), 'content/helper-setup-chat-v1.json and content/dash-setup-list-v2.json'],
     [DASH_JS, dashDataSource(), 'content/dash-setup-list-v2.json and content/dash-words-v1.json'],
     [DASH_CSS_JS, dashCssSource(), 'src/dash.css'],
-    [README, readmeForMode(fs.readFileSync(README, 'utf8'), readJson(LIVE_JSON), aiModeOf()), 'content/helper-talk-live-v2.json lines_by_mode and src/ai-mode.js']
+    [README, readmeForMode(fs.readFileSync(README, 'utf8'), readJson(LIVE_JSON), aiModeOf(), setupAiOf()), 'content/helper-talk-live-v2.json lines_by_mode, src/ai-mode.js and src/setup-built.js']
   ]
 }
 
@@ -150,6 +150,17 @@ export function aiModeOf(text = fs.readFileSync(AI_MODE_JS, 'utf8')) {
   const m = text.match(/^export const AI_MODE = '([a-z_]+)'$/m)
   if (!m) throw new Error("src/ai-mode.js has no line export const AI_MODE = '...'")
   return m[1]
+}
+// setup-chat-2: whether the build sends the set-up conversation's answers to the AI (its recommendation's AI step):
+// both switches of src/setup-built.js true, as written there. README point 11 says so only then.
+const SETUP_BUILT_JS = path.join(ROOT, 'src', 'setup-built.js')
+export function setupAiOf(text = fs.readFileSync(SETUP_BUILT_JS, 'utf8')) {
+  const one = name => {
+    const m = text.match(new RegExp(`^export const ${name} = (true|false)$`, 'm'))
+    if (!m) throw new Error(`src/setup-built.js has no line export const ${name} = true or false`)
+    return m[1] === 'true'
+  }
+  return one('SETUP_BUILT') && one('SETUP_AI_BUILT')
 }
 
 export function liveDataSource(live = readJson(LIVE_JSON), talk = readJson(TALK_JSON), wants = readJson(WANTS_JSON), mode = aiModeOf()) {

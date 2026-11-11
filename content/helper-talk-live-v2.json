@@ -841,7 +841,8 @@
     "no_ai_step": null,
     "ai_picks_line": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help.",
     "ai_writes": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help.",
-    "when": "Under the first Kept: line that holds one of the three (What you do, New to Hermes, What you want Hermes to do), once."
+    "when": "Under the first Kept: line that holds one of the three (What you do, New to Hermes, What you want Hermes to do), once.",
+    "entry_note_c1": "setup-chat changes-1: not used in the entry (SETUP_AI_BUILT false). work_told is the true line there."
    }
   },
   "settings_top_line_2": {
@@ -853,6 +854,12 @@
    "was_c6": "Only the What you do line is sent to your AI, when Helper asks it for help.",
    "note_c6": "live changes-6: the changes-4 line failed R1-R9 (a 17-word sentence) and named only one line; the setup chat sends three. The row names are the Settings rows of content/helper-setup-chat-v1.md lines 24 to 26 (the third row's full label is What you want Hermes to do)."
   },
+  "settings_top_line_2_work_only": {
+   "about": "setup-chat changes-1: the build with the set-up conversation and its AI step off (SETUP_AI_BUILT false). Only What you do is handed to the AI, on typed questions. Takes the place of was_c6, which had a 17-word sentence.",
+   "no_ai_step": null,
+   "ai_picks_line": "Only What you do goes to your AI. Only when Helper asks it for help.",
+   "ai_writes": "Only What you do goes to your AI. Only when Helper asks it for help."
+  },
   "readme_point_11": {
    "no_ai_step": "11. Nothing you type to Helper is sent to any AI, including the AI your Hermes uses. Helper answers with fixed text, picked by fixed rules on this computer. Of what you type, it keeps only the things in points 2 to 4, in the Hermes app's own storage on this computer. You can see and delete them as point 10 says.",
    "ai_picks_line": "11. Helper answers most messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI only picks which of Helper's checked lines to show. Nothing is sent anywhere else. Of what Helper keeps about you, only three short lines are sent: what you do, whether you are new to Hermes, and what you want Hermes to do. Your name and the rest never are. When Helper recommends where to start, it also sends what it read about your Hermes setup on this computer, such as whether a model answers and whether you have scheduled jobs. Deleting does not take back what was already sent.",
@@ -861,6 +868,12 @@
    "true_when": "ai modes: the Builder's test shows the request holds no kept value and no name (input.never_sent). no_ai_step: as before (the page makes no request when a message is typed).",
    "was_c6_ai_picks_line": "11. Helper answers most messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI only picks which of Helper's checked lines to show. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent.",
    "was_c6_ai_writes": "11. Helper answers many messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI writes Helper's reply in its own words from those checked lines, and Helper checks each reply by fixed rules before showing it. On a small AI on your own computer, Helper can still say things that are not true, and the checks do not catch all of them. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent."
+  },
+  "readme_point_11_work_only": {
+   "about": "setup-chat changes-1: point 11 for the build with SETUP_AI_BUILT false. The same words as was_c6: only what you do is sent; no sentence about the set-up read, because no recommendation call is made.",
+   "no_ai_step": "11. Nothing you type to Helper is sent to any AI, including the AI your Hermes uses. Helper answers with fixed text, picked by fixed rules on this computer. Of what you type, it keeps only the things in points 2 to 4, in the Hermes app's own storage on this computer. You can see and delete them as point 10 says.",
+   "ai_picks_line": "11. Helper answers most messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI only picks which of Helper's checked lines to show. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent.",
+   "ai_writes": "11. Helper answers many messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI writes Helper's reply in its own words from those checked lines, and Helper checks each reply by fixed rules before showing it. On a small AI on your own computer, Helper can still say things that are not true, and the checks do not catch all of them. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent."
   },
   "readme_status_sentence_2": {
    "about": "live-v2 changes-1. README line 5 (Status) keeps its first sentence as the Builder writes it (what is built); its second sentence is this, by AI_MODE. Exempt from R1 to R9, as all README lines.",

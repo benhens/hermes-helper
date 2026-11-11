@@ -130,6 +130,9 @@ export function liveProblems(live, talk, wants, mode) {
     else if (!(talk.fixed_lines || []).some(f => f.id === lm.are_you_an_ai[m].id && f.text === lm.are_you_an_ai[m].text)) problems.push(`lines_by_mode.are_you_an_ai.${m} is not the talk data's fixed line ${lm.are_you_an_ai[m].id} word for word`)
     if (!(lm.first_time_grey && lm.first_time_grey[m] && lm.first_time_grey[m].text)) problems.push(`lines_by_mode.first_time_grey.${m} is missing`)
     if (!(lm.readme_point_11 && lm.readme_point_11[m])) problems.push(`lines_by_mode.readme_point_11.${m} is missing`)
+    // setup-chat-2 (setup-chat changes-1): the words for a build that sends only what the person does
+    if (!(lm.readme_point_11_work_only && lm.readme_point_11_work_only[m])) problems.push(`lines_by_mode.readme_point_11_work_only.${m} is missing`)
+    if (lm.settings_top_line_2 && lm.settings_top_line_2[m] && !(lm.settings_top_line_2_work_only && lm.settings_top_line_2_work_only[m])) problems.push(`lines_by_mode.settings_top_line_2_work_only.${m} is missing`)
   }
   if (lm.first_time_grey && lm.first_time_grey.no_ai_step && talk.keeps.tell.first_time_if_no_model_call !== lm.first_time_grey.no_ai_step.text) problems.push('the no-AI first-time line differs from keeps.tell.first_time_if_no_model_call')
   const fb = (live.order || {}).fallback || {}
@@ -207,9 +210,10 @@ export function slimLiveData(live, talk, wants) {
       are_you_an_ai: byMode(m => lm.are_you_an_ai[m].id),
       first_time_grey: byMode(m => lm.first_time_grey[m].text),
       settings_top_line_2: byMode(m => lm.settings_top_line_2[m] || null),
-      // live changes-6: the line above names the set-up conversation's three rows; a build without that conversation
-      // (src/setup-built.js) sends only what the person does and says so with changes-4's line (the data's was_c6)
-      settings_top_line_2_no_setup: byMode(m => (lm.settings_top_line_2[m] ? lm.settings_top_line_2.was_c6 : null)),
+      // live changes-6: the line above names the set-up conversation's three rows; a build without that conversation's
+      // AI step (src/setup-built.js) sends only what the person does and says so (setup-chat changes-1's words, in
+      // place of the data's was_c6, which had a 17-word sentence)
+      settings_top_line_2_work_only: byMode(m => (lm.settings_top_line_2[m] ? lm.settings_top_line_2_work_only[m] : null)),
       // live-v2 changes-4: under the first Kept: of what the person does (null with no AI step)
       work_told: byMode(m => lm.first_time_grey.work_told[m] || null),
       // live changes-6: once the set-up conversation is built, in place of work_told (src/setup-built.js)
@@ -222,7 +226,9 @@ export function slimLiveData(live, talk, wants) {
 // Status line, a sentence in the conversation window's bullet after "see the rest at once.", the bullet about
 // the "The model answers" card, and point 11 of the disclosure. The build writes them for src/ai-mode.js's
 // mode (tests/readme-disclosure.test.mjs checks them); everything else in README is the Builder's.
-export function readmeForMode(readme, live, mode) {
+// setup-chat-2: point 11 names the set-up conversation's lines only when the build sends them (setupAi: its AI step is
+// built, scripts/build.mjs setupAiOf); else setup-chat changes-1's readme_point_11_work_only.
+export function readmeForMode(readme, live, mode, setupAi = false) {
   const lm = live.lines_by_mode
   const lines = readme.split('\n')
   const at = (test, what) => {
@@ -243,6 +249,6 @@ export function readmeForMode(readme, live, mode) {
   const c = at(l => l.startsWith('- The "The model answers" card makes one call'), '"The model answers" bullet')
   lines[c] = `- ${lm.readme_model_call_bullet[mode]}`
   const p = at(l => l.startsWith('11. '), 'point 11')
-  lines[p] = lm.readme_point_11[mode]
+  lines[p] = (setupAi ? lm.readme_point_11 : lm.readme_point_11_work_only)[mode]
   return lines.join('\n')
 }

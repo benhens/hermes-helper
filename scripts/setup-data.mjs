@@ -9,8 +9,13 @@ export const SETUP_LINES = {
   F2: ['{name}'], F3: [], WORK_SECRET: [], WORK_LONG_2: [], Q_GOAL: [], SETUP_REASK: [], SETUP_REASK_GOAL: [],
   REC: ['{reason}', '{card}', '{why}'], STEP: ['{n}', '{total}', '{step}'], STUCK: [], STUCK_MODEL: [], DONE_SEEN: ['{seen_part}'],
   NOT_SEEN: [], DONE_SAID: [], ALREADY_SEEABLE: [], SOMETHING_ELSE: [], NOT_NOW: [], ALL_DONE: [],
-  BACK_DONE: ['{name}', '{seen_part}'], BACK_REC: ['{name}', '{card}'], BACK_Q: ['{name}'], BACK: ['{name}'], RESTART: []
+  BACK_DONE: ['{name}', '{seen_part}'], BACK_REC: ['{name}', '{card}', '{why}'], BACK_Q: ['{name}'], BACK: ['{name}'], RESTART: [],
+  // setup-chat-2 (setup-chat changes-1): the returning line when something else is seen done and the line after it, the
+  // line of "I can't see that yet" and of "Count it as done", and the line back to the step after a typed question
+  BACK_SEEN: ['{name}', '{back_part}'], BACK_NEXT: ['{card}', '{why}'], ALREADY_SEEABLE: ['{not_part}'], ALREADY_COUNT: [], STEP_BACK: ['{n}', '{total}', '{step}']
 }
+// setup-chat-2: BACK_SEEN's parts, one for each thing Helper can see done
+export const BACK_SEEN_PARTS = { scheduled_job: ['{n}'], scheduled_job_plural: ['{n}'], personality: [], second_bot: ['{n}'] }
 export const SETUP_PARTS = ['LOOK_OPEN', 'model_ok', 'model_not', 'model_unread', 'scheduled_job_done', 'scheduled_job_done_plural', 'scheduled_job_not', 'second_bot_done', 'second_bot_not', 'personality_done', 'personality_not', 'chat_apps_cannot', 'read_failed']
 const REASONS = ['R1', 'R2_new', 'R2_skip', 'R3_schedule', 'R3_phone', 'R3_bots', 'R4']
 
@@ -60,7 +65,18 @@ export function setupProblems(setup, list) {
     if (slots.includes('{name}') && (typeof l.text_no_name !== 'string' || l.text_no_name.includes('{name}'))) bad(`line ${id}: no text_no_name`)
     if (Array.isArray(l.answers) && (l.answers.length < 2 || l.answers.length > max)) bad(`line ${id}: ${l.answers.length} answers`)
   }
-  for (const [id, n] of [['REC', 4], ['BACK_REC', 4], ['STEP', 3], ['NOT_SEEN', 3], ['STUCK', 2]]) if (lines[id] && (!Array.isArray(lines[id].answers) || lines[id].answers.length !== n)) bad(`line ${id}: its ${n} answers are missing`)
+  for (const [id, n] of [['REC', 4], ['BACK_REC', 4], ['BACK_NEXT', 4], ['ALREADY_SEEABLE', 4], ['STEP', 3], ['NOT_SEEN', 3], ['STUCK', 2]]) if (lines[id] && (!Array.isArray(lines[id].answers) || lines[id].answers.length !== n)) bad(`line ${id}: its ${n} answers are missing`)
+  // setup-chat-2: what changes-1 gives these lines besides their text
+  for (const [part, slots] of Object.entries(BACK_SEEN_PARTS)) {
+    const t = ((lines.BACK_SEEN || {}).parts || {})[part]
+    if (typeof t !== 'string' || !t.trim() || slots.some(s => !t.includes(s))) bad(`line BACK_SEEN: no part ${part}${slots.length ? ' with ' + slots.join(' ') : ''}`)
+  }
+  for (const it of setup.seeable || []) {
+    const ref = (((lines.ALREADY_SEEABLE || {}).not_part) || {})[it]
+    if (typeof ref !== 'string' || !/^look\.parts\./.test(ref) || typeof ((setup.look || {}).parts || {})[ref.slice('look.parts.'.length)] !== 'string') bad(`line ALREADY_SEEABLE: no not_part for ${it} among look.parts`)
+  }
+  if (lines.ALREADY_SEEABLE && (!Array.isArray(lines.ALREADY_SEEABLE.answers_second_bot) || lines.ALREADY_SEEABLE.answers_second_bot.length !== 3)) bad('line ALREADY_SEEABLE: its 3 answers_second_bot are missing')
+  if (lines.NOT_SEEN && (typeof lines.NOT_SEEN.text_second_bot !== 'string' || !lines.NOT_SEEN.text_second_bot.trim() || !Array.isArray(lines.NOT_SEEN.answers_second_bot) || lines.NOT_SEEN.answers_second_bot.length !== 2)) bad('line NOT_SEEN: no text_second_bot with its 2 answers_second_bot')
   if (lines.STEP && (!Array.isArray(lines.STEP.last_step_answers) || lines.STEP.last_step_answers.length !== 3)) bad('line STEP: no last_step_answers')
   if (lines.STUCK && (!lines.STUCK.paste || !lines.STUCK.paste.includes('{card}') || !lines.STUCK.paste.includes('{step}') || !lines.STUCK.paste_label)) bad('line STUCK: no paste text with {card} and {step}, or no paste_label')
   if (lines.STUCK_MODEL && (!lines.STUCK_MODEL.button || !/^https:\/\//.test(lines.STUCK_MODEL.url || ''))) bad('line STUCK_MODEL: no button or web address')
@@ -81,6 +97,16 @@ export function setupProblems(setup, list) {
 
 const pick = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undefined).map(k => [k, o[k]]))
 
+// one line, cut to the fields the code reads; changes-1's not_part names look.parts, so the code gets their words
+function slimLine(setup, id) {
+  const l = setup.lines[id]
+  const out = pick(l, ['text', 'text_no_name', 'answers', 'answers_second_bot', 'text_second_bot', 'last_step_answers', 'paste_label', 'paste', 'button', 'url', 'offer', 'parts'])
+  // STEP_BACK's answers are a note ("the step's own"), not a list: the code gives it STEP's
+  if (out.answers !== undefined && !Array.isArray(out.answers)) delete out.answers
+  if (l.not_part) out.not_part = Object.fromEntries(Object.entries(l.not_part).map(([k, ref]) => [k, setup.look.parts[ref.slice('look.parts.'.length)]]))
+  return out
+}
+
 export function slimSetupData(setup, list) {
   const items = Object.fromEntries(list.items.map(i => [i.id, i]))
   const qs = Object.fromEntries(setup.questions.map(q => [q.id, q]))
@@ -96,7 +122,7 @@ export function slimSetupData(setup, list) {
     goal_item: setup.goal_item,
     seeable: setup.seeable,
     reasons: setup.reasons,
-    lines: Object.fromEntries(Object.keys(SETUP_LINES).map(id => [id, pick(setup.lines[id], ['text', 'text_no_name', 'answers', 'last_step_answers', 'paste_label', 'paste', 'button', 'url', 'offer'])])),
+    lines: Object.fromEntries(Object.keys(SETUP_LINES).map(id => [id, slimLine(setup, id)])),
     restart_phrases: setup.restart_phrases,
     ask_phrases: setup.setup_ask.phrases,
     keeps: setup.keeps.rows.map(r => ({ key: r.key, row: r.settings_row, kept_line: /^Kept:/.test(r.grey_kept_line) ? r.grey_kept_line : null })),

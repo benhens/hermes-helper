@@ -27,7 +27,7 @@
   "F2/F3 + Q_NEW (one question)",
   "Q_GOAL",
   "SEEN (the look, by itself, no AI)",
-  "REC (rule; AI may word the reason)",
+  "REC (rule; written sentence only for the entry, ai.status)",
   "STEP x n (written)",
   "DONE_SEEN / NOT_SEEN / DONE_SAID / STUCK",
   "REC next ..."
@@ -414,7 +414,7 @@
     "Something else",
     "Not now"
    ],
-   "ai": "With the AI, {reason} Next: {card}. {why} is replaced by the AI's text if it passes the checks; Want the steps? is always written."
+   "ai": "OFF for the entry (ai.status): always the written text. Was: With the AI, {reason} Next: {card}. {why} is replaced by the AI's text if it passes the checks; Want the steps? is always written."
   },
   "STEP": {
    "text": "Step {n} of {total}: {step}",
@@ -428,7 +428,7 @@
     "It didn't work",
     "Stop for now"
    ],
-   "note": "Steps are the list's steps, word for word, one per message. A step starting Check: is the last one. If the item has no Check: step, the last step still gets the last_step_answers."
+   "note": "Steps are the list's steps, word for word, one per message. The last step gets the last_step_answers, whatever it starts with. (changes-1: Scheduled jobs has 3 steps and its Check: is step 2.)"
   },
   "STUCK": {
    "text": "Your own Hermes can help with this. Paste this into a new chat there.",
@@ -457,15 +457,39 @@
     "I did it on another bot",
     "Not now"
    ],
-   "when": "It worked on a seeable item, but the read still says not done. I did it on another bot marks it said done."
+   "when": "It worked on a seeable item, but the read still says not done. I did it on another bot marks it said done.",
+   "answers_second_bot": [
+    "Show me the steps",
+    "Not now"
+   ],
+   "text_second_bot": "I can't see it yet. You have one bot so far.",
+   "note_c1": "changes-1: for second_bot the line and the other-bot answer were untrue (bots are counted across the whole Hermes, list v2 read profiles.list)."
   },
   "DONE_SAID": {
    "text": "Good. I'll remember that you did it.",
    "when": "It worked on an item that cannot be seen, or I've done this already. The item is kept as said done. Then REC for the next item."
   },
   "ALREADY_SEEABLE": {
-   "text": "Thanks. I'll take your word for it.",
-   "when": "I've done this already on a seeable item whose read says not done: kept as said done, then REC."
+   "text": "I can't see that yet. {not_part}",
+   "not_part": {
+    "personality": "look.parts.personality_not",
+    "scheduled_job": "look.parts.scheduled_job_not",
+    "second_bot": "look.parts.second_bot_not"
+   },
+   "answers": [
+    "Show me the steps",
+    "I did it on another bot",
+    "Count it as done",
+    "Not now"
+   ],
+   "answers_second_bot": [
+    "Show me the steps",
+    "Count it as done",
+    "Not now"
+   ],
+   "when": "I've done this already on a seeable item. First a fresh read. Read says done: DONE_SEEN. Read says not done: this line; nothing is kept yet. I did it on another bot: kept as said done, DONE_SAID. Count it as done: kept as said done, ALREADY_COUNT. Then REC for the next item. For second_bot the bots are counted across the whole Hermes, so the other-bot answer is left out.",
+   "text_was": "Thanks. I'll take your word for it.",
+   "why_changed": "hhtech-setup-run.md line 116: it came right after the look said the personality text is still the starter one."
   },
   "SOMETHING_ELSE": {
    "text": "Fine, here's another.",
@@ -487,18 +511,20 @@
   "BACK_DONE": {
    "text": "Hi again, {name}. I can see it now. {seen_part}",
    "text_no_name": "Hi again. I can see it now. {seen_part}",
-   "when": "Return visit; the kept current item is seeable and its read now says done. Then REC for the next item."
+   "when": "Return visit; the kept current item is seeable and its read now says done. Then REC for the next item. Wins over BACK_SEEN (never both)."
   },
   "BACK_REC": {
-   "text": "Hi again, {name}. Last time we picked {card}. Want to go on?",
-   "text_no_name": "Hi again. Last time we picked {card}. Want to go on?",
+   "text": "Hi again, {name}. We stopped at {card}. {why} Want the steps?",
+   "text_no_name": "Hi again. We stopped at {card}. {why} Want the steps?",
    "answers": [
     "Show me the steps",
     "I've done this already",
     "Something else",
     "Not now"
    ],
-   "when": "Return visit; a current item is kept and not seen done. For the model item a fresh read says ok: BACK_DONE instead."
+   "when": "Return visit; a current item is kept, its fresh read does not say done, and no seeable item is seen done (else BACK_SEEN then BACK_NEXT). The same line whether the person pressed Not now, Stop for now, or closed the window: all three are a stop. {why} is the list's why sentence, so the thing is explained again.",
+   "text_was": "Hi again, {name}. Last time we picked {card}. Want to go on?",
+   "why_changed": "hhtech-setup-run.md line 43: it came right after Not now on that thing; he did not pick it. The old line also did not say what the thing is."
   },
   "BACK_Q": {
    "text": "Hi again, {name}. Before we go on: are you new to Hermes?",
@@ -517,6 +543,37 @@
    "text": "Sure, let's start again. Are you new to Hermes?",
    "answers": "Q_NEW",
    "when": "Typed restart phrase, or Settings button Ask me the set-up questions again. Clears new, goal and current item; keeps name, work and said-done items."
+  },
+  "BACK_SEEN": {
+   "text": "Hi again, {name}. {back_part}",
+   "text_no_name": "Hi again. {back_part}",
+   "when": "Return visit, after the fresh look, when BACK_DONE does not apply and at least one seeable item is seen done. One part only: the goal's item if it is seen done, else the first seen done in the order scheduled_job, personality, second_bot. Then BACK_NEXT as the next message (or REC for a new item, or ALL_DONE).",
+   "parts": {
+    "scheduled_job": "I can see you have {n} scheduled job.",
+    "scheduled_job_plural": "I can see you have {n} scheduled jobs.",
+    "personality": "I can see your Hermes has its own personality text.",
+    "second_bot": "I can see you have {n} bots."
+   },
+   "guess": "It says what is seen now, not what changed since last time: Helper keeps nothing of what the reads saw (keeps.not_kept), so it cannot know since. It shows on every return visit while the thing is there. Only-when-new needs one more kept thing and a Settings row; not written."
+  },
+  "BACK_NEXT": {
+   "text": "We stopped at {card}. {why} Want the steps?",
+   "answers": [
+    "Show me the steps",
+    "I've done this already",
+    "Something else",
+    "Not now"
+   ],
+   "when": "Right after BACK_SEEN, when a current item is kept and not seen done. BACK_REC without the greeting."
+  },
+  "ALREADY_COUNT": {
+   "text": "Fine. I'll count it as done.",
+   "when": "Count it as done under ALREADY_SEEABLE. Kept as said done. Then REC for the next item."
+  },
+  "STEP_BACK": {
+   "text": "Back to step {n} of {total}: {step}",
+   "answers": "the step's own: STEP.answers, or STEP.last_step_answers on the last step",
+   "when": "A question typed while a STEP is the open line: the answer is shown as now, then this line as the next message with the step's answers. Needed: without it Done sits under an answer about something else and the step's words are scrolled away. Not shown after I'm stuck (STUCK has its own answers) and not after Stop for now."
   }
  },
  "restart_phrases": [
@@ -569,6 +626,7 @@
   ]
  },
  "ai": {
+  "status": "OFF for the entry (Lead, 11 Nov, from hhtech-setup-run.md): SETUP_AI_BUILT false. REC is the written sentence only. No call is made for a recommendation, so goal, new and the SEEN line are sent to no AI. Everything below is kept for a later build and is not in the entry.",
   "where": "Only REC (and BACK_DONE/DONE_SEEN followed by REC) has an AI step. Every question, the look, the choice, the steps and every other line are written lines.",
   "call": "One llm call per REC, max_tokens 120, the same 12 s and slow_ai rule as the live answers (helper-talk-live-v2 slow_ai).",
   "instructions": "You are Helper, inside the Hermes app. Write one short message that recommends the next thing to set up.\nRules:\n1. Recommend only this: {card}. Use that name exactly.\n2. Say why it fits the person, using the lines About them and What they want. If both say (not told), use The reason.\n3. Do not write steps, clicks, commands or screen names. The steps are shown under your message.\n4. Do not name any other thing to set up, any app, company, price, time or number.\n5. Do not ask a question. Do not use \"!\". Do not use the person's name.\n6. Never say you will set anything up. The person does it.\n7. At most two sentences and 35 words.\nAbout them: {work or (not told)}\nWhat they want: {goal kept_as, or the typed text, or (not told)}\nNew to Hermes: {Q_NEW kept_as or (not told)}\nWhat I can see: {SEEN line without LOOK_OPEN}\nThe thing: {card}: {why}\nThe reason: {reason}",
@@ -1076,7 +1134,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 1 of 4: Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).",
+    "text": "Step 1 of 5: Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).",
     "words": 20,
     "picks": [
      "Done",
@@ -1093,7 +1151,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 2 of 4: Ask something small you can check yourself.",
+    "text": "Step 2 of 5: Ask something small you can check yourself.",
     "words": 11,
     "picks": [
      "Done",
@@ -1110,7 +1168,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 3 of 4: Check: Hermes answers, with no error.",
+    "text": "Step 3 of 5: Check: Hermes answers, with no error.",
     "words": 10,
     "picks": [
      "Done",
@@ -1127,15 +1185,32 @@
    },
    {
     "who": "Helper",
-    "text": "Step 4 of 4: Check: ask one more thing in the same chat. It carries on.",
+    "text": "Step 4 of 5: Check: ask one more thing in the same chat. It carries on.",
     "words": 16,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 4)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 5 of 5: To come back: click Helper in the left list.",
+    "words": 13,
     "picks": [
      "It worked",
      "It didn't work",
      "Stop for now"
     ],
     "grey": null,
-    "line": "STEP (first_chat 4)"
+    "line": "STEP (first_chat 5)"
    },
    {
     "who": "Person",
@@ -1170,7 +1245,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 1 of 4: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
     "words": 22,
     "picks": [
      "Done",
@@ -1187,8 +1262,8 @@
    },
    {
     "who": "Helper",
-    "text": "Step 2 of 4: Hermes makes the job for you.",
-    "words": 10,
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
     "picks": [
      "Done",
      "I'm stuck",
@@ -1204,32 +1279,15 @@
    },
    {
     "who": "Helper",
-    "text": "Step 3 of 4: Check: click Scheduled jobs in the left list. Your job is there.",
-    "words": 16,
-    "picks": [
-     "Done",
-     "I'm stuck",
-     "Stop for now"
-    ],
-    "grey": null,
-    "line": "STEP (scheduled_job 3)"
-   },
-   {
-    "who": "Person",
-    "text": "Done",
-    "words": 1
-   },
-   {
-    "who": "Helper",
-    "text": "Step 4 of 4: There you can pause, change or delete it.",
-    "words": 12,
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
     "picks": [
      "It worked",
      "It didn't work",
      "Stop for now"
     ],
     "grey": null,
-    "line": "STEP (scheduled_job 4)"
+    "line": "STEP (scheduled_job 3)"
    },
    {
     "who": "Person",
@@ -1362,7 +1420,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 1 of 4: Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).",
+    "text": "Step 1 of 5: Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).",
     "words": 20,
     "picks": [
      "Done",
@@ -1379,7 +1437,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 2 of 4: Ask something small you can check yourself.",
+    "text": "Step 2 of 5: Ask something small you can check yourself.",
     "words": 11,
     "picks": [
      "Done",
@@ -1396,7 +1454,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 3 of 4: Check: Hermes answers, with no error.",
+    "text": "Step 3 of 5: Check: Hermes answers, with no error.",
     "words": 10,
     "picks": [
      "Done",
@@ -1413,15 +1471,32 @@
    },
    {
     "who": "Helper",
-    "text": "Step 4 of 4: Check: ask one more thing in the same chat. It carries on.",
+    "text": "Step 4 of 5: Check: ask one more thing in the same chat. It carries on.",
     "words": 16,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 4)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 5 of 5: To come back: click Helper in the left list.",
+    "words": 13,
     "picks": [
      "It worked",
      "It didn't work",
      "Stop for now"
     ],
     "grey": null,
-    "line": "STEP (first_chat 4)"
+    "line": "STEP (first_chat 5)"
    },
    {
     "who": "Person",
@@ -1456,7 +1531,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 1 of 4: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
     "words": 22,
     "picks": [
      "Done",
@@ -1473,8 +1548,8 @@
    },
    {
     "who": "Helper",
-    "text": "Step 2 of 4: Hermes makes the job for you.",
-    "words": 10,
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
     "picks": [
      "Done",
      "I'm stuck",
@@ -1490,32 +1565,15 @@
    },
    {
     "who": "Helper",
-    "text": "Step 3 of 4: Check: click Scheduled jobs in the left list. Your job is there.",
-    "words": 16,
-    "picks": [
-     "Done",
-     "I'm stuck",
-     "Stop for now"
-    ],
-    "grey": null,
-    "line": "STEP (scheduled_job 3)"
-   },
-   {
-    "who": "Person",
-    "text": "Done",
-    "words": 1
-   },
-   {
-    "who": "Helper",
-    "text": "Step 4 of 4: There you can pause, change or delete it.",
-    "words": 12,
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
     "picks": [
      "It worked",
      "It didn't work",
      "Stop for now"
     ],
     "grey": null,
-    "line": "STEP (scheduled_job 4)"
+    "line": "STEP (scheduled_job 3)"
    },
    {
     "who": "Person",
@@ -1572,15 +1630,22 @@
   "a_next_day": [
    {
     "who": "Helper",
-    "text": "Hi again, Peter. Last time we picked Its personality. Want to go on?",
-    "words": 13,
+    "text": "Hi again, Peter. I can see you have 1 scheduled job.",
+    "words": 11,
+    "picks": null,
+    "line": "BACK_SEEN (fresh read: 1 job)"
+   },
+   {
+    "who": "Helper",
+    "text": "We stopped at Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?",
+    "words": 22,
     "picks": [
      "Show me the steps",
      "I've done this already",
      "Something else",
      "Not now"
     ],
-    "line": "BACK_REC"
+    "line": "BACK_NEXT"
    }
   ],
   "b_written": [
@@ -1674,7 +1739,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 1 of 4: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
     "words": 22,
     "picks": [
      "Done",
@@ -1691,8 +1756,8 @@
    },
    {
     "who": "Helper",
-    "text": "Step 2 of 4: Hermes makes the job for you.",
-    "words": 10,
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
     "picks": [
      "Done",
      "I'm stuck",
@@ -1708,32 +1773,15 @@
    },
    {
     "who": "Helper",
-    "text": "Step 3 of 4: Check: click Scheduled jobs in the left list. Your job is there.",
-    "words": 16,
-    "picks": [
-     "Done",
-     "I'm stuck",
-     "Stop for now"
-    ],
-    "grey": null,
-    "line": "STEP (scheduled_job 3)"
-   },
-   {
-    "who": "Person",
-    "text": "Done",
-    "words": 1
-   },
-   {
-    "who": "Helper",
-    "text": "Step 4 of 4: There you can pause, change or delete it.",
-    "words": 12,
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
     "picks": [
      "It worked",
      "It didn't work",
      "Stop for now"
     ],
     "grey": null,
-    "line": "STEP (scheduled_job 4)"
+    "line": "STEP (scheduled_job 3)"
    },
    {
     "who": "Person",
@@ -1866,7 +1914,7 @@
    },
    {
     "who": "Helper",
-    "text": "Step 1 of 4: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
     "words": 22,
     "picks": [
      "Done",
@@ -1883,8 +1931,8 @@
    },
    {
     "who": "Helper",
-    "text": "Step 2 of 4: Hermes makes the job for you.",
-    "words": 10,
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
     "picks": [
      "Done",
      "I'm stuck",
@@ -1900,32 +1948,15 @@
    },
    {
     "who": "Helper",
-    "text": "Step 3 of 4: Check: click Scheduled jobs in the left list. Your job is there.",
-    "words": 16,
-    "picks": [
-     "Done",
-     "I'm stuck",
-     "Stop for now"
-    ],
-    "grey": null,
-    "line": "STEP (scheduled_job 3)"
-   },
-   {
-    "who": "Person",
-    "text": "Done",
-    "words": 1
-   },
-   {
-    "who": "Helper",
-    "text": "Step 4 of 4: There you can pause, change or delete it.",
-    "words": 12,
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
     "picks": [
      "It worked",
      "It didn't work",
      "Stop for now"
     ],
     "grey": null,
-    "line": "STEP (scheduled_job 4)"
+    "line": "STEP (scheduled_job 3)"
    },
    {
     "who": "Person",
@@ -2214,6 +2245,20 @@
     "grey": null,
     "line": "NOT_NOW"
    }
+  ],
+  "a_next_day_nothing_seen": [
+   {
+    "who": "Helper",
+    "text": "Hi again, Peter. We stopped at Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?",
+    "words": 25,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "line": "BACK_REC (no seeable thing done)"
+   }
   ]
  },
  "gaps": [
@@ -2224,5 +2269,7 @@
   "Whether a scheduled job can message other people (club members) is not checked; no line says it can.",
   "STUCK_MODEL's live URL not checked."
  ],
- "changed_offer_t1": "hhcontent, 11 Nov 2026, changes-8: NOT_NOW, ALL_DONE, BACK end with an offer (helper-talk-v2.json offers); Q_GOAL and SETUP_REASK_GOAL in his either/or shape, same four answers; setup_ask phrases widened."
+ "changed_offer_t1": "hhcontent, 11 Nov 2026, changes-8: NOT_NOW, ALL_DONE, BACK end with an offer (helper-talk-v2.json offers); Q_GOAL and SETUP_REASK_GOAL in his either/or shape, same four answers; setup_ask phrases widened.",
+ "changes_1": "2026-11-11 08:48 UTC, Lead's job from docs/answers/hhtech-setup-run.md: content/helper-setup-chat-v1-changes-1.md",
+ "conversations_note_c1": "changes-1: a_ai, b_ai and c_ai are examples of the AI step, which is off for the entry; nothing in them is shown. Their REC lines marked (AI, mine) are not checked facts."
 }

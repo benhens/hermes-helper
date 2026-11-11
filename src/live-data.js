@@ -5711,10 +5711,10 @@ export const LIVE_DATA = {
       "ai_picks_line": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.",
       "ai_writes": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help."
     },
-    "settings_top_line_2_no_setup": {
+    "settings_top_line_2_work_only": {
       "no_ai_step": null,
-      "ai_picks_line": "Only the What you do line is sent to your AI, when Helper asks it for help.",
-      "ai_writes": "Only the What you do line is sent to your AI, when Helper asks it for help."
+      "ai_picks_line": "Only What you do goes to your AI. Only when Helper asks it for help.",
+      "ai_writes": "Only What you do goes to your AI. Only when Helper asks it for help."
     },
     "work_told": {
       "no_ai_step": null,

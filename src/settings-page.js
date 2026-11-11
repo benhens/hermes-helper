@@ -24,8 +24,9 @@ import { curlyQuotes } from './quotes.js'
 
 const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
 // live changes-6: when the set-up conversation's two answers go to the AI too (its AI step, SETUP_AI_BUILT) the line
-// names the three rows; else only what the person does is sent, and the line says that (settings_top_line_2 was_c6)
-export const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode[SETUP_BUILT && SETUP_AI_BUILT ? 'settings_top_line_2' : 'settings_top_line_2_no_setup'][AI_MODE]
+// names the three rows; else only what the person does is sent, and the line says that (setup-chat changes-1:
+// settings_top_line_2_work_only)
+export const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode[SETUP_BUILT && SETUP_AI_BUILT ? 'settings_top_line_2' : 'settings_top_line_2_work_only'][AI_MODE]
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')

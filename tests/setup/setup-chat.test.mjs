@@ -151,7 +151,7 @@ test('conversation (a) of the write-up: Peter, a tennis club, only installed', o
   assert.deepEqual(p.labels(), ['Which AI to use', 'Phone and chat apps'])
   // Hermes closed and opened: the returning line, from what is kept
   const back = person(NOTHING(), { kept: cleanKept(keptToStore(p.st.kept)), met: true }).opening()
-  assert.deepEqual([back.last().line, back.last().text], ['BACK_REC', 'Hi again, Peter. Last time we picked Scheduled jobs. Want to go on?'])
+  assert.deepEqual([back.last().line, back.last().text], ['BACK_REC', 'Hi again, Peter. We stopped at Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?'])
   assert.deepEqual(back.labels(), REC4)
 })
 
@@ -175,8 +175,8 @@ test('the scheduled job\'s steps, then "It worked": Helper reads again and says 
   assert.deepEqual(lines(s), [['NOT_SEEN', "I can't see it yet. I only look at your main bot."]])
   assert.deepEqual(p.labels(), ['Show me the steps', 'I did it on another bot', 'Not now'])
   p.press('Show me the steps')
-  assert.match(p.last().text, /^Step 1 of 5: /)
-  for (let i = 0; i < 4; i++) p.press('Done')
+  assert.match(p.last().text, /^Step 1 of 3: /)
+  for (let i = 0; i < 2; i++) p.press('Done')
   p.reads.jobs = 1 // the job is made in Hermes
   p.said()
   p.press('It worked')
@@ -229,7 +229,10 @@ test('conversation (c): Skip, Skip, Not sure yet: nothing kept, the usual first 
   p.press("I've done this already")
   assert.deepEqual(lines(p.said()), [['DONE_SAID', "Good. I'll remember that you did it."], ['REC', 'This is next in the order the Hermes docs suggest. Next: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?']])
   p.press("I've done this already")
-  assert.equal(p.said()[0].text, "Thanks. I'll take your word for it.", 'a thing Helper can see, and does not see done')
+  // setup-chat-2 (changes-1 ALREADY_SEEABLE): a thing Helper can see, and does not see done
+  assert.equal(p.said()[0].text, "I can't see that yet. Its personality text is still the starter one.")
+  p.press('Count it as done')
+  assert.equal(p.said()[0].text, "Fine. I'll count it as done.")
   p.press('Something else')
   assert.equal(p.said()[0].text, "Fine, here's another.")
   assert.deepEqual(p.st.kept.setup_done_said, ['first_chat', 'personality'], 'Something else is for this visit only')
@@ -353,10 +356,10 @@ test('what is kept is cleaned when read back: only the data\'s ids, a goal text 
 test('returning: the thing picked last time; seen done now; before the questions; all done', opt, () => {
   const kept = { name: 'Peter', setup_new: 'new', setup_goal: 'Do things at set times', setup_goal_id: 'schedule', setup_done_said: ['first_chat'], setup_current: 'scheduled_job' }
   let p = person(NOTHING(), { kept: { ...kept }, met: true }).opening()
-  assert.deepEqual(lines(p.log), [['BACK_REC', 'Hi again, Peter. Last time we picked Scheduled jobs. Want to go on?']])
+  assert.deepEqual(lines(p.log), [['BACK_REC', 'Hi again, Peter. We stopped at Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?']])
   assert.deepEqual(p.labels(), REC4)
   p.press('Show me the steps')
-  assert.match(p.last().text, /^Step 1 of 5: In a chat, ask in plain words/)
+  assert.match(p.last().text, /^Step 1 of 3: In a chat, ask in plain words/)
   // the job was made meanwhile: Helper reads first and says so, then the next thing
   p = person({ model: 'ok', soul: false, jobs: 2, bots: 1 }, { kept: { ...kept }, met: true }).opening()
   assert.deepEqual(lines(p.log), [
@@ -366,7 +369,7 @@ test('returning: the thing picked last time; seen done now; before the questions
   assert.equal(p.st.kept.setup_current, 'personality')
   // no name kept
   p = person(NOTHING(), { kept: { setup_current: 'memory' }, met: true }).opening()
-  assert.deepEqual(lines(p.log), [['BACK_REC', 'Hi again. Last time we picked Memory. Want to go on?']])
+  assert.deepEqual(lines(p.log), [['BACK_REC', `Hi again. We stopped at Memory. ${LIST_JSON.items.find(i => i.id === 'memory').why} Want the steps?`]])
   // closed before the questions
   p = person(NOTHING(), { kept: { name: 'Peter', work: 'I run a tennis club' }, met: true }).opening()
   assert.deepEqual(lines(p.log), [['BACK_Q', 'Hi again, Peter. Before we go on: are you new to Hermes?']])
@@ -384,7 +387,7 @@ test('a read that fails after "It worked": Helper says it could not read it and 
   const p = person()
   p.skip()
   p.press('I know it well').press('Do things at set times').press('Show me the steps')
-  for (let i = 0; i < 4; i++) p.press('Done')
+  for (let i = 0; i < 2; i++) p.press('Done')
   p.reads.jobs = null
   p.said()
   p.press('It worked')

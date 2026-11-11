@@ -213,32 +213,25 @@ export const SETUP_DATA = {
   "lines": {
     "F2": {
       "text": "Thanks, {name}. I'll help you set up Hermes for that. Are you new to Hermes?",
-      "text_no_name": "Thanks. I'll help you set up Hermes for that. Are you new to Hermes?",
-      "answers": "Q_NEW"
+      "text_no_name": "Thanks. I'll help you set up Hermes for that. Are you new to Hermes?"
     },
     "F3": {
-      "text": "That's fine. I'll help you set up Hermes. Are you new to Hermes?",
-      "answers": "Q_NEW"
+      "text": "That's fine. I'll help you set up Hermes. Are you new to Hermes?"
     },
     "WORK_SECRET": {
-      "text": "Thanks. I didn't keep that, because it looks like a password or a long number. Are you new to Hermes?",
-      "answers": "Q_NEW"
+      "text": "Thanks. I didn't keep that, because it looks like a password or a long number. Are you new to Hermes?"
     },
     "WORK_LONG_2": {
-      "text": "Thanks. I didn't keep that, because it is too long. Are you new to Hermes?",
-      "answers": "Q_NEW"
+      "text": "Thanks. I didn't keep that, because it is too long. Are you new to Hermes?"
     },
     "Q_GOAL": {
-      "text": "Do you want jobs at set times, phone chats, or something else?",
-      "answers": "Q_GOAL"
+      "text": "Do you want jobs at set times, phone chats, or something else?"
     },
     "SETUP_REASK": {
-      "text": "When you're ready: are you new to Hermes?",
-      "answers": "Q_NEW"
+      "text": "When you're ready: are you new to Hermes?"
     },
     "SETUP_REASK_GOAL": {
-      "text": "When you're ready: do you want jobs, phone chats, or more?",
-      "answers": "Q_GOAL"
+      "text": "When you're ready: do you want jobs, phone chats, or more?"
     },
     "REC": {
       "text": "{reason} Next: {card}. {why} Want the steps?",
@@ -285,13 +278,34 @@ export const SETUP_DATA = {
         "Show me the steps",
         "I did it on another bot",
         "Not now"
-      ]
+      ],
+      "answers_second_bot": [
+        "Show me the steps",
+        "Not now"
+      ],
+      "text_second_bot": "I can't see it yet. You have one bot so far."
     },
     "DONE_SAID": {
       "text": "Good. I'll remember that you did it."
     },
     "ALREADY_SEEABLE": {
-      "text": "Thanks. I'll take your word for it."
+      "text": "I can't see that yet. {not_part}",
+      "answers": [
+        "Show me the steps",
+        "I did it on another bot",
+        "Count it as done",
+        "Not now"
+      ],
+      "answers_second_bot": [
+        "Show me the steps",
+        "Count it as done",
+        "Not now"
+      ],
+      "not_part": {
+        "personality": "Its personality text is still the starter one.",
+        "scheduled_job": "You have no scheduled jobs yet.",
+        "second_bot": "You have one bot so far."
+      }
     },
     "SOMETHING_ELSE": {
       "text": "Fine, here's another."
@@ -309,8 +323,8 @@ export const SETUP_DATA = {
       "text_no_name": "Hi again. I can see it now. {seen_part}"
     },
     "BACK_REC": {
-      "text": "Hi again, {name}. Last time we picked {card}. Want to go on?",
-      "text_no_name": "Hi again. Last time we picked {card}. Want to go on?",
+      "text": "Hi again, {name}. We stopped at {card}. {why} Want the steps?",
+      "text_no_name": "Hi again. We stopped at {card}. {why} Want the steps?",
       "answers": [
         "Show me the steps",
         "I've done this already",
@@ -320,8 +334,7 @@ export const SETUP_DATA = {
     },
     "BACK_Q": {
       "text": "Hi again, {name}. Before we go on: are you new to Hermes?",
-      "text_no_name": "Hi again. Before we go on: are you new to Hermes?",
-      "answers": "Q_NEW"
+      "text_no_name": "Hi again. Before we go on: are you new to Hermes?"
     },
     "BACK": {
       "text": "Hi again, {name}.",
@@ -329,8 +342,32 @@ export const SETUP_DATA = {
       "offer": "general_2"
     },
     "RESTART": {
-      "text": "Sure, let's start again. Are you new to Hermes?",
-      "answers": "Q_NEW"
+      "text": "Sure, let's start again. Are you new to Hermes?"
+    },
+    "BACK_SEEN": {
+      "text": "Hi again, {name}. {back_part}",
+      "text_no_name": "Hi again. {back_part}",
+      "parts": {
+        "scheduled_job": "I can see you have {n} scheduled job.",
+        "scheduled_job_plural": "I can see you have {n} scheduled jobs.",
+        "personality": "I can see your Hermes has its own personality text.",
+        "second_bot": "I can see you have {n} bots."
+      }
+    },
+    "BACK_NEXT": {
+      "text": "We stopped at {card}. {why} Want the steps?",
+      "answers": [
+        "Show me the steps",
+        "I've done this already",
+        "Something else",
+        "Not now"
+      ]
+    },
+    "ALREADY_COUNT": {
+      "text": "Fine. I'll count it as done."
+    },
+    "STEP_BACK": {
+      "text": "Back to step {n} of {total}: {step}"
     }
   },
   "restart_phrases": [
@@ -517,10 +554,8 @@ export const SETUP_DATA = {
       "why": "Hermes does a job for you at set times, like every morning.",
       "steps": [
         "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
-        "Hermes makes the job for you.",
-        "Check: open Scheduled jobs. Your job is there.",
-        "Or make one by hand there: click New cron, type a name and the job, then Create cron.",
-        "There you can also pause, change or delete a job."
+        "Check: open Scheduled jobs. The job Hermes made is there.",
+        "No job? Make one by hand: click New cron, type a name and the job, then Create cron."
       ]
     },
     "second_bot": {

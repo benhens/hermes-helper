@@ -1,6 +1,6 @@
 {
   "id": "dash-setup-list-v2",
-  "written": "2026-11-11 hhcontent; changed 2026-11-11 07:30 UTC (job hhcontent-dash-words-lk): Chat apps counted, steps corrected against docs/answers/hhtech-dash-run.md",
+  "written": "2026-11-11 hhcontent; changed 2026-11-11 07:30 UTC (job hhcontent-dash-words-lk): Chat apps counted, steps corrected against docs/answers/hhtech-dash-run.md; changed 2026-11-11 08:48 UTC (setup-chat changes-1): Scheduled jobs has 3 steps",
   "replaces": "nothing; dash-setup-list-v1 stays as the first look",
   "docs_copy": "/hermes-docs (Hermes v0.23.0 mounted copy; the server runs v0.23.1; live docs not compared)",
   "quote_check": "dev/checks/hhcontent-dash-list-v2/check.py finds every quote on its cited line",
@@ -210,12 +210,13 @@
         {"file": "getting-started/quickstart.md", "line": 273, "quote": "Cron — only after your bot or CLI setup is stable"}
       ],
       "steps": [
-        {"text": "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.", "src": {"file": "user-guide/features/cron.md", "line": 86, "quote": "Every morning at 9am, check Hacker News for AI news and send me a summary on Telegram."}, "not_seen": "docs words, not seen"},
-        {"text": "Hermes makes the job for you.", "src": {"file": "user-guide/features/cron.md", "line": 24, "quote": "by asking in plain language — no CLI required"}, "not_seen": "docs words, not seen"},
-        {"text": "Check: open Scheduled jobs. Your job is there.", "src": {"file": "user-guide/desktop.md", "line": 485, "quote": "view and manage [scheduled jobs]"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 28, "quote": "the Scheduled jobs screen (#/cron), \"0 jobs\", blueprints, \"New cron\""}, "note": "No longer says \"in the left list\": Hermes shows that row only in Advanced mode (design/dash-r7/notes.md line 45, read in source). The button on this step opens the screen."},
-        {"text": "Or make one by hand there: click New cron, type a name and the job, then Create cron.", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 12, "quote": "Scheduled jobs, \"New cron\", name and prompt, \"Create cron\""}},
-        {"text": "There you can also pause, change or delete a job.", "src": {"file": "user-guide/desktop.md", "line": 485, "quote": "actions (pause, resume, edit, delete)"}, "not_seen": "docs words, not seen"}
+        {"text": "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.", "src": {"file": "user-guide/features/cron.md", "line": 86, "quote": "Every morning at 9am, check Hacker News for AI news and send me a summary on Telegram."}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-setup-run.md", "line": 32, "quote": "I then asked Hermes's own chat for a job and it made one in 32 s"}, "seen_note": "Seen: a job asked for in Hermes's own chat was made (free model). Not seen: this exact sentence typed."},
+        {"text": "Check: open Scheduled jobs. The job Hermes made is there.", "src": {"file": "user-guide/desktop.md", "line": 485, "quote": "view and manage [scheduled jobs]"}, "src2": {"file": "user-guide/features/cron.md", "line": 24, "quote": "by asking in plain language — no CLI required"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 28, "quote": "the Scheduled jobs screen (#/cron), \"0 jobs\", blueprints, \"New cron\""}, "note": "Does not say \"in the left list\": Hermes shows that row only in Advanced mode (design/dash-r7/notes.md line 45, read in source). The button on this step opens the screen. \"The job Hermes made\" carries the old step 2 (cron.md 24)."},
+        {"text": "No job? Make one by hand: click New cron, type a name and the job, then Create cron.", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 12, "quote": "Scheduled jobs, \"New cron\", name and prompt, \"Create cron\""}}
       ],
+      "after": {"text": "There you can also pause, change or delete a job.", "src": {"file": "user-guide/desktop.md", "line": 485, "quote": "actions (pause, resume, edit, delete)"}, "not_seen": "docs words, not seen", "note": "Was step 5. Not a step: nothing to do. The Dashboard may show it as one quiet line under the steps; the set-up conversation does not show it."},
+      "steps_were": ["In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.", "Hermes makes the job for you.", "Check: open Scheduled jobs. Your job is there.", "Or make one by hand there: click New cron, type a name and the job, then Create cron.", "There you can also pause, change or delete a job."],
+      "steps_changed": "2026-11-11 setup-chat changes-1: 5 steps to 3 (docs/answers/hhtech-setup-run.md lines 99 and 115). The same 3 steps show on the Dashboard.",
       "counts": true,
       "done_rule": "Done when the main bot has at least one scheduled job, paused ones included (Lead, 11 Nov).",
       "read": "cron.manage {action: \"list\", profile: main bot, include_disabled: true}, count >= 1. Always pass profile.",

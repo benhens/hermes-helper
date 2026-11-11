@@ -124,12 +124,11 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   assert.equal(oldText(olds(view).at(-1)).replace(/’/g, "'"), "That's fine. I'll keep your place.")
   assert.equal(bubbleLine(view), 'offer-general_2')
   assert.deepEqual(labels(view), ['Which AI to use', 'Phone and chat apps'])
-  // the AI was asked only for the two recommendation sentences (it answered NONE here, so the written ones show);
-  // the questions, the look, the choice and the steps used no AI, and nothing was written to Hermes
-  assert.equal(host.asks.length, 2, 'one call for each recommendation, none for anything else')
-  for (const p of host.asks) assert.match(p.instructions, /^You are Helper, inside the Hermes app\. Write one short message that recommends the next thing to set up\./)
+  // setup-chat-2 (SETUP_AI_BUILT false, Lead from hhtech-setup-run): no AI call at all, the recommendations too are
+  // written; the questions, the look, the choice and the steps used no AI, and nothing was written to Hermes
+  assert.equal(host.asks.length, 0, 'no call, also for the recommendations')
   // (dash-v2: plugins.manage is the Dashboard's read of the plugins list when the page opened, only ever action 'list')
-  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'llm.oneshot', 'plugins.manage', 'profiles.describe', 'setup.runtime_check'])
+  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'plugins.manage', 'profiles.describe', 'setup.runtime_check'])
   for (const [m, p] of host.calls) if (m === 'plugins.manage' || m === 'cron.manage') assert.equal(p.action, 'list', m)
   // kept between visits
   const kept = storage.data.get('kept')
@@ -138,7 +137,7 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   const again = await open({ storage })
   finish(again.view)
   assert.equal(bubbleLine(again.view), 'BACK_REC')
-  assert.equal(bubbleSaid(again.view), 'Hi again, Peter. Last time we picked Scheduled jobs. Want to go on?')
+  assert.equal(bubbleSaid(again.view), 'Hi again, Peter. We stopped at Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?')
   assert.deepEqual(labels(again.view).map(l => l.replace(/’/g, "'")), REC4)
   assert.equal(lookCalls(again.host).length, 3, 'the opening of a later visit reads Hermes once')
   assert.equal(again.host.asks.length, 0, 'and asks no AI')

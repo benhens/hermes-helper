@@ -303,20 +303,14 @@ export const DASH_DATA = {
           "text": "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary."
         },
         {
-          "text": "Hermes makes the job for you."
+          "text": "Check: open Scheduled jobs. The job Hermes made is there."
         },
         {
-          "text": "Check: open Scheduled jobs. Your job is there.",
+          "text": "No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
           "route": {
             "label": "Open Scheduled jobs",
             "to": "/cron"
           }
-        },
-        {
-          "text": "Or make one by hand there: click New cron, type a name and the job, then Create cron."
-        },
-        {
-          "text": "There you can also pause, change or delete a job."
         }
       ],
       "terminal": null,
