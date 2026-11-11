@@ -79,7 +79,8 @@ test('after "What do you do?": "Thanks, Peter." moves up as Helper\'s line and t
 })
 
 test('his example "How can I migrate?": the line, the offer under it, and each pick pressed gives its own line with the label as the person\'s message', async () => {
-  for (const [label, id] of [['From another AI app', 'MIG_APP'], ['To another computer', 'MIG_PC']]) {
+  // loom-fixes: From another AI app asks which app first (MIG_WHICH, its question in its own bubble)
+  for (const [label, id] of [['From another AI app', 'offer-mig_which'], ['To another computer', 'MIG_PC']]) {
     const { view } = await pastOpening('no_ai_step')
     send(view, 'How can I migrate?')
     assert.equal(olds(view).at(-1).props['data-line'], 'MIG')

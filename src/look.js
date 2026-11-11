@@ -243,6 +243,9 @@ export const D = {
   tileWords: 'hhd-tile-words',
   tileNum: 'hhd-tile-num',
   tileLabel: 'hhd-tile-label',
+  // loom-fixes: a tile that opens Hermes's own screen, and the plugins tile's name in place of a number
+  tileBtn: 'hhd-tile-btn',
+  tileName: 'hhd-tile-name',
   wait: 'hhd-wait',
   // Activity
   act: 'hhd-act',
@@ -347,7 +350,7 @@ export const T = {
   where: 'hh-where',
   dots: 'hh-dots',
   dotOn: 'hh-on',
-  dotsWait: 'hh-wait',
+  dotsWait: 'hh-dots-run',
   dotsStill: 'hh-still',
   // under the bubble: the piece between bubble and character, the character, the answers to pick
   under: 'hh-under',
@@ -373,6 +376,7 @@ export const T = {
   docs: 'hh-docs',
   docsHead: 'hh-docs-head',
   docsWords: 'hh-docs-words',
+  docsWhere: 'hh-docs-where',
   // the numbered clicks to add an optional skill, and the faint line after them
   steps: 'hh-steps',
   after: 'hh-after',

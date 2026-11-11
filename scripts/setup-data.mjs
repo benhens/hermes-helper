@@ -12,7 +12,9 @@ export const SETUP_LINES = {
   BACK_DONE: ['{name}', '{seen_part}'], BACK_REC: ['{name}', '{card}', '{why}'], BACK_Q: ['{name}'], BACK: ['{name}'], RESTART: [],
   // setup-chat-2 (setup-chat changes-1): the returning line when something else is seen done and the line after it, the
   // line of "I can't see that yet" and of "Count it as done", and the line back to the step after a typed question
-  BACK_SEEN: ['{name}', '{back_part}'], BACK_NEXT: ['{card}', '{why}'], ALREADY_SEEABLE: ['{not_part}'], ALREADY_COUNT: [], STEP_BACK: ['{n}', '{total}', '{step}']
+  BACK_SEEN: ['{name}', '{back_part}'], BACK_NEXT: ['{card}', '{why}'], ALREADY_SEEABLE: ['{not_part}'], ALREADY_COUNT: [], STEP_BACK: ['{n}', '{total}', '{step}'],
+  // loom-fixes (helper-loom-fixes-v1 point 6): Set up Hermes with answers already kept
+  FROM_KEPT: ['{new_said}', '{and}', '{goal_said}']
 }
 // setup-chat-2: BACK_SEEN's parts, one for each thing Helper can see done
 export const BACK_SEEN_PARTS = { scheduled_job: ['{n}'], scheduled_job_plural: ['{n}'], personality: [], second_bot: ['{n}'] }
@@ -100,7 +102,7 @@ const pick = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undefined
 // one line, cut to the fields the code reads; changes-1's not_part names look.parts, so the code gets their words
 function slimLine(setup, id) {
   const l = setup.lines[id]
-  const out = pick(l, ['text', 'text_no_name', 'answers', 'answers_second_bot', 'text_second_bot', 'last_step_answers', 'paste_label', 'paste', 'button', 'url', 'offer', 'parts'])
+  const out = pick(l, ['text', 'text_no_name', 'answers', 'answers_second_bot', 'text_second_bot', 'last_step_answers', 'paste_label', 'paste', 'button', 'url', 'offer', 'parts', 'new_said', 'goal_said', 'and'])
   // STEP_BACK's answers are a note ("the step's own"), not a list: the code gives it STEP's
   if (out.answers !== undefined && !Array.isArray(out.answers)) delete out.answers
   if (l.not_part) out.not_part = Object.fromEntries(Object.entries(l.not_part).map(([k, ref]) => [k, setup.look.parts[ref.slice('look.parts.'.length)]]))
@@ -124,6 +126,8 @@ export function slimSetupData(setup, list) {
     reasons: setup.reasons,
     lines: Object.fromEntries(Object.keys(SETUP_LINES).map(id => [id, slimLine(setup, id)])),
     restart_phrases: setup.restart_phrases,
+    // loom-fixes (helper-loom-fixes-v1 point 2): a message typed at Q_NEW or Q_GOAL is kept only when it reads as an answer
+    typed_answer: pick(setup.typed_answer, ['question_starts', 'request_starts', 'request_words', 'small_talk_kinds']),
     ask_phrases: setup.setup_ask.phrases,
     keeps: setup.keeps.rows.map(r => ({ key: r.key, row: r.settings_row, kept_line: /^Kept:/.test(r.grey_kept_line) ? r.grey_kept_line : null })),
     ai: {

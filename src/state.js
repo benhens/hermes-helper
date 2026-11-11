@@ -13,7 +13,8 @@ import { clampHelperWidth, HELPER_PX } from './layout.js'
 // visit; nothing about the person, and no Forget removes it (src/page.js).
 export const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met']
 // dash-v1: the three tabs, Dashboard first (only it is built)
-export const TAB_IDS = ['dashboard', 'learn', 'my_setup']
+// loom-fixes: My setup is out (his words, Loom 3:22); a stored 'my_setup' opens the Dashboard
+export const TAB_IDS = ['dashboard', 'learn']
 
 export function readState(get) {
   const tab = get('tab', TAB_IDS[0])

@@ -92,9 +92,15 @@ test('his example "How can I migrate?": the line MIG with the offer move; each p
   assert.deepEqual([m.line, m.text, m.offer.set], ['MIG', 'There are two kinds of moving.', 'move'])
   assert.deepEqual(labels(m), ['From another AI app', 'To another computer'])
   assert.deepEqual(m.offer.answers.items.map(i => i.offer), ['mig_app', 'mig_pc'])
-  const app = lineFor(pressOffer('mig_app', st), st)
+  // loom-fixes (helper-loom-fixes-v1 point 3): From another AI app asks which app first (MIG_WHICH); an app picked
+  // gives MIG_APP with a text to copy that names it
+  const which = lineFor(pressOffer('mig_app', st), st)
+  assert.equal(which.line, 'MIG_WHICH')
+  assert.deepEqual(which.offer.answers.items.map(i => i.label), ['OpenClaw', 'Claude Code', 'Codex', 'Another app'])
+  const app = lineFor(pressOffer('mig_codex', st), st)
   assert.equal(app.line, 'MIG_APP')
   assert.equal(app.next.label, 'Show me what to ask')
+  assert.equal(app.next.text, 'Please bring my setup over from Codex with hermes migrate codex. Show me the plan before you write anything.')
   const st2 = visit()
   say(st2, 'How can I migrate?')
   const pc = lineFor(pressOffer('mig_pc', st2), st2)

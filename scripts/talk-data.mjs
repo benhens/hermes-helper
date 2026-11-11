@@ -78,7 +78,9 @@ export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N_HINT', 'TP'
   'PRIV', 'POWER', 'HVC', 'MIG', 'MIG_APP', 'MIG_NOT_LISTED', 'MIG_PC', 'HERMES', 'START', 'KEY', 'UPDATE', 'SAFE', 'PERSONALITY', 'KEY_WHAT',
   'MIG_CHATGPT', 'AGENT', 'KEY_WHERE', 'FREE', 'MODEL_FOR', 'MODEL_CHANGE', 'SKILL_ADD', 'PLUGIN_WHICH', 'PLUGIN_ADD', 'CODING', 'PICK_FIRST', 'HOW_PASTE', 'HOW_PART', 'START_2',
   // find-v1 (live changes-11, breadth-t1): how / why / and then alone after a line with no next step
-  'NO_MORE']
+  'NO_MORE',
+  // loom-fixes (helper-loom-fixes-v1 point 3): which app to bring a setup over from
+  'MIG_WHICH']
 // live-v2 changes-3: what no_repeat.in_place may name besides fixed lines: a topic's plain line, the "are you an
 // AI" line of this build (ai_line) and HELLO with the name (src/talk.js noRepeat)
 const IN_PLACE_ALSO = ['plain', 'ai_line']
@@ -190,7 +192,11 @@ export function talkLines(d) {
     next(f.next)
   }
   // offer-t1: each offer set's question (after_topic: one per topic, from its template)
-  for (const [id, text] of offerTexts(d)) add('offer-' + id, text, 'question')
+  // loom-fixes (helper-loom-fixes-v1 point 3): the six apps the docs name (offer_words.migrate_apps labels) are app names,
+  // as in MIG_APP's quoted "Grok Bot": in the offer questions that list them they are not checked as Hermes terms
+  const appNames = ((d.offer_words && d.offer_words.migrate_apps) || []).map(a => a.label)
+  const unApp = text => appNames.reduce((t, n) => t.split(n).join('"' + n + '"'), text)
+  for (const [id, text] of offerTexts(d)) add('offer-' + id, id.startsWith('mig_which') ? unApp(text) : text, 'question')
   for (const [id, kind, text] of keepLines(d)) add(id, text, kind)
   for (const t of d.topics || []) {
     add(t.question.id, t.question.text, 'question')
@@ -440,7 +446,7 @@ function slimKeeps(K) {
 export const START_FOUR_TEXT = 'Do you want one of these instead?'
 export function slimTalkData(d, skills = { skills: [] }) {
   const fixed = {}
-  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source', 'offer', 'title', 'phrases']), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
+  for (const f of d.fixed_lines) if (FIXED_USED.includes(f.id)) fixed[f.id] = { ...pickKeys(f, ['text', 'text_no_name', 'paste_text', 'source', 'offer', 'title', 'phrases']), ...(f.docs_box ? { docs_box: pickKeys(f.docs_box, ['head', 'quote', 'where']) } : {}), ...(f.next ? { next: slimNext(f.next) } : {}), text: C1_TEXT(f) }
   return {
     docs_version: d.docs_version,
     limits: pickKeys(d.limits, ['request_chars_in_paste', 'service_chars_in_paste']),
@@ -472,7 +478,7 @@ export function slimTalkData(d, skills = { skills: [] }) {
     live_c6: { ...pickKeys(d.live_c6, ['privacy_words', 'power_words', 'vs_names', 'vs_words', 'hosted_words']), greet_more: pickKeys(d.live_c6.greet_more, ['question_words']) },
     offers: {
       hint: d.offers.hint,
-      things: Object.fromEntries(Object.entries(d.offers.things).map(([k, v]) => [k, { ...pickKeys(v, ['label', 'say']), gives: pickKeys(v.gives, ['kind', 'id']) }])),
+      things: Object.fromEntries(Object.entries(d.offers.things).map(([k, v]) => [k, { ...pickKeys(v, ['label', 'say']), gives: pickKeys(v.gives, ['kind', 'id', 'app']) }])),
       // find-v1: the bubble above the four fixed picks (start_four) says Lead's words (11 Nov 08:35), not hhcontent's guess
       sets: Object.fromEntries(Object.entries(d.offers.sets).map(([k, v]) => [k, { ...pickKeys(v, ['text', 'picks', 'text_no_setup', 'picks_no_setup', 'instead', 'template', 'by_topic']), ...(k === 'start_four' ? { text: START_FOUR_TEXT } : {}) }]))
     },

@@ -20,14 +20,23 @@ export function quoteProblem(where, s, docs) {
   return null
 }
 
-// The six things with a fixed rule in src/dash-rules.js (doneFlags). A seventh counted thing would need a rule.
-export const COUNTED_IDS = ['install', 'model', 'personality', 'chat_apps', 'scheduled_job', 'second_bot']
+// loom-fixes (helper-loom-fixes-v1 point 8, dash-setup-list-v2 eb3aeba8): the path is the items with on_path true (10;
+// Install is off it) and every stop on it counts. A stop the page sees for itself (marked_by page) needs a fixed rule in
+// src/setup-reads.js (doneFlags); the others are marked by the person. SEEN_IDS: the stops with a rule. First chat is
+// one of them by hhtech's rule (hhtech-loom-n1.md 3; Lead: where hhcontent and hhtech differ, hhtech wins), though the
+// data marks it 'person': the page shows it as a self-marked stop only when Hermes has no listPersistedSessions.
+export const SEEN_IDS = ['model', 'first_chat', 'personality', 'chat_apps', 'scheduled_job', 'second_bot']
+export const SEEN_OVER_DATA = ['first_chat']
+// Lead's words (job loom-fixes point 14): the plugins tile has no number (no read gives the one Hermes's Plugins
+// screen shows, hhtech-loom-n1.md 1)
+export const PLUGINS_TILE = { title: 'Plugins', line: 'See them in Capabilities' }
 // The places hhtech opened from a plugin page (docs/answers/hhtech-dash-reads.md lines 25 to 28); 'new-chat' is
 // host.newChat().
 export const ROUTE_TARGETS = ['/settings?tab=config:model', '/messaging', '/cron', 'new-chat']
 // The longest short name under a stop that fits at the narrow size (design/dash-r4/notes.md line 78).
 export const MARK_MAX = 15
 
+const pickWords = (o, keys) => Object.fromEntries(keys.map(k => [k, o[k]]))
 const isText = v => typeof v === 'string' && v.trim().length > 0
 // hhcontent's short wording of the plugins label (content/dash-words-v1.json variants.plugins_label, n: 3)
 function shortPlugins(data) {
@@ -75,20 +84,28 @@ export function dashProblems(data, docs) {
         else if (isText(p.text) && !p.src.quote.includes(p.text.trim())) fails.push(`${it.id}: paste ${k + 1} is not in its docs quote: ${p.text.slice(0, 60)}`)
       })
   })
-  const counted = items.filter(i => i.counts === true).map(i => i.id)
-  if (counted.join() !== COUNTED_IDS.filter(id => ids.includes(id)).join() || counted.length !== COUNTED_IDS.length) fails.push(`counted things are ${counted.join(', ')}; the code has rules for exactly ${COUNTED_IDS.join(', ')}`)
+  const path = items.filter(i => i.on_path === true)
+  if (path.length !== 10) fails.push(`the path has ${path.length} stops, not 10`)
+  for (const it of items) if (typeof it.on_path !== 'boolean') fails.push(`${it.id}: on_path is not true or false`)
+  for (const it of path) if (!['page', 'person'].includes(it.marked_by)) fails.push(`${it.id}: marked_by is not page or person`)
+  const byPage = path.filter(i => i.marked_by === 'page').map(i => i.id)
+  const seen = [...new Set([...byPage, ...SEEN_OVER_DATA])]
+  if (seen.slice().sort().join() !== SEEN_IDS.slice().sort().join()) fails.push(`stops the page sees are ${seen.join(', ')}; the code has rules for exactly ${SEEN_IDS.join(', ')}`)
 
   const w = data.page_words
   if (!w || typeof w !== 'object') return [...fails, 'page_words missing']
   const need = (obj, keys, where) => keys.forEach(k => isText(obj && obj[k]) || fails.push(`page_words.${where}${k} missing`))
   need(w, ['tab_list_label', 'not_built'], '')
-  need(w.tabs, ['dashboard', 'learn', 'my_setup'], 'tabs.')
+  need(w.tabs, ['dashboard', 'learn'], 'tabs.')
+  // loom-fixes: My setup is out (his words, Loom 3:22): two tabs
+  if (w.tabs && Object.keys(w.tabs).join() !== 'dashboard,learn') fails.push('page_words.tabs: not exactly Dashboard and Learn')
+  need(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no'], 'helper_window.')
   // dash-v2: the word for one (bots_one ...), and what a screen reader hears while a number waits or could not be read
   need(w.stats, ['bots', 'bots_one', 'skills', 'skills_one', 'plugins', 'plugins_one', 'not_known', 'waiting'], 'stats.')
   // the plugins label's short variant, for the narrow size (hhcontent's variant 3; Lead, 11 Nov)
   if (!shortPlugins(data)) fails.push('word_variants: no short variant (n: 3) of the plugins label with its word for one and for many')
   need(w.activity, ['title', 'last_used_today', 'last_used_one', 'last_used_n', 'less', 'more'], 'activity.')
-  need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'not_counted', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_counted', 'state_not_known'], 'setup.')
+  need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_known', 'mark_done', 'mark_undo', 'person_note', 'state_said_done'], 'setup.')
   if (w.activity) {
     if (!Array.isArray(w.activity.months) || w.activity.months.length !== 12 || !w.activity.months.every(isText)) fails.push('page_words.activity.months: not 12 names')
     if (!Array.isArray(w.activity.days) || w.activity.days.length !== 7 || !w.activity.days.every(d => typeof d === 'string')) fails.push('page_words.activity.days: not 7 (Sunday first; empty for no label)')
@@ -97,16 +114,15 @@ export function dashProblems(data, docs) {
   if (w.setup) {
     if (isText(w.setup.count) && !(w.setup.count.includes('{n}') && w.setup.count.includes('{total}'))) fails.push('page_words.setup.count needs {n} and {total}')
     if (isText(w.setup.source) && !(w.setup.source.includes('{file}') && w.setup.source.includes('{line}'))) fails.push('page_words.setup.source needs {file} and {line}')
-    // "All 6 are set up." has the number written in it (hhcontent): it must be the number of counted stops
+    // "All 10 are set up." has the number written in it (hhcontent): it must be the number of stops on the path
     if (isText(w.setup.all_done)) {
       const said = w.setup.all_done.match(/\d+/)
-      const counted = items.filter(i => i.counts === true).length
       if (!said) fails.push('page_words.setup.all_done does not say how many')
-      else if (Number(said[0]) !== counted) fails.push(`page_words.setup.all_done says ${said[0]}; ${counted} stops are counted`)
+      else if (Number(said[0]) !== path.length) fails.push(`page_words.setup.all_done says ${said[0]}; the path has ${path.length} stops`)
     }
-    if (isText(w.setup.not_counted) && !(data.cannot_tell_words || []).includes(w.setup.not_counted)) fails.push('page_words.setup.not_counted is not one of cannot_tell_words')
+    if (isText(w.setup.person_note) && !(data.cannot_tell_words || []).includes(w.setup.person_note)) fails.push('page_words.setup.person_note is not one of cannot_tell_words')
   }
-  for (const id of ids) {
+  for (const id of path.map(i => i.id)) {
     const m = w.marks && w.marks[id]
     if (!isText(m)) fails.push(`page_words.marks.${id} missing`)
     else if (m.length > MARK_MAX) fails.push(`page_words.marks.${id} longer than ${MARK_MAX} characters`)
@@ -126,9 +142,10 @@ export function slimDashData(data) {
   const w = data.page_words
   const routes = Array.isArray(w.routes) ? w.routes : []
   return {
-    items: data.items.map(it => ({
+    // loom-fixes: only the 10 stops on the path; seen: the page has a rule for it (SEEN_IDS), else the person marks it
+    items: data.items.filter(it => it.on_path === true).map(it => ({
       id: it.id,
-      counts: it.counts,
+      seen: SEEN_IDS.includes(it.id),
       name: it.card_name,
       mark: w.marks[it.id],
       why: it.why,
@@ -139,15 +156,16 @@ export function slimDashData(data) {
       terminal: it.terminal ? { when: it.terminal.when, paste: it.terminal.paste.map(p => ({ for: p.for, text: p.text })) } : null,
       sources: it.sources.map(s => ({ file: s.file, line: s.line }))
     })),
-    total: data.items.filter(i => i.counts).length,
+    total: data.items.filter(i => i.on_path === true).length,
     words: {
       tabs: w.tabs,
       tabListLabel: w.tab_list_label,
       notBuilt: w.not_built,
-      stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many },
+      stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
+      helperWindow: pickWords(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no']),
       // activity.no_chats (hhcontent's optional line for an empty Activity) is not shown (Lead, 11 Nov): left out
       activity: Object.fromEntries(Object.entries(w.activity).filter(([k]) => k !== 'no_chats')),
-      setup: w.setup
+      setup: pickWords(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_known', 'mark_done', 'mark_undo', 'person_note', 'state_said_done'])
     }
   }
 }

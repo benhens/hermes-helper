@@ -125,6 +125,8 @@
 .hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}
 .hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}
 .hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}
+/* loom-fixes: under the docs' own words, the file and line they are from (a name's line, the migrate line) */
+.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}
 .hh-old .hh-docs{margin-top:4px}
 .hh-old .hh-docs-words{font-size:12.5px;line-height:17px}
 /* The clicks to add an optional skill: Hermes's own numbered list (rule B), the numbers quieter than the
@@ -149,8 +151,8 @@
 /* talk-live row 7: while Helper waits for the person's AI, the lit dot moves on every 0.4 s (0, 1, 2, again), as a
    change of colour in steps: no script timer, no new draw of the page, no moving or fading layer. Reduce motion
    (the page's own watch, src/motion.js): no dot lit, all three the same, nothing moves. */
-.hh-dots.hh-wait i{animation:hh-dot 1.2s step-end infinite}
-.hh-dots.hh-wait i:nth-child(2){animation-delay:.4s}
-.hh-dots.hh-wait i:nth-child(3){animation-delay:.8s}
+.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}
+.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}
+.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}
 @keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}
 .hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}

@@ -1359,7 +1359,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -3790,7 +3790,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -9144,7 +9144,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -9623,7 +9623,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -9660,11 +9660,13 @@
       "kind": "N1a",
       "offer": {
        "picks": [
-        "what",
-        "setup"
+        "can",
+        "mod",
+        "msg",
+        "mem"
        ],
        "set": "dont_know",
-       "text": "Do you want to know what Hermes is, or set it up?"
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1a",
@@ -9877,7 +9879,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -11332,7 +11334,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -11440,7 +11442,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -11497,7 +11499,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -11614,7 +11616,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -11671,7 +11673,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -13619,11 +13621,11 @@
       "kind": "CUT",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "CUT",
@@ -14240,11 +14242,11 @@
       "kind": "HELLO_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "HELLO_SAME",
@@ -17572,7 +17574,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -18024,11 +18026,11 @@
       "kind": "AGAIN",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "row"
      },
@@ -18359,7 +18361,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -18497,11 +18499,11 @@
       "kind": "OK",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "OK",
@@ -18767,11 +18769,11 @@
       "kind": "WRONG_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "WRONG"
      },
@@ -18822,7 +18824,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -18854,7 +18856,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       },
       "repeat_of": "N1"
      },
@@ -18898,7 +18900,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -18930,7 +18932,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       },
       "repeat_of": "N1"
      },
@@ -19009,7 +19011,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -19041,7 +19043,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       },
       "repeat_of": "N1"
      },
@@ -19338,11 +19340,11 @@
       "kind": "THANKS_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "THANKS"
      },
@@ -19410,11 +19412,11 @@
       "kind": "CUT_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "CUT"
      },
@@ -19718,11 +19720,11 @@
       "kind": "AI",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "AI",
@@ -20609,7 +20611,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -21503,7 +21505,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -21546,7 +21548,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -23161,11 +23163,11 @@
       "kind": "CUT",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "CUT",
@@ -23208,7 +23210,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -24704,7 +24706,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -25567,11 +25569,11 @@
       "kind": "CUT",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "CUT",
@@ -25644,7 +25646,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -25687,7 +25689,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -25719,7 +25721,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       },
       "repeat_of": "N1"
      },
@@ -25816,7 +25818,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -26069,11 +26071,11 @@
       "kind": "HELLO_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "HELLO_SAME",
@@ -26231,11 +26233,11 @@
       "name": null,
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "HELLO_SAME"
      },
@@ -26401,11 +26403,11 @@
       "name": "Peter",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "HELLO_SAME"
      },
@@ -26477,11 +26479,11 @@
       "kind": "HELLO_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       }
      },
      "shown": "HELLO_SAME",
@@ -26647,11 +26649,11 @@
       "kind": "WRONG_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "WRONG"
      },
@@ -26831,11 +26833,11 @@
       "kind": "WRONG_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "WRONG"
      },
@@ -26910,11 +26912,11 @@
       "kind": "THANKS_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "THANKS"
      },
@@ -26982,11 +26984,11 @@
       "kind": "THANKS_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "THANKS"
      },
@@ -27084,11 +27086,11 @@
       "kind": "OK_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "OK"
      },
@@ -27156,11 +27158,11 @@
       "kind": "HOW_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "HOW"
      },
@@ -27228,11 +27230,11 @@
       "kind": "AI",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "WHO"
      },
@@ -27356,11 +27358,11 @@
       "kind": "CUT_SAME",
       "offer": {
        "picks": [
-        "mod",
-        "msg"
+        "setup",
+        "can"
        ],
-       "set": "general_2",
-       "text": "Do you want to pick its AI, or chat from your phone?"
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
       },
       "repeat_of": "CUT"
      },
@@ -28234,7 +28236,7 @@
         "mem"
        ],
        "set": "start_four",
-       "text": "I can explain these four. Pick one."
+       "text": "Do you want one of these instead?"
       }
      },
      "shown": "N1",
@@ -29122,17 +29124,666 @@
      "text": "it costs me too much, how do I spend less"
     }
    ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "HELLO_SAME",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom hey after Hi again: a greeting (HELLO_SAME now reads Hi.)",
+   "stage": "name",
+   "steps": [
+    {
+     "do": "open",
+     "out": {
+      "kind": "OPEN"
+     },
+     "shown": "OPEN",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "name",
+      "work": null
+     }
+    },
+    {
+     "do": "skip",
+     "out": {
+      "kind": "F3"
+     },
+     "shown": "F3",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "visit"
+    },
+    {
+     "do": "open",
+     "out": {
+      "kind": "BACK",
+      "name": null
+     },
+     "shown": "BACK name=None",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     }
+    },
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HELLO_SAME",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "HELLO_SAME",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": true,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hey"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MIG_APP app=openclaw",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom How can I migrate from OpenClaw?",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "app": "openclaw",
+      "by": "title",
+      "calls": 0,
+      "kind": "MIG_APP"
+     },
+     "shown": "MIG_APP app=openclaw",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "How can I migrate from OpenClaw?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MIG_APP app=claude_code",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom migrate from claude code",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "app": "claude_code",
+      "by": "title",
+      "calls": 0,
+      "kind": "MIG_APP"
+     },
+     "shown": "MIG_APP app=claude_code",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "can i migrate from claude code"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MIG_APP app=openclaw",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom move my stuff from moltbot (the docs' old name of OpenClaw)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "app": "openclaw",
+      "calls": 0,
+      "kind": "MIG_APP"
+     },
+     "shown": "MIG_APP app=openclaw",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how do I move my stuff from moltbot"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "MIG",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom how do I migrate: from an app or to a computer",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "MIG",
+      "offer": {
+       "picks": [
+        "mig_app",
+        "mig_pc"
+       ],
+       "set": "move",
+       "text": "Do you mean from another AI app, or to a new computer?"
+      }
+     },
+     "shown": "MIG",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "how do I migrate"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "NAME nm_hindsight",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom what is hindsight",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "id": "nm_hindsight",
+      "kind": "NAME",
+      "offer": {
+       "picks": [
+        "mem",
+        "can"
+       ],
+       "set": "name_memory",
+       "text": "Do you want to know what Hermes remembers, or what it does?"
+      }
+     },
+     "shown": "NAME nm_hindsight",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is hindsight"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "NAME nm_hindsight",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom whats hindsight",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "id": "nm_hindsight",
+      "kind": "NAME",
+      "offer": {
+       "picks": [
+        "mem",
+        "can"
+       ],
+       "set": "name_memory",
+       "text": "Do you want to know what Hermes remembers, or what it does?"
+      }
+     },
+     "shown": "NAME nm_hindsight",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "whats hindsight"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "NAME nm_hindsight",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom what's Hindsight?",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "id": "nm_hindsight",
+      "kind": "NAME",
+      "offer": {
+       "picks": [
+        "mem",
+        "can"
+       ],
+       "set": "name_memory",
+       "text": "Do you want to know what Hermes remembers, or what it does?"
+      }
+     },
+     "shown": "NAME nm_hindsight",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what's Hindsight?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "NAME nm_hindsight",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom tell me about hindsight",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "id": "nm_hindsight",
+      "kind": "NAME",
+      "offer": {
+       "picks": [
+        "mem",
+        "can"
+       ],
+       "set": "name_memory",
+       "text": "Do you want to know what Hermes remembers, or what it does?"
+      }
+     },
+     "shown": "NAME nm_hindsight",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "tell me about hindsight"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "NAME nm_hindsight",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom Hindsight?",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "id": "nm_hindsight",
+      "kind": "NAME",
+      "offer": {
+       "picks": [
+        "mem",
+        "can"
+       ],
+       "set": "name_memory",
+       "text": "Do you want to know what Hermes remembers, or what it does?"
+      }
+     },
+     "shown": "NAME nm_hindsight",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "Hindsight?"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "NAME nm_honcho",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom what is honcho",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "id": "nm_honcho",
+      "kind": "NAME",
+      "offer": {
+       "picks": [
+        "mem",
+        "can"
+       ],
+       "set": "name_memory",
+       "text": "Do you want to know what Hermes remembers, or what it does?"
+      }
+     },
+     "shown": "NAME nm_honcho",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is honcho"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "term line skill",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom what is a skill: the older term line wins",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "term",
+      "term": "skill"
+     },
+     "shown": "term line skill",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is a skill"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "plain line mem0",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom what is memory: the older plain line wins",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "plain",
+      "topic": "mem",
+      "why": "what is"
+     },
+     "shown": "plain line mem0",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "what is memory"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "HERMES",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom What Hermes is, typed (his pick's words)",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "HERMES",
+      "offer": {
+       "picks": [
+        "setup",
+        "can"
+       ],
+       "set": "general",
+       "text": "Do you want to set up Hermes, or see what it does?"
+      }
+     },
+     "shown": "HERMES",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "What Hermes is"
+    }
+   ]
+  },
+  {
+   "about_keeping": false,
+   "expect": "N1",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "loom hindsight is great (not a question): don't-know as before",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "N1",
+      "offer": {
+       "picks": [
+        "can",
+        "mod",
+        "msg",
+        "mem"
+       ],
+       "set": "start_four",
+       "text": "Do you want one of these instead?"
+      }
+     },
+     "shown": "N1",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "met": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "hindsight is great"
+    }
+   ]
   }
  ],
- "json_sha256": "cd2c4d54992939b44f2ef36d6b6b532dd884073fea372f9bd0b643d57d400b4c",
+ "json_sha256": "9fc1db6a5834653cc9dbdbafe9d11bccc40a7baec8536141203dcf881fee0b45",
  "keeps_off": false,
  "last_printed_lines": [
-  "ok    lc3 kept: it costs me too much, how do I spend less: use2: line use2",
-  "",
-  "conversations: 503 of 503 as expected"
+  "unseen-20 'Passwords & Logins?': fact d_passwords (older line)",
+  "unseen-20 \"what's Microsoft Graph Webhook Listener?\": NAME nm_microsoftgraphwebhooklistener (name line)",
+  "unseen-20: name line 12, an older line 8, don't-know 0 (of 20)"
  ],
  "no_wants": false,
- "route2_sha256": "8862ec3aeee840a82a958bc674c5dd108eab5576358136d9f5a0708409f0f56e",
+ "route2_sha256": "1d6ea48b9655f82ebee74c683365bc508d499f03f0b5835ac026dc752597b4c6",
  "singles": [
   {
    "landed": "mem",
@@ -30354,7 +31005,7 @@
       "mem"
      ],
      "set": "start_four",
-     "text": "I can explain these four. Pick one."
+     "text": "Do you want one of these instead?"
     }
    },
    "shown": "N1",
@@ -30626,7 +31277,7 @@
       "mem"
      ],
      "set": "start_four",
-     "text": "I can explain these four. Pick one."
+     "text": "Do you want one of these instead?"
     }
    },
    "shown": "N1",

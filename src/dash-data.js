@@ -4,52 +4,8 @@
 export const DASH_DATA = {
   "items": [
     {
-      "id": "install",
-      "counts": true,
-      "name": "Install Hermes",
-      "mark": "Install",
-      "why": "Hermes is the program itself. It works only while its computer is on.",
-      "steps": [
-        {
-          "text": "Go to hermes-agent.nousresearch.com and download Hermes for your computer."
-        },
-        {
-          "text": "On a Mac: open the download and drag Hermes into Applications."
-        },
-        {
-          "text": "On Windows: open the download, and Windows installs it."
-        },
-        {
-          "text": "Open Hermes. Its first screens take you to your first message."
-        }
-      ],
-      "terminal": {
-        "when": "Only for Linux, a server, or without the app. The docs give only these commands.",
-        "paste": [
-          {
-            "for": "Linux, Mac or Windows WSL2",
-            "text": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash"
-          },
-          {
-            "for": "Windows, in PowerShell",
-            "text": "iex (irm https://hermes-agent.nousresearch.com/install.ps1)"
-          }
-        ]
-      },
-      "sources": [
-        {
-          "file": "getting-started/quickstart.md",
-          "line": 53
-        },
-        {
-          "file": "guides/team-telegram-assistant.md",
-          "line": 27
-        }
-      ]
-    },
-    {
       "id": "model",
-      "counts": true,
+      "seen": true,
       "name": "A model",
       "mark": "Model",
       "why": "The AI that does the thinking. Your app may already have a free one.",
@@ -92,7 +48,7 @@ export const DASH_DATA = {
     },
     {
       "id": "first_chat",
-      "counts": false,
+      "seen": true,
       "name": "First chat",
       "mark": "First chat",
       "why": "Ask Hermes one small thing, to see that it works.",
@@ -127,7 +83,7 @@ export const DASH_DATA = {
     },
     {
       "id": "personality",
-      "counts": true,
+      "seen": true,
       "name": "Its personality",
       "mark": "Personality",
       "why": "A short text that tells your Hermes who it is and how to talk.",
@@ -162,7 +118,7 @@ export const DASH_DATA = {
     },
     {
       "id": "chat_apps",
-      "counts": true,
+      "seen": true,
       "name": "Chat apps",
       "mark": "Chat apps",
       "why": "Talk to your Hermes from Telegram or another chat app on your phone.",
@@ -205,7 +161,7 @@ export const DASH_DATA = {
     },
     {
       "id": "tools_apps",
-      "counts": false,
+      "seen": false,
       "name": "Tools and apps",
       "mark": "Tools and apps",
       "why": "Actions Hermes can take, and outside apps like Gmail it can use.",
@@ -237,7 +193,7 @@ export const DASH_DATA = {
     },
     {
       "id": "skills",
-      "counts": false,
+      "seen": false,
       "name": "Skills",
       "mark": "Skills",
       "why": "Written know-how that teaches Hermes one task. Many come already installed.",
@@ -266,7 +222,7 @@ export const DASH_DATA = {
     },
     {
       "id": "memory",
-      "counts": false,
+      "seen": false,
       "name": "Memory",
       "mark": "Memory",
       "why": "Short notes Hermes keeps about you, so it remembers between chats.",
@@ -294,7 +250,7 @@ export const DASH_DATA = {
     },
     {
       "id": "scheduled_job",
-      "counts": true,
+      "seen": true,
       "name": "Scheduled jobs",
       "mark": "Scheduled jobs",
       "why": "Hermes does a job for you at set times, like every morning.",
@@ -327,7 +283,7 @@ export const DASH_DATA = {
     },
     {
       "id": "second_bot",
-      "counts": true,
+      "seen": true,
       "name": "A second bot",
       "mark": "Second bot",
       "why": "A bot is one separate Hermes, with its own name, memory and skills.",
@@ -366,7 +322,7 @@ export const DASH_DATA = {
     },
     {
       "id": "safety",
-      "counts": false,
+      "seen": false,
       "name": "Safety",
       "mark": "Safety",
       "why": "Hermes asks you first before it runs anything risky on your computer.",
@@ -400,12 +356,11 @@ export const DASH_DATA = {
       ]
     }
   ],
-  "total": 6,
+  "total": 10,
   "words": {
     "tabs": {
       "dashboard": "Dashboard",
-      "learn": "Learn",
-      "my_setup": "My setup"
+      "learn": "Learn"
     },
     "tabListLabel": "Helper tabs",
     "notBuilt": "Nothing here yet. What is ready is on Dashboard.",
@@ -419,7 +374,17 @@ export const DASH_DATA = {
       "not_known": "Helper could not read this number just now.",
       "waiting": "Counting",
       "plugins_short_one": "plugin, this bot",
-      "plugins_short": "plugins, this bot"
+      "plugins_short": "plugins, this bot",
+      "plugins_title": "Plugins",
+      "plugins_line": "See them in Capabilities"
+    },
+    "helperWindow": {
+      "hide": "Hide Helper",
+      "show": "Show Helper",
+      "clear": "Clear chat",
+      "clear_ask": "Clear this chat with Helper? Yes / No",
+      "clear_yes": "Yes",
+      "clear_no": "No"
     },
     "activity": {
       "title": "This bot's activity",
@@ -458,16 +423,18 @@ export const DASH_DATA = {
       "you_are_here": "You are here",
       "next": "Next",
       "open": "Open",
-      "all_done": "All 6 are set up.",
-      "not_counted": "Helper can't see this one, so it isn't counted.",
+      "all_done": "All 10 are set up.",
       "close": "Close",
       "copy": "Copy",
       "copied": "Copied",
       "source": "{file}, line {line}",
       "state_done": "done",
       "state_not_done": "to do",
-      "state_not_counted": "not counted",
-      "state_not_known": "Helper could not check this one just now"
+      "state_not_known": "Helper could not check this one just now",
+      "mark_done": "I've done this",
+      "mark_undo": "Not done yet",
+      "person_note": "Helper can't see this one, so it takes your word.",
+      "state_said_done": "done, you said so"
     }
   }
 }

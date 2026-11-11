@@ -312,7 +312,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please search the web for <what you want to know>, and list the pages you used. If web search is not ready, tell me what it needs."
+    "paste_text": "First ask me what I want to know. Then search the web for it and list the pages you used. If web search is not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please search the web for <what you want to know>, and list the pages you used. If web search is not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 19,
    "title": "Searching the web and reading pages",
@@ -385,7 +387,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please open <website> with your browser tool and <what to do there>. Ask me before you send, buy or sign in to anything."
+    "paste_text": "First ask me which website and what to do there. Then open it with your browser tool and do it. Ask me before you send, buy or sign in to anything.",
+    "paste_text_was_loom": "Please open <website> with your browser tool and <what to do there>. Ask me before you send, buy or sign in to anything.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 21,
    "title": "Using websites for you: clicking and forms",
@@ -439,7 +443,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"xurl\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"xurl\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"xurl\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 18,
    "title": "Posting and searching on X (Twitter)",
@@ -586,7 +592,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part."
+    "paste_text": "First ask me where the file is. Then read it and tell me what is in it. If you cannot read part of it, say which part.",
+    "paste_text_was_loom": "Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 17,
    "title": "Reading your Word, Excel and PDF files",
@@ -635,7 +643,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"pdf\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"pdf\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"pdf\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 21,
    "title": "Making, merging or editing PDF files",
@@ -690,7 +700,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"microsoft-office\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"microsoft-office\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"microsoft-office\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 22,
    "title": "Making Word, PowerPoint or Excel files",
@@ -742,7 +754,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"obsidian\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"obsidian\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"obsidian\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 20,
    "title": "Working with your Obsidian notes",
@@ -794,7 +808,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"meeting-action-items\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"meeting-action-items\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"meeting-action-items\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 22,
    "title": "Turning meeting notes into decisions and tasks",
@@ -854,7 +870,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please look at the code in <folder> and <what you want>. Ask me before you change or run anything."
+    "paste_text": "First ask me which folder and what I want done. Then look at the code there. Ask me before you change or run anything.",
+    "paste_text_was_loom": "Please look at the code in <folder> and <what you want>. Ask me before you change or run anything.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 14,
    "title": "Writing and running code",
@@ -914,7 +932,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "I want you to click and type in an app on my computer: <which app, and what to do>. Tell me first what Computer Use needs. Ask me before you change anything."
+    "paste_text": "I want you to click and type in an app on my computer. First ask me which app and what to do. Tell me first what Computer Use needs. Ask me before you change anything.",
+    "paste_text_was_loom": "I want you to click and type in an app on my computer: <which app, and what to do>. Tell me first what Computer Use needs. Ask me before you change anything.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 22,
    "title": "Clicking and typing in your computer's apps",
@@ -984,7 +1004,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please make a picture of <what>. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
+    "paste_text": "First ask me what picture I want. Then make it. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything.",
+    "paste_text_was_loom": "Please make a picture of <what>. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 22,
    "title": "Making pictures (images) from your words",
@@ -1162,7 +1184,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"manim-video\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"manim-video\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"manim-video\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 18,
    "title": "Making animated maths explainer videos",
@@ -1272,7 +1296,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"youtube-content\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"youtube-content\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"youtube-content\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 22,
    "title": "Summarising a YouTube video",
@@ -1548,7 +1574,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"songwriting-and-ai-music\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"songwriting-and-ai-music\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"songwriting-and-ai-music\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 24,
    "title": "Writing songs and briefing a music AI",
@@ -1594,7 +1622,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"arxiv\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"arxiv\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"arxiv\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 18,
    "title": "Finding research papers on arXiv",
@@ -1647,7 +1677,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"maps\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"maps\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"maps\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 19,
    "title": "Finding places, routes and time zones",
@@ -1766,7 +1798,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please use your \"product-price-monitor\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+    "paste_text": "Please use your \"product-price-monitor\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs.",
+    "paste_text_was_loom": "Please use your \"product-price-monitor\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "words": 23,
    "title": "Watching a product's price for you",

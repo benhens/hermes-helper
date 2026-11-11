@@ -519,7 +519,7 @@ test('an older line keeps its button as a small link, and it still works: text t
   click(link)
   const again = lines(view).find(c => c.props['data-line'] === 'mem1')
   assert.equal(byData(again, 'old-link').props['aria-expanded'], true)
-  assert.equal(all(again, n => n.type === 'sdk:CopyButton')[0].props.text, 'Please save this to your memory: <one thing about you>. Then tell me what you saved.')
+  assert.equal(all(again, n => n.type === 'sdk:CopyButton')[0].props.text, 'Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved.')
   assert.equal(line(view), 'term-skill', 'the bubble is not touched')
   finish(view)
   click(byData(bubble(view), 'bubble-button'))
@@ -936,7 +936,7 @@ test('a row picked: the person\'s message is its label, Helper says the row\'s o
   assert.equal(text(button(view)).trim(), 'Show me what to ask')
   click(button(view))
   const copy = all(bubble(view), n => n.type === 'sdk:CopyButton')
-  assert.equal(copy[0].props.text, 'Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part.')
+  assert.equal(copy[0].props.text, 'First ask me where the file is. Then read it and tell me what is in it. If you cannot read part of it, say which part.')
   assert.equal(docsBox(view), null, 'a hand-written row shows no docs box')
 })
 

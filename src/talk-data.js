@@ -127,7 +127,8 @@ export const TALK_DATA = {
       "offer": "general"
     },
     "HELLO_SAME": {
-      "text": "I'm here.",
+      "text": "Hi, {name}.",
+      "text_no_name": "Hi.",
       "offer": "general"
     },
     "THANKS": {
@@ -274,11 +275,16 @@ export const TALK_DATA = {
         "take my rules",
         "bring my setup"
       ],
+      "docs_box": {
+        "head": "From the Hermes docs",
+        "quote": "hermes import-agent imports your existing OpenClaw, Claude Code, OpenAI Codex CLI, Cursor, Grok Bot or OpenBot setup into Hermes with one command.",
+        "where": "user-guide/import-from-other-agents.md, line 9"
+      },
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please bring my setup over from <my old AI app> with hermes migrate. Show me the plan before you write anything.",
-        "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 15 (\"Already set up? Run `hermes migrate` for the same offer\") and line 9 (\"You always see a per-item plan before anything is written\")"
+        "paste_text": "Please bring my setup over from {app_label} with hermes migrate {app_agent}. Show me the plan before you write anything.",
+        "source": "user-guide/import-from-other-agents.md line 15 (\"`hermes migrate <agent>` (`openclaw`, `claude-code`, `codex`, `cursor`, `grok-bot`, `openbot`) to import from one agent\") and line 9 (\"You always see a per-item plan before anything is written\")"
       }
     },
     "MIG_NOT_LISTED": {
@@ -533,7 +539,7 @@ export const TALK_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on."
+        "paste_text": "Please help me install a plugin with hermes plugins install. First ask me which plugin I mean. Ask me before you switch it on."
       }
     },
     "CODING": {
@@ -573,6 +579,11 @@ export const TALK_DATA = {
     "NO_MORE": {
       "text": "That is all I have checked on that.",
       "offer": "general"
+    },
+    "MIG_WHICH": {
+      "text": "Hermes can bring your setup over from six apps.",
+      "source": "user-guide/import-from-other-agents.md line 9 (the six names)",
+      "offer": "mig_which"
     }
   },
   "opening": {
@@ -1795,7 +1806,7 @@ export const TALK_DATA = {
         "label": "From another AI app",
         "gives": {
           "kind": "line",
-          "id": "MIG_APP"
+          "id": "MIG_WHICH"
         }
       },
       "mig_pc": {
@@ -1867,6 +1878,68 @@ export const TALK_DATA = {
           "kind": "row",
           "id": "mod3"
         }
+      },
+      "mig_openclaw": {
+        "label": "OpenClaw",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "openclaw"
+        }
+      },
+      "mig_claude_code": {
+        "label": "Claude Code",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "claude_code"
+        }
+      },
+      "mig_codex": {
+        "label": "Codex",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "codex"
+        }
+      },
+      "mig_cursor": {
+        "label": "Cursor",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "cursor"
+        }
+      },
+      "mig_grok_bot": {
+        "label": "Grok Bot",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "grok_bot"
+        }
+      },
+      "mig_openbot": {
+        "label": "OpenBot",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "openbot"
+        }
+      },
+      "mig_more": {
+        "label": "Another app",
+        "gives": {
+          "kind": "set",
+          "id": "mig_which_2"
+        }
+      },
+      "mig_none": {
+        "label": "None of these",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_NOT_LISTED"
+        }
       }
     },
     "sets": {
@@ -1892,17 +1965,13 @@ export const TALK_DATA = {
         "instead": "general"
       },
       "dont_know": {
-        "text": "Do you want to know what Hermes is, or set it up?",
+        "text": "Do you want one of these instead?",
         "picks": [
-          "what",
-          "setup"
-        ],
-        "text_no_setup": "Do you want to know what Hermes is, or what it does?",
-        "picks_no_setup": [
-          "what",
-          "can"
-        ],
-        "instead": "general_2"
+          "can",
+          "mod",
+          "msg",
+          "mem"
+        ]
       },
       "words": {
         "text": "Do you want one of these words explained?",
@@ -1982,6 +2051,72 @@ export const TALK_DATA = {
           "mem"
         ],
         "instead": "general"
+      },
+      "mig_which": {
+        "text": "Is it OpenClaw, Claude Code, Codex, or another?",
+        "picks": [
+          "mig_openclaw",
+          "mig_claude_code",
+          "mig_codex",
+          "mig_more"
+        ]
+      },
+      "mig_which_2": {
+        "text": "Is it Cursor, Grok Bot, OpenBot, or none of these?",
+        "picks": [
+          "mig_cursor",
+          "mig_grok_bot",
+          "mig_openbot",
+          "mig_none"
+        ]
+      },
+      "name_memory": {
+        "text": "Do you want to know what Hermes remembers, or what it does?",
+        "picks": [
+          "mem",
+          "can"
+        ]
+      },
+      "name_chat": {
+        "text": "Do you want to use your phone, or see what Hermes does?",
+        "picks": [
+          "msg",
+          "can"
+        ]
+      },
+      "name_provider": {
+        "text": "Do you want to pick its AI, or see what Hermes does?",
+        "picks": [
+          "mod",
+          "can"
+        ]
+      },
+      "name_toolset": {
+        "text": "Do you want to see what Hermes does, or set it up?",
+        "picks": [
+          "can",
+          "setup"
+        ]
+      },
+      "name_feature": {
+        "text": "Do you want to see what Hermes does, or set it up?",
+        "picks": [
+          "can",
+          "setup"
+        ]
+      },
+      "dont_know_was_loom": {
+        "text": "Do you want to know what Hermes is, or set it up?",
+        "picks": [
+          "what",
+          "setup"
+        ],
+        "text_no_setup": "Do you want to know what Hermes is, or what it does?",
+        "picks_no_setup": [
+          "what",
+          "can"
+        ],
+        "instead": "general_2"
       }
     }
   },
@@ -2046,7 +2181,8 @@ export const TALK_DATA = {
       "whats hermes",
       "what is this",
       "what does hermes do",
-      "tell me about hermes"
+      "tell me about hermes",
+      "what hermes is"
     ],
     "start": [
       "get started",
@@ -2279,6 +2415,62 @@ export const TALK_DATA = {
       "cant code",
       "not technical",
       "non-technical"
+    ],
+    "migrate_apps": [
+      {
+        "id": "openclaw",
+        "label": "OpenClaw",
+        "agent": "openclaw",
+        "phrases": [
+          "openclaw",
+          "open claw",
+          "clawdbot",
+          "moltbot"
+        ]
+      },
+      {
+        "id": "claude_code",
+        "label": "Claude Code",
+        "agent": "claude-code",
+        "phrases": [
+          "claude code"
+        ]
+      },
+      {
+        "id": "codex",
+        "label": "Codex",
+        "agent": "codex",
+        "phrases": [
+          "codex",
+          "codex cli"
+        ]
+      },
+      {
+        "id": "cursor",
+        "label": "Cursor",
+        "agent": "cursor",
+        "phrases": [
+          "cursor"
+        ]
+      },
+      {
+        "id": "grok_bot",
+        "label": "Grok Bot",
+        "agent": "grok-bot",
+        "phrases": [
+          "grok bot",
+          "grokbot"
+        ]
+      },
+      {
+        "id": "openbot",
+        "label": "OpenBot",
+        "agent": "openbot",
+        "phrases": [
+          "openbot",
+          "open bot"
+        ]
+      }
     ]
   },
   "about_rule": {
@@ -3150,7 +3342,7 @@ export const TALK_DATA = {
         "next": {
           "kind": "paste",
           "label": "Try it",
-          "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
+          "paste_text": "Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved."
         }
       },
       "needs": [
@@ -3180,7 +3372,7 @@ export const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Try it",
-            "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
+            "paste_text": "Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved."
           }
         },
         {
@@ -3214,7 +3406,7 @@ export const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Try it",
-            "paste_text": "What did we talk about last time about <topic>?"
+            "paste_text": "What did we talk about in our last chat?"
           }
         },
         {
@@ -3874,7 +4066,7 @@ export const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
-            "paste_text": "Every morning at 8, send me a short summary of <what>."
+            "paste_text": "I want a short summary every morning at 8. First ask me what it should be about."
           }
         },
         {
@@ -3898,7 +4090,7 @@ export const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
-            "paste_text": "Remind me <when> to <what>."
+            "paste_text": "I want a reminder. First ask me what it is for and when."
           }
         },
         {
@@ -3924,7 +4116,7 @@ export const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
-            "paste_text": "Every <how often>, check <what> and tell me what you find."
+            "paste_text": "I want you to check something for me again and again. First ask me what to check and how often. Then tell me what you find each time."
           }
         },
         {
@@ -6205,7 +6397,7 @@ export const TALK_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please search the Hermes plugin catalog for <what you want> and show me what you find. Install nothing yet."
+        "paste_text": "First ask me what I want a plugin for. Then search the Hermes plugin catalog and show me what you find. Install nothing yet."
       }
     },
     {

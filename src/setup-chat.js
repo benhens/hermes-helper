@@ -10,12 +10,16 @@
 // (the thing last recommended). Not kept: Skip, Not sure yet, what the look saw, Something else.
 import { SETUP_DATA } from './setup-data.js'
 import { TALK_DATA } from './talk-data.js'
-import { talkNorm, whichOf } from './talk.js'
+import { talkNorm, whichOf, startsWith, smallTalk, freshVisit } from './talk.js'
 import { workOk, workSqueeze } from './kept.js'
 import { looksLikeKey } from './key-check.js'
 import { LIVE_DATA } from './live-data.js'
 import { AI_MODE } from './ai-mode.js'
 import { SETUP_AI_BUILT } from './setup-built.js'
+import { hereStop } from './setup-reads.js'
+import { DASH_DATA } from './dash-data.js'
+// the path's stops in order (the Dashboard's), for the one "You are here" rule
+const SU_PATH_OF = () => DASH_DATA.items.map(it => it.id)
 
 const SU = SETUP_DATA
 const SU_L = SU.lines
@@ -62,8 +66,15 @@ export function seenDone(item, seen) {
   if (item === 'scheduled_job') return seen.jobs === null ? null : seen.jobs >= 1
   if (item === 'second_bot') return seen.bots === null ? null : seen.bots >= 2
   if (item === 'personality') return seen.soul
+  // loom-fixes: Chat apps and First chat as the Dashboard reads them (src/setup-look.js); undefined: not read here
+  if (item === 'chat_apps') return seen.chat
+  if (item === 'first_chat') return seen.firstChat
   return undefined
 }
+// the things the look can see done: the data's four, and since loom-fixes Chat apps and First chat. Only the data's
+// four have words for "I can see it now" (look.parts), so only they are said as seen; the other two count as done.
+const SU_SEEN_ALSO = ['chat_apps', 'first_chat']
+const suSaysSeen = item => SU.seeable.includes(item)
 // "I can see it now. {seen_part}" (build.py seen_part)
 const suSeenPart = (item, seen) => (item === 'scheduled_job' ? suJobsPart(seen.jobs) : item === 'second_bot' ? suBotsPart(seen.bots) : item === 'personality' ? SU_P.personality_done : SU_P.model_ok)
 // The six lines behind "What did you look at?"
@@ -76,7 +87,7 @@ export function lookList(seen) {
 // The things done: seen by a read, said by the person (kept), Something else in this visit
 export function doneSet(st, seen) {
   const done = new Set([...(st.kept.setup_done_said || []), ...((st.setup && st.setup.other) || [])])
-  for (const it of SU.seeable) if (seenDone(it, seen) === true) done.add(it)
+  for (const it of [...SU.seeable, ...SU_SEEN_ALSO]) if (seenDone(it, seen) === true) done.add(it)
   return done
 }
 
@@ -125,6 +136,18 @@ function suTypedGoal(text) {
   return 'unsure'
 }
 export const isRestart = text => suInList(suFlat(text), SU.restart_phrases)
+// loom-fixes (helper-setup-chat-v1.json typed_answer; route2.py setup_typed): a message typed at Q_NEW or Q_GOAL is
+// kept as the answer only when it reads as one. Not an answer, never kept: a question (a question mark, or one of
+// question_starts at the start), a request to Helper (request_starts at the start, or request_words anywhere), or
+// small talk (the talk data's small-talk kinds the rule names, read as in a fresh visit). Restart words come first
+// (setupTyped). His "can we start from the begining" was kept as his goal (Loom 1:56).
+const SU_TA = SU.typed_answer
+export function notAnAnswer(text) {
+  const t = suFlat(text)
+  if (String(text).includes('?')) return true
+  if (startsWith(t, SU_TA.question_starts) || startsWith(t, SU_TA.request_starts) || suInList(t, SU_TA.request_words)) return true
+  return SU_TA.small_talk_kinds.includes(smallTalk(text, freshVisit('open')))
+}
 export const isSetupAsk = text => suInList(suFlat(text), SU.ask_phrases)
 const suLabelOf = (answers, text) => answers.findIndex(a => suFlat(a) === suFlat(text))
 const SU_STEP_NEXT = ['next', 'done', 'what next', 'ok', 'okay', 'did it', 'yes', 'now what']
@@ -182,7 +205,7 @@ function suSaidDone(st, item) {
 function suWorked(st, seen) {
   const s = suOf(st)
   const item = s.item
-  const d = seenDone(item, seen)
+  const d = suSaysSeen(item) ? seenDone(item, seen) : undefined
   if (d === undefined) {
     suSaidDone(st, item)
     return suRecommend(st, seen, [suSaid('DONE_SAID', SU_L.DONE_SAID.text)])
@@ -266,8 +289,23 @@ function suRestart(st) {
   const s = suOf(st)
   for (const k of ['setup_new', 'setup_goal', 'setup_goal_id', 'setup_current']) delete st.kept[k]
   Object.assign(s, { stage: 'new', item: null, step: 0, goal: null, newAnswered: false, asked: { new: true }, reasked: {} })
-  return [suSaid('RESTART', SU_L.RESTART.text, { answers: suNEW_PICKS() })]
+  // loom-fixes (the data's RESTART.then): "Sure, let's start again." and then the first question as its own bubble
+  return [suSaid('RESTART', SU_L.RESTART.text), suSaid('Q_NEW', SU_Q_NEW.text, { answers: suNEW_PICKS() })]
 }
+// loom-fixes (helper-loom-fixes-v1 point 6, FROM_KEPT): Set up Hermes picked (or asked for) while the answer to Q_NEW or
+// Q_GOAL is kept: one line on what Helper goes on from, with Go on | Answer again. Only the kept parts are said; a typed
+// goal is said in the words of its kind (unsure: "you are not sure yet what you want"), never as the person typed it.
+const SU_FK = SU_L.FROM_KEPT
+function suFromKept(st) {
+  const k = st.kept
+  const a = SU_FK.new_said[k.setup_new] || ''
+  const b = k.setup_goal_id ? SU_FK.goal_said[k.setup_goal_id] || '' : ''
+  if (!a && !b) return null
+  const s = suOf(st)
+  s.stage = 'fromkept'
+  return suMove(false, () => [suSaid('FROM_KEPT', suFill(SU_FK.text, { new_said: a, and: a && b ? SU_FK.and : '', goal_said: b }), { answers: suFromKeptPicks() })])
+}
+const suFromKeptPicks = () => suPicks(['fromkept:go', 'fromkept:again'].map((x, i) => [x, SU_FK.answers[i]]))
 // "what should I set up first": the question not answered yet first, else the look and the recommendation
 function suAsk(st) {
   const s = suOf(st)
@@ -298,6 +336,7 @@ function suOpenPicks(st) {
   if (s.stage === 'already') return suPicks(suAlreadyActs(s.item).map((a, i) => [a, suAlreadyLabels(s.item)[i]]))
   if (s.stage === 'new') return suNEW_PICKS()
   if (s.stage === 'goal') return suGOAL_PICKS()
+  if (s.stage === 'fromkept') return suFromKeptPicks()
   return null
 }
 // A thing picked, or a button pressed: its action. Returns a move, or null when the action is not for this stage.
@@ -311,6 +350,12 @@ export function setupPress(action, st) {
   // setup-chat-2: the same for any open line of the set-up conversation (a step, "I can't see that yet", ...)
   if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: suOpenPicks(st) })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
+  // loom-fixes: Go on is the next question not answered yet, or the look and the written recommendation; Answer again
+  // starts the questions again
+  if (kind === 'fromkept' && s.stage === 'fromkept') {
+    s.stage = null
+    return id === 'again' ? suMove(false, () => suRestart(st)) : suAsk(st)
+  }
   if (kind === 'goal' && s.stage === 'goal') return suMove(true, seen => suAnswerGoal(st, id, null, seen))
   if (kind === 'rec' && s.stage === 'rec') {
     if (id === 'steps') return suMove(false, () => ((s.step = 0), [suStepLine(st)]))
@@ -360,20 +405,23 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   const s = suOf(st)
   const t = suFlat(text)
   if (!t || looksLikeKey(text)) return null
-  if (isRestart(text)) return suMove(false, () => suRestart(st))
+  // loom-fixes: the restart list now holds everyday words ("reset", "redo"), so anywhere in the message only while the
+  // set-up conversation has a line open; with none open, only the restart words alone ("how do I reset my key" is a
+  // question about Hermes, not a restart) (Decided myself, in the report)
+  if (s.stage ? isRestart(text) : SU.restart_phrases.includes(t)) return suMove(false, () => suRestart(st))
   const question = text.includes('?')
   if (s.stage === 'new') {
     const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
     if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
     if (isSetupAsk(text)) return suAsk(st)
-    if (question || hasTopicWord(text)) return null
+    if (question || hasTopicWord(text) || notAnAnswer(text)) return null
     return suMove(false, () => suAnswerNew(st, suTypedNew(text)))
   }
   if (s.stage === 'goal') {
     const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
     if (i >= 0) return suMove(true, seen => suAnswerGoal(st, SU_Q_GOAL.answers[i].id, null, seen))
     if (isSetupAsk(text)) return suAsk(st)
-    if (question) return null
+    if (question || notAnAnswer(text)) return null
     // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
     if (SU_UNSURE.includes(t)) return suMove(true, seen => suAnswerGoal(st, 'unsure', null, seen))
     return suMove(true, seen => suAnswerGoal(st, suTypedGoal(text), text, seen))
@@ -400,6 +448,10 @@ export function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'notseen') {
     const i = suLabelOf(suNotSeenLabels(s.item), text)
     if (i >= 0) return setupPress(suNotSeenActs(s.item)[i], st)
+  }
+  if (s.stage === 'fromkept') {
+    const i = suLabelOf(SU_FK.answers, text)
+    if (i >= 0) return setupPress(['fromkept:go', 'fromkept:again'][i], st)
   }
   if (s.stage === 'already') {
     const i = suLabelOf(suAlreadyLabels(s.item), text)
@@ -458,11 +510,21 @@ export function setupOpening(st, seen) {
   const name = st.kept.name || null
   const cur = st.kept.setup_current
   s.seen = seen
+  // loom-fixes: the stop kept as current is done now in a way Helper has no "I can see it" words for (seen as Chat apps
+  // or First chat, or said done on the Dashboard): it is current no more, and the visit opens as with none kept
+  if (cur && SU.items[cur] && doneSet(st, seen).has(cur) && !(suSaysSeen(cur) && seenDone(cur, seen) === true)) {
+    delete st.kept.setup_current
+    return setupOpening(st, seen)
+  }
   if (cur && SU.items[cur]) {
     s.item = cur
     if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
     s.stage = 'rec'
-    const slots = { card: SU.items[cur].name, why: SU.items[cur].why }
+    // loom-fixes (here_rule, one rule with the Dashboard: src/setup-reads.js hereStop): the stop named is the Dashboard's
+    // "You are here"; with the stop kept as current not done, that is this stop
+    const done = doneSet(st, seen)
+    const card = hereStop(SU_PATH_OF(), id => (done.has(id) ? true : seenDone(id, seen) === null ? null : false), cur) || cur
+    const slots = { card: SU.items[card].name, why: SU.items[card].why }
     // setup-chat-2 (changes-1): something else Helper can see is done now: say that, then where we stopped
     const part = suBackPart(st, seen)
     if (part) return [suSaid('BACK_SEEN', suNamed(SU_L.BACK_SEEN, name, { back_part: part })), suSaid('BACK_NEXT', suFill(SU_L.BACK_NEXT.text, slots), { answers: suREC_PICKS(SU_L.BACK_NEXT.answers) })]
@@ -507,7 +569,8 @@ export function setupRows(kept) {
 export const SETUP_ROW_KEYS = { setup_new: ['setup_new'], setup_goal: ['setup_goal', 'setup_goal_id'], setup_done_said: ['setup_done_said'], setup_current: ['setup_current'] }
 export const SETUP_ASKED_KEYS = ['setup_new', 'setup_goal', 'setup_goal_id', 'setup_current']
 export const SETUP_ALL_KEYS = [...SETUP_ASKED_KEYS, 'setup_done_said']
-// The pick "Set up Hermes" under an offer (offers.things.setup): the question not answered yet, else the look and REC
-export const setupAskMove = st => suAsk(st)
+// The pick "Set up Hermes" under an offer (offers.things.setup): with an answer kept, FROM_KEPT (loom-fixes); else the
+// question not answered yet
+export const setupAskMove = st => suFromKept(st) || suAsk(st)
 // Whether a later visit opens with the set-up conversation (always, once it is built)
 export const SETUP_UNSEEN = { model: 'unread', soul: null, jobs: null, bots: null }

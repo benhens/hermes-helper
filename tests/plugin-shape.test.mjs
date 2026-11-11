@@ -120,10 +120,11 @@ test('the page reads only through read-only calls (no set, configure, write or s
   // dash-v1: the Dashboard adds cron.manage and plugins.manage, each only with action 'list' (and Your setup's
   // reads left the built file with it)
   const methods = [...code.matchAll(/request\('([a-z_.]+)'/g)].map(m => m[1])
-  assert.deepEqual([...new Set(methods)].sort(), ['cron.manage', 'free_tier.status', 'llm.oneshot', 'plugins.manage', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
+  // loom-fixes: the plugins read is gone (hhtech-loom-n1 1: no read gives the number Hermes's Plugins screen shows)
+  assert.deepEqual([...new Set(methods)].sort(), ['cron.manage', 'free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
   for (const m of code.matchAll(/request\('(cron|plugins)\.manage', \{([^}]*)\}/g)) assert.match(m[2], /^\s*action: 'list',/, m[0])
-  // three: the Dashboard's scheduled jobs and plugins, and the set-up conversation's look at the scheduled jobs
-  assert.equal([...code.matchAll(/request\('(cron|plugins)\.manage'/g)].length, 3)
+  // two: the Dashboard's scheduled jobs and the set-up conversation's look at them (loom-fixes: no plugins read)
+  assert.equal([...code.matchAll(/request\('(cron|plugins)\.manage'/g)].length, 2)
   assert.doesNotMatch(code, /setEnabled|profiles\.configure|set_asset|config\.set|composer\.setDraft|\.write\(/)
   // host.newChat only in the Dashboard's route button, and only when the person presses it (goTo)
   assert.deepEqual([...code.matchAll(/\bnewChat\(/g)].length, 1)
@@ -240,7 +241,11 @@ test('buttons are Hermes Button components; bare <button>s only where Hermes use
   // their names), one real <button type="button"> wearing D classes; every other button there is Hermes's
   const stops = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.stop,[^\n]*\)),/g)].map(m => m[1])
   assert.equal(stops.length, 1)
-  assert.equal([...src('dash.js').matchAll(/jsxs?\(\s*'button'/g)].length, 1)
+  // loom-fixes (Lead's point 15): a tile that opens Hermes's own screen is the whole tile as one real <button
+  // type="button"> wearing D classes (no Hermes component is a card that is a button); the bots tile stays a <div>
+  const tiles = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.tile, D\.tileBtn\)),/g)].map(m => m[1])
+  assert.equal(tiles.length, 1)
+  assert.equal([...src('dash.js').matchAll(/jsxs?\(\s*'button'/g)].length, 2)
   assert.match(src('page.js'), /jsx\('button', \{ type: 'button', className: T\.skip,/)
   assert.doesNotMatch(src('setup-tab.js'), /jsxs?\(\s*'button'/)
   // In Helper's window (src/talk-view.js): the answers to pick, a button inside the bubble and an
@@ -312,7 +317,9 @@ test('the character is drawn, not loaded: no picture, no data URL, no sprite she
   assert.doesNotMatch(code, /jsxs?\(\s*['"](img|image|canvas|picture|video|object|embed|use)['"]/)
   // the 9 Nov sprite-sheet slot and the drawn hand's poses are gone (commit cff33f6 has them)
   assert.equal(fs.existsSync(path.join(ROOT, 'src', 'pet-sheet.js')), false)
-  assert.doesNotMatch(code, /PET_SHEET|POSE_ROW|poseFor|spriteLayer|petdex/)
+  // (loom-fixes: the names from the Hermes docs hold "pets (petdex mascots)", a docs page's title, so the word is
+  // looked for outside that list)
+  assert.doesNotMatch(code.replace(/const NAMES_DATA = \[[\s\S]*?\n\]\n/, ''), /PET_SHEET|POSE_ROW|poseFor|spriteLayer|petdex/)
   // one colour: the accent is the only theme colour the character names
   const colours = [...src('character.js').matchAll(/var\(--[\w-]+\)/g)].map(m => m[0])
   assert.deepEqual([...new Set(colours)], ['var(--ui-accent)'])

@@ -466,8 +466,10 @@
    "note_c1": "changes-1: for second_bot the line and the other-bot answer were untrue (bots are counted across the whole Hermes, list v2 read profiles.list)."
   },
   "DONE_SAID": {
-   "text": "Good. I'll remember that you did it.",
-   "when": "It worked on an item that cannot be seen, or I've done this already. The item is kept as said done. Then REC for the next item."
+   "text": "Good. I can't see that one, so I'll take your word.",
+   "when": "It worked on an item that cannot be seen, or I've done this already. The item is kept as said done. Then REC for the next item.",
+   "text_was_loom": "Good. I'll remember that you did it.",
+   "changed": "loom-fixes-v1 (11 Nov, his Loom 0:43 and 3:13; Lead's decisions from his words, his to overrule on screen)"
   },
   "ALREADY_SEEABLE": {
    "text": "I can't see that yet. {not_part}",
@@ -514,8 +516,8 @@
    "when": "Return visit; the kept current item is seeable and its read now says done. Then REC for the next item. Wins over BACK_SEEN (never both)."
   },
   "BACK_REC": {
-   "text": "Hi again, {name}. We stopped at {card}. {why} Want the steps?",
-   "text_no_name": "Hi again. We stopped at {card}. {why} Want the steps?",
+   "text": "Hi again, {name}. Next on your list: {card}. {why} Want the steps?",
+   "text_no_name": "Hi again. Next on your list: {card}. {why} Want the steps?",
    "answers": [
     "Show me the steps",
     "I've done this already",
@@ -524,7 +526,10 @@
    ],
    "when": "Return visit; a current item is kept, its fresh read does not say done, and no seeable item is seen done (else BACK_SEEN then BACK_NEXT). The same line whether the person pressed Not now, Stop for now, or closed the window: all three are a stop. {why} is the list's why sentence, so the thing is explained again.",
    "text_was": "Hi again, {name}. Last time we picked {card}. Want to go on?",
-   "why_changed": "hhtech-setup-run.md line 43: it came right after Not now on that thing; he did not pick it. The old line also did not say what the thing is."
+   "why_changed": "hhtech-setup-run.md line 43: it came right after Not now on that thing; he did not pick it. The old line also did not say what the thing is.",
+   "card_rule": "{card} is the Dashboard's You are here stop, by dash-setup-list-v2.json here_rule, read at the moment the window opens. Never a different stop.",
+   "changed": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)",
+   "text_was_loom": "Hi again, {name}. We stopped at {card}. {why} Want the steps?"
   },
   "BACK_Q": {
    "text": "Hi again, {name}. Before we go on: are you new to Hermes?",
@@ -540,9 +545,12 @@
    "text_no_name": "Hi again."
   },
   "RESTART": {
-   "text": "Sure, let's start again. Are you new to Hermes?",
+   "text": "Sure, let's start again.",
    "answers": "Q_NEW",
-   "when": "Typed restart phrase, or Settings button Ask me the set-up questions again. Clears new, goal and current item; keeps name, work and said-done items."
+   "when": "Restart words typed anywhere in the set-up conversation (typed_answer rule 1), or Settings button Ask me the set-up questions again. Clears the kept answers to Q_NEW and Q_GOAL and the current item; the new answers replace them. Keeps name, work, and every stop the person marked done (I've done this): those are the person's own marks and show on the Dashboard; Not done yet there undoes one.",
+   "text_was_loom": "Sure, let's start again. Are you new to Hermes?",
+   "then": "Q_NEW as its own bubble, with its four picks (Are you new to Hermes?).",
+   "changed": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
   },
   "BACK_SEEN": {
    "text": "Hi again, {name}. {back_part}",
@@ -557,14 +565,18 @@
    "guess": "It says what is seen now, not what changed since last time: Helper keeps nothing of what the reads saw (keeps.not_kept), so it cannot know since. It shows on every return visit while the thing is there. Only-when-new needs one more kept thing and a Settings row; not written."
   },
   "BACK_NEXT": {
-   "text": "We stopped at {card}. {why} Want the steps?",
+   "text": "Next on your list: {card}. {why} Want the steps?",
    "answers": [
     "Show me the steps",
     "I've done this already",
     "Something else",
     "Not now"
    ],
-   "when": "Right after BACK_SEEN, when a current item is kept and not seen done. BACK_REC without the greeting."
+   "when": "Right after BACK_SEEN, when a current item is kept and not seen done. BACK_REC without the greeting.",
+   "card_rule": "{card} is the Dashboard's You are here stop, by dash-setup-list-v2.json here_rule, read at the moment the window opens. Never a different stop.",
+   "changed": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)",
+   "text_was_loom": "We stopped at {card}. {why} Want the steps?",
+   "words_why": "\"Next on your list\" is right whatever happened since the last visit (a stop seen done, a stop marked done on the page). \"We stopped at\" would be wrong when the page moved on."
   },
   "ALREADY_COUNT": {
    "text": "Fine. I'll count it as done.",
@@ -574,16 +586,58 @@
    "text": "Back to step {n} of {total}: {step}",
    "answers": "the step's own: STEP.answers, or STEP.last_step_answers on the last step",
    "when": "A question typed while a STEP is the open line: the answer is shown as now, then this line as the next message with the step's answers. Needed: without it Done sits under an answer about something else and the step's words are scrolled away. Not shown after I'm stuck (STUCK has its own answers) and not after Stop for now."
+  },
+  "FROM_KEPT": {
+   "text": "You told me {new_said}{and}{goal_said}. I'll go on from there.",
+   "answers": [
+    "Go on",
+    "Answer again"
+   ],
+   "new_said": {
+    "new": "you are new to Hermes",
+    "some": "you have used Hermes a bit",
+    "well": "you know Hermes well"
+   },
+   "goal_said": {
+    "schedule": "you want jobs at set times",
+    "phone": "you want to talk to it from your phone",
+    "bots": "you want several bots",
+    "unsure": "you are not sure yet what you want"
+   },
+   "and": " and ",
+   "fill": "Only the parts that are kept. Neither kept: this line is not shown (Q_NEW is asked). A typed goal that matched no list says unsure's words; the typed words are not repeated.",
+   "when": "Set up Hermes picked (or typed) while Q_NEW or Q_GOAL is already answered and kept. Go on: REC for the current item (the written sentence). Answer again: RESTART.",
+   "why": "His Loom 5:16: Helper skipped the questions without a word and repeated \"Since you want to start from the beginning\".",
+   "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
   }
  },
  "restart_phrases": [
-  "start again",
-  "start over",
   "ask me again",
-  "set up again",
-  "redo the questions",
   "ask the questions again",
-  "restart"
+  "back to the start",
+  "begin again",
+  "do it again from the start",
+  "from the beggining",
+  "from the begining",
+  "from the beginning",
+  "from the start",
+  "go back to the beginning",
+  "go back to the start",
+  "redo",
+  "redo the questions",
+  "reset",
+  "restart",
+  "set up again",
+  "start again",
+  "start again please",
+  "start all over",
+  "start fresh",
+  "start from the beggining",
+  "start from the begining",
+  "start from the beginning",
+  "start from the start",
+  "start over",
+  "start over again"
  ],
  "setup_ask": {
   "phrases": [
@@ -2271,5 +2325,91 @@
  ],
  "changed_offer_t1": "hhcontent, 11 Nov 2026, changes-8: NOT_NOW, ALL_DONE, BACK end with an offer (helper-talk-v2.json offers); Q_GOAL and SETUP_REASK_GOAL in his either/or shape, same four answers; setup_ask phrases widened.",
  "changes_1": "2026-11-11 08:48 UTC, Lead's job from docs/answers/hhtech-setup-run.md: content/helper-setup-chat-v1-changes-1.md",
- "conversations_note_c1": "changes-1: a_ai, b_ai and c_ai are examples of the AI step, which is off for the entry; nothing in them is shown. Their REC lines marked (AI, mine) are not checked facts."
+ "conversations_note_c1": "changes-1: a_ai, b_ai and c_ai are examples of the AI step, which is off for the entry; nothing in them is shown. Their REC lines marked (AI, mine) are not checked facts.",
+ "restart_phrases_was_loom": [
+  "start again",
+  "start over",
+  "ask me again",
+  "set up again",
+  "redo the questions",
+  "ask the questions again",
+  "restart"
+ ],
+ "typed_answer": {
+  "rule": "At Q_NEW and Q_GOAL, a typed message is kept as the answer only when it reads as an answer. In this order: 1. restart words (restart_phrases, whole words, anywhere in the message): RESTART. 2. Not an answer, never kept: a question (has ?, or starts with one of question_starts), a request to Helper (starts with one of request_starts, or holds one of request_words), or small talk (helper-talk-v2.json small_talk kinds). It is answered by the normal routing, then SETUP_REASK or SETUP_REASK_GOAL asks again (once). 3. Anything else is an answer: kept as typed (Q_GOAL: matched to schedule, phone or bots by the typed lists, else unsure; Q_NEW: well, some, new by its lists, else not kept).",
+  "question_starts": [
+   "what",
+   "whats",
+   "what's",
+   "how",
+   "why",
+   "where",
+   "when",
+   "who",
+   "which",
+   "is",
+   "are",
+   "do",
+   "does",
+   "did",
+   "should",
+   "will",
+   "would",
+   "could",
+   "can",
+   "may",
+   "am"
+  ],
+  "request_starts": [
+   "can we",
+   "can you",
+   "could we",
+   "could you",
+   "would you",
+   "will you",
+   "please",
+   "pls",
+   "let's",
+   "lets",
+   "let me",
+   "i want to go back",
+   "go back",
+   "stop",
+   "wait",
+   "hold on",
+   "never mind",
+   "nevermind"
+  ],
+  "request_words": [
+   "start over",
+   "go back",
+   "restart",
+   "from the beginning",
+   "from the begining",
+   "begin again",
+   "start again",
+   "help me",
+   "i don't understand",
+   "i dont understand",
+   "what do you mean"
+  ],
+  "small_talk_kinds": [
+   "hello",
+   "thanks",
+   "how",
+   "who",
+   "ai",
+   "bye",
+   "mean",
+   "again",
+   "wrong",
+   "stuck",
+   "cut"
+  ],
+  "small_talk_note": "Small talk here means these helper-talk-v2.json small_talk kinds. Not ok: yes, ok and sure are answers at a question.",
+  "answer_note": "An answer may still start with \"I\" or \"I want\": \"I want a morning summary\" is kept (schedule). \"Can it remind me every morning\" starts with can: not kept, it is answered as a question, then Q_GOAL is asked again.",
+  "his_case": "\"can we start from the begining\" at Q_GOAL: restart words (from the begining), so RESTART. Before: kept as the goal (Loom 1:56).",
+  "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+ },
+ "rec_rule_loom": "REC is the written sentence only, with no AI ({reason} from reasons, {card} and {why} from the list). It reads the same every time for the same person, and says Hermes, never your assistant. Its {card} is the Dashboard's You are here stop (dash-setup-list-v2.json here_rule)."
 }

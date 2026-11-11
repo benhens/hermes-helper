@@ -51,7 +51,9 @@ const DocsBox = ({ docs, wait }) =>
     'data-hh': 'docs',
     children: [
       jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: drawn(docs.head) }, 'h'),
-      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: drawn(docs.words) }, 'w')
+      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: drawn(docs.words) }, 'w'),
+      // loom-fixes: where the words are from, for a name's line and the migrate line (hhcontent's "file, line N")
+      docs.where ? jsx('p', { className: T.docsWhere, 'data-hh': 'docs-where', children: drawn(docs.where) }, 'f') : null
     ]
   })
 // The clicks to add an optional skill: Hermes's own numbered list (rule B), and the faint line after them.

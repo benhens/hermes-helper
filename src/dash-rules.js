@@ -10,34 +10,42 @@
 //   second_bot     profiles.list: two or more bots
 // A read that failed or has not come back is "not known" (null): never shown as done, never "You are here".
 import { DASH_DATA } from './dash-data.js'
+import { hereStop } from './setup-reads.js'
 // dash-v2 (the two branches joined): the starter personality texts, which bot, and the six rules (doneFlags) are in
 // src/setup-reads.js, the one copy the Dashboard and Helper's set-up conversation both use.
 
 /* ---------- the path ---------- */
-// Each of the 11 stops: 'done' (seen done: filled), 'todo' (seen, not done), 'here' (the first seen stop not done:
-// "You are here"), 'unknown' (seen, but its read failed or is still out: drawn as not done, never "You are here"),
-// or 'quiet' (Helper cannot see it: the smaller mark that never fills). The line itself has no state.
-export function pathStates(flags, items = DASH_DATA.items) {
+// loom-fixes (dash-setup-list-v2 eb3aeba8): the 10 stops on the path (Install is off it), every one counted. A stop the
+// page sees (it.seen) is done when its read says so; a stop the person marks is done when they said so ("I've done this"
+// here, or "I've done this already" / "It worked" in Helper's set-up conversation: the same kept list, said). A
+// stop the page sees and the person said is done too (Helper's "Count it as done").
+// The state of one stop: true, false, or null (its read failed or is still out). selfMarked(it): the person marks it.
+export function stopState(it, flags, said, selfMarked) {
+  if (said.includes(it.id)) return true
+  if (selfMarked(it)) return false
+  const f = flags[it.id]
+  return f === true ? true : f === false ? false : null
+}
+// Each stop: 'done' (filled), 'todo', 'here' ("You are here", by the one shared rule, src/setup-reads.js hereStop),
+// 'unknown' (its read failed or is still out: drawn as not done, never "here"). The line itself has no state.
+export function pathStates(stateOf, items = DASH_DATA.items, current = null) {
   const states = items.map(it => {
-    if (!it.counts) return 'quiet'
-    const f = flags[it.id]
-    return f === true ? 'done' : f === false ? 'todo' : 'unknown'
+    const v = stateOf(it.id)
+    return v === true ? 'done' : v === false ? 'todo' : 'unknown'
   })
-  // "You are here" only where it is known: the first counted stop not done, when every counted stop before it is
-  // seen done. A stop before it that could not be read (unknown) places nobody (review, dash-v1).
-  const firstOpen = states.findIndex(s => s === 'todo' || s === 'unknown')
-  const here = firstOpen >= 0 && states[firstOpen] === 'todo' ? firstOpen : -1
+  const at = hereStop(items.map(it => it.id), stateOf, current)
+  const here = at ? items.findIndex(it => it.id === at) : -1
   if (here >= 0) states[here] = 'here'
-  const counted = items.filter(it => it.counts)
-  const done = counted.filter(it => flags[it.id] === true).length
-  return { states, here, done, total: counted.length, allDone: done === counted.length }
+  const done = states.filter(s => s === 'done').length
+  return { states, here, done, total: items.length, allDone: done === items.length }
 }
 
 /* ---------- Activity: the days the open bot was used ---------- */
 // Rows of host.listPersistedSessions that are Hermes's own work, left out: scheduled jobs (cron), the task board
-// (kanban), tool and helper-agent runs, and 'local', the source Hermes's own first-run chat ("Getting started") came
-// back with (hhtech-dash-reads2.md section 3). Chats with no message are left out too.
-export const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent', 'local']
+// (kanban), tool and helper-agent runs. Chats with no message are left out too.
+// loom-fixes (hhtech-loom-n1 3, its correction): 'local' is no longer left out: a chat the person typed in a fresh home
+// came back as local. Hermes's own first-run chat is left out by its title (below).
+export const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent']
 // dash-v2: while Hermes is still writing that first-run chat it is not 'local' yet. Read in three brand-new homes on
 // the first opening (dev/checks/dash-v2/fresh-probe-65b108b.out): source 'gui', 1 to 3 messages, title "Getting
 // started"; some seconds later 'local' with 4 messages. So a fresh install showed "Last used today" (hhtech-dash-run,
@@ -124,18 +132,6 @@ export function distinctSkills(perBot) {
     for (const s of r.value) if (s && typeof s.name === 'string' && s.name.trim()) names.add(s.name.trim())
   }
   return names.size
-}
-// Plugins (dash-v2; Lead, 11 Nov, his words "active plugins"): the plugins switched on for the open bot, plus 1 for
-// Helper itself (Helper is never in that list: hhtech-dash-icons.md point 2). A row of plugins.manage list is the
-// person's when its source is not 'bundled' (Hermes's own parts; tui_gateway/methods_tools.py counts user_count the
-// same way), and switched on when its status is 'enabled' ('not enabled' and 'disabled' are not: hermes_cli/
-// plugins_cmd.py _plugin_status). A row that does not say where it comes from is not taken for the person's. A
-// failed read, or an answer without the list of rows: not shown, never a bare 1.
-export function pluginCount(read) {
-  if (!read || !read.ok || !read.value || typeof read.value !== 'object') return null
-  const rows = read.value.plugins
-  if (!Array.isArray(rows)) return null
-  return rows.filter(r => r && typeof r === 'object' && typeof r.source === 'string' && r.source !== 'bundled' && r.status === 'enabled').length + 1
 }
 // A tile's word under its number (hhcontent): the number 1 takes the _one word, every other number, and a tile with
 // no number yet, the plain one. narrow: at the narrow size a tile that has a short word takes it (the plugins tile:

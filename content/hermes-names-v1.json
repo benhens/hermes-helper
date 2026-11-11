@@ -1,0 +1,2230 @@
+{
+ "id": "hermes-names-v1",
+ "written": "2026-11-11, hhcontent, loom-fixes-v1 part 1 point 4, by dev/checks/hhcontent-loom-fixes-v1/names.py",
+ "rule": "A message is a name question when, lower-cased and cut of end marks, it is: what is / what's / whats / what are / tell me about / explain <name>, or the bare <name> with a question mark. <name> is compared after cutting a, an, the and every character that is not a to z or 0 to 9. Checked only where the routing would give the don't-know (N1 or N1a): every older line wins. Helper shows: say (one fixed sentence), then the box From the Hermes docs with quote and file:line, and when outside is set, its quote too, then the offer for the kind (offers.sets.name_<kind>).",
+ "outside_rule": "Where the docs say a thing is not built in or is made by others (outside set), the sentence says so and gives no advice to add it: no steps, no copy box, no button to it. His rule: Helper recommends only what is official.",
+ "sources_read": [
+  "user-guide/features/memory-providers.md (### headings of one word)",
+  "user-guide/messaging/*.md (title, description)",
+  "integrations/providers.md (### headings naming a provider)",
+  "reference/toolsets-reference.md (table rows)",
+  "user-guide/features/*.md (title, description)",
+  "No glossary page in the docs (searched: three pages only use the word)."
+ ],
+ "count": 137,
+ "refused": 0,
+ "names": [
+  {
+   "id": "nm_honcho",
+   "name": "Honcho",
+   "kind": "memory",
+   "say": "Honcho is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 53,
+   "quote": "AI-native cross-session user modeling with dialectic reasoning, session-scoped context injection, semantic search, and persistent conclusions.",
+   "quote_plain": "AI-native cross-session user modeling with dialectic reasoning, session-scoped context injection, semantic search, and persistent conclusions.",
+   "outside": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 50,
+    "quote": "Honcho is maintained by [Plastic Labs](https://github.com/plastic-labs/honcho/tree/main/hermes-plugin-honcho) and installed from the [plugin catalog](./plugins.md) rather than bundled with Hermes",
+    "quote_plain": "Honcho is maintained by Plastic Labs and installed from the plugin catalog rather than bundled with Hermes"
+   },
+   "aliases": [
+    "honcho"
+   ],
+   "offer": "name_memory"
+  },
+  {
+   "id": "nm_openviking",
+   "name": "OpenViking",
+   "kind": "memory",
+   "say": "OpenViking is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 301,
+   "quote": "Context database by Volcengine (ByteDance) with filesystem-style knowledge hierarchy, tiered retrieval, and automatic memory extraction into 6 categories.",
+   "quote_plain": "Context database by Volcengine (ByteDance) with filesystem-style knowledge hierarchy, tiered retrieval, and automatic memory extraction into 6 categories.",
+   "outside": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 298,
+    "quote": "OpenViking is maintained by Volcengine and installed from the [plugin catalog](./plugins.md) rather than bundled with Hermes",
+    "quote_plain": "OpenViking is maintained by Volcengine and installed from the plugin catalog rather than bundled with Hermes"
+   },
+   "aliases": [
+    "openviking"
+   ],
+   "offer": "name_memory"
+  },
+  {
+   "id": "nm_mem0",
+   "name": "Mem0",
+   "kind": "memory",
+   "say": "Mem0 is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 394,
+   "quote": "Server-side LLM fact extraction with semantic search, reranking, and automatic deduplication.",
+   "quote_plain": "Server-side LLM fact extraction with semantic search, reranking, and automatic deduplication.",
+   "outside": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 391,
+    "quote": "Mem0 is maintained by Mem0 and installed from the [plugin catalog](./plugins.md) rather than bundled with Hermes",
+    "quote_plain": "Mem0 is maintained by Mem0 and installed from the plugin catalog rather than bundled with Hermes"
+   },
+   "aliases": [
+    "mem0"
+   ],
+   "offer": "name_memory"
+  },
+  {
+   "id": "nm_hindsight",
+   "name": "Hindsight",
+   "kind": "memory",
+   "say": "Hindsight is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 491,
+   "quote": "Long-term memory with knowledge graph, entity resolution, and multi-strategy retrieval.",
+   "quote_plain": "Long-term memory with knowledge graph, entity resolution, and multi-strategy retrieval.",
+   "outside": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 488,
+    "quote": "Hindsight is maintained by [vectorize-io](https://github.com/vectorize-io/hindsight) and installed from the [plugin catalog](./plugins.md) rather than bundled with Hermes",
+    "quote_plain": "Hindsight is maintained by vectorize-io and installed from the plugin catalog rather than bundled with Hermes"
+   },
+   "aliases": [
+    "hindsight"
+   ],
+   "offer": "name_memory"
+  },
+  {
+   "id": "nm_holographic",
+   "name": "Holographic",
+   "kind": "memory",
+   "say": "Holographic is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 558,
+   "quote": "Local SQLite fact store with FTS5 full-text search, trust scoring, and HRR (Holographic Reduced Representations) for compositional algebraic queries.",
+   "quote_plain": "Local SQLite fact store with FTS5 full-text search, trust scoring, and HRR (Holographic Reduced Representations) for compositional algebraic queries.",
+   "outside": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 555,
+    "quote": "Holographic is maintained by [itpartypattaya](https://github.com/itpartypattaya/hermes-plugin-holographic) and installed from the [plugin catalog](./plugins.md) rather than bundled with Hermes",
+    "quote_plain": "Holographic is maintained by itpartypattaya and installed from the plugin catalog rather than bundled with Hermes"
+   },
+   "aliases": [
+    "holographic"
+   ],
+   "offer": "name_memory"
+  },
+  {
+   "id": "nm_retaindb",
+   "name": "RetainDB",
+   "kind": "memory",
+   "say": "RetainDB is a memory add-on. It helps Hermes remember things from one chat to the next. It comes with Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 609,
+   "quote": "Cloud memory API with hybrid search (Vector + BM25 + Reranking), 7 memory types, and delta compression.",
+   "quote_plain": "Cloud memory API with hybrid search (Vector + BM25 + Reranking), 7 memory types, and delta compression.",
+   "outside": null,
+   "aliases": [
+    "retaindb"
+   ],
+   "offer": "name_memory",
+   "ships": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 9,
+    "quote": "ships with 2 external memory provider plugins (RetainDB and ByteRover)"
+   }
+  },
+  {
+   "id": "nm_byterover",
+   "name": "ByteRover",
+   "kind": "memory",
+   "say": "ByteRover is a memory add-on. It helps Hermes remember things from one chat to the next. It comes with Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 632,
+   "quote": "Persistent memory via the `brv` CLI — hierarchical knowledge tree with tiered retrieval (fuzzy text → LLM-driven search).",
+   "quote_plain": "Persistent memory via the brv CLI — hierarchical knowledge tree with tiered retrieval (fuzzy text → LLM-driven search).",
+   "outside": null,
+   "aliases": [
+    "byterover"
+   ],
+   "offer": "name_memory",
+   "ships": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 9,
+    "quote": "ships with 2 external memory provider plugins (RetainDB and ByteRover)"
+   }
+  },
+  {
+   "id": "nm_supermemory",
+   "name": "Supermemory",
+   "kind": "memory",
+   "say": "Supermemory is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 667,
+   "quote": "Semantic long-term memory with profile recall, semantic search, explicit memory tools, and per-turn conversation capture (one document per session per 4-hour window).",
+   "quote_plain": "Semantic long-term memory with profile recall, semantic search, explicit memory tools, and per-turn conversation capture (one document per session per 4-hour window).",
+   "outside": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 664,
+    "quote": "Supermemory is maintained by Supermemory and installed from the [plugin catalog](./plugins.md) rather than bundled with Hermes",
+    "quote_plain": "Supermemory is maintained by Supermemory and installed from the plugin catalog rather than bundled with Hermes"
+   },
+   "aliases": [
+    "supermemory"
+   ],
+   "offer": "name_memory"
+  },
+  {
+   "id": "nm_memori",
+   "name": "Memori",
+   "kind": "memory",
+   "say": "Memori is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 761,
+   "quote": "Structured long-term memory using Memori Cloud, with background completed-turn capture, tool-aware turn context, and explicit recall tools for facts, summaries, quota, signup, and feedback.",
+   "quote_plain": "Structured long-term memory using Memori Cloud, with background completed-turn capture, tool-aware turn context, and explicit recall tools for facts, summaries, quota, signup, and feedback.",
+   "outside": {
+    "file": "user-guide/features/memory-providers.md",
+    "line": 766,
+    "quote": "Externally supplied `hermes-memori` CLI and provider integration + [Memori API key](https://app.memorilabs.ai/signup)",
+    "quote_plain": "Externally supplied hermes-memori CLI and provider integration + Memori API key"
+   },
+   "aliases": [
+    "memori"
+   ],
+   "offer": "name_memory"
+  },
+  {
+   "id": "nm_dingtalk",
+   "name": "DingTalk",
+   "kind": "chat",
+   "say": "DingTalk is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/dingtalk.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a DingTalk chatbot",
+   "quote_plain": "Set up Hermes Agent as a DingTalk chatbot",
+   "outside": null,
+   "aliases": [
+    "dingtalk"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_discord",
+   "name": "Discord",
+   "kind": "chat",
+   "say": "Discord is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/discord.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Discord bot",
+   "quote_plain": "Set up Hermes Agent as a Discord bot",
+   "outside": null,
+   "aliases": [
+    "discord"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_email",
+   "name": "Email",
+   "kind": "chat",
+   "say": "Email is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/email.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as an email assistant via IMAP/SMTP",
+   "quote_plain": "Set up Hermes Agent as an email assistant via IMAP/SMTP",
+   "outside": null,
+   "aliases": [
+    "email"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_feishulark",
+   "name": "Feishu / Lark",
+   "kind": "chat",
+   "say": "Feishu / Lark is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/feishu.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Feishu or Lark bot",
+   "quote_plain": "Set up Hermes Agent as a Feishu or Lark bot",
+   "outside": null,
+   "aliases": [
+    "feishu / lark",
+    "feishulark"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_googlechat",
+   "name": "Google Chat",
+   "kind": "chat",
+   "say": "Google Chat is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/google_chat.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Google Chat bot using Cloud Pub/Sub",
+   "quote_plain": "Set up Hermes Agent as a Google Chat bot using Cloud Pub/Sub",
+   "outside": null,
+   "aliases": [
+    "google chat",
+    "googlechat"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_homeassistant",
+   "name": "Home Assistant",
+   "kind": "chat",
+   "say": "Home Assistant is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/homeassistant.md",
+   "line": 3,
+   "quote": "Control your smart home with Hermes Agent via the Home Assistant plugin from the plugin catalog.",
+   "quote_plain": "Control your smart home with Hermes Agent via the Home Assistant plugin from the plugin catalog.",
+   "outside": null,
+   "aliases": [
+    "home assistant",
+    "homeassistant"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_line",
+   "name": "LINE",
+   "kind": "chat",
+   "say": "LINE is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/line.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a LINE Messaging API bot",
+   "quote_plain": "Set up Hermes Agent as a LINE Messaging API bot",
+   "outside": null,
+   "aliases": [
+    "line"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_matrix",
+   "name": "Matrix",
+   "kind": "chat",
+   "say": "Matrix is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/matrix.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Matrix bot",
+   "quote_plain": "Set up Hermes Agent as a Matrix bot",
+   "outside": null,
+   "aliases": [
+    "matrix"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_mattermost",
+   "name": "Mattermost",
+   "kind": "chat",
+   "say": "Mattermost is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/mattermost.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Mattermost bot",
+   "quote_plain": "Set up Hermes Agent as a Mattermost bot",
+   "outside": null,
+   "aliases": [
+    "mattermost"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_microsoftgraphwebhooklistener",
+   "name": "Microsoft Graph Webhook Listener",
+   "kind": "chat",
+   "say": "Microsoft Graph Webhook Listener is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/msgraph-webhook.md",
+   "line": 4,
+   "quote": "Receive Microsoft Graph change notifications (meetings, calendar, chat, etc.) in Hermes",
+   "quote_plain": "Receive Microsoft Graph change notifications (meetings, calendar, chat, etc.) in Hermes",
+   "outside": null,
+   "aliases": [
+    "microsoft graph webhook listener",
+    "microsoftgraphwebhooklistener"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_openwebui",
+   "name": "Open WebUI",
+   "kind": "chat",
+   "say": "Open WebUI is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/open-webui.md",
+   "line": 4,
+   "quote": "Connect Open WebUI to Hermes Agent via the OpenAI-compatible API server",
+   "quote_plain": "Connect Open WebUI to Hermes Agent via the OpenAI-compatible API server",
+   "outside": null,
+   "aliases": [
+    "open webui",
+    "openwebui"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_raft",
+   "name": "Raft",
+   "kind": "chat",
+   "say": "Raft is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/raft.md",
+   "line": 4,
+   "quote": "Connect Hermes Agent to Raft as an external agent via wake-channel bridge",
+   "quote_plain": "Connect Hermes Agent to Raft as an external agent via wake-channel bridge",
+   "outside": null,
+   "aliases": [
+    "raft"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_hermesrelay",
+   "name": "Hermes Relay",
+   "kind": "chat",
+   "say": "Hermes Relay is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/relay.md",
+   "line": 4,
+   "quote": "Connect Hermes to messaging platforms through a relay connector that owns the platform credentials — enrollment, capabilities, config, and troubleshooting",
+   "quote_plain": "Connect Hermes to messaging platforms through a relay connector that owns the platform credentials — enrollment, capabilities, config, and troubleshooting",
+   "outside": null,
+   "aliases": [
+    "hermes relay",
+    "hermesrelay"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_signal",
+   "name": "Signal",
+   "kind": "chat",
+   "say": "Signal is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/signal.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Signal messenger bot via signal-cli daemon",
+   "quote_plain": "Set up Hermes Agent as a Signal messenger bot via signal-cli daemon",
+   "outside": null,
+   "aliases": [
+    "signal"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_slack",
+   "name": "Slack",
+   "kind": "chat",
+   "say": "Slack is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/slack.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Slack bot using Socket Mode",
+   "quote_plain": "Set up Hermes Agent as a Slack bot using Socket Mode",
+   "outside": null,
+   "aliases": [
+    "slack"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_smstwilio",
+   "name": "SMS (Twilio)",
+   "kind": "chat",
+   "say": "SMS (Twilio) is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/sms.md",
+   "line": 5,
+   "quote": "Set up Hermes Agent as an SMS chatbot via Twilio",
+   "quote_plain": "Set up Hermes Agent as an SMS chatbot via Twilio",
+   "outside": null,
+   "aliases": [
+    "sms (twilio)",
+    "smstwilio"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_teamsmeetings",
+   "name": "Teams Meetings",
+   "kind": "chat",
+   "say": "Teams Meetings is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/teams-meetings.md",
+   "line": 4,
+   "quote": "Set up the Microsoft Teams meeting summary pipeline with Microsoft Graph webhooks",
+   "quote_plain": "Set up the Microsoft Teams meeting summary pipeline with Microsoft Graph webhooks",
+   "outside": null,
+   "aliases": [
+    "teams meetings",
+    "teamsmeetings"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_microsoftteams",
+   "name": "Microsoft Teams",
+   "kind": "chat",
+   "say": "Microsoft Teams is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/teams.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Microsoft Teams bot",
+   "quote_plain": "Set up Hermes Agent as a Microsoft Teams bot",
+   "outside": null,
+   "aliases": [
+    "microsoft teams",
+    "microsoftteams"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_telegram",
+   "name": "Telegram",
+   "kind": "chat",
+   "say": "Telegram is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/telegram.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a Telegram bot",
+   "quote_plain": "Set up Hermes Agent as a Telegram bot",
+   "outside": null,
+   "aliases": [
+    "telegram"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_webhooks",
+   "name": "Webhooks",
+   "kind": "chat",
+   "say": "Webhooks is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/webhooks.md",
+   "line": 4,
+   "quote": "Receive events from GitHub, GitLab, and other services to trigger Hermes agent runs",
+   "quote_plain": "Receive events from GitHub, GitLab, and other services to trigger Hermes agent runs",
+   "outside": null,
+   "aliases": [
+    "webhooks"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_wecomenterprisewechat",
+   "name": "WeCom (Enterprise WeChat)",
+   "kind": "chat",
+   "say": "WeCom (Enterprise WeChat) is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/wecom.md",
+   "line": 4,
+   "quote": "Connect Hermes Agent to WeCom via the AI Bot WebSocket gateway",
+   "quote_plain": "Connect Hermes Agent to WeCom via the AI Bot WebSocket gateway",
+   "outside": null,
+   "aliases": [
+    "wecom (enterprise wechat)",
+    "wecomenterprisewechat"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_weixinwechat",
+   "name": "Weixin (WeChat)",
+   "kind": "chat",
+   "say": "Weixin (WeChat) is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/weixin.md",
+   "line": 4,
+   "quote": "Connect Hermes Agent to personal WeChat accounts via the iLink Bot API",
+   "quote_plain": "Connect Hermes Agent to personal WeChat accounts via the iLink Bot API",
+   "outside": null,
+   "aliases": [
+    "weixin (wechat)",
+    "weixinwechat"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_whatsappbusinesscloudapi",
+   "name": "WhatsApp Business (Cloud API)",
+   "kind": "chat",
+   "say": "WhatsApp Business (Cloud API) is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/whatsapp-cloud.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a WhatsApp bot via Meta's official Business Cloud API",
+   "quote_plain": "Set up Hermes Agent as a WhatsApp bot via Meta's official Business Cloud API",
+   "outside": null,
+   "aliases": [
+    "whatsapp business (cloud api)",
+    "whatsappbusinesscloudapi"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_whatsapp",
+   "name": "WhatsApp",
+   "kind": "chat",
+   "say": "WhatsApp is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/whatsapp.md",
+   "line": 4,
+   "quote": "Set up Hermes Agent as a WhatsApp bot via the built-in Baileys bridge",
+   "quote_plain": "Set up Hermes Agent as a WhatsApp bot via the built-in Baileys bridge",
+   "outside": null,
+   "aliases": [
+    "whatsapp"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_yuanbao",
+   "name": "Yuanbao",
+   "kind": "chat",
+   "say": "Yuanbao is one of the places you can talk to Hermes from, outside the Hermes app.",
+   "file": "user-guide/messaging/yuanbao.md",
+   "line": 4,
+   "quote": "Yuanbao moved out of Hermes core into the yuanbao Hermes Labs plugin",
+   "quote_plain": "Yuanbao moved out of Hermes core into the yuanbao Hermes Labs plugin",
+   "outside": null,
+   "aliases": [
+    "yuanbao"
+   ],
+   "offer": "name_chat"
+  },
+  {
+   "id": "nm_nousportal",
+   "name": "Nous Portal",
+   "kind": "provider",
+   "say": "Nous Portal is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 74,
+   "quote": "[Nous Portal](https://portal.nousresearch.com) is Nous Research's unified subscription gateway and **the recommended way to run Hermes Agent**.",
+   "quote_plain": "Nous Portal is Nous Research's unified subscription gateway and the recommended way to run Hermes Agent.",
+   "outside": null,
+   "aliases": [
+    "nous portal",
+    "nousportal"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_anthropic",
+   "name": "Anthropic",
+   "kind": "provider",
+   "say": "Anthropic is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 160,
+   "quote": "Use Claude models directly through the Anthropic API — no OpenRouter proxy needed.",
+   "quote_plain": "Use Claude models directly through the Anthropic API — no OpenRouter proxy needed.",
+   "outside": null,
+   "aliases": [
+    "anthropic",
+    "anthropic (native)"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_githubcopilot",
+   "name": "GitHub Copilot",
+   "kind": "provider",
+   "say": "GitHub Copilot is a company or service that runs AI models. A model is the AI that thinks for Hermes. It is not part of Hermes itself.",
+   "file": "integrations/providers.md",
+   "line": 210,
+   "quote": "The GitHub Copilot providers (`copilot` for the Copilot API, `copilot-acp` for the Copilot CLI over ACP) are no longer built into Hermes.",
+   "quote_plain": "The GitHub Copilot providers (copilot for the Copilot API, copilot-acp for the Copilot CLI over ACP) are no longer built into Hermes.",
+   "outside": {
+    "file": "integrations/providers.md",
+    "line": 208,
+    "quote": "GitHub Copilot (labs plugin)",
+    "quote_plain": "GitHub Copilot (labs plugin)"
+   },
+   "aliases": [
+    "github copilot",
+    "github copilot (labs plugin)",
+    "githubcopilot"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_xai",
+   "name": "xAI",
+   "kind": "provider",
+   "say": "xAI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 314,
+   "quote": "xAI is wired through the Responses API (`codex_responses` transport) for automatic reasoning support on Grok 4 models — no `reasoning_effort` parameter needed, the server reasons by default.",
+   "quote_plain": "xAI is wired through the Responses API (codex_responses transport) for automatic reasoning support on Grok 4 models — no reasoning_effort parameter needed, the server reasons by default.",
+   "outside": null,
+   "aliases": [
+    "xai",
+    "xai (grok) — responses api + prompt caching"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_novitaai",
+   "name": "NovitaAI",
+   "kind": "provider",
+   "say": "NovitaAI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 335,
+   "quote": "[NovitaAI](https://novita.ai) is the AI-native cloud for builders and agents.",
+   "quote_plain": "NovitaAI is the AI-native cloud for builders and agents.",
+   "outside": null,
+   "aliases": [
+    "novitaai"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_ollamacloud",
+   "name": "Ollama Cloud",
+   "kind": "provider",
+   "say": "Ollama Cloud is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 358,
+   "quote": "[Ollama Cloud](https://ollama.com/cloud) hosts the same open-weight catalog as local Ollama but without the GPU requirement.",
+   "quote_plain": "Ollama Cloud hosts the same open-weight catalog as local Ollama but without the GPU requirement.",
+   "outside": null,
+   "aliases": [
+    "ollama cloud",
+    "ollama cloud — managed ollama models, oauth + api key",
+    "ollamacloud"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_deepinfra",
+   "name": "DeepInfra",
+   "kind": "provider",
+   "say": "DeepInfra is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 382,
+   "quote": "DeepInfra (`--provider deepinfra`, `DEEPINFRA_API_KEY`) is discovered live from its catalog.",
+   "quote_plain": "DeepInfra (--provider deepinfra, DEEPINFRA_API_KEY) is discovered live from its catalog.",
+   "outside": null,
+   "aliases": [
+    "deepinfra"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_awsbedrock",
+   "name": "AWS Bedrock",
+   "kind": "provider",
+   "say": "AWS Bedrock is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 386,
+   "quote": "Anthropic Claude, Amazon Nova, DeepSeek v3.2, Meta Llama 4, and other models via AWS Bedrock.",
+   "quote_plain": "Anthropic Claude, Amazon Nova, DeepSeek v3.2, Meta Llama 4, and other models via AWS Bedrock.",
+   "outside": null,
+   "aliases": [
+    "aws bedrock",
+    "awsbedrock"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_googlevertexai",
+   "name": "Google Vertex AI",
+   "kind": "provider",
+   "say": "Google Vertex AI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 418,
+   "quote": "Gemini models on Google Cloud Vertex AI via Vertex's OpenAI-compatible endpoint.",
+   "quote_plain": "Gemini models on Google Cloud Vertex AI via Vertex's OpenAI-compatible endpoint.",
+   "outside": null,
+   "aliases": [
+    "google vertex ai",
+    "googlevertexai"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_qwenportal",
+   "name": "Qwen Portal",
+   "kind": "provider",
+   "say": "Qwen Portal is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 443,
+   "quote": "Alibaba's Qwen Portal with browser-based OAuth login.",
+   "quote_plain": "Alibaba's Qwen Portal with browser-based OAuth login.",
+   "outside": null,
+   "aliases": [
+    "qwen portal",
+    "qwen portal (oauth)",
+    "qwenportal"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_alibabacloud",
+   "name": "Alibaba Cloud",
+   "kind": "provider",
+   "say": "Alibaba Cloud is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 469,
+   "quote": "If you're subscribed to Alibaba's **Coding Plan** (a pricing SKU separate from standard DashScope API access), Hermes exposes it as its own first-class provider: `alibaba-coding-plan`.",
+   "quote_plain": "If you're subscribed to Alibaba's Coding Plan (a pricing SKU separate from standard DashScope API access), Hermes exposes it as its own first-class provider: alibaba-coding-plan.",
+   "outside": null,
+   "aliases": [
+    "alibaba cloud",
+    "alibaba cloud (coding plan)",
+    "alibabacloud"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_minimax",
+   "name": "MiniMax",
+   "kind": "provider",
+   "say": "MiniMax is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 489,
+   "quote": "MiniMax-M2.7 via browser OAuth login — no API key needed.",
+   "quote_plain": "MiniMax-M2.7 via browser OAuth login — no API key needed.",
+   "outside": null,
+   "aliases": [
+    "minimax",
+    "minimax (oauth)"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_nvidianim",
+   "name": "NVIDIA NIM",
+   "kind": "provider",
+   "say": "NVIDIA NIM is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 515,
+   "quote": "Use the NVIDIA NIM provider to access Nemotron and other open-source models through NVIDIA’s hosted service or a local NIM endpoint.",
+   "quote_plain": "Use the NVIDIA NIM provider to access Nemotron and other open-source models through NVIDIA’s hosted service or a local NIM endpoint.",
+   "outside": null,
+   "aliases": [
+    "nvidia nim",
+    "nvidianim"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_gmicloud",
+   "name": "GMI Cloud",
+   "kind": "provider",
+   "say": "GMI Cloud is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 566,
+   "quote": "Open and reasoning models via [GMI Cloud](https://www.gmicloud.ai/) — OpenAI-compatible API, API key authentication.",
+   "quote_plain": "Open and reasoning models via GMI Cloud — OpenAI-compatible API, API key authentication.",
+   "outside": null,
+   "aliases": [
+    "gmi cloud",
+    "gmicloud"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_actualcomputer",
+   "name": "Actual Computer",
+   "kind": "provider",
+   "say": "Actual Computer is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 585,
+   "quote": "Your own hardware as a private inference cluster via [Actual Computer](https://actual.inc).",
+   "quote_plain": "Your own hardware as a private inference cluster via Actual Computer.",
+   "outside": null,
+   "aliases": [
+    "actual computer",
+    "actualcomputer"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_stepfun",
+   "name": "StepFun",
+   "kind": "provider",
+   "say": "StepFun is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 616,
+   "quote": "Step-series models via [StepFun](https://platform.stepfun.com) — OpenAI-compatible API, API key authentication.",
+   "quote_plain": "Step-series models via StepFun — OpenAI-compatible API, API key authentication.",
+   "outside": null,
+   "aliases": [
+    "stepfun"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_huggingfaceinferenceproviders",
+   "name": "Hugging Face Inference Providers",
+   "kind": "provider",
+   "say": "Hugging Face Inference Providers is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 635,
+   "quote": "[Hugging Face Inference Providers](https://huggingface.co/docs/inference-providers) routes to 20+ open models through a unified OpenAI-compatible endpoint (`router.huggingface.co/v1`).",
+   "quote_plain": "Hugging Face Inference Providers routes to 20+ open models through a unified OpenAI-compatible endpoint (router.huggingface.co/v1).",
+   "outside": null,
+   "aliases": [
+    "hugging face inference providers",
+    "huggingfaceinferenceproviders"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_ollama",
+   "name": "Ollama",
+   "kind": "provider",
+   "say": "Ollama is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 728,
+   "quote": "[Ollama](https://ollama.com/) runs open-weight models locally with one command.",
+   "quote_plain": "Ollama runs open-weight models locally with one command.",
+   "outside": null,
+   "aliases": [
+    "ollama",
+    "ollama — local models, zero config"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_vllm",
+   "name": "vLLM",
+   "kind": "provider",
+   "say": "vLLM is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 801,
+   "quote": "[vLLM](https://docs.vllm.ai/) is the standard for production LLM serving.",
+   "quote_plain": "vLLM is the standard for production LLM serving.",
+   "outside": null,
+   "aliases": [
+    "vllm",
+    "vllm — high-performance gpu inference"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_sglang",
+   "name": "SGLang",
+   "kind": "provider",
+   "say": "SGLang is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 844,
+   "quote": "[SGLang](https://github.com/sgl-project/sglang) is an alternative to vLLM with RadixAttention for KV cache reuse.",
+   "quote_plain": "SGLang is an alternative to vLLM with RadixAttention for KV cache reuse.",
+   "outside": null,
+   "aliases": [
+    "sglang",
+    "sglang — fast serving with radixattention"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_llamacpp",
+   "name": "llama.cpp",
+   "kind": "provider",
+   "say": "llama.cpp is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 877,
+   "quote": "[llama.cpp](https://github.com/ggml-org/llama.cpp) runs quantized models on CPU, Apple Silicon (Metal), and consumer GPUs.",
+   "quote_plain": "llama.cpp runs quantized models on CPU, Apple Silicon (Metal), and consumer GPUs.",
+   "outside": null,
+   "aliases": [
+    "llama.cpp",
+    "llama.cpp / llama-server — cpu & metal inference",
+    "llamacpp"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_lmstudio",
+   "name": "LM Studio",
+   "kind": "provider",
+   "say": "LM Studio is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 920,
+   "quote": "[LM Studio](https://lmstudio.ai/) is a desktop app for running local models with a GUI.",
+   "quote_plain": "LM Studio is a desktop app for running local models with a GUI.",
+   "outside": null,
+   "aliases": [
+    "lm studio",
+    "lm studio — desktop app with local models",
+    "lmstudio"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_litellmproxy",
+   "name": "LiteLLM Proxy",
+   "kind": "provider",
+   "say": "LiteLLM Proxy is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 1148,
+   "quote": "[LiteLLM](https://docs.litellm.ai/) is an OpenAI-compatible proxy that unifies 100+ LLM providers behind a single API.",
+   "quote_plain": "LiteLLM is an OpenAI-compatible proxy that unifies 100+ LLM providers behind a single API.",
+   "outside": null,
+   "aliases": [
+    "litellm proxy",
+    "litellm proxy — multi-provider gateway",
+    "litellmproxy"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_clawrouter",
+   "name": "ClawRouter",
+   "kind": "provider",
+   "say": "ClawRouter is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+   "file": "integrations/providers.md",
+   "line": 1180,
+   "quote": "[ClawRouter](https://github.com/BlockRunAI/ClawRouter) by BlockRunAI is a local routing proxy that auto-selects models based on query complexity.",
+   "quote_plain": "ClawRouter by BlockRunAI is a local routing proxy that auto-selects models based on query complexity.",
+   "outside": null,
+   "aliases": [
+    "clawrouter",
+    "clawrouter — cost-optimized routing"
+   ],
+   "offer": "name_provider"
+  },
+  {
+   "id": "nm_browser",
+   "name": "browser",
+   "kind": "toolset",
+   "say": "browser is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 55,
+   "quote": "Core browser automation.",
+   "quote_plain": "Core browser automation.",
+   "outside": null,
+   "aliases": [
+    "browser"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_clarify",
+   "name": "clarify",
+   "kind": "toolset",
+   "say": "clarify is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 56,
+   "quote": "Ask the user a question when the agent needs clarification.",
+   "quote_plain": "Ask the user a question when the agent needs clarification.",
+   "outside": null,
+   "aliases": [
+    "clarify"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_codeexecution",
+   "name": "code_execution",
+   "kind": "toolset",
+   "say": "code_execution is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 57,
+   "quote": "Run Python scripts that call Hermes tools programmatically.",
+   "quote_plain": "Run Python scripts that call Hermes tools programmatically.",
+   "outside": null,
+   "aliases": [
+    "code execution",
+    "code_execution",
+    "codeexecution"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_connections",
+   "name": "connections",
+   "kind": "toolset",
+   "say": "connections is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 58,
+   "quote": "Connect the user to apps: managed connector accounts through the Nous gateway, and local MCP servers from the catalog.",
+   "quote_plain": "Connect the user to apps: managed connector accounts through the Nous gateway, and local MCP servers from the catalog.",
+   "outside": null,
+   "aliases": [
+    "connections"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_coding",
+   "name": "coding",
+   "kind": "toolset",
+   "say": "coding is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 59,
+   "quote": "Coding-focused bundle for software work: file editing, terminal, search, web docs, skills, browser, delegate, and code execution.",
+   "quote_plain": "Coding-focused bundle for software work: file editing, terminal, search, web docs, skills, browser, delegate, and code execution.",
+   "outside": null,
+   "aliases": [
+    "coding"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_cronjob",
+   "name": "cronjob",
+   "kind": "toolset",
+   "say": "cronjob is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 60,
+   "quote": "Schedule and manage recurring tasks.",
+   "quote_plain": "Schedule and manage recurring tasks.",
+   "outside": null,
+   "aliases": [
+    "cronjob"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_debugging",
+   "name": "debugging",
+   "kind": "toolset",
+   "say": "debugging is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 61,
+   "quote": "Debug bundle — file, process/terminal, web extract/search.",
+   "quote_plain": "Debug bundle — file, process/terminal, web extract/search.",
+   "outside": null,
+   "aliases": [
+    "debugging"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_delegation",
+   "name": "delegation",
+   "kind": "toolset",
+   "say": "delegation is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 62,
+   "quote": "Spawn isolated subagent instances for parallel work.",
+   "quote_plain": "Spawn isolated subagent instances for parallel work.",
+   "outside": null,
+   "aliases": [
+    "delegation"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_discordadmin",
+   "name": "discord_admin",
+   "kind": "toolset",
+   "say": "discord_admin is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 64,
+   "quote": "Discord moderation (bans, role changes, channel management).",
+   "quote_plain": "Discord moderation (bans, role changes, channel management).",
+   "outside": null,
+   "aliases": [
+    "discord admin",
+    "discord_admin",
+    "discordadmin"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_feishudoc",
+   "name": "feishu_doc",
+   "kind": "toolset",
+   "say": "feishu_doc is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 65,
+   "quote": "Read Feishu/Lark document content.",
+   "quote_plain": "Read Feishu/Lark document content.",
+   "outside": null,
+   "aliases": [
+    "feishu doc",
+    "feishu_doc",
+    "feishudoc"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_feishudrive",
+   "name": "feishu_drive",
+   "kind": "toolset",
+   "say": "feishu_drive is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 66,
+   "quote": "Feishu/Lark drive comment operations.",
+   "quote_plain": "Feishu/Lark drive comment operations.",
+   "outside": null,
+   "aliases": [
+    "feishu drive",
+    "feishu_drive",
+    "feishudrive"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_file",
+   "name": "file",
+   "kind": "toolset",
+   "say": "file is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 67,
+   "quote": "File reading, writing, searching, and editing.",
+   "quote_plain": "File reading, writing, searching, and editing.",
+   "outside": null,
+   "aliases": [
+    "file"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_computeruse",
+   "name": "computer_use",
+   "kind": "toolset",
+   "say": "computer_use is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 68,
+   "quote": "Background desktop control via cua-driver — does not steal cursor/focus.",
+   "quote_plain": "Background desktop control via cua-driver — does not steal cursor/focus.",
+   "outside": null,
+   "aliases": [
+    "computer use",
+    "computer_use",
+    "computeruse"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_contextengine",
+   "name": "context_engine",
+   "kind": "toolset",
+   "say": "context_engine is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 69,
+   "quote": "Runtime tools exposed by the active context-engine plugin (empty until a plugin populates it).",
+   "quote_plain": "Runtime tools exposed by the active context-engine plugin (empty until a plugin populates it).",
+   "outside": null,
+   "aliases": [
+    "context engine",
+    "context_engine",
+    "contextengine"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_imagegen",
+   "name": "image_gen",
+   "kind": "toolset",
+   "say": "image_gen is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 70,
+   "quote": "Text-to-image generation via FAL.ai (with opt-in OpenAI / xAI backends).",
+   "quote_plain": "Text-to-image generation via FAL.ai (with opt-in OpenAI / xAI backends).",
+   "outside": null,
+   "aliases": [
+    "image gen",
+    "image_gen",
+    "imagegen"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_videogen",
+   "name": "video_gen",
+   "kind": "toolset",
+   "say": "video_gen is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 71,
+   "quote": "Text-to-video and image-to-video via plugin-registered backends (xAI Grok-Imagine, FAL.ai Veo 3.1 / Pixverse v6 / Kling 3.0 / Kling O3).",
+   "quote_plain": "Text-to-video and image-to-video via plugin-registered backends (xAI Grok-Imagine, FAL.ai Veo 3.1 / Pixverse v6 / Kling 3.0 / Kling O3).",
+   "outside": null,
+   "aliases": [
+    "video gen",
+    "video_gen",
+    "videogen"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_kanban",
+   "name": "kanban",
+   "kind": "toolset",
+   "say": "kanban is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 72,
+   "quote": "Multi-agent coordination tools.",
+   "quote_plain": "Multi-agent coordination tools.",
+   "outside": null,
+   "aliases": [
+    "kanban"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_memory",
+   "name": "memory",
+   "kind": "toolset",
+   "say": "memory is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 73,
+   "quote": "Persistent cross-session memory management.",
+   "quote_plain": "Persistent cross-session memory management.",
+   "outside": null,
+   "aliases": [
+    "memory"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_desktopui",
+   "name": "desktop_ui",
+   "kind": "toolset",
+   "say": "desktop_ui is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 74,
+   "quote": "Affordances that act on the Hermes desktop app itself — read/close the embedded terminal pane, open, read, close, interact with, and annotate the in-app browser, identify the OS window behind the app, reveal a pane, react to a message, run a guided tour",
+   "quote_plain": "Affordances that act on the Hermes desktop app itself — read/close the embedded terminal pane, open, read, close, interact with, and annotate the in-app browser, identify the OS window behind the app, reveal a pane, react to a message, run a guided tour",
+   "outside": null,
+   "aliases": [
+    "desktop ui",
+    "desktop_ui",
+    "desktopui"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_project",
+   "name": "project",
+   "kind": "toolset",
+   "say": "project is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 75,
+   "quote": "Create and switch desktop [Projects](../user-guide/cli.md) (named, multi-folder workspaces) via one `create`/`switch`/`list` action enum.",
+   "quote_plain": "Create and switch desktop Projects (named, multi-folder workspaces) via one create/switch/list action enum.",
+   "outside": null,
+   "aliases": [
+    "project"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_catalog",
+   "name": "catalog",
+   "kind": "toolset",
+   "say": "catalog is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 76,
+   "quote": "Search the plugin catalog and skills hub, and install items through the approval card into this chat's profile.",
+   "quote_plain": "Search the plugin catalog and skills hub, and install items through the approval card into this chat's profile.",
+   "outside": null,
+   "aliases": [
+    "catalog"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_safe",
+   "name": "safe",
+   "kind": "toolset",
+   "say": "safe is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 77,
+   "quote": "Read-only research + media generation.",
+   "quote_plain": "Read-only research + media generation.",
+   "outside": null,
+   "aliases": [
+    "safe"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_search",
+   "name": "search",
+   "kind": "toolset",
+   "say": "search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 78,
+   "quote": "Web search only (without extract).",
+   "quote_plain": "Web search only (without extract).",
+   "outside": null,
+   "aliases": [
+    "search"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_sessionsearch",
+   "name": "session_search",
+   "kind": "toolset",
+   "say": "session_search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 79,
+   "quote": "Search past conversation sessions.",
+   "quote_plain": "Search past conversation sessions.",
+   "outside": null,
+   "aliases": [
+    "session search",
+    "session_search",
+    "sessionsearch"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_skills",
+   "name": "skills",
+   "kind": "toolset",
+   "say": "skills is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 80,
+   "quote": "Skill CRUD and browsing.",
+   "quote_plain": "Skill CRUD and browsing.",
+   "outside": null,
+   "aliases": [
+    "skills"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_terminal",
+   "name": "terminal",
+   "kind": "toolset",
+   "say": "terminal is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 81,
+   "quote": "Shell command execution and background process management.",
+   "quote_plain": "Shell command execution and background process management.",
+   "outside": null,
+   "aliases": [
+    "terminal"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_todo",
+   "name": "todo",
+   "kind": "toolset",
+   "say": "todo is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 82,
+   "quote": "Task list management within a session.",
+   "quote_plain": "Task list management within a session.",
+   "outside": null,
+   "aliases": [
+    "todo"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_tts",
+   "name": "tts",
+   "kind": "toolset",
+   "say": "tts is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 83,
+   "quote": "Text-to-speech audio generation.",
+   "quote_plain": "Text-to-speech audio generation.",
+   "outside": null,
+   "aliases": [
+    "tts"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_vision",
+   "name": "vision",
+   "kind": "toolset",
+   "say": "vision is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 84,
+   "quote": "Image analysis via vision-capable models.",
+   "quote_plain": "Image analysis via vision-capable models.",
+   "outside": null,
+   "aliases": [
+    "vision"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_video",
+   "name": "video",
+   "kind": "toolset",
+   "say": "video is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 85,
+   "quote": "Video analysis and understanding tools (opt-in, not in the default toolset — add explicitly via `--toolsets`).",
+   "quote_plain": "Video analysis and understanding tools (opt-in, not in the default toolset — add explicitly via --toolsets).",
+   "outside": null,
+   "aliases": [
+    "video"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_web",
+   "name": "web",
+   "kind": "toolset",
+   "say": "web is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 86,
+   "quote": "Web search and page content extraction.",
+   "quote_plain": "Web search and page content extraction.",
+   "outside": null,
+   "aliases": [
+    "web"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_xsearch",
+   "name": "x_search",
+   "kind": "toolset",
+   "say": "x_search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+   "file": "reference/toolsets-reference.md",
+   "line": 87,
+   "quote": "Read-only public X discovery via xAI's built-in `x_search` Responses tool.",
+   "quote_plain": "Read-only public X discovery via xAI's built-in x_search Responses tool.",
+   "outside": null,
+   "aliases": [
+    "x search",
+    "x_search",
+    "xsearch"
+   ],
+   "offer": "name_toolset"
+  },
+  {
+   "id": "nm_acphostintegration",
+   "name": "ACP Host Integration",
+   "kind": "feature",
+   "say": "ACP Host Integration is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/acp.md",
+   "line": 4,
+   "quote": "Use Hermes Agent inside ACP-compatible editors and collaboration platforms",
+   "quote_plain": "Use Hermes Agent inside ACP-compatible editors and collaboration platforms",
+   "outside": null,
+   "aliases": [
+    "acp host integration",
+    "acphostintegration"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_apiserver",
+   "name": "API Server",
+   "kind": "feature",
+   "say": "API Server is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/api-server.md",
+   "line": 4,
+   "quote": "Expose hermes-agent as an OpenAI-compatible API for any frontend",
+   "quote_plain": "Expose hermes-agent as an OpenAI-compatible API for any frontend",
+   "outside": null,
+   "aliases": [
+    "api server",
+    "apiserver"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_batchprocessing",
+   "name": "Batch Processing",
+   "kind": "feature",
+   "say": "Batch Processing is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/batch-processing.md",
+   "line": 4,
+   "quote": "Generate agent trajectories at scale — parallel processing, checkpointing, and toolset distributions",
+   "quote_plain": "Generate agent trajectories at scale — parallel processing, checkpointing, and toolset distributions",
+   "outside": null,
+   "aliases": [
+    "batch processing",
+    "batchprocessing"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_browserautomation",
+   "name": "Browser Automation",
+   "kind": "feature",
+   "say": "Browser Automation is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/browser.md",
+   "line": 3,
+   "quote": "Drive a real browser with browser_exec — Hermes-launched Chromium, cloud browsers, Lightpanda, or your own Chrome via CDP — for web interaction, form filling, scraping, and more.",
+   "quote_plain": "Drive a real browser with browser_exec — Hermes-launched Chromium, cloud browsers, Lightpanda, or your own Chrome via CDP — for web interaction, form filling, scraping, and more.",
+   "outside": null,
+   "aliases": [
+    "browser automation",
+    "browserautomation"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_builtinplugins",
+   "name": "Built-in Plugins",
+   "kind": "feature",
+   "say": "Built-in Plugins is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/built-in-plugins.md",
+   "line": 5,
+   "quote": "Plugins shipped with Hermes Agent that run automatically via lifecycle hooks — disk-cleanup and friends",
+   "quote_plain": "Plugins shipped with Hermes Agent that run automatically via lifecycle hooks — disk-cleanup and friends",
+   "outside": null,
+   "aliases": [
+    "built-in plugins",
+    "builtinplugins"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_contextfiles",
+   "name": "Context Files",
+   "kind": "feature",
+   "say": "Context Files is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/context-files.md",
+   "line": 4,
+   "quote": "Project context files — .hermes.md, AGENTS.md, CLAUDE.md, global SOUL.md, and .cursorrules — automatically injected into every conversation",
+   "quote_plain": "Project context files — .hermes.md, AGENTS.md, CLAUDE.md, global SOUL.md, and .cursorrules — automatically injected into every conversation",
+   "outside": null,
+   "aliases": [
+    "context files",
+    "contextfiles"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_contextreferences",
+   "name": "Context References",
+   "kind": "feature",
+   "say": "Context References is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/context-references.md",
+   "line": 5,
+   "quote": "Inline @-syntax for attaching files, folders, git diffs, and URLs directly into your messages",
+   "quote_plain": "Inline @-syntax for attaching files, folders, git diffs, and URLs directly into your messages",
+   "outside": null,
+   "aliases": [
+    "context references",
+    "contextreferences"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_credentialpools",
+   "name": "Credential Pools",
+   "kind": "feature",
+   "say": "Credential Pools is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/credential-pools.md",
+   "line": 3,
+   "quote": "Pool multiple API keys or OAuth tokens per provider for automatic rotation and rate limit recovery.",
+   "quote_plain": "Pool multiple API keys or OAuth tokens per provider for automatic rotation and rate limit recovery.",
+   "outside": null,
+   "aliases": [
+    "credential pools",
+    "credentialpools"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_passwordslogins",
+   "name": "Passwords & Logins",
+   "kind": "feature",
+   "say": "Passwords & Logins is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/credential-vault.md",
+   "line": 3,
+   "quote": "The agent signs into sites, pays and fills addresses for you without ever seeing a password.",
+   "quote_plain": "The agent signs into sites, pays and fills addresses for you without ever seeing a password.",
+   "outside": null,
+   "aliases": [
+    "passwords & logins",
+    "passwordslogins"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_scheduledtaskscron",
+   "name": "Scheduled Tasks (Cron)",
+   "kind": "feature",
+   "say": "Scheduled Tasks (Cron) is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/cron.md",
+   "line": 4,
+   "quote": "Schedule automated tasks with natural language, manage them with one cron tool, and attach one or more skills",
+   "quote_plain": "Schedule automated tasks with natural language, manage them with one cron tool, and attach one or more skills",
+   "outside": null,
+   "aliases": [
+    "scheduled tasks (cron)",
+    "scheduledtaskscron"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_curator",
+   "name": "Curator",
+   "kind": "feature",
+   "say": "Curator is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/curator.md",
+   "line": 4,
+   "quote": "Background maintenance for agent-created skills — usage tracking, staleness, archival, and LLM-driven review",
+   "quote_plain": "Background maintenance for agent-created skills — usage tracking, staleness, archival, and LLM-driven review",
+   "outside": null,
+   "aliases": [
+    "curator"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_subagentdelegation",
+   "name": "Subagent Delegation",
+   "kind": "feature",
+   "say": "Subagent Delegation is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/delegation.md",
+   "line": 4,
+   "quote": "Spawn isolated child agents for parallel workstreams with delegate_task",
+   "quote_plain": "Spawn isolated child agents for parallel workstreams with delegate_task",
+   "outside": null,
+   "aliases": [
+    "subagent delegation",
+    "subagentdelegation"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_deliverablemodeartifactsinchat",
+   "name": "Deliverable Mode (Artifacts in Chat)",
+   "kind": "feature",
+   "say": "Deliverable Mode (Artifacts in Chat) is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/deliverable-mode.md",
+   "line": 4,
+   "quote": "How the agent ships generated charts, PDFs, spreadsheets, and other files as native attachments in messaging platforms.",
+   "quote_plain": "How the agent ships generated charts, PDFs, spreadsheets, and other files as native attachments in messaging platforms.",
+   "outside": null,
+   "aliases": [
+    "deliverable mode (artifacts in chat)",
+    "deliverablemodeartifactsinchat"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_documentextraction",
+   "name": "Document Extraction",
+   "kind": "feature",
+   "say": "Document Extraction is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/document-extraction.md",
+   "line": 4,
+   "quote": "How read_file converts PDFs, Office documents, and notebooks to text — and what to do when a PDF is scanned images",
+   "quote_plain": "How read_file converts PDFs, Office documents, and notebooks to text — and what to do when a PDF is scanned images",
+   "outside": null,
+   "aliases": [
+    "document extraction",
+    "documentextraction"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_extendingthedashboard",
+   "name": "Extending the Dashboard",
+   "kind": "feature",
+   "say": "Extending the Dashboard is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/extending-the-dashboard.md",
+   "line": 4,
+   "quote": "Build themes and plugins for the Hermes web dashboard — palettes, typography, layouts, custom tabs, shell slots, page-scoped slots, and backend API routes",
+   "quote_plain": "Build themes and plugins for the Hermes web dashboard — palettes, typography, layouts, custom tabs, shell slots, page-scoped slots, and backend API routes",
+   "outside": null,
+   "aliases": [
+    "extending the dashboard",
+    "extendingthedashboard"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_fallbackproviders",
+   "name": "Fallback Providers",
+   "kind": "feature",
+   "say": "Fallback Providers is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/fallback-providers.md",
+   "line": 3,
+   "quote": "Configure automatic failover to backup LLM providers when your primary model is unavailable.",
+   "quote_plain": "Configure automatic failover to backup LLM providers when your primary model is unavailable.",
+   "outside": null,
+   "aliases": [
+    "fallback providers",
+    "fallbackproviders"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_persistentgoals",
+   "name": "Persistent Goals",
+   "kind": "feature",
+   "say": "Persistent Goals is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/goals.md",
+   "line": 4,
+   "quote": "Set a standing goal and let Hermes keep working across turns until it's done. Our take on the Ralph loop.",
+   "quote_plain": "Set a standing goal and let Hermes keep working across turns until it's done. Our take on the Ralph loop.",
+   "outside": null,
+   "aliases": [
+    "persistent goals",
+    "persistentgoals"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_sessionheartbeats",
+   "name": "Session Heartbeats",
+   "kind": "feature",
+   "say": "Session Heartbeats is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/heartbeat.md",
+   "line": 4,
+   "quote": "A recurring prompt that re-enters your current session whenever it's idle — /heartbeat every 10m Check the deployment.",
+   "quote_plain": "A recurring prompt that re-enters your current session whenever it's idle — /heartbeat every 10m Check the deployment.",
+   "outside": null,
+   "aliases": [
+    "session heartbeats",
+    "sessionheartbeats"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_honchomemory",
+   "name": "Honcho Memory",
+   "kind": "feature",
+   "say": "Honcho Memory is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/honcho.md",
+   "line": 4,
+   "quote": "AI-native persistent memory via Honcho — dialectic reasoning, multi-agent user modeling, and deep personalization",
+   "quote_plain": "AI-native persistent memory via Honcho — dialectic reasoning, multi-agent user modeling, and deep personalization",
+   "outside": null,
+   "aliases": [
+    "honcho memory",
+    "honchomemory"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_eventhooks",
+   "name": "Event Hooks",
+   "kind": "feature",
+   "say": "Event Hooks is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/hooks.md",
+   "line": 4,
+   "quote": "Run custom code at key lifecycle points — log activity, send alerts, post to webhooks",
+   "quote_plain": "Run custom code at key lifecycle points — log activity, send alerts, post to webhooks",
+   "outside": null,
+   "aliases": [
+    "event hooks",
+    "eventhooks"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_imagegeneration",
+   "name": "Image Generation",
+   "kind": "feature",
+   "say": "Image Generation is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/image-generation.md",
+   "line": 3,
+   "quote": "Generate images via FAL.ai — 11 models including FLUX 2, GPT Image (1.5 & 2), Nano Banana Pro, Ideogram, Recraft V4 Pro, Krea 2, and more, selectable via `hermes tools`.",
+   "quote_plain": "Generate images via FAL.ai — 11 models including FLUX 2, GPT Image (1.5 & 2), Nano Banana Pro, Ideogram, Recraft V4 Pro, Krea 2, and more, selectable via hermes tools.",
+   "outside": null,
+   "aliases": [
+    "image generation",
+    "imagegeneration"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_kanbanmultigatewaydeployment",
+   "name": "Kanban Multi-Gateway Deployment",
+   "kind": "feature",
+   "say": "Kanban Multi-Gateway Deployment is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/kanban-multi-gateway.md",
+   "line": 3,
+   "quote": "Running one kanban board across several per-profile gateways: single dispatcher, profile-owned delivery",
+   "quote_plain": "Running one kanban board across several per-profile gateways: single dispatcher, profile-owned delivery",
+   "outside": null,
+   "aliases": [
+    "kanban multi-gateway deployment",
+    "kanbanmultigatewaydeployment"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_kanbanmultiagentboard",
+   "name": "Kanban (Multi-Agent Board)",
+   "kind": "feature",
+   "say": "Kanban (Multi-Agent Board) is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/kanban.md",
+   "line": 4,
+   "quote": "Durable SQLite-backed task board for coordinating multiple Hermes profiles",
+   "quote_plain": "Durable SQLite-backed task board for coordinating multiple Hermes profiles",
+   "outside": null,
+   "aliases": [
+    "kanban (multi-agent board)",
+    "kanbanmultiagentboard"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_languagepacks",
+   "name": "Language Packs",
+   "kind": "feature",
+   "say": "Language Packs is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/language-packs.md",
+   "line": 4,
+   "quote": "Add or override UI languages for the CLI, gateway, TUI and Desktop with a plugin or a personal overlay",
+   "quote_plain": "Add or override UI languages for the CLI, gateway, TUI and Desktop with a plugin or a personal overlay",
+   "outside": null,
+   "aliases": [
+    "language packs",
+    "languagepacks"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_recurringloops",
+   "name": "Recurring Loops",
+   "kind": "feature",
+   "say": "Recurring Loops is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/loops.md",
+   "line": 4,
+   "quote": "Re-run a prompt on a recurring interval inside your session — Hermes' take on Claude Code's /loop.",
+   "quote_plain": "Re-run a prompt on a recurring interval inside your session — Hermes' take on Claude Code's /loop.",
+   "outside": null,
+   "aliases": [
+    "recurring loops",
+    "recurringloops"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_lspsemanticdiagnostics",
+   "name": "LSP — Semantic Diagnostics",
+   "kind": "feature",
+   "say": "LSP — Semantic Diagnostics is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/lsp.md",
+   "line": 4,
+   "quote": "Real language servers (pyright, gopls, rust-analyzer, …) wired into the post-write lint check used by write_file and patch.",
+   "quote_plain": "Real language servers (pyright, gopls, rust-analyzer, …) wired into the post-write lint check used by write_file and patch.",
+   "outside": null,
+   "aliases": [
+    "lsp — semantic diagnostics",
+    "lspsemanticdiagnostics"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_mcpmodelcontextprotocol",
+   "name": "MCP (Model Context Protocol)",
+   "kind": "feature",
+   "say": "MCP (Model Context Protocol) is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/mcp.md",
+   "line": 4,
+   "quote": "Connect Hermes Agent to external tool servers via MCP — and control exactly which MCP tools Hermes loads",
+   "quote_plain": "Connect Hermes Agent to external tool servers via MCP — and control exactly which MCP tools Hermes loads",
+   "outside": null,
+   "aliases": [
+    "mcp (model context protocol)",
+    "mcpmodelcontextprotocol"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_memoryproviders",
+   "name": "Memory Providers",
+   "kind": "feature",
+   "say": "Memory Providers is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/memory-providers.md",
+   "line": 4,
+   "quote": "External memory provider plugins — Honcho, OpenViking, Mem0, Hindsight, Holographic, RetainDB, ByteRover, Supermemory",
+   "quote_plain": "External memory provider plugins — Honcho, OpenViking, Mem0, Hindsight, Holographic, RetainDB, ByteRover, Supermemory",
+   "outside": null,
+   "aliases": [
+    "memory providers",
+    "memoryproviders"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_persistentmemory",
+   "name": "Persistent Memory",
+   "kind": "feature",
+   "say": "Persistent Memory is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/memory.md",
+   "line": 4,
+   "quote": "How Hermes Agent remembers across sessions — MEMORY.md, USER.md, and session search",
+   "quote_plain": "How Hermes Agent remembers across sessions — MEMORY.md, USER.md, and session search",
+   "outside": null,
+   "aliases": [
+    "persistent memory",
+    "persistentmemory"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_mixtureofagents",
+   "name": "Mixture of Agents",
+   "kind": "feature",
+   "say": "Mixture of Agents is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/mixture-of-agents.md",
+   "line": 4,
+   "quote": "Create named MoA presets that appear as selectable models under the Mixture of Agents provider",
+   "quote_plain": "Create named MoA presets that appear as selectable models under the Mixture of Agents provider",
+   "outside": null,
+   "aliases": [
+    "mixture of agents",
+    "mixtureofagents"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_personalitysoulmd",
+   "name": "Personality & SOUL.md",
+   "kind": "feature",
+   "say": "Personality & SOUL.md is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/personality.md",
+   "line": 4,
+   "quote": "Customize Hermes Agent's personality with a global SOUL.md, built-in personalities, and custom persona definitions",
+   "quote_plain": "Customize Hermes Agent's personality with a global SOUL.md, built-in personalities, and custom persona definitions",
+   "outside": null,
+   "aliases": [
+    "personality & soul.md",
+    "personalitysoulmd"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_petspetdexmascots",
+   "name": "Pets (Petdex Mascots)",
+   "kind": "feature",
+   "say": "Pets (Petdex Mascots) is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/pets.md",
+   "line": 4,
+   "quote": "Adopt an animated mascot that reacts to agent activity across the CLI, TUI, and desktop app",
+   "quote_plain": "Adopt an animated mascot that reacts to agent activity across the CLI, TUI, and desktop app",
+   "outside": null,
+   "aliases": [
+    "pets (petdex mascots)",
+    "petspetdexmascots"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_plugincatalog",
+   "name": "Plugin Catalog",
+   "kind": "feature",
+   "say": "Plugin Catalog is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/plugin-catalog.md",
+   "line": 5,
+   "quote": "Give Hermes new powers with reviewed plugins you can install in one click",
+   "quote_plain": "Give Hermes new powers with reviewed plugins you can install in one click",
+   "outside": null,
+   "aliases": [
+    "plugin catalog",
+    "plugincatalog"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_plugins",
+   "name": "Plugins",
+   "kind": "feature",
+   "say": "Plugins is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/plugins.md",
+   "line": 5,
+   "quote": "Extend Hermes with custom tools, hooks, and integrations via the plugin system",
+   "quote_plain": "Extend Hermes with custom tools, hooks, and integrations via the plugin system",
+   "outside": null,
+   "aliases": [
+    "plugins"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_providerrouting",
+   "name": "Provider Routing",
+   "kind": "feature",
+   "say": "Provider Routing is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/provider-routing.md",
+   "line": 3,
+   "quote": "Configure OpenRouter provider preferences to optimize for cost, speed, or quality.",
+   "quote_plain": "Configure OpenRouter provider preferences to optimize for cost, speed, or quality.",
+   "outside": null,
+   "aliases": [
+    "provider routing",
+    "providerrouting"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_skillssystem",
+   "name": "Skills System",
+   "kind": "feature",
+   "say": "Skills System is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/skills.md",
+   "line": 4,
+   "quote": "On-demand knowledge documents — progressive disclosure, agent-managed skills, and the Skills Hub",
+   "quote_plain": "On-demand knowledge documents — progressive disclosure, agent-managed skills, and the Skills Hub",
+   "outside": null,
+   "aliases": [
+    "skills system",
+    "skillssystem"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_skinsthemes",
+   "name": "Skins & Themes",
+   "kind": "feature",
+   "say": "Skins & Themes is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/skins.md",
+   "line": 4,
+   "quote": "Customize the Hermes CLI with built-in and user-defined skins",
+   "quote_plain": "Customize the Hermes CLI with built-in and user-defined skins",
+   "outside": null,
+   "aliases": [
+    "skins & themes",
+    "skinsthemes"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_subscriptionproxy",
+   "name": "Subscription Proxy",
+   "kind": "feature",
+   "say": "Subscription Proxy is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/subscription-proxy.md",
+   "line": 4,
+   "quote": "Use your Nous Portal subscription (or other OAuth provider) as an OpenAI-compatible endpoint for external apps",
+   "quote_plain": "Use your Nous Portal subscription (or other OAuth provider) as an OpenAI-compatible endpoint for external apps",
+   "outside": null,
+   "aliases": [
+    "subscription proxy",
+    "subscriptionproxy"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_noustoolgateway",
+   "name": "Nous Tool Gateway",
+   "kind": "feature",
+   "say": "Nous Tool Gateway is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/tool-gateway.md",
+   "line": 3,
+   "quote": "One subscription, every tool. Web search, image generation, TTS, and cloud browsers — all routed through Nous Portal with no extra API keys.",
+   "quote_plain": "One subscription, every tool. Web search, image generation, TTS, and cloud browsers — all routed through Nous Portal with no extra API keys.",
+   "outside": null,
+   "aliases": [
+    "nous tool gateway",
+    "noustoolgateway"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_toolstoolsets",
+   "name": "Tools & Toolsets",
+   "kind": "feature",
+   "say": "Tools & Toolsets is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/tools.md",
+   "line": 4,
+   "quote": "Overview of Hermes Agent's tools — what's available, how toolsets work, and terminal backends",
+   "quote_plain": "Overview of Hermes Agent's tools — what's available, how toolsets work, and terminal backends",
+   "outside": null,
+   "aliases": [
+    "tools & toolsets",
+    "toolstoolsets"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_voicetts",
+   "name": "Voice & TTS",
+   "kind": "feature",
+   "say": "Voice & TTS is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/tts.md",
+   "line": 4,
+   "quote": "Text-to-speech and voice message transcription across all platforms",
+   "quote_plain": "Text-to-speech and voice message transcription across all platforms",
+   "outside": null,
+   "aliases": [
+    "voice & tts",
+    "voicetts"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_visionimagepaste",
+   "name": "Vision & Image Paste",
+   "kind": "feature",
+   "say": "Vision & Image Paste is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/vision.md",
+   "line": 3,
+   "quote": "Paste images from your clipboard into the Hermes CLI for multimodal vision analysis.",
+   "quote_plain": "Paste images from your clipboard into the Hermes CLI for multimodal vision analysis.",
+   "outside": null,
+   "aliases": [
+    "vision & image paste",
+    "visionimagepaste"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_voicemode",
+   "name": "Voice Mode",
+   "kind": "feature",
+   "say": "Voice Mode is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/voice-mode.md",
+   "line": 4,
+   "quote": "Real-time voice conversations with Hermes Agent — CLI, Telegram, Discord (DMs, text channels, and voice channels)",
+   "quote_plain": "Real-time voice conversations with Hermes Agent — CLI, Telegram, Discord (DMs, text channels, and voice channels)",
+   "outside": null,
+   "aliases": [
+    "voice mode",
+    "voicemode"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_wakeword",
+   "name": "Wake Word",
+   "kind": "feature",
+   "say": "Wake Word is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/wake-word.md",
+   "line": 4,
+   "quote": "Hands-free 'Hey Hermes' wake word — start a voice session by speaking, the 'Hey Siri' way",
+   "quote_plain": "Hands-free 'Hey Hermes' wake word — start a voice session by speaking, the 'Hey Siri' way",
+   "outside": null,
+   "aliases": [
+    "wake word",
+    "wakeword"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_hermeswebdashboard",
+   "name": "Hermes Web Dashboard",
+   "kind": "feature",
+   "say": "Hermes Web Dashboard is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/web-dashboard.md",
+   "line": 4,
+   "quote": "Browser-based administration panel for managing configuration, API keys, MCP servers, messaging pairing, webhooks, the gateway, memory, credentials, sessions, logs, analytics, cron jobs, and skills",
+   "quote_plain": "Browser-based administration panel for managing configuration, API keys, MCP servers, messaging pairing, webhooks, the gateway, memory, credentials, sessions, logs, analytics, cron jobs, and skills",
+   "outside": null,
+   "aliases": [
+    "hermes web dashboard",
+    "hermeswebdashboard"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_websearchextract",
+   "name": "Web Search & Extract",
+   "kind": "feature",
+   "say": "Web Search & Extract is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/web-search.md",
+   "line": 3,
+   "quote": "Search the web and extract page content with multiple backend providers — including free self-hosted SearXNG.",
+   "quote_plain": "Search the web and extract page content with multiple backend providers — including free self-hosted SearXNG.",
+   "outside": null,
+   "aliases": [
+    "web search & extract",
+    "websearchextract"
+   ],
+   "offer": "name_feature"
+  },
+  {
+   "id": "nm_xtwittersearch",
+   "name": "X (Twitter) Search",
+   "kind": "feature",
+   "say": "X (Twitter) Search is a part of Hermes. The docs explain it on a page of its own.",
+   "file": "user-guide/features/x-search.md",
+   "line": 3,
+   "quote": "Search X (Twitter) posts and threads from within the agent using xAI's built-in x_search Responses tool — works with either a SuperGrok OAuth login or an XAI_API_KEY.",
+   "quote_plain": "Search X (Twitter) posts and threads from within the agent using xAI's built-in x_search Responses tool — works with either a SuperGrok OAuth login or an XAI_API_KEY.",
+   "outside": null,
+   "aliases": [
+    "x (twitter) search",
+    "xtwittersearch"
+   ],
+   "offer": "name_feature"
+  }
+ ]
+}

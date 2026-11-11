@@ -180,9 +180,16 @@
   },
   {
    "id": "HELLO_SAME",
-   "text": "I'm here.",
+   "text": "Hi, {name}.",
    "kind": "reply",
    "words": 2,
+   "found": []
+  },
+  {
+   "id": "HELLO_SAME-no-name",
+   "text": "Hi.",
+   "kind": "reply",
+   "words": 1,
    "found": []
   },
   {
@@ -550,6 +557,13 @@
    "found": []
   },
   {
+   "id": "MIG_WHICH",
+   "text": "Hermes can bring your setup over from six apps.",
+   "kind": "reply",
+   "words": 9,
+   "found": []
+  },
+  {
    "id": "offer-general",
    "text": "Do you want to set up Hermes, or see what it does?",
    "kind": "question",
@@ -572,16 +586,9 @@
   },
   {
    "id": "offer-dont_know",
-   "text": "Do you want to know what Hermes is, or set it up?",
+   "text": "Do you want one of these instead?",
    "kind": "question",
-   "words": 12,
-   "found": []
-  },
-  {
-   "id": "offer-dont_know-no-setup",
-   "text": "Do you want to know what Hermes is, or what it does?",
-   "kind": "question",
-   "words": 12,
+   "words": 7,
    "found": []
   },
   {
@@ -663,9 +670,72 @@
   },
   {
    "id": "offer-start_four",
-   "text": "I can explain these four. Pick one.",
+   "text": "Do you want one of these instead?",
    "kind": "question",
    "words": 7,
+   "found": []
+  },
+  {
+   "id": "offer-mig_which",
+   "text": "Is it \"OpenClaw\", \"Claude Code\", \"Codex\", or another?",
+   "kind": "question",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "offer-mig_which_2",
+   "text": "Is it \"Cursor\", \"Grok Bot\", \"OpenBot\", or none of these?",
+   "kind": "question",
+   "words": 10,
+   "found": []
+  },
+  {
+   "id": "offer-name_memory",
+   "text": "Do you want to know what Hermes remembers, or what it does?",
+   "kind": "question",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "offer-name_chat",
+   "text": "Do you want to use your phone, or see what Hermes does?",
+   "kind": "question",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "offer-name_provider",
+   "text": "Do you want to pick its AI, or see what Hermes does?",
+   "kind": "question",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "offer-name_toolset",
+   "text": "Do you want to see what Hermes does, or set it up?",
+   "kind": "question",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "offer-name_feature",
+   "text": "Do you want to see what Hermes does, or set it up?",
+   "kind": "question",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "offer-dont_know_was_loom",
+   "text": "Do you want to know what Hermes is, or set it up?",
+   "kind": "question",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "offer-dont_know_was_loom-no-setup",
+   "text": "Do you want to know what Hermes is, or what it does?",
+   "kind": "question",
+   "words": 12,
    "found": []
   },
   {

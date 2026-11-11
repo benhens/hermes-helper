@@ -11,6 +11,7 @@
 //   chat_apps      host.status(): gateway_platforms names at least one chat app (not used by the set-up conversation)
 //   scheduled_job  cron.manage { action: 'list', profile: main bot, include_disabled: true }: at least one job
 //   second_bot     profiles.list: two or more bots
+//   first_chat     host.listPersistedSessions for the bot: a chat with a preview, not a job's (loom-fixes, below)
 // A read that failed or has not come back is "not known" (null): never shown as done.
 
 /* ---------- Hermes's starter personality texts (hermes_cli/default_soul.py, Hermes v0.23.0) ---------- */
@@ -69,10 +70,36 @@ export function doneFlags(reads) {
     personality: known(reads.soul) ? (soul === null ? null : soulNormal(soul) !== '' && !isStarterSoul(soul)) : null,
     chat_apps: known(reads.status) && got(reads.status) && typeof got(reads.status) === 'object' ? !!platforms && typeof platforms === 'object' && Object.keys(platforms).length > 0 : null,
     scheduled_job: jobs === null ? null : jobs >= 1,
-    second_bot: rows ? rows.length >= 2 : null
+    second_bot: rows ? rows.length >= 2 : null,
+    // loom-fixes: undefined when there is no sessions read at all (no door in this Hermes: the person marks it)
+    first_chat: reads.sessions === undefined ? undefined : known(reads.sessions) ? firstChatSeen(got(reads.sessions)) : null
   }
 }
 
+
+/* ---------- loom-fixes: First chat, seen ---------- */
+// hhtech-loom-n1.md 3 (ran in three homes): First chat is done when a chat of the bot (host.listPersistedSessions, not in
+// the SDK docs: feature-checked) has a preview, the first thing the person typed, and is not Hermes's own work (a
+// scheduled job, the task board, a tool run). Hermes's first-run chat "Getting started" has an empty preview. Source
+// 'local' is a chat of the person's (the typed chat in a fresh home came back as local). value: the read's answer
+// ({ sessions: [...] }). Returns true, false, or null (no list in the answer).
+export const NOT_A_CHAT = ['cron', 'kanban', 'tool']
+export function firstChatSeen(value) {
+  const rows = value && Array.isArray(value.sessions) ? value.sessions : null
+  if (!rows) return null
+  return rows.some(r => r && typeof r === 'object' && typeof r.preview === 'string' && r.preview.trim() !== '' && !NOT_A_CHAT.includes(String(r.source || '').toLowerCase()))
+}
+
+/* ---------- loom-fixes: "You are here", one rule for the Dashboard and for Helper ---------- */
+// content/dash-setup-list-v2.json here_rule (hhcontent; Lead's point 9: Helper's next thing IS the Dashboard's "You are
+// here" stop): 1. the stop Helper's set-up conversation recommended last (kept as setup_current), if it is not done;
+// else 2. the first stop in path order that is not done. path: the stops' ids in order. stateOf(id): true (done, seen
+// or said), false (not done), null (not known: its read failed or is still out). A stop not known is never "here": it
+// then places nobody (as the Dashboard's first rule had it). All done: null.
+export function hereStop(path, stateOf, current) {
+  const at = current && path.includes(current) && stateOf(current) !== true ? current : path.find(id => stateOf(id) !== true)
+  return at && stateOf(at) === false ? at : null
+}
 
 /* ---------- a read that always ends ---------- */
 // A read that gives up after `ms` (the host's own timer, cleaned up with the plugin). A host door that throws

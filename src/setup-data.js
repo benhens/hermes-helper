@@ -286,7 +286,7 @@ export const SETUP_DATA = {
       "text_second_bot": "I can't see it yet. You have one bot so far."
     },
     "DONE_SAID": {
-      "text": "Good. I'll remember that you did it."
+      "text": "Good. I can't see that one, so I'll take your word."
     },
     "SOMETHING_ELSE": {
       "text": "Fine, here's another."
@@ -304,8 +304,8 @@ export const SETUP_DATA = {
       "text_no_name": "Hi again. I can see it now. {seen_part}"
     },
     "BACK_REC": {
-      "text": "Hi again, {name}. We stopped at {card}. {why} Want the steps?",
-      "text_no_name": "Hi again. We stopped at {card}. {why} Want the steps?",
+      "text": "Hi again, {name}. Next on your list: {card}. {why} Want the steps?",
+      "text_no_name": "Hi again. Next on your list: {card}. {why} Want the steps?",
       "answers": [
         "Show me the steps",
         "I've done this already",
@@ -323,7 +323,7 @@ export const SETUP_DATA = {
       "offer": "general_2"
     },
     "RESTART": {
-      "text": "Sure, let's start again. Are you new to Hermes?"
+      "text": "Sure, let's start again."
     },
     "BACK_SEEN": {
       "text": "Hi again, {name}. {back_part}",
@@ -336,7 +336,7 @@ export const SETUP_DATA = {
       }
     },
     "BACK_NEXT": {
-      "text": "We stopped at {card}. {why} Want the steps?",
+      "text": "Next on your list: {card}. {why} Want the steps?",
       "answers": [
         "Show me the steps",
         "I've done this already",
@@ -368,17 +368,126 @@ export const SETUP_DATA = {
     },
     "STEP_BACK": {
       "text": "Back to step {n} of {total}: {step}"
+    },
+    "FROM_KEPT": {
+      "text": "You told me {new_said}{and}{goal_said}. I'll go on from there.",
+      "answers": [
+        "Go on",
+        "Answer again"
+      ],
+      "new_said": {
+        "new": "you are new to Hermes",
+        "some": "you have used Hermes a bit",
+        "well": "you know Hermes well"
+      },
+      "goal_said": {
+        "schedule": "you want jobs at set times",
+        "phone": "you want to talk to it from your phone",
+        "bots": "you want several bots",
+        "unsure": "you are not sure yet what you want"
+      },
+      "and": " and "
     }
   },
   "restart_phrases": [
-    "start again",
-    "start over",
     "ask me again",
-    "set up again",
-    "redo the questions",
     "ask the questions again",
-    "restart"
+    "back to the start",
+    "begin again",
+    "do it again from the start",
+    "from the beggining",
+    "from the begining",
+    "from the beginning",
+    "from the start",
+    "go back to the beginning",
+    "go back to the start",
+    "redo",
+    "redo the questions",
+    "reset",
+    "restart",
+    "set up again",
+    "start again",
+    "start again please",
+    "start all over",
+    "start fresh",
+    "start from the beggining",
+    "start from the begining",
+    "start from the beginning",
+    "start from the start",
+    "start over",
+    "start over again"
   ],
+  "typed_answer": {
+    "question_starts": [
+      "what",
+      "whats",
+      "what's",
+      "how",
+      "why",
+      "where",
+      "when",
+      "who",
+      "which",
+      "is",
+      "are",
+      "do",
+      "does",
+      "did",
+      "should",
+      "will",
+      "would",
+      "could",
+      "can",
+      "may",
+      "am"
+    ],
+    "request_starts": [
+      "can we",
+      "can you",
+      "could we",
+      "could you",
+      "would you",
+      "will you",
+      "please",
+      "pls",
+      "let's",
+      "lets",
+      "let me",
+      "i want to go back",
+      "go back",
+      "stop",
+      "wait",
+      "hold on",
+      "never mind",
+      "nevermind"
+    ],
+    "request_words": [
+      "start over",
+      "go back",
+      "restart",
+      "from the beginning",
+      "from the begining",
+      "begin again",
+      "start again",
+      "help me",
+      "i don't understand",
+      "i dont understand",
+      "what do you mean"
+    ],
+    "small_talk_kinds": [
+      "hello",
+      "thanks",
+      "how",
+      "who",
+      "ai",
+      "bye",
+      "mean",
+      "again",
+      "wrong",
+      "stuck",
+      "cut"
+    ]
+  },
   "ask_phrases": [
     "what should i set up",
     "what do i set up",

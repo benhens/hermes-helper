@@ -119,7 +119,7 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   const before = lookCalls(host).length
   await press(view, 'It worked')
   assert.equal(lookCalls(host).length, before + 3, '"It worked" reads again')
-  assert.equal(oldText(olds(view).at(-1)).replace(/’/g, "'"), "Good. I'll remember that you did it.")
+  assert.equal(oldText(olds(view).at(-1)).replace(/’/g, "'"), "Good. I can't see that one, so I'll take your word.")
   assert.equal(bubbleSaid(view), 'You want Hermes to do things at set times. Next: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?')
   await press(view, 'Not now')
   assert.equal(oldText(olds(view).at(-1)).replace(/’/g, "'"), "That's fine. I'll keep your place.")
@@ -129,7 +129,8 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   // written; the questions, the look, the choice and the steps used no AI, and nothing was written to Hermes
   assert.equal(host.asks.length, 0, 'no call, also for the recommendations')
   // (dash-v2: plugins.manage is the Dashboard's read of the plugins list when the page opened, only ever action 'list')
-  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'plugins.manage', 'profiles.describe', 'setup.runtime_check'])
+  // (loom-fixes: no plugins read any more)
+  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'profiles.describe', 'setup.runtime_check'])
   for (const [m, p] of host.calls) if (m === 'plugins.manage' || m === 'cron.manage') assert.equal(p.action, 'list', m)
   // kept between visits
   const kept = storage.data.get('kept')
@@ -138,7 +139,7 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   const again = await open({ storage })
   finish(again.view)
   assert.equal(bubbleLine(again.view), 'BACK_REC')
-  assert.equal(bubbleSaid(again.view), 'Hi again, Peter. We stopped at Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?')
+  assert.equal(bubbleSaid(again.view), 'Hi again, Peter. Next on your list: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?')
   assert.deepEqual(labels(again.view).map(l => l.replace(/’/g, "'")), REC4)
   assert.equal(lookCalls(again.host).length, 3, 'the opening of a later visit reads Hermes once')
   assert.equal(again.host.asks.length, 0, 'and asks no AI')
@@ -177,7 +178,9 @@ test('"What did you look at?" under the look line: the six short lines; the butt
 })
 
 test('a read that fails: "I couldn\'t check", never a guess; the conversation goes on', opt, async () => {
-  const { view } = await open({ hermes: { fail: ['profiles.list'] } })
+  // (loom-fixes: the look reads the bot the app names, as the Dashboard does, so a failed list of bots alone no longer
+  // stops the bot's own reads; here those reads fail)
+  const { view } = await open({ hermes: { fail: ['setup.runtime_check', 'cron.manage'] } })
   finish(view)
   byData(view.tree, 'skip').props.onClick({ preventDefault() {} })
   finish(view)
@@ -200,8 +203,9 @@ test('no model that answers: the model first (R1), whatever the answers', opt, a
   assert.equal(bubbleSaid(view), 'Hermes needs a model before anything else. Next: A model. The AI that does the thinking. Your app may already have a free one. Want the steps?')
 })
 
-// dash-v2: the Dashboard reads the bot the app has open; Helper's set-up conversation still reads the main bot
-test('another bot open in the app: the look still reads the main bot (the one Hermes marks as default), never the open one', opt, async () => {
+// dash-v2: the Dashboard reads the bot the app has open. loom-fixes (Lead's point 9: Helper's next thing and the
+// Dashboard's "You are here" agree): Helper's look reads that same bot now, never another
+test('another bot open in the app: the look reads the open bot, the same as the Dashboard, never the main one', opt, async () => {
   const host = useHost({ bots: 2 })
   host.profile = 'bot1'
   const { Page } = await registerPlugin(fakeStorage(), fakeTimers({ hold: [12000] }), {}, src => aiModeSource(src, 'ai_writes'))
@@ -213,8 +217,8 @@ test('another bot open in the app: the look still reads the main bot (the one He
   await press(view, 'I know it well')
   await press(view, 'Several bots, one per job')
   assert.deepEqual(lookCalls(host).map(([m]) => m).sort(), READS)
-  for (const [m, p] of lookCalls(host)) assert.equal(m === 'profiles.describe' ? p.name : p.profile, 'default', m + ' for the main bot')
-  // while the Dashboard, on the same page, read the open bot
+  for (const [m, p] of lookCalls(host)) assert.equal(m === 'profiles.describe' ? p.name : p.profile, 'bot1', m + ' for the open bot')
+  // and the Dashboard, on the same page, read the open bot too
   const dashReads = host.calls.filter(([m, p, ms]) => ms !== LOOK_READ_MS && p && (p.profile || p.name))
   assert.ok(dashReads.length >= 3)
   for (const [m, p] of dashReads) assert.equal(p.profile || p.name, 'bot1', m + ' for the open bot')
@@ -259,6 +263,9 @@ test('the pick "Set up Hermes" under an offer, and "where do I start" typed, bri
   assert.deepEqual(labels(view), ['Set up Hermes', 'What Hermes can do'])
   await press(view, 'Set up Hermes')
   assert.equal(mine(view).at(-1), 'Set up Hermes')
+  // loom-fixes (point 4): an answer is kept (I know it well), so first the line on what Helper goes on from
+  assert.equal(bubbleLine(view), 'FROM_KEPT')
+  await press(view, 'Go on')
   assert.equal(bubbleLine(view), 'REC')
   assert.match(bubbleSaid(view), /Next: Its personality\./)
   await press(view, 'Not now')

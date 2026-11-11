@@ -108,12 +108,12 @@ test('no "Back to step" after I\'m stuck (its own answers) or after Stop for now
 
 /* ---------- 3: the returning lines ---------- */
 const KEPT = { name: 'Peter', setup_new: 'new', setup_goal: 'send reminders to my members about training', setup_goal_id: 'schedule', setup_done_said: ['first_chat'], setup_current: 'personality' }
-test('returning, nothing seen done: "We stopped at ..." with the thing\'s why sentence, and the four answers (BACK_REC)', opt, () => {
+test('returning, nothing seen done: "Next on your list: ..." with the thing\'s why sentence, and the four answers (BACK_REC)', opt, () => {
   let p = person(NOTHING(), { kept: { ...KEPT, setup_current: 'scheduled_job' }, met: true }).opening()
-  assert.deepEqual(lines(p.log), [['BACK_REC', 'Hi again, Peter. We stopped at Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?']])
+  assert.deepEqual(lines(p.log), [['BACK_REC', 'Hi again, Peter. Next on your list: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?']])
   assert.deepEqual(p.labels(), REC4)
   p = person(NOTHING(), { kept: { setup_current: 'memory' }, met: true }).opening()
-  assert.deepEqual(lines(p.log), [['BACK_REC', `Hi again. We stopped at Memory. ${item('memory').why} Want the steps?`]])
+  assert.deepEqual(lines(p.log), [['BACK_REC', `Hi again. Next on your list: Memory. ${item('memory').why} Want the steps?`]])
   assert.equal(p.log.some(x => /Last time we picked/.test(x.text)), false)
 })
 
@@ -122,7 +122,7 @@ test('returning, something else seen done: BACK_SEEN names it, then BACK_NEXT wi
   let p = person({ model: 'ok', soul: false, jobs: 1, bots: 1 }, { kept: { ...KEPT }, met: true }).opening()
   assert.deepEqual(lines(p.log), [
     ['BACK_SEEN', 'Hi again, Peter. I can see you have 1 scheduled job.'],
-    ['BACK_NEXT', 'We stopped at Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?']
+    ['BACK_NEXT', 'Next on your list: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?']
   ])
   assert.deepEqual(p.labels(), REC4)
   assert.equal(p.st.kept.setup_current, 'personality')
@@ -180,7 +180,7 @@ test('under "I can\'t see that yet": I did it on another bot, Show me the steps,
   let p = atRec(NOTHING())
   p.press("I've done this already").press('I did it on another bot')
   let s = p.said()
-  assert.deepEqual(lines(s.slice(1, 2)), [['DONE_SAID', "Good. I'll remember that you did it."]])
+  assert.deepEqual(lines(s.slice(1, 2)), [['DONE_SAID', "Good. I can't see that one, so I'll take your word."]])
   assert.equal(s.at(-1).line, 'REC')
   assert.deepEqual(p.st.kept.setup_done_said, ['personality'])
   p = atRec(NOTHING())
@@ -226,14 +226,14 @@ test('"I\'ve done this already" and the fresh read fails: Helper says so and tak
   p.reads.soul = null
   p.press("I've done this already")
   const s = p.said()
-  assert.equal(s[0].text, "I couldn't read that part this time. Good. I'll remember that you did it.")
+  assert.equal(s[0].text, "I couldn't read that part this time. Good. I can't see that one, so I'll take your word.")
   assert.deepEqual(p.st.kept.setup_done_said, ['personality'])
 })
 
 test('"I\'ve done this already" on a thing Helper cannot see: "Good. I\'ll remember that you did it." as before', opt, () => {
   const p = atRec(NOTHING(), 'Talk to it from my phone')
   p.press("I've done this already")
-  assert.deepEqual(lines(p.said().slice(0, 1)), [['DONE_SAID', "Good. I'll remember that you did it."]])
+  assert.deepEqual(lines(p.said().slice(0, 1)), [['DONE_SAID', "Good. I can't see that one, so I'll take your word."]])
   assert.deepEqual(p.st.kept.setup_done_said, ['chat_apps'])
 })
 
@@ -387,7 +387,7 @@ test('conversation (a) on the page with a typed question at a step and Not now; 
   const again = await open({ storage, hermes: { jobs: 1 } })
   finish(again.view)
   assert.equal(bubbleLine(again.view), 'BACK_NEXT')
-  assert.equal(bubbleSaid(again.view), 'We stopped at Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?')
+  assert.equal(bubbleSaid(again.view), 'Next on your list: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?')
   assert.equal(olds(again.view).at(-1).props['data-line'], 'BACK_SEEN')
   assert.match(text(olds(again.view).at(-1)), /Hi again, Peter\. I can see you have 1 scheduled job\./)
   assert.deepEqual(labels(again.view), REC4)

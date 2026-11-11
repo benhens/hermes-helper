@@ -44,8 +44,8 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-// dash-v1: three tabs, Dashboard, Learn, My setup (Pēteris's pick, 11 Nov 2026); their names from the Dashboard's
-// data (content/dash-setup-list-v2.json page_words). Only Dashboard is built: Learn and My setup show one quiet line.
+// dash-v1: the tabs, their names from the Dashboard's data (content/dash-words-v1.json page_words). loom-fixes: two,
+// Dashboard and Learn (My setup is out: his words, Loom 3:22). Only Dashboard is built: Learn shows one quiet line.
 export const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
@@ -197,7 +197,8 @@ export function makePage(ctx, opts = {}) {
     return out
   }
   // The look: Helper reads what is set up, on this computer (src/setup-look.js). No AI call, nothing sent.
-  const look = makeLook(ctx, host)
+  // loom-fixes: the look reads the bot the app has open, as the Dashboard does (live.profile, set on every draw)
+  const look = makeLook(ctx, host, () => live.profile || '')
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
   // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
@@ -392,6 +393,7 @@ export function makePage(ctx, opts = {}) {
     live.recheck = () => recheckModel(true)
     // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
     const dashboard = useDashboard({ active: tab === 'dashboard' })
+    live.profile = dashboard.given
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
     // (review) the page drawn last holds the view; a page that leaves lets go only of its own
@@ -538,6 +540,18 @@ export function makePage(ctx, opts = {}) {
 
     /* ---------- the conversation: what the person does, what Helper says back ---------- */
     const visit = remembered().visit
+    // loom-fixes (Lead's point 12): "I've done this" / "Not done yet" on a stop the page cannot see: the same kept list as
+    // the "done" of Helper's set-up conversation (setup_done_said), so Helper's settings page shows it with the other
+    // kept things and Forget all clears it. Written at once; the page is drawn again.
+    const [, setMarks] = useState(0)
+    function markStop(id, done) {
+      const list = (visit.kept.setup_done_said || []).filter(x => x !== id)
+      if (done) list.push(id)
+      if (list.length) visit.kept.setup_done_said = list
+      else delete visit.kept.setup_done_said
+      writeKept()
+      setMarks(n => n + 1)
+    }
     function addToLog(entries) {
       // talk v2 look (hhdesign's notes-wants.md rule C point 3, settled by Lead): only the newest line keeps
       // its opened part; the line that moves up into the older lines closes its steps or text to paste, and
@@ -985,7 +999,7 @@ export function makePage(ctx, opts = {}) {
     /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
     const panel =
       tab === 'dashboard'
-        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX })
+        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
         : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
 
     const main = jsx(

@@ -163,7 +163,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please search the web for <what you want to know>, and list the pages you used. If web search is not ready, tell me what it needs."
+        "paste_text": "First ask me what I want to know. Then search the web for it and list the pages you used. If web search is not ready, tell me what it needs."
       }
     },
     {
@@ -233,7 +233,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please open <website> with your browser tool and <what to do there>. Ask me before you send, buy or sign in to anything."
+        "paste_text": "First ask me which website and what to do there. Then open it with your browser tool and do it. Ask me before you send, buy or sign in to anything."
       }
     },
     {
@@ -282,7 +282,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"xurl\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"xurl\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -418,7 +418,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part."
+        "paste_text": "First ask me where the file is. Then read it and tell me what is in it. If you cannot read part of it, say which part."
       }
     },
     {
@@ -463,7 +463,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"pdf\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"pdf\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -514,7 +514,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"microsoft-office\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"microsoft-office\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -561,7 +561,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"obsidian\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"obsidian\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -609,7 +609,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"meeting-action-items\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"meeting-action-items\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -666,7 +666,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please look at the code in <folder> and <what you want>. Ask me before you change or run anything."
+        "paste_text": "First ask me which folder and what I want done. Then look at the code there. Ask me before you change or run anything."
       }
     },
     {
@@ -724,7 +724,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "I want you to click and type in an app on my computer: <which app, and what to do>. Tell me first what Computer Use needs. Ask me before you change anything."
+        "paste_text": "I want you to click and type in an app on my computer. First ask me which app and what to do. Tell me first what Computer Use needs. Ask me before you change anything."
       }
     },
     {
@@ -792,7 +792,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please make a picture of <what>. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
+        "paste_text": "First ask me what picture I want. Then make it. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
       }
     },
     {
@@ -956,7 +956,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"manim-video\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"manim-video\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -1054,7 +1054,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"youtube-content\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"youtube-content\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -1305,7 +1305,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"songwriting-and-ai-music\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"songwriting-and-ai-music\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -1347,7 +1347,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"arxiv\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"arxiv\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -1397,7 +1397,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"maps\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"maps\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -1503,7 +1503,7 @@ export const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"product-price-monitor\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"product-price-monitor\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     }
   ],

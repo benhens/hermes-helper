@@ -7,6 +7,8 @@
 // setup-chat: the talk data, the live data and route2.py at live-v2 changes-10's. find-v1: the talk data, the wants and route2.py at live-v2
 // changes-12's (that note names each checksum by its first 16 characters, so a pin counts as named when its first 16
 // stand on the file's line). setup-chat-2: the live data, the set-up conversation and the set-up list at setup-chat changes-1's (Lead, 11 Nov 08:50). A test compares the plugin's copy with the pin, checks that
+// loom-fixes: the talk data, the wants, the set-up conversation, the set-up list, the Dashboard's words, route2.py and
+// the new names list at helper-loom-fixes-v1's checksums (Lead, 11 Nov 10:10).
 // the pin is a checksum the team named (in its note, or its own "before" copy), and only reports when the
 // team's file on disk has moved on since.
 import fs from 'node:fs'
@@ -18,18 +20,20 @@ const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).di
 
 // file (in the team's folder) -> [the pinned sha256, where the team names it]
 export const PINS = {
-  'content/helper-talk-v2.json': ['cd2c4d54992939b44f2ef36d6b6b532dd884073fea372f9bd0b643d57d400b4c', 'content/helper-talk-live-v2-changes-12.md'],
+  'content/helper-talk-v2.json': ['9fc1db6a5834653cc9dbdbafe9d11bccc40a7baec8536141203dcf881fee0b45', 'content/helper-loom-fixes-v1.md'],
   'content/helper-talk-live-v2.json': ['efc691e0542cccc7aba0bb6dd5db7c4543346e810f3e979921c891022a1690ec', 'content/helper-setup-chat-v1-changes-1.md'],
-  'content/helper-wants-v1.json': ['fe9f0d567550b7ed2517d54ae5a15481f19ce747b0d0f2a5246058c8eaaf9024', 'content/helper-talk-live-v2-changes-12.md'],
+  'content/helper-wants-v1.json': ['1cbf56686fa4fbc4f4a1faab77b2ba6510c3117bd79822bcefe63263f4199fe6', 'content/helper-loom-fixes-v1.md'],
   'content/skills-list-v1.json': ['678667bfa3277f54885b530297a782b7b297c823e0ce4583e6cf5bfe656d7eb9', 'content/helper-talk-v2-changes-19.md'],
-  'dev/checks/hhcontent-talk-v2/route2.py': ['8862ec3aeee840a82a958bc674c5dd108eab5576358136d9f5a0708409f0f56e', 'content/helper-talk-live-v2-changes-12.md'],
+  'dev/checks/hhcontent-talk-v2/route2.py': ['1d6ea48b9655f82ebee74c683365bc508d499f03f0b5835ac026dc752597b4c6', 'content/helper-loom-fixes-v1.md'],
   'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e', 'content/helper-talk-v2-changes-16.md'],
   'dev/checks/hhcontent-talk-v2/check.py': ['0eb598430d47d77857013a8017f57cffacbf69bc16d5e5aa478a77909790afac', 'content/helper-talk-live-v2-changes-1.md'],
   // setup-chat: the set-up conversation (named at changes-8, unchanged at changes-10) and the set-up list
-  'content/helper-setup-chat-v1.json': ['e23e553b56164824df39f012b6aaefe8244ee8272add90b7f0c2b322baab974d', 'content/helper-setup-chat-v1-changes-1.md'],
-  'content/dash-setup-list-v2.json': ['95d3debcf1e4f7e70f6d751eac0f7d3435f0d47614e4019a5887cac30a91b929', 'content/helper-setup-chat-v1-changes-1.md'],
+  'content/helper-setup-chat-v1.json': ['caeee5b05199f4e64a702ca25e0a39be8d978019bb8a73cf35174234401c5c96', 'content/helper-loom-fixes-v1.md'],
+  'content/dash-setup-list-v2.json': ['eb3aeba8da98f286e7f847f6ec42e9343657bd463138103c0090f8c02e7f8cbb', 'content/helper-loom-fixes-v1.md'],
   // dash-v2: every other word on the Dashboard tab
-  'content/dash-words-v1.json': ['c7b22d5f2805797ccadb2d0dae47e4df5b606b9c11656b99ab56eaef5a7992b5', 'content/result-hhcontent-dash-words.md'],
+  'content/dash-words-v1.json': ['034d2bd298608883ef75e158c4776000f685a629370c1984ef98275d99c27859', 'content/helper-loom-fixes-v1.md'],
+  // loom-fixes: hhcontent's list of names from the Hermes docs
+  'content/hermes-names-v1.json': ['55df44fe69a0e102c06df209b7c3c18fb62329fa83c8bb6e59c1848b4bb13153', 'content/helper-loom-fixes-v1.md'],
   // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs)
   'content/helper-keeps-v1.md': ['0b2563a8e2772d5b918af6bef73cb53af74ce0840b359151a3689c5168a311f4', 'content/helper-talk-live-v2.md'],
   // changes-12 and -13 (the secret rule), ported in the look job: settings_read.py and tests.json at

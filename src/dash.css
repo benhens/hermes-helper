@@ -26,6 +26,11 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}
 .hhd-compact .hhd-tile-icon{width:32px;height:32px}
 .hhd-tile-words{display:flex;flex-direction:column;min-width:0}
+/* loom-fixes: a tile that opens Hermes's own screen: the whole tile is the button; a quiet change on hover, the stops' ring on focus */
+.hhd-tile-btn{width:100%;border:0;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.hhd-tile-btn:hover{background:var(--ui-bg-tertiary)}
+.hhd-tile-btn:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}
+.hhd-tile-name{font-size:15px;line-height:22px;font-weight:600;color:var(--ui-text-primary)}
 .hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}
 .hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}
 .hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}

@@ -175,16 +175,18 @@ test('header: no page title, three text tabs in a tablist (Capabilities\' look),
   assert.equal(byData(view.tree, 'tabs').props['aria-label'], 'Helper tabs')
   assert.equal(all(view.tree, n => n.type === 'sdk:SegmentedControl').length, 0)
   assert.equal(byData(view.tree, 'tabs').props.role, 'tablist')
-  // dash-v1: Dashboard, Learn, My setup (their names from the Dashboard's data); the first build's two are gone
-  assert.deepEqual(tabButtons(view).map(t => text(t).trim()), ['Dashboard', 'Learn', 'My setup'])
-  const [dashTab, learnTab, mineTab] = tabButtons(view)
-  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false, false])
-  assert.deepEqual(tabButtons(view).map(t => t.props.tabIndex), [0, -1, -1])
+  // dash-v1: the tabs' names from the Dashboard's data; the first build's two are gone. loom-fixes: Dashboard and Learn
+  // (My setup is out: his words, Loom 3:22)
+  assert.deepEqual(tabButtons(view).map(t => text(t).trim()), ['Dashboard', 'Learn'])
+  assert.doesNotMatch(text(view.tree), /My setup/)
+  const [dashTab, learnTab] = tabButtons(view)
+  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false])
+  assert.deepEqual(tabButtons(view).map(t => t.props.tabIndex), [0, -1])
   // dash-v2: the tab names' look sits behind one value (src/look.js TAB_LOOK); as committed it is the look as built
   assert.equal(TAB_LOOK, 'capabilities')
   assert.deepEqual(TAB_LOOKS.capabilities, { tab: K.textTab, idle: K.textTabIdle, on: K.textTabOn, label: K.textTabLabel, labelOn: K.textTabLabelOn })
   assert.equal(dashTab.props.className, `${K.textTab} ${K.textTabOn}`)
-  for (const t of [learnTab, mineTab]) assert.equal(t.props.className, `${K.textTab} ${K.textTabIdle}`)
+  for (const t of [learnTab]) assert.equal(t.props.className, `${K.textTab} ${K.textTabIdle}`)
   assert.equal(dashTab.props.children.props.className, K.textTabLabelOn)
   assert.equal(learnTab.props.children.props.className, K.textTabLabel)
   assert.doesNotMatch(text(view.tree), /Your setup|\bSetup\b/)
@@ -200,11 +202,11 @@ test('the tab names as Hermes\'s own tabs (capitals, a blue line under the open 
   const { Page } = await registerPlugin(fakeStorage(), undefined, {}, src => src.replace(line, "const TAB_LOOK = 'hermes'"))
   const view = mount(Page)
   await settle()
-  const [dashTab, learnTab, mineTab] = tabButtons(view)
+  const [dashTab, learnTab] = tabButtons(view)
   const H = TAB_LOOKS.hermes
   assert.equal(dashTab.props.className, `${H.tab} ${H.on}`)
-  for (const t of [learnTab, mineTab]) assert.equal(t.props.className, `${H.tab} ${H.idle}`)
-  for (const t of [dashTab, learnTab, mineTab]) assert.equal(t.props.children.props.className, H.label)
+  for (const t of [learnTab]) assert.equal(t.props.className, `${H.tab} ${H.idle}`)
+  for (const t of [dashTab, learnTab]) assert.equal(t.props.children.props.className, H.label)
   // Hermes's own SESSIONS | BOTS tabs (components/ui/pane-tab.tsx): 11 px capitals; under the open one a 2 px line
   // in the theme's primary blue, drawn by Hermes's own class
   assert.match(H.label, /(^|\s)uppercase(\s|$)/)
@@ -213,17 +215,17 @@ test('the tab names as Hermes\'s own tabs (capitals, a blue line under the open 
   assert.doesNotMatch(H.idle, /shadow/)
   assert.doesNotMatch(`${H.label} ${H.labelOn}`, /underline/)
   // the names, the roles and the keys are the same
-  assert.deepEqual(tabButtons(view).map(t => text(t).trim()), ['Dashboard', 'Learn', 'My setup'])
-  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false, false])
+  assert.deepEqual(tabButtons(view).map(t => text(t).trim()), ['Dashboard', 'Learn'])
+  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [true, false])
   click(learnTab)
-  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [false, true, false])
+  assert.deepEqual(tabButtons(view).map(t => t.props['aria-selected']), [false, true])
 })
 
-test('tabs: Learn and My setup show one quiet line each and nothing else; the tab is remembered; arrow keys move between the tabs; Helper stays where it is', async () => {
+test('tabs: Learn shows one quiet line and nothing else; the tab is remembered; arrow keys move between the tabs; Helper stays where it is', async () => {
   const { view, storage } = await open()
   assert.ok(byData(view.tree, 'dashboard'))
   assert.equal(byData(view.tree, 'steps'), null, 'no step list on any tab')
-  for (const [i, id] of [[1, 'learn'], [2, 'my_setup']]) {
+  for (const [i, id] of [[1, 'learn']]) {
     click(tabButtons(view)[i])
     assert.equal(storage.data.get('tab'), id)
     assert.equal(byData(view.tree, 'dashboard'), null)
@@ -235,15 +237,15 @@ test('tabs: Learn and My setup show one quiet line each and nothing else; the ta
   }
   let focused = null
   tabButtons(view)[0].props.ref({ focus: () => (focused = 'dashboard') })
-  tabButtons(view)[2].props.onKeyDown({ key: 'ArrowRight', preventDefault() {} })
+  tabButtons(view)[1].props.onKeyDown({ key: 'ArrowRight', preventDefault() {} })
   assert.equal(storage.data.get('tab'), 'dashboard')
   assert.equal(focused, 'dashboard')
   tabButtons(view)[0].props.onKeyDown({ key: 'ArrowLeft', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'my_setup')
-  tabButtons(view)[2].props.onKeyDown({ key: 'a', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'my_setup')
-  // the first build's stored tab names open the Dashboard
-  for (const old of ['setup', 'yours']) {
+  assert.equal(storage.data.get('tab'), 'learn')
+  tabButtons(view)[1].props.onKeyDown({ key: 'a', preventDefault() {} })
+  assert.equal(storage.data.get('tab'), 'learn')
+  // the first build's stored tab names, and My setup (out since loom-fixes), open the Dashboard
+  for (const old of ['setup', 'yours', 'my_setup']) {
     const again = await open(fakeStorage({ tab: old }))
     assert.ok(byData(again.view.tree, 'dashboard'), old)
   }
@@ -252,8 +254,8 @@ test('tabs: Learn and My setup show one quiet line each and nothing else; the ta
 test('tabs: Home and End; each tab points at the one tab panel, which names its tab', async () => {
   const { view, storage } = await open()
   tabButtons(view)[0].props.onKeyDown({ key: 'End', preventDefault() {} })
-  assert.equal(storage.data.get('tab'), 'my_setup')
-  tabButtons(view)[2].props.onKeyDown({ key: 'Home', preventDefault() {} })
+  assert.equal(storage.data.get('tab'), 'learn')
+  tabButtons(view)[1].props.onKeyDown({ key: 'Home', preventDefault() {} })
   assert.equal(storage.data.get('tab'), 'dashboard')
   const panel = byData(view.tree, 'detail')
   assert.equal(panel.props.role, 'tabpanel')

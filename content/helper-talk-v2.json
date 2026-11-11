@@ -447,12 +447,15 @@
   {
    "id": "HELLO_SAME",
    "kind": "reply",
-   "text": "I'm here.",
+   "text": "Hi, {name}.",
    "answers": "none",
-   "when": "small_talk kind hello, when Helper's line just before was BACK, HELLO, HELLO_SAME or a question (lastq true). Never a second question in a row.",
+   "when": "small_talk kind hello, when Helper's line just before was BACK, HELLO, HELLO_SAME or a question. Same words as HELLO: a greeting gets a greeting (his words, Loom 1:11: \"I'm here, what does this mean?\"). Kept as its own id only so the code's no-repeat check sees a different id.",
    "added": "changes-14",
    "text_was_offer_t1": "I'm here. Type your question whenever you are ready.",
-   "offer": "general"
+   "offer": "general",
+   "text_was_loom": "I'm here.",
+   "text_no_name": "Hi.",
+   "changed": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
   },
   {
    "id": "THANKS",
@@ -741,9 +744,11 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please bring my setup over from <my old AI app> with hermes migrate. Show me the plan before you write anything.",
-    "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 15 (\"Already set up? Run `hermes migrate` for the same offer\") and line 9 (\"You always see a per-item plan before anything is written\")",
-    "not_checked": "Not seen run: whether a person's Hermes can run hermes migrate for them from a chat (it asks to confirm)."
+    "paste_text": "Please bring my setup over from {app_label} with hermes migrate {app_agent}. Show me the plan before you write anything.",
+    "source": "user-guide/import-from-other-agents.md line 15 (\"`hermes migrate <agent>` (`openclaw`, `claude-code`, `codex`, `cursor`, `grok-bot`, `openbot`) to import from one agent\") and line 9 (\"You always see a per-item plan before anything is written\")",
+    "not_checked": "Not seen run: whether a person's Hermes can run hermes migrate for them from a chat (it asks to confirm).",
+    "paste_text_was_loom": "Please bring my setup over from <my old AI app> with hermes migrate. Show me the plan before you write anything.",
+    "fill": "{app_label} and {app_agent} come from offer_words.migrate_apps for the app the person named or picked. MIG_APP is never shown without an app: with no app named, MIG_WHICH comes first."
    },
    "when": "offer_words.migrate with a listed app; or the pick From another AI app",
    "title": "Moving from Cursor, Claude Code, Codex or OpenClaw",
@@ -755,7 +760,15 @@
     "take my rules",
     "bring my setup"
    ],
-   "title_was_t2": "Moving from another AI app"
+   "title_was_t2": "Moving from another AI app",
+   "docs_box": {
+    "head": "From the Hermes docs",
+    "quote": "hermes import-agent imports your existing OpenClaw, Claude Code, OpenAI Codex CLI, Cursor, Grok Bot or OpenBot setup into Hermes with one command.",
+    "where": "user-guide/import-from-other-agents.md, line 9",
+    "quote_raw": "`hermes import-agent` imports your existing **OpenClaw**, **Claude Code**, **OpenAI Codex CLI**, **Cursor**, **Grok Bot** or **OpenBot** setup into Hermes with one command.",
+    "why": "His words (Loom 2:13): \"I'm not sure if this is actually true.\" The box shows where the line comes from, as a skill line does."
+   },
+   "changed": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
   },
   {
    "id": "MIG_NOT_LISTED",
@@ -1124,7 +1137,9 @@
    "next": {
     "kind": "paste",
     "label": "Show me what to ask",
-    "paste_text": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on."
+    "paste_text": "Please help me install a plugin with hermes plugins install. First ask me which plugin I mean. Ask me before you switch it on.",
+    "paste_text_was_loom": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on.",
+    "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
    },
    "not_checked": "Not seen run: whether a person's Hermes can run hermes plugins install from a chat. The app's own clicks for plugins were not seen by hhcontent.",
    "title": "Adding a plugin (an add-on)",
@@ -1203,6 +1218,16 @@
    "when": "near.bare_follow_rule: how / why / and then alone, and the last line has no next step",
    "added": "breadth-t1",
    "offer": "general"
+  },
+  {
+   "id": "MIG_WHICH",
+   "kind": "reply",
+   "text": "Hermes can bring your setup over from six apps.",
+   "answers": "none",
+   "offer": "mig_which",
+   "when": "The pick From another AI app, or migrate words with no app named and an app meant. The docs name six apps; four picks at most, so the first set has three apps and More apps.",
+   "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)",
+   "source": "user-guide/import-from-other-agents.md line 9 (the six names)"
   }
  ],
  "keeps": {
@@ -3304,7 +3329,9 @@
     "next": {
      "kind": "paste",
      "label": "Try it",
-     "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
+     "paste_text": "Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved.",
+     "paste_text_was_loom": "Please save this to your memory: <one thing about you>. Then tell me what you saved.",
+     "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
     },
     "next_note_10": "Was the part button, which with no Memory part fell back to Bots and showed the line where Hermes's Bots tab is. That line answers a question the person did not ask. Changed in changes-10 to mem1's Try it: the person sees memory work in their own Hermes. part_if_no_memory_part still holds for the topic's own part, not for this line.",
     "title": "What memory is",
@@ -3336,7 +3363,9 @@
      "next": {
       "kind": "paste",
       "label": "Try it",
-      "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
+      "paste_text": "Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved.",
+      "paste_text_was_loom": "Please save this to your memory: <one thing about you>. Then tell me what you saved.",
+      "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
      },
      "how_to_tell": "Start a new chat and ask for it (memory.md line 86).",
      "title": "Hermes remembering things about you",
@@ -3373,7 +3402,9 @@
      "next": {
       "kind": "paste",
       "label": "Try it",
-      "paste_text": "What did we talk about last time about <topic>?"
+      "paste_text": "What did we talk about in our last chat?",
+      "paste_text_was_loom": "What did we talk about last time about <topic>?",
+      "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
      },
      "title": "Finding and searching old chats",
      "phrases": [
@@ -4097,7 +4128,9 @@
      "next": {
       "kind": "paste",
       "label": "Show me what to ask",
-      "paste_text": "Every morning at 8, send me a short summary of <what>."
+      "paste_text": "I want a short summary every morning at 8. First ask me what it should be about.",
+      "paste_text_was_loom": "Every morning at 8, send me a short summary of <what>.",
+      "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
      },
      "key_words_note_c5": "live changes-5: plain \"update\" removed (\"how do I update hermes\" got this row). It counts only next to every, daily, weekly, morning or each.",
      "title": "A job every day or week",
@@ -4124,7 +4157,9 @@
      "next": {
       "kind": "paste",
       "label": "Show me what to ask",
-      "paste_text": "Remind me <when> to <what>."
+      "paste_text": "I want a reminder. First ask me what it is for and when.",
+      "paste_text_was_loom": "Remind me <when> to <what>.",
+      "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
      },
      "title": "Reminders",
      "phrases": [
@@ -4152,7 +4187,9 @@
      "next": {
       "kind": "paste",
       "label": "Show me what to ask",
-      "paste_text": "Every <how often>, check <what> and tell me what you find."
+      "paste_text": "I want you to check something for me again and again. First ask me what to check and how often. Then tell me what you find each time.",
+      "paste_text_was_loom": "Every <how often>, check <what> and tell me what you find.",
+      "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
      },
      "title": "Checking or watching something regularly",
      "phrases": [
@@ -6642,7 +6679,7 @@
  },
  "offers": {
   "about": "offer-t1 (11 Nov, his words inputs/pb-words-11nov-test-helper.md): Helper never leaves the person to think of what to type. Where a line used to invite a question, it now ends with one either/or question, shown as its own bubble right under the line, with two or three things to pick. Typing stays possible (grey hint as under any question). Each thing to pick is tied to an id, never to key words.",
-  "rule": "A fixed line with an offer field shows its text, then the offer set's question in a second bubble, with the set's picks under it. Which set: 1. the line's offer field names it. 'after_topic' means: if Helper's last answer before this line came from a topic (row, question, plain, then), the set after_topic.<that topic>; else 'general'. 2. No repeat: if the set chosen is the set shown on Helper's last line, show that set's instead set. 3. Build without the set-up conversation (helper-setup-chat-v1.json not built): every set with text_no_setup uses it and picks_no_setup.",
+  "rule": "A fixed line with an offer field shows its text, then the offer set's question in a second bubble, with the set's picks under it. One situation, one wording, every time (his words, Loom 5:08: \"there's a bunch of inconsistencies here\"): the set named by the line is shown as it is, never swapped for another. 'after_topic' means the set for the topic just answered (offers.sets.after_topic.by_topic), else 'general'. Build without the set-up conversation: text_no_setup and picks_no_setup.",
   "hint": "Or type your own question",
   "things": {
    "setup": {
@@ -6722,6 +6759,10 @@
     "label": "From another AI app",
     "gives": {
      "kind": "line",
+     "id": "MIG_WHICH"
+    },
+    "gives_was_loom": {
+     "kind": "line",
      "id": "MIG_APP"
     }
    },
@@ -6794,6 +6835,68 @@
      "kind": "row",
      "id": "mod3"
     }
+   },
+   "mig_openclaw": {
+    "label": "OpenClaw",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_APP",
+     "app": "openclaw"
+    }
+   },
+   "mig_claude_code": {
+    "label": "Claude Code",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_APP",
+     "app": "claude_code"
+    }
+   },
+   "mig_codex": {
+    "label": "Codex",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_APP",
+     "app": "codex"
+    }
+   },
+   "mig_cursor": {
+    "label": "Cursor",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_APP",
+     "app": "cursor"
+    }
+   },
+   "mig_grok_bot": {
+    "label": "Grok Bot",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_APP",
+     "app": "grok_bot"
+    }
+   },
+   "mig_openbot": {
+    "label": "OpenBot",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_APP",
+     "app": "openbot"
+    }
+   },
+   "mig_more": {
+    "label": "Another app",
+    "gives": {
+     "kind": "set",
+     "id": "mig_which_2"
+    }
+   },
+   "mig_none": {
+    "label": "None of these",
+    "gives": {
+     "kind": "line",
+     "id": "MIG_NOT_LISTED"
+    }
    }
   },
   "sets": {
@@ -6808,7 +6911,9 @@
      "can",
      "mod"
     ],
-    "instead": "general_2"
+    "instead": "general_2",
+    "fixed": true,
+    "note_loom": "After a greeting, at the start, and after What Hermes is: always this set. (In the Loom, What Hermes is was followed once by this set and once by the old dont_know wording.)"
    },
    "general_2": {
     "text": "Do you want to pick its AI, or chat from your phone?",
@@ -6819,17 +6924,16 @@
     "instead": "general"
    },
    "dont_know": {
-    "text": "Do you want to know what Hermes is, or set it up?",
+    "text": "Do you want one of these instead?",
     "picks": [
-     "what",
-     "setup"
+     "can",
+     "mod",
+     "msg",
+     "mem"
     ],
-    "text_no_setup": "Do you want to know what Hermes is, or what it does?",
-    "picks_no_setup": [
-     "what",
-     "can"
-    ],
-    "instead": "general_2"
+    "same_as": "start_four",
+    "fixed": true,
+    "changed": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
    },
    "words": {
     "text": "Do you want one of these words explained?",
@@ -6905,7 +7009,7 @@
     "note": "ask-fix-t1: the model topic's own question and answers, shown as an offer under MODEL_FOR. A pick gives the row and is kept as a picked answer to that question is."
    },
    "start_four": {
-    "text": "I can explain these four. Pick one.",
+    "text": "Do you want one of these instead?",
     "picks": [
      "can",
      "mod",
@@ -6913,9 +7017,90 @@
      "mem"
     ],
     "fixed": true,
-    "note": "titles-t2: shown under a don't-know with nothing near, every time, never swapped by the no-repeat rule. The picks are the TP four (topic_picks). The text is hhcontent's wording, not Lead's or his.",
+    "note": "Under every don't-know, the same text and the same four picks, every time. Text: Lead's wording of 11 Nov morning.",
     "instead": "general",
-    "instead_note": "never used: this set is fixed and is shown every time (near.nothing_near_rule)"
+    "instead_note": "never used: this set is fixed and is shown every time (near.nothing_near_rule)",
+    "text_was_loom": "I can explain these four. Pick one."
+   },
+   "mig_which": {
+    "text": "Is it OpenClaw, Claude Code, Codex, or another?",
+    "picks": [
+     "mig_openclaw",
+     "mig_claude_code",
+     "mig_codex",
+     "mig_more"
+    ],
+    "fixed": true,
+    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+   },
+   "mig_which_2": {
+    "text": "Is it Cursor, Grok Bot, OpenBot, or none of these?",
+    "picks": [
+     "mig_cursor",
+     "mig_grok_bot",
+     "mig_openbot",
+     "mig_none"
+    ],
+    "fixed": true,
+    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+   },
+   "name_memory": {
+    "text": "Do you want to know what Hermes remembers, or what it does?",
+    "picks": [
+     "mem",
+     "can"
+    ],
+    "fixed": true,
+    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+   },
+   "name_chat": {
+    "text": "Do you want to use your phone, or see what Hermes does?",
+    "picks": [
+     "msg",
+     "can"
+    ],
+    "fixed": true,
+    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+   },
+   "name_provider": {
+    "text": "Do you want to pick its AI, or see what Hermes does?",
+    "picks": [
+     "mod",
+     "can"
+    ],
+    "fixed": true,
+    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+   },
+   "name_toolset": {
+    "text": "Do you want to see what Hermes does, or set it up?",
+    "picks": [
+     "can",
+     "setup"
+    ],
+    "fixed": true,
+    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+   },
+   "name_feature": {
+    "text": "Do you want to see what Hermes does, or set it up?",
+    "picks": [
+     "can",
+     "setup"
+    ],
+    "fixed": true,
+    "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+   },
+   "dont_know_was_loom": {
+    "text": "Do you want to know what Hermes is, or set it up?",
+    "picks": [
+     "what",
+     "setup"
+    ],
+    "text_no_setup": "Do you want to know what Hermes is, or what it does?",
+    "picks_no_setup": [
+     "what",
+     "can"
+    ],
+    "instead": "general_2"
    }
   },
   "on_lines": {
@@ -6951,7 +7136,9 @@
    "MIG_NOT_LISTED": "general",
    "HERMES": "general",
    "START": "general"
-  }
+  },
+  "rule_was_loom": "A fixed line with an offer field shows its text, then the offer set's question in a second bubble, with the set's picks under it. Which set: 1. the line's offer field names it. 'after_topic' means: if Helper's last answer before this line came from a topic (row, question, plain, then), the set after_topic.<that topic>; else 'general'. 2. No repeat: if the set chosen is the set shown on Helper's last line, show that set's instead set. 3. Build without the set-up conversation (helper-setup-chat-v1.json not built): every set with text_no_setup uses it and picks_no_setup.",
+  "no_repeat_gone": "The old rule 2 (never the same offer twice in a row; show the instead set) is gone. The instead fields stay in the data and are not used."
  },
  "offer_words": {
   "about": "offer-t1, part 3. Checked in this order, at stage open, after what_is and before cost/where; only when no topic or term key word matched (except MIG names).",
@@ -7015,7 +7202,8 @@
    "whats hermes",
    "what is this",
    "what does hermes do",
-   "tell me about hermes"
+   "tell me about hermes",
+   "what hermes is"
   ],
   "start": [
    "get started",
@@ -7252,7 +7440,64 @@
   ],
   "pending_rule": "ask-fix-t1: while Helper's own question is open (pending), a typed message in question form that these words recognise is a new question, not an answer; its line shows and the open question is dropped. Not for free (free words answer the pay question, row mod3 as picked) and not for laptop_off.",
   "order_ask_fix_t1": "migrate (computer, listed app, chatgpt -> MIG_CHATGPT, other not-listed app, else MIG); agent_what -> AGENT; key (key_where -> KEY_WHERE, what-start -> KEY_WHAT, else KEY); personality; stuck_more; free -> FREE; model_change -> MODEL_CHANGE; model_for with the word for -> MODEL_FOR; own_ai with one of about_rule.rows.mod3 -> row mod3; skill_add -> SKILL_ADD; plugin_which -> PLUGIN_WHICH; plugin_add -> PLUGIN_ADD; coding_ask -> CODING; what_hermes_any -> HERMES; then, only with no topic, weak or term key word, as before: laptop_off, what_hermes (whole message), update, safe, start.",
-  "free_note": "free model, free ai and free one are not here: they stay with the model topic (its question, and the mod3 guard of live changes-6)."
+  "free_note": "free model, free ai and free one are not here: they stay with the model topic (its question, and the mod3 guard of live changes-6).",
+  "migrate_apps": [
+   {
+    "id": "openclaw",
+    "label": "OpenClaw",
+    "agent": "openclaw",
+    "phrases": [
+     "openclaw",
+     "open claw",
+     "clawdbot",
+     "moltbot"
+    ]
+   },
+   {
+    "id": "claude_code",
+    "label": "Claude Code",
+    "agent": "claude-code",
+    "phrases": [
+     "claude code"
+    ]
+   },
+   {
+    "id": "codex",
+    "label": "Codex",
+    "agent": "codex",
+    "phrases": [
+     "codex",
+     "codex cli"
+    ]
+   },
+   {
+    "id": "cursor",
+    "label": "Cursor",
+    "agent": "cursor",
+    "phrases": [
+     "cursor"
+    ]
+   },
+   {
+    "id": "grok_bot",
+    "label": "Grok Bot",
+    "agent": "grok-bot",
+    "phrases": [
+     "grok bot",
+     "grokbot"
+    ]
+   },
+   {
+    "id": "openbot",
+    "label": "OpenBot",
+    "agent": "openbot",
+    "phrases": [
+     "openbot",
+     "open bot"
+    ]
+   }
+  ],
+  "migrate_apps_rule": "With offer_words.migrate and one of these phrases (whole words): MIG_APP for that app. Two apps named: the first in this order. migrate with no app and no computer word: MIG (\"from another AI app, or to a new computer?\"); its pick From another AI app gives MIG_WHICH, never MIG_APP without an app."
  },
  "changed_offer_t1": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2-changes-8.md): offers (new), fixed lines rewritten to end with an either/or offer, mem/sch/bot questions get answers, new lines MIG, MIG_APP, MIG_NOT_LISTED, MIG_PC, HERMES, START, KEY, UPDATE, SAFE, PERSONALITY, offer_words (new), where.words and small_talk.kinds.stuck widened.",
  "about_rule": {
@@ -8811,7 +9056,9 @@
     "next": {
      "kind": "paste",
      "label": "Show me what to ask",
-     "paste_text": "Please search the Hermes plugin catalog for <what you want> and show me what you find. Install nothing yet."
+     "paste_text": "First ask me what I want a plugin for. Then search the Hermes plugin catalog and show me what you find. Install nothing yet.",
+     "paste_text_was_loom": "Please search the Hermes plugin catalog for <what you want> and show me what you find. Install nothing yet.",
+     "paste_changed": "loom-fixes-v1: no blank to fill in a text to copy (his rule: never a line that leaves the person to think of what to type)"
     },
     "seen_in_app": false,
     "added": "breadth-t1"
@@ -9541,5 +9788,30 @@
   "want_say_was_t2": "how to {label}"
  },
  "changed_breadth_t1": "breadth-t1: facts_t1 (new fact lines by docs page), near (titles, phrases, the three rules), title and phrases on every older fact line, MIG_PC copy box, MODEL_CHANGE and KEY_WHERE texts, NO_MORE.",
- "changed_titles_t2": "changes-12 (11 Nov): titles rewritten to name the thing (titles_rule), every line has three or more phrases, 26 hand-written titles and phrases in helper-wants-v1.json, 8 new fact lines (d_undo, d_open_source, d_gemini, d_forget, d_meter, d_two, d_approve_off, d_siri), build.can_question_rule, near.nothing_near_rule (the four fixed picks)."
+ "changed_titles_t2": "changes-12 (11 Nov): titles rewritten to name the thing (titles_rule), every line has three or more phrases, 26 hand-written titles and phrases in helper-wants-v1.json, 8 new fact lines (d_undo, d_open_source, d_gemini, d_forget, d_meter, d_two, d_approve_off, d_siri), build.can_question_rule, near.nothing_near_rule (the four fixed picks).",
+ "copy_text_rule": {
+  "rule": "No text to copy (paste_text, paste, copy) may show a blank for the person to fill: no < >, no [ ], no ___, no ..., no {field} left after filling. Checked by dev/checks/hhcontent-loom-fixes-v1/check_copy.py over every content JSON.",
+  "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+ },
+ "names": {
+  "file": "content/hermes-names-v1.json",
+  "rule": "See that file's rule. Checked only where the routing would give the don't-know (N1 or N1a), so every older line wins. Helper shows the entry's say, then the box From the Hermes docs (quote_plain, and outside.quote_plain when set) with file and line, then offers.sets.name_<kind>.",
+  "starts": [
+   "what is",
+   "what's",
+   "whats",
+   "what are",
+   "what exactly is",
+   "tell me about",
+   "explain",
+   "what does"
+  ],
+  "cut": [
+   "a",
+   "an",
+   "the"
+  ],
+  "added": "loom-fixes-v1 (11 Nov, his Loom review: inputs/pb-words-11nov-loom-review.md)"
+ },
+ "changed_loom_fixes_v1": "content/helper-loom-fixes-v1.md"
 }

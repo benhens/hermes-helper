@@ -8,10 +8,12 @@ import { PARKED } from '../scripts/build.mjs'
 
 const store = obj => (k, d) => (k in obj ? obj[k] : d)
 
-// dash-v1: the tabs are Dashboard, Learn and My setup; the first build's step and answers are no longer read
+// dash-v1: the tabs; the first build's step and answers are no longer read. loom-fixes: My setup is out (his words,
+// Loom 3:22), so a stored 'my_setup' opens the Dashboard
 test('first open: the Dashboard tab, Helper\'s window 460 px wide', () => {
-  assert.deepEqual(TAB_IDS, ['dashboard', 'learn', 'my_setup'])
+  assert.deepEqual(TAB_IDS, ['dashboard', 'learn'])
   assert.deepEqual(readState(store({})), { tab: 'dashboard', helperWidth: 460 })
+  assert.deepEqual(readState(store({ tab: 'my_setup' })), { tab: 'dashboard', helperWidth: 460 })
 })
 
 test('remembered values come back, the dragged width too', () => {

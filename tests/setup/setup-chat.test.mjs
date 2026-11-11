@@ -139,7 +139,7 @@ test('conversation (a) of the write-up: Peter, a tennis club, only installed', o
   assert.equal(p.looks.length, 2, '"It worked" reads again')
   s = p.said()
   assert.deepEqual(lines(s), [
-    ['DONE_SAID', "Good. I'll remember that you did it."],
+    ['DONE_SAID', "Good. I can't see that one, so I'll take your word."],
     ['REC', 'You want Hermes to do things at set times. Next: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?']
   ])
   assert.deepEqual(p.st.kept.setup_done_said, ['first_chat'])
@@ -151,7 +151,7 @@ test('conversation (a) of the write-up: Peter, a tennis club, only installed', o
   assert.deepEqual(p.labels(), ['Which AI to use', 'Phone and chat apps'])
   // Hermes closed and opened: the returning line, from what is kept
   const back = person(NOTHING(), { kept: cleanKept(keptToStore(p.st.kept)), met: true }).opening()
-  assert.deepEqual([back.last().line, back.last().text], ['BACK_REC', 'Hi again, Peter. We stopped at Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?'])
+  assert.deepEqual([back.last().line, back.last().text], ['BACK_REC', 'Hi again, Peter. Next on your list: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?'])
   assert.deepEqual(back.labels(), REC4)
 })
 
@@ -201,7 +201,7 @@ test('"I\'m stuck": the line and the text to paste with the thing and the step; 
   assert.equal(l.paste, "I'm setting up Chat apps in Hermes. I'm stuck at this step: On the Telegram card, click Create with QR. Scan the code with Telegram on your phone. Please help me, one small step at a time.")
   assert.deepEqual(p.labels(), ['Done, it works now', 'Stop for now'])
   p.press('Done, it works now')
-  assert.equal(p.said().find(x => x.line === 'DONE_SAID').text, "Good. I'll remember that you did it.")
+  assert.equal(p.said().find(x => x.line === 'DONE_SAID').text, "Good. I can't see that one, so I'll take your word.")
   const m = person({ model: 'not', soul: false, jobs: 0, bots: 1 })
   m.skip()
   m.press('Skip').press('Not sure yet')
@@ -227,7 +227,7 @@ test('conversation (c): Skip, Skip, Not sure yet: nothing kept, the usual first 
   assert.equal(s.find(x => x.line === 'SEEN').note, null)
   assert.equal(p.last().text, 'The usual first step is to check that Hermes answers. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?')
   p.press("I've done this already")
-  assert.deepEqual(lines(p.said()), [['DONE_SAID', "Good. I'll remember that you did it."], ['REC', 'This is next in the order the Hermes docs suggest. Next: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?']])
+  assert.deepEqual(lines(p.said()), [['DONE_SAID', "Good. I can't see that one, so I'll take your word."], ['REC', 'This is next in the order the Hermes docs suggest. Next: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?']])
   p.press("I've done this already")
   // setup-chat-2 (changes-1 ALREADY_SEEABLE): a thing Helper can see, and does not see done
   assert.equal(p.said()[0].text, "I can't see that yet. Its personality text is still the starter one.")
@@ -324,7 +324,9 @@ test('"start again": the two answers and the thing recommended are cleared, the 
   p.press("Yes, I'm new").press('Do things at set times').press("I've done this already")
   assert.deepEqual(Object.keys(p.st.kept).filter(k => k.startsWith('setup')).sort(), ['setup_current', 'setup_done_said', 'setup_goal', 'setup_goal_id', 'setup_new'])
   p.type('start again')
-  assert.deepEqual([p.last().line, p.last().text], ['RESTART', "Sure, let's start again. Are you new to Hermes?"])
+  // loom-fixes (the data's RESTART.then): "Sure, let's start again.", then the first question as its own bubble
+  const said = p.said()
+  assert.deepEqual(said.slice(-2).map(x => [x.line, x.text]), [['RESTART', "Sure, let's start again."], ['Q_NEW', 'Are you new to Hermes?']])
   assert.deepEqual(p.labels(), ["Yes, I'm new", "I've used it a bit", 'I know it well', 'Skip'])
   assert.deepEqual(Object.keys(p.st.kept).filter(k => !k.startsWith('told')).sort(), ['name', 'setup_done_said', 'work'])
   p.press('I know it well')
@@ -356,7 +358,7 @@ test('what is kept is cleaned when read back: only the data\'s ids, a goal text 
 test('returning: the thing picked last time; seen done now; before the questions; all done', opt, () => {
   const kept = { name: 'Peter', setup_new: 'new', setup_goal: 'Do things at set times', setup_goal_id: 'schedule', setup_done_said: ['first_chat'], setup_current: 'scheduled_job' }
   let p = person(NOTHING(), { kept: { ...kept }, met: true }).opening()
-  assert.deepEqual(lines(p.log), [['BACK_REC', 'Hi again, Peter. We stopped at Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?']])
+  assert.deepEqual(lines(p.log), [['BACK_REC', 'Hi again, Peter. Next on your list: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?']])
   assert.deepEqual(p.labels(), REC4)
   p.press('Show me the steps')
   assert.match(p.last().text, /^Step 1 of 3: In a chat, ask in plain words/)
@@ -369,7 +371,7 @@ test('returning: the thing picked last time; seen done now; before the questions
   assert.equal(p.st.kept.setup_current, 'personality')
   // no name kept
   p = person(NOTHING(), { kept: { setup_current: 'memory' }, met: true }).opening()
-  assert.deepEqual(lines(p.log), [['BACK_REC', `Hi again. We stopped at Memory. ${LIST_JSON.items.find(i => i.id === 'memory').why} Want the steps?`]])
+  assert.deepEqual(lines(p.log), [['BACK_REC', `Hi again. Next on your list: Memory. ${LIST_JSON.items.find(i => i.id === 'memory').why} Want the steps?`]])
   // closed before the questions
   p = person(NOTHING(), { kept: { name: 'Peter', work: 'I run a tennis club' }, met: true }).opening()
   assert.deepEqual(lines(p.log), [['BACK_Q', 'Hi again, Peter. Before we go on: are you new to Hermes?']])
@@ -397,7 +399,7 @@ test('a read that fails after "It worked": Helper says it could not read it and 
   p.said()
   p.press('It worked')
   const s = p.said()
-  assert.equal(s[0].text, "I couldn't read that part this time. Good. I'll remember that you did it.")
+  assert.equal(s[0].text, "I couldn't read that part this time. Good. I can't see that one, so I'll take your word.")
   assert.equal(s.some(x => /I can see it now/.test(x.text)), false)
   assert.deepEqual(p.st.kept.setup_done_said, ['scheduled_job'])
 })

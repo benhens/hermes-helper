@@ -22,6 +22,7 @@ import { AI_MODE } from './ai-mode.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
 import { openQNew } from './setup-chat.js'
 import { LIVE_DATA } from './live-data.js'
+import { NAMES_DATA } from './names-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
 import { hasKept, workOk, workSqueeze } from './kept.js'
@@ -1011,9 +1012,14 @@ function offerSet(sid, prevTopic = null) {
   }
   const s = S[sid]
   if (!SETUP_BUILT && s.text_no_setup) return [sid, s.text_no_setup, s.picks_no_setup]
+  // loom-fixes: a set new in the data with the pick "Set up Hermes" and no wording without it (name_toolset,
+  // name_feature): in a build with no set-up conversation, the start offer's wording without it (note b)
+  if (!SETUP_BUILT && s.picks.some(p => OF.things[p].gives.kind === 'setup_chat')) return offerSet('general')
   return [sid, s.text, s.picks]
 }
-// A line with an offer gets it (o.offer: { set, text, picks }); never the same set twice in a row (its instead set).
+// A line with an offer gets it (o.offer: { set, text, picks }).
+// loom-fixes (helper-loom-fixes-v1 point 5, offers.rule): one situation, one wording, every time. The old swap (never the
+// same set twice in a row, its instead set) is gone; the data's instead fields are not read.
 // prevTopic: the topic of Helper's last answer before this line, for after_topic.
 export function attachOffer(o, st, prevTopic = null) {
   const of = o && !setupOpens(o.kind, st) && offerOfLine(o.kind)
@@ -1021,8 +1027,7 @@ export function attachOffer(o, st, prevTopic = null) {
     st.lastOffer = null
     return o
   }
-  let [sid, text, picks] = offerSet(of, prevTopic)
-  if (sid === st.lastOffer) [sid, text, picks] = offerSet(sid.startsWith('after_topic:') ? OF.sets.after_topic.instead : OF.sets[sid].instead)
+  const [sid, text, picks] = offerSet(of, prevTopic)
   o.offer = { set: sid, text, picks }
   st.lastOffer = sid
   return o
@@ -1033,8 +1038,7 @@ const SETUP_OPENERS = ['F2', 'F3', 'WORK_SECRET', 'WORK_LONG_2']
 const setupOpens = (kind, st) => SETUP_BUILT && SETUP_OPENERS.includes(kind) && !st.kept.setup_new && !(st.setup && st.setup.newAnswered)
 // An offer by its set id, as a line carries it (the set-up conversation's NOT_NOW, ALL_DONE and BACK end with one)
 export function offerSaid(sid, st) {
-  let [id, text, picks] = offerSet(sid)
-  if (id === st.lastOffer) [id, text, picks] = offerSet(OF.sets[id].instead)
+  const [id, text, picks] = offerSet(sid)
   st.lastOffer = id
   return { set: id, text, answers: { kind: 'offer', hint: OF.hint, items: picks.map(p => ({ id: 'offer-' + p, label: OF.things[p].label, offer: p })) } }
 }
@@ -1178,12 +1182,60 @@ export function turnParts(text, st) {
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
   noteLast(st, out)
   attachOffer(out, st, prevTopic)
+  // loom-fixes (helper-loom-fixes-v1 points 3 and 4; route2.py turn): a name from the Hermes docs where the don't-know
+  // would show (every older line wins), and the app a person wants to bring a setup over from
+  if (out.kind === 'N1' || out.kind === 'N1a' || out.kind === 'N1_AGAIN') {
+    const ne = nameLine(text)
+    if (ne) {
+      for (const k of Object.keys(out)) delete out[k]
+      const [sid, otext, picks] = offerSet(ne.offer)
+      Object.assign(out, { kind: 'NAME', id: ne.id, offer: { set: sid, text: otext, picks } })
+      st.lastOffer = sid
+      st.last = 'NAME'
+      // a line code is sure of: never handed to the AI
+      pre.kind = 'NAME'
+      pre.by = 'title'
+    }
+  }
+  if (out.kind === 'MIG_APP') {
+    const app = migApp(text)
+    if (app) out.app = app.id
+    else {
+      for (const k of Object.keys(out)) delete out[k]
+      out.kind = 'MIG_WHICH'
+      attachOffer(out, st)
+    }
+  }
   delete pre.near_lines
   // breadth-t1 (near.near_rule, nothing_near_rule): under a don't-know line, the near lines or the four starting things
   if (out.kind === 'N1' || out.kind === 'N1_AGAIN') nearOffer(out, st)
   else delete out.near_lines
   return { pre, out }
 }
+// loom-fixes (content/hermes-names-v1.json rule; route2.py name_line): what is / what's / whats / what are / what exactly
+// is / tell me about / explain / what does <name>, or the bare <name> with a question mark -> the names entry, or null.
+// The name is compared with every character that is not a to z or 0 to 9 cut, after a, an, the.
+const nameKey = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '')
+const NAME_BY_KEY = new Map()
+for (const e of NAMES_DATA) for (const a of e.aliases) if (!NAME_BY_KEY.has(nameKey(a))) NAME_BY_KEY.set(nameKey(a), e)
+export function nameLine(text) {
+  let t = talkNorm(text).replace(/^[ .!]+|[ .!]+$/g, '')
+  const bare = t.endsWith('?')
+  t = t.replace(/[ ?!.]+$/, '')
+  t = t.replace(/^(?:(?:so|ok|okay|and|hi|hey|helper|please|pls|plz|can you|could you)[ ,]+)*/, '')
+  const m = t.match(/^(?:what is|what's|whats|what are|what exactly is|tell me about|explain|what does)\s+(.+?)(?:\s+(?:is|are|do|does|mean|means))?$/)
+  let part = m ? m[1] : bare ? t : null
+  if (!part) return null
+  part = part.replace(/^(?:a|an|the)\s+/, '')
+  return NAME_BY_KEY.get(nameKey(part)) || null
+}
+// loom-fixes (offer_words.migrate_apps; route2.py mig_app): the first of the six apps the message names, or null
+export function migApp(text) {
+  const t = talkNorm(text)
+  return OW.migrate_apps.find(a => whichOf(t, a.phrases).length > 0) || null
+}
+const MIG_APPS = Object.fromEntries((TALK_DATA.offer_words.migrate_apps || []).map(a => [a.id, a]))
+
 // find-v1 part 5: the results that are no line of their own (see turnSteps, a full typed message while a question is open)
 const FULL_NOT_FOR = ['N1', 'N1a', 'N1_AGAIN', 'N2', 'skill by name', 'CUT', 'MEAN_NONE', 'AGAIN']
 // The order of steps is route2.py's _turn(), with no model.
@@ -1278,7 +1330,8 @@ function turnSteps(text, st) {
     const [line, x] = smallLine(sk, st)
     st.stage = 'open'
     if (line === 'plain') return done('plain', { topic: x, why: 'what do you mean' })
-    return line === 'HELLO' ? done(line, { name: x }) : done(line)
+    // loom-fixes: HELLO_SAME is "Hi, {name}." now (helper-loom-fixes-v1 point 1), so it takes the name as HELLO does
+    return line === 'HELLO' || line === 'HELLO_SAME' ? done(line, { name: x }) : done(line)
   }
   // 1 b. a request to Helper to remember something; then what Helper keeps, asked about by typing
   if (remember(text, st, out)) return out
@@ -1607,7 +1660,15 @@ export function pressOffer(thing, st) {
       keep(st, o, 'mod', g.id)
     }
   } else if (g.kind === 'setup_chat') o = { kind: 'SETUP_' + g.id }
-  else o = { kind: g.id }
+  else if (g.kind === 'set') {
+    // loom-fixes (route2.py press_offer): "Another app" shows the next set of apps, a question with no line before it
+    o = { kind: 'SET_' + g.id }
+    noteLast(st, o)
+    const [sid, text, picks] = offerSet(g.id)
+    o.offer = { set: sid, text, picks }
+    st.lastOffer = sid
+    return o
+  } else o = { kind: g.id, ...(g.app ? { app: g.app } : {}) }
   noteLast(st, o)
   return attachOffer(o, st, prevTopic)
 }
@@ -1828,12 +1889,12 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('OPEN', FIXED.OPEN.text)
     // changes-14: a later visit (BACK) and a hello greet by the kept name, or without one
     case 'BACK':
-    case 'HELLO': {
+    case 'HELLO':
+    case 'HELLO_SAME': {
       const f = FIXED[result.kind]
       return said(result.kind, result.name ? fillSlots(f.text, { name: result.name }) : f.text_no_name || f.text)
     }
     // changes-14/15: ordinary talk and the lines no_repeat puts in place of a repeat: one line, nothing to pick
-    case 'HELLO_SAME':
     case 'THANKS':
     case 'OK':
     case 'HOW':
@@ -1875,6 +1936,32 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('F3', FIXED.F3.text)
     case 'TP':
       return said('TP', FIXED.TP.text, { answers: topicPicks() })
+    // loom-fixes (helper-loom-fixes-v1 point 4, "For builder" 3): a name from the Hermes docs: its one fixed sentence,
+    // the box "From the Hermes docs" with the docs' own sentence (and the one saying it is not part of Hermes, when
+    // set) with file and line, then its kind's offer. No button, no text to copy.
+    case 'NAME': {
+      const e = NAMES_DATA.find(x => x.id === result.id)
+      // "file, line N"; two lines of one file: "file, lines N and M" (hhcontent's own way of writing it)
+      const o = e.outside
+      const where = !o ? `${e.file}, line ${e.line}` : o.file === e.file ? `${e.file}, lines ${e.line} and ${o.line}` : `${e.file}, line ${e.line}; ${o.file}, line ${o.line}`
+      const words = [e.quote, ...(o ? [o.quote] : [])].map(x => (/[.!?]$/.test(x) ? x : x + '.')).join(' ')
+      const docs = { head: WANTS_DATA.fixed['box-head'].text, words, source: where, where }
+      return said('NAME-' + e.id, e.say, { source: docs.source, docs })
+    }
+    // loom-fixes ("For builder" 4): the text to copy names the app and the docs' own command; the docs box as a skill's
+    case 'MIG_APP': {
+      const f = FIXED.MIG_APP
+      const app = MIG_APPS[result.app]
+      // no app: no text to copy (never a blank to fill in); MIG_WHICH asks first, so this is not reached
+      const next = app ? { kind: 'paste', label: f.next.label, text: fillSlots(f.next.paste_text, { app_label: app.label, app_agent: app.agent }) } : null
+      const docs = f.docs_box ? { head: f.docs_box.head, words: f.docs_box.quote, source: f.docs_box.where, where: f.docs_box.where } : null
+      return said('MIG_APP', f.text, { source: f.source || null, next, docs })
+    }
+    // "Another app": the next three apps and None of these, as the question itself (no line before it)
+    case 'SET_mig_which_2': {
+      const { offer: o, ...line } = said('SET_mig_which_2', offer.text, { answers: offer.answers })
+      return line
+    }
     case 'N1':
     case 'N1a':
     case 'N1_AGAIN': // changes-15: in place of a second don't-know line, the faint hint under it as under N1

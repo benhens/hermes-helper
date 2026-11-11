@@ -517,7 +517,8 @@ const TALK_DATA = {
       "offer": "general"
     },
     "HELLO_SAME": {
-      "text": "I'm here.",
+      "text": "Hi, {name}.",
+      "text_no_name": "Hi.",
       "offer": "general"
     },
     "THANKS": {
@@ -664,11 +665,16 @@ const TALK_DATA = {
         "take my rules",
         "bring my setup"
       ],
+      "docs_box": {
+        "head": "From the Hermes docs",
+        "quote": "hermes import-agent imports your existing OpenClaw, Claude Code, OpenAI Codex CLI, Cursor, Grok Bot or OpenBot setup into Hermes with one command.",
+        "where": "user-guide/import-from-other-agents.md, line 9"
+      },
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please bring my setup over from <my old AI app> with hermes migrate. Show me the plan before you write anything.",
-        "source": "dev/hermes-src/website/docs/user-guide/import-from-other-agents.md line 15 (\"Already set up? Run `hermes migrate` for the same offer\") and line 9 (\"You always see a per-item plan before anything is written\")"
+        "paste_text": "Please bring my setup over from {app_label} with hermes migrate {app_agent}. Show me the plan before you write anything.",
+        "source": "user-guide/import-from-other-agents.md line 15 (\"`hermes migrate <agent>` (`openclaw`, `claude-code`, `codex`, `cursor`, `grok-bot`, `openbot`) to import from one agent\") and line 9 (\"You always see a per-item plan before anything is written\")"
       }
     },
     "MIG_NOT_LISTED": {
@@ -923,7 +929,7 @@ const TALK_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please install the plugin <name> with hermes plugins install. Ask me before you switch it on."
+        "paste_text": "Please help me install a plugin with hermes plugins install. First ask me which plugin I mean. Ask me before you switch it on."
       }
     },
     "CODING": {
@@ -963,6 +969,11 @@ const TALK_DATA = {
     "NO_MORE": {
       "text": "That is all I have checked on that.",
       "offer": "general"
+    },
+    "MIG_WHICH": {
+      "text": "Hermes can bring your setup over from six apps.",
+      "source": "user-guide/import-from-other-agents.md line 9 (the six names)",
+      "offer": "mig_which"
     }
   },
   "opening": {
@@ -2185,7 +2196,7 @@ const TALK_DATA = {
         "label": "From another AI app",
         "gives": {
           "kind": "line",
-          "id": "MIG_APP"
+          "id": "MIG_WHICH"
         }
       },
       "mig_pc": {
@@ -2257,6 +2268,68 @@ const TALK_DATA = {
           "kind": "row",
           "id": "mod3"
         }
+      },
+      "mig_openclaw": {
+        "label": "OpenClaw",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "openclaw"
+        }
+      },
+      "mig_claude_code": {
+        "label": "Claude Code",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "claude_code"
+        }
+      },
+      "mig_codex": {
+        "label": "Codex",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "codex"
+        }
+      },
+      "mig_cursor": {
+        "label": "Cursor",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "cursor"
+        }
+      },
+      "mig_grok_bot": {
+        "label": "Grok Bot",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "grok_bot"
+        }
+      },
+      "mig_openbot": {
+        "label": "OpenBot",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_APP",
+          "app": "openbot"
+        }
+      },
+      "mig_more": {
+        "label": "Another app",
+        "gives": {
+          "kind": "set",
+          "id": "mig_which_2"
+        }
+      },
+      "mig_none": {
+        "label": "None of these",
+        "gives": {
+          "kind": "line",
+          "id": "MIG_NOT_LISTED"
+        }
       }
     },
     "sets": {
@@ -2282,17 +2355,13 @@ const TALK_DATA = {
         "instead": "general"
       },
       "dont_know": {
-        "text": "Do you want to know what Hermes is, or set it up?",
+        "text": "Do you want one of these instead?",
         "picks": [
-          "what",
-          "setup"
-        ],
-        "text_no_setup": "Do you want to know what Hermes is, or what it does?",
-        "picks_no_setup": [
-          "what",
-          "can"
-        ],
-        "instead": "general_2"
+          "can",
+          "mod",
+          "msg",
+          "mem"
+        ]
       },
       "words": {
         "text": "Do you want one of these words explained?",
@@ -2372,6 +2441,72 @@ const TALK_DATA = {
           "mem"
         ],
         "instead": "general"
+      },
+      "mig_which": {
+        "text": "Is it OpenClaw, Claude Code, Codex, or another?",
+        "picks": [
+          "mig_openclaw",
+          "mig_claude_code",
+          "mig_codex",
+          "mig_more"
+        ]
+      },
+      "mig_which_2": {
+        "text": "Is it Cursor, Grok Bot, OpenBot, or none of these?",
+        "picks": [
+          "mig_cursor",
+          "mig_grok_bot",
+          "mig_openbot",
+          "mig_none"
+        ]
+      },
+      "name_memory": {
+        "text": "Do you want to know what Hermes remembers, or what it does?",
+        "picks": [
+          "mem",
+          "can"
+        ]
+      },
+      "name_chat": {
+        "text": "Do you want to use your phone, or see what Hermes does?",
+        "picks": [
+          "msg",
+          "can"
+        ]
+      },
+      "name_provider": {
+        "text": "Do you want to pick its AI, or see what Hermes does?",
+        "picks": [
+          "mod",
+          "can"
+        ]
+      },
+      "name_toolset": {
+        "text": "Do you want to see what Hermes does, or set it up?",
+        "picks": [
+          "can",
+          "setup"
+        ]
+      },
+      "name_feature": {
+        "text": "Do you want to see what Hermes does, or set it up?",
+        "picks": [
+          "can",
+          "setup"
+        ]
+      },
+      "dont_know_was_loom": {
+        "text": "Do you want to know what Hermes is, or set it up?",
+        "picks": [
+          "what",
+          "setup"
+        ],
+        "text_no_setup": "Do you want to know what Hermes is, or what it does?",
+        "picks_no_setup": [
+          "what",
+          "can"
+        ],
+        "instead": "general_2"
       }
     }
   },
@@ -2436,7 +2571,8 @@ const TALK_DATA = {
       "whats hermes",
       "what is this",
       "what does hermes do",
-      "tell me about hermes"
+      "tell me about hermes",
+      "what hermes is"
     ],
     "start": [
       "get started",
@@ -2669,6 +2805,62 @@ const TALK_DATA = {
       "cant code",
       "not technical",
       "non-technical"
+    ],
+    "migrate_apps": [
+      {
+        "id": "openclaw",
+        "label": "OpenClaw",
+        "agent": "openclaw",
+        "phrases": [
+          "openclaw",
+          "open claw",
+          "clawdbot",
+          "moltbot"
+        ]
+      },
+      {
+        "id": "claude_code",
+        "label": "Claude Code",
+        "agent": "claude-code",
+        "phrases": [
+          "claude code"
+        ]
+      },
+      {
+        "id": "codex",
+        "label": "Codex",
+        "agent": "codex",
+        "phrases": [
+          "codex",
+          "codex cli"
+        ]
+      },
+      {
+        "id": "cursor",
+        "label": "Cursor",
+        "agent": "cursor",
+        "phrases": [
+          "cursor"
+        ]
+      },
+      {
+        "id": "grok_bot",
+        "label": "Grok Bot",
+        "agent": "grok-bot",
+        "phrases": [
+          "grok bot",
+          "grokbot"
+        ]
+      },
+      {
+        "id": "openbot",
+        "label": "OpenBot",
+        "agent": "openbot",
+        "phrases": [
+          "openbot",
+          "open bot"
+        ]
+      }
     ]
   },
   "about_rule": {
@@ -3540,7 +3732,7 @@ const TALK_DATA = {
         "next": {
           "kind": "paste",
           "label": "Try it",
-          "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
+          "paste_text": "Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved."
         }
       },
       "needs": [
@@ -3570,7 +3762,7 @@ const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Try it",
-            "paste_text": "Please save this to your memory: <one thing about you>. Then tell me what you saved."
+            "paste_text": "Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved."
           }
         },
         {
@@ -3604,7 +3796,7 @@ const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Try it",
-            "paste_text": "What did we talk about last time about <topic>?"
+            "paste_text": "What did we talk about in our last chat?"
           }
         },
         {
@@ -4264,7 +4456,7 @@ const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
-            "paste_text": "Every morning at 8, send me a short summary of <what>."
+            "paste_text": "I want a short summary every morning at 8. First ask me what it should be about."
           }
         },
         {
@@ -4288,7 +4480,7 @@ const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
-            "paste_text": "Remind me <when> to <what>."
+            "paste_text": "I want a reminder. First ask me what it is for and when."
           }
         },
         {
@@ -4314,7 +4506,7 @@ const TALK_DATA = {
           "next": {
             "kind": "paste",
             "label": "Show me what to ask",
-            "paste_text": "Every <how often>, check <what> and tell me what you find."
+            "paste_text": "I want you to check something for me again and again. First ask me what to check and how often. Then tell me what you find each time."
           }
         },
         {
@@ -6595,7 +6787,7 @@ const TALK_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please search the Hermes plugin catalog for <what you want> and show me what you find. Install nothing yet."
+        "paste_text": "First ask me what I want a plugin for. Then search the Hermes plugin catalog and show me what you find. Install nothing yet."
       }
     },
     {
@@ -8845,6 +9037,1940 @@ const TALK_DATA = {
   ]
 }
 
+// ---- src/names-data.js ----
+// Generated by scripts/build.mjs from content/hermes-names-v1.json (hhcontent's names from the Hermes docs). Only the
+// fields the code reads. Edit the JSON, then build.
+const NAMES_DATA = [
+  {
+    "id": "nm_honcho",
+    "name": "Honcho",
+    "kind": "memory",
+    "say": "Honcho is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 53,
+    "quote": "AI-native cross-session user modeling with dialectic reasoning, session-scoped context injection, semantic search, and persistent conclusions.",
+    "outside": {
+      "file": "user-guide/features/memory-providers.md",
+      "line": 50,
+      "quote": "Honcho is maintained by Plastic Labs and installed from the plugin catalog rather than bundled with Hermes"
+    },
+    "aliases": [
+      "honcho"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_openviking",
+    "name": "OpenViking",
+    "kind": "memory",
+    "say": "OpenViking is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 301,
+    "quote": "Context database by Volcengine (ByteDance) with filesystem-style knowledge hierarchy, tiered retrieval, and automatic memory extraction into 6 categories.",
+    "outside": {
+      "file": "user-guide/features/memory-providers.md",
+      "line": 298,
+      "quote": "OpenViking is maintained by Volcengine and installed from the plugin catalog rather than bundled with Hermes"
+    },
+    "aliases": [
+      "openviking"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_mem0",
+    "name": "Mem0",
+    "kind": "memory",
+    "say": "Mem0 is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 394,
+    "quote": "Server-side LLM fact extraction with semantic search, reranking, and automatic deduplication.",
+    "outside": {
+      "file": "user-guide/features/memory-providers.md",
+      "line": 391,
+      "quote": "Mem0 is maintained by Mem0 and installed from the plugin catalog rather than bundled with Hermes"
+    },
+    "aliases": [
+      "mem0"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_hindsight",
+    "name": "Hindsight",
+    "kind": "memory",
+    "say": "Hindsight is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 491,
+    "quote": "Long-term memory with knowledge graph, entity resolution, and multi-strategy retrieval.",
+    "outside": {
+      "file": "user-guide/features/memory-providers.md",
+      "line": 488,
+      "quote": "Hindsight is maintained by vectorize-io and installed from the plugin catalog rather than bundled with Hermes"
+    },
+    "aliases": [
+      "hindsight"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_holographic",
+    "name": "Holographic",
+    "kind": "memory",
+    "say": "Holographic is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 558,
+    "quote": "Local SQLite fact store with FTS5 full-text search, trust scoring, and HRR (Holographic Reduced Representations) for compositional algebraic queries.",
+    "outside": {
+      "file": "user-guide/features/memory-providers.md",
+      "line": 555,
+      "quote": "Holographic is maintained by itpartypattaya and installed from the plugin catalog rather than bundled with Hermes"
+    },
+    "aliases": [
+      "holographic"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_retaindb",
+    "name": "RetainDB",
+    "kind": "memory",
+    "say": "RetainDB is a memory add-on. It helps Hermes remember things from one chat to the next. It comes with Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 609,
+    "quote": "Cloud memory API with hybrid search (Vector + BM25 + Reranking), 7 memory types, and delta compression.",
+    "aliases": [
+      "retaindb"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_byterover",
+    "name": "ByteRover",
+    "kind": "memory",
+    "say": "ByteRover is a memory add-on. It helps Hermes remember things from one chat to the next. It comes with Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 632,
+    "quote": "Persistent memory via the brv CLI — hierarchical knowledge tree with tiered retrieval (fuzzy text → LLM-driven search).",
+    "aliases": [
+      "byterover"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_supermemory",
+    "name": "Supermemory",
+    "kind": "memory",
+    "say": "Supermemory is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself. It comes from the plugin catalog, a list of add-ons for Hermes.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 667,
+    "quote": "Semantic long-term memory with profile recall, semantic search, explicit memory tools, and per-turn conversation capture (one document per session per 4-hour window).",
+    "outside": {
+      "file": "user-guide/features/memory-providers.md",
+      "line": 664,
+      "quote": "Supermemory is maintained by Supermemory and installed from the plugin catalog rather than bundled with Hermes"
+    },
+    "aliases": [
+      "supermemory"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_memori",
+    "name": "Memori",
+    "kind": "memory",
+    "say": "Memori is a memory add-on. It helps Hermes remember things from one chat to the next. It is not part of Hermes itself.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 761,
+    "quote": "Structured long-term memory using Memori Cloud, with background completed-turn capture, tool-aware turn context, and explicit recall tools for facts, summaries, quota, signup, and feedback.",
+    "outside": {
+      "file": "user-guide/features/memory-providers.md",
+      "line": 766,
+      "quote": "Externally supplied hermes-memori CLI and provider integration + Memori API key"
+    },
+    "aliases": [
+      "memori"
+    ],
+    "offer": "name_memory"
+  },
+  {
+    "id": "nm_dingtalk",
+    "name": "DingTalk",
+    "kind": "chat",
+    "say": "DingTalk is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/dingtalk.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a DingTalk chatbot",
+    "aliases": [
+      "dingtalk"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_discord",
+    "name": "Discord",
+    "kind": "chat",
+    "say": "Discord is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/discord.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Discord bot",
+    "aliases": [
+      "discord"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_email",
+    "name": "Email",
+    "kind": "chat",
+    "say": "Email is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/email.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as an email assistant via IMAP/SMTP",
+    "aliases": [
+      "email"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_feishulark",
+    "name": "Feishu / Lark",
+    "kind": "chat",
+    "say": "Feishu / Lark is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/feishu.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Feishu or Lark bot",
+    "aliases": [
+      "feishu / lark",
+      "feishulark"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_googlechat",
+    "name": "Google Chat",
+    "kind": "chat",
+    "say": "Google Chat is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/google_chat.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Google Chat bot using Cloud Pub/Sub",
+    "aliases": [
+      "google chat",
+      "googlechat"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_homeassistant",
+    "name": "Home Assistant",
+    "kind": "chat",
+    "say": "Home Assistant is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/homeassistant.md",
+    "line": 3,
+    "quote": "Control your smart home with Hermes Agent via the Home Assistant plugin from the plugin catalog.",
+    "aliases": [
+      "home assistant",
+      "homeassistant"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_line",
+    "name": "LINE",
+    "kind": "chat",
+    "say": "LINE is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/line.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a LINE Messaging API bot",
+    "aliases": [
+      "line"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_matrix",
+    "name": "Matrix",
+    "kind": "chat",
+    "say": "Matrix is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/matrix.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Matrix bot",
+    "aliases": [
+      "matrix"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_mattermost",
+    "name": "Mattermost",
+    "kind": "chat",
+    "say": "Mattermost is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/mattermost.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Mattermost bot",
+    "aliases": [
+      "mattermost"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_microsoftgraphwebhooklistener",
+    "name": "Microsoft Graph Webhook Listener",
+    "kind": "chat",
+    "say": "Microsoft Graph Webhook Listener is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/msgraph-webhook.md",
+    "line": 4,
+    "quote": "Receive Microsoft Graph change notifications (meetings, calendar, chat, etc.) in Hermes",
+    "aliases": [
+      "microsoft graph webhook listener",
+      "microsoftgraphwebhooklistener"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_openwebui",
+    "name": "Open WebUI",
+    "kind": "chat",
+    "say": "Open WebUI is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/open-webui.md",
+    "line": 4,
+    "quote": "Connect Open WebUI to Hermes Agent via the OpenAI-compatible API server",
+    "aliases": [
+      "open webui",
+      "openwebui"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_raft",
+    "name": "Raft",
+    "kind": "chat",
+    "say": "Raft is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/raft.md",
+    "line": 4,
+    "quote": "Connect Hermes Agent to Raft as an external agent via wake-channel bridge",
+    "aliases": [
+      "raft"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_hermesrelay",
+    "name": "Hermes Relay",
+    "kind": "chat",
+    "say": "Hermes Relay is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/relay.md",
+    "line": 4,
+    "quote": "Connect Hermes to messaging platforms through a relay connector that owns the platform credentials — enrollment, capabilities, config, and troubleshooting",
+    "aliases": [
+      "hermes relay",
+      "hermesrelay"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_signal",
+    "name": "Signal",
+    "kind": "chat",
+    "say": "Signal is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/signal.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Signal messenger bot via signal-cli daemon",
+    "aliases": [
+      "signal"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_slack",
+    "name": "Slack",
+    "kind": "chat",
+    "say": "Slack is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/slack.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Slack bot using Socket Mode",
+    "aliases": [
+      "slack"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_smstwilio",
+    "name": "SMS (Twilio)",
+    "kind": "chat",
+    "say": "SMS (Twilio) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/sms.md",
+    "line": 5,
+    "quote": "Set up Hermes Agent as an SMS chatbot via Twilio",
+    "aliases": [
+      "sms (twilio)",
+      "smstwilio"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_teamsmeetings",
+    "name": "Teams Meetings",
+    "kind": "chat",
+    "say": "Teams Meetings is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/teams-meetings.md",
+    "line": 4,
+    "quote": "Set up the Microsoft Teams meeting summary pipeline with Microsoft Graph webhooks",
+    "aliases": [
+      "teams meetings",
+      "teamsmeetings"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_microsoftteams",
+    "name": "Microsoft Teams",
+    "kind": "chat",
+    "say": "Microsoft Teams is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/teams.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Microsoft Teams bot",
+    "aliases": [
+      "microsoft teams",
+      "microsoftteams"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_telegram",
+    "name": "Telegram",
+    "kind": "chat",
+    "say": "Telegram is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/telegram.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a Telegram bot",
+    "aliases": [
+      "telegram"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_webhooks",
+    "name": "Webhooks",
+    "kind": "chat",
+    "say": "Webhooks is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/webhooks.md",
+    "line": 4,
+    "quote": "Receive events from GitHub, GitLab, and other services to trigger Hermes agent runs",
+    "aliases": [
+      "webhooks"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_wecomenterprisewechat",
+    "name": "WeCom (Enterprise WeChat)",
+    "kind": "chat",
+    "say": "WeCom (Enterprise WeChat) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/wecom.md",
+    "line": 4,
+    "quote": "Connect Hermes Agent to WeCom via the AI Bot WebSocket gateway",
+    "aliases": [
+      "wecom (enterprise wechat)",
+      "wecomenterprisewechat"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_weixinwechat",
+    "name": "Weixin (WeChat)",
+    "kind": "chat",
+    "say": "Weixin (WeChat) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/weixin.md",
+    "line": 4,
+    "quote": "Connect Hermes Agent to personal WeChat accounts via the iLink Bot API",
+    "aliases": [
+      "weixin (wechat)",
+      "weixinwechat"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_whatsappbusinesscloudapi",
+    "name": "WhatsApp Business (Cloud API)",
+    "kind": "chat",
+    "say": "WhatsApp Business (Cloud API) is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/whatsapp-cloud.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a WhatsApp bot via Meta's official Business Cloud API",
+    "aliases": [
+      "whatsapp business (cloud api)",
+      "whatsappbusinesscloudapi"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_whatsapp",
+    "name": "WhatsApp",
+    "kind": "chat",
+    "say": "WhatsApp is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/whatsapp.md",
+    "line": 4,
+    "quote": "Set up Hermes Agent as a WhatsApp bot via the built-in Baileys bridge",
+    "aliases": [
+      "whatsapp"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_yuanbao",
+    "name": "Yuanbao",
+    "kind": "chat",
+    "say": "Yuanbao is one of the places you can talk to Hermes from, outside the Hermes app.",
+    "file": "user-guide/messaging/yuanbao.md",
+    "line": 4,
+    "quote": "Yuanbao moved out of Hermes core into the yuanbao Hermes Labs plugin",
+    "aliases": [
+      "yuanbao"
+    ],
+    "offer": "name_chat"
+  },
+  {
+    "id": "nm_nousportal",
+    "name": "Nous Portal",
+    "kind": "provider",
+    "say": "Nous Portal is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 74,
+    "quote": "Nous Portal is Nous Research's unified subscription gateway and the recommended way to run Hermes Agent.",
+    "aliases": [
+      "nous portal",
+      "nousportal"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_anthropic",
+    "name": "Anthropic",
+    "kind": "provider",
+    "say": "Anthropic is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 160,
+    "quote": "Use Claude models directly through the Anthropic API — no OpenRouter proxy needed.",
+    "aliases": [
+      "anthropic",
+      "anthropic (native)"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_githubcopilot",
+    "name": "GitHub Copilot",
+    "kind": "provider",
+    "say": "GitHub Copilot is a company or service that runs AI models. A model is the AI that thinks for Hermes. It is not part of Hermes itself.",
+    "file": "integrations/providers.md",
+    "line": 210,
+    "quote": "The GitHub Copilot providers (copilot for the Copilot API, copilot-acp for the Copilot CLI over ACP) are no longer built into Hermes.",
+    "outside": {
+      "file": "integrations/providers.md",
+      "line": 208,
+      "quote": "GitHub Copilot (labs plugin)"
+    },
+    "aliases": [
+      "github copilot",
+      "github copilot (labs plugin)",
+      "githubcopilot"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_xai",
+    "name": "xAI",
+    "kind": "provider",
+    "say": "xAI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 314,
+    "quote": "xAI is wired through the Responses API (codex_responses transport) for automatic reasoning support on Grok 4 models — no reasoning_effort parameter needed, the server reasons by default.",
+    "aliases": [
+      "xai",
+      "xai (grok) — responses api + prompt caching"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_novitaai",
+    "name": "NovitaAI",
+    "kind": "provider",
+    "say": "NovitaAI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 335,
+    "quote": "NovitaAI is the AI-native cloud for builders and agents.",
+    "aliases": [
+      "novitaai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_ollamacloud",
+    "name": "Ollama Cloud",
+    "kind": "provider",
+    "say": "Ollama Cloud is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 358,
+    "quote": "Ollama Cloud hosts the same open-weight catalog as local Ollama but without the GPU requirement.",
+    "aliases": [
+      "ollama cloud",
+      "ollama cloud — managed ollama models, oauth + api key",
+      "ollamacloud"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_deepinfra",
+    "name": "DeepInfra",
+    "kind": "provider",
+    "say": "DeepInfra is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 382,
+    "quote": "DeepInfra (--provider deepinfra, DEEPINFRA_API_KEY) is discovered live from its catalog.",
+    "aliases": [
+      "deepinfra"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_awsbedrock",
+    "name": "AWS Bedrock",
+    "kind": "provider",
+    "say": "AWS Bedrock is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 386,
+    "quote": "Anthropic Claude, Amazon Nova, DeepSeek v3.2, Meta Llama 4, and other models via AWS Bedrock.",
+    "aliases": [
+      "aws bedrock",
+      "awsbedrock"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_googlevertexai",
+    "name": "Google Vertex AI",
+    "kind": "provider",
+    "say": "Google Vertex AI is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 418,
+    "quote": "Gemini models on Google Cloud Vertex AI via Vertex's OpenAI-compatible endpoint.",
+    "aliases": [
+      "google vertex ai",
+      "googlevertexai"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_qwenportal",
+    "name": "Qwen Portal",
+    "kind": "provider",
+    "say": "Qwen Portal is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 443,
+    "quote": "Alibaba's Qwen Portal with browser-based OAuth login.",
+    "aliases": [
+      "qwen portal",
+      "qwen portal (oauth)",
+      "qwenportal"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_alibabacloud",
+    "name": "Alibaba Cloud",
+    "kind": "provider",
+    "say": "Alibaba Cloud is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 469,
+    "quote": "If you're subscribed to Alibaba's Coding Plan (a pricing SKU separate from standard DashScope API access), Hermes exposes it as its own first-class provider: alibaba-coding-plan.",
+    "aliases": [
+      "alibaba cloud",
+      "alibaba cloud (coding plan)",
+      "alibabacloud"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_minimax",
+    "name": "MiniMax",
+    "kind": "provider",
+    "say": "MiniMax is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 489,
+    "quote": "MiniMax-M2.7 via browser OAuth login — no API key needed.",
+    "aliases": [
+      "minimax",
+      "minimax (oauth)"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_nvidianim",
+    "name": "NVIDIA NIM",
+    "kind": "provider",
+    "say": "NVIDIA NIM is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 515,
+    "quote": "Use the NVIDIA NIM provider to access Nemotron and other open-source models through NVIDIA’s hosted service or a local NIM endpoint.",
+    "aliases": [
+      "nvidia nim",
+      "nvidianim"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_gmicloud",
+    "name": "GMI Cloud",
+    "kind": "provider",
+    "say": "GMI Cloud is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 566,
+    "quote": "Open and reasoning models via GMI Cloud — OpenAI-compatible API, API key authentication.",
+    "aliases": [
+      "gmi cloud",
+      "gmicloud"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_actualcomputer",
+    "name": "Actual Computer",
+    "kind": "provider",
+    "say": "Actual Computer is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 585,
+    "quote": "Your own hardware as a private inference cluster via Actual Computer.",
+    "aliases": [
+      "actual computer",
+      "actualcomputer"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_stepfun",
+    "name": "StepFun",
+    "kind": "provider",
+    "say": "StepFun is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 616,
+    "quote": "Step-series models via StepFun — OpenAI-compatible API, API key authentication.",
+    "aliases": [
+      "stepfun"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_huggingfaceinferenceproviders",
+    "name": "Hugging Face Inference Providers",
+    "kind": "provider",
+    "say": "Hugging Face Inference Providers is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 635,
+    "quote": "Hugging Face Inference Providers routes to 20+ open models through a unified OpenAI-compatible endpoint (router.huggingface.co/v1).",
+    "aliases": [
+      "hugging face inference providers",
+      "huggingfaceinferenceproviders"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_ollama",
+    "name": "Ollama",
+    "kind": "provider",
+    "say": "Ollama is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 728,
+    "quote": "Ollama runs open-weight models locally with one command.",
+    "aliases": [
+      "ollama",
+      "ollama — local models, zero config"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_vllm",
+    "name": "vLLM",
+    "kind": "provider",
+    "say": "vLLM is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 801,
+    "quote": "vLLM is the standard for production LLM serving.",
+    "aliases": [
+      "vllm",
+      "vllm — high-performance gpu inference"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_sglang",
+    "name": "SGLang",
+    "kind": "provider",
+    "say": "SGLang is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 844,
+    "quote": "SGLang is an alternative to vLLM with RadixAttention for KV cache reuse.",
+    "aliases": [
+      "sglang",
+      "sglang — fast serving with radixattention"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_llamacpp",
+    "name": "llama.cpp",
+    "kind": "provider",
+    "say": "llama.cpp is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 877,
+    "quote": "llama.cpp runs quantized models on CPU, Apple Silicon (Metal), and consumer GPUs.",
+    "aliases": [
+      "llama.cpp",
+      "llama.cpp / llama-server — cpu & metal inference",
+      "llamacpp"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_lmstudio",
+    "name": "LM Studio",
+    "kind": "provider",
+    "say": "LM Studio is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 920,
+    "quote": "LM Studio is a desktop app for running local models with a GUI.",
+    "aliases": [
+      "lm studio",
+      "lm studio — desktop app with local models",
+      "lmstudio"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_litellmproxy",
+    "name": "LiteLLM Proxy",
+    "kind": "provider",
+    "say": "LiteLLM Proxy is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1148,
+    "quote": "LiteLLM is an OpenAI-compatible proxy that unifies 100+ LLM providers behind a single API.",
+    "aliases": [
+      "litellm proxy",
+      "litellm proxy — multi-provider gateway",
+      "litellmproxy"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_clawrouter",
+    "name": "ClawRouter",
+    "kind": "provider",
+    "say": "ClawRouter is a company or service that runs AI models. A model is the AI that thinks for Hermes.",
+    "file": "integrations/providers.md",
+    "line": 1180,
+    "quote": "ClawRouter by BlockRunAI is a local routing proxy that auto-selects models based on query complexity.",
+    "aliases": [
+      "clawrouter",
+      "clawrouter — cost-optimized routing"
+    ],
+    "offer": "name_provider"
+  },
+  {
+    "id": "nm_browser",
+    "name": "browser",
+    "kind": "toolset",
+    "say": "browser is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 55,
+    "quote": "Core browser automation.",
+    "aliases": [
+      "browser"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_clarify",
+    "name": "clarify",
+    "kind": "toolset",
+    "say": "clarify is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 56,
+    "quote": "Ask the user a question when the agent needs clarification.",
+    "aliases": [
+      "clarify"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_codeexecution",
+    "name": "code_execution",
+    "kind": "toolset",
+    "say": "code_execution is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 57,
+    "quote": "Run Python scripts that call Hermes tools programmatically.",
+    "aliases": [
+      "code execution",
+      "code_execution",
+      "codeexecution"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_connections",
+    "name": "connections",
+    "kind": "toolset",
+    "say": "connections is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 58,
+    "quote": "Connect the user to apps: managed connector accounts through the Nous gateway, and local MCP servers from the catalog.",
+    "aliases": [
+      "connections"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_coding",
+    "name": "coding",
+    "kind": "toolset",
+    "say": "coding is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 59,
+    "quote": "Coding-focused bundle for software work: file editing, terminal, search, web docs, skills, browser, delegate, and code execution.",
+    "aliases": [
+      "coding"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_cronjob",
+    "name": "cronjob",
+    "kind": "toolset",
+    "say": "cronjob is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 60,
+    "quote": "Schedule and manage recurring tasks.",
+    "aliases": [
+      "cronjob"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_debugging",
+    "name": "debugging",
+    "kind": "toolset",
+    "say": "debugging is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 61,
+    "quote": "Debug bundle — file, process/terminal, web extract/search.",
+    "aliases": [
+      "debugging"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_delegation",
+    "name": "delegation",
+    "kind": "toolset",
+    "say": "delegation is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 62,
+    "quote": "Spawn isolated subagent instances for parallel work.",
+    "aliases": [
+      "delegation"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_discordadmin",
+    "name": "discord_admin",
+    "kind": "toolset",
+    "say": "discord_admin is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 64,
+    "quote": "Discord moderation (bans, role changes, channel management).",
+    "aliases": [
+      "discord admin",
+      "discord_admin",
+      "discordadmin"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_feishudoc",
+    "name": "feishu_doc",
+    "kind": "toolset",
+    "say": "feishu_doc is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 65,
+    "quote": "Read Feishu/Lark document content.",
+    "aliases": [
+      "feishu doc",
+      "feishu_doc",
+      "feishudoc"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_feishudrive",
+    "name": "feishu_drive",
+    "kind": "toolset",
+    "say": "feishu_drive is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 66,
+    "quote": "Feishu/Lark drive comment operations.",
+    "aliases": [
+      "feishu drive",
+      "feishu_drive",
+      "feishudrive"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_file",
+    "name": "file",
+    "kind": "toolset",
+    "say": "file is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 67,
+    "quote": "File reading, writing, searching, and editing.",
+    "aliases": [
+      "file"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_computeruse",
+    "name": "computer_use",
+    "kind": "toolset",
+    "say": "computer_use is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 68,
+    "quote": "Background desktop control via cua-driver — does not steal cursor/focus.",
+    "aliases": [
+      "computer use",
+      "computer_use",
+      "computeruse"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_contextengine",
+    "name": "context_engine",
+    "kind": "toolset",
+    "say": "context_engine is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 69,
+    "quote": "Runtime tools exposed by the active context-engine plugin (empty until a plugin populates it).",
+    "aliases": [
+      "context engine",
+      "context_engine",
+      "contextengine"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_imagegen",
+    "name": "image_gen",
+    "kind": "toolset",
+    "say": "image_gen is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 70,
+    "quote": "Text-to-image generation via FAL.ai (with opt-in OpenAI / xAI backends).",
+    "aliases": [
+      "image gen",
+      "image_gen",
+      "imagegen"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_videogen",
+    "name": "video_gen",
+    "kind": "toolset",
+    "say": "video_gen is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 71,
+    "quote": "Text-to-video and image-to-video via plugin-registered backends (xAI Grok-Imagine, FAL.ai Veo 3.1 / Pixverse v6 / Kling 3.0 / Kling O3).",
+    "aliases": [
+      "video gen",
+      "video_gen",
+      "videogen"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_kanban",
+    "name": "kanban",
+    "kind": "toolset",
+    "say": "kanban is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 72,
+    "quote": "Multi-agent coordination tools.",
+    "aliases": [
+      "kanban"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_memory",
+    "name": "memory",
+    "kind": "toolset",
+    "say": "memory is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 73,
+    "quote": "Persistent cross-session memory management.",
+    "aliases": [
+      "memory"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_desktopui",
+    "name": "desktop_ui",
+    "kind": "toolset",
+    "say": "desktop_ui is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 74,
+    "quote": "Affordances that act on the Hermes desktop app itself — read/close the embedded terminal pane, open, read, close, interact with, and annotate the in-app browser, identify the OS window behind the app, reveal a pane, react to a message, run a guided tour",
+    "aliases": [
+      "desktop ui",
+      "desktop_ui",
+      "desktopui"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_project",
+    "name": "project",
+    "kind": "toolset",
+    "say": "project is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 75,
+    "quote": "Create and switch desktop Projects (named, multi-folder workspaces) via one create/switch/list action enum.",
+    "aliases": [
+      "project"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_catalog",
+    "name": "catalog",
+    "kind": "toolset",
+    "say": "catalog is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 76,
+    "quote": "Search the plugin catalog and skills hub, and install items through the approval card into this chat's profile.",
+    "aliases": [
+      "catalog"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_safe",
+    "name": "safe",
+    "kind": "toolset",
+    "say": "safe is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 77,
+    "quote": "Read-only research + media generation.",
+    "aliases": [
+      "safe"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_search",
+    "name": "search",
+    "kind": "toolset",
+    "say": "search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 78,
+    "quote": "Web search only (without extract).",
+    "aliases": [
+      "search"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_sessionsearch",
+    "name": "session_search",
+    "kind": "toolset",
+    "say": "session_search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 79,
+    "quote": "Search past conversation sessions.",
+    "aliases": [
+      "session search",
+      "session_search",
+      "sessionsearch"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_skills",
+    "name": "skills",
+    "kind": "toolset",
+    "say": "skills is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 80,
+    "quote": "Skill CRUD and browsing.",
+    "aliases": [
+      "skills"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_terminal",
+    "name": "terminal",
+    "kind": "toolset",
+    "say": "terminal is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 81,
+    "quote": "Shell command execution and background process management.",
+    "aliases": [
+      "terminal"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_todo",
+    "name": "todo",
+    "kind": "toolset",
+    "say": "todo is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 82,
+    "quote": "Task list management within a session.",
+    "aliases": [
+      "todo"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_tts",
+    "name": "tts",
+    "kind": "toolset",
+    "say": "tts is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 83,
+    "quote": "Text-to-speech audio generation.",
+    "aliases": [
+      "tts"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_vision",
+    "name": "vision",
+    "kind": "toolset",
+    "say": "vision is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 84,
+    "quote": "Image analysis via vision-capable models.",
+    "aliases": [
+      "vision"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_video",
+    "name": "video",
+    "kind": "toolset",
+    "say": "video is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 85,
+    "quote": "Video analysis and understanding tools (opt-in, not in the default toolset — add explicitly via --toolsets).",
+    "aliases": [
+      "video"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_web",
+    "name": "web",
+    "kind": "toolset",
+    "say": "web is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 86,
+    "quote": "Web search and page content extraction.",
+    "aliases": [
+      "web"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_xsearch",
+    "name": "x_search",
+    "kind": "toolset",
+    "say": "x_search is a group of tools. A tool is one thing Hermes can do, like reading a file.",
+    "file": "reference/toolsets-reference.md",
+    "line": 87,
+    "quote": "Read-only public X discovery via xAI's built-in x_search Responses tool.",
+    "aliases": [
+      "x search",
+      "x_search",
+      "xsearch"
+    ],
+    "offer": "name_toolset"
+  },
+  {
+    "id": "nm_acphostintegration",
+    "name": "ACP Host Integration",
+    "kind": "feature",
+    "say": "ACP Host Integration is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/acp.md",
+    "line": 4,
+    "quote": "Use Hermes Agent inside ACP-compatible editors and collaboration platforms",
+    "aliases": [
+      "acp host integration",
+      "acphostintegration"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_apiserver",
+    "name": "API Server",
+    "kind": "feature",
+    "say": "API Server is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/api-server.md",
+    "line": 4,
+    "quote": "Expose hermes-agent as an OpenAI-compatible API for any frontend",
+    "aliases": [
+      "api server",
+      "apiserver"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_batchprocessing",
+    "name": "Batch Processing",
+    "kind": "feature",
+    "say": "Batch Processing is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/batch-processing.md",
+    "line": 4,
+    "quote": "Generate agent trajectories at scale — parallel processing, checkpointing, and toolset distributions",
+    "aliases": [
+      "batch processing",
+      "batchprocessing"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_browserautomation",
+    "name": "Browser Automation",
+    "kind": "feature",
+    "say": "Browser Automation is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/browser.md",
+    "line": 3,
+    "quote": "Drive a real browser with browser_exec — Hermes-launched Chromium, cloud browsers, Lightpanda, or your own Chrome via CDP — for web interaction, form filling, scraping, and more.",
+    "aliases": [
+      "browser automation",
+      "browserautomation"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_builtinplugins",
+    "name": "Built-in Plugins",
+    "kind": "feature",
+    "say": "Built-in Plugins is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/built-in-plugins.md",
+    "line": 5,
+    "quote": "Plugins shipped with Hermes Agent that run automatically via lifecycle hooks — disk-cleanup and friends",
+    "aliases": [
+      "built-in plugins",
+      "builtinplugins"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_contextfiles",
+    "name": "Context Files",
+    "kind": "feature",
+    "say": "Context Files is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/context-files.md",
+    "line": 4,
+    "quote": "Project context files — .hermes.md, AGENTS.md, CLAUDE.md, global SOUL.md, and .cursorrules — automatically injected into every conversation",
+    "aliases": [
+      "context files",
+      "contextfiles"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_contextreferences",
+    "name": "Context References",
+    "kind": "feature",
+    "say": "Context References is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/context-references.md",
+    "line": 5,
+    "quote": "Inline @-syntax for attaching files, folders, git diffs, and URLs directly into your messages",
+    "aliases": [
+      "context references",
+      "contextreferences"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_credentialpools",
+    "name": "Credential Pools",
+    "kind": "feature",
+    "say": "Credential Pools is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/credential-pools.md",
+    "line": 3,
+    "quote": "Pool multiple API keys or OAuth tokens per provider for automatic rotation and rate limit recovery.",
+    "aliases": [
+      "credential pools",
+      "credentialpools"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_passwordslogins",
+    "name": "Passwords & Logins",
+    "kind": "feature",
+    "say": "Passwords & Logins is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/credential-vault.md",
+    "line": 3,
+    "quote": "The agent signs into sites, pays and fills addresses for you without ever seeing a password.",
+    "aliases": [
+      "passwords & logins",
+      "passwordslogins"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_scheduledtaskscron",
+    "name": "Scheduled Tasks (Cron)",
+    "kind": "feature",
+    "say": "Scheduled Tasks (Cron) is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/cron.md",
+    "line": 4,
+    "quote": "Schedule automated tasks with natural language, manage them with one cron tool, and attach one or more skills",
+    "aliases": [
+      "scheduled tasks (cron)",
+      "scheduledtaskscron"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_curator",
+    "name": "Curator",
+    "kind": "feature",
+    "say": "Curator is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/curator.md",
+    "line": 4,
+    "quote": "Background maintenance for agent-created skills — usage tracking, staleness, archival, and LLM-driven review",
+    "aliases": [
+      "curator"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_subagentdelegation",
+    "name": "Subagent Delegation",
+    "kind": "feature",
+    "say": "Subagent Delegation is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/delegation.md",
+    "line": 4,
+    "quote": "Spawn isolated child agents for parallel workstreams with delegate_task",
+    "aliases": [
+      "subagent delegation",
+      "subagentdelegation"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_deliverablemodeartifactsinchat",
+    "name": "Deliverable Mode (Artifacts in Chat)",
+    "kind": "feature",
+    "say": "Deliverable Mode (Artifacts in Chat) is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/deliverable-mode.md",
+    "line": 4,
+    "quote": "How the agent ships generated charts, PDFs, spreadsheets, and other files as native attachments in messaging platforms.",
+    "aliases": [
+      "deliverable mode (artifacts in chat)",
+      "deliverablemodeartifactsinchat"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_documentextraction",
+    "name": "Document Extraction",
+    "kind": "feature",
+    "say": "Document Extraction is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/document-extraction.md",
+    "line": 4,
+    "quote": "How read_file converts PDFs, Office documents, and notebooks to text — and what to do when a PDF is scanned images",
+    "aliases": [
+      "document extraction",
+      "documentextraction"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_extendingthedashboard",
+    "name": "Extending the Dashboard",
+    "kind": "feature",
+    "say": "Extending the Dashboard is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/extending-the-dashboard.md",
+    "line": 4,
+    "quote": "Build themes and plugins for the Hermes web dashboard — palettes, typography, layouts, custom tabs, shell slots, page-scoped slots, and backend API routes",
+    "aliases": [
+      "extending the dashboard",
+      "extendingthedashboard"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_fallbackproviders",
+    "name": "Fallback Providers",
+    "kind": "feature",
+    "say": "Fallback Providers is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/fallback-providers.md",
+    "line": 3,
+    "quote": "Configure automatic failover to backup LLM providers when your primary model is unavailable.",
+    "aliases": [
+      "fallback providers",
+      "fallbackproviders"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_persistentgoals",
+    "name": "Persistent Goals",
+    "kind": "feature",
+    "say": "Persistent Goals is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/goals.md",
+    "line": 4,
+    "quote": "Set a standing goal and let Hermes keep working across turns until it's done. Our take on the Ralph loop.",
+    "aliases": [
+      "persistent goals",
+      "persistentgoals"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_sessionheartbeats",
+    "name": "Session Heartbeats",
+    "kind": "feature",
+    "say": "Session Heartbeats is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/heartbeat.md",
+    "line": 4,
+    "quote": "A recurring prompt that re-enters your current session whenever it's idle — /heartbeat every 10m Check the deployment.",
+    "aliases": [
+      "session heartbeats",
+      "sessionheartbeats"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_honchomemory",
+    "name": "Honcho Memory",
+    "kind": "feature",
+    "say": "Honcho Memory is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/honcho.md",
+    "line": 4,
+    "quote": "AI-native persistent memory via Honcho — dialectic reasoning, multi-agent user modeling, and deep personalization",
+    "aliases": [
+      "honcho memory",
+      "honchomemory"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_eventhooks",
+    "name": "Event Hooks",
+    "kind": "feature",
+    "say": "Event Hooks is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/hooks.md",
+    "line": 4,
+    "quote": "Run custom code at key lifecycle points — log activity, send alerts, post to webhooks",
+    "aliases": [
+      "event hooks",
+      "eventhooks"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_imagegeneration",
+    "name": "Image Generation",
+    "kind": "feature",
+    "say": "Image Generation is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/image-generation.md",
+    "line": 3,
+    "quote": "Generate images via FAL.ai — 11 models including FLUX 2, GPT Image (1.5 & 2), Nano Banana Pro, Ideogram, Recraft V4 Pro, Krea 2, and more, selectable via hermes tools.",
+    "aliases": [
+      "image generation",
+      "imagegeneration"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_kanbanmultigatewaydeployment",
+    "name": "Kanban Multi-Gateway Deployment",
+    "kind": "feature",
+    "say": "Kanban Multi-Gateway Deployment is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/kanban-multi-gateway.md",
+    "line": 3,
+    "quote": "Running one kanban board across several per-profile gateways: single dispatcher, profile-owned delivery",
+    "aliases": [
+      "kanban multi-gateway deployment",
+      "kanbanmultigatewaydeployment"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_kanbanmultiagentboard",
+    "name": "Kanban (Multi-Agent Board)",
+    "kind": "feature",
+    "say": "Kanban (Multi-Agent Board) is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/kanban.md",
+    "line": 4,
+    "quote": "Durable SQLite-backed task board for coordinating multiple Hermes profiles",
+    "aliases": [
+      "kanban (multi-agent board)",
+      "kanbanmultiagentboard"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_languagepacks",
+    "name": "Language Packs",
+    "kind": "feature",
+    "say": "Language Packs is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/language-packs.md",
+    "line": 4,
+    "quote": "Add or override UI languages for the CLI, gateway, TUI and Desktop with a plugin or a personal overlay",
+    "aliases": [
+      "language packs",
+      "languagepacks"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_recurringloops",
+    "name": "Recurring Loops",
+    "kind": "feature",
+    "say": "Recurring Loops is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/loops.md",
+    "line": 4,
+    "quote": "Re-run a prompt on a recurring interval inside your session — Hermes' take on Claude Code's /loop.",
+    "aliases": [
+      "recurring loops",
+      "recurringloops"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_lspsemanticdiagnostics",
+    "name": "LSP — Semantic Diagnostics",
+    "kind": "feature",
+    "say": "LSP — Semantic Diagnostics is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/lsp.md",
+    "line": 4,
+    "quote": "Real language servers (pyright, gopls, rust-analyzer, …) wired into the post-write lint check used by write_file and patch.",
+    "aliases": [
+      "lsp — semantic diagnostics",
+      "lspsemanticdiagnostics"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_mcpmodelcontextprotocol",
+    "name": "MCP (Model Context Protocol)",
+    "kind": "feature",
+    "say": "MCP (Model Context Protocol) is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/mcp.md",
+    "line": 4,
+    "quote": "Connect Hermes Agent to external tool servers via MCP — and control exactly which MCP tools Hermes loads",
+    "aliases": [
+      "mcp (model context protocol)",
+      "mcpmodelcontextprotocol"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_memoryproviders",
+    "name": "Memory Providers",
+    "kind": "feature",
+    "say": "Memory Providers is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/memory-providers.md",
+    "line": 4,
+    "quote": "External memory provider plugins — Honcho, OpenViking, Mem0, Hindsight, Holographic, RetainDB, ByteRover, Supermemory",
+    "aliases": [
+      "memory providers",
+      "memoryproviders"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_persistentmemory",
+    "name": "Persistent Memory",
+    "kind": "feature",
+    "say": "Persistent Memory is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/memory.md",
+    "line": 4,
+    "quote": "How Hermes Agent remembers across sessions — MEMORY.md, USER.md, and session search",
+    "aliases": [
+      "persistent memory",
+      "persistentmemory"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_mixtureofagents",
+    "name": "Mixture of Agents",
+    "kind": "feature",
+    "say": "Mixture of Agents is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/mixture-of-agents.md",
+    "line": 4,
+    "quote": "Create named MoA presets that appear as selectable models under the Mixture of Agents provider",
+    "aliases": [
+      "mixture of agents",
+      "mixtureofagents"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_personalitysoulmd",
+    "name": "Personality & SOUL.md",
+    "kind": "feature",
+    "say": "Personality & SOUL.md is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/personality.md",
+    "line": 4,
+    "quote": "Customize Hermes Agent's personality with a global SOUL.md, built-in personalities, and custom persona definitions",
+    "aliases": [
+      "personality & soul.md",
+      "personalitysoulmd"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_petspetdexmascots",
+    "name": "Pets (Petdex Mascots)",
+    "kind": "feature",
+    "say": "Pets (Petdex Mascots) is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/pets.md",
+    "line": 4,
+    "quote": "Adopt an animated mascot that reacts to agent activity across the CLI, TUI, and desktop app",
+    "aliases": [
+      "pets (petdex mascots)",
+      "petspetdexmascots"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_plugincatalog",
+    "name": "Plugin Catalog",
+    "kind": "feature",
+    "say": "Plugin Catalog is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/plugin-catalog.md",
+    "line": 5,
+    "quote": "Give Hermes new powers with reviewed plugins you can install in one click",
+    "aliases": [
+      "plugin catalog",
+      "plugincatalog"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_plugins",
+    "name": "Plugins",
+    "kind": "feature",
+    "say": "Plugins is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/plugins.md",
+    "line": 5,
+    "quote": "Extend Hermes with custom tools, hooks, and integrations via the plugin system",
+    "aliases": [
+      "plugins"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_providerrouting",
+    "name": "Provider Routing",
+    "kind": "feature",
+    "say": "Provider Routing is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/provider-routing.md",
+    "line": 3,
+    "quote": "Configure OpenRouter provider preferences to optimize for cost, speed, or quality.",
+    "aliases": [
+      "provider routing",
+      "providerrouting"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_skillssystem",
+    "name": "Skills System",
+    "kind": "feature",
+    "say": "Skills System is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/skills.md",
+    "line": 4,
+    "quote": "On-demand knowledge documents — progressive disclosure, agent-managed skills, and the Skills Hub",
+    "aliases": [
+      "skills system",
+      "skillssystem"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_skinsthemes",
+    "name": "Skins & Themes",
+    "kind": "feature",
+    "say": "Skins & Themes is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/skins.md",
+    "line": 4,
+    "quote": "Customize the Hermes CLI with built-in and user-defined skins",
+    "aliases": [
+      "skins & themes",
+      "skinsthemes"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_subscriptionproxy",
+    "name": "Subscription Proxy",
+    "kind": "feature",
+    "say": "Subscription Proxy is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/subscription-proxy.md",
+    "line": 4,
+    "quote": "Use your Nous Portal subscription (or other OAuth provider) as an OpenAI-compatible endpoint for external apps",
+    "aliases": [
+      "subscription proxy",
+      "subscriptionproxy"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_noustoolgateway",
+    "name": "Nous Tool Gateway",
+    "kind": "feature",
+    "say": "Nous Tool Gateway is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/tool-gateway.md",
+    "line": 3,
+    "quote": "One subscription, every tool. Web search, image generation, TTS, and cloud browsers — all routed through Nous Portal with no extra API keys.",
+    "aliases": [
+      "nous tool gateway",
+      "noustoolgateway"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_toolstoolsets",
+    "name": "Tools & Toolsets",
+    "kind": "feature",
+    "say": "Tools & Toolsets is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/tools.md",
+    "line": 4,
+    "quote": "Overview of Hermes Agent's tools — what's available, how toolsets work, and terminal backends",
+    "aliases": [
+      "tools & toolsets",
+      "toolstoolsets"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_voicetts",
+    "name": "Voice & TTS",
+    "kind": "feature",
+    "say": "Voice & TTS is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/tts.md",
+    "line": 4,
+    "quote": "Text-to-speech and voice message transcription across all platforms",
+    "aliases": [
+      "voice & tts",
+      "voicetts"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_visionimagepaste",
+    "name": "Vision & Image Paste",
+    "kind": "feature",
+    "say": "Vision & Image Paste is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/vision.md",
+    "line": 3,
+    "quote": "Paste images from your clipboard into the Hermes CLI for multimodal vision analysis.",
+    "aliases": [
+      "vision & image paste",
+      "visionimagepaste"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_voicemode",
+    "name": "Voice Mode",
+    "kind": "feature",
+    "say": "Voice Mode is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/voice-mode.md",
+    "line": 4,
+    "quote": "Real-time voice conversations with Hermes Agent — CLI, Telegram, Discord (DMs, text channels, and voice channels)",
+    "aliases": [
+      "voice mode",
+      "voicemode"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_wakeword",
+    "name": "Wake Word",
+    "kind": "feature",
+    "say": "Wake Word is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/wake-word.md",
+    "line": 4,
+    "quote": "Hands-free 'Hey Hermes' wake word — start a voice session by speaking, the 'Hey Siri' way",
+    "aliases": [
+      "wake word",
+      "wakeword"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_hermeswebdashboard",
+    "name": "Hermes Web Dashboard",
+    "kind": "feature",
+    "say": "Hermes Web Dashboard is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/web-dashboard.md",
+    "line": 4,
+    "quote": "Browser-based administration panel for managing configuration, API keys, MCP servers, messaging pairing, webhooks, the gateway, memory, credentials, sessions, logs, analytics, cron jobs, and skills",
+    "aliases": [
+      "hermes web dashboard",
+      "hermeswebdashboard"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_websearchextract",
+    "name": "Web Search & Extract",
+    "kind": "feature",
+    "say": "Web Search & Extract is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/web-search.md",
+    "line": 3,
+    "quote": "Search the web and extract page content with multiple backend providers — including free self-hosted SearXNG.",
+    "aliases": [
+      "web search & extract",
+      "websearchextract"
+    ],
+    "offer": "name_feature"
+  },
+  {
+    "id": "nm_xtwittersearch",
+    "name": "X (Twitter) Search",
+    "kind": "feature",
+    "say": "X (Twitter) Search is a part of Hermes. The docs explain it on a page of its own.",
+    "file": "user-guide/features/x-search.md",
+    "line": 3,
+    "quote": "Search X (Twitter) posts and threads from within the agent using xAI's built-in x_search Responses tool — works with either a SuperGrok OAuth login or an XAI_API_KEY.",
+    "aliases": [
+      "x (twitter) search",
+      "xtwittersearch"
+    ],
+    "offer": "name_feature"
+  }
+]
+
 // ---- src/wants-data.js ----
 // Generated by scripts/build.mjs from content/helper-wants-v1.json (hhcontent's wants: the rows, the
 // groups, the skills of the two docs pages) and content/skills-list-v1.json (which skills are left
@@ -9011,7 +11137,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please search the web for <what you want to know>, and list the pages you used. If web search is not ready, tell me what it needs."
+        "paste_text": "First ask me what I want to know. Then search the web for it and list the pages you used. If web search is not ready, tell me what it needs."
       }
     },
     {
@@ -9081,7 +11207,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please open <website> with your browser tool and <what to do there>. Ask me before you send, buy or sign in to anything."
+        "paste_text": "First ask me which website and what to do there. Then open it with your browser tool and do it. Ask me before you send, buy or sign in to anything."
       }
     },
     {
@@ -9130,7 +11256,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"xurl\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"xurl\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -9266,7 +11392,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please read this file and tell me what is in it: <where the file is>. If you cannot read part of it, say which part."
+        "paste_text": "First ask me where the file is. Then read it and tell me what is in it. If you cannot read part of it, say which part."
       }
     },
     {
@@ -9311,7 +11437,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"pdf\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"pdf\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -9362,7 +11488,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"microsoft-office\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"microsoft-office\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -9409,7 +11535,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"obsidian\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"obsidian\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -9457,7 +11583,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"meeting-action-items\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"meeting-action-items\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -9514,7 +11640,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please look at the code in <folder> and <what you want>. Ask me before you change or run anything."
+        "paste_text": "First ask me which folder and what I want done. Then look at the code there. Ask me before you change or run anything."
       }
     },
     {
@@ -9572,7 +11698,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "I want you to click and type in an app on my computer: <which app, and what to do>. Tell me first what Computer Use needs. Ask me before you change anything."
+        "paste_text": "I want you to click and type in an app on my computer. First ask me which app and what to do. Tell me first what Computer Use needs. Ask me before you change anything."
       }
     },
     {
@@ -9640,7 +11766,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please make a picture of <what>. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
+        "paste_text": "First ask me what picture I want. Then make it. If picture making is not ready, tell me what it needs and what it costs. Ask me before you change anything."
       }
     },
     {
@@ -9804,7 +11930,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"manim-video\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"manim-video\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -9902,7 +12028,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"youtube-content\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"youtube-content\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -10153,7 +12279,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"songwriting-and-ai-music\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"songwriting-and-ai-music\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -10195,7 +12321,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"arxiv\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"arxiv\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -10245,7 +12371,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"maps\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"maps\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     },
     {
@@ -10351,7 +12477,7 @@ const WANTS_DATA = {
       "next": {
         "kind": "paste",
         "label": "Show me what to ask",
-        "paste_text": "Please use your \"product-price-monitor\" skill to <what you want>. If the skill is missing or not ready, tell me what it needs."
+        "paste_text": "Please use your \"product-price-monitor\" skill for me. First ask me what I want it to do. If the skill is missing or not ready, tell me what it needs."
       }
     }
   ],
@@ -12284,7 +14410,7 @@ const SETUP_DATA = {
       "text_second_bot": "I can't see it yet. You have one bot so far."
     },
     "DONE_SAID": {
-      "text": "Good. I'll remember that you did it."
+      "text": "Good. I can't see that one, so I'll take your word."
     },
     "SOMETHING_ELSE": {
       "text": "Fine, here's another."
@@ -12302,8 +14428,8 @@ const SETUP_DATA = {
       "text_no_name": "Hi again. I can see it now. {seen_part}"
     },
     "BACK_REC": {
-      "text": "Hi again, {name}. We stopped at {card}. {why} Want the steps?",
-      "text_no_name": "Hi again. We stopped at {card}. {why} Want the steps?",
+      "text": "Hi again, {name}. Next on your list: {card}. {why} Want the steps?",
+      "text_no_name": "Hi again. Next on your list: {card}. {why} Want the steps?",
       "answers": [
         "Show me the steps",
         "I've done this already",
@@ -12321,7 +14447,7 @@ const SETUP_DATA = {
       "offer": "general_2"
     },
     "RESTART": {
-      "text": "Sure, let's start again. Are you new to Hermes?"
+      "text": "Sure, let's start again."
     },
     "BACK_SEEN": {
       "text": "Hi again, {name}. {back_part}",
@@ -12334,7 +14460,7 @@ const SETUP_DATA = {
       }
     },
     "BACK_NEXT": {
-      "text": "We stopped at {card}. {why} Want the steps?",
+      "text": "Next on your list: {card}. {why} Want the steps?",
       "answers": [
         "Show me the steps",
         "I've done this already",
@@ -12366,17 +14492,126 @@ const SETUP_DATA = {
     },
     "STEP_BACK": {
       "text": "Back to step {n} of {total}: {step}"
+    },
+    "FROM_KEPT": {
+      "text": "You told me {new_said}{and}{goal_said}. I'll go on from there.",
+      "answers": [
+        "Go on",
+        "Answer again"
+      ],
+      "new_said": {
+        "new": "you are new to Hermes",
+        "some": "you have used Hermes a bit",
+        "well": "you know Hermes well"
+      },
+      "goal_said": {
+        "schedule": "you want jobs at set times",
+        "phone": "you want to talk to it from your phone",
+        "bots": "you want several bots",
+        "unsure": "you are not sure yet what you want"
+      },
+      "and": " and "
     }
   },
   "restart_phrases": [
-    "start again",
-    "start over",
     "ask me again",
-    "set up again",
-    "redo the questions",
     "ask the questions again",
-    "restart"
+    "back to the start",
+    "begin again",
+    "do it again from the start",
+    "from the beggining",
+    "from the begining",
+    "from the beginning",
+    "from the start",
+    "go back to the beginning",
+    "go back to the start",
+    "redo",
+    "redo the questions",
+    "reset",
+    "restart",
+    "set up again",
+    "start again",
+    "start again please",
+    "start all over",
+    "start fresh",
+    "start from the beggining",
+    "start from the begining",
+    "start from the beginning",
+    "start from the start",
+    "start over",
+    "start over again"
   ],
+  "typed_answer": {
+    "question_starts": [
+      "what",
+      "whats",
+      "what's",
+      "how",
+      "why",
+      "where",
+      "when",
+      "who",
+      "which",
+      "is",
+      "are",
+      "do",
+      "does",
+      "did",
+      "should",
+      "will",
+      "would",
+      "could",
+      "can",
+      "may",
+      "am"
+    ],
+    "request_starts": [
+      "can we",
+      "can you",
+      "could we",
+      "could you",
+      "would you",
+      "will you",
+      "please",
+      "pls",
+      "let's",
+      "lets",
+      "let me",
+      "i want to go back",
+      "go back",
+      "stop",
+      "wait",
+      "hold on",
+      "never mind",
+      "nevermind"
+    ],
+    "request_words": [
+      "start over",
+      "go back",
+      "restart",
+      "from the beginning",
+      "from the begining",
+      "begin again",
+      "start again",
+      "help me",
+      "i don't understand",
+      "i dont understand",
+      "what do you mean"
+    ],
+    "small_talk_kinds": [
+      "hello",
+      "thanks",
+      "how",
+      "who",
+      "ai",
+      "bye",
+      "mean",
+      "again",
+      "wrong",
+      "stuck",
+      "cut"
+    ]
+  },
   "ask_phrases": [
     "what should i set up",
     "what do i set up",
@@ -20769,7 +23004,8 @@ function looksSecret(text) {
 // visit; nothing about the person, and no Forget removes it (src/page.js).
 const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met']
 // dash-v1: the three tabs, Dashboard first (only it is built)
-const TAB_IDS = ['dashboard', 'learn', 'my_setup']
+// loom-fixes: My setup is out (his words, Loom 3:22); a stored 'my_setup' opens the Dashboard
+const TAB_IDS = ['dashboard', 'learn']
 
 function readState(get) {
   const tab = get('tab', TAB_IDS[0])
@@ -21856,9 +24092,14 @@ function offerSet(sid, prevTopic = null) {
   }
   const s = S[sid]
   if (!SETUP_BUILT && s.text_no_setup) return [sid, s.text_no_setup, s.picks_no_setup]
+  // loom-fixes: a set new in the data with the pick "Set up Hermes" and no wording without it (name_toolset,
+  // name_feature): in a build with no set-up conversation, the start offer's wording without it (note b)
+  if (!SETUP_BUILT && s.picks.some(p => OF.things[p].gives.kind === 'setup_chat')) return offerSet('general')
   return [sid, s.text, s.picks]
 }
-// A line with an offer gets it (o.offer: { set, text, picks }); never the same set twice in a row (its instead set).
+// A line with an offer gets it (o.offer: { set, text, picks }).
+// loom-fixes (helper-loom-fixes-v1 point 5, offers.rule): one situation, one wording, every time. The old swap (never the
+// same set twice in a row, its instead set) is gone; the data's instead fields are not read.
 // prevTopic: the topic of Helper's last answer before this line, for after_topic.
 function attachOffer(o, st, prevTopic = null) {
   const of = o && !setupOpens(o.kind, st) && offerOfLine(o.kind)
@@ -21866,8 +24107,7 @@ function attachOffer(o, st, prevTopic = null) {
     st.lastOffer = null
     return o
   }
-  let [sid, text, picks] = offerSet(of, prevTopic)
-  if (sid === st.lastOffer) [sid, text, picks] = offerSet(sid.startsWith('after_topic:') ? OF.sets.after_topic.instead : OF.sets[sid].instead)
+  const [sid, text, picks] = offerSet(of, prevTopic)
   o.offer = { set: sid, text, picks }
   st.lastOffer = sid
   return o
@@ -21878,8 +24118,7 @@ const SETUP_OPENERS = ['F2', 'F3', 'WORK_SECRET', 'WORK_LONG_2']
 const setupOpens = (kind, st) => SETUP_BUILT && SETUP_OPENERS.includes(kind) && !st.kept.setup_new && !(st.setup && st.setup.newAnswered)
 // An offer by its set id, as a line carries it (the set-up conversation's NOT_NOW, ALL_DONE and BACK end with one)
 function offerSaid(sid, st) {
-  let [id, text, picks] = offerSet(sid)
-  if (id === st.lastOffer) [id, text, picks] = offerSet(OF.sets[id].instead)
+  const [id, text, picks] = offerSet(sid)
   st.lastOffer = id
   return { set: id, text, answers: { kind: 'offer', hint: OF.hint, items: picks.map(p => ({ id: 'offer-' + p, label: OF.things[p].label, offer: p })) } }
 }
@@ -22023,12 +24262,60 @@ function turnParts(text, st) {
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
   noteLast(st, out)
   attachOffer(out, st, prevTopic)
+  // loom-fixes (helper-loom-fixes-v1 points 3 and 4; route2.py turn): a name from the Hermes docs where the don't-know
+  // would show (every older line wins), and the app a person wants to bring a setup over from
+  if (out.kind === 'N1' || out.kind === 'N1a' || out.kind === 'N1_AGAIN') {
+    const ne = nameLine(text)
+    if (ne) {
+      for (const k of Object.keys(out)) delete out[k]
+      const [sid, otext, picks] = offerSet(ne.offer)
+      Object.assign(out, { kind: 'NAME', id: ne.id, offer: { set: sid, text: otext, picks } })
+      st.lastOffer = sid
+      st.last = 'NAME'
+      // a line code is sure of: never handed to the AI
+      pre.kind = 'NAME'
+      pre.by = 'title'
+    }
+  }
+  if (out.kind === 'MIG_APP') {
+    const app = migApp(text)
+    if (app) out.app = app.id
+    else {
+      for (const k of Object.keys(out)) delete out[k]
+      out.kind = 'MIG_WHICH'
+      attachOffer(out, st)
+    }
+  }
   delete pre.near_lines
   // breadth-t1 (near.near_rule, nothing_near_rule): under a don't-know line, the near lines or the four starting things
   if (out.kind === 'N1' || out.kind === 'N1_AGAIN') nearOffer(out, st)
   else delete out.near_lines
   return { pre, out }
 }
+// loom-fixes (content/hermes-names-v1.json rule; route2.py name_line): what is / what's / whats / what are / what exactly
+// is / tell me about / explain / what does <name>, or the bare <name> with a question mark -> the names entry, or null.
+// The name is compared with every character that is not a to z or 0 to 9 cut, after a, an, the.
+const nameKey = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '')
+const NAME_BY_KEY = new Map()
+for (const e of NAMES_DATA) for (const a of e.aliases) if (!NAME_BY_KEY.has(nameKey(a))) NAME_BY_KEY.set(nameKey(a), e)
+function nameLine(text) {
+  let t = talkNorm(text).replace(/^[ .!]+|[ .!]+$/g, '')
+  const bare = t.endsWith('?')
+  t = t.replace(/[ ?!.]+$/, '')
+  t = t.replace(/^(?:(?:so|ok|okay|and|hi|hey|helper|please|pls|plz|can you|could you)[ ,]+)*/, '')
+  const m = t.match(/^(?:what is|what's|whats|what are|what exactly is|tell me about|explain|what does)\s+(.+?)(?:\s+(?:is|are|do|does|mean|means))?$/)
+  let part = m ? m[1] : bare ? t : null
+  if (!part) return null
+  part = part.replace(/^(?:a|an|the)\s+/, '')
+  return NAME_BY_KEY.get(nameKey(part)) || null
+}
+// loom-fixes (offer_words.migrate_apps; route2.py mig_app): the first of the six apps the message names, or null
+function migApp(text) {
+  const t = talkNorm(text)
+  return OW.migrate_apps.find(a => whichOf(t, a.phrases).length > 0) || null
+}
+const MIG_APPS = Object.fromEntries((TALK_DATA.offer_words.migrate_apps || []).map(a => [a.id, a]))
+
 // find-v1 part 5: the results that are no line of their own (see turnSteps, a full typed message while a question is open)
 const FULL_NOT_FOR = ['N1', 'N1a', 'N1_AGAIN', 'N2', 'skill by name', 'CUT', 'MEAN_NONE', 'AGAIN']
 // The order of steps is route2.py's _turn(), with no model.
@@ -22123,7 +24410,8 @@ function turnSteps(text, st) {
     const [line, x] = smallLine(sk, st)
     st.stage = 'open'
     if (line === 'plain') return done('plain', { topic: x, why: 'what do you mean' })
-    return line === 'HELLO' ? done(line, { name: x }) : done(line)
+    // loom-fixes: HELLO_SAME is "Hi, {name}." now (helper-loom-fixes-v1 point 1), so it takes the name as HELLO does
+    return line === 'HELLO' || line === 'HELLO_SAME' ? done(line, { name: x }) : done(line)
   }
   // 1 b. a request to Helper to remember something; then what Helper keeps, asked about by typing
   if (remember(text, st, out)) return out
@@ -22452,7 +24740,15 @@ function pressOffer(thing, st) {
       keep(st, o, 'mod', g.id)
     }
   } else if (g.kind === 'setup_chat') o = { kind: 'SETUP_' + g.id }
-  else o = { kind: g.id }
+  else if (g.kind === 'set') {
+    // loom-fixes (route2.py press_offer): "Another app" shows the next set of apps, a question with no line before it
+    o = { kind: 'SET_' + g.id }
+    noteLast(st, o)
+    const [sid, text, picks] = offerSet(g.id)
+    o.offer = { set: sid, text, picks }
+    st.lastOffer = sid
+    return o
+  } else o = { kind: g.id, ...(g.app ? { app: g.app } : {}) }
   noteLast(st, o)
   return attachOffer(o, st, prevTopic)
 }
@@ -22673,12 +24969,12 @@ function lineFor(result, st, typed = '', opts = {}) {
       return said('OPEN', FIXED.OPEN.text)
     // changes-14: a later visit (BACK) and a hello greet by the kept name, or without one
     case 'BACK':
-    case 'HELLO': {
+    case 'HELLO':
+    case 'HELLO_SAME': {
       const f = FIXED[result.kind]
       return said(result.kind, result.name ? fillSlots(f.text, { name: result.name }) : f.text_no_name || f.text)
     }
     // changes-14/15: ordinary talk and the lines no_repeat puts in place of a repeat: one line, nothing to pick
-    case 'HELLO_SAME':
     case 'THANKS':
     case 'OK':
     case 'HOW':
@@ -22720,6 +25016,32 @@ function lineFor(result, st, typed = '', opts = {}) {
       return said('F3', FIXED.F3.text)
     case 'TP':
       return said('TP', FIXED.TP.text, { answers: topicPicks() })
+    // loom-fixes (helper-loom-fixes-v1 point 4, "For builder" 3): a name from the Hermes docs: its one fixed sentence,
+    // the box "From the Hermes docs" with the docs' own sentence (and the one saying it is not part of Hermes, when
+    // set) with file and line, then its kind's offer. No button, no text to copy.
+    case 'NAME': {
+      const e = NAMES_DATA.find(x => x.id === result.id)
+      // "file, line N"; two lines of one file: "file, lines N and M" (hhcontent's own way of writing it)
+      const o = e.outside
+      const where = !o ? `${e.file}, line ${e.line}` : o.file === e.file ? `${e.file}, lines ${e.line} and ${o.line}` : `${e.file}, line ${e.line}; ${o.file}, line ${o.line}`
+      const words = [e.quote, ...(o ? [o.quote] : [])].map(x => (/[.!?]$/.test(x) ? x : x + '.')).join(' ')
+      const docs = { head: WANTS_DATA.fixed['box-head'].text, words, source: where, where }
+      return said('NAME-' + e.id, e.say, { source: docs.source, docs })
+    }
+    // loom-fixes ("For builder" 4): the text to copy names the app and the docs' own command; the docs box as a skill's
+    case 'MIG_APP': {
+      const f = FIXED.MIG_APP
+      const app = MIG_APPS[result.app]
+      // no app: no text to copy (never a blank to fill in); MIG_WHICH asks first, so this is not reached
+      const next = app ? { kind: 'paste', label: f.next.label, text: fillSlots(f.next.paste_text, { app_label: app.label, app_agent: app.agent }) } : null
+      const docs = f.docs_box ? { head: f.docs_box.head, words: f.docs_box.quote, source: f.docs_box.where, where: f.docs_box.where } : null
+      return said('MIG_APP', f.text, { source: f.source || null, next, docs })
+    }
+    // "Another app": the next three apps and None of these, as the question itself (no line before it)
+    case 'SET_mig_which_2': {
+      const { offer: o, ...line } = said('SET_mig_which_2', offer.text, { answers: offer.answers })
+      return line
+    }
     case 'N1':
     case 'N1a':
     case 'N1_AGAIN': // changes-15: in place of a second don't-know line, the faint hint under it as under N1
@@ -22884,6 +25206,7 @@ const hintFor = entry => (entry && entry.answers && entry.answers.items.length ?
 //   chat_apps      host.status(): gateway_platforms names at least one chat app (not used by the set-up conversation)
 //   scheduled_job  cron.manage { action: 'list', profile: main bot, include_disabled: true }: at least one job
 //   second_bot     profiles.list: two or more bots
+//   first_chat     host.listPersistedSessions for the bot: a chat with a preview, not a job's (loom-fixes, below)
 // A read that failed or has not come back is "not known" (null): never shown as done.
 
 /* ---------- Hermes's starter personality texts (hermes_cli/default_soul.py, Hermes v0.23.0) ---------- */
@@ -22942,10 +25265,36 @@ function doneFlags(reads) {
     personality: known(reads.soul) ? (soul === null ? null : soulNormal(soul) !== '' && !isStarterSoul(soul)) : null,
     chat_apps: known(reads.status) && got(reads.status) && typeof got(reads.status) === 'object' ? !!platforms && typeof platforms === 'object' && Object.keys(platforms).length > 0 : null,
     scheduled_job: jobs === null ? null : jobs >= 1,
-    second_bot: rows ? rows.length >= 2 : null
+    second_bot: rows ? rows.length >= 2 : null,
+    // loom-fixes: undefined when there is no sessions read at all (no door in this Hermes: the person marks it)
+    first_chat: reads.sessions === undefined ? undefined : known(reads.sessions) ? firstChatSeen(got(reads.sessions)) : null
   }
 }
 
+
+/* ---------- loom-fixes: First chat, seen ---------- */
+// hhtech-loom-n1.md 3 (ran in three homes): First chat is done when a chat of the bot (host.listPersistedSessions, not in
+// the SDK docs: feature-checked) has a preview, the first thing the person typed, and is not Hermes's own work (a
+// scheduled job, the task board, a tool run). Hermes's first-run chat "Getting started" has an empty preview. Source
+// 'local' is a chat of the person's (the typed chat in a fresh home came back as local). value: the read's answer
+// ({ sessions: [...] }). Returns true, false, or null (no list in the answer).
+const NOT_A_CHAT = ['cron', 'kanban', 'tool']
+function firstChatSeen(value) {
+  const rows = value && Array.isArray(value.sessions) ? value.sessions : null
+  if (!rows) return null
+  return rows.some(r => r && typeof r === 'object' && typeof r.preview === 'string' && r.preview.trim() !== '' && !NOT_A_CHAT.includes(String(r.source || '').toLowerCase()))
+}
+
+/* ---------- loom-fixes: "You are here", one rule for the Dashboard and for Helper ---------- */
+// content/dash-setup-list-v2.json here_rule (hhcontent; Lead's point 9: Helper's next thing IS the Dashboard's "You are
+// here" stop): 1. the stop Helper's set-up conversation recommended last (kept as setup_current), if it is not done;
+// else 2. the first stop in path order that is not done. path: the stops' ids in order. stateOf(id): true (done, seen
+// or said), false (not done), null (not known: its read failed or is still out). A stop not known is never "here": it
+// then places nobody (as the Dashboard's first rule had it). All done: null.
+function hereStop(path, stateOf, current) {
+  const at = current && path.includes(current) && stateOf(current) !== true ? current : path.find(id => stateOf(id) !== true)
+  return at && stateOf(at) === false ? at : null
+}
 
 /* ---------- a read that always ends ---------- */
 // A read that gives up after `ms` (the host's own timer, cleaned up with the plugin). A host door that throws
@@ -22981,6 +25330,8 @@ function makeReader(ctx) {
 // What is kept between visits (the visit's kept record, src/kept.js): setup_new (the Q_NEW answer id), setup_goal (the
 // label or the typed text) with setup_goal_id, setup_done_said (the things the person said are done), setup_current
 // (the thing last recommended). Not kept: Skip, Not sure yet, what the look saw, Something else.
+// the path's stops in order (the Dashboard's), for the one "You are here" rule
+const SU_PATH_OF = () => DASH_DATA.items.map(it => it.id)
 
 const SU = SETUP_DATA
 const SU_L = SU.lines
@@ -23027,8 +25378,15 @@ function seenDone(item, seen) {
   if (item === 'scheduled_job') return seen.jobs === null ? null : seen.jobs >= 1
   if (item === 'second_bot') return seen.bots === null ? null : seen.bots >= 2
   if (item === 'personality') return seen.soul
+  // loom-fixes: Chat apps and First chat as the Dashboard reads them (src/setup-look.js); undefined: not read here
+  if (item === 'chat_apps') return seen.chat
+  if (item === 'first_chat') return seen.firstChat
   return undefined
 }
+// the things the look can see done: the data's four, and since loom-fixes Chat apps and First chat. Only the data's
+// four have words for "I can see it now" (look.parts), so only they are said as seen; the other two count as done.
+const SU_SEEN_ALSO = ['chat_apps', 'first_chat']
+const suSaysSeen = item => SU.seeable.includes(item)
 // "I can see it now. {seen_part}" (build.py seen_part)
 const suSeenPart = (item, seen) => (item === 'scheduled_job' ? suJobsPart(seen.jobs) : item === 'second_bot' ? suBotsPart(seen.bots) : item === 'personality' ? SU_P.personality_done : SU_P.model_ok)
 // The six lines behind "What did you look at?"
@@ -23041,7 +25399,7 @@ function lookList(seen) {
 // The things done: seen by a read, said by the person (kept), Something else in this visit
 function doneSet(st, seen) {
   const done = new Set([...(st.kept.setup_done_said || []), ...((st.setup && st.setup.other) || [])])
-  for (const it of SU.seeable) if (seenDone(it, seen) === true) done.add(it)
+  for (const it of [...SU.seeable, ...SU_SEEN_ALSO]) if (seenDone(it, seen) === true) done.add(it)
   return done
 }
 
@@ -23090,6 +25448,18 @@ function suTypedGoal(text) {
   return 'unsure'
 }
 const isRestart = text => suInList(suFlat(text), SU.restart_phrases)
+// loom-fixes (helper-setup-chat-v1.json typed_answer; route2.py setup_typed): a message typed at Q_NEW or Q_GOAL is
+// kept as the answer only when it reads as one. Not an answer, never kept: a question (a question mark, or one of
+// question_starts at the start), a request to Helper (request_starts at the start, or request_words anywhere), or
+// small talk (the talk data's small-talk kinds the rule names, read as in a fresh visit). Restart words come first
+// (setupTyped). His "can we start from the begining" was kept as his goal (Loom 1:56).
+const SU_TA = SU.typed_answer
+function notAnAnswer(text) {
+  const t = suFlat(text)
+  if (String(text).includes('?')) return true
+  if (startsWith(t, SU_TA.question_starts) || startsWith(t, SU_TA.request_starts) || suInList(t, SU_TA.request_words)) return true
+  return SU_TA.small_talk_kinds.includes(smallTalk(text, freshVisit('open')))
+}
 const isSetupAsk = text => suInList(suFlat(text), SU.ask_phrases)
 const suLabelOf = (answers, text) => answers.findIndex(a => suFlat(a) === suFlat(text))
 const SU_STEP_NEXT = ['next', 'done', 'what next', 'ok', 'okay', 'did it', 'yes', 'now what']
@@ -23147,7 +25517,7 @@ function suSaidDone(st, item) {
 function suWorked(st, seen) {
   const s = suOf(st)
   const item = s.item
-  const d = seenDone(item, seen)
+  const d = suSaysSeen(item) ? seenDone(item, seen) : undefined
   if (d === undefined) {
     suSaidDone(st, item)
     return suRecommend(st, seen, [suSaid('DONE_SAID', SU_L.DONE_SAID.text)])
@@ -23231,8 +25601,23 @@ function suRestart(st) {
   const s = suOf(st)
   for (const k of ['setup_new', 'setup_goal', 'setup_goal_id', 'setup_current']) delete st.kept[k]
   Object.assign(s, { stage: 'new', item: null, step: 0, goal: null, newAnswered: false, asked: { new: true }, reasked: {} })
-  return [suSaid('RESTART', SU_L.RESTART.text, { answers: suNEW_PICKS() })]
+  // loom-fixes (the data's RESTART.then): "Sure, let's start again." and then the first question as its own bubble
+  return [suSaid('RESTART', SU_L.RESTART.text), suSaid('Q_NEW', SU_Q_NEW.text, { answers: suNEW_PICKS() })]
 }
+// loom-fixes (helper-loom-fixes-v1 point 6, FROM_KEPT): Set up Hermes picked (or asked for) while the answer to Q_NEW or
+// Q_GOAL is kept: one line on what Helper goes on from, with Go on | Answer again. Only the kept parts are said; a typed
+// goal is said in the words of its kind (unsure: "you are not sure yet what you want"), never as the person typed it.
+const SU_FK = SU_L.FROM_KEPT
+function suFromKept(st) {
+  const k = st.kept
+  const a = SU_FK.new_said[k.setup_new] || ''
+  const b = k.setup_goal_id ? SU_FK.goal_said[k.setup_goal_id] || '' : ''
+  if (!a && !b) return null
+  const s = suOf(st)
+  s.stage = 'fromkept'
+  return suMove(false, () => [suSaid('FROM_KEPT', suFill(SU_FK.text, { new_said: a, and: a && b ? SU_FK.and : '', goal_said: b }), { answers: suFromKeptPicks() })])
+}
+const suFromKeptPicks = () => suPicks(['fromkept:go', 'fromkept:again'].map((x, i) => [x, SU_FK.answers[i]]))
 // "what should I set up first": the question not answered yet first, else the look and the recommendation
 function suAsk(st) {
   const s = suOf(st)
@@ -23263,6 +25648,7 @@ function suOpenPicks(st) {
   if (s.stage === 'already') return suPicks(suAlreadyActs(s.item).map((a, i) => [a, suAlreadyLabels(s.item)[i]]))
   if (s.stage === 'new') return suNEW_PICKS()
   if (s.stage === 'goal') return suGOAL_PICKS()
+  if (s.stage === 'fromkept') return suFromKeptPicks()
   return null
 }
 // A thing picked, or a button pressed: its action. Returns a move, or null when the action is not for this stage.
@@ -23276,6 +25662,12 @@ function setupPress(action, st) {
   // setup-chat-2: the same for any open line of the set-up conversation (a step, "I can't see that yet", ...)
   if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint, answers: suOpenPicks(st) })]) : null
   if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
+  // loom-fixes: Go on is the next question not answered yet, or the look and the written recommendation; Answer again
+  // starts the questions again
+  if (kind === 'fromkept' && s.stage === 'fromkept') {
+    s.stage = null
+    return id === 'again' ? suMove(false, () => suRestart(st)) : suAsk(st)
+  }
   if (kind === 'goal' && s.stage === 'goal') return suMove(true, seen => suAnswerGoal(st, id, null, seen))
   if (kind === 'rec' && s.stage === 'rec') {
     if (id === 'steps') return suMove(false, () => ((s.step = 0), [suStepLine(st)]))
@@ -23325,20 +25717,23 @@ function setupTyped(text, st, hasTopicWord = () => false) {
   const s = suOf(st)
   const t = suFlat(text)
   if (!t || looksLikeKey(text)) return null
-  if (isRestart(text)) return suMove(false, () => suRestart(st))
+  // loom-fixes: the restart list now holds everyday words ("reset", "redo"), so anywhere in the message only while the
+  // set-up conversation has a line open; with none open, only the restart words alone ("how do I reset my key" is a
+  // question about Hermes, not a restart) (Decided myself, in the report)
+  if (s.stage ? isRestart(text) : SU.restart_phrases.includes(t)) return suMove(false, () => suRestart(st))
   const question = text.includes('?')
   if (s.stage === 'new') {
     const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
     if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
     if (isSetupAsk(text)) return suAsk(st)
-    if (question || hasTopicWord(text)) return null
+    if (question || hasTopicWord(text) || notAnAnswer(text)) return null
     return suMove(false, () => suAnswerNew(st, suTypedNew(text)))
   }
   if (s.stage === 'goal') {
     const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
     if (i >= 0) return suMove(true, seen => suAnswerGoal(st, SU_Q_GOAL.answers[i].id, null, seen))
     if (isSetupAsk(text)) return suAsk(st)
-    if (question) return null
+    if (question || notAnAnswer(text)) return null
     // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
     if (SU_UNSURE.includes(t)) return suMove(true, seen => suAnswerGoal(st, 'unsure', null, seen))
     return suMove(true, seen => suAnswerGoal(st, suTypedGoal(text), text, seen))
@@ -23365,6 +25760,10 @@ function setupTyped(text, st, hasTopicWord = () => false) {
   if (s.stage === 'notseen') {
     const i = suLabelOf(suNotSeenLabels(s.item), text)
     if (i >= 0) return setupPress(suNotSeenActs(s.item)[i], st)
+  }
+  if (s.stage === 'fromkept') {
+    const i = suLabelOf(SU_FK.answers, text)
+    if (i >= 0) return setupPress(['fromkept:go', 'fromkept:again'][i], st)
   }
   if (s.stage === 'already') {
     const i = suLabelOf(suAlreadyLabels(s.item), text)
@@ -23423,11 +25822,21 @@ function setupOpening(st, seen) {
   const name = st.kept.name || null
   const cur = st.kept.setup_current
   s.seen = seen
+  // loom-fixes: the stop kept as current is done now in a way Helper has no "I can see it" words for (seen as Chat apps
+  // or First chat, or said done on the Dashboard): it is current no more, and the visit opens as with none kept
+  if (cur && SU.items[cur] && doneSet(st, seen).has(cur) && !(suSaysSeen(cur) && seenDone(cur, seen) === true)) {
+    delete st.kept.setup_current
+    return setupOpening(st, seen)
+  }
   if (cur && SU.items[cur]) {
     s.item = cur
     if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
     s.stage = 'rec'
-    const slots = { card: SU.items[cur].name, why: SU.items[cur].why }
+    // loom-fixes (here_rule, one rule with the Dashboard: src/setup-reads.js hereStop): the stop named is the Dashboard's
+    // "You are here"; with the stop kept as current not done, that is this stop
+    const done = doneSet(st, seen)
+    const card = hereStop(SU_PATH_OF(), id => (done.has(id) ? true : seenDone(id, seen) === null ? null : false), cur) || cur
+    const slots = { card: SU.items[card].name, why: SU.items[card].why }
     // setup-chat-2 (changes-1): something else Helper can see is done now: say that, then where we stopped
     const part = suBackPart(st, seen)
     if (part) return [suSaid('BACK_SEEN', suNamed(SU_L.BACK_SEEN, name, { back_part: part })), suSaid('BACK_NEXT', suFill(SU_L.BACK_NEXT.text, slots), { answers: suREC_PICKS(SU_L.BACK_NEXT.answers) })]
@@ -23472,8 +25881,9 @@ function setupRows(kept) {
 const SETUP_ROW_KEYS = { setup_new: ['setup_new'], setup_goal: ['setup_goal', 'setup_goal_id'], setup_done_said: ['setup_done_said'], setup_current: ['setup_current'] }
 const SETUP_ASKED_KEYS = ['setup_new', 'setup_goal', 'setup_goal_id', 'setup_current']
 const SETUP_ALL_KEYS = [...SETUP_ASKED_KEYS, 'setup_done_said']
-// The pick "Set up Hermes" under an offer (offers.things.setup): the question not answered yet, else the look and REC
-const setupAskMove = st => suAsk(st)
+// The pick "Set up Hermes" under an offer (offers.things.setup): with an answer kept, FROM_KEPT (loom-fixes); else the
+// question not answered yet
+const setupAskMove = st => suFromKept(st) || suAsk(st)
 // Whether a later visit opens with the set-up conversation (always, once it is built)
 const SETUP_UNSEEN = { model: 'unread', soul: null, jobs: null, bots: null }
 
@@ -23488,6 +25898,10 @@ const SETUP_UNSEEN = { model: 'unread', soul: null, jobs: null, bots: null }
 // Every read ends as { ok: true, value } or { ok: false } (failed, threw, or gave no answer in LOOK_READ_MS); a failed
 // read is "couldn't check" (null, or model 'unread'), never a guess. The rules that turn the answers into done or not
 // done are src/setup-reads.js (the Dashboard job's), and so is makeReader (one copy, shared with src/dash.js).
+// loom-fixes (Lead's point 9: Helper's next thing and the Dashboard's "You are here" agree): the look reads the same bot
+// as the Dashboard, the one the app has open (by the app's own name for it; with no name given, the one Hermes marks
+// as default), where it read the main bot before; and it reads Chat apps and First chat as the Dashboard does
+// (host.status(), host.listPersistedSessions: feature-checked; with no door the thing is not seen, as before).
 
 const LOOK_READ_MS = 8000
 // What Helper has seen when nothing could be read (also before the first look comes back)
@@ -23499,26 +25913,42 @@ function seenFrom(reads) {
   const rows = reads.bots && reads.bots.ok ? botRows(reads.bots.value) : null
   const cron = reads.cron && reads.cron.ok ? reads.cron.value : null
   const jobs = cron && typeof cron === 'object' ? (Number.isInteger(cron.count) ? cron.count : Array.isArray(cron.jobs) ? cron.jobs.length : null) : null
-  return { model: f.model === null ? 'unread' : f.model ? 'ok' : 'not', soul: f.personality, jobs, bots: rows ? rows.length : null }
+  // chat, firstChat (loom-fixes): true, false, null (the read failed), undefined (no such read in this Hermes)
+  return { model: f.model === null ? 'unread' : f.model ? 'ok' : 'not', soul: f.personality, jobs, bots: rows ? rows.length : null, chat: reads.status === undefined ? undefined : f.chat_apps, firstChat: f.first_chat }
 }
 
 // look() reads Hermes now and resolves with `seen`; it never rejects.
-function makeLook(ctx, host) {
+// getProfile: the name the app gives the open bot now ('' or missing: none given); src/page.js hands it in.
+function makeLook(ctx, host, getProfile = () => '') {
   const read = makeReader(ctx)
   const request = (method, params) => read(() => host.request(method, params, LOOK_READ_MS), LOOK_READ_MS)
   return async function look() {
     try {
       const bots = await read(() => host.profiles.list(), LOOK_READ_MS)
       const rows = bots.ok ? botRows(bots.value) : null
-      // the main bot's three reads need its name; when the bots read failed they are not made (never another bot's answer)
-      const main = mainBotName(rows)
+      // the bot's reads need its name: the open bot by the app's own name, else the one marked default; with neither
+      // (the bots read failed and the app names none) they are not made (never another bot's answer)
+      const given = getProfile()
+      const main = typeof given === 'string' && given.trim() ? openBotName(given) : mainBotName(rows)
       const notRead = Promise.resolve({ ok: false })
-      const [model, soul, cron] = await Promise.all([
+      const door = get => {
+        try {
+          const fn = get()
+          return typeof fn === 'function' ? fn : null
+        } catch {
+          return null
+        }
+      }
+      const getStatus = door(() => host.status)
+      const listSessions = door(() => host.listPersistedSessions)
+      const [model, soul, cron, status, sessions] = await Promise.all([
         main ? request('setup.runtime_check', { profile: main }) : notRead,
         main ? request('profiles.describe', { name: main }) : notRead,
-        main ? request('cron.manage', { action: 'list', profile: main, include_disabled: true }) : notRead
+        main ? request('cron.manage', { action: 'list', profile: main, include_disabled: true }) : notRead,
+        getStatus ? read(() => getStatus(), LOOK_READ_MS) : Promise.resolve(undefined),
+        listSessions && main ? read(() => listSessions(null, { profile: main, limit: 500 }), LOOK_READ_MS) : Promise.resolve(undefined)
       ])
-      return seenFrom({ bots: rows ? bots : { ok: false }, model, soul, cron })
+      return seenFrom({ bots: rows ? bots : { ok: false }, model, soul, cron, status, sessions })
     } catch {
       return { ...LOOK_UNSEEN }
     }
@@ -24746,6 +27176,9 @@ const D = {
   tileWords: 'hhd-tile-words',
   tileNum: 'hhd-tile-num',
   tileLabel: 'hhd-tile-label',
+  // loom-fixes: a tile that opens Hermes's own screen, and the plugins tile's name in place of a number
+  tileBtn: 'hhd-tile-btn',
+  tileName: 'hhd-tile-name',
   wait: 'hhd-wait',
   // Activity
   act: 'hhd-act',
@@ -24850,7 +27283,7 @@ const T = {
   where: 'hh-where',
   dots: 'hh-dots',
   dotOn: 'hh-on',
-  dotsWait: 'hh-wait',
+  dotsWait: 'hh-dots-run',
   dotsStill: 'hh-still',
   // under the bubble: the piece between bubble and character, the character, the answers to pick
   under: 'hh-under',
@@ -24876,6 +27309,7 @@ const T = {
   docs: 'hh-docs',
   docsHead: 'hh-docs-head',
   docsWords: 'hh-docs-words',
+  docsWhere: 'hh-docs-where',
   // the numbered clicks to add an optional skill, and the faint line after them
   steps: 'hh-steps',
   after: 'hh-after',
@@ -24900,7 +27334,7 @@ const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-wait i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-wait i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-wait i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -25890,52 +28324,8 @@ function Character({ size = CHARACTER_PX, expression = 'resting', rising = false
 const DASH_DATA = {
   "items": [
     {
-      "id": "install",
-      "counts": true,
-      "name": "Install Hermes",
-      "mark": "Install",
-      "why": "Hermes is the program itself. It works only while its computer is on.",
-      "steps": [
-        {
-          "text": "Go to hermes-agent.nousresearch.com and download Hermes for your computer."
-        },
-        {
-          "text": "On a Mac: open the download and drag Hermes into Applications."
-        },
-        {
-          "text": "On Windows: open the download, and Windows installs it."
-        },
-        {
-          "text": "Open Hermes. Its first screens take you to your first message."
-        }
-      ],
-      "terminal": {
-        "when": "Only for Linux, a server, or without the app. The docs give only these commands.",
-        "paste": [
-          {
-            "for": "Linux, Mac or Windows WSL2",
-            "text": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash"
-          },
-          {
-            "for": "Windows, in PowerShell",
-            "text": "iex (irm https://hermes-agent.nousresearch.com/install.ps1)"
-          }
-        ]
-      },
-      "sources": [
-        {
-          "file": "getting-started/quickstart.md",
-          "line": 53
-        },
-        {
-          "file": "guides/team-telegram-assistant.md",
-          "line": 27
-        }
-      ]
-    },
-    {
       "id": "model",
-      "counts": true,
+      "seen": true,
       "name": "A model",
       "mark": "Model",
       "why": "The AI that does the thinking. Your app may already have a free one.",
@@ -25978,7 +28368,7 @@ const DASH_DATA = {
     },
     {
       "id": "first_chat",
-      "counts": false,
+      "seen": true,
       "name": "First chat",
       "mark": "First chat",
       "why": "Ask Hermes one small thing, to see that it works.",
@@ -26013,7 +28403,7 @@ const DASH_DATA = {
     },
     {
       "id": "personality",
-      "counts": true,
+      "seen": true,
       "name": "Its personality",
       "mark": "Personality",
       "why": "A short text that tells your Hermes who it is and how to talk.",
@@ -26048,7 +28438,7 @@ const DASH_DATA = {
     },
     {
       "id": "chat_apps",
-      "counts": true,
+      "seen": true,
       "name": "Chat apps",
       "mark": "Chat apps",
       "why": "Talk to your Hermes from Telegram or another chat app on your phone.",
@@ -26091,7 +28481,7 @@ const DASH_DATA = {
     },
     {
       "id": "tools_apps",
-      "counts": false,
+      "seen": false,
       "name": "Tools and apps",
       "mark": "Tools and apps",
       "why": "Actions Hermes can take, and outside apps like Gmail it can use.",
@@ -26123,7 +28513,7 @@ const DASH_DATA = {
     },
     {
       "id": "skills",
-      "counts": false,
+      "seen": false,
       "name": "Skills",
       "mark": "Skills",
       "why": "Written know-how that teaches Hermes one task. Many come already installed.",
@@ -26152,7 +28542,7 @@ const DASH_DATA = {
     },
     {
       "id": "memory",
-      "counts": false,
+      "seen": false,
       "name": "Memory",
       "mark": "Memory",
       "why": "Short notes Hermes keeps about you, so it remembers between chats.",
@@ -26180,7 +28570,7 @@ const DASH_DATA = {
     },
     {
       "id": "scheduled_job",
-      "counts": true,
+      "seen": true,
       "name": "Scheduled jobs",
       "mark": "Scheduled jobs",
       "why": "Hermes does a job for you at set times, like every morning.",
@@ -26213,7 +28603,7 @@ const DASH_DATA = {
     },
     {
       "id": "second_bot",
-      "counts": true,
+      "seen": true,
       "name": "A second bot",
       "mark": "Second bot",
       "why": "A bot is one separate Hermes, with its own name, memory and skills.",
@@ -26252,7 +28642,7 @@ const DASH_DATA = {
     },
     {
       "id": "safety",
-      "counts": false,
+      "seen": false,
       "name": "Safety",
       "mark": "Safety",
       "why": "Hermes asks you first before it runs anything risky on your computer.",
@@ -26286,12 +28676,11 @@ const DASH_DATA = {
       ]
     }
   ],
-  "total": 6,
+  "total": 10,
   "words": {
     "tabs": {
       "dashboard": "Dashboard",
-      "learn": "Learn",
-      "my_setup": "My setup"
+      "learn": "Learn"
     },
     "tabListLabel": "Helper tabs",
     "notBuilt": "Nothing here yet. What is ready is on Dashboard.",
@@ -26305,7 +28694,17 @@ const DASH_DATA = {
       "not_known": "Helper could not read this number just now.",
       "waiting": "Counting",
       "plugins_short_one": "plugin, this bot",
-      "plugins_short": "plugins, this bot"
+      "plugins_short": "plugins, this bot",
+      "plugins_title": "Plugins",
+      "plugins_line": "See them in Capabilities"
+    },
+    "helperWindow": {
+      "hide": "Hide Helper",
+      "show": "Show Helper",
+      "clear": "Clear chat",
+      "clear_ask": "Clear this chat with Helper? Yes / No",
+      "clear_yes": "Yes",
+      "clear_no": "No"
     },
     "activity": {
       "title": "This bot's activity",
@@ -26344,16 +28743,18 @@ const DASH_DATA = {
       "you_are_here": "You are here",
       "next": "Next",
       "open": "Open",
-      "all_done": "All 6 are set up.",
-      "not_counted": "Helper can't see this one, so it isn't counted.",
+      "all_done": "All 10 are set up.",
       "close": "Close",
       "copy": "Copy",
       "copied": "Copied",
       "source": "{file}, line {line}",
       "state_done": "done",
       "state_not_done": "to do",
-      "state_not_counted": "not counted",
-      "state_not_known": "Helper could not check this one just now"
+      "state_not_known": "Helper could not check this one just now",
+      "mark_done": "I've done this",
+      "mark_undo": "Not done yet",
+      "person_note": "Helper can't see this one, so it takes your word.",
+      "state_said_done": "done, you said so"
     }
   }
 }
@@ -26374,30 +28775,37 @@ const DASH_DATA = {
 // src/setup-reads.js, the one copy the Dashboard and Helper's set-up conversation both use.
 
 /* ---------- the path ---------- */
-// Each of the 11 stops: 'done' (seen done: filled), 'todo' (seen, not done), 'here' (the first seen stop not done:
-// "You are here"), 'unknown' (seen, but its read failed or is still out: drawn as not done, never "You are here"),
-// or 'quiet' (Helper cannot see it: the smaller mark that never fills). The line itself has no state.
-function pathStates(flags, items = DASH_DATA.items) {
+// loom-fixes (dash-setup-list-v2 eb3aeba8): the 10 stops on the path (Install is off it), every one counted. A stop the
+// page sees (it.seen) is done when its read says so; a stop the person marks is done when they said so ("I've done this"
+// here, or "I've done this already" / "It worked" in Helper's set-up conversation: the same kept list, said). A
+// stop the page sees and the person said is done too (Helper's "Count it as done").
+// The state of one stop: true, false, or null (its read failed or is still out). selfMarked(it): the person marks it.
+function stopState(it, flags, said, selfMarked) {
+  if (said.includes(it.id)) return true
+  if (selfMarked(it)) return false
+  const f = flags[it.id]
+  return f === true ? true : f === false ? false : null
+}
+// Each stop: 'done' (filled), 'todo', 'here' ("You are here", by the one shared rule, src/setup-reads.js hereStop),
+// 'unknown' (its read failed or is still out: drawn as not done, never "here"). The line itself has no state.
+function pathStates(stateOf, items = DASH_DATA.items, current = null) {
   const states = items.map(it => {
-    if (!it.counts) return 'quiet'
-    const f = flags[it.id]
-    return f === true ? 'done' : f === false ? 'todo' : 'unknown'
+    const v = stateOf(it.id)
+    return v === true ? 'done' : v === false ? 'todo' : 'unknown'
   })
-  // "You are here" only where it is known: the first counted stop not done, when every counted stop before it is
-  // seen done. A stop before it that could not be read (unknown) places nobody (review, dash-v1).
-  const firstOpen = states.findIndex(s => s === 'todo' || s === 'unknown')
-  const here = firstOpen >= 0 && states[firstOpen] === 'todo' ? firstOpen : -1
+  const at = hereStop(items.map(it => it.id), stateOf, current)
+  const here = at ? items.findIndex(it => it.id === at) : -1
   if (here >= 0) states[here] = 'here'
-  const counted = items.filter(it => it.counts)
-  const done = counted.filter(it => flags[it.id] === true).length
-  return { states, here, done, total: counted.length, allDone: done === counted.length }
+  const done = states.filter(s => s === 'done').length
+  return { states, here, done, total: items.length, allDone: done === items.length }
 }
 
 /* ---------- Activity: the days the open bot was used ---------- */
 // Rows of host.listPersistedSessions that are Hermes's own work, left out: scheduled jobs (cron), the task board
-// (kanban), tool and helper-agent runs, and 'local', the source Hermes's own first-run chat ("Getting started") came
-// back with (hhtech-dash-reads2.md section 3). Chats with no message are left out too.
-const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent', 'local']
+// (kanban), tool and helper-agent runs. Chats with no message are left out too.
+// loom-fixes (hhtech-loom-n1 3, its correction): 'local' is no longer left out: a chat the person typed in a fresh home
+// came back as local. Hermes's own first-run chat is left out by its title (below).
+const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent']
 // dash-v2: while Hermes is still writing that first-run chat it is not 'local' yet. Read in three brand-new homes on
 // the first opening (dev/checks/dash-v2/fresh-probe-65b108b.out): source 'gui', 1 to 3 messages, title "Getting
 // started"; some seconds later 'local' with 4 messages. So a fresh install showed "Last used today" (hhtech-dash-run,
@@ -26485,18 +28893,6 @@ function distinctSkills(perBot) {
   }
   return names.size
 }
-// Plugins (dash-v2; Lead, 11 Nov, his words "active plugins"): the plugins switched on for the open bot, plus 1 for
-// Helper itself (Helper is never in that list: hhtech-dash-icons.md point 2). A row of plugins.manage list is the
-// person's when its source is not 'bundled' (Hermes's own parts; tui_gateway/methods_tools.py counts user_count the
-// same way), and switched on when its status is 'enabled' ('not enabled' and 'disabled' are not: hermes_cli/
-// plugins_cmd.py _plugin_status). A row that does not say where it comes from is not taken for the person's. A
-// failed read, or an answer without the list of rows: not shown, never a bare 1.
-function pluginCount(read) {
-  if (!read || !read.ok || !read.value || typeof read.value !== 'object') return null
-  const rows = read.value.plugins
-  if (!Array.isArray(rows)) return null
-  return rows.filter(r => r && typeof r === 'object' && typeof r.source === 'string' && r.source !== 'bundled' && r.status === 'enabled').length + 1
-}
 // A tile's word under its number (hhcontent): the number 1 takes the _one word, every other number, and a tile with
 // no number yet, the plain one. narrow: at the narrow size a tile that has a short word takes it (the plugins tile:
 // "plugins on in this bot" is 126 px wide and a tile has 112 px there, measured in the app; Lead, 11 Nov: then the
@@ -26509,7 +28905,7 @@ function tileWord(key, n, words = DASH_DATA.words.stats, narrow = false) {
 // ---- src/dash-css.js ----
 // Generated by scripts/build.mjs from src/dash.css (the style sheet of the Dashboard tab).
 // Edit the CSS, then build; tests/dash-css.test.mjs checks it.
-const DASH_CSS = ".hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}\n.hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}\n.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:18px 22px}\n.hhd-compact .hhd-card{padding:14px 16px}\nhtml:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}\n.hhd-compact .hhd-stats{gap:8px}\n.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}\n.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}\nhtml:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}\n.hhd-compact .hhd-tile-icon{width:32px;height:32px}\n.hhd-tile-words{display:flex;flex-direction:column;min-width:0}\n.hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}\n.hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}\n.hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-compact .hhd-tile-label{white-space:normal}\n.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}\n.hhd-compact .hhd-wait{margin:4px 0}\n.hhd-act{flex-direction:row;align-items:stretch;gap:24px;padding:12px 22px}\n.hhd-compact .hhd-act{gap:16px;padding:10px 16px}\n.hhd-act-words{flex:none;display:flex;flex-direction:column;gap:1px;min-width:0}\n.hhd-act-words .hhd-title{margin-bottom:3px}\n.hhd-lu{font-size:12px;line-height:17px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-key{margin-top:auto;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;line-height:14px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-key-sq{width:8px;height:8px;border-radius:2px}\n.hhd-key-first{margin-left:4px}\n.hhd-key-last{margin-right:4px}\n.hhd-gridwrap{flex:1;min-width:0;display:flex;align-items:flex-end;justify-content:flex-end;gap:6px}\n.hhd-daynames{flex:none;display:grid;grid-template-rows:repeat(7,8px);gap:2px;width:22px;font-size:9.5px;line-height:8px;color:var(--ui-text-tertiary)}\n.hhd-months{position:relative;height:13px;font-size:10px;line-height:12px;color:var(--ui-text-tertiary)}\n.hhd-month{position:absolute;top:0;white-space:nowrap}\n.hhd-grid{display:grid;grid-template-rows:repeat(7,8px);grid-auto-columns:8px;gap:2px}\n.hhd-sq{width:8px;height:8px;border-radius:2px}\n.hhd-l0{background:var(--ui-bg-tertiary)}\n.hhd-l1{background:color-mix(in srgb,var(--ui-accent) 35%,transparent)}\n.hhd-l2{background:color-mix(in srgb,var(--ui-accent) 65%,transparent)}\n.hhd-l3{background:var(--ui-accent)}\n.hhd-today{outline:1px solid var(--ui-text-secondary);outline-offset:1px}\n.hhd-head{display:flex;align-items:baseline;gap:12px;min-width:0}\n.hhd-count{font-size:13px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-count-n{font-size:15px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-road{position:relative;margin:4px 0 0;width:100%}\n.hhd-compact .hhd-road{margin-top:2px}\n.hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}\n.hhd-line{fill:none;stroke:var(--ui-text-quaternary);stroke-width:1;stroke-linecap:round}\n.hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}\n.hhd-stop:focus-visible{outline:none}\n.hhd-dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;box-sizing:border-box}\n.hhd-compact .hhd-dot{width:32px;height:32px}\n.hhd-done .hhd-dot{background:var(--ui-accent);color:var(--background)}\n.hhd-todo .hhd-dot{background:var(--ui-bg-tertiary);color:var(--ui-text-tertiary)}\n.hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}\n.hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}\n.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-text-quaternary);color:var(--ui-text-quaternary)}\n.hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}\n.hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}\n.hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}\n.hhd-up .hhd-label{bottom:calc(100% + 6px);flex-direction:column-reverse}\n.hhd-down .hhd-label{top:calc(100% + 6px)}\n.hhd-here.hhd-up .hhd-label{bottom:calc(100% + 9px)}\n.hhd-here.hhd-down .hhd-label{top:calc(100% + 9px)}\n.hhd-name{display:block;font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}\n.hhd-compact .hhd-name{font-size:11px;line-height:15px;white-space:normal}\n.hhd-done .hhd-name{color:var(--ui-text-secondary)}\n.hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}\n.hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}\n.hhd-you{display:block;font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}\n.hhd-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--ui-stroke-tertiary);min-width:0}\n.hhd-compact .hhd-next{margin-top:8px;padding-top:10px}\n.hhd-next-words{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}\n.hhd-next-line{display:flex;align-items:baseline;gap:10px;min-width:0}\n.hhd-next-label{font-size:11px;line-height:14px;letter-spacing:.8px;text-transform:uppercase;color:var(--ui-accent);font-weight:600}\n.hhd-next-name{font-size:13px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-alldone{color:var(--ui-accent)}\n.hhd-open-word{display:inline-flex;align-items:center}\n.hhd-open-chev{display:inline-flex;margin-left:4px}\n.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}\n.hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}\n.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}\n.hhd-compact .hhd-caret{display:none}\n.hhd-steps-head{display:flex;align-items:center;gap:10px;min-width:0}\n.hhd-steps-icon{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--ui-accent) 18%,transparent);color:var(--ui-accent)}\n.hhd-steps-name{font-size:14px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-steps-why{font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}\n.hhd-compact .hhd-ol{line-height:19px}\n.hhd-ol li::marker{color:var(--ui-accent);font-weight:600}\n.hhd-li{margin:0 0 2px}\n.hhd-route{margin:4px 0 2px}\n.hhd-term{display:flex;flex-direction:column;gap:6px;min-width:0}\n.hhd-term-when{font-size:12px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-paste{display:flex;flex-direction:column;gap:4px;min-width:0}\n.hhd-paste-text{min-width:0;flex:1 1 auto;overflow-x:auto;font-size:12px;line-height:18px;color:var(--ui-text-secondary)}\n.hhd-paste-box{flex-wrap:wrap}\n.hhd-word{white-space:nowrap}\n.hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-quietline{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}\n.hhd-foot .hhd-src{font-size:10.5px;color:var(--ui-text-quaternary)}\n.hhd-close{position:absolute;right:10px;top:10px}"
+const DASH_CSS = ".hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}\n.hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}\n.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:18px 22px}\n.hhd-compact .hhd-card{padding:14px 16px}\nhtml:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}\n.hhd-compact .hhd-stats{gap:8px}\n.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}\n.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}\nhtml:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}\n.hhd-compact .hhd-tile-icon{width:32px;height:32px}\n.hhd-tile-words{display:flex;flex-direction:column;min-width:0}\n.hhd-tile-btn{width:100%;border:0;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}\n.hhd-tile-btn:hover{background:var(--ui-bg-tertiary)}\n.hhd-tile-btn:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}\n.hhd-tile-name{font-size:15px;line-height:22px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}\n.hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}\n.hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-compact .hhd-tile-label{white-space:normal}\n.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}\n.hhd-compact .hhd-wait{margin:4px 0}\n.hhd-act{flex-direction:row;align-items:stretch;gap:24px;padding:12px 22px}\n.hhd-compact .hhd-act{gap:16px;padding:10px 16px}\n.hhd-act-words{flex:none;display:flex;flex-direction:column;gap:1px;min-width:0}\n.hhd-act-words .hhd-title{margin-bottom:3px}\n.hhd-lu{font-size:12px;line-height:17px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-key{margin-top:auto;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;line-height:14px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-key-sq{width:8px;height:8px;border-radius:2px}\n.hhd-key-first{margin-left:4px}\n.hhd-key-last{margin-right:4px}\n.hhd-gridwrap{flex:1;min-width:0;display:flex;align-items:flex-end;justify-content:flex-end;gap:6px}\n.hhd-daynames{flex:none;display:grid;grid-template-rows:repeat(7,8px);gap:2px;width:22px;font-size:9.5px;line-height:8px;color:var(--ui-text-tertiary)}\n.hhd-months{position:relative;height:13px;font-size:10px;line-height:12px;color:var(--ui-text-tertiary)}\n.hhd-month{position:absolute;top:0;white-space:nowrap}\n.hhd-grid{display:grid;grid-template-rows:repeat(7,8px);grid-auto-columns:8px;gap:2px}\n.hhd-sq{width:8px;height:8px;border-radius:2px}\n.hhd-l0{background:var(--ui-bg-tertiary)}\n.hhd-l1{background:color-mix(in srgb,var(--ui-accent) 35%,transparent)}\n.hhd-l2{background:color-mix(in srgb,var(--ui-accent) 65%,transparent)}\n.hhd-l3{background:var(--ui-accent)}\n.hhd-today{outline:1px solid var(--ui-text-secondary);outline-offset:1px}\n.hhd-head{display:flex;align-items:baseline;gap:12px;min-width:0}\n.hhd-count{font-size:13px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-count-n{font-size:15px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-road{position:relative;margin:4px 0 0;width:100%}\n.hhd-compact .hhd-road{margin-top:2px}\n.hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}\n.hhd-line{fill:none;stroke:var(--ui-text-quaternary);stroke-width:1;stroke-linecap:round}\n.hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}\n.hhd-stop:focus-visible{outline:none}\n.hhd-dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;box-sizing:border-box}\n.hhd-compact .hhd-dot{width:32px;height:32px}\n.hhd-done .hhd-dot{background:var(--ui-accent);color:var(--background)}\n.hhd-todo .hhd-dot{background:var(--ui-bg-tertiary);color:var(--ui-text-tertiary)}\n.hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}\n.hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}\n.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-text-quaternary);color:var(--ui-text-quaternary)}\n.hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}\n.hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}\n.hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}\n.hhd-up .hhd-label{bottom:calc(100% + 6px);flex-direction:column-reverse}\n.hhd-down .hhd-label{top:calc(100% + 6px)}\n.hhd-here.hhd-up .hhd-label{bottom:calc(100% + 9px)}\n.hhd-here.hhd-down .hhd-label{top:calc(100% + 9px)}\n.hhd-name{display:block;font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}\n.hhd-compact .hhd-name{font-size:11px;line-height:15px;white-space:normal}\n.hhd-done .hhd-name{color:var(--ui-text-secondary)}\n.hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}\n.hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}\n.hhd-you{display:block;font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}\n.hhd-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--ui-stroke-tertiary);min-width:0}\n.hhd-compact .hhd-next{margin-top:8px;padding-top:10px}\n.hhd-next-words{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}\n.hhd-next-line{display:flex;align-items:baseline;gap:10px;min-width:0}\n.hhd-next-label{font-size:11px;line-height:14px;letter-spacing:.8px;text-transform:uppercase;color:var(--ui-accent);font-weight:600}\n.hhd-next-name{font-size:13px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-alldone{color:var(--ui-accent)}\n.hhd-open-word{display:inline-flex;align-items:center}\n.hhd-open-chev{display:inline-flex;margin-left:4px}\n.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}\n.hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}\n.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}\n.hhd-compact .hhd-caret{display:none}\n.hhd-steps-head{display:flex;align-items:center;gap:10px;min-width:0}\n.hhd-steps-icon{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--ui-accent) 18%,transparent);color:var(--ui-accent)}\n.hhd-steps-name{font-size:14px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-steps-why{font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}\n.hhd-compact .hhd-ol{line-height:19px}\n.hhd-ol li::marker{color:var(--ui-accent);font-weight:600}\n.hhd-li{margin:0 0 2px}\n.hhd-route{margin:4px 0 2px}\n.hhd-term{display:flex;flex-direction:column;gap:6px;min-width:0}\n.hhd-term-when{font-size:12px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-paste{display:flex;flex-direction:column;gap:4px;min-width:0}\n.hhd-paste-text{min-width:0;flex:1 1 auto;overflow-x:auto;font-size:12px;line-height:18px;color:var(--ui-text-secondary)}\n.hhd-paste-box{flex-wrap:wrap}\n.hhd-word{white-space:nowrap}\n.hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-quietline{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}\n.hhd-foot .hhd-src{font-size:10.5px;color:var(--ui-text-quaternary)}\n.hhd-close{position:absolute;right:10px;top:10px}"
 
 // ---- src/dash.js ----
 // The Dashboard tab (dash-v1, as Pēteris picked it: design/dash-r5 way (ii), r6 Activity, r7 tiles, icons and line).
@@ -26526,7 +28922,10 @@ const DASH_CSS = ".hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap
 //           personality, Chat apps, Scheduled jobs) reads the bot the app has open, the same bot as the plugins tile
 //           and Activity; it rereads when the open bot changes. Install and A second bot are for the whole Hermes.")
 //   then    host.skills.list for each bot (the skills number)
-//   last    plugins.manage list for the open bot (slow: up to a second)
+// loom-fixes: no plugins read any more (hhtech-loom-n1 1: no read gives the number Hermes's Plugins screen shows); the
+// plugins tile has no number and opens that screen. The skills tile opens Capabilities, Skills; the bots tile stays
+// plain (no address opens the Bots tab). The path: 10 stops (Install is off it), each counted; the stops the page cannot
+// see are marked by the person ("I've done this"), in the same kept list as Helper's set-up conversation's "done".
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -26567,7 +28966,8 @@ function DashIcon({ icon, size }) {
 
 // How long a read may take before it counts as failed (makeReader, src/setup-reads.js).
 const DASH_READ_MS = 30000
-const DASH_SLOW_READ_MS = 60000
+// loom-fixes: the screens the tiles open (hhtech-loom-n1 2, ran from Helper's page); bots: none opens the Bots tab
+const TILE_GO = { skills: '/capabilities?tab=skills', plugins: '/capabilities?tab=plugins' }
 
 // The element's own width, from a ResizeObserver on our own markup (0 until measured).
 // A long word with a "/" before its end (a web address) may break after its last "/" only.
@@ -26705,7 +29105,7 @@ function makeDashboard(ctx) {
         const bot = nameGiven ? openBot : mainBotName(rows) || openBot
         const listSessions = door(() => host.listPersistedSessions)
         const getStatus = door(() => host.status)
-        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
+        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve(undefined)
         const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
         const [model, soul, cron, st, ses] = await Promise.all([
           // the open bot, by the name the app itself gives (never a guessed bot): so these are read also when the
@@ -26717,12 +29117,11 @@ function makeDashboard(ctx) {
           sessions
         ])
         if (!alive) return
-        put({ model, soul, cron, status: st, sessions: ses, pathRead: true })
+        // sessionsDoor: whether this Hermes has the sessions read at all (without it First chat is marked by the person)
+        put({ model, soul, cron, status: st, sessions: ses, sessionsDoor: !!listSessions, pathRead: true })
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
         put({ skills: skills || [{ ok: false }] })
-        const plugins = await request('plugins.manage', { action: 'list', profile: bot }, DASH_SLOW_READ_MS)
-        put({ plugins })
       })().catch(() => {})
       return () => {
         alive = false
@@ -26756,11 +29155,15 @@ function makeDashboard(ctx) {
       setOpen(o => (o === id ? null : id))
       if (open !== id) setReveal(true)
     }
-    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox }
+    // given: the app's own name for the open bot (loom-fixes: Helper's look reads the same bot, src/page.js)
+    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox, given }
   }
 
   // The tab, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
-  function renderDashboard(state, { compact = false } = {}) {
+  // kept: the record Helper keeps (src/kept.js; its setup_done_said is the person's marks, its setup_current the stop
+  // Helper recommended last); onMark(id, done): the person pressed "I've done this" or "Not done yet" (src/page.js
+  // writes the kept record)
+  function renderDashboard(state, { compact = false, kept = {}, onMark = () => {} } = {}) {
     const W = DASH_DATA.words
     const { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox } = state
 
@@ -26769,42 +29172,34 @@ function makeDashboard(ctx) {
     const numbers = {
       // undefined = still reading (the waiting block); null = the read failed (no number at all)
       bots: reads.bots ? (rows ? rows.length : null) : undefined,
-      skills: reads.skills ? distinctSkills(reads.skills) : undefined,
-      plugins: reads.plugins ? pluginCount(reads.plugins) : undefined
+      skills: reads.skills ? distinctSkills(reads.skills) : undefined
     }
-    const tile = key =>
-      jsxs(
-        'div',
-        {
-          className: D.tile,
-          'data-hh': `tile-${key}`,
-          children: [
-            jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'),
-            jsxs(
-              'span',
-              {
-                className: D.tileWords,
-                children: [
-                  numbers[key] === undefined
-                    ? jsx('i', { className: D.wait, 'data-hh': 'wait', 'aria-hidden': true }, 'n')
-                    : numbers[key] === null
-                      ? null
-                      : jsx('b', { className: D.tileNum, 'data-hh': 'number', children: String(numbers[key]) }, 'n'),
-                  jsx('span', { className: D.tileLabel, children: tileWord(key, numbers[key], W.stats, compact) }, 'l'),
-                  // for a screen reader only: the number is still being read, or could not be read
-                  numbers[key] === undefined
-                    ? jsx('span', { className: K.srOnly, children: W.stats.waiting }, 'sr')
-                    : numbers[key] === null
-                      ? jsx('span', { className: K.srOnly, children: W.stats.not_known }, 'sr')
-                      : null
-                ]
-              },
-              'w'
-            )
+    // loom-fixes (Lead's points 14 and 15, hhtech-loom-n1 1 and 2): a tile with a screen of Hermes's own that lists the
+    // same things is a button to that screen; the bots tile stays plain. The plugins tile has no number.
+    const tileWords = key =>
+      key === 'plugins'
+        ? [jsx('b', { className: D.tileName, 'data-hh': 'tile-name', children: W.stats.plugins_title }, 'n'), jsx('span', { className: D.tileLabel, children: W.stats.plugins_line }, 'l')]
+        : [
+            numbers[key] === undefined
+              ? jsx('i', { className: D.wait, 'data-hh': 'wait', 'aria-hidden': true }, 'n')
+              : numbers[key] === null
+                ? null
+                : jsx('b', { className: D.tileNum, 'data-hh': 'number', children: String(numbers[key]) }, 'n'),
+            jsx('span', { className: D.tileLabel, children: tileWord(key, numbers[key], W.stats, compact) }, 'l'),
+            // for a screen reader only: the number is still being read, or could not be read
+            numbers[key] === undefined
+              ? jsx('span', { className: K.srOnly, children: W.stats.waiting }, 'sr')
+              : numbers[key] === null
+                ? jsx('span', { className: K.srOnly, children: W.stats.not_known }, 'sr')
+                : null,
+            // a tile that opens Hermes's screen says where it goes (the plugins tile says it on screen)
+            TILE_GO[key] ? jsx('span', { className: K.srOnly, children: '. ' + W.stats.plugins_line }, 'go') : null
           ]
-        },
-        key
-      )
+    const tile = key => {
+      const inner = [jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'), jsxs('span', { className: D.tileWords, children: tileWords(key) }, 'w')]
+      if (!TILE_GO[key]) return jsxs('div', { className: D.tile, 'data-hh': `tile-${key}`, children: inner }, key)
+      return jsxs('button', { type: 'button', className: cx(D.tile, D.tileBtn), 'data-hh': `tile-${key}`, 'data-to': TILE_GO[key], onClick: () => goTo(TILE_GO[key]), children: inner }, key)
+    }
     const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
 
     /* ---------- Activity: shown only when the read worked ---------- */
@@ -26889,25 +29284,32 @@ function makeDashboard(ctx) {
     /* ---------- Set up: the path ---------- */
     const items = DASH_DATA.items
     const ready = !!reads.pathRead
-    const flags = ready ? doneFlags(reads) : { install: true }
-    const path = pathStates(ready ? flags : {}, items)
-    // before the path's reads are back: every counted stop waits as not done, nobody is "here", no count
-    const states = ready ? path.states : items.map(it => (it.counts ? 'todo' : 'quiet'))
+    const flags = ready ? doneFlags(reads) : {}
+    const said = Array.isArray(kept.setup_done_said) ? kept.setup_done_said : []
+    // the person marks a stop the page cannot see; First chat too when this Hermes has no sessions read (hhtech's rule)
+    const selfMarked = it => !it.seen || (it.id === 'first_chat' && ready && !reads.sessionsDoor)
+    const stateOf = id => stopState(items.find(it => it.id === id), flags, said, selfMarked)
+    const path = pathStates(stateOf, items, kept.setup_current || null)
+    // before the path's reads are back: a stop the person marked shows it, every other one waits as not done, nobody is
+    // "here", no count
+    const states = ready ? path.states : items.map(it => (said.includes(it.id) ? 'done' : 'todo'))
     const here = ready ? path.here : -1
     const width = roadWidth || ROAD_WIDTH_UNMEASURED
     const shape = roadShape(width, compact, here)
-    const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here, quiet: D.quiet }
-    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_known, here: W.setup.you_are_here, quiet: W.setup.state_not_counted }
+    const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here }
+    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_known, here: W.setup.you_are_here }
+    // a stop done because the person said so (not seen by a read): "done, you said so"
+    const wordOf = (it, s) => (s === 'done' && said.includes(it.id) && flags[it.id] !== true ? W.setup.state_said_done : stateWord[s])
     const stops = items.map((it, i) => {
       const s = states[i]
-      const size = s === 'quiet' ? 14 : 16
+      const size = 16
       return jsxs(
         'button',
         {
           type: 'button',
           className: cx(D.stop, stateClass[s], i % 2 ? D.down : D.up, open === it.id && D.sel),
           style: { left: `${shape.points[i][0]}px`, top: `${shape.points[i][1]}px` },
-          'aria-label': `${it.mark}: ${stateWord[s]}`,
+          'aria-label': `${it.mark}: ${wordOf(it, s)}`,
           'aria-expanded': open === it.id,
           'aria-controls': open === it.id ? 'helper-dash-steps' : undefined,
           'data-hh': 'stop',
@@ -27058,7 +29460,26 @@ function makeDashboard(ctx) {
                   'term'
                 )
               : null,
-            openItem.counts ? null : jsx('p', { className: D.quietLine, 'data-hh': 'not-counted', children: W.setup.not_counted }, 'nc'),
+            // loom-fixes (dash-words rules.marks): a stop the person marks: the faint sentence and one button, I've done this
+            // or, once marked, Not done yet. A stop the page sees has neither.
+            selfMarked(openItem) ? jsx('p', { className: D.quietLine, 'data-hh': 'person-note', children: W.setup.person_note }, 'pn') : null,
+            selfMarked(openItem)
+              ? jsx(
+                  'div',
+                  {
+                    className: D.route,
+                    children: jsx(Button, {
+                      variant: 'secondary',
+                      size: 'xs',
+                      'data-hh': 'mark',
+                      'data-marked': said.includes(openItem.id),
+                      onClick: () => onMark(openItem.id, !said.includes(openItem.id)),
+                      children: said.includes(openItem.id) ? W.setup.mark_undo : W.setup.mark_done
+                    })
+                  },
+                  'mark'
+                )
+              : null,
             jsx(
               'div',
               {
@@ -27350,7 +29771,9 @@ const DocsBox = ({ docs, wait }) =>
     'data-hh': 'docs',
     children: [
       jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: drawn(docs.head) }, 'h'),
-      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: drawn(docs.words) }, 'w')
+      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: drawn(docs.words) }, 'w'),
+      // loom-fixes: where the words are from, for a name's line and the migrate line (hhcontent's "file, line N")
+      docs.where ? jsx('p', { className: T.docsWhere, 'data-hh': 'docs-where', children: drawn(docs.where) }, 'f') : null
     ]
   })
 // The clicks to add an optional skill: Hermes's own numbered list (rule B), and the faint line after them.
@@ -27693,8 +30116,8 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-// dash-v1: three tabs, Dashboard, Learn, My setup (Pēteris's pick, 11 Nov 2026); their names from the Dashboard's
-// data (content/dash-setup-list-v2.json page_words). Only Dashboard is built: Learn and My setup show one quiet line.
+// dash-v1: the tabs, their names from the Dashboard's data (content/dash-words-v1.json page_words). loom-fixes: two,
+// Dashboard and Learn (My setup is out: his words, Loom 3:22). Only Dashboard is built: Learn shows one quiet line.
 const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
@@ -27846,7 +30269,8 @@ function makePage(ctx, opts = {}) {
     return out
   }
   // The look: Helper reads what is set up, on this computer (src/setup-look.js). No AI call, nothing sent.
-  const look = makeLook(ctx, host)
+  // loom-fixes: the look reads the bot the app has open, as the Dashboard does (live.profile, set on every draw)
+  const look = makeLook(ctx, host, () => live.profile || '')
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
   // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
@@ -28041,6 +30465,7 @@ function makePage(ctx, opts = {}) {
     live.recheck = () => recheckModel(true)
     // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
     const dashboard = useDashboard({ active: tab === 'dashboard' })
+    live.profile = dashboard.given
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
     // (review) the page drawn last holds the view; a page that leaves lets go only of its own
@@ -28187,6 +30612,18 @@ function makePage(ctx, opts = {}) {
 
     /* ---------- the conversation: what the person does, what Helper says back ---------- */
     const visit = remembered().visit
+    // loom-fixes (Lead's point 12): "I've done this" / "Not done yet" on a stop the page cannot see: the same kept list as
+    // the "done" of Helper's set-up conversation (setup_done_said), so Helper's settings page shows it with the other
+    // kept things and Forget all clears it. Written at once; the page is drawn again.
+    const [, setMarks] = useState(0)
+    function markStop(id, done) {
+      const list = (visit.kept.setup_done_said || []).filter(x => x !== id)
+      if (done) list.push(id)
+      if (list.length) visit.kept.setup_done_said = list
+      else delete visit.kept.setup_done_said
+      writeKept()
+      setMarks(n => n + 1)
+    }
     function addToLog(entries) {
       // talk v2 look (hhdesign's notes-wants.md rule C point 3, settled by Lead): only the newest line keeps
       // its opened part; the line that moves up into the older lines closes its steps or text to paste, and
@@ -28634,7 +31071,7 @@ function makePage(ctx, opts = {}) {
     /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
     const panel =
       tab === 'dashboard'
-        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX })
+        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX, kept: visit.kept, onMark: markStop })
         : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
 
     const main = jsx(

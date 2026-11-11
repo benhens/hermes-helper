@@ -61,7 +61,10 @@ function show(o) {
     nextline: () => 'next line ' + o.id,
     termmean: () => 'mean line ' + o.term + '-mean',
     HOW_PASTE: () => `HOW_PASTE (${o.label})`,
-    HOW_PART: () => `HOW_PART (${o.label})`
+    HOW_PART: () => `HOW_PART (${o.label})`,
+    // loom-fixes (route2.py show)
+    NAME: () => 'NAME ' + o.id,
+    MIG_APP: () => (o.app ? 'MIG_APP app=' + o.app : 'MIG_APP')
   }
   return (by[o.kind] || (() => o.kind))()
 }
@@ -422,7 +425,8 @@ test('part buttons open Hermes\'s own screens; Bots has no screen a button can o
   const mem0 = lineFor(pickTopic('mem', st), st)
   assert.equal(mem0.line, 'mem0')
   assert.deepEqual([mem0.next.kind, mem0.next.label], ['paste', 'Try it'])
-  assert.equal(mem0.next.text, 'Please save this to your memory: <one thing about you>. Then tell me what you saved.')
+  // loom-fixes (helper-loom-fixes-v1 point 3): no text to copy has a blank to fill in
+  assert.equal(mem0.next.text, 'Please save one thing about me to your memory. First ask me what it should be. Then tell me what you saved.')
   // the Bots tab line stays where a line is about bots
   st = freshVisit()
   st.lastq = true

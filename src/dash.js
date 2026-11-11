@@ -12,7 +12,10 @@
 //           personality, Chat apps, Scheduled jobs) reads the bot the app has open, the same bot as the plugins tile
 //           and Activity; it rereads when the open bot changes. Install and A second bot are for the whole Hermes.")
 //   then    host.skills.list for each bot (the skills number)
-//   last    plugins.manage list for the open bot (slow: up to a second)
+// loom-fixes: no plugins read any more (hhtech-loom-n1 1: no read gives the number Hermes's Plugins screen shows); the
+// plugins tile has no number and opens that screen. The skills tile opens Capabilities, Skills; the bots tile stays
+// plain (no address opens the Bots tab). The path: 10 stops (Install is off it), each counted; the stops the page cannot
+// see are marked by the person ("I've done this"), in the same kept list as Helper's set-up conversation's "done".
 import { host, useValue, icons, Button, Codicon, CopyButton } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
@@ -20,7 +23,7 @@ import { K, D, cx } from './look.js'
 import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
 import { botRows, mainBotName, openBotName, doneFlags, makeReader } from './setup-reads.js'
-import { pathStates, chatDays, activityGrid, daysSinceUsed, lastUsedLine, weeksThatFit, distinctSkills, pluginCount, tileWord } from './dash-rules.js'
+import { pathStates, stopState, chatDays, activityGrid, daysSinceUsed, lastUsedLine, weeksThatFit, distinctSkills, tileWord } from './dash-rules.js'
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -61,7 +64,8 @@ function DashIcon({ icon, size }) {
 
 // How long a read may take before it counts as failed (makeReader, src/setup-reads.js).
 export const DASH_READ_MS = 30000
-export const DASH_SLOW_READ_MS = 60000
+// loom-fixes: the screens the tiles open (hhtech-loom-n1 2, ran from Helper's page); bots: none opens the Bots tab
+export const TILE_GO = { skills: '/capabilities?tab=skills', plugins: '/capabilities?tab=plugins' }
 
 // The element's own width, from a ResizeObserver on our own markup (0 until measured).
 // A long word with a "/" before its end (a web address) may break after its last "/" only.
@@ -199,7 +203,7 @@ export function makeDashboard(ctx) {
         const bot = nameGiven ? openBot : mainBotName(rows) || openBot
         const listSessions = door(() => host.listPersistedSessions)
         const getStatus = door(() => host.status)
-        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
+        const sessions = listSessions ? read(() => listSessions(null, { profile: bot, limit: 500 }), DASH_READ_MS) : Promise.resolve(undefined)
         const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
         const [model, soul, cron, st, ses] = await Promise.all([
           // the open bot, by the name the app itself gives (never a guessed bot): so these are read also when the
@@ -211,12 +215,11 @@ export function makeDashboard(ctx) {
           sessions
         ])
         if (!alive) return
-        put({ model, soul, cron, status: st, sessions: ses, pathRead: true })
+        // sessionsDoor: whether this Hermes has the sessions read at all (without it First chat is marked by the person)
+        put({ model, soul, cron, status: st, sessions: ses, sessionsDoor: !!listSessions, pathRead: true })
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
         put({ skills: skills || [{ ok: false }] })
-        const plugins = await request('plugins.manage', { action: 'list', profile: bot }, DASH_SLOW_READ_MS)
-        put({ plugins })
       })().catch(() => {})
       return () => {
         alive = false
@@ -250,11 +253,15 @@ export function makeDashboard(ctx) {
       setOpen(o => (o === id ? null : id))
       if (open !== id) setReveal(true)
     }
-    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox }
+    // given: the app's own name for the open bot (loom-fixes: Helper's look reads the same bot, src/page.js)
+    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox, given }
   }
 
   // The tab, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
-  function renderDashboard(state, { compact = false } = {}) {
+  // kept: the record Helper keeps (src/kept.js; its setup_done_said is the person's marks, its setup_current the stop
+  // Helper recommended last); onMark(id, done): the person pressed "I've done this" or "Not done yet" (src/page.js
+  // writes the kept record)
+  function renderDashboard(state, { compact = false, kept = {}, onMark = () => {} } = {}) {
     const W = DASH_DATA.words
     const { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox } = state
 
@@ -263,42 +270,34 @@ export function makeDashboard(ctx) {
     const numbers = {
       // undefined = still reading (the waiting block); null = the read failed (no number at all)
       bots: reads.bots ? (rows ? rows.length : null) : undefined,
-      skills: reads.skills ? distinctSkills(reads.skills) : undefined,
-      plugins: reads.plugins ? pluginCount(reads.plugins) : undefined
+      skills: reads.skills ? distinctSkills(reads.skills) : undefined
     }
-    const tile = key =>
-      jsxs(
-        'div',
-        {
-          className: D.tile,
-          'data-hh': `tile-${key}`,
-          children: [
-            jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'),
-            jsxs(
-              'span',
-              {
-                className: D.tileWords,
-                children: [
-                  numbers[key] === undefined
-                    ? jsx('i', { className: D.wait, 'data-hh': 'wait', 'aria-hidden': true }, 'n')
-                    : numbers[key] === null
-                      ? null
-                      : jsx('b', { className: D.tileNum, 'data-hh': 'number', children: String(numbers[key]) }, 'n'),
-                  jsx('span', { className: D.tileLabel, children: tileWord(key, numbers[key], W.stats, compact) }, 'l'),
-                  // for a screen reader only: the number is still being read, or could not be read
-                  numbers[key] === undefined
-                    ? jsx('span', { className: K.srOnly, children: W.stats.waiting }, 'sr')
-                    : numbers[key] === null
-                      ? jsx('span', { className: K.srOnly, children: W.stats.not_known }, 'sr')
-                      : null
-                ]
-              },
-              'w'
-            )
+    // loom-fixes (Lead's points 14 and 15, hhtech-loom-n1 1 and 2): a tile with a screen of Hermes's own that lists the
+    // same things is a button to that screen; the bots tile stays plain. The plugins tile has no number.
+    const tileWords = key =>
+      key === 'plugins'
+        ? [jsx('b', { className: D.tileName, 'data-hh': 'tile-name', children: W.stats.plugins_title }, 'n'), jsx('span', { className: D.tileLabel, children: W.stats.plugins_line }, 'l')]
+        : [
+            numbers[key] === undefined
+              ? jsx('i', { className: D.wait, 'data-hh': 'wait', 'aria-hidden': true }, 'n')
+              : numbers[key] === null
+                ? null
+                : jsx('b', { className: D.tileNum, 'data-hh': 'number', children: String(numbers[key]) }, 'n'),
+            jsx('span', { className: D.tileLabel, children: tileWord(key, numbers[key], W.stats, compact) }, 'l'),
+            // for a screen reader only: the number is still being read, or could not be read
+            numbers[key] === undefined
+              ? jsx('span', { className: K.srOnly, children: W.stats.waiting }, 'sr')
+              : numbers[key] === null
+                ? jsx('span', { className: K.srOnly, children: W.stats.not_known }, 'sr')
+                : null,
+            // a tile that opens Hermes's screen says where it goes (the plugins tile says it on screen)
+            TILE_GO[key] ? jsx('span', { className: K.srOnly, children: '. ' + W.stats.plugins_line }, 'go') : null
           ]
-        },
-        key
-      )
+    const tile = key => {
+      const inner = [jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'), jsxs('span', { className: D.tileWords, children: tileWords(key) }, 'w')]
+      if (!TILE_GO[key]) return jsxs('div', { className: D.tile, 'data-hh': `tile-${key}`, children: inner }, key)
+      return jsxs('button', { type: 'button', className: cx(D.tile, D.tileBtn), 'data-hh': `tile-${key}`, 'data-to': TILE_GO[key], onClick: () => goTo(TILE_GO[key]), children: inner }, key)
+    }
     const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
 
     /* ---------- Activity: shown only when the read worked ---------- */
@@ -383,25 +382,32 @@ export function makeDashboard(ctx) {
     /* ---------- Set up: the path ---------- */
     const items = DASH_DATA.items
     const ready = !!reads.pathRead
-    const flags = ready ? doneFlags(reads) : { install: true }
-    const path = pathStates(ready ? flags : {}, items)
-    // before the path's reads are back: every counted stop waits as not done, nobody is "here", no count
-    const states = ready ? path.states : items.map(it => (it.counts ? 'todo' : 'quiet'))
+    const flags = ready ? doneFlags(reads) : {}
+    const said = Array.isArray(kept.setup_done_said) ? kept.setup_done_said : []
+    // the person marks a stop the page cannot see; First chat too when this Hermes has no sessions read (hhtech's rule)
+    const selfMarked = it => !it.seen || (it.id === 'first_chat' && ready && !reads.sessionsDoor)
+    const stateOf = id => stopState(items.find(it => it.id === id), flags, said, selfMarked)
+    const path = pathStates(stateOf, items, kept.setup_current || null)
+    // before the path's reads are back: a stop the person marked shows it, every other one waits as not done, nobody is
+    // "here", no count
+    const states = ready ? path.states : items.map(it => (said.includes(it.id) ? 'done' : 'todo'))
     const here = ready ? path.here : -1
     const width = roadWidth || ROAD_WIDTH_UNMEASURED
     const shape = roadShape(width, compact, here)
-    const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here, quiet: D.quiet }
-    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_known, here: W.setup.you_are_here, quiet: W.setup.state_not_counted }
+    const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here }
+    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_known, here: W.setup.you_are_here }
+    // a stop done because the person said so (not seen by a read): "done, you said so"
+    const wordOf = (it, s) => (s === 'done' && said.includes(it.id) && flags[it.id] !== true ? W.setup.state_said_done : stateWord[s])
     const stops = items.map((it, i) => {
       const s = states[i]
-      const size = s === 'quiet' ? 14 : 16
+      const size = 16
       return jsxs(
         'button',
         {
           type: 'button',
           className: cx(D.stop, stateClass[s], i % 2 ? D.down : D.up, open === it.id && D.sel),
           style: { left: `${shape.points[i][0]}px`, top: `${shape.points[i][1]}px` },
-          'aria-label': `${it.mark}: ${stateWord[s]}`,
+          'aria-label': `${it.mark}: ${wordOf(it, s)}`,
           'aria-expanded': open === it.id,
           'aria-controls': open === it.id ? 'helper-dash-steps' : undefined,
           'data-hh': 'stop',
@@ -552,7 +558,26 @@ export function makeDashboard(ctx) {
                   'term'
                 )
               : null,
-            openItem.counts ? null : jsx('p', { className: D.quietLine, 'data-hh': 'not-counted', children: W.setup.not_counted }, 'nc'),
+            // loom-fixes (dash-words rules.marks): a stop the person marks: the faint sentence and one button, I've done this
+            // or, once marked, Not done yet. A stop the page sees has neither.
+            selfMarked(openItem) ? jsx('p', { className: D.quietLine, 'data-hh': 'person-note', children: W.setup.person_note }, 'pn') : null,
+            selfMarked(openItem)
+              ? jsx(
+                  'div',
+                  {
+                    className: D.route,
+                    children: jsx(Button, {
+                      variant: 'secondary',
+                      size: 'xs',
+                      'data-hh': 'mark',
+                      'data-marked': said.includes(openItem.id),
+                      onClick: () => onMark(openItem.id, !said.includes(openItem.id)),
+                      children: said.includes(openItem.id) ? W.setup.mark_undo : W.setup.mark_done
+                    })
+                  },
+                  'mark'
+                )
+              : null,
             jsx(
               'div',
               {

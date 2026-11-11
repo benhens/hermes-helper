@@ -102,7 +102,11 @@ test('after "Ask me the set-up questions again", Helper\'s window asks again whe
   await settle()
   byData(back.tree, 'page').props.onPointerDownCapture({})
   const bubble = byData(byData(back.tree, 'helper'), 'bubble')
-  assert.equal(bubble.props['data-line'], 'RESTART')
-  assert.equal(spoken(byData(bubble, 'said')).trim(), 'Sure, let’s start again. Are you new to Hermes?')
+  // loom-fixes (the data's RESTART.then): the restart line, then the first question as its own bubble
+  const olds = all(byData(back.tree, 'helper'), n => n.props['data-hh'] === 'old')
+  assert.equal(olds.at(-1).props['data-line'], 'RESTART')
+  assert.match(text(olds.at(-1)), /Sure, let’s start again\./)
+  assert.equal(bubble.props['data-line'], 'Q_NEW')
+  assert.equal(spoken(byData(bubble, 'said')).trim(), 'Are you new to Hermes?')
   assert.equal(all(back.tree, n => n.props['data-hh'] === 'answer').length, 4)
 })
