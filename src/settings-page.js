@@ -78,6 +78,9 @@ export function makeSettingsPage(ctx) {
       ctx.storage.remove('kept')
       // loom-fixes (Lead's point 17b): the kept conversation with Helper goes with it
       ctx.storage.remove('talk')
+      // last-reset (Lead, 11 Nov 15:41): a full reset: the met mark goes too, so after a restart Helper greets as on a
+      // first visit and asks the name again. What stays is the page's layout (tab, helperWidth, helperHidden).
+      ctx.storage.remove('met')
       showStored()
       setSaid(null)
       setForget('done')

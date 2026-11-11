@@ -43,7 +43,7 @@ const click = node => {
 const olds = view => all(helper(view), n => n.props['data-hh'] === 'old').map(n => text(n).replace(/\s+/g, ' ').trim())
 // loom-fixes-2: the earlier conversation's lines (Helper's and the person's) that must not come back. Not "no old line
 // at all": with the set-up conversation off a later visit opens with "Hi again." and its offer bubble, which makes
-// that greeting an older line of the new visit (keeps.met stays after Forget all, by the data's own rule)
+// that greeting an older line of the new visit (written before last-reset, when keeps.met stayed after Forget all)
 const shownLines = view => all(helper(view), n => ['old', 'me', 'bubble'].includes(n.props['data-hh'])).map(n => text(n).replace(/\s+/g, ' ').trim()).filter(Boolean)
 // of those, the ones that belong to that conversation: the person's own lines and Helper's lines with his name or work
 // (a fresh visit may say the same general lines again, such as the offer's question)

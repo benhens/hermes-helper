@@ -113,9 +113,9 @@ export function makePage(ctx, opts = {}) {
   const remembered = () => {
     if (!memory) {
       const kept = readKept()
-      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (no Forget removes
-      // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
-      // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
+      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (since last-reset, Forget
+      // all removes it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
+      // counts as met too (src/talk.js laterVisit); met is then written.
       const metStored = readMet()
       memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null', forgotUpTo: 0 }
       // loom-fixes (Lead's point 17b): the conversation of earlier visits, the last 50 lines, shown above this visit's
@@ -188,6 +188,9 @@ export function makePage(ctx, opts = {}) {
     const m = remembered()
     // loom-fixes: Forget all on Helper's settings page removes the kept conversation too: it goes from the window
     if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) forgetTalk()
+    // last-reset: Forget all on Helper's settings page removes the met mark too (a full reset); the name said in this
+    // visit is not used again either (as after the typed Forget all), and the mark is not written again in this visit
+    if (m.metStored && !readMet()) m.visit.name = null
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
@@ -200,7 +203,17 @@ export function makePage(ctx, opts = {}) {
   // After everything the person does: the record is written when it changed, and removed whole
   // when nothing is left in it (told with it). A storage that fails is not kept from answering.
   const writeKept = () => {
-    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); never removed
+    // last-reset (Lead, 11 Nov 15:41; Pēteris: "is there a way to full reset the plugin"): Forget all typed to Helper
+    // (Yes) removes the met mark too, so the next visit is a first visit and asks the name again. It is not written
+    // again in this visit (metStored stays true: "written once"); a later visit writes it when its opening ends.
+    if (memory.visit.resetAll) {
+      memory.visit.resetAll = false
+      try {
+        ctx.storage.remove('met')
+      } catch {}
+      memory.metStored = true
+    }
+    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); removed only by Forget all
     if (memory.visit.met && !memory.metStored) {
       try {
         ctx.storage.set('met', true)

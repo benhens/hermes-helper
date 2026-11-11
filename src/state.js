@@ -10,7 +10,7 @@ import { clampHelperWidth, HELPER_PX } from './layout.js'
 
 // 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
 // 'met' (changes-14, keeps.met): true once Helper has said hello, so the name is asked only on the first
-// visit; nothing about the person, and no Forget removes it (src/page.js).
+// visit; Forget all removes it since last-reset (a full reset: the next visit asks the name again).
 // loom-fixes (Lead's point 17): 'talk', the last 50 lines of the conversation with Helper (src/talk-keep.js), and
 // 'helperHidden', whether the person put Helper's window away with Hide Helper (true, or nothing)
 export const STORED_KEYS = ['tab', 'helperWidth', 'kept', 'met', 'talk', 'helperHidden']
