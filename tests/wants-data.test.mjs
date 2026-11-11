@@ -70,6 +70,9 @@ const BREAKS = [
   // wants fixes v1: skill_name_rule_wf1
   ['no skill_name_rule_wf1', w => delete w.skill_name_rule_wf1, /skill_name_rule_wf1 is missing/],
   ['an ordinary name that is no skill', w => w.skill_name_rule_wf1.ordinary_names.push('knitting'), /ordinary name knitting is no skill/],
+  ['no ordinary names', w => delete w.skill_name_rule_wf1.ordinary_names, /ordinary_names is not a list of names/],
+  ['a "not after" list that is no list', w => (w.skill_name_rule_wf1.skill_for_not_after = 'me'), /skill_for_not_after is not a list/],
+  ['a say whose sentence is over 18 words with the fixed words', w => (w.skills.find(s => s.name === 'github').say = 'work with all GitHub issues, pull requests, reviews, code folders, the wiki, releases and more.'), /skill github: S1 line fails: sentence of 19 words > 14/],
   ['a "skill for" pattern that does not catch the word after it', w => (w.skill_name_rule_wf1.skill_for_pattern = 'skills? for (?:a )?'), /skill_for_pattern does not catch the word/],
   ['a "skill for" pattern that does not compile', w => (w.skill_name_rule_wf1.skill_for_pattern = 'skills? for ([a-z]'), /skill_for_pattern does not compile/],
   // skill lines v1: S1 and S2 say {say}, or text_fixed when a skill has none

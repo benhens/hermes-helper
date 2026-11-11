@@ -22,6 +22,8 @@ export const PINS = {
   // hhcontent's changes-14 job (started 00:30 UTC) changes check.py too: kept as it was, hhcontent's own
   // "before" copy of that job
   'dev/checks/hhcontent-talk-v2/check.py': ['83c807fdac78a1579386e03a8006f2d3c3afcd87dd536b6f323b4d04dce2de2f', 'dev/checks/hhcontent-changes-14/before/check.py'],
+  // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs): changes-14 changes it
+  'content/helper-keeps-v1.md': ['80ebe181341055d633fc469ce44495bf2130e15166f8ce765ebfeff40bb6140a', 'dev/checks/hhcontent-changes-14/before/helper-keeps-v1.md'],
   // changes-12 and -13 (the secret rule) are not ported here (Lead: point 8 of the look job): the two
   // settings files stay at hhcontent's own copies from before changes-12
   'dev/checks/hhcontent-settings-edit/settings_read.py': ['470c4c774a34d4fa95915495f1365e7e3cd4ecefe9e93b46bd3e31a8a55cefdf', 'dev/checks/hhcontent-changes-12/before/dev/checks/hhcontent-settings-edit/settings_read.py'],
@@ -33,7 +35,9 @@ export const PINS = {
 export function pinned(t, file) {
   const [pin, where] = PINS[file]
   const src = path.join(TEAM, where)
-  const named = where.endsWith('.md') ? fs.readFileSync(src, 'utf8').includes(pin) : sha(src) === pin
+  // a note must name the pin on the same line as the file's own name (not under another file)
+  const lines = where.endsWith('.md') ? fs.readFileSync(src, 'utf8').split('\n') : null
+  const named = lines ? lines.some(l => l.includes(pin) && l.includes(path.basename(file))) : sha(src) === pin
   if (!named) throw new Error(`${file}: the pin ${pin.slice(0, 12)} is not named in ${where}`)
   const now = sha(path.join(TEAM, file))
   if (now !== pin) t.diagnostic(`${file}: the team's file has moved on since the pin (now ${now.slice(0, 12)}); a later job ports it`)

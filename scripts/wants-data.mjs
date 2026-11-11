@@ -98,6 +98,7 @@ export function wantsProblems(W, talk, skillsList, docs) {
   const wf1 = W.skill_name_rule_wf1
   if (!wf1) fail('skill_name_rule_wf1 is missing')
   else {
+    if (!Array.isArray(wf1.ordinary_names) || !wf1.ordinary_names.length) fail('skill_name_rule_wf1.ordinary_names is not a list of names')
     for (const n of wf1.ordinary_names || []) if (!byName.has(n)) fail(`skill_name_rule_wf1: ordinary name ${n} is no skill`)
     let re = null
     try {
@@ -225,12 +226,14 @@ export function skillSentence(W, s, name = s.name) {
   if (s.say != null && /\{say\}/.test(f.text)) return f.text.replace(/\{name\}/g, name).replace(/\{say\}/g, s.say)
   return (f.text_fixed !== undefined ? f.text_fixed : f.text).replace(/\{name\}/g, name)
 }
-// hhcontent's own check of these lines (dev/checks/hhcontent-skill-lines/apply_sl1.py), ported: the whole
-// line with {name} left in (one word, as check.py always counted it) passes every R rule, except that the
-// sentence "It teaches Hermes to ..." may have up to 18 words (4 fixed words and the plain part); the
-// plain part alone, with a capital first letter, passes every rule (so at most 14 words). Builder's own:
-// a say ends with a full stop (the template has none after {say}) and holds no {slot}; a skill with no say
-// needs its line's text_fixed; text_fixed holds no slot but {name}.
+// hhcontent's own check of these lines (dev/checks/hhcontent-skill-lines/apply_sl1.py), ported in part: the
+// whole line with {name} left in (one word, as check.py always counted it) passes every R rule, except that a
+// sentence may have up to 18 words when the line holds ". It teaches" (apply_sl1.py's MAX_SENT_LINE: 4 fixed
+// words and the plain part); the plain part alone, with a capital first letter, passes every rule (so at
+// most 14 words). Not ported: apply_sl1.py's overclaims() (cost, place and name words the docs line does not
+// back), a reading check the team ran on its own data. Builder's own: a say ends with a full stop (the
+// template has none after {say}) and holds no {slot}; a skill with no say needs its line's text_fixed;
+// text_fixed holds no slot but {name}.
 export function skillLineProblems(W) {
   const out = []
   for (const s of W.skills || []) {
@@ -250,10 +253,11 @@ export function skillLineProblems(W) {
     if (/\{\w+\}/.test(s.say)) out.push(`skill ${s.name}: say holds a {slot}: ${s.say}`)
     if (!/\.$/.test(s.say)) out.push(`skill ${s.name}: say does not end with a full stop: ${s.say}`)
     const whole = skillSentence(W, s, '{name}')
-    const teach = whole.slice(whole.indexOf('It teaches Hermes to'))
-    const teachWords = teach.split(/\s+/).filter(w => /[A-Za-z0-9{]/.test(w)).length
-    const bent = `sentence of ${teachWords} words > 14`
-    const f1 = checkLine(whole).filter(x => !(whole.includes('It teaches Hermes to') && teachWords <= SAY_SENTENCE_MAX && x === bent))
+    const bent = x => {
+      const m = /^sentence of (\d+) words > \d+$/.exec(x)
+      return !!m && Number(m[1]) <= SAY_SENTENCE_MAX && whole.includes('. It teaches')
+    }
+    const f1 = checkLine(whole).filter(x => !bent(x))
     const f2 = checkLine(s.say[0].toUpperCase() + s.say.slice(1)).map(x => 'plain part: ' + x)
     if (f1.length || f2.length) out.push(`skill ${s.name}: ${id} line fails: ${[...f1, ...f2].join('; ')} :: ${whole}`)
   }

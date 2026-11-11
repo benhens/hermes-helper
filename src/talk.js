@@ -614,7 +614,9 @@ export function turn(text, st) {
   if (st.wants !== false) {
     // The Builder's rule, in the reference since wants fixes v1 (wants_fixes_step.py c): a group's own label typed as it is on its
     // button ("pictures and video") is that group, as if picked; else "I don't know that one" (N2).
-    // Only when the conversation was already open as the message came, as the reference has it.
+    // Only when the conversation was already open as the message came, as the reference has it. The
+    // reference checks it first, before "remember that ..." and the other early steps; here it stays at
+    // its old place, after them: none of the four labels reaches those steps (tests/talk-wf1.test.mjs).
     const group = openAtStart ? GROUP_BY_LABEL.get(asLabel(cutIgnored(talkNorm(text)))) : null
     if (group) return done('G1', { group, buttons: pickGroup(group, st).buttons })
     const sk = skillOf(cutIgnored(talkNorm(text)))
@@ -877,7 +879,7 @@ const sourceText = sources => (sources || []).map(s => `${s.file} line ${s.line}
 function skillLine(name, said) {
   const s = WSKILLS.get(name)
   const f = WANTS_DATA.fixed[s.kind === 'optional' ? 'S2' : 'S1']
-  const text = s.say != null ? fillSlots(f.text, { name, say: s.say }) : fillSlots(f.text_fixed !== undefined ? f.text_fixed : f.text, { name })
+  const text = s.say != null && /\{say\}/.test(f.text) ? fillSlots(f.text, { name, say: s.say }) : fillSlots(f.text_fixed !== undefined ? f.text_fixed : f.text, { name })
   const docs = { head: WANTS_DATA.fixed['box-head'].text, words: s.docs_words, source: `${s.page} line ${s.line}` }
   return said(s.kind === 'optional' ? 'S2' : 'S1', text, { source: docs.source, docs, next: f.next ? wantNext(f.next, name) : null })
 }

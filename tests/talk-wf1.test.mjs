@@ -16,7 +16,10 @@ const F = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/wf1-cases.j
 // route2.py's show() with the wants layers' own kinds (as tests/talk-wants.test.mjs)
 function show(o) {
   if (o.kept && o.kept.length) return show({ ...o, kept: null, first: null })
+  const py = v => (v === null || v === undefined ? 'None' : v)
   const by = {
+    F1: () => `F1 name=${py(o.name)}`,
+    F2: () => `F2 name=${py(o.name)} work=${py(o.work)}`,
     row: () => 'line ' + o.need,
     question: () => 'question ' + o.topic,
     plain: () => 'plain line ' + o.topic + '0',
@@ -103,16 +106,31 @@ test('key pattern 5: 200,000 random AWS-style 40-character secrets, the new patt
 })
 
 // A group's label typed while the opening is not over (the name or the work question open): the reference
-// opens the group only once the conversation is open (wants_fixes_step.py c). Its results, from
-// dev/checks/talk-v2-wf1/stage_label.py (stage-label-out.txt; the reference's "+kept=work" is its older
-// opening, which the plugin never had: what the person does is not kept).
+// opens the group only once the conversation is open (wants_fixes_step.py c). And keeps.typed_change with a
+// service kept: a typed name inside a longer one does not count ("I use one drive now": OneDrive, not also
+// Google Drive). The reference's results: tests/fixtures/wf1-extra.json, written by
+// dev/checks/talk-v2-wf1/stage_label.py from the pinned scripts.
+const X = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/wf1-extra.json'), 'utf8'))
+test('the extra cases were made from the pinned scripts: route2.py and wants_fixes_step.py at the job\'s checksums', () => {
+  assert.equal(X.sha256['hhcontent-talk-v2/route2.py'], '46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368')
+  assert.equal(X.sha256['hhcontent-wants-fixes/wants_fixes_step.py'], '9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a')
+  assert.deepEqual([X.group_label_by_stage.length, X.typed_change.length], [12, 6])
+})
+
 test('a group\'s label at the name or work question is not a group: as the reference, F1 or F2, or N2 for a question', () => {
-  const REF = [
-    ['name', 'pictures and video', 'F1'], ['name', 'pictures and video?', 'N2 group pics'], ['name', 'Voice and sound.', 'F1'],
-    ['name', 'what are files and my computer', 'N2 group files'], ['work', 'pictures and video', 'F2'], ['work', 'pictures and video?', 'N2 group pics'],
-    ['work', 'Voice and sound.', 'F2'], ['work', 'what are files and my computer', 'N2 group files'], ['open', 'pictures and video', 'G1 group pics'],
-    ['open', 'pictures and video?', 'G1 group pics'], ['open', 'Voice and sound.', 'G1 group voice'], ['open', 'what are files and my computer', 'N2 group files']
-  ]
-  const off = REF.map(([stage, text, want]) => [stage, text, run(text, stage)[0], want]).filter(([, , got, want]) => got !== want)
+  const off = X.group_label_by_stage.map(c => [c.stage, c.text, run(c.text, c.stage)[0], c.shown]).filter(([, , got, want]) => got !== want)
   assert.deepEqual(off, [])
+})
+
+test('keeps.typed_change with a service kept: the longer typed name wins, as route2.py (wants steps off as in route2.py, and on)', () => {
+  for (const wants of [false, true]) {
+    const off = X.typed_change.flatMap(c => {
+      const st = freshVisit('open', { svc: c.kept_before, told: true })
+      st.wants = wants
+      const shown = show(turn(c.text, st))
+      return (!wants && shown !== c.shown) || st.kept.svc !== c.kept_after ? [[wants, c.text, shown, st.kept.svc, c.shown, c.kept_after]] : []
+    })
+    assert.deepEqual(off, [])
+  }
+  assert.equal(X.typed_change.find(c => c.text === 'I use one drive now').kept_after, 'OneDrive')
 })
