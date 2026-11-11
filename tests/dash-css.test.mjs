@@ -127,7 +127,7 @@ test('look: the ring of catalog.css on every tile and card and on the opened pan
   assert.match(ring, /background:conic-gradient\(from var\(--hhd-arc\),transparent 0deg,var\(--color-primary\) 60deg,transparent 130deg\)/)
   assert.match(ring, /mask-composite:exclude;opacity:0;transition:opacity \.35s ease;animation:hhd-arc-turn 4s linear infinite paused/)
   const on = rules.find(r => r.endsWith('{opacity:1;animation-play-state:running}')) || ''
-  assert.deepEqual(selectorsOf(on), [`.${D.tile}:hover::after`, `.${D.tile}:focus-within::after`, `.${D.scard}:hover::after`, `.${D.scard}:focus-within::after`, `.${D.scard}.${D.sel}::after`, `.${D.steps}:hover::after`, `.${D.steps}:focus-within::after`])
+  assert.deepEqual(selectorsOf(on), [`.${D.tile}:hover::after`, `.${D.tile}:focus-within::after`, `.${D.scard}:hover::after`, `.${D.scard}:focus-visible::after`, `.${D.scard}.${D.sel}::after`, `.${D.steps}:hover::after`, `.${D.steps}:focus-within::after`])
   assert.ok(rules.includes("@property --hhd-arc{syntax:'<angle>';inherits:false;initial-value:0deg}"))
   assert.ok(rules.includes('@keyframes hhd-arc-turn{to{--hhd-arc:360deg}}'))
   assert.ok(rules.includes(`@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`))
@@ -238,5 +238,8 @@ test('follow-up 19:55 (REVIEW.md 5): at the narrow size no tile line is cut with
 
 test('follow-up 19:47 (REVIEW.md 1 and 3): titles at the top of the icon square on every card; the sign font line thickened in its own colour', () => {
   assert.match(DASH_CSS, /\.hhd-scard-top\{display:flex;align-items:flex-start;/)
-  assert.match(DASH_CSS, /\.hhd-scard-sign\{[^}]*-webkit-text-stroke:5px currentColor/)
+  assert.match(DASH_CSS, /\.hhd-scard-sign\{[^}]*-webkit-text-stroke:3px currentColor/)
+  // follow-up 19:55 (REVIEW2.md 4): no word left alone on a why-line's or the banner line's last line
+  assert.match(ruleOf(`.${D.scardWhy}`), /text-wrap:pretty/)
+  assert.match(ruleOf(`.${D.bannerLine}`), /text-wrap:pretty/)
 })
