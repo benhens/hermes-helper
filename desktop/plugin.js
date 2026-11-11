@@ -24248,6 +24248,7 @@ How to answer:
 - Quick replies: you may end a reply with up to three choices on one last line, each in double square brackets, like this: [[Claude Code]] [[The Claude app]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
 - Dashboard cards: Helper's Dashboard has nine set-up cards, each with its steps and a place for a video. When the question is about one of these subjects, end your reply with [[card:ID]] on its own line, with that card's id (one card at most):
 ${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
+- Do it for me: Helper can run one kind of step for the person: bringing a setup over from another agent. When that import is the step to do now and you know which agent, end your reply with [[do:import AGENT]] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw. The person then sees a button "Do it for me": it first shows a preview and changes nothing until they press "Import it". Tell them in one line that they can press it. For every other step, give the step to do by hand, and never write [[do:...]] for anything else.
 - Use the doc excerpts you are given. They come from the Hermes docs. When they don't cover the question, say so in one line, give your best short answer, and point to the closest docs page.
 - Don't invent commands, settings or menu names that are not in the excerpts. If you are not sure, say so.
 - Never ask for an API key, password or token, and never repeat one. If the person needs a key, tell them where in the app to put it (Settings), not to send it in the chat.
@@ -24258,7 +24259,7 @@ Write in markdown: short paragraphs, \`code\` for anything to type.`
 
 // The model's reply, taken apart: the words to show, and its marks in double square brackets, which are never shown.
 //   [[card:<id>]]   one of the nine cards (the first known one; an unknown id is dropped)
-//   [[do:...]]      an action Helper offers to run (chatAction); anything else is dropped
+//   [[do:import <agent>]]   the one action Helper offers to run (chatAction); any other [[do:...]] is dropped
 //   [[A]] [[B]]     quick replies, at most CHAT_QUICK_MAX: on a line of their own, or at the end of the last line
 // Any other pair of double brackets loses its brackets and keeps its words (a mark in the middle of a sentence stays
 // part of the sentence). Text to type is left alone: a code block as src/md.js reads it (from a ``` or ~~~ line to
@@ -24272,6 +24273,7 @@ const CHAT_QUICK_CHARS = 60
 function chatParts(reply) {
   const lines = String(reply || '').replace(/\r\n?/g, '\n').split('\n')
   let card = null
+  let act = null
   const quick = []
   const typed = lines.map(() => false)
   for (let i = 0; i < lines.length; i++) {
@@ -24289,6 +24291,7 @@ function chatParts(reply) {
   const named = (kind, what) => {
     const id = what.trim().toLowerCase()
     if (kind.toLowerCase() === 'card' && !card && CHAT_CARDS.some(c => c[0] === id)) card = id
+    if (kind.toLowerCase() === 'do' && !act) act = chatAction(what)
   }
   const choice = words => {
     const t = words.replace(/[\p{Cc}\p{Cf}]/gu, '').replace(/\s+/g, ' ').trim()
@@ -24331,7 +24334,78 @@ function chatParts(reply) {
     if (k.line.trim() && !shown.trim()) return
     out.push(shown.replace(/\s+$/, ''))
   })
-  return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), quick, card }
+  return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), quick, card, ...(act ? { act } : {}) }
+}
+
+// ---- chat-fix part 3: "Do it for me" (his words: "Is it possible for the helper to do it and do something on his
+// behalf?") ----
+// Hermes lets a plugin run Hermes's own commands (host.request('cli.exec', { argv }): `hermes <argv>`, not
+// interactive, gives { blocked, code, output }). Helper uses it for this short fixed list only, never for a command
+// the model writes: the model can only name an action and one of the agents below; the commands are written here.
+//   import <agent>: first a preview (--dry-run never touches the disk), shown in plain words; then, on a second
+//   click, the import (--yes). When Hermes's import add-on is missing, installing it is the action's first step,
+//   shown and confirmed the same way.
+const CHAT_AGENTS = { 'claude-code': 'Claude Code', codex: 'Codex', cursor: 'Cursor', openclaw: 'OpenClaw' }
+// what the model wrote after "do:" -> the action, or null (dropped silently)
+function chatAction(what) {
+  const m = String(what).trim().toLowerCase().match(/^import\s+([a-z-]+)$/)
+  return m && Object.hasOwn(CHAT_AGENTS, m[1]) ? { kind: 'import', agent: m[1], state: 'offer' } : null
+}
+// the command of each step, as cli.exec takes it
+function chatActionArgv(step, agent) {
+  if (!Object.hasOwn(CHAT_AGENTS, agent)) return null
+  if (step === 'preview') return ['import-agent', agent, '--dry-run']
+  if (step === 'import') return ['import-agent', agent, '--yes']
+  if (step === 'plugin') return ['plugins', 'install', 'agent-importers', '--enable']
+  return null
+}
+// the same step typed by hand in a terminal (there Hermes asks before it applies, so no --yes and no --enable)
+function chatActionTyped(step, agent) {
+  const argv = chatActionArgv(step, agent)
+  return argv ? 'hermes ' + argv.filter(a => a !== '--yes' && a !== '--enable').join(' ') : ''
+}
+// The command's output as plain lines: no colour codes, no drawn boxes, no empty lines.
+function chatActionLines(output) {
+  return String(output || '')
+    .replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, '')
+    .replace(/\r/g, '')
+    .split('\n')
+    .map(l => l.replace(/\s+$/, ''))
+    .filter(l => l.trim() && !/^\s*[\u2502\u250c\u2510\u2514\u2518\u256d-\u2570]/.test(l) && !/^[\s\u2500-\u257f]+$/.test(l))
+}
+// Hermes without its import add-on says so and names the install command (seen in Hermes v0.23.0, exit code 2)
+const chatNeedsPlugin = lines => /agent-importers/.test(lines.join('\n')) && /not loaded|plugins install/.test(lines.join('\n'))
+// the last lines of a failed run, each cut short
+const chatActionTail = (lines, count = 6) => lines.slice(-count).map(l => (l.length > 200 ? l.slice(0, 200) + '…' : l.trim()))
+// The things an import names, in plain words (the importer's own ids; an id not listed here is shown as it is)
+const CHAT_ITEMS = {
+  'claude-md': 'Your instructions (CLAUDE.md), as memory notes',
+  settings: 'Settings',
+  'command-allowlist': 'The commands you allowed',
+  'command-denylist': 'The commands you blocked',
+  'mcp-servers': 'MCP servers (outside tools)',
+  skills: 'Skills'
+}
+// What a preview or an import printed: the things it would bring over (or brought over), how many it skipped, and
+// its own summary line. Only the things' names are read; where they go (a path on the person's disk) is left out.
+function chatActionRead(lines, step) {
+  const head = step === 'import' ? /Imported:\s*$/ : /Would import:\s*$/
+  const section = re => {
+    const at = lines.findLastIndex(l => re.test(l))
+    const rows = []
+    for (let i = at + 1; at >= 0 && i < lines.length && /^\s{4,}\S/.test(lines[i]); i++) rows.push(lines[i].trim().split(/\s+/)[0])
+    return rows
+  }
+  const sum = lines.findLast(l => /^\s*Summary:/.test(l))
+  return { rows: section(head).map(id => CHAT_ITEMS[id] || id.replace(/-/g, ' ')), skipped: section(/Skipped:\s*$/).length, summary: sum ? sum.replace(/^\s*Summary:\s*/, '').trim() : '' }
+}
+// What a later call is told about an action under one of Helper's lines: a fixed phrase, never the command's output
+// (it holds paths on the person's disk)
+const CHAT_ACT_TOLD = {
+  plugin: ' (Helper tried to run this step for the person: Hermes needs its import add-on first, and Helper offered to install it.)',
+  preview: ' (Helper ran the preview for the person and showed what would come over; the import itself has not been run yet.)',
+  done: ' (Helper ran the import for the person; it is done.)',
+  failed: ' (Helper tried to run this step for the person; the command failed, and Helper showed how to do it by hand.)'
 }
 
 // ---- the docs: words of each chunk, counted once on the first message ----
@@ -24436,7 +24510,8 @@ function chatLines(log, names = []) {
     if (!e || e.send === false || (e.who !== 'you' && e.who !== 'helper')) continue
     const text = typeof e.text === 'string' ? e.text.replace(/\s+/g, ' ').trim() : ''
     if (!text || chatHoldsBack(text)) continue
-    out.push(`${e.who === 'you' ? 'Person' : 'Helper'}: ${withoutNames(Array.from(text).slice(0, CHAT_LINE_CHARS).join(''), names)}`)
+    const told = e.who === 'helper' && e.act && CHAT_ACT_TOLD[e.act.state] ? CHAT_ACT_TOLD[e.act.state] : ''
+    out.push(`${e.who === 'you' ? 'Person' : 'Helper'}: ${withoutNames(Array.from(text).slice(0, CHAT_LINE_CHARS).join(''), names)}${told}`)
   }
   return out.slice(-CHAT_LAST_LINES)
 }
@@ -29075,7 +29150,11 @@ const T = {
   mdOld: 'hh-md-old',
   // chat-fix: under a reply, the choices the model gave (buttons) and a card's video place with its Open button
   quick: 'hh-quick',
-  chatCard: 'hh-chat-card'
+  chatCard: 'hh-chat-card',
+  // chat-fix part 3: "Do it for me" under a reply: what it will do, what the preview found, what Hermes said
+  act: 'hh-act',
+  actRows: 'hh-act-rows',
+  actOut: 'hh-act-out'
 }
 
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
@@ -29090,7 +29169,7 @@ const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-root{overflow:clip}\n.hh-bar{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:4px;min-height:24px;margin:-8px -8px 2px 0}\n.hh-bar-ask{flex:1;min-width:0;font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}\n.hh-md{font-size:14px;line-height:21px;font-weight:400;text-wrap:pretty;color:var(--ui-text-primary);display:flex;flex-direction:column;gap:8px;min-width:0;overflow-wrap:anywhere}\n.hh-md p{margin:0}\n.hh-md ol,.hh-md ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}\n.hh-md ol{list-style:decimal}\n.hh-md ul{list-style:disc}\n.hh-md li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-md a{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-md.hh-md-old{font-size:13px;line-height:19px;gap:5px;color:var(--ui-text-secondary)}\n.hh-conv-in>.hh-bubble{margin-top:5px}\n.hh-win>.hh-bubble{flex:0 1 auto;min-height:0;overflow:hidden auto}\n.hh-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}\n.hh-quick .hh-answer{min-height:27px;padding:3px 11px;font-size:13px;line-height:19px}\n.hh-chat-card{--hhd-round:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px;min-width:0;width:100%}\n.hh-chat-card>:first-child{box-sizing:border-box;border:1px solid var(--ui-stroke-tertiary)}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-root{overflow:clip}\n.hh-bar{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:4px;min-height:24px;margin:-8px -8px 2px 0}\n.hh-bar-ask{flex:1;min-width:0;font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hh-docs-where{margin:2px 0 0;font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary);overflow-wrap:anywhere}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}\n.hh-dots.hh-dots-run i{animation:hh-dot 1.2s step-end infinite}\n.hh-dots.hh-dots-run i:nth-child(2){animation-delay:.4s}\n.hh-dots.hh-dots-run i:nth-child(3){animation-delay:.8s}\n@keyframes hh-dot{0%{background:var(--ui-text-secondary)}33.333%{background:var(--ui-text-quaternary)}}\n.hh-dots.hh-still i{animation:none;background:var(--ui-text-tertiary)}\n.hh-md{font-size:14px;line-height:21px;font-weight:400;text-wrap:pretty;color:var(--ui-text-primary);display:flex;flex-direction:column;gap:8px;min-width:0;overflow-wrap:anywhere}\n.hh-md p{margin:0}\n.hh-md ol,.hh-md ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}\n.hh-md ol{list-style:decimal}\n.hh-md ul{list-style:disc}\n.hh-md li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-md a{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-md.hh-md-old{font-size:13px;line-height:19px;gap:5px;color:var(--ui-text-secondary)}\n.hh-conv-in>.hh-bubble{margin-top:5px}\n.hh-win>.hh-bubble{flex:0 1 auto;min-height:0;overflow:hidden auto}\n.hh-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}\n.hh-quick .hh-answer{min-height:27px;padding:3px 11px;font-size:13px;line-height:19px}\n.hh-chat-card{--hhd-round:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px;min-width:0;width:100%}\n.hh-chat-card>:first-child{box-sizing:border-box;border:1px solid var(--ui-stroke-tertiary)}\n.hh-act{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;width:100%;margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);font-size:13px;line-height:19px;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-act p{margin:0}\n.hh-act-rows{margin:0;padding-left:18px;list-style:disc;color:var(--ui-text-primary)}\n.hh-act-out{margin:0;white-space:pre-wrap;font-size:12px;line-height:17px;color:var(--ui-text-secondary)}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -31564,6 +31643,20 @@ function notesOf(entry, onNote, kept) {
 function OldLine({ entry, onNext, onCard }) {
   // chat-fix: a reply about a card keeps a small link to that card once it is an older line (no video place there)
   const cardOf = entry.md && entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
+  // chat-fix part 3: an action under this reply that was started (the person typed on while it ran, or after it):
+  // one faint line says how it ended; an action never started shows nothing here
+  const actName = entry.act && Object.hasOwn(CHAT_AGENTS, entry.act.agent) ? CHAT_AGENTS[entry.act.agent] : null
+  const actEnd = !actName
+    ? null
+    : entry.act.state === 'done'
+      ? `Done: your ${actName} setup is in Hermes now.`
+      : entry.act.state === 'failed'
+        ? 'That step didn’t work. Ask me again and I’ll show you how to do it by hand.'
+        : entry.act.state === 'running'
+          ? 'Still working on that step…'
+          : entry.act.state === 'preview'
+            ? `I showed you a preview for ${actName}; nothing was changed. Ask me again to bring it over.`
+            : null
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
@@ -31579,6 +31672,7 @@ function OldLine({ entry, onNext, onCard }) {
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
       entry.md ? jsx(Markdown, { text: entry.text, old: true }, 'md') : drawn(entry.text, entry.asTyped),
+      actEnd ? jsx('p', { className: T.where, 'data-hh': 'old-act', 'data-state': entry.act.state, children: actEnd }, 'act') : null,
       cardOf ? jsxs('button', { type: 'button', className: T.oldLink, 'data-hh': 'old-card-open', 'data-card': cardOf.id, onClick: () => onCard && onCard(cardOf.id), children: [`Open ${cardOf.name} on the Dashboard`, jsx(Codicon, { name: 'arrow-right' }, 'icon')] }, 'card') : null,
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
@@ -31670,10 +31764,60 @@ function Conversation({ entries, newest, kept, onNext, onNote, scrollRef, reply 
 // chat-fix: what the model's marks become, under its reply. A card: that card's video place exactly as the Dashboard's
 // opened card shows it (src/dash.js CardVideo) and a button that opens the card there. Quick replies: up to three
 // small buttons; a click sends that text as the person's message. An id that is no card shows nothing.
-function ReplyExtras({ entry, onQuick, onCard }) {
+// chat-fix part 3: "Do it for me" under a reply. One line says exactly what will run (the command is written in
+// src/chat.js, never by the model), then the button. Nothing runs without a click (src/page.js runs it); the import
+// itself needs a second click, after the preview. A failed run shows Hermes's last lines and the step to do by hand.
+function ReplyAction({ entry, onAct }) {
+  const act = entry.act
+  if (!act || !Object.hasOwn(CHAT_AGENTS, act.agent)) return null
+  const name = CHAT_AGENTS[act.agent]
+  const cmd = step => jsx('code', { className: K.mono, 'data-hh': 'typed', 'data-act-command': step, children: 'hermes ' + chatActionArgv(step, act.agent).join(' ') }, 'cmd-' + step)
+  const button = (step, label, variant = 'default') => jsx(Button, { variant, size: 'xs', 'data-hh': 'act-button', 'data-step': step, onClick: () => onAct && onAct(entry, step), children: label }, 'go')
+  const rows = Array.isArray(act.rows) && act.rows.length ? jsx('ul', { className: T.actRows, 'data-hh': 'act-rows', children: act.rows.map((r, i) => jsx('li', { children: r }, i)) }, 'rows') : null
+  let parts
+  if (act.state === 'running') parts = [jsx('p', { role: 'status', 'data-hh': 'act-line', children: 'Working on it…' }, 'l')]
+  else if (act.state === 'plugin')
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: ['Hermes needs its import add-on first (the agent-importers plugin, from Nous Research). Installing it runs ', cmd('plugin'), '. Then I show you the preview.'] }, 'l'),
+      button('plugin', 'Install it')
+    ]
+  else if (act.state === 'preview')
+    parts = rows
+      ? [
+          jsx('p', { 'data-hh': 'act-line', children: `Here is what would come over from ${name}. Nothing is changed yet.` }, 'l'),
+          rows,
+          act.skipped ? jsx('p', { 'data-hh': 'act-skipped', children: act.skipped === 1 ? '1 other thing had nothing to bring over.' : `${act.skipped} other things had nothing to bring over.` }, 's') : null,
+          jsx('p', { 'data-hh': 'act-next', children: ['“Import it” runs ', cmd('import'), '.'] }, 'n'),
+          button('import', 'Import it')
+        ]
+      : [jsx('p', { 'data-hh': 'act-line', children: `Hermes found nothing to bring over from ${name}. Nothing is changed.` }, 'l')]
+  else if (act.state === 'done')
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: `Done. Your ${name} setup is in Hermes now.` }, 'l'),
+      rows,
+      act.summary ? jsx('p', { 'data-hh': 'act-summary', children: `Hermes says: ${act.summary}.` }, 'sum') : null,
+      jsx('p', { 'data-hh': 'act-keys', children: 'API keys and passwords are never brought over.' }, 'k')
+    ]
+  else if (act.state === 'failed')
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: act.tail && act.tail.length ? 'That didn’t work. Hermes said:' : 'That didn’t work: Hermes could not run the command here.' }, 'l'),
+      act.tail && act.tail.length ? jsx('p', { className: T.actOut, 'data-hh': 'act-output', children: act.tail.join('\n') }, 'o') : null,
+      jsx('p', { 'data-hh': 'act-by-hand', children: 'You can do this step by hand: open a terminal and paste this.' }, 'h'),
+      jsx(BubblePaste, { text: chatActionTyped(act.step, act.agent) }, 'paste')
+    ]
+  else
+    parts = [
+      jsx('p', { 'data-hh': 'act-line', children: ['I can do this step for you. It runs ', cmd('preview'), `: a preview of what would come over from ${name}. Nothing is changed.`] }, 'l'),
+      button('preview', 'Do it for me')
+    ]
+  return jsx('div', { className: T.act, 'data-hh': 'act', 'data-state': act.state, 'data-agent': act.agent, children: parts }, 'act')
+}
+
+function ReplyExtras({ entry, onQuick, onCard, onAct }) {
   const it = entry.card ? DASH_DATA.items.find(x => x.id === entry.card) : null
   const quick = Array.isArray(entry.quick) ? entry.quick : []
   return [
+    ReplyAction({ entry, onAct }),
     it
       ? jsxs(
           'div',
@@ -31702,7 +31846,7 @@ function ReplyExtras({ entry, onQuick, onCard }) {
   ]
 }
 
-function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard }) {
+function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard, onAct }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
@@ -31738,7 +31882,7 @@ function Bubble({ entry, clock, fresh, said, onNext, onQuick, onCard }) {
     'aria-live': 'polite',
     children: [
       entry.md ? jsx(Markdown, { text: entry.text }, entry.key) : jsx(Said, { clock, id: entry.key, text: curlyQuotes(entry.text, entry.asTyped), className: T.line, fresh }, entry.key),
-      ...(entry.md ? ReplyExtras({ entry, onQuick, onCard }) : []),
+      ...(entry.md ? ReplyExtras({ entry, onQuick, onCard, onAct }) : []),
       // rule A: the docs quote belongs to the sentence, directly under it, with no divider between them;
       // the thin divider comes after it, and only when something follows
       entry.docs ? jsx(DocsBox, { docs: entry.docs, wait: !said }, 'docs') : null,
@@ -32145,7 +32289,7 @@ function makePage(ctx, opts = {}) {
         // choices and the card they name are drawn under it; a reply with no words left counts as no reply
         // (review finding 11) a choice that would start Helper's own forget or what-do-you-keep lines is no button
         const parts = chatParts(r && r.ok ? chatClean(r.text) : '')
-        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick.filter(q => !typedAboutKept(q)), card: parts.card })), send: true })
+        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick.filter(q => !typedAboutKept(q)), card: parts.card, act: parts.act || null })), send: true })
         lookAgain()
         const kind = r && !r.ok ? r.kind : 'other'
         const f = FAIL_LINES[kind] || FAIL_LINES.other
@@ -32156,6 +32300,53 @@ function makePage(ctx, opts = {}) {
         chat.running = false
         chatPump()
       })
+  }
+
+  /* ---------- chat-fix part 3: "Do it for me" under a reply (the commands are fixed in src/chat.js) ---------- */
+  // One step of the action under the line with this id, run through Hermes's own door for its commands (cli.exec:
+  // `hermes <argv>`, not interactive). Called only by a click on the action's button. step: 'preview' (changes
+  // nothing), 'plugin' (installs Hermes's import add-on; then the preview the person asked for follows), 'import'.
+  // The line may be gone meanwhile (Clear chat): then nothing more happens.
+  const actOf = id => {
+    const e = memory.log.find(x => x.id === id)
+    return e && e.act ? e.act : null
+  }
+  const setAct = (id, act) => {
+    if (!actOf(id)) return false
+    memory.log = memory.log.map(e => (e.id === id ? { ...e, act } : e))
+    if (live.view) live.view.setLog(memory.log)
+    return true
+  }
+  function runAct(id, step) {
+    const act = actOf(id)
+    const argv = act ? chatActionArgv(step, act.agent) : null
+    if (!argv || act.state === 'running') return
+    // each button belongs to one state: the preview to the offer, the install to "needs its add-on", the import to
+    // the preview that was shown
+    if ((step === 'preview' && act.state !== 'offer') || (step === 'plugin' && act.state !== 'plugin') || (step === 'import' && act.state !== 'preview')) return
+    const run = (stepNow, args) => {
+      setAct(id, { kind: act.kind, agent: act.agent, state: 'running', step: stepNow })
+      return Promise.resolve()
+        .then(() => host.request('cli.exec', { argv: args, timeout: 240 }, 250000))
+        .then(
+          r => r,
+          () => null
+        )
+        .then(r => {
+          const base = { kind: act.kind, agent: act.agent, step: stepNow }
+          const lines = chatActionLines(r && typeof r.output === 'string' ? r.output : '')
+          if (!r || typeof r !== 'object') return setAct(id, { ...base, state: 'failed', tail: [] })
+          if (r.blocked) return setAct(id, { ...base, state: 'failed', tail: typeof r.hint === 'string' && r.hint.trim() ? [r.hint.trim()] : [] })
+          if (r.code !== 0) {
+            if (stepNow === 'preview' && chatNeedsPlugin(lines)) return setAct(id, { ...base, state: 'plugin' })
+            return setAct(id, { ...base, state: 'failed', tail: chatActionTail(lines) })
+          }
+          // the add-on is in: now the preview the person asked for with "Do it for me"
+          if (stepNow === 'plugin') return actOf(id) ? run('preview', chatActionArgv('preview', act.agent)) : false
+          return setAct(id, { ...base, state: stepNow === 'preview' ? 'preview' : 'done', ...chatActionRead(lines, stepNow) })
+        })
+    }
+    run(step, argv)
   }
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
@@ -33160,7 +33351,7 @@ function makePage(ctx, opts = {}) {
             winBar,
             // chat-fix: a reply of the model (md) is drawn inside the part that scrolls, as its last line; Helper's own
             // short lines and the waiting dots stay in the bubble over the character
-            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, reply: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard }, 'bubble') : null }, 'conversation'),
+            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, reply: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard, onAct: (entry, step) => runAct(entry.id, step) }, 'bubble') : null }, 'conversation'),
             inBubble ? (inBubble.md ? null : jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble')) : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer

@@ -1,0 +1,7 @@
+
+┌─────────────────────────────────────────────────────────┐
+│          ☤ Hermes — Import From Another Agent          │
+└─────────────────────────────────────────────────────────┘
+
+✗ Agent directory not found: /Users/peter/.claude
+  Specify a custom path: hermes import-agent claude-code --source /path/to/.claude

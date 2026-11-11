@@ -1,0 +1,3 @@
+hermes: 'import-agent' is not a `hermes` command.
+`hermes import-agent` moved out of core into the 'agent-importers' plugin, which is not loaded. Install it with: `hermes plugins install agent-importers`.
+Run `hermes --help` to see all commands.

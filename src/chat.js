@@ -44,6 +44,7 @@ How to answer:
 - Quick replies: you may end a reply with up to three choices on one last line, each in double square brackets, like this: [[Claude Code]] [[The Claude app]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
 - Dashboard cards: Helper's Dashboard has nine set-up cards, each with its steps and a place for a video. When the question is about one of these subjects, end your reply with [[card:ID]] on its own line, with that card's id (one card at most):
 ${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
+- Do it for me: Helper can run one kind of step for the person: bringing a setup over from another agent. When that import is the step to do now and you know which agent, end your reply with [[do:import AGENT]] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw. The person then sees a button "Do it for me": it first shows a preview and changes nothing until they press "Import it". Tell them in one line that they can press it. For every other step, give the step to do by hand, and never write [[do:...]] for anything else.
 - Use the doc excerpts you are given. They come from the Hermes docs. When they don't cover the question, say so in one line, give your best short answer, and point to the closest docs page.
 - Don't invent commands, settings or menu names that are not in the excerpts. If you are not sure, say so.
 - Never ask for an API key, password or token, and never repeat one. If the person needs a key, tell them where in the app to put it (Settings), not to send it in the chat.
@@ -54,7 +55,7 @@ Write in markdown: short paragraphs, \`code\` for anything to type.`
 
 // The model's reply, taken apart: the words to show, and its marks in double square brackets, which are never shown.
 //   [[card:<id>]]   one of the nine cards (the first known one; an unknown id is dropped)
-//   [[do:...]]      an action Helper offers to run (chatAction); anything else is dropped
+//   [[do:import <agent>]]   the one action Helper offers to run (chatAction); any other [[do:...]] is dropped
 //   [[A]] [[B]]     quick replies, at most CHAT_QUICK_MAX: on a line of their own, or at the end of the last line
 // Any other pair of double brackets loses its brackets and keeps its words (a mark in the middle of a sentence stays
 // part of the sentence). Text to type is left alone: a code block as src/md.js reads it (from a ``` or ~~~ line to
@@ -68,6 +69,7 @@ const CHAT_QUICK_CHARS = 60
 export function chatParts(reply) {
   const lines = String(reply || '').replace(/\r\n?/g, '\n').split('\n')
   let card = null
+  let act = null
   const quick = []
   const typed = lines.map(() => false)
   for (let i = 0; i < lines.length; i++) {
@@ -85,6 +87,7 @@ export function chatParts(reply) {
   const named = (kind, what) => {
     const id = what.trim().toLowerCase()
     if (kind.toLowerCase() === 'card' && !card && CHAT_CARDS.some(c => c[0] === id)) card = id
+    if (kind.toLowerCase() === 'do' && !act) act = chatAction(what)
   }
   const choice = words => {
     const t = words.replace(/[\p{Cc}\p{Cf}]/gu, '').replace(/\s+/g, ' ').trim()
@@ -127,7 +130,78 @@ export function chatParts(reply) {
     if (k.line.trim() && !shown.trim()) return
     out.push(shown.replace(/\s+$/, ''))
   })
-  return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), quick, card }
+  return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), quick, card, ...(act ? { act } : {}) }
+}
+
+// ---- chat-fix part 3: "Do it for me" (his words: "Is it possible for the helper to do it and do something on his
+// behalf?") ----
+// Hermes lets a plugin run Hermes's own commands (host.request('cli.exec', { argv }): `hermes <argv>`, not
+// interactive, gives { blocked, code, output }). Helper uses it for this short fixed list only, never for a command
+// the model writes: the model can only name an action and one of the agents below; the commands are written here.
+//   import <agent>: first a preview (--dry-run never touches the disk), shown in plain words; then, on a second
+//   click, the import (--yes). When Hermes's import add-on is missing, installing it is the action's first step,
+//   shown and confirmed the same way.
+export const CHAT_AGENTS = { 'claude-code': 'Claude Code', codex: 'Codex', cursor: 'Cursor', openclaw: 'OpenClaw' }
+// what the model wrote after "do:" -> the action, or null (dropped silently)
+export function chatAction(what) {
+  const m = String(what).trim().toLowerCase().match(/^import\s+([a-z-]+)$/)
+  return m && Object.hasOwn(CHAT_AGENTS, m[1]) ? { kind: 'import', agent: m[1], state: 'offer' } : null
+}
+// the command of each step, as cli.exec takes it
+export function chatActionArgv(step, agent) {
+  if (!Object.hasOwn(CHAT_AGENTS, agent)) return null
+  if (step === 'preview') return ['import-agent', agent, '--dry-run']
+  if (step === 'import') return ['import-agent', agent, '--yes']
+  if (step === 'plugin') return ['plugins', 'install', 'agent-importers', '--enable']
+  return null
+}
+// the same step typed by hand in a terminal (there Hermes asks before it applies, so no --yes and no --enable)
+export function chatActionTyped(step, agent) {
+  const argv = chatActionArgv(step, agent)
+  return argv ? 'hermes ' + argv.filter(a => a !== '--yes' && a !== '--enable').join(' ') : ''
+}
+// The command's output as plain lines: no colour codes, no drawn boxes, no empty lines.
+export function chatActionLines(output) {
+  return String(output || '')
+    .replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, '')
+    .replace(/\r/g, '')
+    .split('\n')
+    .map(l => l.replace(/\s+$/, ''))
+    .filter(l => l.trim() && !/^\s*[\u2502\u250c\u2510\u2514\u2518\u256d-\u2570]/.test(l) && !/^[\s\u2500-\u257f]+$/.test(l))
+}
+// Hermes without its import add-on says so and names the install command (seen in Hermes v0.23.0, exit code 2)
+export const chatNeedsPlugin = lines => /agent-importers/.test(lines.join('\n')) && /not loaded|plugins install/.test(lines.join('\n'))
+// the last lines of a failed run, each cut short
+export const chatActionTail = (lines, count = 6) => lines.slice(-count).map(l => (l.length > 200 ? l.slice(0, 200) + '…' : l.trim()))
+// The things an import names, in plain words (the importer's own ids; an id not listed here is shown as it is)
+const CHAT_ITEMS = {
+  'claude-md': 'Your instructions (CLAUDE.md), as memory notes',
+  settings: 'Settings',
+  'command-allowlist': 'The commands you allowed',
+  'command-denylist': 'The commands you blocked',
+  'mcp-servers': 'MCP servers (outside tools)',
+  skills: 'Skills'
+}
+// What a preview or an import printed: the things it would bring over (or brought over), how many it skipped, and
+// its own summary line. Only the things' names are read; where they go (a path on the person's disk) is left out.
+export function chatActionRead(lines, step) {
+  const head = step === 'import' ? /Imported:\s*$/ : /Would import:\s*$/
+  const section = re => {
+    const at = lines.findLastIndex(l => re.test(l))
+    const rows = []
+    for (let i = at + 1; at >= 0 && i < lines.length && /^\s{4,}\S/.test(lines[i]); i++) rows.push(lines[i].trim().split(/\s+/)[0])
+    return rows
+  }
+  const sum = lines.findLast(l => /^\s*Summary:/.test(l))
+  return { rows: section(head).map(id => CHAT_ITEMS[id] || id.replace(/-/g, ' ')), skipped: section(/Skipped:\s*$/).length, summary: sum ? sum.replace(/^\s*Summary:\s*/, '').trim() : '' }
+}
+// What a later call is told about an action under one of Helper's lines: a fixed phrase, never the command's output
+// (it holds paths on the person's disk)
+const CHAT_ACT_TOLD = {
+  plugin: ' (Helper tried to run this step for the person: Hermes needs its import add-on first, and Helper offered to install it.)',
+  preview: ' (Helper ran the preview for the person and showed what would come over; the import itself has not been run yet.)',
+  done: ' (Helper ran the import for the person; it is done.)',
+  failed: ' (Helper tried to run this step for the person; the command failed, and Helper showed how to do it by hand.)'
 }
 
 // ---- the docs: words of each chunk, counted once on the first message ----
@@ -232,7 +306,8 @@ export function chatLines(log, names = []) {
     if (!e || e.send === false || (e.who !== 'you' && e.who !== 'helper')) continue
     const text = typeof e.text === 'string' ? e.text.replace(/\s+/g, ' ').trim() : ''
     if (!text || chatHoldsBack(text)) continue
-    out.push(`${e.who === 'you' ? 'Person' : 'Helper'}: ${withoutNames(Array.from(text).slice(0, CHAT_LINE_CHARS).join(''), names)}`)
+    const told = e.who === 'helper' && e.act && CHAT_ACT_TOLD[e.act.state] ? CHAT_ACT_TOLD[e.act.state] : ''
+    out.push(`${e.who === 'you' ? 'Person' : 'Helper'}: ${withoutNames(Array.from(text).slice(0, CHAT_LINE_CHARS).join(''), names)}${told}`)
   }
   return out.slice(-CHAT_LAST_LINES)
 }

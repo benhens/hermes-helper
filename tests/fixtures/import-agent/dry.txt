@@ -1,0 +1,32 @@
+
+┌─────────────────────────────────────────────────────────┐
+│          ☤ Hermes — Import From Another Agent          │
+└─────────────────────────────────────────────────────────┘
+
+
+  Import Settings
+  Agent:       claude-code
+  Source:      /Users/peter/.claude
+  Target:      /Users/peter/.hermes
+  Overwrite:   no (skip conflicts)
+  Secrets:     never imported — run 'hermes setup' for credentials
+
+
+  Import Preview — 1 item(s) would be imported
+  No changes have been made yet. Review the list below:
+
+
+  Dry Run Results
+  No files were modified. This is a preview of what would happen.
+
+  ✓ Would import:
+      claude-md              → /Users/peter/.hermes/memories/MEMORY.md
+
+  ─ Skipped:
+      settings                No settings.json found
+      command-allowlist       No permissions.allow rules found
+      command-denylist        No permissions.deny rules found
+      mcp-servers             No MCP servers found
+      skills                  No skills directory found
+
+  Summary: 1 would import, 5 skipped

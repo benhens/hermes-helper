@@ -23,7 +23,7 @@ import { prefersReducedMotion, watchReducedMotion } from './motion.js'
 import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS, NO_MODEL_LINE } from './model-status.js'
 import { askModel, failLines, FAIL_LINES } from './model-call.js'
-import { chatCall, chatHello, chatBack, chatHoldsBack, chatParts } from './chat.js'
+import { chatCall, chatHello, chatBack, chatHoldsBack, chatParts, chatActionArgv, chatActionLines, chatNeedsPlugin, chatActionTail, chatActionRead } from './chat.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { typedAboutKept, laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, pressNear, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor, noteLast } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
@@ -305,7 +305,7 @@ export function makePage(ctx, opts = {}) {
         // choices and the card they name are drawn under it; a reply with no words left counts as no reply
         // (review finding 11) a choice that would start Helper's own forget or what-do-you-keep lines is no button
         const parts = chatParts(r && r.ok ? chatClean(r.text) : '')
-        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick.filter(q => !typedAboutKept(q)), card: parts.card })), send: true })
+        if (parts.text) return chatPut(job.id, { ...helperEntry(chatSaid('CHAT', parts.text, { md: true, quick: parts.quick.filter(q => !typedAboutKept(q)), card: parts.card, act: parts.act || null })), send: true })
         lookAgain()
         const kind = r && !r.ok ? r.kind : 'other'
         const f = FAIL_LINES[kind] || FAIL_LINES.other
@@ -316,6 +316,53 @@ export function makePage(ctx, opts = {}) {
         chat.running = false
         chatPump()
       })
+  }
+
+  /* ---------- chat-fix part 3: "Do it for me" under a reply (the commands are fixed in src/chat.js) ---------- */
+  // One step of the action under the line with this id, run through Hermes's own door for its commands (cli.exec:
+  // `hermes <argv>`, not interactive). Called only by a click on the action's button. step: 'preview' (changes
+  // nothing), 'plugin' (installs Hermes's import add-on; then the preview the person asked for follows), 'import'.
+  // The line may be gone meanwhile (Clear chat): then nothing more happens.
+  const actOf = id => {
+    const e = memory.log.find(x => x.id === id)
+    return e && e.act ? e.act : null
+  }
+  const setAct = (id, act) => {
+    if (!actOf(id)) return false
+    memory.log = memory.log.map(e => (e.id === id ? { ...e, act } : e))
+    if (live.view) live.view.setLog(memory.log)
+    return true
+  }
+  function runAct(id, step) {
+    const act = actOf(id)
+    const argv = act ? chatActionArgv(step, act.agent) : null
+    if (!argv || act.state === 'running') return
+    // each button belongs to one state: the preview to the offer, the install to "needs its add-on", the import to
+    // the preview that was shown
+    if ((step === 'preview' && act.state !== 'offer') || (step === 'plugin' && act.state !== 'plugin') || (step === 'import' && act.state !== 'preview')) return
+    const run = (stepNow, args) => {
+      setAct(id, { kind: act.kind, agent: act.agent, state: 'running', step: stepNow })
+      return Promise.resolve()
+        .then(() => host.request('cli.exec', { argv: args, timeout: 240 }, 250000))
+        .then(
+          r => r,
+          () => null
+        )
+        .then(r => {
+          const base = { kind: act.kind, agent: act.agent, step: stepNow }
+          const lines = chatActionLines(r && typeof r.output === 'string' ? r.output : '')
+          if (!r || typeof r !== 'object') return setAct(id, { ...base, state: 'failed', tail: [] })
+          if (r.blocked) return setAct(id, { ...base, state: 'failed', tail: typeof r.hint === 'string' && r.hint.trim() ? [r.hint.trim()] : [] })
+          if (r.code !== 0) {
+            if (stepNow === 'preview' && chatNeedsPlugin(lines)) return setAct(id, { ...base, state: 'plugin' })
+            return setAct(id, { ...base, state: 'failed', tail: chatActionTail(lines) })
+          }
+          // the add-on is in: now the preview the person asked for with "Do it for me"
+          if (stepNow === 'plugin') return actOf(id) ? run('preview', chatActionArgv('preview', act.agent)) : false
+          return setAct(id, { ...base, state: stepNow === 'preview' ? 'preview' : 'done', ...chatActionRead(lines, stepNow) })
+        })
+    }
+    run(step, argv)
   }
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
@@ -1320,7 +1367,7 @@ export function makePage(ctx, opts = {}) {
             winBar,
             // chat-fix: a reply of the model (md) is drawn inside the part that scrolls, as its last line; Helper's own
             // short lines and the waiting dots stay in the bubble over the character
-            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, reply: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard }, 'bubble') : null }, 'conversation'),
+            jsx(Conversation, { entries: older, newest: inBubble, kept: visit.kept, onNext: pressNext, onNote: pressNote, scrollRef: helperScroll, onCard: dashboard.openCard, reply: inBubble && inBubble.md ? jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext, onQuick: sendText, onCard: dashboard.openCard, onAct: (entry, step) => runAct(entry.id, step) }, 'bubble') : null }, 'conversation'),
             inBubble ? (inBubble.md ? null : jsx(Bubble, { entry: inBubble, clock, fresh, said, onNext: pressNext }, 'bubble')) : jsx(BusyDots, { reduced }, 'bubble'),
             jsx(Under, { character }, 'under'),
             composer
