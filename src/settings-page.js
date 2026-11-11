@@ -15,6 +15,7 @@ import { jsx, jsxs } from 'react/jsx-runtime'
 import { TALK_DATA } from './talk-data.js'
 import { AI_MODE } from './ai-mode.js'
 import { SETUP_BUILT } from './setup-built.js'
+import { setupRows, SETUP_ROW_KEYS, SETUP_ASKED_KEYS, SETUP_ALL_KEYS, SETUP_AI_BUILT } from './setup-chat.js'
 import { LIVE_DATA } from './live-data.js'
 import { K } from './look.js'
 import { cleanKept, hasKept, keptToStore } from './kept.js'
@@ -22,9 +23,9 @@ import { renderKept, saveBox } from './settings-file.js'
 import { curlyQuotes } from './quotes.js'
 
 const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
-// live changes-6: with the set-up conversation built the line names its three rows; without it, only what the person
-// does is sent, and the line says that (lines_by_mode.settings_top_line_2 was_c6)
-export const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode[SETUP_BUILT ? 'settings_top_line_2' : 'settings_top_line_2_no_setup'][AI_MODE]
+// live changes-6: when the set-up conversation's two answers go to the AI too (its AI step, SETUP_AI_BUILT) the line
+// names the three rows; else only what the person does is sent, and the line says that (settings_top_line_2 was_c6)
+export const SETTINGS_TOP_LINE_2 = LIVE_DATA.lines_by_mode[SETUP_BUILT && SETUP_AI_BUILT ? 'settings_top_line_2' : 'settings_top_line_2_no_setup'][AI_MODE]
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')
@@ -57,7 +58,9 @@ export function makeSettingsPage(ctx) {
     function save(answer) {
       const r = saveBox(stored, box, answer)
       if (r.result === 'saved') {
-        write(r.stored)
+        // setup-chat: the box holds the name, what you do and the kept answers; the set-up conversation's rows are not
+        // in it, so a save of the box leaves them as they are
+        write({ ...r.stored, ...Object.fromEntries(SETUP_ALL_KEYS.filter(k => stored[k] !== undefined).map(k => [k, stored[k]])) })
         showStored()
         setSaid({ kind: 'saved', lines: r.message })
       } else if (r.result === 'refused') setSaid({ kind: 'refused', lines: r.message })
@@ -157,6 +160,33 @@ export function makeSettingsPage(ctx) {
       })
     })
 
+    // setup-chat (content/helper-setup-chat-v1.json keeps): the four rows the set-up conversation keeps, each with
+    // Delete, and the button "Ask me the set-up questions again". (The data also names a Change on each row; it is
+    // not built: Delete, or the button, and the conversation asks again.) The two labels are the data's own words
+    // (keeps.settings_page).
+    const dropKeys = keys => {
+      const next = { ...read() }
+      for (const k of keys) delete next[k]
+      write(next)
+      showStored()
+      setSaid(null)
+    }
+    const rows = SETUP_BUILT ? setupRows(stored) : []
+    const setupBlock = rows.length
+      ? jsxs('div', {
+          className: K.settingsRule,
+          'data-hh': 'settings-setup',
+          children: [
+            ...rows.map(([key, name, shows]) =>
+              jsx(ListRow, { title: curlyQuotes(name), description: curlyQuotes(shows), action: jsx(Button, { size: 'sm', variant: 'text', onClick: () => dropKeys(SETUP_ROW_KEYS[key]), 'aria-label': `Delete: ${name}`, 'data-hh': 'settings-setup-delete', 'data-key': key, children: 'Delete' }, 'd') }, key)
+            ),
+            stored.setup_new || stored.setup_goal || stored.setup_current
+              ? jsx('div', { className: K.settingsButtons, children: jsx(Button, { size: 'sm', onClick: () => dropKeys(SETUP_ASKED_KEYS), 'data-hh': 'settings-setup-again', children: 'Ask me the set-up questions again' }, 'again') }, 'again')
+              : null
+          ]
+        })
+      : null
+
     const facts = jsxs('div', { className: K.settingsFacts, 'data-hh': 'settings-facts', children: [jsx('p', { children: curlyQuotes(SETTINGS_WORDS.also_tell) }, 'tell'), ...SETTINGS_WORDS.facts.map((f, i) => jsx('p', { children: curlyQuotes(f) }, i))] })
 
     // "Forget all of this" (hhdesign's review of e86b410, section 1 point 1): under a thin divider, one of
@@ -198,6 +228,6 @@ export function makeSettingsPage(ctx) {
         ? jsx('div', { className: K.settingsRule, 'data-hh': 'settings-forget', children: jsx('p', { className: K.settingsMessage, role: 'status', 'data-hh': 'settings-forgot', children: curlyQuotes(FA.after_yes) }) })
         : null
 
-    return jsxs('div', { className: K.settingsPage, 'data-hh': 'settings-page', children: [boxRow, facts, forgetRow] })
+    return jsxs('div', { className: K.settingsPage, 'data-hh': 'settings-page', children: [boxRow, setupBlock, facts, forgetRow] })
   }
 }

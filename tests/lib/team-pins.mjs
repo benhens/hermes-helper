@@ -23,6 +23,9 @@ export const PINS = {
   'dev/checks/hhcontent-talk-v2/route2.py': ['62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9', 'content/helper-talk-live-v2-changes-10.md'],
   'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e', 'content/helper-talk-v2-changes-16.md'],
   'dev/checks/hhcontent-talk-v2/check.py': ['0eb598430d47d77857013a8017f57cffacbf69bc16d5e5aa478a77909790afac', 'content/helper-talk-live-v2-changes-1.md'],
+  // setup-chat: the set-up conversation (named at changes-8, unchanged at changes-10) and the set-up list
+  'content/helper-setup-chat-v1.json': ['c2e2e9d77ca05a43f570191e791ca954e81ccc04e1dbe635fb7d02e501cc313b', 'content/helper-talk-live-v2-changes-8.md'],
+  'content/dash-setup-list-v2.json': ['e47f30e49d14485e351b382d577f857762ec55dad95653dafef501dcfa29cc80', 'content/result-hhcontent-dash-words.md'],
   // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs)
   'content/helper-keeps-v1.md': ['0b2563a8e2772d5b918af6bef73cb53af74ce0840b359151a3689c5168a311f4', 'content/helper-talk-live-v2.md'],
   // changes-12 and -13 (the secret rule), ported in the look job: settings_read.py and tests.json at

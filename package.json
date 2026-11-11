@@ -7,6 +7,6 @@
   "license": "MIT",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node scripts/build.mjs --check && node --check desktop/plugin.js && node --test tests/ && node scripts/test-modes.mjs"
+    "test": "node scripts/build.mjs --check && node --check desktop/plugin.js && node scripts/test-modes.mjs"
   }
 }

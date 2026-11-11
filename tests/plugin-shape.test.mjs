@@ -40,7 +40,8 @@ test('every SDK name used is imported (a missing one is a ReferenceError at rend
     'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue',
     'Textarea', 'Tip', 'EmptyState', 'GlyphSpinner', 'RowButton', 'PRIMARY_ICON_BTN', 'composerInputBacking',
     'composerSurfaceRing', 'jsx', 'jsxs', 'useState', 'useEffect', 'useRef', 'useId']) {
-    if (new RegExp(`\\b${name}\\b`).test(code.replace(/^import.*$/gm, ''))) assert.ok(imported.has(name), `${name} used but not imported`)
+    // setup-chat: the set-up list's step texts are prose for the person ("Switch one off only if ..."), not code
+    if (new RegExp(`\\b${name}\\b`).test(code.replace(/^import.*$/gm, '').replace(/\nconst SETUP_DATA = \{[\s\S]*?\n\}\n/, '\n'))) assert.ok(imported.has(name), `${name} used but not imported`)
   }
 })
 
@@ -108,7 +109,10 @@ test('the model name never comes from host.state.model or config.get', () => {
 
 test('Your setup reads only through read-only calls (no set, configure, write, newChat or send)', () => {
   const methods = [...code.matchAll(/request\('([a-z_.]+)'/g)].map(m => m[1])
-  assert.deepEqual([...new Set(methods)].sort(), ['free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
+  // setup-chat: the look reads the main bot's scheduled jobs too: cron.manage, only ever with action 'list'
+  assert.deepEqual([...new Set(methods)].sort(), ['cron.manage', 'free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
+  const cron = [...code.matchAll(/request\('cron\.manage', \{([^}]*)\}/g)].map(m => m[1])
+  assert.ok(cron.length >= 1 && cron.every(c => /action: 'list'/.test(c)), 'cron.manage is only asked for its list')
   assert.doesNotMatch(code, /setEnabled|profiles\.configure|set_asset|config\.set|newChat|composer\.setDraft|\.write\(/)
 })
 

@@ -24,8 +24,11 @@ import { readState } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
+import { SETUP_BUILT } from './setup-built.js'
+import { setupTyped, setupPress, setupAfter, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
+import { makeLook, LOOK_UNSEEN } from './setup-look.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
@@ -117,6 +120,17 @@ export function makePage(ctx, opts = {}) {
       const metStored = readMet()
       memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
       memory.log = saidEntries(openingLine(memory.visit), true)
+      // setup-chat: a later visit opens with the set-up conversation's returning line (BACK_REC, BACK_Q ...). It is said
+      // at once from what is kept, as if nothing could be read; the page then reads Hermes (the look) and, when the
+      // person has done nothing yet and the reads change the line (the thing is now done: BACK_DONE), says that instead.
+      // What the first, unread line would keep is not kept.
+      if (SETUP_BUILT && memory.visit.met) {
+        const before = JSON.stringify(memory.visit.kept)
+        memory.log = setupOpening(memory.visit, LOOK_UNSEEN).flatMap(setupEntries)
+        memory.opening = { kept: before, ids: memory.log.map(e => e.id) }
+        for (const k of Object.keys(memory.visit.kept)) delete memory.visit.kept[k]
+        Object.assign(memory.visit.kept, JSON.parse(before))
+      }
       writeKept()
     }
     return memory
@@ -125,6 +139,10 @@ export function makePage(ctx, opts = {}) {
   const rereadKept = () => {
     const m = remembered()
     const kept = readKept()
+    // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
+    // questions again", or each row deleted): the conversation starts the questions again (RESTART)
+    const had = k => ['setup_new', 'setup_goal', 'setup_current'].some(x => k[x])
+    if (SETUP_BUILT && had(m.visit.kept) && !had(kept)) m.setupRestart = true
     for (const k of Object.keys(m.visit.kept)) delete m.visit.kept[k]
     Object.assign(m.visit.kept, kept)
     m.stored = JSON.stringify(keptToStore(kept))
@@ -168,6 +186,21 @@ export function makePage(ctx, opts = {}) {
     return out
   }
 
+  // setup-chat: one line of the set-up conversation (src/setup-chat.js) as the entries of the conversation. Nothing
+  // of the set-up conversation is ever among the lines sent to the AI (send: false). A line that ends with an offer
+  // (NOT_NOW, ALL_DONE, BACK) gets the offer's bubble under it.
+  const setupEntries = s => {
+    const { setupOffer, rec, pasteLabel, ...line } = s
+    const out = [{ ...helperEntry(line), send: false }]
+    if (setupOffer) {
+      const offer = offerSaid(setupOffer, memory.visit)
+      out.push({ ...helperEntry({ line: 'offer-' + offer.set, text: offer.text, source: null, answers: offer.answers, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false, offer: true })
+    }
+    return out
+  }
+  // The look: Helper reads what is set up, on this computer (src/setup-look.js). No AI call, nothing sent.
+  const look = makeLook(ctx, host)
+
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
   // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
   // time), how many of Helper's calls Hermes still works on (also after the page stopped waiting for one: no new
@@ -187,6 +220,13 @@ export function makePage(ctx, opts = {}) {
     }
     return out.filter(s => typeof s === 'string' && s.trim())
   }
+  // setup-chat: after the ordinary talk answered a message typed in place of an answer to Q_NEW or Q_GOAL, the line
+  // that asks that question again, once (SETUP_REASK, SETUP_REASK_GOAL); not after the lines that ask it themselves
+  const setupReask = result => {
+    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return []
+    const again = setupAfter(memory.visit)
+    return again ? setupEntries(again) : []
+  }
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
   const liveFinish = (w, final) => {
     if (live.waiting !== w) return
@@ -196,7 +236,7 @@ export function makePage(ctx, opts = {}) {
     const result = final || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(said, w.sendHelper), ...slowAfter(said)].slice(-LOG_MAX)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(said, w.sendHelper), ...slowAfter(said), ...setupReask(result)].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -486,9 +526,65 @@ export function makePage(ctx, opts = {}) {
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper)].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(said, may.helper), ...(typed ? setupReask(result) : [])].filter(Boolean))
       setFocusAsk(true)
     }
+
+    // setup-chat: one move of the set-up conversation (src/setup-chat.js): the person's side shows at once; when the
+    // move needs the look, Hermes is read first (no AI call; the character shows busy meanwhile), then Helper's lines.
+    function runSetup(mv, shown) {
+      liveClose()
+      const n = (memory.setupTurn = (memory.setupTurn || 0) + 1)
+      memory.opening = null
+      if (shown) addToLog([{ ...youEntry(shown), send: false }])
+      const finish = seen => {
+        if (memory.setupTurn !== n) return // the person did something else meanwhile
+        const says = mv.go(seen)
+        writeKept()
+        const entries = says.flatMap(setupEntries)
+        memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...entries].slice(-LOG_MAX)
+        if (live.view) {
+          live.view.setLog(memory.log)
+          live.view.setFocusAsk(true)
+        }
+      }
+      if (!mv.look) return finish(memory.seen || LOOK_UNSEEN)
+      const end = busy.begin()
+      look().then(seen => {
+        end()
+        memory.seen = seen
+        finish(seen)
+      })
+    }
+    // setup-chat: "Ask me the set-up questions again" was pressed on Helper's settings page (see rereadKept)
+    useEffect(() => {
+      if (!memory.setupRestart) return
+      memory.setupRestart = false
+      runSetup(setupRestartMove(visit), null)
+    }, [])
+    // setup-chat: the opening of a later visit, once the look has come back (see remembered())
+    useEffect(() => {
+      const o = memory.opening
+      if (!SETUP_BUILT || !o || o.started) return
+      o.started = true
+      look().then(seen => {
+        memory.seen = seen
+        if (memory.opening !== o) return
+        memory.opening = null
+        // only while the opening lines are still all there is
+        if (memory.log.length !== o.ids.length || memory.log.some((e, i) => e.id !== o.ids[i])) return
+        const was = memory.log.map(e => [e.line, e.text])
+        for (const k of Object.keys(visit.kept)) delete visit.kept[k]
+        Object.assign(visit.kept, JSON.parse(o.kept))
+        visit.setup = undefined
+        visit.lastOffer = null
+        const entries = setupOpening(visit, seen).flatMap(setupEntries)
+        writeKept()
+        if (JSON.stringify(entries.map(e => [e.line, e.text])) === JSON.stringify(was)) return
+        memory.log = entries
+        if (live.view) live.view.setLog(memory.log)
+      })
+    }, [])
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
     // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
@@ -500,6 +596,15 @@ export function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       liveClose()
+      // setup-chat: an answer to the set-up conversation's open question, a step word, "what should I set up first",
+      // "start again": taken by its fixed rules, with no AI call
+      if (SETUP_BUILT) {
+        const mv = setupTyped(typed, visit, hasTopicWord)
+        if (mv) {
+          const cs = Array.from(typed.trim())
+          return runSetup(mv, cs.length > MAX_INPUT_CHARS ? cs.slice(0, MAX_INPUT_CHARS).join('') + '…' : cs.join(''))
+        }
+      }
       const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null, lastOffer: visit.lastOffer || null, lastTopic: visit.lastTopic || null }
       // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
       const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
@@ -586,6 +691,11 @@ export function makePage(ctx, opts = {}) {
         setFocusPick(true)
         return setLog(old => (memory.log = old.map((e, i) => (i === old.length - 1 && e.answers ? { ...e, answers: { ...e.answers, items } } : e))))
       }
+      // setup-chat: an answer of the set-up conversation, or the pick "Set up Hermes" under an offer
+      if (item.setup || (SETUP_BUILT && item.offer && offerIsSetup(item.offer))) {
+        const mv = item.setup ? setupPress(item.setup, visit) : setupAskMove(visit)
+        return mv ? runSetup(mv, item.label) : undefined
+      }
       liveClose()
       let result
       if (item.answer) result = pick(item.answer[0], item.answer[1], visit)
@@ -622,6 +732,14 @@ export function makePage(ctx, opts = {}) {
         return answer(result, next.label, '', true)
       }
       if (next.kind === 'settings') return go(settingsHref)
+      // setup-chat: "What did you look at?" under the look line; "Open the Quickstart" (the docs page, in the browser)
+      if (next.kind === 'setup') {
+        const mv = setupPress(next.setup, visit)
+        if (!mv) return
+        setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
+        return runSetup(mv, next.label)
+      }
+      if (next.kind === 'docs') return openDocs(next.url)
       if (next.kind === 'part') go(next.to)
     }
 

@@ -1,0 +1,415 @@
+// The set-up conversation (setup-chat; content/helper-setup-chat-v1.json, the content team's): after "What do you
+// do?" Helper asks two questions (Q_NEW, Q_GOAL), looks at what is set up, recommends one thing by a fixed rule
+// (R1 to R5), gives its steps one at a time, and picks up where it left off on the next visit.
+// Pure code: no React, no Hermes, no AI. What Hermes holds is read by src/setup-look.js and handed in as `seen`:
+//   seen = { model: 'ok' | 'not' | 'unread', soul: true | false | null, jobs: number | null, bots: number | null }
+//   (null = that read failed: Helper then says it couldn't read it, never a guess)
+// Every word said here is the team's (src/setup-data.js, made by the build from its two files).
+// What is kept between visits (the visit's kept record, src/kept.js): setup_new (the Q_NEW answer id), setup_goal (the
+// label or the typed text) with setup_goal_id, setup_done_said (the things the person said are done), setup_current
+// (the thing last recommended). Not kept: Skip, Not sure yet, what the look saw, Something else.
+import { SETUP_DATA } from './setup-data.js'
+import { TALK_DATA } from './talk-data.js'
+import { talkNorm, whichOf } from './talk.js'
+import { workOk, workSqueeze } from './kept.js'
+import { looksLikeKey } from './key-check.js'
+
+const SU = SETUP_DATA
+const SU_L = SU.lines
+const SU_P = SU.look.parts
+export const SETUP_ITEMS = SU.items
+const SU_Q_NEW = SU.questions.Q_NEW
+const SU_Q_GOAL = SU.questions.Q_GOAL
+const suFill = (text, slots) => text.replace(/\{([a-z_]+)\}/g, (m, k) => (slots[k] !== undefined ? slots[k] : m))
+
+/* ---------- the rule (hhcontent's build.py, choose) ---------- */
+// model: ok | not | unread; isNew: new | some | well | skip; goal: schedule | phone | bots | unsure;
+// done: the ids done (seen by a read, said by the person, or Something else in this visit). Returns [item, rule].
+export function choose(model, isNew, goal, done) {
+  const has = id => (done instanceof Set ? done.has(id) : done.includes(id))
+  if (model === 'not') return ['model', 'R1']
+  if ((isNew === 'new' || isNew === 'skip') && !has('first_chat')) return ['first_chat', 'R2']
+  const g = SU.goal_item[goal]
+  if (g && !has(g)) return [g, 'R3']
+  for (const it of SU.rule_order) {
+    if (it === 'first_chat' && (isNew === 'some' || isNew === 'well')) continue
+    if (!has(it)) return [it, 'R4']
+  }
+  return [null, 'R5']
+}
+const suReasonId = (rule, isNew, goal) => (rule === 'R1' ? 'R1' : rule === 'R2' ? (isNew === 'new' ? 'R2_new' : 'R2_skip') : rule === 'R3' ? 'R3_' + goal : 'R4')
+// The written recommendation, without "Want the steps?" (build.py rec_text)
+export const recText = (item, rule, isNew, goal) => suFill(SU_L.REC.text, { reason: SU.reasons[suReasonId(rule, isNew, goal)], card: SU.items[item].name, why: SU.items[item].why }).replace(/ Want the steps\?$/, '')
+const SU_REC_TAIL = SU_L.REC.text.match(/ (Want the steps\?)$/)[1]
+
+/* ---------- the look, as words ---------- */
+const suJobsPart = n => (n === null ? SU_P.read_failed : n === 0 ? SU_P.scheduled_job_not : suFill(n === 1 ? SU_P.scheduled_job_done : SU_P.scheduled_job_done_plural, { n }))
+const suBotsPart = n => (n === null ? SU_P.read_failed : n < 2 ? SU_P.second_bot_not : suFill(SU_P.second_bot_done, { n }))
+const suSoulPart = s => (s === null ? SU_P.read_failed : s ? SU_P.personality_done : SU_P.personality_not)
+const suModelPart = m => ({ ok: SU_P.model_ok, not: SU_P.model_not, unread: SU_P.model_unread })[m]
+// SEEN: "I looked at your Hermes." + the model part + the goal part (build.py seen_line)
+export function seenLine(seen, goal) {
+  const g = SU.goal_item[goal] || 'personality'
+  const part = g === 'chat_apps' ? SU_P.chat_apps_cannot : g === 'scheduled_job' ? suJobsPart(seen.jobs) : g === 'second_bot' ? suBotsPart(seen.bots) : suSoulPart(seen.soul)
+  return [SU_P.LOOK_OPEN, suModelPart(seen.model), part].join(' ')
+}
+// What a read says about one thing: true (done), false (not done), null (the read failed), undefined (cannot be seen)
+export function seenDone(item, seen) {
+  if (item === 'model') return seen.model === 'unread' ? null : seen.model === 'ok'
+  if (item === 'scheduled_job') return seen.jobs === null ? null : seen.jobs >= 1
+  if (item === 'second_bot') return seen.bots === null ? null : seen.bots >= 2
+  if (item === 'personality') return seen.soul
+  return undefined
+}
+// "I can see it now. {seen_part}" (build.py seen_part)
+const suSeenPart = (item, seen) => (item === 'scheduled_job' ? suJobsPart(seen.jobs) : item === 'second_bot' ? suBotsPart(seen.bots) : item === 'personality' ? SU_P.personality_done : SU_P.model_ok)
+// The six lines behind "What did you look at?"
+export function lookList(seen) {
+  const yn = v => (v === null ? "couldn't check" : v ? 'yes' : 'no')
+  const n = v => (v === null ? "couldn't check" : String(v))
+  const [a, b, c, d, e, f] = SU.look.list
+  return [a, b.replace(/\{[^}]*\}/, seen.model === 'unread' ? "couldn't check" : seen.model === 'ok' ? 'yes' : 'no'), c.replace(/\{[^}]*\}/, yn(seen.soul)), d.replace('{n}', n(seen.jobs)), e.replace('{n}', n(seen.bots)), f]
+}
+// The things done: seen by a read, said by the person (kept), Something else in this visit
+export function doneSet(st, seen) {
+  const done = new Set([...(st.kept.setup_done_said || []), ...((st.setup && st.setup.other) || [])])
+  for (const it of SU.seeable) if (seenDone(it, seen) === true) done.add(it)
+  return done
+}
+
+/* ---------- what Helper says, in the page's shape ---------- */
+const SU_HINT = TALK_DATA.answers.hint_under_question
+const suSaid = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null, ...more })
+// things to pick: [action, label]; the page hands the action back to setupPress
+const suPicks = pairs => ({ kind: 'setup', hint: SU_HINT, items: pairs.map(([action, label]) => ({ id: 'setup-' + action, label, setup: action })) })
+const suNEW_PICKS = () => suPicks(SU_Q_NEW.answers.map(a => ['new:' + a.id, a.label]))
+const suGOAL_PICKS = () => suPicks(SU_Q_GOAL.answers.map(a => ['goal:' + a.id, a.label]))
+const suREC_PICKS = labels => suPicks(['rec:steps', 'rec:already', 'rec:other', 'rec:notnow'].map((a, i) => [a, labels[i]]))
+const suNamed = (line, name, slots = {}) => (name ? suFill(line.text, { ...slots, name }) : suFill(line.text_no_name, slots))
+const suOf = st => (st.setup = st.setup || { stage: null, item: null, step: 0, other: [], reasked: {}, asked: {} })
+// the faint "Kept: ..." line under a line (the page strikes it when the thing is no longer kept)
+const suKeptNote = (key, words, value) => ({ text: words, link: TALK_DATA.keeps.tell.link.words, first: null, items: [[key, value]] })
+const SU_KEPT_LINE = Object.fromEntries(SU.keeps.map(k => [k.key, k.kept_line]))
+
+/* ---------- the lines that open it ---------- */
+// F2, F3, WORK_SECRET, WORK_LONG_2 with the set-up conversation built: the team's new text and the Q_NEW answers
+// (src/talk.js lineFor calls this for those four)
+export function openQNew(kind, st) {
+  const s = suOf(st)
+  s.stage = 'new'
+  s.asked.new = true
+  return { text: kind === 'F2' ? suNamed(SU_L.F2, st.name || st.kept.name || null) : SU_L[kind].text, answers: suNEW_PICKS() }
+}
+
+/* ---------- typed answers ---------- */
+const suFlat = text => talkNorm(text).replace(/[ ?!.,]+$/, '')
+const suInList = (t, list) => whichOf(t, list).length > 0
+function suTypedNew(text) {
+  const t = suFlat(text)
+  for (const k of SU_Q_NEW.typed.order) if (suInList(t, SU_Q_NEW.typed.lists[k])) return k
+  return 'skip'
+}
+function suTypedGoal(text) {
+  const t = suFlat(text)
+  for (const k of SU_Q_GOAL.typed.order) if (suInList(t, SU_Q_GOAL.typed.lists[k])) return k
+  return 'unsure'
+}
+export const isRestart = text => suInList(suFlat(text), SU.restart_phrases)
+export const isSetupAsk = text => suInList(suFlat(text), SU.ask_phrases)
+const suLabelOf = (answers, text) => answers.findIndex(a => suFlat(a) === suFlat(text))
+const SU_STEP_NEXT = ['next', 'done', 'what next', 'ok', 'okay', 'did it', 'yes', 'now what']
+const SU_REC_YES = ['yes', 'yeah', 'yep', 'ok', 'okay', 'sure', 'show me', 'steps', 'go on', 'please']
+const SU_UNSURE = ['skip', 'not sure', 'not sure yet', "i'm not sure", 'im not sure', "i don't know", 'i dont know', "don't know", 'dont know', 'no idea', 'nothing']
+const SU_REC_NO = ['no', 'not now', 'later', 'stop', 'nope']
+
+/* ---------- the moves ---------- */
+// Each move is { look: whether the page must read Hermes first, go(seen) -> the lines Helper says }.
+// seen may be null when look is false.
+const suMove = (look, go) => ({ look, go })
+
+function suRecommend(st, seen, lead = []) {
+  const s = suOf(st)
+  const isNew = st.kept.setup_new || 'skip'
+  const goal = st.kept.setup_goal_id || s.goal || 'unsure'
+  const [item, rule] = choose(seen.model, isNew, goal, doneSet(st, seen))
+  if (!item) {
+    s.stage = null
+    s.item = null
+    delete st.kept.setup_current
+    return [...lead, suSaid('ALL_DONE', SU_L.ALL_DONE.text, { setupOffer: SU_L.ALL_DONE.offer })]
+  }
+  s.stage = 'rec'
+  s.item = item
+  s.rule = rule
+  st.kept.setup_current = item
+  // rec: what the AI step may reword (src/setup-rec.js): the written text stands unless a checked reply replaces it
+  return [...lead, suSaid('REC', recText(item, rule, isNew, goal) + ' ' + SU_REC_TAIL, { answers: suREC_PICKS(SU_L.REC.answers), rec: { item, rule, isNew, goal } })]
+}
+function suStepLine(st) {
+  const s = suOf(st)
+  const steps = SU.items[s.item].steps
+  const last = s.step === steps.length - 1
+  s.stage = 'step'
+  const labels = last ? SU_L.STEP.last_step_answers : SU_L.STEP.answers
+  const acts = last ? ['step:worked', 'step:stuck', 'step:stop'] : ['step:done', 'step:stuck', 'step:stop']
+  return suSaid('STEP', suFill(SU_L.STEP.text, { n: s.step + 1, total: steps.length, step: steps[s.step] }), { answers: suPicks(acts.map((a, i) => [a, labels[i]])) })
+}
+function suNotNow(st) {
+  suOf(st).stage = null
+  return [suSaid('NOT_NOW', SU_L.NOT_NOW.text, { setupOffer: SU_L.NOT_NOW.offer })]
+}
+function suSaidDone(st, item) {
+  const list = st.kept.setup_done_said || []
+  if (!list.includes(item)) st.kept.setup_done_said = [...list, item]
+}
+// "It worked" (or "Done, it works now"): Helper reads again
+function suWorked(st, seen) {
+  const s = suOf(st)
+  const item = s.item
+  const d = seenDone(item, seen)
+  if (d === undefined) {
+    suSaidDone(st, item)
+    return suRecommend(st, seen, [suSaid('DONE_SAID', SU_L.DONE_SAID.text)])
+  }
+  if (d === true) return suRecommend(st, seen, [suSaid('DONE_SEEN', suFill(SU_L.DONE_SEEN.text, { seen_part: suSeenPart(item, seen) }))])
+  if (d === null) {
+    // the read failed: Helper says so and takes the person's word, never a guess (Decided myself, in the report)
+    suSaidDone(st, item)
+    return suRecommend(st, seen, [suSaid('READ_FAILED', SU_P.read_failed + ' ' + SU_L.DONE_SAID.text)])
+  }
+  s.stage = 'notseen'
+  return [suSaid('NOT_SEEN', SU_L.NOT_SEEN.text, { answers: suPicks(['notseen:steps', 'notseen:otherbot', 'notseen:notnow'].map((a, i) => [a, SU_L.NOT_SEEN.answers[i]])) })]
+}
+function suStuck(st) {
+  const s = suOf(st)
+  s.stage = 'stuck'
+  const answers = suPicks(['stuck:works', 'stuck:stop'].map((a, i) => [a, SU_L.STUCK.answers[i]]))
+  // its own Hermes cannot answer yet: the docs page instead, opened in the person's browser
+  if (s.item === 'model') return [suSaid('STUCK_MODEL', SU_L.STUCK_MODEL.text, { answers, next: { kind: 'docs', label: SU_L.STUCK_MODEL.button, url: SU_L.STUCK_MODEL.url } })]
+  const text = suFill(SU_L.STUCK.paste, { card: SU.items[s.item].name, step: SU.items[s.item].steps[s.step] })
+  // the text to paste, open at once in its box (as the slow-AI line's)
+  return [suSaid('STUCK', SU_L.STUCK.text, { answers, paste: text, pasteLabel: SU_L.STUCK.paste_label })]
+}
+function suAnswerNew(st, id) {
+  const s = suOf(st)
+  const a = SU_Q_NEW.answers.find(x => x.id === id)
+  let note = null
+  if (a.kept_as) {
+    st.kept.setup_new = id
+    note = suKeptNote('setup_new', suFill(SU_KEPT_LINE.setup_new, { label: a.label }), id)
+  } else delete st.kept.setup_new
+  s.newAnswered = true
+  s.stage = 'goal'
+  s.asked.goal = true
+  return [suSaid('Q_GOAL', SU_L.Q_GOAL.text, { answers: suGOAL_PICKS(), note })]
+}
+function suAnswerGoal(st, id, typed, seen) {
+  const s = suOf(st)
+  const a = SU_Q_GOAL.answers.find(x => x.id === id)
+  const text = typed ? workSqueeze(typed) : a.kept_as
+  let note = null
+  s.goal = id
+  if (text && (!typed || workOk(text))) {
+    st.kept.setup_goal = text
+    st.kept.setup_goal_id = id
+    note = suKeptNote('setup_goal', SU_KEPT_LINE.setup_goal.replace(/\{[^}]*\}/, text), text)
+  } else {
+    delete st.kept.setup_goal
+    delete st.kept.setup_goal_id
+  }
+  s.seen = seen
+  // under the look line: the Kept: line, the faint line, and the button "What did you look at?"
+  const look = suSaid('SEEN', seenLine(seen, id), { note, hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+  return suRecommend(st, seen, [look])
+}
+function suRestart(st) {
+  const s = suOf(st)
+  for (const k of ['setup_new', 'setup_goal', 'setup_goal_id', 'setup_current']) delete st.kept[k]
+  Object.assign(s, { stage: 'new', item: null, step: 0, goal: null, newAnswered: false, asked: { new: true }, reasked: {} })
+  return [suSaid('RESTART', SU_L.RESTART.text, { answers: suNEW_PICKS() })]
+}
+// "what should I set up first": the question not answered yet first, else the look and the recommendation
+function suAsk(st) {
+  const s = suOf(st)
+  if (!st.kept.setup_new && !s.newAnswered) {
+    s.stage = 'new'
+    s.asked.new = true
+    return suMove(false, () => [suSaid('Q_NEW', SU_Q_NEW.text, { answers: suNEW_PICKS() })])
+  }
+  if (!st.kept.setup_goal_id && !s.goal) {
+    s.stage = 'goal'
+    s.asked.goal = true
+    return suMove(false, () => [suSaid('Q_GOAL', SU_L.Q_GOAL.text, { answers: suGOAL_PICKS() })])
+  }
+  return suMove(true, seen => {
+    s.seen = seen
+    const look = suSaid('SEEN', seenLine(seen, st.kept.setup_goal_id || s.goal || 'unsure'), { hint: SU.look.under.faint, next: { kind: 'setup', label: SU.look.under.button, setup: 'lookwhat' } })
+    return suRecommend(st, seen, [look])
+  })
+}
+
+// A thing picked, or a button pressed: its action. Returns a move, or null when the action is not for this stage.
+export function setupPress(action, st) {
+  const s = suOf(st)
+  const [kind, id] = action.split(':')
+  // "What did you look at?": the six short lines, under the look's own opening sentence (Decided myself: the data has
+  // no sentence for above the list)
+  if (action === 'lookwhat') return s.seen ? suMove(false, () => [suSaid('LOOK_LIST', SU_P.LOOK_OPEN, { rows: lookList(s.seen), hint: SU.look.under.faint })]) : null
+  if (kind === 'new' && s.stage === 'new') return suMove(false, () => suAnswerNew(st, id))
+  if (kind === 'goal' && s.stage === 'goal') return suMove(true, seen => suAnswerGoal(st, id, null, seen))
+  if (kind === 'rec' && s.stage === 'rec') {
+    if (id === 'steps') return suMove(false, () => ((s.step = 0), [suStepLine(st)]))
+    if (id === 'notnow') return suMove(false, () => suNotNow(st))
+    if (id === 'other')
+      return suMove(true, seen => {
+        s.other.push(s.item)
+        return suRecommend(st, seen, [suSaid('SOMETHING_ELSE', SU_L.SOMETHING_ELSE.text)])
+      })
+    if (id === 'already')
+      return suMove(true, seen => {
+        const line = SU.seeable.includes(s.item) && seenDone(s.item, seen) !== true ? 'ALREADY_SEEABLE' : 'DONE_SAID'
+        suSaidDone(st, s.item)
+        return suRecommend(st, seen, [suSaid(line, SU_L[line].text)])
+      })
+  }
+  if (kind === 'step' && s.stage === 'step') {
+    if (id === 'done') return suMove(false, () => ((s.step += 1), [suStepLine(st)]))
+    if (id === 'worked') return suMove(true, seen => suWorked(st, seen))
+    if (id === 'stuck') return suMove(false, () => suStuck(st))
+    if (id === 'stop') return suMove(false, () => suNotNow(st))
+  }
+  if (kind === 'stuck' && s.stage === 'stuck') {
+    if (id === 'works') return suMove(true, seen => suWorked(st, seen))
+    if (id === 'stop') return suMove(false, () => suNotNow(st))
+  }
+  if (kind === 'notseen' && s.stage === 'notseen') {
+    if (id === 'steps') return suMove(false, () => ((s.step = 0), [suStepLine(st)]))
+    if (id === 'notnow') return suMove(false, () => suNotNow(st))
+    if (id === 'otherbot')
+      return suMove(true, seen => {
+        suSaidDone(st, s.item)
+        return suRecommend(st, seen, [suSaid('DONE_SAID', SU_L.DONE_SAID.text)])
+      })
+  }
+  return null
+}
+
+// A typed message. Returns a move when the set-up conversation takes it, else null (the ordinary talk answers it;
+// the page then calls setupAfter for the line that asks the open question again, once).
+// hasTopicWord: the message holds a key word of a topic or a Hermes term (src/talk.js)
+export function setupTyped(text, st, hasTopicWord = () => false) {
+  const s = suOf(st)
+  const t = suFlat(text)
+  if (!t || looksLikeKey(text)) return null
+  if (isRestart(text)) return suMove(false, () => suRestart(st))
+  const question = text.includes('?')
+  if (s.stage === 'new') {
+    const i = suLabelOf(SU_Q_NEW.answers.map(a => a.label), text)
+    if (i >= 0) return suMove(false, () => suAnswerNew(st, SU_Q_NEW.answers[i].id))
+    if (isSetupAsk(text)) return suAsk(st)
+    if (question || hasTopicWord(text)) return null
+    return suMove(false, () => suAnswerNew(st, suTypedNew(text)))
+  }
+  if (s.stage === 'goal') {
+    const i = suLabelOf(SU_Q_GOAL.answers.map(a => a.label), text)
+    if (i >= 0) return suMove(true, seen => suAnswerGoal(st, SU_Q_GOAL.answers[i].id, null, seen))
+    if (isSetupAsk(text)) return suAsk(st)
+    if (question) return null
+    // typed in place of "Not sure yet": nothing is kept (Decided myself: the data lists no such words)
+    if (SU_UNSURE.includes(t)) return suMove(true, seen => suAnswerGoal(st, 'unsure', null, seen))
+    return suMove(true, seen => suAnswerGoal(st, suTypedGoal(text), text, seen))
+  }
+  if (s.stage === 'rec') {
+    const i = suLabelOf(SU_L.REC.answers, text)
+    const act = i >= 0 ? ['rec:steps', 'rec:already', 'rec:other', 'rec:notnow'][i] : SU_REC_YES.includes(t) ? 'rec:steps' : SU_REC_NO.includes(t) ? 'rec:notnow' : null
+    if (act) return setupPress(act, st)
+  }
+  if (s.stage === 'step') {
+    const last = s.step === SU.items[s.item].steps.length - 1
+    const labels = last ? SU_L.STEP.last_step_answers : SU_L.STEP.answers
+    // the answers of either kind of step count, typed at any step: "It worked" at a step before the last is Done
+    const i = Math.max(suLabelOf(labels, text), suLabelOf(last ? SU_L.STEP.answers : SU_L.STEP.last_step_answers, text))
+    const act = i >= 0 ? [last ? 'step:worked' : 'step:done', 'step:stuck', 'step:stop'][i] : SU_STEP_NEXT.includes(t) ? (last ? 'step:worked' : 'step:done') : null
+    if (act) return setupPress(act, st)
+  }
+  if (s.stage === 'stuck') {
+    const i = suLabelOf(SU_L.STUCK.answers, text)
+    if (i >= 0) return setupPress(['stuck:works', 'stuck:stop'][i], st)
+  }
+  if (s.stage === 'notseen') {
+    const i = suLabelOf(SU_L.NOT_SEEN.answers, text)
+    if (i >= 0) return setupPress(['notseen:steps', 'notseen:otherbot', 'notseen:notnow'][i], st)
+  }
+  if (isSetupAsk(text) && !hasTopicWord(text)) return suAsk(st)
+  return null
+}
+
+// After the ordinary talk answered a question typed in place of an answer to SU_Q_NEW or Q_GOAL: the line that asks
+// again, once for each question; else null.
+export function setupAfter(st) {
+  const s = suOf(st)
+  if (s.stage === 'new' && !s.reasked.new) {
+    s.reasked.new = true
+    return suSaid('SETUP_REASK', SU_L.SETUP_REASK.text, { answers: suNEW_PICKS() })
+  }
+  if (s.stage === 'goal' && !s.reasked.goal) {
+    s.reasked.goal = true
+    return suSaid('SETUP_REASK_GOAL', SU_L.SETUP_REASK_GOAL.text, { answers: suGOAL_PICKS() })
+  }
+  return null
+}
+
+// The opening of a later visit (met is true), after Helper has read Hermes. Returns the lines.
+export function setupOpening(st, seen) {
+  const s = suOf(st)
+  const name = st.kept.name || null
+  const cur = st.kept.setup_current
+  s.seen = seen
+  if (cur && SU.items[cur]) {
+    s.item = cur
+    if (seenDone(cur, seen) === true) return suRecommend(st, seen, [suSaid('BACK_DONE', suNamed(SU_L.BACK_DONE, name, { seen_part: suSeenPart(cur, seen) }))])
+    s.stage = 'rec'
+    return [suSaid('BACK_REC', suNamed(SU_L.BACK_REC, name, { card: SU.items[cur].name }), { answers: suREC_PICKS(SU_L.BACK_REC.answers) })]
+  }
+  if (!st.kept.setup_new) {
+    s.stage = 'new'
+    s.asked.new = true
+    return [suSaid('BACK_Q', suNamed(SU_L.BACK_Q, name), { answers: suNEW_PICKS() })]
+  }
+  if (!st.kept.setup_goal_id) {
+    // SU_Q_NEW answered, SU_Q_GOAL never shown: "Q_GOAL with the Hi again opening" (the data's BACK_Q note)
+    s.stage = 'goal'
+    s.asked.goal = true
+    return [suSaid('BACK', suNamed(SU_L.BACK, name)), suSaid('Q_GOAL', SU_L.Q_GOAL.text, { answers: suGOAL_PICKS() })]
+  }
+  const back = suSaid('BACK', suNamed(SU_L.BACK, name))
+  const lines = suRecommend(st, seen, [back])
+  // everything done: the old BACK alone, with its offer (the data's BACK: "Unchanged, for R5 (all done) only")
+  if (lines.at(-1).line === 'ALL_DONE') return [{ ...back, setupOffer: SU_L.BACK.offer }]
+  return lines
+}
+// "start again" from Helper's settings page (the button "Ask me the set-up questions again"): the same as typed
+export const setupRestartMove = st => suMove(false, () => suRestart(st))
+// The four rows of what the set-up conversation keeps, for Helper's settings page: [key, the row's name, what it shows]
+export function setupRows(kept) {
+  const name = Object.fromEntries(SU.keeps.map(k => [k.key, k.row]))
+  const rows = []
+  const a = SU_Q_NEW.answers.find(x => x.id === kept.setup_new)
+  if (a) rows.push(['setup_new', name.setup_new, a.label])
+  if (kept.setup_goal) rows.push(['setup_goal', name.setup_goal, kept.setup_goal])
+  const said = (kept.setup_done_said || []).filter(id => SU.items[id])
+  if (said.length) rows.push(['setup_done_said', name.setup_done_said, said.map(id => SU.items[id].name).join(', ')])
+  if (kept.setup_current && SU.items[kept.setup_current]) rows.push(['setup_current', name.setup_current, SU.items[kept.setup_current].name])
+  return rows
+}
+// The stored keys behind each row, and the ones "Ask me the set-up questions again" clears (the things said done stay)
+export const SETUP_ROW_KEYS = { setup_new: ['setup_new'], setup_goal: ['setup_goal', 'setup_goal_id'], setup_done_said: ['setup_done_said'], setup_current: ['setup_current'] }
+export const SETUP_ASKED_KEYS = ['setup_new', 'setup_goal', 'setup_goal_id', 'setup_current']
+export const SETUP_ALL_KEYS = [...SETUP_ASKED_KEYS, 'setup_done_said']
+// The AI step of the recommendation (the job's point 6) is in this build: the two answers New to Hermes and What you
+// want then go to the person's AI, and the lines that say what is sent name them
+export const SETUP_AI_BUILT = false
+// The pick "Set up Hermes" under an offer (offers.things.setup): the question not answered yet, else the look and REC
+export const setupAskMove = st => suAsk(st)
+// Whether a later visit opens with the set-up conversation (always, once it is built)
+export const SETUP_UNSEEN = { model: 'unread', soul: null, jobs: null, bots: null }

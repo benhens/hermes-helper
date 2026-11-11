@@ -20,6 +20,7 @@ import { TALK_DATA } from './talk-data.js'
 import { WANTS_DATA } from './wants-data.js'
 import { AI_MODE } from './ai-mode.js'
 import { SETUP_BUILT } from './setup-built.js'
+import { openQNew } from './setup-chat.js'
 import { LIVE_DATA } from './live-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
@@ -908,7 +909,7 @@ function offerSet(sid, prevTopic = null) {
 // A line with an offer gets it (o.offer: { set, text, picks }); never the same set twice in a row (its instead set).
 // prevTopic: the topic of Helper's last answer before this line, for after_topic.
 export function attachOffer(o, st, prevTopic = null) {
-  const of = o && offerOfLine(o.kind)
+  const of = o && !setupOpens(o.kind, st) && offerOfLine(o.kind)
   if (!of) {
     st.lastOffer = null
     return o
@@ -919,6 +920,21 @@ export function attachOffer(o, st, prevTopic = null) {
   st.lastOffer = sid
   return o
 }
+// setup-chat: with the set-up conversation built, the four lines that end the opening (F2, F3, WORK_SECRET,
+// WORK_LONG_2) ask Q_NEW in place of their offer, until that question has been answered or is kept
+const SETUP_OPENERS = ['F2', 'F3', 'WORK_SECRET', 'WORK_LONG_2']
+const setupOpens = (kind, st) => SETUP_BUILT && SETUP_OPENERS.includes(kind) && !st.kept.setup_new && !(st.setup && st.setup.newAnswered)
+// An offer by its set id, as a line carries it (the set-up conversation's NOT_NOW, ALL_DONE and BACK end with one)
+export function offerSaid(sid, st) {
+  let [id, text, picks] = offerSet(sid)
+  if (id === st.lastOffer) [id, text, picks] = offerSet(OF.sets[id].instead)
+  st.lastOffer = id
+  return { set: id, text, answers: { kind: 'offer', hint: OF.hint, items: picks.map(p => ({ id: 'offer-' + p, label: OF.things[p].label, offer: p })) } }
+}
+// whether a thing picked under an offer starts the set-up conversation (offers.things.setup)
+export const offerIsSetup = thing => OF.things[thing].gives.kind === 'setup_chat'
+// the message holds a key word of a topic or a Hermes term
+export const hasTopicWord = text => knownWords(cutIgnored(talkNorm(text)))
 // Every offer question this build can show: [set id, text, pick ids] (tests; the after_topic sets by topic)
 export const offerSets = () => [...Object.keys(OF.sets).filter(k => k !== 'after_topic').map(k => offerSet(k)), ...Object.keys(OF.sets.after_topic.by_topic).map(t => offerSet('after_topic', t))]
 
@@ -1611,6 +1627,11 @@ export function keptWasShown(log) {
   const done = [KEEPS.tell.see.delete_all.after_yes, KEEP_TYPED.forget_one.after_yes]
   return log.some(e => e.who === 'helper' && !!(e.note || e.used || (e.rows && e.rows.length) || done.includes(e.text)))
 }
+// setup-chat: the text and the Q_NEW answers of a line that opens the set-up conversation
+const setupOpener = (kind, st) => {
+  const q = openQNew(kind, st)
+  return [q.text, { answers: q.answers }]
+}
 export function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
@@ -1668,14 +1689,18 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'WORK_SECRET':
     case 'WORK_LONG':
     case 'WORK_LONG_2':
-    case 'WORK_ASK':
+    case 'WORK_ASK': {
+      if (setupOpens(result.kind, st)) return said(result.kind, ...setupOpener(result.kind, st))
       return said(result.kind, WORK.lines[result.kind])
+    }
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
+      if (setupOpens('F2', st)) return said('F2', ...setupOpener('F2', st))
       // talk-live-2: on a later visit (WORK_ASK, a typed change) the result carries the kept name
       return said('F2', result.name && !st.name ? fillSlots(FIXED.F2.text, { name: result.name }) : named(FIXED.F2))
     case 'F3':
+      if (setupOpens('F3', st)) return said('F3', ...setupOpener('F3', st))
       return said('F3', FIXED.F3.text)
     case 'TP':
       return said('TP', FIXED.TP.text, { answers: topicPicks() })
