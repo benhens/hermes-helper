@@ -332,14 +332,23 @@ const givesOf = g => (g.kind === 'C1' ? { ...g, buttons: TOPIC_PICKS.can.holds }
 // more) stand side by side among the message's content words. The longest hit phrase wins (content words, then
 // words); a tie goes to the line first in the data. singleOk false is the first step: phrases of two or more words,
 // of the new fact lines and the older lines on first_step_old only.
+// loom-fixes-2 part B 2 (hhtech ask-run 4, For builder 3: "whats a contex window" got the Windows line with no AI):
+// a phrase with the word window or windows hits only where the message names Windows the system: the word "windows"
+// itself (never "window", which the word rule makes the same), not after context, contex, token or a word that makes
+// it an app's window ("two windows", "chat windows"). Builder's rule; route2.py has none.
+const APP_WINDOWS = /(^|[^a-z0-9])(?:cont[a-z]*|token|chat|app|apps|browser|terminal|new|two|three|several|multiple|many|other|second|both|separate|extra|more|these|those|its|hermes)\s+windows($|[^a-z0-9])/g
+export const namesWindowsOs = text => /(^|[^a-z0-9])windows($|[^a-z0-9])/.test(talkNorm(text).replace(APP_WINDOWS, ' '))
+const aboutWindow = pw => pw.includes('window')
 export function fullHit(text, singleOk) {
   const mw = nearWords(text).filter(w => !NEAR_FILLER.has(w))
   const mc = nearContent(mw)
+  const os = namesWindowsOs(text)
   let best = null
   for (const { gives, phrases } of TITLED) {
     if (!singleOk && gives.kind !== 'fact' && !NEAR.first_step_old.includes(gives.kind)) continue
     for (const [pw, cw] of phrases) {
       if (!pw.length || (pw.length === 1 && !singleOk)) continue
+      if (!os && aboutWindow(pw) && gives.need === 'd_windows') continue
       if (runIn(mw, pw) || (cw.length >= 2 && runIn(mc, cw))) {
         if (!best || cw.length > best[0] || (cw.length === best[0] && pw.length > best[1])) best = [cw.length, pw.length, gives]
       }
@@ -354,7 +363,9 @@ const NEVER_NEAR = new Set([...(NEAR.never_near || []), ...nearWords((NEAR.never
 export function nearLines(text, st) {
   const ms = new Set(nearContent(nearWords(text).filter(w => !NEAR_FILLER.has(w))).filter(w => !NEVER_NEAR.has(w)))
   const sc = []
+  const os = namesWindowsOs(text) // loom-fixes-2 part B 2: the Windows line is not near an app's window or a context window
   TITLED.forEach(({ gives, title, titleWords, allWords }, i) => {
+    if (!os && gives.need === 'd_windows') return
     const n = [...ms].filter(w => allWords.has(w)).length
     if ((n >= 2 || [...ms].some(w => titleWords.has(w))) && lineKey(givesOf(gives)) !== st.lastKey) sc.push([n, i, gives, title])
   })
