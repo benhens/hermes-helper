@@ -14,46 +14,39 @@
 .hhd-main{display:flex;flex-direction:column;gap:20px;padding:6px 32px 20px;min-width:0}
 .hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}
 
-/* each box's own accent, in Hermes's order (catalog-card.tsx CARD_ACCENTS), by position */
+/* each box's own accent, four only (the approved mockup dash-look-r8): blue, orange, purple, green, by position */
 .hhd-acc-0{--hhd-accent:var(--ui-blue)}
 .hhd-acc-1{--hhd-accent:var(--ui-orange)}
 .hhd-acc-2{--hhd-accent:var(--ui-purple)}
 .hhd-acc-3{--hhd-accent:var(--ui-green)}
-.hhd-acc-4{--hhd-accent:var(--ui-red)}
-.hhd-acc-5{--hhd-accent:var(--ui-cyan)}
-.hhd-acc-6{--hhd-accent:var(--ui-yellow)}
 
-/* the banner: Capabilities' hero (catalog-discovery.css): the words in the left 58%, the picture in the right 42%
-   behind them, fading into the card towards the left */
-.hhd-banner{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:12px;min-width:0;min-height:180px;padding:20px;border-radius:var(--radius-lg);background:color-mix(in srgb,var(--color-primary) 28%,var(--ui-chat-bubble-background))}
+/* the banner: Capabilities' hero (catalog-discovery.css): the words in the left 56%, the picture in the right 42%,
+   fading into the card towards the left; nothing crosses the banner's edge */
+.hhd-banner{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:12px;min-width:0;min-height:200px;padding:20px;overflow:hidden;container-type:inline-size;border-radius:var(--radius-lg);background:radial-gradient(140% 100% at 0% 0%,color-mix(in srgb,var(--color-primary) 22%,transparent),transparent 70%) var(--ui-chat-bubble-background)}
 .hhd-banner-eyebrow{font-size:.75rem;color:var(--ui-text-tertiary)}
-.hhd-banner-title{margin:0;max-width:58%;font-size:2rem;line-height:1.2;font-weight:600;letter-spacing:-.025em;color:var(--ui-text-primary)}
-.hhd-banner-line{margin:0;max-width:58%;font-size:var(--conversation-caption-font-size);line-height:1.625;color:var(--ui-text-secondary)}
+.hhd-banner-title{margin:0;max-width:56%;font-size:2rem;line-height:1.2;font-weight:600;letter-spacing:-.025em;color:var(--ui-text-primary)}
+.hhd-banner-line{margin:0;max-width:56%;font-size:var(--conversation-caption-font-size);line-height:1.625;color:var(--ui-text-secondary)}
 .hhd-banner-name{font-weight:600;color:var(--ui-text-primary)}
-.hhd-banner-open{max-width:58%}
+.hhd-banner-open{max-width:56%}
 /* the picture: ours, made of the theme's colour. A mask uses only its colour's alpha: --ui-base is opaque in both
    themes (as talk.css's fades) */
 .hhd-banner-art{position:absolute;inset:0 0 0 auto;width:42%;height:100%;z-index:-1;overflow:hidden;border-radius:0 var(--radius-lg) var(--radius-lg) 0;pointer-events:none;mask-image:linear-gradient(to right,transparent,var(--ui-base) 45%)}
 /* a field of 2 px dots on a 9 px grid, and 3.5 px dots on an 18 px grid over the right third; both dense at the top
    right and gone at the left */
-.hhd-banner-dots{position:absolute;inset:0;background:radial-gradient(circle,color-mix(in srgb,var(--color-primary) 80%,var(--ui-text-primary)) 1px,transparent 1.2px) 0 0/9px 9px;mask-image:radial-gradient(120% 130% at 100% 0%,var(--ui-base) 25%,transparent 75%)}
-.hhd-banner-dots2{position:absolute;inset:0 0 0 auto;width:33.333%;background:radial-gradient(circle,color-mix(in srgb,var(--color-primary) 80%,var(--ui-text-primary)) 1.75px,transparent 1.95px) 0 0/18px 18px;mask-image:radial-gradient(120% 130% at 100% 0%,var(--ui-base) 25%,transparent 75%)}
-/* Helper's character, in front of the dots, behind the words: its fingers hold the banner's bottom edge as they hold
-   the message box (the drawing's edge line is 9 px above its own bottom at this size) */
-.hhd-banner-char{position:absolute;right:5%;bottom:-9px;z-index:-1;pointer-events:none}
-/* narrow: the words take the full width and the picture is a 30% wash behind them */
-.hhd-compact .hhd-banner-title{max-width:100%}
-.hhd-compact .hhd-banner-line{max-width:100%}
-.hhd-compact .hhd-banner-open{max-width:100%}
-.hhd-compact .hhd-banner-art{width:100%;opacity:.3}
-.hhd-compact .hhd-banner-char{opacity:.3}
+.hhd-banner-dots{position:absolute;inset:0;background:radial-gradient(circle,color-mix(in srgb,var(--color-primary) 80%,var(--ui-text-primary)) 1px,transparent 1.2px) 0 0/9px 9px;mask-image:radial-gradient(120% 130% at 100% 0%,var(--ui-base) 25%,transparent 75%);opacity:.85}
+.hhd-banner-dots2{position:absolute;inset:0 0 0 auto;width:33.333%;background:radial-gradient(circle,color-mix(in srgb,var(--color-primary) 80%,var(--ui-text-primary)) 1.75px,transparent 1.95px) 0 0/18px 18px;mask-image:radial-gradient(120% 130% at 100% 0%,var(--ui-base) 25%,transparent 75%);opacity:.75}
+/* Helper's character, about 180 px tall, in front of the dots at the right: its fingers end on the banner's bottom
+   edge; it stays clear of the words (the left 56%) */
+.hhd-banner-char{position:absolute;right:5%;bottom:0;z-index:-1;pointer-events:none;line-height:0}
+/* a banner narrower than 600 px: no character, only the dot field at 30% */
+@container (max-width:599px){.hhd-banner-char{display:none}.hhd-banner-art{width:100%;opacity:.3}.hhd-banner-title,.hhd-banner-line,.hhd-banner-open{max-width:100%}}
 
 /* the top box: three tiles, each a Capabilities card; the icon on a square in the tile's accent at the left (at the
    narrow size, above). The wash: dark rests at the top left at 11%, light at the bottom left at 6% (catalog.css) */
 .hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .hhd-compact .hhd-stats{gap:8px}
 .hhd-tile{position:relative;display:flex;align-items:center;gap:12px;min-width:0;border:1px solid transparent;border-radius:var(--radius-lg);padding:20px;--hhd-rest-y:0%;--hhd-tint:11%;background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)}
-.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}
+.hhd-compact .hhd-tile{gap:10px;padding:12px}
 html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 html:not(.dark) .hhd-tile{--hhd-rest-y:100%;--hhd-tint:6%}
 .hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-lg);background:color-mix(in srgb,var(--hhd-accent) 16%,transparent);color:var(--hhd-accent)}
@@ -69,7 +62,8 @@ html:not(.dark) .hhd-tile{--hhd-rest-y:100%;--hhd-tint:6%}
 .hhd-tile-label{font-size:var(--conversation-caption-font-size);line-height:1.625;color:var(--ui-text-secondary);white-space:nowrap}
 /* at the narrow size a word may take a second line rather than run out of its tile */
 .hhd-compact .hhd-tile-label{white-space:normal}
-.hhd-tile-line{margin-top:4px;font-size:var(--conversation-caption-font-size);line-height:1.625;color:var(--ui-text-secondary)}
+/* the line under the number: one line where it fits, never more than two */
+.hhd-tile-line{margin-top:2px;font-size:var(--conversation-caption-font-size);line-height:1.625;color:var(--ui-text-secondary);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:var(--radius-lg);background:var(--ui-bg-tertiary)}
 .hhd-compact .hhd-wait{margin:4px 0}
 
@@ -93,22 +87,24 @@ html:not(.dark) .hhd-scard{--hhd-rest-y:100%;--hhd-tint:6%}
 .hhd-scard-head{display:flex;flex-direction:column;gap:2px;min-width:0}
 .hhd-scard-name{font-size:1.125rem;line-height:1.4;font-weight:600;color:var(--ui-text-primary)}
 .hhd-scard-why{font-size:var(--conversation-caption-font-size);line-height:1.625;color:var(--ui-text-secondary)}
-/* marked done by the person: the icon square filled with the card's accent, and "Done" in it under the name */
-.hhd-done .hhd-tile-icon{background:var(--hhd-accent);color:var(--background)}
-.hhd-done-line{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:16px;font-weight:600;color:var(--hhd-accent)}
+/* marked done by the person: always green, whatever the card's accent: the icon square filled, and "Done" under the name */
+.hhd-done .hhd-tile-icon{background:var(--ui-green);color:var(--background)}
+.hhd-done-line{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:16px;font-weight:600;color:var(--ui-green)}
 /* the first card not marked */
 .hhd-start{font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}
 
 /* an opened card's steps: full width under its row, a Capabilities card in its card's accent */
-.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;border:1px solid transparent;border-radius:var(--radius-lg);padding:20px 44px 20px 20px;--hhd-rest-y:0%;--hhd-tint:11%;background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)}
+.hhd-steps{position:relative;display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px 20px;border:1px solid transparent;border-radius:var(--radius-lg);padding:20px;--hhd-rest-y:0%;--hhd-tint:11%;background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)}
 html:not(.dark) .hhd-steps{--hhd-rest-y:100%;--hhd-tint:6%}
-.hhd-compact .hhd-steps{gap:8px;padding:12px 34px 12px 14px}
+.hhd-compact .hhd-steps{gap:12px 20px;padding:14px}
+/* the steps to the right of the 320 px video place; under 700 px of panel they wrap under it (320 + 20 + 320 px) */
+.hhd-steps-body{flex:1 1 320px;display:flex;flex-direction:column;gap:10px;min-width:0;padding-right:24px}
 /* the pointer to the opened card: only its half above the panel is drawn, in the panel's surface */
 .hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-chat-bubble-background);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}
-/* the card's video, 16:9, at the top of the opened card; until it has an address a quiet box of the same shape.
+/* the card's video, 320 px wide, 16:9, at the left of the opened card (on top under 700 px); until it has an address a quiet box of the same shape.
    Also drawn in Helper's window, so its corners are Hermes's own and need nothing the Dashboard sets. */
-.hhd-video{display:block;width:100%;max-width:560px;aspect-ratio:16/9;border-radius:var(--radius-lg);background:var(--ui-bg-elevated)}
-.hhd-video-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;max-width:560px;aspect-ratio:16/9;border-radius:var(--radius-lg);background:var(--ui-bg-elevated);font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}
+.hhd-video{display:block;flex:none;width:320px;max-width:100%;aspect-ratio:16/9;border-radius:var(--radius-lg);background:var(--ui-bg-elevated)}
+.hhd-video-soon{display:flex;flex:none;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:320px;max-width:100%;aspect-ratio:16/9;border-radius:var(--radius-lg);background:var(--ui-bg-elevated);font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}
 .hhd-video-name{font-size:13px;font-weight:600;color:var(--ui-text-secondary)}
 .hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}
 .hhd-compact .hhd-ol{line-height:19px}
