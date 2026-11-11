@@ -29,15 +29,18 @@ import { prefersReducedMotion } from './motion.js'
 // look (his words of 11 Nov, 18:20 UTC): every box is a card of Hermes's Capabilities page. Each box has its own
 // accent, in Hermes's order (catalog-card.tsx CARD_ACCENTS), by position: tile 1 to 3, then card 1 to 9 carrying on
 // the count. The class sets the accent; the sheet paints it.
-const BOX_ACCENTS = [D.acc0, D.acc1, D.acc2, D.acc3, D.acc4, D.acc5, D.acc6]
+// look-fix (the approved mockup, dash-look-r8): four accents only. Tiles take them from the first; the cards start at
+// the second and go round again.
+const BOX_ACCENTS = [D.acc0, D.acc1, D.acc2, D.acc3]
 export const boxAccent = position => BOX_ACCENTS[position % BOX_ACCENTS.length]
+export const CARD_ACCENT_START = 1
 const TILE_KEYS = ['bots', 'skills', 'plugins']
 // 20 px between boxes (Hermes's catalog-bento)
 export const BOX_GAP_PX = 20
-// The banner's character: 224 px wide is 150 px tall (the drawing is 200 by 134 units); its dots keep a 5 px cell
-export const BANNER_CHARACTER_PX = 224
+// The banner's character: 268 px wide is about 180 px tall (the drawing is 200 by 134 units); its dots keep a 5 px cell
+export const BANNER_CHARACTER_PX = 268
 // The banner's words that are not in the team's data: Lead's job words (look, part 2 b)
-export const BANNER_WORDS = { eyebrow: 'Helper', count_tail: ' set up', open: 'Open {name}' }
+export const BANNER_WORDS = { eyebrow: 'Helper', count_tail: ' set up', open: 'Open {name}', next: 'Next: {name}.' }
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -327,7 +330,7 @@ export function makeDashboard(ctx) {
         'button',
         {
           type: 'button',
-          className: cx(D.scard, boxAccent(TILE_KEYS.length + i), done && D.done, openAt === i && D.sel),
+          className: cx(D.scard, boxAccent(CARD_ACCENT_START + i), done && D.done, openAt === i && D.sel),
           'aria-expanded': openAt === i,
           'aria-controls': openAt === i ? 'helper-dash-steps' : undefined,
           'data-hh': 'card',
@@ -361,7 +364,9 @@ export function makeDashboard(ctx) {
               },
               'top'
             ),
-            jsx('span', { className: D.scardWhy, 'data-hh': 'card-why', children: it.why }, 'w')
+            jsx('span', { className: D.scardWhy, 'data-hh': 'card-why', children: it.why }, 'w'),
+            // his pick (PICK.md, way 3): the same sign once more, large, in dots, behind the words
+            jsx('span', { className: D.scardSign, 'data-hh': 'card-sign', 'aria-hidden': true, children: jsx(DashIcon, { icon: cardIcon(it.id), size: 140 }) }, 'sign')
           ]
         },
         it.id
@@ -377,7 +382,7 @@ export function makeDashboard(ctx) {
         'div',
         {
           // the opened panel carries its card's accent
-          className: cx(D.steps, boxAccent(TILE_KEYS.length + openAt)),
+          className: cx(D.steps, boxAccent(CARD_ACCENT_START + openAt)),
           id: 'helper-dash-steps',
           ref: stepsBox,
           role: 'region',
@@ -389,6 +394,7 @@ export function makeDashboard(ctx) {
             // the pointer to the opened card: over the middle of its column
             jsx('i', { className: D.caret, style: { left: `calc(${(((openAt % columns) + 0.5) * 100) / columns}% - 7px)` }, 'aria-hidden': true }, 'caret'),
             jsx(CardVideo, { it: openItem }, 'video'),
+            jsxs('div', { className: D.stepsBody, children: [
             jsx(
               'ol',
               {
@@ -467,11 +473,11 @@ export function makeDashboard(ctx) {
                 className: D.route,
                 children: jsx(Button, {
                   variant: 'secondary',
-                  size: 'xs',
+                  size: 'sm',
                   'data-hh': 'mark',
                   'data-marked': marked,
                   onClick: () => onMark(openItem.id, !marked),
-                  children: marked ? W.setup.mark_undo : W.setup.mark_done
+                  children: marked ? W.setup.mark_undo : [jsx(DashIcon, { icon: DASH_ICONS.check, size: 14 }, 'c'), W.setup.mark_done]
                 })
               },
               'mark'
@@ -507,7 +513,8 @@ export function makeDashboard(ctx) {
                 })
               },
               'foot'
-            ),
+            )
+            ] }, 'body'),
             jsx(
               'div',
               {
@@ -602,7 +609,7 @@ export function makeDashboard(ctx) {
           ),
           // the name and the why-line of the first card not marked, and the button that opens it as a click on it does
           nextItem
-            ? jsxs('p', { className: D.bannerLine, 'data-hh': 'banner-line', 'data-card': nextItem.id, children: [jsx('b', { className: D.bannerName, children: nextItem.name }, 'n'), ' ', nextItem.why] }, 'l')
+            ? jsxs('p', { className: D.bannerLine, 'data-hh': 'banner-line', 'data-card': nextItem.id, children: [jsx('b', { className: D.bannerName, 'data-hh': 'banner-next', children: fill(BANNER_WORDS.next, { name: nextItem.name }) }, 'n'), ' ', nextItem.why] }, 'l')
             : null,
           nextItem
             ? jsx(

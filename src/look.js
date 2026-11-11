@@ -209,9 +209,6 @@ export const D = {
   acc1: 'hhd-acc-1',
   acc2: 'hhd-acc-2',
   acc3: 'hhd-acc-3',
-  acc4: 'hhd-acc-4',
-  acc5: 'hhd-acc-5',
-  acc6: 'hhd-acc-6',
   // look: the banner on top, built as Capabilities' hero
   banner: 'hhd-banner',
   bannerEyebrow: 'hhd-banner-eyebrow',
@@ -245,6 +242,8 @@ export const D = {
   scardHead: 'hhd-scard-head',
   scardName: 'hhd-scard-name',
   scardWhy: 'hhd-scard-why',
+  // look-fix (his pick, PICK.md way 3): the card's own sign drawn large in dots at its right
+  scardSign: 'hhd-scard-sign',
   done: 'hhd-done',
   doneLine: 'hhd-done-line',
   start: 'hhd-start',
@@ -254,6 +253,8 @@ export const D = {
   videoSoon: 'hhd-video-soon',
   videoName: 'hhd-video-name',
   steps: 'hhd-steps',
+  // look-fix: the opened card's steps to the right of its video
+  stepsBody: 'hhd-steps-body',
   caret: 'hhd-caret',
   ol: 'hhd-ol',
   li: 'hhd-li',
