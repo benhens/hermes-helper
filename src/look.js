@@ -255,6 +255,7 @@ export const D = {
   sel: 'hhd-sel',
   up: 'hhd-up',
   down: 'hhd-down',
+  label: 'hhd-label',
   name: 'hhd-name',
   you: 'hhd-you',
   next: 'hhd-next',

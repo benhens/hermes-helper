@@ -73,18 +73,17 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-stroke-tertiary);color:var(--ui-text-quaternary)}
 .hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}
 .hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}
-.hhd-name{position:absolute;left:50%;transform:translateX(-50%);font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}
-.hhd-compact .hhd-name{font-size:11px;line-height:15px}
+.hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}
+.hhd-up .hhd-label{bottom:calc(100% + 6px);flex-direction:column-reverse}
+.hhd-down .hhd-label{top:calc(100% + 6px)}
+.hhd-here.hhd-up .hhd-label{bottom:calc(100% + 9px)}
+.hhd-here.hhd-down .hhd-label{top:calc(100% + 9px)}
+.hhd-name{display:block;font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}
+.hhd-compact .hhd-name{font-size:11px;line-height:15px;white-space:normal}
 .hhd-done .hhd-name{color:var(--ui-text-secondary)}
 .hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}
 .hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}
-.hhd-up .hhd-name{bottom:calc(100% + 6px)}
-.hhd-down .hhd-name{top:calc(100% + 6px)}
-.hhd-here.hhd-up .hhd-name{bottom:calc(100% + 9px)}
-.hhd-here.hhd-down .hhd-name{top:calc(100% + 9px)}
-.hhd-you{position:absolute;left:50%;transform:translateX(-50%);font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}
-.hhd-up .hhd-you{bottom:calc(100% + 28px)}
-.hhd-down .hhd-you{top:calc(100% + 28px)}
+.hhd-you{display:block;font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}
 
 /* under the path: what comes next, or "everything is set up", or the opened stop's steps */
 .hhd-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--ui-stroke-tertiary);min-width:0}

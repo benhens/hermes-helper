@@ -100,7 +100,8 @@ function useDashWidth() {
 // The path's shape (r5/r7 build.js setup()): 11 points across the road, high and low in turn, joined by soft curves.
 export function roadShape(width, compact, here, count = DASH_DATA.items.length) {
   const A = compact ? 16 : 20
-  const NAMEH = 22
+  // the name's row: one line of 16 px, or at the narrow size up to two lines of 15 px
+  const NAMEH = compact ? 37 : 22
   const YOUH = compact ? 18 : 19
   const RB = compact ? 22 : 26
   const pad = compact ? 16 : 30
@@ -114,7 +115,9 @@ export function roadShape(width, compact, here, count = DASH_DATA.items.length) 
     const dx = (b[0] - a[0]) / 2
     return `M ${a[0]} ${a[1]} C ${a[0] + dx} ${a[1]} ${b[0] - dx} ${b[1]} ${b[0]} ${b[1]}`
   })
-  return { points, segments, height }
+  // the width a name may take at the narrow size: the room between the stops on its side, less a gap
+  const nameRoom = Math.max(40, Math.floor((2 * (width - 2 * pad)) / (count - 1)) - 8)
+  return { points, segments, height, nameRoom }
 }
 // Before the road is measured (and in the tests, which have no layout): this width.
 export const ROAD_WIDTH_UNMEASURED = 560
@@ -368,8 +371,21 @@ export function makeDashboard(ctx) {
           onClick: () => toggle(it.id),
           children: [
             jsx('span', { className: D.dot, children: jsx(DashIcon, { icon: stopIcon(it.id), size }) }, 'd'),
-            jsx('span', { className: D.name, 'aria-hidden': true, children: it.mark }, 'n'),
-            s === 'here' ? jsx('span', { className: D.you, 'aria-hidden': true, 'data-hh': 'you-are-here', children: W.setup.you_are_here }, 'y') : null
+            // the name, and under it (outward from the line) "You are here"; at the narrow size a long name may take
+            // two lines, no wider than the room to the next stop on its side
+            jsxs(
+              'span',
+              {
+                className: D.label,
+                'aria-hidden': true,
+                style: compact ? { width: `${shape.nameRoom}px` } : undefined,
+                children: [
+                  jsx('span', { className: D.name, children: it.mark }, 'n'),
+                  s === 'here' ? jsx('span', { className: D.you, 'data-hh': 'you-are-here', children: W.setup.you_are_here }, 'y') : null
+                ]
+              },
+              'l'
+            )
           ]
         },
         it.id
