@@ -30241,6 +30241,191 @@ function Character({ size = CHARACTER_PX, expression = 'resting', rising = false
   })
 }
 
+// The Dashboard banner's own figure (job banner-face), drawn after design/dash-look-r8/after.html, the picture
+// Pēteris approved: two eyes apart from each other (a 14 unit gap), each with its pupil hole, the mouth centred
+// under them, and four fingers a side whose round tops come up from the banner's bottom edge. Helper's window keeps
+// <Character> above; this one is for the banner only. The same dots as <Character> (DOTS: one grid, 5 px a cell at
+// the banner's 268 px), the same accent fill. Eyes: the page's tracker places the pupils, a blink every few seconds;
+// under reduce motion nothing moves and the eyes stay still.
+//   size     its width in px (268 on the Dashboard, about 175 px tall)
+//   reduced  the person's "reduce motion" setting
+//   eyes     the page's eyes tracker (src/eyes.js)
+const BANNER_FACE = {
+  view: { x: 0, y: 0, width: 230, height: 150 },
+  eyes: [{ cx: 78, cy: 56 }, { cx: 152, cy: 56 }],
+  rx: 30,
+  ry: 36,
+  // ry while shut, in a blink
+  shutRy: 3,
+  holes: [{ cx: 86, cy: 62 }, { cx: 160, cy: 62 }],
+  holeR: 11,
+  mouth: 'M88 112 Q115 132 142 112',
+  mouthWidth: 9,
+  // each finger: its left x; all 11 wide, their round tops 16 units over the bottom edge
+  fingers: [[6, 21, 36, 51], [168, 183, 198, 213]],
+  fingerWidth: 11,
+  fingerUp: 16,
+  area: { x: -20, y: -20, width: 270, height: 190 }
+}
+const BANNER_SIDE_NAMES = ['left', 'right']
+// A pupil hole as an even-odd path: the whole mask area with a round hole of radius r (0: no hole, a shut eye).
+const bannerHole = (i, r) => {
+  const A = BANNER_FACE.area
+  const h = BANNER_FACE.holes[i]
+  const outer = `M${A.x} ${A.y} H${A.x + A.width} V${A.y + A.height} H${A.x} Z`
+  return r > 0 ? `${outer} M${h.cx - r} ${h.cy} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0 Z` : outer
+}
+const bannerFingerPath = x => {
+  const bottom = BANNER_FACE.view.y + BANNER_FACE.view.height
+  const w = BANNER_FACE.fingerWidth
+  const top = bottom - BANNER_FACE.fingerUp + w / 2
+  return `M${x} ${bottom} V${top} A ${w / 2} ${w / 2} 0 0 1 ${x + w} ${top} V${bottom} Z`
+}
+const BANNER_BLINK = BANNER_SIDE_NAMES.flatMap((side, i) => [
+  [`banner-eye-${side}`, 'ry', `${BANNER_FACE.ry}px`, `${BANNER_FACE.shutRy}px`],
+  [`banner-pupil-hole-${side}`, 'd', `path("${bannerHole(i, BANNER_FACE.holeR)}")`, `path("${bannerHole(i, 0)}")`]
+])
+const bannerBlinkOnce = (nodes, reduced) => {
+  if (reduced) return
+  for (const [name, what, open, shut] of BANNER_BLINK) play(nodes[name], [{ [what]: open }, { [what]: shut }, { [what]: open }], { duration: BLINK_MS, easing: 'ease-in-out' })
+}
+
+function BannerCharacter({ size = 268, reduced = false, eyes = null }) {
+  const uid = 'hh-face-banner-' + useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const pieces = useRef(null)
+  if (!pieces.current) pieces.current = makePieces()
+  const { nodes, ref } = pieces.current
+  const own = useRef(null)
+  if (!eyes && !own.current) own.current = makeEyes()
+  const tracker = eyes || own.current
+  const still = useRef(reduced)
+  still.current = reduced
+
+  useEffect(() => {
+    tracker.attach({
+      svg: nodes.svg,
+      eyes: BANNER_SIDE_NAMES.map(side => nodes[`banner-eye-${side}`]),
+      pupils: BANNER_SIDE_NAMES.map(side => nodes[`banner-pupil-${side}`]),
+      blink: () => bannerBlinkOnce(nodes, still.current)
+    })
+    return () => tracker.detach()
+  }, [tracker])
+  useEffect(() => {
+    tracker.setGlide(!reduced)
+    tracker.setFollowing(!reduced)
+    tracker.setRest([[0, 0], [0, 0]])
+  }, [tracker, reduced])
+  // the blink every few seconds, as <Character> resting; none under reduce motion
+  useEffect(() => {
+    if (reduced) return
+    const at = [0, (BLINK_EVERY_MS - BLINK_MS) / BLINK_EVERY_MS, (BLINK_EVERY_MS - BLINK_MS / 2) / BLINK_EVERY_MS, 1]
+    const running = BANNER_BLINK.map(([name, what, open, shut]) => play(nodes[name], [open, open, shut, open].map((value, k) => ({ [what]: value, offset: at[k] })), { duration: BLINK_EVERY_MS, iterations: Infinity }))
+    return () => running.forEach(a => a && a.cancel())
+  }, [reduced])
+
+  const F = BANNER_FACE
+  const view = F.view
+  const A = F.area
+  const cell = Math.round((DOTS.cellPx.large * view.width * 10000) / size) / 10000
+  const ramp = dir =>
+    jsx(
+      'linearGradient',
+      {
+        id: `${uid}-ramp-${dir}`,
+        x1: 0,
+        y1: 0,
+        x2: dir === 'x' ? 1 : 0,
+        y2: dir === 'y' ? 1 : 0,
+        children: [0, 0.5, 1].map(offset => jsx('stop', { offset, style: { stopColor: ACCENT.fill, stopOpacity: offset === 0.5 ? 1 : 0 } }, offset))
+      },
+      `ramp-${dir}`
+    )
+  const grid = dir => [
+    jsx('pattern', { id: `${uid}-cells-${dir}`, patternUnits: 'userSpaceOnUse', x: 0, y: 0, width: cell, height: cell, children: jsx('rect', { width: cell, height: cell, fill: `url(#${uid}-ramp-${dir})` }) }, `cells-${dir}`),
+    jsx('rect', { id: `${uid}-grid-${dir}`, ...A, fill: `url(#${uid}-cells-${dir})` }, `grid-${dir}`)
+  ]
+  const half = dir => [
+    jsx('feImage', { href: `#${uid}-grid-${dir}`, ...A, result: `ramp${dir}` }, `img-${dir}`),
+    jsx('feComposite', { in: `ramp${dir}`, in2: 'deep', operator: 'arithmetic', k1: 0, k2: 0.5, k3: 0.5 * DOTS.fill, k4: 0, result: `sum${dir}` }, `sum-${dir}`),
+    jsx('feComponentTransfer', { in: `sum${dir}`, result: `keep${dir}`, children: jsx('feFuncA', { type: 'discrete', tableValues: '0 1' }) }, `keep-${dir}`)
+  ]
+  const dots = jsxs(
+    'filter',
+    {
+      id: `${uid}-dots`,
+      'data-hh': 'dots',
+      filterUnits: 'userSpaceOnUse',
+      primitiveUnits: 'userSpaceOnUse',
+      ...A,
+      colorInterpolationFilters: 'sRGB',
+      children: [
+        jsx('feGaussianBlur', { in: 'SourceAlpha', stdDeviation: DOTS.blur, result: 'soft' }, 'blur'),
+        jsx('feComponentTransfer', { in: 'soft', result: 'deep', children: jsx('feFuncA', { type: 'linear', slope: DOTS.gain, intercept: 0 }) }, 'gain'),
+        ...half('x'),
+        ...half('y'),
+        jsx('feComposite', { in: 'keepx', in2: 'keepy', operator: 'in', result: 'squares' }, 'squares'),
+        jsx('feFlood', { style: { floodColor: ACCENT.fill }, result: 'ink' }, 'ink'),
+        jsx('feComposite', { in: 'ink', in2: 'squares', operator: 'in' }, 'paint')
+      ]
+    },
+    'dots'
+  )
+  const mask = (side, i) =>
+    jsx(
+      'mask',
+      {
+        id: `${uid}-pupil-${side}`,
+        maskUnits: 'userSpaceOnUse',
+        ...A,
+        style: { maskType: 'alpha' },
+        children: jsx('g', {
+          ref: ref(`banner-pupil-${side}`),
+          'data-hh': `banner-pupil-${side}`,
+          children: jsx('path', { ref: ref(`banner-pupil-hole-${side}`), 'data-hh': `banner-pupil-hole-${side}`, d: bannerHole(i, F.holeR), fillRule: 'evenodd', style: { ...ACCENT } })
+        })
+      },
+      side
+    )
+  const eye = (side, i) =>
+    jsx(
+      'g',
+      {
+        mask: `url(#${uid}-pupil-${side})`,
+        children: jsx('ellipse', { ref: ref(`banner-eye-${side}`), 'data-hh': `banner-eye-${side}`, cx: F.eyes[i].cx, cy: F.eyes[i].cy, rx: F.rx, ry: F.ry, style: { ...ACCENT } })
+      },
+      side
+    )
+  const fingers = BANNER_SIDE_NAMES.flatMap((side, hand) => F.fingers[hand].map((x, i) => jsx('path', { 'data-hh': `banner-finger-${side}-${i + 1}`, d: bannerFingerPath(x), style: { ...ACCENT } }, `${side}-${i}`)))
+
+  return jsxs('svg', {
+    ref: ref('svg'),
+    'aria-hidden': true,
+    'data-hh-character': 'banner-face',
+    'data-expression': 'resting',
+    'data-eyes': reduced ? 'still' : 'follow',
+    viewBox: `${view.x} ${view.y} ${view.width} ${view.height}`,
+    width: size,
+    height: Math.round(((size * view.height) / view.width) * 100) / 100,
+    style: { display: 'block', flex: 'none', width: size, maxWidth: '100%', height: 'auto', overflow: 'visible', pointerEvents: 'none' },
+    children: [
+      jsxs('defs', { children: [...BANNER_SIDE_NAMES.map(mask), ramp('x'), ramp('y'), ...grid('x'), ...grid('y'), dots] }, 'defs'),
+      jsxs(
+        'g',
+        {
+          filter: `url(#${uid}-dots)`,
+          'data-hh': 'banner-dotted',
+          children: [
+            ...BANNER_SIDE_NAMES.map(eye),
+            jsx('path', { 'data-hh': 'banner-mouth', d: F.mouth, fill: 'none', strokeWidth: F.mouthWidth, strokeLinecap: 'round', style: { stroke: ACCENT.fill } }, 'mouth'),
+            ...fingers
+          ]
+        },
+        'dotted'
+      )
+    ]
+  })
+}
+
 // ---- src/dash-data.js ----
 // Generated by scripts/build.mjs from content/dash-setup-list-v2.json (the Dashboard tab: hhcontent's 11 things and
 // the tab's other words), checked against content/dash-docs-lines-v0.23.0.json. Only the fields the code reads.
@@ -31241,7 +31426,7 @@ function makeDashboard(ctx) {
         className: D.banner,
         'data-hh': 'banner',
         children: [
-          // the picture, behind the words: two fields of dots, and in front of them Helper's character holding the
+          // the picture, behind the words: two fields of dots, and in front of them the banner's own figure (banner-face) holding the
           // banner's bottom edge, its eyes on the pointer
           jsxs('div', { className: D.bannerArt, 'data-hh': 'banner-art', 'aria-hidden': true, children: [jsx('i', { className: D.bannerDots }, 'd1'), jsx('i', { className: D.bannerDots2 }, 'd2')] }, 'art'),
           jsx(
@@ -31250,7 +31435,7 @@ function makeDashboard(ctx) {
               className: D.bannerChar,
               'data-hh': 'banner-character',
               'aria-hidden': true,
-              children: jsx(Character, { size: BANNER_CHARACTER_PX, expression: 'resting', rising: false, reduced: !!state.still, eyes: state.bannerEyes || null, label: '' })
+              children: jsx(BannerCharacter, { size: BANNER_CHARACTER_PX, reduced: !!state.still, eyes: state.bannerEyes || null })
             },
             'char'
           ),
