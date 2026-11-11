@@ -23,6 +23,19 @@ const NOT_RX = Object.fromEntries(Object.entries(LC.not_words).map(([cls, ws]) =
 const MONEY_RX = LC.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
 const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
 
+// hhtech-weak-ai (For builder): a reply that is the model's thinking is no reply: an unclosed <think> (Hermes cuts a
+// closed block itself), or text that starts with "Thinking Process" or holds "**Analyze" (a managed local server
+// hands back the thinking with no tag at all). Constants: live-v2 changes-5, which would hold them as data, does not
+// exist (11 Nov 04:40).
+const THINK_START = /^\s*thinking process\b/i
+const THINK_ANYWHERE = '**Analyze'
+export function isThinking(raw) {
+  // a closed block is cut first (Hermes cuts it too); what is left is the reply (review)
+  const s = String(raw || '').replace(/<think>[\s\S]*?<\/think>/g, '')
+  if (s.includes('<think>')) return true
+  return THINK_START.test(s) || s.includes(THINK_ANYWHERE)
+}
+
 // <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
 // while the model still thinks)
 const cutThink = s => String(s || '').replace(/<think>[\s\S]*?<\/think>/g, '').replace(/<think>[\s\S]*$/, '')
@@ -94,6 +107,26 @@ const sameWords = s => talkNorm(s).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s
 // failed check is listed (the turn shows the fallback when the list is not empty).
 //   rows: the rows handed, [{ id, text }]; used: the ids after USED: (or null)
 //   talk: { lastLine: Helper's last line as shown, message: the person's newest message } for c18 and c23
+// live-v2 changes-4, c24: a claim about the person beyond what was kept (checks.list c24, apply_c4_check.py
+// c24_fails): after each "you run", "as a", "your" ... up to 3 words in the same sentence part; a word of 3 letters
+// or more that is not a stop word, not on person_ok, and (with or without a final s) not a word of what was kept, of
+// the person's newest message or of the rows handed fails. Returns the first such word, or null.
+const C24_RX = new RegExp(LC.c24.person_pattern, 'gi')
+const C24_STOP = new Set([...LIVE_DATA.stop_words, ...LC.c24.person_ok])
+const c24Words = s => new Set((String(s || '').toLowerCase().match(/[a-z']+/g) || []).map(w => w.replace(/s+$/, '')))
+export function c24Fails(reply, work, message, hand) {
+  const allowed = new Set([...c24Words(work), ...c24Words(message), ...c24Words(hand)])
+  C24_RX.lastIndex = 0
+  for (const m of String(reply).matchAll(C24_RX)) {
+    const part = reply.slice(m.index + m[0].length).split(/[.,;!?]/)[0]
+    for (const w of (part.match(/[A-Za-z']+/g) || []).slice(0, 3)) {
+      const lw = w.toLowerCase()
+      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, ''))) return w
+    }
+  }
+  return null
+}
+
 export function replyFlags(reply, rows, used, talk = {}) {
   const ids = rows.map(r => r.id)
   const textOf = Object.fromEntries(rows.map(r => [r.id, r.text]))
@@ -132,6 +165,9 @@ export function replyFlags(reply, rows, used, talk = {}) {
   }
   for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
+  // c24, after c23 (changes-4: "Run c24 after c23")
+  const c24Word = c24Fails(reply, talk.work, talk.message, hand)
+  if (c24Word) out.push('c24 about the person ' + c24Word)
   return out
 }
 

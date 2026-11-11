@@ -70,6 +70,7 @@ function ours(m) {
 
 // Where the plugin differs from the reference on purpose: message -> [the plugin's result, why].
 const TYPED_ABOUT_KEPT = 'keeps.typed (A2 and A4: "forget my name", "forget everything", changes-8 not_when): the plugin\'s own step from the talk v2 job, not in route2.py and switched off in the reference (SETTINGS_ON False, its word lists are older than the data); in a fresh visit nothing is kept, so Helper says there is nothing like that to forget'
+const KEEPS_WORK = 'live-v2 changes-4: what the person does is kept; the reference keeps nothing at What do you do?'
 const KNOWN = {
   'forget everything': ['A-none', TYPED_ABOUT_KEPT],
   'please forget my name': ['A-none', TYPED_ABOUT_KEPT],
@@ -77,7 +78,12 @@ const KNOWN = {
   'can you forget my name?': ['A-none', TYPED_ABOUT_KEPT],
   'will you forget everything when I close the window': ['A-none', TYPED_ABOUT_KEPT],
   'is it possible to delete everything you know about me?': ['A-none', TYPED_ABOUT_KEPT],
-  'forget everything, it was a mistake': ['A-none', TYPED_ABOUT_KEPT]
+  'forget everything, it was a mistake': ['A-none', TYPED_ABOUT_KEPT],
+  // talk-live-2: live-v2 changes-4 keeps what the person does at "What do you do?" (keeps.work step 7); route2.py
+  // and the wants layers keep nothing there (changes-4: "route2.py ... still keep nothing at What do you do?")
+  "I'm a nurse": ["F2 name=Sam work=I'm a nurse +kept=work,name +first", KEEPS_WORK],
+  'I teach piano every day after school': ['F2 name=Sam work=I teach piano every day after school +kept=work,name +first', KEEPS_WORK],
+  'I write emails and connect clients with suppliers': ['F2 name=Sam work=I write emails and connect clients with suppliers +kept=work,name +first', KEEPS_WORK]
 }
 
 test('the reference file was made from the team\'s scripts (when the team\'s folder is there): route2.py at the pin, the three wants layers as they are now', t => {

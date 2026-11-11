@@ -697,11 +697,11 @@
     "message": [
      "Nothing was saved. Helper could not read line 1:",
      "\"Job: teacher\"",
-     "Start it with a word such as Name or Remember, then a colon."
+     "Write at least two words after Remember."
     ],
     "result": "refused",
     "stored": {},
-    "why": "no_label"
+    "why": "remember_short"
    },
    "id": "R03",
    "rendered": "",

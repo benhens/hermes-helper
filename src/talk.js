@@ -22,7 +22,7 @@ import { AI_MODE } from './ai-mode.js'
 import { LIVE_DATA } from './live-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
-import { hasKept } from './kept.js'
+import { hasKept, workOk, workSqueeze } from './kept.js'
 
 const TOPICS = Object.fromEntries(TALK_DATA.topics.map(t => [t.id, t]))
 const TOPIC_IDS = TALK_DATA.topics.map(t => t.id)
@@ -297,8 +297,12 @@ function byCode(text, st) {
 // visit and no Forget removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
 // note_last), for ordinary talk and for never saying the same line twice; rejected: the lines the person
 // called wrong in this visit (no_repeat.rejected_rule), never stored.
+// live-v2 changes-3: lastAnswer, lastAnswerKey, lastByAgain: this visit's last answer line, for "again"
+// (small_talk.again_rule). changes-4: keepWork, the keep rule of keeps.work (false only for replaying route2.py,
+// which keeps nothing at "What do you do?"); workLong, WORK_LONG was said once at this question. aiOff: the AI step is
+// off for the rest of this visit (hhtech-weak-ai; set by src/page.js).
 export function freshVisit(stage = 'open', kept = {}, met = false) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [] }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false }
 }
 // A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
 // earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,
@@ -325,12 +329,30 @@ export function opening(st) {
 // route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
 // wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
 export const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
+// live-v2 changes-3 (small_talk.again_brings_back): the kinds an answer line has, in this plugin's words (the
+// data's wants is this plugin's want; its "skill by name", the skills-by-name line S1 or S2, is this plugin's skill)
+const AGAIN_BACK = (TALK_DATA.small_talk.again_brings_back || []).map(k => (k === 'wants' ? 'want' : k === 'skill by name' ? 'skill' : k))
+// what a line brought back by "again" leaves out: its faint Kept: line and what only that moment had
+const AGAIN_DROP = ['kept', 'first', 'name_taken', 'thing', 'repeat_of', 'by_again', 'code', 'work_first']
 export function noteLast(st, o) {
   if (!o) return o
   st.last = o.kind
   st.lastKey = lineKey(o)
   st.lastTopic = ['row', 'question', 'plain'].includes(o.kind) ? o.topic || null : null
+  st.lastByAgain = !!o.by_again
+  if (AGAIN_BACK.includes(o.kind)) {
+    st.lastAnswer = Object.fromEntries(Object.entries(o).filter(([k]) => !AGAIN_DROP.includes(k)))
+    st.lastAnswerKey = st.lastKey
+  }
   return o
+}
+// route2.py again_line: (1) the last answer line when it is not the line just before; (2) it once more when it
+// is, unless that line was itself brought back by again (then AGAIN); (3) none: MEAN_NONE, or AGAIN after MEAN_NONE
+function againLine(st) {
+  const a = st.lastAnswer
+  if (a && st.lastAnswerKey !== st.lastKey) return { ...a }
+  if (a) return st.lastByAgain ? { kind: 'AGAIN' } : { ...a }
+  return { kind: st.last === 'MEAN_NONE' ? 'AGAIN' : 'MEAN_NONE' }
 }
 
 /* ---------- what Helper keeps (route2.py: keep, keep_typed, kept_need, remember) ---------- */
@@ -340,6 +362,13 @@ function keep(st, out, key, value) {
   if (key === 'asked') st.kept.asked = [...(st.kept.asked || []), value]
   else st.kept[key] = value
   out.kept = [...(out.kept || []), key]
+  // live-v2 changes-4 (keeps.tell.work_told): the first time what the person does is kept, the line that the AI is
+  // told goes under the Kept: line (AI builds); shown again only after it was deleted and kept anew
+  // (review: only in a build that shows that line, so a record carried into an AI build still gets it once)
+  if (key === 'work' && !st.kept.told_work && LIVE_DATA.lines_by_mode.work_told[AI_MODE]) {
+    st.kept.told_work = true
+    out.work_first = true
+  }
   if (!st.kept.told) {
     st.kept.told = true
     out.first = true
@@ -605,6 +634,9 @@ export function whatIs(t) {
 // where byCode would look at the rows: not while Helper's own question is open and the message is
 // no question (there route2.py's order stands).
 function fixedByWords(t, st) {
+  // live-v2 changes-3 (cost.amount_rule): what something costs, asked with only price words of topic use, is COST
+  const C = TALK_DATA.cost
+  if ((C.amount_asks || []).length && questionForm(t) && whichOf(t, C.amount_asks).length && strongTopics(t).join() === 'use' && !anyTerm(t) && TOPICS.use && whichOf(t, TOPICS.use.key_words.concat(TOPICS.use.misspellings || [])).every(w => C.use_price_words.includes(w))) return 'COST'
   if (strongTopics(t).length || anyTerm(t)) return null
   if (st.wants !== false && wantsOf(t).length && !(st.pending && !questionForm(t))) return null
   if (questionForm(t) && whichOf(t, TALK_DATA.cost.words).length) return 'COST'
@@ -649,6 +681,8 @@ export function serviceIn(text, st, answered) {
 const ST = TALK_DATA.small_talk
 // talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
 export const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
+// live-v2 changes-4: under the first Kept: of what the person does, in a build that calls an AI
+export const WORK_TOLD = LIVE_DATA.lines_by_mode.work_told[AI_MODE]
 // live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
 const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
 const NR = TALK_DATA.no_repeat
@@ -720,7 +754,8 @@ export function smallTalk(text, st) {
   // changes-15 no_rule: a bare no right after an answer, with nothing open, says the answer was wrong
   if (kind === 'ok' && ST.no_words.includes(t) && !st.pending && ST.no_means_wrong_after.includes(st.last)) kind = 'wrong'
   if (opening && !['thanks', 'how', 'who', 'ai', 'bye', 'cut'].includes(kind)) return null // at_opening
-  if (st.pending && (kind === 'ok' || kind === 'mean')) return null // when_pending: the answer to Helper's question
+  // when_pending: the answer to Helper's question (live-v2 changes-3: again too; stuck is taken, as wrong)
+  if (st.pending && (kind === 'ok' || kind === 'mean' || kind === 'again')) return null
   return kind
 }
 // The fixed line for a small-talk kind: [line, the name for HELLO or the topic for a plain line].
@@ -729,7 +764,7 @@ function smallLine(kind, st) {
   if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
   if (kind === 'ai') return [LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE], null] // talk-live: AI, AI_PICK or AI_WRITES
   if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
-  return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG' }[kind], null]
+  return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG', stuck: 'STUCK' }[kind], null] // changes-3: stuck
 }
 // Builder: the plugin's own kinds that route2.py does not have, kept out of no_repeat like the data's exempt
 // ones: a skill named by name (changes-15's own words: "a skill named by name") and what Helper keeps, asked
@@ -741,6 +776,11 @@ const EXEMPT_ALSO = ['skill', 'A1', 'A2', 'A4', 'A-none']
 // asks for it again in so many words gets the same line.
 function noRepeat(out, st, text) {
   const k = out.kind
+  // live-v2 changes-3: what "again" brings back is final
+  if (out.by_again) {
+    st.rejected = []
+    return out
+  }
   const t = talkNorm(text)
   const saidWrong = startsWith(t, NR.wrong_starts) || whichOf(t, NR.wrong_anywhere).length > 0
   if (saidWrong && st.lastKey) st.rejected.push(st.lastKey)
@@ -758,17 +798,77 @@ function noRepeat(out, st, text) {
   for (const c of NR.in_place[group]) {
     if (c === 'plain') {
       if (out.topic) cands.push({ kind: 'plain', topic: out.topic })
-    } else cands.push({ kind: c })
+    } else if (c === 'ai_line') cands.push({ kind: LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE] }) // changes-3: group who
+    else if (c === 'HELLO') cands.push({ kind: 'HELLO', name: st.name || st.kept.name || null }) // changes-3: with the name
+    else cands.push({ kind: c })
   }
   const next = cands.find(x => !avoid.includes(lineKey(x))) || cands.find(x => lineKey(x) !== st.lastKey)
   // no other line to say (not possible with today's data: every in_place group has two lines that are not
   // 'plain'): the line as chosen, rather than a crash
   if (!next) return out
-  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) next[x] = out[x]
+  for (const x of ['kept', 'first', 'name_taken', 'thing', 'work_first']) if (x in out) next[x] = out[x]
   next.repeat_of = k
   st.pending = null
   st.lastq = false
   return next
+}
+
+/* ---------- live-v2 changes-4: what the person does (keeps.work) ---------- */
+const WORK = KEEPS.work
+const workEnd = s => s.replace(/[.!\s]+$/, '')
+const workWhole = t => t.replace(/[ ?!.,]+$/, '').trim()
+// Steps 2 to 7 at "What do you do?". Returns { kind, more } for a line of this step, or null when the message is
+// to be answered as an ordinary message (a question, or a topic or term word that does not start like "I run").
+function workStep(text, t, st, out) {
+  if (questionForm(t)) return null // 2
+  if ((strongTopics(t).length || anyTerm(t)) && !startsWith(t, OPENING.name_with_more.self_starts)) return null // 3
+  const whole = workWhole(talkNorm(text))
+  st.stage = 'open'
+  // 4 (review: "change what I do" typed again at WORK_ASK is no answer either)
+  if (Object.values(ST.kinds).some(ws => ws.includes(whole)) || WORK.non_answers.includes(whole) || WORK.non_answers.includes(talkNorm(text).trim()) || WORK.typed_change.ask_again_words.includes(whole)) return { kind: 'F3' }
+  if (looksSecret(text)) return { kind: 'WORK_SECRET' } // 5
+  const value = workEnd(workSqueeze(text))
+  if (!workOk(value, { withSecretRule: false })) {
+    // 6: too long; the first time the question stays open
+    if (!st.workLong) {
+      st.workLong = true
+      st.stage = 'work'
+      return { kind: 'WORK_LONG' }
+    }
+    st.workLong = false
+    return { kind: 'WORK_LONG_2' }
+  }
+  st.workLong = false
+  keep(st, out, 'work', value) // 7
+  st.work = value
+  if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
+  // (review: after WORK_ASK on a later visit the name is the kept one)
+  return { kind: 'F2', more: { name: st.name || st.kept.name || null, work: value } }
+}
+// keeps.work.typed_change: "I'm a teacher now" replaces (or keeps) what the person does; "change what I do" asks
+// WORK_ASK, and the reply goes through workStep. Returns { kind, more } or null.
+function workChange(text, st, out) {
+  const TC = WORK.typed_change
+  const whole = workWhole(talkNorm(text))
+  if (TC.ask_again_words.includes(whole)) {
+    st.stage = 'work'
+    st.workLong = false
+    st.pending = null
+    return { kind: 'WORK_ASK' }
+  }
+  const raw = workSqueeze(String(text).replace(/[\u2018\u2019]/g, "'"))
+  let t = stripLead(talkNorm(raw))
+  if (startsWith(t, ['actually'])) t = t.slice('actually'.length).replace(/^[ ,]+/, '')
+  if (!startsWith(t, TC.starts) || !whichOf(t, TC.now_words).length) return null
+  // (the rule names keeps.typed_change.not_words; changes-4's own list is not_with: review, both count)
+  if (t.includes('?') || questionForm(t) || whichOf(t, TC.not_with).length || whichOf(t, KEEPS.typed_change.not_words).length || strongTopics(t).length || anyTerm(t)) return null
+  // the value: the message as typed, from where t starts, with end marks and the now-word at its end cut
+  let value = workEnd(Array.from(raw).slice(Array.from(raw).length - charCount(t)).join(''))
+  const nowAtEnd = [...TC.now_words].sort((a, b) => b.length - a.length).find(w => value.toLowerCase().endsWith(' ' + w))
+  if (nowAtEnd) value = workEnd(value.slice(0, value.length - nowAtEnd.length).replace(/[ ,]+$/, ''))
+  if (!value || looksSecret(text) || !workOk(value)) return null
+  keep(st, out, 'work', value)
+  return { kind: 'F2', more: { name: st.name || st.kept.name || null, work: value } }
 }
 
 // One typed message -> a result (route2.py turn, changes-14's wrapper): the steps below, then no_repeat; met
@@ -803,6 +903,12 @@ function turnSteps(text, st) {
   }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
+  // live-v2 changes-3 (small_talk.again_rule): this visit's last answer line again, or AGAIN or MEAN_NONE
+  if (sk === 'again') {
+    st.stage = 'open'
+    const { kind, ...more } = againLine(st)
+    return done(kind, { ...more, by_again: true })
+  }
   if (sk) {
     const [line, x] = smallLine(sk, st)
     st.stage = 'open'
@@ -852,6 +958,11 @@ function turnSteps(text, st) {
       ordinary = both || (!name && (strongTopics(t).length > 0 || anyTerm(t) || questionForm(t)) && !oneWordName(text, st))
       if (!name && !ordinary) name = codeName(text)
       if (name && oneWordName(text, st)) name = capFirst(String(text).trim().replace(/[.!]+$/, '').trim()) // "Ty!" is Ty
+    } else if (st.keepWork !== false) {
+      // live-v2 changes-4: the reply to "What do you do?" (keeps.work steps 2 to 7; step 1, a key, is above)
+      const w = workStep(text, t, st, out)
+      if (w) return done(w.kind, w.more)
+      ordinary = true
     } else ordinary = questionForm(t)
     if (!ordinary) {
       let work = null
@@ -899,6 +1010,11 @@ function turnSteps(text, st) {
   if (dk === 'N1a') return done(dk)
   // changes-11, in route2.py's order: a name on a later visit, "what is ...", cost, where
   if (st.stage === 'open') {
+    // live-v2 changes-4 (keeps.work.typed_change and ask_again): what the person does, said again by typing
+    if (st.keepWork !== false) {
+      const wc = workChange(text, st, out)
+      if (wc) return done(wc.kind, wc.more)
+    }
     const nl = nameLater(text, st, out)
     if (nl) return done(nl.kind, { name: nl.name })
     const tw = cutIgnored(talkNorm(text))
@@ -1076,6 +1192,7 @@ function forgetAnswerSteps(what, yes, st) {
   st.pending = null
   if (!yes) return { kind: 'A-no', what }
   if (what !== 'all') delete st.kept[what]
+  if (what === 'work') delete st.kept.told_work // changes-4: told again when kept anew
   if (what === 'all' || !hasKeptValues(st.kept)) for (const k of Object.keys(st.kept)) delete st.kept[k]
   if (what === 'all' || what === 'name') st.name = null
   return { kind: 'A-yes', what }
@@ -1175,13 +1292,14 @@ export function keptWords(key, value) {
     return v ? v.value : String(value)
   }
   const thing = KEEPS.things.find(x => x.id === key)
-  return fillSlots(thing ? thing.kept_words : '{value}', { name: value, app: value, service: value, thing: value, value })
+  return fillSlots(thing ? thing.kept_words : '{value}', { name: value, app: value, service: value, thing: value, work: value, value })
 }
 // The rows of the list behind "See what I keep" (keeps.tell.see.rows), in their order.
 export function keptRows(kept) {
   const R = KEEPS.tell.see.rows
   const rows = []
   if (kept.name) rows.push(fillSlots(R.name, { name: kept.name }))
+  if (kept.work) rows.push(fillSlots(R.work, { work: kept.work })) // changes-4: second, after the name
   if (kept.mod) rows.push(fillSlots(R.mod, { value: keptWords('mod', kept.mod) }))
   if (kept.msg) rows.push(fillSlots(R.msg, { app: kept.msg }))
   if (kept.svc) rows.push(fillSlots(R.svc, { service: kept.svc }))
@@ -1197,7 +1315,8 @@ function keptNote(result, st) {
   // items: what this line says was kept, [key, value] each, so the page can mark the line once
   // that is no longer kept (forgotten, or replaced by a newer one)
   const items = result.kept.map(k => [k, k === 'asked' ? result.thing : st.kept[k]])
-  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, items }
+  // workTold: changes-4's line that the AI is told what the person does (lines_by_mode.work_told; none with no AI step)
+  return { text: fillSlots(KEEPS.tell.kept_line, { kept_words: words.join('. ') }), link: KEEPS.tell.link.words, first: result.first ? FIRST_TIME : null, ...(result.work_first && WORK_TOLD ? { workTold: WORK_TOLD } : {}), items }
 }
 // Is one thing a faint line named still kept, as it was then? In any capitals (a name saved again
 // as "anna" on the settings page is still Anna; "asked" things count the same way in the remember
@@ -1282,11 +1401,27 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'MEAN_NONE':
     case 'WRONG':
     case 'AGAIN':
+    // live-v2 changes-3: each kind's own line in place of a repeat, and STUCK
+    case 'OK_SAME':
+    case 'THANKS_SAME':
+    case 'HOW_SAME':
+    case 'BYE_SAME':
+    case 'CUT_SAME':
+    case 'WRONG_SAME':
+    case 'STUCK':
+    case 'STUCK_SAME':
       return said(result.kind, FIXED[result.kind].text)
+    // live-v2 changes-4: what the person does, not kept (a secret, too long) or asked again
+    case 'WORK_SECRET':
+    case 'WORK_LONG':
+    case 'WORK_LONG_2':
+    case 'WORK_ASK':
+      return said(result.kind, WORK.lines[result.kind])
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
-      return said('F2', named(FIXED.F2))
+      // talk-live-2: on a later visit (WORK_ASK, a typed change) the result carries the kept name
+      return said('F2', result.name && !st.name ? fillSlots(FIXED.F2.text, { name: result.name }) : named(FIXED.F2))
     case 'F3':
       return said('F3', FIXED.F3.text)
     case 'TP':

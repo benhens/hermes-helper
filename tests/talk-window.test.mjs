@@ -17,7 +17,7 @@ import { TALK_DATA } from '../src/talk-data.js'
 import { WANTS_DATA } from '../src/wants-data.js'
 import { T, K } from '../src/look.js'
 import { curlyQuotes } from '../src/quotes.js'
-import { FIRST_TIME } from '../src/talk.js'
+import { FIRST_TIME, WORK_TOLD } from '../src/talk.js'
 
 function useHost({ runtime = { ok: true, model: 'mock-small' } } = {}) {
   const calls = []
@@ -156,7 +156,14 @@ test('the opening, played: the name, with the faint "Kept: Peter." line and its 
   assert.equal(line(view), 'F2')
   assert.equal(said(view), 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(skipLink(view), null)
-  assert.equal(conversation(view).at(-1).props['data-hh'], 'me', 'the name was told once, under F1')
+  // talk-live-2 (live-v2 changes-4): what the person does is kept, with its own faint line; the first-time line was
+  // told under F1, so not again; in a build with an AI step, the line that the AI is told it, once
+  const workNote = conversation(view).at(-1)
+  assert.equal(workNote.props['data-hh'], 'kept-note')
+  assert.equal(text(workNote.props.children[0]), 'Kept: I run a tennis club.')
+  assert.equal(byData(workNote, 'kept-first'), null, 'the first-time line was told once, under F1')
+  if (WORK_TOLD) assert.equal(text(byData(workNote, 'kept-work-told')), WORK_TOLD)
+  else assert.equal(byData(workNote, 'kept-work-told'), null)
   finish(view)
   // talk v2 (changes-7): no topics after the greeting
   assert.equal(picks(view), null)
@@ -168,7 +175,7 @@ test('the opening, played: the name, with the faint "Kept: Peter." line and its 
     ['old', T.old, 'Nice to meet you, Peter. What do you do?'],
     ['me', T.me, 'I run a tennis club']
   ])
-  assert.equal(notes(view).length, 1)
+  assert.equal(notes(view).length, 2)
   // the first-time line comes once only
   send(view, 'remember that my club has six courts')
   assert.equal(line(view), 'RM1')
@@ -604,7 +611,7 @@ test('a long message is shown back cut to 500 characters; Helper still reads all
   assert.equal(line(view), 'mem-q', 'the word after character 500 was read')
 })
 
-test('what is kept about the person: one stored record ("kept") by fixed rules, never what they do or the conversation; nothing is sent', async () => {
+test('what is kept about the person: one stored record ("kept") by fixed rules, what they do (live-v2 changes-4) but never the conversation; nothing is sent', async () => {
   const { view, storage } = await open()
   finish(view)
   send(view, 'Peter')
@@ -618,8 +625,8 @@ test('what is kept about the person: one stored record ("kept") by fixed rules, 
   send(view, 'what is a skill')
   assert.deepEqual([...storage.data.keys()].sort(), ['kept', 'met'], 'the record and the met mark (changes-14), nothing else')
   assert.equal(storage.data.get('met'), true)
-  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', msg: 'WhatsApp', asked: ['my club has six courts'], told: true })
-  assert.doesNotMatch(JSON.stringify([...storage.data]), /tennis|install|skill/)
+  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', work: 'I run a tennis club', msg: 'WhatsApp', asked: ['my club has six courts'], told: true, ...(WORK_TOLD ? { told_work: true } : {}) })
+  assert.doesNotMatch(JSON.stringify([...storage.data]), /install|skill/)
   assert.deepEqual(globalThis.__hhHost.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'and nothing was sent to Hermes')
 })
 
@@ -654,7 +661,8 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   assert.equal(storage.data.get('met'), true)
   finish(back)
   send(back, 'I run a tennis club')
-  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', told: true })
+  // talk-live-2 (live-v2 changes-4): what the person does is kept, and outlives the restart below
+  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', told: true, work: 'I run a tennis club', ...(WORK_TOLD ? { told_work: true } : {}) })
   // Hermes starts again: the plugin is loaded anew, with the same storage
   const second = await registerPlugin(storage, fakeTimers())
   const fresh = mount(second.Page)
@@ -664,10 +672,10 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   assert.equal(spoken(byData(byData(fresh.tree, 'bubble'), 'said')).trim(), 'Hi again, Peter. What would you like Hermes to help you with?')
   assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children, [])
   assert.equal(byData(fresh.tree, 'skip'), null, 'no question to skip')
-  assert.doesNotMatch(text(fresh.tree), /tennis|your name/)
+  assert.doesNotMatch(text(fresh.tree), /tennis|your name/, 'Helper does not say on a later visit what it remembers (not decided)')
   send(fresh, 'what do you know about me')
   assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'A1')
-  assert.deepEqual(all(byData(fresh.tree, 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter'])
+  assert.deepEqual(all(byData(fresh.tree, 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter', 'What you do: I run a tennis club'])
 })
 
 test('his complaint (changes-14): Skip on the first visit is remembered; after Hermes starts again Helper asks no name, then "hey" and "he" get their own lines', async () => {
@@ -714,7 +722,7 @@ test('"See what I keep" opens Helper\'s settings page; "what do you know about m
   send(view, 'what do you know about me')
   assert.equal(line(view), 'A1')
   assert.equal(said(view), 'This is all I keep about you.')
-  assert.deepEqual(all(byData(bubble(view), 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter'])
+  assert.deepEqual(all(byData(bubble(view), 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter', 'What you do: I run a tennis club'])
   assert.equal(text(byData(bubble(view), 'hint')), 'By hand: open “Settings”, then “Plugins”, then “Helper”.')
   finish(view)
   assert.equal(text(button(view)).trim(), 'Open Helper settings')
@@ -1014,13 +1022,14 @@ test('after "Forget all", the older "Kept: ..." lines above are marked as forgot
   const { view, storage } = await pastOpening()
   send(view, 'remember that my club has six courts')
   finish(view)
-  assert.deepEqual(keptNotes(view).map(forgotten), [false, false], 'nothing forgotten yet')
+  // talk-live-2: the three lines are the name, what the person does (live-v2 changes-4) and the thing to remember
+  assert.deepEqual(keptNotes(view).map(forgotten), [false, false, false], 'nothing forgotten yet')
   // one thing forgotten: only its line is marked
   send(view, 'forget my name')
   finish(view)
   click(answer(view, yesLabel))
   finish(view)
-  assert.deepEqual(keptNotes(view).map(n => [text(n.props.children[0]), forgotten(n)]), [['Kept: Peter.', true], ['Kept: my club has six courts.', false]])
+  assert.deepEqual(keptNotes(view).map(n => [text(n.props.children[0]), forgotten(n)]), [['Kept: Peter.', true], ['Kept: I run a tennis club.', false], ['Kept: my club has six courts.', false]])
   // everything forgotten
   send(view, 'forget everything')
   finish(view)
@@ -1031,7 +1040,7 @@ test('after "Forget all", the older "Kept: ..." lines above are marked as forgot
   assert.equal(said(view), TALK_DATA.keeps.tell.see.see_line_deleted)
   assert.equal(said(view), 'Everything I kept about you is deleted. I only remember that we have met.')
   const old = keptNotes(view)
-  assert.deepEqual(old.map(forgotten), [true, true])
+  assert.deepEqual(old.map(forgotten), [true, true, true])
   // the words are still there to read, struck through; the link still works
   assert.equal(byData(old[0], 'kept-gone').type, 'del')
   assert.equal(byData(old[0], 'kept-gone').props.className, T.gone)
@@ -1073,6 +1082,7 @@ test('a chat app typed after a different pick: the newest replaces the kept one,
   finish(view)
   assert.deepEqual(keptNotes(view).map(n => [text(n.props.children[0]), forgotten(n)]), [
     ['Kept: Peter.', false],
+    ['Kept: I run a tennis club.', false], // talk-live-2: live-v2 changes-4
     ['Kept: you use Telegram.', true],
     ['Kept: you use WhatsApp.', false]
   ])

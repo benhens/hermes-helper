@@ -88,13 +88,16 @@ export function isFollowPhrase(text) {
 }
 
 // Whether a message is a follow-up (follow_up.rule): Helper's last line came from rows, and the no-AI turn
-// found ordinary talk of kind mean (plain with why "what do you mean", or MEAN_NONE) or the message is a phrase.
+// found ordinary talk of kind mean (plain with why "what do you mean", or MEAN_NONE) or kind stuck, or the message
+// is a phrase.
 // before: the visit's note of Helper's last line as it was before this message ({ last, lastKey, liveRows }).
 export function isFollowUp(text, pre, before) {
   const fromRows = before.last === 'written' ? !!(before.liveRows && before.liveRows.ids.length) : FROM_ROWS.includes(before.last)
   if (!fromRows) return false
   const mean = pre.kind === 'MEAN_NONE' || (pre.kind === 'plain' && pre.why === 'what do you mean')
-  return mean || isFollowPhrase(text)
+  // live-v2 changes-3: kind stuck ("that didn't work") is a follow-up too
+  const stuck = pre.kind === 'STUCK' || pre.kind === 'STUCK_SAME'
+  return mean || stuck || isFollowPhrase(text)
 }
 
 // follow_up.rows: the rows handed for the person's previous message, in the same order, each with its next

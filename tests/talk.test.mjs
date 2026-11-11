@@ -14,7 +14,8 @@ import { TALK_DATA } from '../src/talk-data.js'
 import { AI_MODE } from '../src/ai-mode.js'
 import { LIVE_DATA } from '../src/live-data.js'
 // talk-live: route2.py's "are you an AI" line is the no-AI one (AI); in an AI mode the plugin says that mode's line
-const forMode = s => (s === 'AI' ? LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE] : s)
+// (talk-live-2: also as the first word of a shown result, "AI +norepeat", live-v2 changes-3's group who)
+const forMode = s => (typeof s === 'string' ? s.replace(/^AI(?= |$)/, LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE]) : s)
 import { pinned, PINS } from './lib/team-pins.mjs'
 
 const { freshVisit, laterVisit, opening, turn, pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, typedAboutKept, lineFor, openingLine, hintFor, buildHit, talkNorm, keptRows, PARTS, EXTRA_LINES, REPLY_HINT } = TALK
@@ -30,6 +31,7 @@ function show(o) {
   if (o.name_taken) return show({ ...o, name_taken: null }) + ' +name=' + o.name_taken
   if (o.kept && o.kept.length) return show({ ...o, kept: null, first: null }) + ' +kept=' + o.kept.join(',') + (o.first ? ' +first' : '')
   if (o.used) return show({ ...o, used: null }) + ' +from-kept'
+  if (o.by_again) return show({ ...o, by_again: null }) + ' +again' // live-v2 changes-3
   if (o.repeat_of) return show({ ...o, repeat_of: null }) + ' +norepeat' // changes-15
   const py = v => (v === null || v === undefined ? 'None' : v)
   const by = {
@@ -62,7 +64,9 @@ const usesWants = c => c.steps.some(s => s.do === 'topic' && s.topic === 'wants'
 // A visit as route2.py has it: the wants steps (rows, skills by name, the near miss, the service
 // lines) off, since route2.py has none of them. The held pick "Web, files, pictures and voice" is
 // route2.py's own (pick_topic), so it stays.
-const asRoute2 = st => Object.assign(st, { wants: false })
+// talk-live-2: and the keep rule of what the person does (live-v2 changes-4) off, since route2.py keeps nothing at
+// "What do you do?" (tests/talk-live-2.test.mjs has that rule's own cases)
+const asRoute2 = st => Object.assign(st, { wants: false, keepWork: false })
 
 function replay(conv) {
   let st = asRoute2(freshVisit(conv.stage, conv.kept ? { ...conv.kept } : {}))
@@ -232,7 +236,7 @@ test('a how-question is never a request to do it; a request gets the hand-over l
   assert.equal(cut.length, 'I asked for this: "". Please do it for me. Ask me before you change anything.'.length + 300)
 })
 
-test('the opening: greeting, name, what the person does, then a line with nothing to pick, the name kept and told at F1 (changes-15)', () => {
+test('the opening: greeting, name, what the person does, then a line with nothing to pick, the name kept and told at F1 (changes-15); what the person does kept at F2 (live-v2 changes-4)', () => {
   const st = freshVisit('name')
   assert.equal(openingLine().text, "Hi, I'm Helper. I can help you learn about Hermes and set it up. What's your name?")
   const f1 = lineFor(turn('Peter', st), st)
@@ -245,10 +249,12 @@ test('the opening: greeting, name, what the person does, then a line with nothin
   const f2 = lineFor(turn('I run a tennis club', st), st)
   assert.equal(f2.text, 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(f2.answers, null, 'no topics after the greeting')
-  assert.equal(f2.note, null, 'told once, under F1')
-  assert.deepEqual(st.kept, { name: 'Peter', told: true })
-  assert.equal(st.work, 'I run a tennis club', 'what the person does is used for this visit')
-  assert.equal(st.kept.work, undefined, 'and never kept')
+  // talk-live-2 (live-v2 changes-4, keeps.work step 7): what the person does is kept, with its own Kept: line (the
+  // first-time line was told under F1 already) and, in a build with an AI step, the line that the AI is told it
+  assert.deepEqual(f2.note, { text: 'Kept: I run a tennis club.', link: 'See what I keep', first: null, ...(TALK.WORK_TOLD ? { workTold: TALK.WORK_TOLD } : {}), items: [['work', 'I run a tennis club']] })
+  // told_work: the mark that the AI line was shown, only in a build that shows it (review)
+  assert.deepEqual(st.kept, { name: 'Peter', told: true, work: 'I run a tennis club', ...(TALK.WORK_TOLD ? { told_work: true } : {}) })
+  assert.equal(st.work, 'I run a tennis club')
 })
 
 test('no name given: the lines without a name and nothing kept; Skip: the "that\'s fine" line with nothing to pick', () => {
@@ -256,8 +262,10 @@ test('no name given: the lines without a name and nothing kept; Skip: the "that\
   assert.equal(lineFor(turn('hi', st), st).text, 'Nice to meet you. What do you do?')
   const f2 = lineFor(turn('this and that', st), st)
   assert.equal(f2.text, 'Thanks. Ask me anything about Hermes.')
-  assert.equal(f2.note, null)
-  assert.deepEqual(st.kept, {})
+  // talk-live-2 (live-v2 changes-4): the answer to What do you do? is kept, with the first-time line (nothing was kept before)
+  assert.equal(f2.note.text, 'Kept: this and that.')
+  assert.equal(f2.note.first, TALK.FIRST_TIME)
+  assert.deepEqual(st.kept, { work: 'this and that', told: true, ...(TALK.WORK_TOLD ? { told_work: true } : {}) })
   const st2 = freshVisit('name')
   const f3 = lineFor(skip(st2), st2)
   assert.equal(f3.text, "That's fine. Ask me anything about Hermes.")
@@ -462,7 +470,8 @@ test('the first-time line is the one of this build\'s AI mode (talk-live); with 
   assert.equal(first, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
   assert.equal(TALK.FIRST_TIME, LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE])
   if (AI_MODE === 'no_ai_step') assert.equal(TALK.FIRST_TIME, first)
-  else assert.equal(TALK.FIRST_TIME, 'I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords.')
+  // live-v2 changes-4: "but not this" became false (what the person does is sent), so "but not your name"
+  else assert.equal(TALK.FIRST_TIME, 'I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.')
   assert.doesNotMatch(JSON.stringify(TALK_DATA), /Only your name goes to your AI/)
 })
 

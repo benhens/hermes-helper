@@ -2,7 +2,8 @@
 // fixes: "if the files on disk no longer match the checksums this job names, take them at the checksums
 // this job names"). builder-qs + changes-14 to -18 (11 Nov 2026): each file at the newest checksum the team
 // named for it; the talk data at changes-18's. talk-live (11 Nov 2026): the talk data, the live data,
-// route2.py at live-v2 changes-2's, check.py at changes-1's; the wants and the skills list at changes-19's. A test compares the plugin's copy with the pin, checks that
+// route2.py at live-v2 changes-2's, check.py at changes-1's; the wants and the skills list at changes-19's.
+// talk-live-2 (11 Nov 2026): the talk data and the live data at live-v2 changes-4's, route2.py at changes-3's. A test compares the plugin's copy with the pin, checks that
 // the pin is a checksum the team named (in its note, or its own "before" copy), and only reports when the
 // team's file on disk has moved on since.
 import fs from 'node:fs'
@@ -14,11 +15,11 @@ const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).di
 
 // file (in the team's folder) -> [the pinned sha256, where the team names it]
 export const PINS = {
-  'content/helper-talk-v2.json': ['3440302a8171d1a09b0964c519008b9d143cc9b4730a7d76b689207240d593ce', 'content/helper-talk-live-v2-changes-2.md'],
-  'content/helper-talk-live-v2.json': ['3df1e39ad07fb7c099ace02eebaf905a78b38f98ee1e0638591dc2cead832810', 'content/helper-talk-live-v2-changes-2.md'],
+  'content/helper-talk-v2.json': ['2b1913352ce6ad8169dc046495b9dd9e3a1723a1868c2d23804df27c28eb59d9', 'content/helper-talk-live-v2-changes-4.md'],
+  'content/helper-talk-live-v2.json': ['53273862bf5d95056ded37fa6a1cd444421f40e9fcb0d4c9c494843a18e4697a', 'content/helper-talk-live-v2-changes-4.md'],
   'content/helper-wants-v1.json': ['96530c154849c2dd34397eeadf74748620a45e21589b52be8aafe92800dbd4ac', 'content/helper-talk-v2-changes-19.md'],
   'content/skills-list-v1.json': ['678667bfa3277f54885b530297a782b7b297c823e0ce4583e6cf5bfe656d7eb9', 'content/helper-talk-v2-changes-19.md'],
-  'dev/checks/hhcontent-talk-v2/route2.py': ['2188b2d67f284ec7e7b4f508695c3c6a7c1bc174b4c8f5f77588e39d79a491df', 'content/helper-talk-live-v2-changes-2.md'],
+  'dev/checks/hhcontent-talk-v2/route2.py': ['0356dfb91c0bfde85a56280434e6886a90e5b82a91bbfb27ddce1a1387e7ffbe', 'content/helper-talk-live-v2-changes-3.md'],
   'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e', 'content/helper-talk-v2-changes-16.md'],
   'dev/checks/hhcontent-talk-v2/check.py': ['0eb598430d47d77857013a8017f57cffacbf69bc16d5e5aa478a77909790afac', 'content/helper-talk-live-v2-changes-1.md'],
   // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs)

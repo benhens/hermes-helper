@@ -125,7 +125,7 @@ export const TALK_DATA = {
       "text": "Sorry, that looks cut off. Tell me a bit more about what you need."
     },
     "MEAN_NONE": {
-      "text": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\"."
+      "text": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\"."
     },
     "WRONG": {
       "text": "Sorry about that. Please say it another way."
@@ -135,6 +135,30 @@ export const TALK_DATA = {
     },
     "N1_AGAIN": {
       "text": "Sorry, I don't have checked information on that one either."
+    },
+    "OK_SAME": {
+      "text": "All right. I'm here when you need me."
+    },
+    "THANKS_SAME": {
+      "text": "Any time. I'm here if you have another question."
+    },
+    "HOW_SAME": {
+      "text": "Still good, thanks. Ask me anything about Hermes."
+    },
+    "BYE_SAME": {
+      "text": "Bye for now."
+    },
+    "CUT_SAME": {
+      "text": "I can't tell what you need from that. Type your whole question in one message."
+    },
+    "WRONG_SAME": {
+      "text": "Sorry again. Try other words, or ask about another part of Hermes."
+    },
+    "STUCK": {
+      "text": "Sorry it didn't work. Tell me what you tried and what you saw on the screen."
+    },
+    "STUCK_SAME": {
+      "text": "Sorry it still isn't working. Try other words, or ask about another part of Hermes."
     }
   },
   "opening": {
@@ -933,6 +957,56 @@ export const TALK_DATA = {
         "nope, wrong",
         "i meant something else",
         "not quite"
+      ],
+      "stuck": [
+        "that didn't work",
+        "that didnt work",
+        "that did not work",
+        "it didn't work",
+        "it didnt work",
+        "it did not work",
+        "didn't work",
+        "didnt work",
+        "did not work",
+        "that doesn't work",
+        "that doesnt work",
+        "it doesn't work",
+        "it doesnt work",
+        "it does not work",
+        "doesn't work",
+        "doesnt work",
+        "not working",
+        "it's not working",
+        "its not working",
+        "it is not working",
+        "still not working",
+        "it's still not working",
+        "its still not working",
+        "it still isn't working",
+        "it still isnt working",
+        "still isn't working",
+        "it still doesn't work",
+        "it still doesnt work",
+        "that still didn't work",
+        "still didn't work",
+        "still doesn't work",
+        "still doesnt work",
+        "that didn't help",
+        "that didnt help",
+        "it didn't help",
+        "it didnt help",
+        "didn't help",
+        "that doesn't help",
+        "that doesnt help",
+        "that did nothing",
+        "nothing happened"
+      ],
+      "again": [
+        "again",
+        "once more",
+        "repeat",
+        "repeat that",
+        "one more time"
       ]
     },
     "cut_question_words": [
@@ -1005,6 +1079,17 @@ export const TALK_DATA = {
       "buddy",
       "x"
     ],
+    "again_brings_back": [
+      "row",
+      "plain",
+      "term",
+      "W2",
+      "COST",
+      "WHERE",
+      "skill by name",
+      "wants",
+      "written"
+    ],
     "how_after_rows": {
       "words": [
         "how",
@@ -1020,8 +1105,7 @@ export const TALK_DATA = {
         "WHERE",
         "written"
       ]
-    },
-    "ai_line": "AI"
+    }
   },
   "no_repeat": {
     "exempt": [
@@ -1046,16 +1130,40 @@ export const TALK_DATA = {
       "skill by name"
     ],
     "groups": {
-      "talk": [
-        "THANKS",
-        "OK",
-        "HOW",
-        "WHO",
-        "BYE",
-        "CUT",
+      "hello": [
         "HELLO",
-        "HELLO_SAME",
-        "WRONG"
+        "HELLO_SAME"
+      ],
+      "ok": [
+        "OK",
+        "OK_SAME"
+      ],
+      "thanks": [
+        "THANKS",
+        "THANKS_SAME"
+      ],
+      "how": [
+        "HOW",
+        "HOW_SAME"
+      ],
+      "who": [
+        "WHO"
+      ],
+      "bye": [
+        "BYE",
+        "BYE_SAME"
+      ],
+      "cut": [
+        "CUT",
+        "CUT_SAME"
+      ],
+      "wrong": [
+        "WRONG",
+        "WRONG_SAME"
+      ],
+      "stuck": [
+        "STUCK",
+        "STUCK_SAME"
       ],
       "dont_know": [
         "N1",
@@ -1064,9 +1172,41 @@ export const TALK_DATA = {
       ]
     },
     "in_place": {
-      "talk": [
+      "hello": [
         "HELLO_SAME",
+        "HELLO"
+      ],
+      "ok": [
+        "OK_SAME",
         "OK"
+      ],
+      "thanks": [
+        "THANKS_SAME",
+        "THANKS"
+      ],
+      "how": [
+        "HOW_SAME",
+        "HOW"
+      ],
+      "who": [
+        "ai_line",
+        "WHO"
+      ],
+      "bye": [
+        "BYE_SAME",
+        "BYE"
+      ],
+      "cut": [
+        "CUT_SAME",
+        "CUT"
+      ],
+      "wrong": [
+        "WRONG_SAME",
+        "WRONG"
+      ],
+      "stuck": [
+        "STUCK_SAME",
+        "STUCK"
       ],
       "dont_know": [
         "N1_AGAIN",
@@ -1187,7 +1327,24 @@ export const TALK_DATA = {
         "contacts",
         "back up",
         "backup",
-        "storage"
+        "storage",
+        "phone my",
+        "phone the",
+        "phone a",
+        "phone an",
+        "phone him",
+        "phone her",
+        "phone them",
+        "phone me",
+        "phone us",
+        "phone someone",
+        "phone somebody",
+        "phone people",
+        "phone back",
+        "phone call",
+        "phone calls",
+        "phone number",
+        "phone numbers"
       ]
     },
     "slow": {
@@ -1519,6 +1676,29 @@ export const TALK_DATA = {
       "pay for it",
       "fee",
       "fees"
+    ],
+    "amount_asks": [
+      "how much",
+      "per month",
+      "a month",
+      "each month",
+      "every month",
+      "monthly",
+      "per year",
+      "a year",
+      "per day",
+      "a day"
+    ],
+    "use_price_words": [
+      "cost",
+      "costs",
+      "costing",
+      "cost me",
+      "costs me",
+      "costing me",
+      "money",
+      "price",
+      "pay"
     ]
   },
   "where": {
@@ -3162,6 +3342,10 @@ export const TALK_DATA = {
         "kept_words": "{name}"
       },
       {
+        "id": "work",
+        "kept_words": "{work}"
+      },
+      {
         "id": "mod",
         "kept_words": "{value}"
       },
@@ -3215,6 +3399,95 @@ export const TALK_DATA = {
         "instead of"
       ]
     },
+    "work": {
+      "limits": {
+        "min_words": 1,
+        "max_words": 12,
+        "max_chars": 80
+      },
+      "non_answers": [
+        "nothing",
+        "not much",
+        "nothing really",
+        "none",
+        "no",
+        "nope",
+        "idk",
+        "i don't know",
+        "i dont know",
+        "dunno",
+        "not sure",
+        "skip",
+        "pass",
+        "rather not say",
+        "i'd rather not say",
+        "prefer not to say",
+        "i prefer not to say",
+        "none of your business",
+        "n/a",
+        "na",
+        "-",
+        "?",
+        "..."
+      ],
+      "lines": {
+        "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes.",
+        "WORK_LONG": "Thanks. That is too long for me to keep. In 12 words or fewer, what do you do?",
+        "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
+        "WORK_ASK": "What do you do now?"
+      },
+      "typed_change": {
+        "starts": [
+          "i'm a",
+          "i'm an",
+          "im a",
+          "i am a",
+          "i am an",
+          "i work as",
+          "i work at",
+          "i work in",
+          "i work for",
+          "i'm working as",
+          "i run",
+          "i own",
+          "i teach",
+          "i study",
+          "i'm studying",
+          "i manage",
+          "i coach",
+          "my job is",
+          "my work is",
+          "i'm retired",
+          "i am retired"
+        ],
+        "now_words": [
+          "now",
+          "nowadays",
+          "these days",
+          "instead",
+          "anymore"
+        ],
+        "not_with": [
+          "not",
+          "no longer",
+          "don't",
+          "dont",
+          "bit",
+          "little",
+          "beginner",
+          "newbie",
+          "confused",
+          "lost",
+          "stuck"
+        ],
+        "ask_again_words": [
+          "change what i do",
+          "change my job",
+          "change what you know about my job",
+          "update what i do"
+        ]
+      }
+    },
     "use": {
       "used_line": "From what I keep: {kept_words}.",
       "used_link": {
@@ -3249,6 +3522,7 @@ export const TALK_DATA = {
         },
         "rows": {
           "name": "Your name: {name}",
+          "work": "What you do: {work}",
           "mod": "Paying for an AI: {value}",
           "msg": "Your chat app: {app}",
           "svc": "A service you use: {service}",
@@ -3749,6 +4023,16 @@ export const TALK_DATA = {
             "forget what i asked you to remember",
             "delete what i asked you to remember",
             "forget what i told you to remember"
+          ],
+          "work": [
+            "forget what i do",
+            "delete what i do",
+            "remove what i do",
+            "forget my job",
+            "delete my job",
+            "remove my job",
+            "forget my work",
+            "delete my work"
           ]
         },
         "questions": {
@@ -3756,7 +4040,8 @@ export const TALK_DATA = {
           "mod": "Delete what you told me about paying?",
           "msg": "Delete your chat app?",
           "svc": "Delete the service you named?",
-          "asked": "Delete all you asked me to remember?"
+          "asked": "Delete all you asked me to remember?",
+          "work": "Delete what you told me you do?"
         },
         "after_yes": "Done. I no longer keep that.",
         "after_no": "Fine. Nothing is changed.",
@@ -3796,39 +4081,9 @@ export const TALK_DATA = {
     },
     "settings_file": {
       "top_line": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
-      "box_lines": {
-        "name": {
-          "label": "Name",
-          "reason": "Helper greets you with it"
-        },
-        "mod": {
-          "label": "Paying for an AI",
-          "reason": "so Helper does not ask again",
-          "values": {
-            "ChatGPT": "mod1",
-            "Claude": "mod2",
-            "Neither": "mod4",
-            "Free": "mod3"
-          }
-        },
-        "msg": {
-          "label": "Chat app",
-          "reason": "so Helper shows that app's setup",
-          "values": "keeps.answers.msg.names, written with the app's own spelling"
-        },
-        "svc": {
-          "label": "Service",
-          "reason": "so Helper can write the text to paste",
-          "values": "keeps.answers.svc.names, written with the service's own spelling"
-        },
-        "asked": {
-          "label": "Remember",
-          "reason": "you asked Helper to keep it",
-          "max": 3
-        }
-      },
       "order": [
         "name",
+        "work",
         "mod",
         "msg",
         "svc",
@@ -3856,7 +4111,8 @@ export const TALK_DATA = {
         "remember_bracket": "Brackets at the end of a line are for Helper's reasons. Leave yours out.",
         "twice": "There is a {label} line already. Keep one of them.",
         "same_twice": "This line is there twice. Delete one.",
-        "too_many": "Helper keeps three Remember lines at most. Delete one."
+        "too_many": "Helper keeps three Remember lines at most. Delete one.",
+        "work_value": "Keep it to 12 words and 80 letters or fewer, with no question mark."
       },
       "saved": "Saved.",
       "also_tell": "You can also tell Helper. In its conversation, type: forget my name.",
@@ -3866,6 +4122,42 @@ export const TALK_DATA = {
         "Removing Helper does not delete it.",
         "Do not type passwords here."
       ],
+      "box_lines": {
+        "name": {
+          "label": "Name",
+          "reason": "Helper greets you with it"
+        },
+        "work": {
+          "label": "What you do",
+          "reason": "Helper tells your AI this when it asks for help",
+          "reason_without_ai": "you told Helper this"
+        },
+        "mod": {
+          "label": "Paying for an AI",
+          "reason": "so Helper does not ask again",
+          "values": {
+            "ChatGPT": "mod1",
+            "Claude": "mod2",
+            "Neither": "mod4",
+            "Free": "mod3"
+          }
+        },
+        "msg": {
+          "label": "Chat app",
+          "reason": "so Helper shows that app's setup",
+          "values": "keeps.answers.msg.names, written with the app's own spelling"
+        },
+        "svc": {
+          "label": "Service",
+          "reason": "so Helper can write the text to paste",
+          "values": "keeps.answers.svc.names, written with the service's own spelling"
+        },
+        "asked": {
+          "label": "Remember",
+          "reason": "you asked Helper to keep it",
+          "max": 3
+        }
+      },
       "would_delete": {
         "question": "Save, and forget {n} things?",
         "question_one": "Save, and forget one thing?",
@@ -3922,6 +4214,14 @@ export const TALK_DATA = {
           "asked": [
             "remember",
             "you asked helper to remember"
+          ],
+          "work": [
+            "what you do",
+            "what i do",
+            "work",
+            "my work",
+            "job",
+            "my job"
           ]
         },
         "max_box_chars": 2000,

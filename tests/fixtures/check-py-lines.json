@@ -258,7 +258,7 @@
   },
   {
    "id": "MEAN_NONE",
-   "text": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\".",
+   "text": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\".",
    "kind": "reply",
    "words": 16,
    "found": []
@@ -282,6 +282,62 @@
    "text": "Sorry, I don't have checked information on that one either.",
    "kind": "reply",
    "words": 10,
+   "found": []
+  },
+  {
+   "id": "OK_SAME",
+   "text": "All right. I'm here when you need me.",
+   "kind": "reply",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "THANKS_SAME",
+   "text": "Any time. I'm here if you have another question.",
+   "kind": "reply",
+   "words": 9,
+   "found": []
+  },
+  {
+   "id": "HOW_SAME",
+   "text": "Still good, thanks. Ask me anything about Hermes.",
+   "kind": "reply",
+   "words": 8,
+   "found": []
+  },
+  {
+   "id": "BYE_SAME",
+   "text": "Bye for now.",
+   "kind": "reply",
+   "words": 3,
+   "found": []
+  },
+  {
+   "id": "CUT_SAME",
+   "text": "I can't tell what you need from that. Type your whole question in one message.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "WRONG_SAME",
+   "text": "Sorry again. Try other words, or ask about another part of Hermes.",
+   "kind": "reply",
+   "words": 12,
+   "found": []
+  },
+  {
+   "id": "STUCK",
+   "text": "Sorry it didn't work. Tell me what you tried and what you saw on the screen.",
+   "kind": "reply",
+   "words": 16,
+   "found": []
+  },
+  {
+   "id": "STUCK_SAME",
+   "text": "Sorry it still isn't working. Try other words, or ask about another part of Hermes.",
+   "kind": "reply",
+   "words": 15,
    "found": []
   },
   {
@@ -362,6 +418,13 @@
    "found": []
   },
   {
+   "id": "A2-work",
+   "text": "Delete what you told me you do?",
+   "kind": "question",
+   "words": 7,
+   "found": []
+  },
+  {
    "id": "A2-after-yes",
    "text": "Done. I no longer keep that.",
    "kind": "reply",
@@ -436,6 +499,43 @@
    "text": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.",
    "kind": "reply",
    "words": 25,
+   "found": []
+  },
+  {
+   "id": "WORK_SECRET",
+   "text": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes.",
+   "kind": "reply",
+   "words": 20,
+   "found": []
+  },
+  {
+   "id": "WORK_LONG",
+   "text": "Thanks. That is too long for me to keep. In 12 words or fewer, what do you do?",
+   "kind": "reply",
+   "words": 18,
+   "found": [
+    "an answer line ends with a question"
+   ]
+  },
+  {
+   "id": "WORK_LONG_2",
+   "text": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
+   "kind": "reply",
+   "words": 15,
+   "found": []
+  },
+  {
+   "id": "WORK_ASK",
+   "text": "What do you do now?",
+   "kind": "question",
+   "words": 5,
+   "found": []
+  },
+  {
+   "id": "work-told",
+   "text": "I also tell your AI what you do when I ask it for help.",
+   "kind": "reply",
+   "words": 14,
    "found": []
   },
   {
@@ -569,6 +669,13 @@
    "text": "Helper keeps three Remember lines at most. Delete one.",
    "kind": "reply",
    "words": 9,
+   "found": []
+  },
+  {
+   "id": "settings-why-work_value",
+   "text": "Keep it to 12 words and 80 letters or fewer, with no question mark.",
+   "kind": "reply",
+   "words": 14,
    "found": []
   },
   {

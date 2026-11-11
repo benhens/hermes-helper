@@ -22,6 +22,7 @@ function show(o) {
   if (o.name_taken) return show({ ...o, name_taken: null }) + ' +name=' + o.name_taken
   if (o.kept && o.kept.length) return show({ ...o, kept: null, first: null }) + ' +kept=' + o.kept.join(',') + (o.first ? ' +first' : '')
   if (o.used) return show({ ...o, used: null }) + ' +from-kept'
+  if (o.by_again) return show({ ...o, by_again: null }) + ' +again' // live-v2 changes-3
   if (o.repeat_of) return show({ ...o, repeat_of: null }) + ' +norepeat'
   const py = v => (v === null || v === undefined ? 'None' : v)
   const by = {

@@ -223,7 +223,8 @@
    "text_no_name": "Thanks. Ask me anything about Hermes.",
    "under": "the grey kept line (keeps.tell) when something was kept. No topic picks.",
    "answers": "none",
-   "when": "After What do you do?, always. Nothing new is written here since changes-15: the name was written at F1. A kept line shows only if a name was given here for the first time (the fake-model route)."
+   "when": "After What do you do?, always. Nothing new is written here since changes-15: the name was written at F1. A kept line shows only if a name was given here for the first time (the fake-model route).",
+   "when_c4": "changes-4: F2 now writes work (keeps.work step 7) and shows Kept: {work}. under it."
   },
   {
    "id": "F3",
@@ -231,7 +232,8 @@
    "text": "That's fine. Ask me anything about Hermes.",
    "under": "the grey kept line if a name was given (keeps.tell). No topic picks.",
    "answers": "none",
-   "when": "Skip pressed at What's your name? or What do you do?. met is written. A name given before Skip was already written at F1 (changes-15), so nothing new is kept and no kept line shows."
+   "when": "Skip pressed at What's your name? or What do you do?. met is written. A name given before Skip was already written at F1 (changes-15), so nothing new is kept and no kept line shows.",
+   "when_c4": "changes-4: also for a non-answer at What do you do? (keeps.work step 4)."
   },
   {
    "id": "N1",
@@ -480,7 +482,9 @@
   {
    "id": "MEAN_NONE",
    "kind": "reply",
-   "text": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\".",
+   "text": "Sorry, I was not clear. Type the word you want explained, like \"what is a skill\".",
+   "text_was": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\".",
+   "text_changed": "live-v2 changes-3 (hhtech-run-c18 section 3, I'm confused): \"that was not clear\" could be read as blaming the person's message. Every message of kind mean says Helper's words were not clear, so Helper takes the blame.",
    "answers": "none",
    "when": "small_talk kind mean, when there is nothing to say again in other words (see small_talk.mean_rule).",
    "added": "changes-14"
@@ -509,27 +513,92 @@
    "under": "the grey line N_HINT, as under N1. No topic picks.",
    "when": "no_repeat: in place of N1 or N1a when the line just before was a don't-know line of the same id. True in every case, because it gives no reason.",
    "added": "changes-15"
+  },
+  {
+   "id": "OK_SAME",
+   "kind": "reply",
+   "text": "All right. I'm here when you need me.",
+   "answers": "none",
+   "when": "no_repeat group ok: in place of OK when OK would show twice in a row.",
+   "added": "live-v2 changes-3"
+  },
+  {
+   "id": "THANKS_SAME",
+   "kind": "reply",
+   "text": "Any time. I'm here if you have another question.",
+   "answers": "none",
+   "when": "no_repeat group thanks: in place of THANKS when THANKS would show twice in a row.",
+   "added": "live-v2 changes-3"
+  },
+  {
+   "id": "HOW_SAME",
+   "kind": "reply",
+   "text": "Still good, thanks. Ask me anything about Hermes.",
+   "answers": "none",
+   "when": "no_repeat group how: in place of HOW when HOW would show twice in a row.",
+   "added": "live-v2 changes-3"
+  },
+  {
+   "id": "BYE_SAME",
+   "kind": "reply",
+   "text": "Bye for now.",
+   "answers": "none",
+   "when": "no_repeat group bye: in place of BYE when BYE would show twice in a row.",
+   "added": "live-v2 changes-3"
+  },
+  {
+   "id": "CUT_SAME",
+   "kind": "reply",
+   "text": "I can't tell what you need from that. Type your whole question in one message.",
+   "answers": "none",
+   "when": "no_repeat group cut: in place of CUT when CUT would show twice in a row.",
+   "added": "live-v2 changes-3"
+  },
+  {
+   "id": "WRONG_SAME",
+   "kind": "reply",
+   "text": "Sorry again. Try other words, or ask about another part of Hermes.",
+   "answers": "none",
+   "when": "no_repeat group wrong: in place of WRONG when WRONG would show twice in a row or the person just called it wrong. True each time, because WRONG (Sorry about that ...) is always the line it replaces or was rejected just before.",
+   "added": "live-v2 changes-3"
+  },
+  {
+   "id": "STUCK",
+   "kind": "reply",
+   "text": "Sorry it didn't work. Tell me what you tried and what you saw on the screen.",
+   "answers": "none",
+   "when": "small_talk kind stuck (that didn't work, it's not working ... as the whole message). No question mark, nothing to pick, no pending topic.",
+   "added": "live-v2 changes-3 (hhtech-run-c18 section 3: that didn't work got N1)"
+  },
+  {
+   "id": "STUCK_SAME",
+   "kind": "reply",
+   "text": "Sorry it still isn't working. Try other words, or ask about another part of Hermes.",
+   "answers": "none",
+   "when": "no_repeat group stuck: in place of STUCK when STUCK would show twice in a row.",
+   "added": "live-v2 changes-3"
   }
  ],
  "keeps": {
   "about": "What Helper keeps, by fixed rules, with no asking. His words of 10 Nov, 19:00 (inputs/pb-words-10nov-keep-rules.md). Every rule here is followed by code. No model decides what is kept. The rules in plain words, the table of every question and answer, and the reasons: content/helper-keeps-v1.md.",
   "tightened_19_15": "His words of 10 Nov, 19:15 (inputs/pb-words-10nov-keep-little-skills-list.md): only what defines the person's Hermes setup, as little as possible, not always updating. So: what-you-do is used for the visit only and is not kept; at most 3 things on request; at most 7 kept things in all (name, mod, msg, svc, and 3 asked). A kept thing changes only when the person answers the same question again after Change, changes or deletes it on the settings page or the list, or tells Helper (remember that ..., forget my ...). Nothing is added from free typing. No model decides. Account: content/helper-keeps-v1.md.",
-  "max_kept": 7,
+  "max_kept": 8,
   "depends_on_his_answer": "Lead's reading, told to him and his to overrule: no model decides what is kept. Nothing a model returns is kept, except the name the model may fill at the opening (helper-talk-v2.md 2.1 step 3), which code checks.",
   "rules": [
-   "1. From the opening: the name only. Written as soon as it is given: at F1 (the reply to What's your name?), or with a question, or at Skip if given before. What the person does is used for this visit only; it is not kept (tightened 19:15) and not sent to any AI as a value of its own. changes-15: was written when the opening ends. live-v2: was also sent to their AI.",
+   "1. From the opening: the name, and what the person does (live-v2 changes-4, his words of 11 Nov 03:58: Of course the helper still knows). The name is written at F1; what the person does is written at F2 by keeps.work. Was: what the person does is used for this visit only (tightened 19:15).",
    "2. From the conversation: an answer to one of the three questions in answers (mod-q, msg-q, svc-q), when the person picks it, or types it while that question is the open one and code finds it by the words listed here. A new answer replaces the old one.",
    "3. On request: what follows a request start (remember.request_starts), word for word, within remember.limits.",
    "4. Never: anything else the person types, anything a model returns beyond rule 1, anything that matches the K1 key patterns or remember.refuse.",
-   "5. Every kept thing has a use: a question is skipped, a line is chosen, or (the name only) Helper greets the person with it. Nothing kept is ever sent to any AI, not even the name (Lead, 11 Nov 00:55; live-v2). Exception, changes-6: things kept on request (asked) have no use. They are kept and shown on the list, and nothing else. They stay because Pēteris asked for them.",
+   "5. Every kept thing has a use: a question is skipped, a line is chosen, the name greets the person, or (work only) it is handed to the person's AI as one labelled line when Helper asks it (helper-talk-live-v2.json input.work_line). The name and everything else kept is never sent to any AI. In no_ai_step, work has no use yet beyond being kept and shown (changes-4, said plainly). Exception, changes-6: things kept on request (asked) have no use.",
    "6. Nothing is kept silently: every keep shows the grey kept line (tell) under Helper's line at that moment.",
    "7. The way to see and delete everything kept ships in the same build that keeps anything: the list in the conversation (tell.see, typed). It needs no settings page.",
-   "8. At most 7 kept things in all: name, mod, msg, svc, and up to 3 asked. Each of the first four holds one value that is replaced, never added to.",
+   "8. At most 8 kept things in all: name, work, mod, msg, svc, and up to 3 asked. Each of the first five holds one value that is replaced, never added to.",
    "9. Not always updating: a kept answer's question is not asked again, so it changes only through Change, through the list, or by telling Helper. Nothing is added from free typing except after a request start."
   ],
   "storage": {
    "shape": {
     "name": "Peter",
+    "work": "I run a tennis club",
     "mod": "mod1",
     "msg": "WhatsApp",
     "svc": "Gmail",
@@ -552,6 +621,18 @@
     "change": "in the conversation: the link Change beside From what I keep, or delete it on the list and Helper asks again",
     "limits": "at most 30 letters, not a key",
     "used_by_was": "... Sent to the person's AI with typed messages only in a build that calls a model (4.2, Name:)."
+   },
+   {
+    "id": "work",
+    "label": "What you do",
+    "rule": 1,
+    "value": "{work}",
+    "kept_words": "{work}",
+    "why": "So Helper's answers can fit what you do.",
+    "used_by": "ai_writes and ai_picks_line: helper-talk-live-v2.json input.work_line, the only kept value sent to any AI. no_ai_step: nothing uses it; no written line changes with it (changes-4).",
+    "change": "typed: keeps.work.typed_change; the list in the conversation; the settings page",
+    "limits": "keeps.work.limits",
+    "added": "live-v2 changes-4"
    },
    {
     "id": "mod",
@@ -763,7 +844,7 @@
     "Kept: you use WhatsApp.",
     "Kept: I only use a Windows laptop."
    ],
-   "first_time": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords.",
+   "first_time": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.",
    "first_time_when": "Under the kept line, the first time anything is kept (told is not set). Once. Shown again after everything was deleted and something new is kept.",
    "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.",
    "link": {
@@ -797,6 +878,7 @@
     "does": "Shows the list in the conversation: the line see_line, then one row per kept thing (label: value, labels from things), then the button delete_all. Nothing kept: see_line_nothing and no button. This is the way to see and delete in this build.",
     "rows": {
      "name": "Your name: {name}",
+     "work": "What you do: {work}",
      "mod": "Paying for an AI: {value}",
      "msg": "Your chat app: {app}",
      "svc": "A service you use: {service}",
@@ -813,7 +895,15 @@
    "first_time_was_12": "I keep this in the Hermes app on this computer. Only your name goes to your AI. It goes to no one else.",
    "first_time_note_12": "Changes-12: the last sentence is the one place the conversation warns about passwords. It shows once, the first time anything is kept, right where the person has just learned that Helper keeps what they ask. Never on every message.",
    "first_time_was_live_v2": "I keep this in the Hermes app on this computer. Only your name goes to your AI, and no one else. Never tell me passwords.",
-   "first_time_note": "live-v2: the first-time line in a build that calls a model (mode ai_picks_line or ai_writes), the same for both. Was: Only your name goes to your AI, and no one else."
+   "first_time_note": "live-v2: the first-time line in a build that calls a model (mode ai_picks_line or ai_writes), the same for both. Was: Only your name goes to your AI, and no one else.",
+   "work_told": {
+    "ai_writes": "I also tell your AI what you do when I ask it for help.",
+    "ai_picks_line": "I also tell your AI what you do when I ask it for help.",
+    "no_ai_step": null,
+    "when": "Under the grey Kept: line that holds work, the first time work is kept (flag told_work in the stored record), below the first-time line if both show. Shown again after work was deleted and kept anew.",
+    "added": "live-v2 changes-4"
+   },
+   "first_time_was_c4": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords."
   },
   "remember": {
    "rule": "Step 1 b, straight after the key check and before the build words. Skipped while the memory question (mem-q) is the open one: there the message is the answer about Hermes. Lower-case the message and cut lead_ins from its start. If it then starts with a request start and has no question mark, it is a request to Helper. {thing} = the rest of the message as typed, without a leading that or colon. For the starts that end in i, i'm, im, my, we or our, {thing} begins at that word.",
@@ -1352,6 +1442,16 @@
       "forget what i asked you to remember",
       "delete what i asked you to remember",
       "forget what i told you to remember"
+     ],
+     "work": [
+      "forget what i do",
+      "delete what i do",
+      "remove what i do",
+      "forget my job",
+      "delete my job",
+      "remove my job",
+      "forget my work",
+      "delete my work"
      ]
     },
     "questions": {
@@ -1359,7 +1459,8 @@
      "mod": "Delete what you told me about paying?",
      "msg": "Delete your chat app?",
      "svc": "Delete the service you named?",
-     "asked": "Delete all you asked me to remember?"
+     "asked": "Delete all you asked me to remember?",
+     "work": "Delete what you told me you do?"
     },
     "answers": [
      {
@@ -1407,12 +1508,17 @@
    "status": "Wanted in this release (his words, 10 Nov 20:05: like memory.md under Helper in Settings). Whether it fits before the deadline is hhtech's and the Builder's to say (hhtech's cut order put it first to go).",
    "where": "Settings, then Plugins, then Helper (hhtech ran: docs/answers/hhtech-helper-settings.md).",
    "top_line": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
-   "top_line_2": "Nothing on this page is sent to any AI.",
+   "top_line_2": "Only the What you do line is sent to your AI, when Helper asks it for help.",
    "top_line_2_note": "Shown only in a build that calls a model (mode ai_picks_line or ai_writes). live-v2: was \"Only your name goes to your AI, when you type to Helper.\"",
    "box_lines": {
     "name": {
      "label": "Name",
      "reason": "Helper greets you with it"
+    },
+    "work": {
+     "label": "What you do",
+     "reason": "Helper tells your AI this when it asks for help",
+     "reason_no_ai_step": "you told Helper this"
     },
     "mod": {
      "label": "Paying for an AI",
@@ -1443,6 +1549,7 @@
    "line_form": "{label}: {value} ({reason})",
    "order": [
     "name",
+    "work",
     "mod",
     "msg",
     "svc",
@@ -1450,6 +1557,7 @@
    ],
    "example": [
     "Name: Peter (Helper greets you with it)",
+    "What you do: I run a tennis club (Helper tells your AI this when it asks for help)",
     "Paying for an AI: ChatGPT (so Helper does not ask again)",
     "Chat app: WhatsApp (so Helper shows that app's setup)",
     "Remember: I only use a Windows laptop (you asked Helper to keep it)"
@@ -1478,7 +1586,8 @@
     "remember_bracket": "Brackets at the end of a line are for Helper's reasons. Leave yours out.",
     "twice": "There is a {label} line already. Keep one of them.",
     "same_twice": "This line is there twice. Delete one.",
-    "too_many": "Helper keeps three Remember lines at most. Delete one."
+    "too_many": "Helper keeps three Remember lines at most. Delete one.",
+    "work_value": "Keep it to 12 words and 80 letters or fewer, with no question mark."
    },
    "would_delete": {
     "question": "Save, and forget {n} things?",
@@ -1576,6 +1685,14 @@
      "asked": [
       "remember",
       "you asked helper to remember"
+     ],
+     "work": [
+      "what you do",
+      "what i do",
+      "work",
+      "my work",
+      "job",
+      "my job"
      ]
     },
     "labels_note": "Besides Helper's own five labels, the labels of the list in the conversation (keeps.tell.see) and 'my ...', so a line copied from there is read too.",
@@ -1584,7 +1701,8 @@
      "mod": "Lower-cased with all spaces taken out, one of chatgpt, claude, neither, free. Gives mod1, mod2, mod4, mod3.",
      "msg": "Lower-cased, spaces squeezed: a key of keeps.answers.msg.names or one of its values lower-cased. Stored in the value's own spelling (whatsap gives WhatsApp).",
      "svc": "The same with keeps.answers.svc.names (drive and google drive both give Google Drive).",
-     "asked": "2 to 15 words, at most 100 characters (keeps.remember.limits). Kept as typed (spaces squeezed)."
+     "asked": "2 to 15 words, at most 100 characters (keeps.remember.limits). Kept as typed (spaces squeezed).",
+     "work": "1 to 12 words, at most 80 characters, no question mark (keeps.work.limits). The secret check is step 4, as for every line. Kept as typed (spaces squeezed)."
     },
     "max_box_chars": 2000,
     "quote_max_chars": 60,
@@ -1597,12 +1715,14 @@
      "layout": "Three short rows under the box: cannot_read, then quote, then the why. secret_line and too_much are one row on their own.",
      "secret_line": "Nothing was saved. Line {n} looks like a password, a secret key or a long number. Delete it.",
      "too_much": "Nothing was saved. That is too much text for Helper's few short lines."
-    }
+    },
+    "steps_on_save_note_c4": "Step 10 and 14 count work like name, mod, msg and svc (one line; a stored work line not in the new record adds 1 to n)."
    },
    "tests": "dev/checks/hhcontent-settings-edit/tests.json (run by settings_read.py)",
    "changed_settings_edit": "10 Nov 2026, 20:45 UTC: read, the new why lines and messages, Undo changes, second under_box line. Account: content/helper-settings-edit-v1.md.",
    "facts_note_12": "Changes-12: the fourth fact is the settings page's one warning, shown with the other facts whenever the page is open. Not repeated per line.",
-   "top_line_2_was": "Only your name goes to your AI, when you type to Helper."
+   "top_line_2_was": "Only your name goes to your AI, when you type to Helper.",
+   "top_line_2_was_c4": "Nothing on this page is sent to any AI."
   },
   "disclosure_point_11": {
    "use_now": "no_ai_step",
@@ -1697,6 +1817,136 @@
    "text": "6. It also keeps a few page settings, such as how wide its panel is, and your answers on its page. It keeps one mark that it has said hello, so it never asks your name twice. Forget all of this does not remove that mark.",
    "was": "6. It also keeps a few page settings, such as how wide its panel is, and your answers on its page.",
    "added": "changes-14"
+  },
+  "work": {
+   "about": "live-v2 changes-4. His decision of 11 Nov 03:58 (inputs/pb-words-11nov-helper-q123.md): the answer to What do you do? is kept between visits, like the name. Fixed rules, no asking, no model decides. Explained in content/helper-talk-live-v2-changes-4.md.",
+   "when": "Only the reply to F1 (What do you do?), stage work, after the K1 key check (a key gets K1, nothing kept, as today). One chance per person: F1 is never asked again once met is written (keeps.met).",
+   "steps": [
+    "1. K1 key patterns match: K1 as today. Nothing kept.",
+    "2. Question: question_form (as today). The message is answered as an ordinary message. Nothing kept, F1 not asked again.",
+    "3. A topic key word, misspelling or term key word, and the message does not start with one of opening.name_with_more.self_starts: answered as an ordinary message. Nothing kept.",
+    "4. Not an answer: the whole message (lower-cased, end marks cut) is a small_talk kind, or one of non_answers. Line F3. Nothing kept.",
+    "5. Secret: looks_secret(text) (keeps.remember.refuse.rule_12, secret_rule.py). Line WORK_SECRET. Nothing kept.",
+    "6. Too long: more than limits.max_words words or more than limits.max_chars characters. The first time: line WORK_LONG, stage stays work. The second time: line WORK_LONG_2, nothing kept, stage open.",
+    "7. Otherwise: keep {work} = the message as typed, spaces squeezed, end full stops and ! cut. Line F2, with the grey line Kept: {work}. under it (tell.kept_line), and in a build that calls an AI, tell.work_told under that, once."
+   ],
+   "limits": {
+    "min_words": 1,
+    "max_words": 12,
+    "max_chars": 80
+   },
+   "limits_note": "12 words is opening.work_max_words, as before. 80 characters is new (was 60 in route2.py's model check only).",
+   "non_answers": [
+    "nothing",
+    "not much",
+    "nothing really",
+    "none",
+    "no",
+    "nope",
+    "idk",
+    "i don't know",
+    "i dont know",
+    "dunno",
+    "not sure",
+    "skip",
+    "pass",
+    "rather not say",
+    "i'd rather not say",
+    "prefer not to say",
+    "i prefer not to say",
+    "none of your business",
+    "n/a",
+    "na",
+    "-",
+    "?",
+    "..."
+   ],
+   "typed_change": {
+    "rule": "Stage open. The person changes what they do by saying so. All must hold: (1) after cutting lead_ins (keeps.remember.lead_ins) and a leading actually, the message starts with one of starts; (2) it has one of now_words; (3) it is not a question (no question mark, no question start); (4) it has none of keeps.typed_change.not_words and no topic key word, misspelling or term key word; (5) looks_secret is false and it is within limits after the cut. {work} = the message with lead_ins, actually and the now_words at its end cut. It replaces the kept value (or is kept if none was). Line F2 (with the kept name), grey line Kept: {work}.",
+    "starts": [
+     "i'm a",
+     "i'm an",
+     "im a",
+     "i am a",
+     "i am an",
+     "i work as",
+     "i work at",
+     "i work in",
+     "i work for",
+     "i'm working as",
+     "i run",
+     "i own",
+     "i teach",
+     "i study",
+     "i'm studying",
+     "i manage",
+     "i coach",
+     "my job is",
+     "my work is",
+     "i'm retired",
+     "i am retired"
+    ],
+    "now_words": [
+     "now",
+     "nowadays",
+     "these days",
+     "instead",
+     "anymore"
+    ],
+    "not_with": [
+     "not",
+     "no longer",
+     "don't",
+     "dont",
+     "bit",
+     "little",
+     "beginner",
+     "newbie",
+     "confused",
+     "lost",
+     "stuck"
+    ],
+    "ask_again_words": [
+     "change what i do",
+     "change my job",
+     "change what you know about my job",
+     "update what i do"
+    ],
+    "ask_again": "A whole message in ask_again_words: Helper asks WORK_ASK (not F1, whose Nice to meet you is wrong on a later visit). Stage work; steps 1 to 7 apply to the reply.",
+    "examples": [
+     [
+      "I'm a teacher now",
+      "kept: I'm a teacher"
+     ],
+     [
+      "actually I run a bakery now",
+      "kept: I run a bakery"
+     ],
+     [
+      "I'm a bit lost now",
+      "not taken (bit, lost): answered as usual"
+     ],
+     [
+      "I don't run the club anymore",
+      "not taken (don't): answered as usual"
+     ],
+     [
+      "I'm a teacher now, can Hermes mark homework?",
+      "not taken (question): answered as usual"
+     ],
+     [
+      "I'm a teacher",
+      "not taken (no now word): answered as usual"
+     ]
+    ]
+   },
+   "lines": {
+    "WORK_SECRET": "Thanks. I didn't keep that, because it looks like a password or a long number. Ask me anything about Hermes.",
+    "WORK_LONG": "Thanks. That is too long for me to keep. In 12 words or fewer, what do you do?",
+    "WORK_LONG_2": "Thanks. I didn't keep that, because it is too long. Ask me anything about Hermes.",
+    "WORK_ASK": "What do you do now?"
+   },
+   "status": "not_run: route2.py is not changed in changes-4 (it still keeps nothing at F2). Data and the reference check apply_c4.py only."
   }
  },
  "opening": {
@@ -1965,7 +2215,36 @@
    "tell me how",
    "show me how"
   ],
-  "skip_starts": ["what is", "what's", "whats", "what are", "what does", "what do", "why", "is it", "is that", "is this", "are there", "does it", "does that", "do i need", "should i", "which", "how do i", "how can i", "how to", "can i", "how", "explain", "could you explain", "can you explain", "would you explain", "please explain", "tell me how", "show me how"],
+  "skip_starts": [
+   "what is",
+   "what's",
+   "whats",
+   "what are",
+   "what does",
+   "what do",
+   "why",
+   "is it",
+   "is that",
+   "is this",
+   "are there",
+   "does it",
+   "does that",
+   "do i need",
+   "should i",
+   "which",
+   "how do i",
+   "how can i",
+   "how to",
+   "can i",
+   "how",
+   "explain",
+   "could you explain",
+   "can you explain",
+   "would you explain",
+   "please explain",
+   "tell me how",
+   "show me how"
+  ],
   "how_phrases": [
    "how to",
    "how do i",
@@ -1984,7 +2263,126 @@
    "connect my",
    "link my"
   ],
-  "build_words": ["do it for me", "do this for me", "do that for me", "can you install", "could you install", "would you install", "please install", "install it", "install this", "install that", "install them", "can you connect", "could you connect", "please connect", "connect it", "connect this", "can you build", "could you build", "please build", "build me", "build it", "can you set up", "could you set up", "please set up", "set it up", "set this up", "set everything up", "set it all up", "can you configure", "please configure", "configure it", "can you enable", "please enable", "enable it", "turn it on", "switch it on", "deploy it", "just do it", "do it now", "build an app", "make an app", "build a website", "make a website", "build a bot", "make a bot", "write the code", "do it all", "make it work", "do everything", "connect my chatgpt", "connect my claude", "connect chatgpt", "connect claude", "add my key", "add my api key", "use my key", "here is my key", "here's my key", "my key is", "switch my model", "change my model", "change the model", "set my model", "download a model", "download the model", "install a model", "install the model", "sign me in", "log me in", "sign in for me", "log in for me", "set up a server", "set up my server", "rent a server", "rent me a server", "deploy hermes", "move hermes", "move it to", "connect to my server", "connect my server", "set up hermes cloud", "sign up for hermes cloud", "sign me up", "install hermes", "keep my computer awake", "install a skill", "install the skill", "install a plugin", "install the plugin", "add a skill", "add the skill", "add this skill", "add a plugin", "add the plugin", "add this plugin", "add an mcp", "add the mcp", "set up mcp", "set up an mcp", "connect gmail", "connect my gmail", "connect my email", "connect my calendar", "connect github", "connect my github", "connect notion", "connect my notion", "write a skill", "create a skill", "make a skill", "build a plugin", "make a plugin", "write a plugin", "turn on the", "switch on the", "enable the", "connect my", "link my"],
+  "build_words": [
+   "do it for me",
+   "do this for me",
+   "do that for me",
+   "can you install",
+   "could you install",
+   "would you install",
+   "please install",
+   "install it",
+   "install this",
+   "install that",
+   "install them",
+   "can you connect",
+   "could you connect",
+   "please connect",
+   "connect it",
+   "connect this",
+   "can you build",
+   "could you build",
+   "please build",
+   "build me",
+   "build it",
+   "can you set up",
+   "could you set up",
+   "please set up",
+   "set it up",
+   "set this up",
+   "set everything up",
+   "set it all up",
+   "can you configure",
+   "please configure",
+   "configure it",
+   "can you enable",
+   "please enable",
+   "enable it",
+   "turn it on",
+   "switch it on",
+   "deploy it",
+   "just do it",
+   "do it now",
+   "build an app",
+   "make an app",
+   "build a website",
+   "make a website",
+   "build a bot",
+   "make a bot",
+   "write the code",
+   "do it all",
+   "make it work",
+   "do everything",
+   "connect my chatgpt",
+   "connect my claude",
+   "connect chatgpt",
+   "connect claude",
+   "add my key",
+   "add my api key",
+   "use my key",
+   "here is my key",
+   "here's my key",
+   "my key is",
+   "switch my model",
+   "change my model",
+   "change the model",
+   "set my model",
+   "download a model",
+   "download the model",
+   "install a model",
+   "install the model",
+   "sign me in",
+   "log me in",
+   "sign in for me",
+   "log in for me",
+   "set up a server",
+   "set up my server",
+   "rent a server",
+   "rent me a server",
+   "deploy hermes",
+   "move hermes",
+   "move it to",
+   "connect to my server",
+   "connect my server",
+   "set up hermes cloud",
+   "sign up for hermes cloud",
+   "sign me up",
+   "install hermes",
+   "keep my computer awake",
+   "install a skill",
+   "install the skill",
+   "install a plugin",
+   "install the plugin",
+   "add a skill",
+   "add the skill",
+   "add this skill",
+   "add a plugin",
+   "add the plugin",
+   "add this plugin",
+   "add an mcp",
+   "add the mcp",
+   "set up mcp",
+   "set up an mcp",
+   "connect gmail",
+   "connect my gmail",
+   "connect my email",
+   "connect my calendar",
+   "connect github",
+   "connect my github",
+   "connect notion",
+   "connect my notion",
+   "write a skill",
+   "create a skill",
+   "make a skill",
+   "build a plugin",
+   "make a plugin",
+   "write a plugin",
+   "turn on the",
+   "switch on the",
+   "enable the",
+   "connect my",
+   "link my"
+  ],
   "build_pair": {
    "must_have": "for me",
    "and_one_of": [
@@ -4212,6 +4610,30 @@
    "fees"
   ],
   "note": "Whole words, as key words. A message that also names an AI (chatgpt, claude ...) is a topic mod message and gets the mod lines, as before.",
+  "amount_asks": [
+   "how much",
+   "per month",
+   "a month",
+   "each month",
+   "every month",
+   "monthly",
+   "per year",
+   "a year",
+   "per day",
+   "a day"
+  ],
+  "use_price_words": [
+   "cost",
+   "costs",
+   "costing",
+   "cost me",
+   "costs me",
+   "costing me",
+   "money",
+   "price",
+   "pay"
+  ],
+  "amount_rule": "live-v2 changes-3 (hhtech-run-c18 section 3: how much money will the AI cost me per month got use2). A question asking what something costs gets COST, not the using-less line, when all of these hold: it is a question (question_form); it has one of amount_asks; the only topic found by a full key word is use, and every key word of topic use found in it is one of use_price_words (so nothing about less, too much, cheaper, saving, limits, tokens or a bill); and no term key word. Checked where COST is checked (after what is, before topics). how much money will this take keeps the model question (no topic use word); it costs too much and how do I save money keep use2.",
   "wants_row_beats": "A row of the wants (content/helper-wants-v1.json) found for the message beats COST and WHERE, the way a topic word does: that row is shown, not the cost or where line. Only where the rows are looked at anyway, so not while Helper's own question is open. Example: can it keep an eye on airline ticket prices gets the prices row, not the cost line. route2.py has no rows, so it cannot show this; the Builder's test: tests/talk-fixes.test.mjs, Builder. Kept by Lead, 10 Nov 2026 (helper-builder-qs-v1.md point 4)."
  },
  "where": {
@@ -4509,8 +4931,72 @@
     "nope, wrong",
     "i meant something else",
     "not quite"
+   ],
+   "stuck": [
+    "that didn't work",
+    "that didnt work",
+    "that did not work",
+    "it didn't work",
+    "it didnt work",
+    "it did not work",
+    "didn't work",
+    "didnt work",
+    "did not work",
+    "that doesn't work",
+    "that doesnt work",
+    "it doesn't work",
+    "it doesnt work",
+    "it does not work",
+    "doesn't work",
+    "doesnt work",
+    "not working",
+    "it's not working",
+    "its not working",
+    "it is not working",
+    "still not working",
+    "it's still not working",
+    "its still not working",
+    "it still isn't working",
+    "it still isnt working",
+    "still isn't working",
+    "it still doesn't work",
+    "it still doesnt work",
+    "that still didn't work",
+    "still didn't work",
+    "still doesn't work",
+    "still doesnt work",
+    "that didn't help",
+    "that didnt help",
+    "it didn't help",
+    "it didnt help",
+    "didn't help",
+    "that doesn't help",
+    "that doesnt help",
+    "that did nothing",
+    "nothing happened"
+   ],
+   "again": [
+    "again",
+    "once more",
+    "repeat",
+    "repeat that",
+    "one more time"
    ]
   },
+  "stuck_rule": "live-v2 changes-3 (hhtech-run-c18 section 3: that didn't work got N1). Kind stuck: the whole message, after the usual cuts, is one of kinds.stuck. Line STUCK (STUCK_SAME by no_repeat). At stage name or work it is not taken (as hello, ok and mean). With a question of Helper's open it is taken and drops pending (as wrong). In a build with an AI step it goes to the AI as a follow-up when Helper's last line came from rows (helper-talk-live-v2.json follow_up), with STUCK as the fallback.",
+  "again_rule": "live-v2 changes-3 (hhtech-run-c18 section 4; Lead 01:05: again brings a line back). Kind again: the whole message, after the usual cuts, is one of kinds.again (say that again stays kind mean, as before). Stage open, nothing pending (with a question open it goes on as the answer, as ok and mean). Helper looks for the last answer line of this visit: the last line whose kind is in again_brings_back. (1) Found, and it is not the line just before: show it again, exactly as it was (same id, buttons, next and paste box; no grey Kept: line). (2) Found, and it is the line just before: show it once more if that line was not itself shown by kind again; if it was, show AGAIN (Sorry, I have nothing more on that. Please ask it another way.). (3) None found: MEAN_NONE, or AGAIN if MEAN_NONE is the line just before. The result is final: no_repeat does not swap it, and it never goes to an AI. So again never gets a don't-know line, and no line shows twice in a row except the one line the person asked for once.",
+  "again_brings_back": [
+   "row",
+   "plain",
+   "term",
+   "W2",
+   "COST",
+   "WHERE",
+   "skill by name",
+   "wants",
+   "written"
+  ],
+  "again_note": "skill by name: the skills-by-name line (S1, S2). wants: a row of helper-wants-v1.json. written: a reply written by the person's AI (AI builds only); it is shown again word for word, with no new call. Not brought back: small talk, questions, don't-know lines, AGAIN, MEAN_NONE, H1 and H2 (a paste box is on screen already), K1, RM lines.",
   "lines": {
    "hello": "HELLO or HELLO_SAME",
    "thanks": "THANKS",
@@ -4521,7 +5007,10 @@
    "bye": "BYE",
    "mean": "see mean_rule",
    "cut": "CUT",
-   "wrong": "WRONG"
+   "wrong": "WRONG",
+   "stuck": "STUCK",
+   "again": "see again_rule",
+   "swap_note": "live-v2 changes-3: each line's other line for a repeat is in no_repeat.in_place (OK_SAME, THANKS_SAME, HOW_SAME, BYE_SAME, CUT_SAME, WRONG_SAME, STUCK_SAME; HELLO and HELLO_SAME take turns; WHO and the ai line take turns)."
   },
   "ai_line_by_build": {
    "no_ai_step": "AI",
@@ -4661,16 +5150,40 @@
   ],
   "exempt_why": "Each says something new each time (a new paste box, a new kept thing, a new skill), or must be said every time it is true (a key, a refused secret, what Helper is), or the person asked for it (TP).",
   "groups": {
-   "talk": [
-    "THANKS",
-    "OK",
-    "HOW",
-    "WHO",
-    "BYE",
-    "CUT",
+   "hello": [
     "HELLO",
-    "HELLO_SAME",
-    "WRONG"
+    "HELLO_SAME"
+   ],
+   "ok": [
+    "OK",
+    "OK_SAME"
+   ],
+   "thanks": [
+    "THANKS",
+    "THANKS_SAME"
+   ],
+   "how": [
+    "HOW",
+    "HOW_SAME"
+   ],
+   "who": [
+    "WHO"
+   ],
+   "bye": [
+    "BYE",
+    "BYE_SAME"
+   ],
+   "cut": [
+    "CUT",
+    "CUT_SAME"
+   ],
+   "wrong": [
+    "WRONG",
+    "WRONG_SAME"
+   ],
+   "stuck": [
+    "STUCK",
+    "STUCK_SAME"
    ],
    "dont_know": [
     "N1",
@@ -4679,9 +5192,41 @@
    ]
   },
   "in_place": {
-   "talk": [
+   "hello": [
     "HELLO_SAME",
+    "HELLO"
+   ],
+   "ok": [
+    "OK_SAME",
     "OK"
+   ],
+   "thanks": [
+    "THANKS_SAME",
+    "THANKS"
+   ],
+   "how": [
+    "HOW_SAME",
+    "HOW"
+   ],
+   "who": [
+    "ai_line",
+    "WHO"
+   ],
+   "bye": [
+    "BYE_SAME",
+    "BYE"
+   ],
+   "cut": [
+    "CUT_SAME",
+    "CUT"
+   ],
+   "wrong": [
+    "WRONG_SAME",
+    "WRONG"
+   ],
+   "stuck": [
+    "STUCK_SAME",
+    "STUCK"
    ],
    "dont_know": [
     "N1_AGAIN",
@@ -4693,6 +5238,8 @@
     "MEAN_NONE"
    ]
   },
+  "groups_rule_c3": "live-v2 changes-3 (hhtech-run-c18 section 5: Good. ... came in place of a repeated hello, hi and that's wrong). A swap line must fit the same kind of message. Each kind of small talk has its own group, and its in_place list holds only lines written for that kind: the kind's line and its _SAME line, which take turns. A swap never takes a line from another group (OK's Good. never answers a greeting or a complaint). HELLO in place carries the name, as small_line gives it (HELLO's text or text_no_name). ai_line means the line of small_talk.ai_line_by_build for this build (AI, AI_PICK or AI_WRITES): it says what Helper is, so it fits who are you.",
+  "groups_was_c15": "talk: THANKS, OK, HOW, WHO, BYE, CUT, HELLO, HELLO_SAME, WRONG, with in_place talk: HELLO_SAME, OK.",
   "in_place_rule": "Take the line's group (any line not exempt and in no group is answer). Show the first line of that group's in_place list that is not the line just before. plain means the plain line (row 0, with its next) of the topic of the repeated line; it is skipped when that line has no topic. The list always holds two lines, so one of them always differs from the line just before.",
   "after": "The shown line is noted as the last line. pending and lastq are dropped (the plain line, AGAIN and the others ask no question of their own beyond AGAIN's one). A Kept: line that the repeated line carried still shows.",
   "his_case": "After the WhatsApp line (msg2), Person: no that's wrong, I meant the Hermes app itself on my phone. 1st time: the plain line msg0 (msg2 is the line just before). 2nd time: AGAIN (msg2 is rejected, msg0 is the line just before). 3rd time: MEAN_NONE (msg2, msg0 and AGAIN all rejected or just before).",
@@ -4754,6 +5301,7 @@
   }
  },
  "changed_15": "11 Nov 2026, Lead's job of 00:45: build.make_words (make me ... reaches H1); no_repeat and fixed lines WRONG, AGAIN, N1_AGAIN, small_talk kind wrong and no_rule; keeps.met and rule 1: the name and met written at F1. Account: content/helper-talk-v2-changes-15.md.",
+ "changed_live_v2_c3": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2-changes-3.md, hhtech-run-c18 sections 3 to 5): no_repeat groups by kind of small talk (new lines OK_SAME, THANKS_SAME, HOW_SAME, BYE_SAME, CUT_SAME, WRONG_SAME); small_talk kinds stuck (STUCK, STUCK_SAME) and again (again_rule, again_brings_back); MEAN_NONE reworded; lonely_words.phone.not_with (phone my dentist); cost.amount_rule (how much money will the AI cost me gets COST).",
  "changed_live_v2": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2.md): nothing kept is sent to any AI, not even the name (keeps.rules 1 and 5, things.name.used_by, disclosure_point_11, tell.first_time, settings_file.top_line_2); AI_PICK and AI_WRITES reworded; no_repeat.asked_again.",
  "changed_19": "hhcontent, 11 Nov 2026 (content/helper-talk-v2-changes-19.md): his words \"Include all skills\" (inputs/pb-words-11nov-decisions-2-6.md). Line N1b (\"Sorry, I leave that one out for now. It is not meant for getting started.\") removed, and its id taken out of small_talk.no_means_wrong_after and no_repeat.groups.dont_know; N_HINT and N1_AGAIN no longer name it; N1a's when says a listed skill always gets S1 or S2. All 186 official skills are answered by name, godmode, obliteratus, scrapling, web-pentest and sherlock included. Mentions of N1b in changed_7 are history.",
  "lonely_words": {
@@ -4818,8 +5366,26 @@
      "contacts",
      "back up",
      "backup",
-     "storage"
+     "storage",
+     "phone my",
+     "phone the",
+     "phone a",
+     "phone an",
+     "phone him",
+     "phone her",
+     "phone them",
+     "phone me",
+     "phone us",
+     "phone someone",
+     "phone somebody",
+     "phone people",
+     "phone back",
+     "phone call",
+     "phone calls",
+     "phone number",
+     "phone numbers"
     ],
+    "not_with_c3": "live-v2 changes-3 (hhtech-run-c18 section 3: can hermes phone my dentist for me got the chat-app question). phone followed by a person or a call (phone my dentist, phone me, phone calls, phone number) is phoning someone, not using Hermes from a phone. Taken as whole words, so my phone, from my phone and on my phone still reach msg.",
     "why": "backing up the photos on a phone is not talking to Hermes from a phone (no. 29)"
    },
    "slow": {
@@ -5001,5 +5567,6 @@
    }
   },
   "changed_17": "changes-17: slow, speed up, speed it up, bill, too long, fills up, filling up, filled up (topic use)."
- }
+ },
+ "changed_live_c4": "hhcontent, 11 Nov 2026, live-v2 changes-4: what the person does is kept (keeps.work, things.work, rules 1, 5, 8, settings rows, forget words, first_time and top_line_2 for AI builds). Account: content/helper-talk-live-v2-changes-4.md."
 }

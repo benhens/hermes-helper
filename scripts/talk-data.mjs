@@ -68,8 +68,15 @@ const NEXT_KINDS = ['part', 'paste', 'line', 'none']
 // build with no AI step (AI; the lines for builds that call a model stay out), WRONG, AGAIN and N1_AGAIN (no_repeat), H2.
 // the kinds small_talk.how_after_rows.after may name (src/talk.js HOW_AFTER maps wants to want)
 const HOW_AFTER_KINDS = ['row', 'plain', 'term', 'wants', 'COST', 'WHERE', 'written']
+// live-v2 changes-3: the kinds small_talk.again_brings_back may name (src/talk.js AGAIN_BACK maps them)
+const AGAIN_KINDS = ['row', 'plain', 'term', 'W2', 'COST', 'WHERE', 'skill by name', 'wants', 'written']
 export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'H2', 'K1', 'COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW',
-  'BACK', 'HELLO', 'HELLO_SAME', 'THANKS', 'OK', 'HOW', 'WHO', 'AI', 'AI_PICK', 'AI_WRITES', 'BYE', 'CUT', 'MEAN_NONE', 'WRONG', 'AGAIN', 'N1_AGAIN']
+  'BACK', 'HELLO', 'HELLO_SAME', 'THANKS', 'OK', 'HOW', 'WHO', 'AI', 'AI_PICK', 'AI_WRITES', 'BYE', 'CUT', 'MEAN_NONE', 'WRONG', 'AGAIN', 'N1_AGAIN',
+  // live-v2 changes-3: each kind of small talk has its own line in place of a repeat (no_repeat.in_place), and STUCK
+  'OK_SAME', 'THANKS_SAME', 'HOW_SAME', 'BYE_SAME', 'CUT_SAME', 'WRONG_SAME', 'STUCK', 'STUCK_SAME']
+// live-v2 changes-3: what no_repeat.in_place may name besides fixed lines: a topic's plain line, the "are you an
+// AI" line of this build (ai_line) and HELLO with the name (src/talk.js noRepeat)
+const IN_PLACE_ALSO = ['plain', 'ai_line']
 // changes-11 (check_json.py): W2 compares the two terms the person typed, so for W2 alone the
 // two-terms rule is lifted; each term must still be explained in the line.
 const LIFTED = { W2: ['2 Hermes terms in one line'] }
@@ -108,6 +115,11 @@ function keepLines(d) {
   add('A4-after-no', all.after_no)
   add('kept-line', tell.kept_line)
   add('kept-first', tell.first_time_if_no_model_call)
+  // live-v2 changes-4: what the person does (keeps.work): its lines, and the line under the first Kept: of it in a
+  // build with an AI step (checked here in every build: the build that shows it is a switch away)
+  // (WORK_LONG thanks, then asks F1 again: checked as the opening lines are, which may end with their question)
+  for (const [id, text] of Object.entries((K.work && K.work.lines) || {})) add(id, text, id === 'WORK_LONG' ? 'opening' : /\?$/.test(text) ? 'question' : 'reply')
+  if (tell.work_told) add('work-told', tell.work_told.ai_writes)
   add('used-line', K.use && K.use.used_line)
   const after = K.after_settings_page_exists || {}
   add('by-hand', after.by_hand)
@@ -268,8 +280,23 @@ export function talkProblems(d) {
   const nr = d.no_repeat || {}
   for (const k of ['exempt', 'wrong_starts', 'wrong_anywhere']) if (!(nr[k] || []).length) problems.push(`no_repeat.${k} is empty`)
   // two lines that are not 'plain' (a line with no topic has no plain one), so noRepeat in src/talk.js always has another
-  for (const k of ['talk', 'dont_know', 'answer']) if ((((nr.in_place || {})[k]) || []).filter(id => id !== 'plain').length < 2) problems.push(`no_repeat.in_place.${k} needs two lines`)
-  for (const [g, ids] of Object.entries(nr.in_place || {})) for (const id of ids) if (id !== 'plain' && !FIXED_USED.includes(id)) problems.push(`no_repeat.in_place.${g} names a line the plugin does not say: ${id}`)
+  // live-v2 changes-3: every group, one per kind of small talk, and every group named in groups has its in_place
+  for (const k of new Set([...Object.keys(nr.in_place || {}), ...Object.keys(nr.groups || {}), 'dont_know', 'answer'])) if ((((nr.in_place || {})[k]) || []).filter(id => id !== 'plain').length < 2) problems.push(`no_repeat.in_place.${k} needs two lines`)
+  for (const [g, ids] of Object.entries(nr.in_place || {})) for (const id of ids) if (!IN_PLACE_ALSO.includes(id) && !FIXED_USED.includes(id)) problems.push(`no_repeat.in_place.${g} names a line the plugin does not say: ${id}`)
+  // live-v2 changes-3: the two new kinds and what "again" may bring back (src/talk.js: want for wants, skill for
+  // skill by name)
+  for (const k of ['again', 'stuck']) if (!((st.kinds || {})[k] || []).length) problems.push(`small_talk.kinds.${k} is empty`)
+  for (const k of st.again_brings_back || []) if (!AGAIN_KINDS.includes(k)) problems.push(`small_talk.again_brings_back names a kind the plugin does not have: ${k}`)
+  if (!(st.again_brings_back || []).length) problems.push('small_talk.again_brings_back is empty')
+  const co = d.cost || {}
+  if (co.amount_rule && !((co.amount_asks || []).length && (co.use_price_words || []).length)) problems.push('cost.amount_rule without amount_asks or use_price_words')
+  // live-v2 changes-4: what the person does
+  const wk = (d.keeps || {}).work || {}
+  const wl = wk.limits || {}
+  if (!(Number.isInteger(wl.max_words) && Number.isInteger(wl.max_chars))) problems.push('keeps.work.limits lacks max_words or max_chars')
+  for (const k of ['WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK']) if (!((wk.lines || {})[k])) problems.push(`keeps.work.lines.${k} is missing`)
+  for (const k of ['starts', 'now_words', 'not_with', 'ask_again_words']) if (!(((wk.typed_change || {})[k]) || []).length) problems.push(`keeps.work.typed_change.${k} is empty`)
+  if (!(wk.non_answers || []).length) problems.push('keeps.work.non_answers is empty')
   if (!((nr.asked_again || {}).words || []).length) problems.push('no_repeat.asked_again.words is empty')
   for (const k of ['make_words', 'make_not_followed_by', 'make_not_when_starts', 'build_question_words', 'software_lead_ins', 'software_verbs', 'software_things', 'software_between_not']) if (!((d.build || {})[k] || []).length) problems.push(`build.${k} is empty`)
   if (!Number.isInteger((d.build || {}).software_between_max)) problems.push('build.software_between_max is not a whole number')
@@ -324,6 +351,8 @@ function slimKeeps(K) {
     things: K.things.map(t => pickKeys(t, ['id', 'kept_words'])),
     // changes-11: a chat app, service or AI the person says they use replaces the kept one
     typed_change: pickKeys(K.typed_change, ['self_words', 'question_words', 'not_words']),
+    // live-v2 changes-4: what the person does (keeps.work: the keep rule's lists and lines; the steps are code)
+    work: { ...pickKeys(K.work, ['limits', 'non_answers', 'lines']), typed_change: pickKeys(K.work.typed_change, ['starts', 'now_words', 'not_with', 'ask_again_words']) },
     use: { used_line: K.use.used_line, used_link: { words: K.use.used_link.words } },
     tell: {
       kept_line: K.tell.kept_line,
@@ -332,7 +361,7 @@ function slimKeeps(K) {
       see: {
         ...pickKeys(K.tell.see, ['see_line', 'see_line_nothing', 'see_line_deleted']),
         delete_all: { ...pickKeys(K.tell.see.delete_all, ['label', 'question', 'after_yes', 'after_no']), answers: slimAnswers(K.tell.see.delete_all.answers) },
-        rows: pickKeys(K.tell.see.rows, ['name', 'mod', 'msg', 'svc', 'asked'])
+        rows: pickKeys(K.tell.see.rows, ['name', 'work', 'mod', 'msg', 'svc', 'asked'])
       }
     },
     remember: {
@@ -352,7 +381,9 @@ function slimKeeps(K) {
     // changes-14/15: the mark that Helper has said hello (its own storage key, never in the record)
     met: pickKeys(K.met, ['store_key', 'value']),
     settings_file: {
-      ...pickKeys(S, ['top_line', 'box_lines', 'order', 'under_box', 'empty', 'buttons', 'cannot_read', 'why', 'saved', 'also_tell', 'facts']),
+      ...pickKeys(S, ['top_line', 'order', 'under_box', 'empty', 'buttons', 'cannot_read', 'why', 'saved', 'also_tell', 'facts']),
+      // live-v2 changes-4: the work line's reason by mode (src/settings-file.js picks reason_without_ai with no AI step)
+      box_lines: Object.fromEntries(Object.entries(S.box_lines).map(([k, v]) => [k, { ...pickKeys(v, ['label', 'reason', 'values', 'max']), ...(v.reason_no_ai_step ? { reason_without_ai: v.reason_no_ai_step } : {}) }])),
       would_delete: { ...pickKeys(S.would_delete, ['question', 'question_one']), answers: slimAnswers(S.would_delete.answers) },
       forget_all: { ...pickKeys(S.forget_all, ['label', 'action', 'under', 'question', 'with_question', 'after_yes']), answers: slimAnswers(S.forget_all.answers) },
       read: { ...pickKeys(S.read, ['labels', 'max_box_chars', 'quote_max_chars']), messages: pickKeys(S.read.messages, ['saved', 'cannot_read', 'quote', 'secret_line', 'too_much']) }
@@ -385,7 +416,8 @@ export function slimTalkData(d, skills = { skills: [] }) {
     // changes-14 (ordinary talk, with changes-15 and -17), changes-15 (never the same line twice), changes-16/17 (a word that needs a second word)
     // small_talk.ai_line: the one line this build says to "are you an AI" (ai_line_by_build[use_now]; the build
     // stops unless use_now is the no-AI one), so neither the other builds' lines nor the note go public
-    small_talk: { ...pickKeys(d.small_talk, ['cut_end_words', 'cut_start_words', 'kinds', 'cut_question_words', 'cut_dangling', 'cut_small_words', 'no_words', 'no_means_wrong_after', 'thanks_tail']), how_after_rows: pickKeys(d.small_talk.how_after_rows, ['words', 'after']), ai_line: d.small_talk.ai_line_by_build[d.small_talk.ai_line_by_build.use_now] },
+    // live-v2 changes-3: again_brings_back (the kinds "again" brings back)
+    small_talk: { ...pickKeys(d.small_talk, ['cut_end_words', 'cut_start_words', 'kinds', 'cut_question_words', 'cut_dangling', 'cut_small_words', 'no_words', 'no_means_wrong_after', 'thanks_tail', 'again_brings_back']), how_after_rows: pickKeys(d.small_talk.how_after_rows, ['words', 'after']) },
     no_repeat: { ...pickKeys(d.no_repeat, ['exempt', 'groups', 'in_place', 'wrong_starts', 'wrong_anywhere']), asked_again: d.no_repeat.asked_again.words },
     lonely_words: Object.fromEntries(Object.entries(d.lonely_words.words).map(([w, r]) => [w, pickKeys(r, ['needs_one_of', 'not_with'])])),
     ignore_phrases: d.ignore_phrases,
@@ -395,7 +427,8 @@ export function slimTalkData(d, skills = { skills: [] }) {
     asks_for_topics: pickKeys(d.asks_for_topics, ['phrases', 'whole_message']),
     // changes-11: "what is ..." gets the explanation; the cost and where lines; the term pairs W2 compares
     what_is: pickKeys(d.what_is, ['pattern', 'words']),
-    cost: { words: d.cost.words },
+    // live-v2 changes-3: cost.amount_rule's lists (src/talk.js fixedByWords)
+    cost: pickKeys(d.cost, ['words', 'amount_asks', 'use_price_words']),
     where: { words: d.where.words },
     w1_pairs: (d.w1_pairs || []).map(p => pickKeys(p, ['terms', 'line'])),
     topic_picks: d.topic_picks.map(p => ({ ...pickKeys(p, ['label', 'gives', 'line']), ...(p.holds ? { holds: heldOf(d, p) } : {}) })),

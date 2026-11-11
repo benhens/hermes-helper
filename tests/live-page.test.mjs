@@ -119,10 +119,11 @@ test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes s
   d.resolve(goodReply('sch1'))
   await settle()
   assert.equal(JSON.stringify(view.tree), before)
-  // Hermes is free again: the next message may call
+  // talk-live-2 (hhtech-weak-ai): a call that gave no answer in 12 s turns the AI step off for the rest of this
+  // visit, so even with Hermes free again the next message makes no call (tests/live-page-2.test.mjs)
   send(view, 'is it safe')
   await settle()
-  assert.equal(host.asks.length, 2)
+  assert.equal(host.asks.length, 1)
 })
 
 test('a second message while Helper waits: the waiting one gets its no-AI line at once, then the new one is answered (by code: the first call is still in Hermes)', async () => {

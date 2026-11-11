@@ -15,7 +15,7 @@ import { TALK_DATA } from './talk-data.js'
 import { looksSecret } from './secret-rule.js'
 import { talkNorm, cutIgnored, startsWith, whichOf, lineKey, noteLast } from './talk.js'
 import { LIVE_ROW, byWords, rankIn, withNext, isFollowUp, followRows, resultOfRow } from './live-rows.js'
-import { readSubject, readPick, judgeWritten } from './live-checks.js'
+import { readSubject, readPick, judgeWritten, isThinking } from './live-checks.js'
 import { firstCallText, writerText, pickText, inputText, liveParams } from './live-request.js'
 import { ONESHOT_TIMEOUT_MS } from './model-call.js'
 
@@ -31,16 +31,20 @@ const LV_DONT_KNOW = ['N1', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE']
 // of an N1 or a repeat; they come only after a result this already sends.
 export function goesToAi(pre) {
   if (!pre) return false
+  // live-v2 changes-3: anything from kind again is code's, AGAIN and MEAN_NONE included
+  if (pre.by_again) return false
   if (pre.kind === 'plain') return pre.why === 'what do you mean'
   return LV_GO.includes(pre.kind)
 }
 
-// Why this message makes no call (null: it may). In this order: the switch, code's own answer, the model the
+// Why this message makes no call (null: it may). In this order: the switch, code's own answer, the AI step is off
+// for this visit (hhtech-weak-ai: an earlier call gave no answer in 12 s or gave thinking text), the model the
 // page checked is not ready (still checking, none or an error), the message looks like a secret by Helper's
 // secret rule, or Hermes still works on an earlier call of Helper's (one call at a time).
-export function liveWhyNot({ mode = AI_MODE, pre, text, status, inHermes = 0 }) {
+export function liveWhyNot({ mode = AI_MODE, pre, text, status, inHermes = 0, off = false }) {
   if (mode === 'no_ai_step') return 'no AI step'
   if (!goesToAi(pre)) return 'code answered'
+  if (off) return 'AI off for this visit'
   if (!status || status.state !== 'ok') return 'model not ready'
   if (looksSecret(text)) return 'looks secret'
   if (inHermes > 0) return 'Hermes still works on a call'
@@ -61,18 +65,34 @@ function isHowQuestion(text) {
 //   lastLine: Helper's last line as shown; request: host.request; msLeft(): ms left of the 12 s
 //   onCall(name): told before each call (for the tests' log)
 //   alive(): false once the page has closed this turn (12 s, or the next message): no further call starts
-export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {} }) {
+//   work: what the person does as kept (live-v2 changes-4), for the work line of the second call and for c24
+// A call that sends back thinking text (hhtech-weak-ai) ends the turn at once: { fallback, thinking: true }, so
+// the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
+// USED: line) is an ordinary fallback.
+//   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
+export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [] }) {
   const input = inputText(message, lines)
+  let thinking = false
   const call = async (name, instructions, maxTokens) => {
     if (!alive()) return null
     onCall(name)
     try {
       const res = await request('llm.oneshot', liveParams(instructions, input, maxTokens), ONESHOT_TIMEOUT_MS)
-      return res && typeof res.text === 'string' ? res.text : null
+      const t = res && typeof res.text === 'string' ? res.text : null
+      if (t !== null && isThinking(t)) {
+        thinking = true
+        return null
+      }
+      return t
     } catch {
       return null
     }
   }
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names })
+  return thinking ? { fallback: 'thinking text', thinking: true } : got
+}
+
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
   let ids = null
   if (isFollowUp(text, pre, before)) ids = followRows(before)
   if (!ids || !ids.length) {
@@ -91,7 +111,7 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
   if (msLeft() < SECOND_CALL_MIN_MS) return { fallback: 'no time for the second call' }
   const rows = ids.map(id => ({ id, text: LIVE_ROW[id].text }))
   if (mode === 'ai_picks_line') {
-    const raw = await call('pick', pickText(ids), LIVE_DATA.pick_only.max_tokens)
+    const raw = await call('pick', pickText(ids, work, names), LIVE_DATA.pick_only.max_tokens)
     if (raw === null) return { fallback: 'pick call failed' }
     const p = readPick(raw, ids)
     if (p.id) return { result: resultOfRow(p.id), rows: ids }
@@ -99,9 +119,9 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
     if (p.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
     return { fallback: 'pick: none' }
   }
-  const raw = await call('writer', writerText(ids), LIVE_DATA.writer.max_tokens)
+  const raw = await call('writer', writerText(ids, work, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }
@@ -123,14 +143,21 @@ export function liveApply(st, got, out, before, text) {
     const k = lineKey(r)
     if (!asked && (k === before.lastKey || (st.rejected || []).includes(k))) return null
   }
-  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) r[x] = out[x]
+  for (const x of ['kept', 'first', 'name_taken', 'thing', 'work_first']) if (x in out) r[x] = out[x]
   st.pending = null
   st.lastq = false
+  // changes-3 (review): the fallback was noted as the last answer line, but it is not shown; "again" must find the
+  // one before it, unless this line is an answer line itself
+  if ('lastAnswer' in before) {
+    st.lastAnswer = before.lastAnswer
+    st.lastAnswerKey = before.lastAnswerKey
+  }
   noteLast(st, r)
   if (r.kind === 'written') {
     // follow_up.rule and how_after_rows: "a written reply that used rows"; one that used none is ordinary talk
     st.last = (r.used || []).some(u => u.toLowerCase() !== 'none') ? 'written' : 'written-talk'
     st.lastKey = writtenKey(r.text)
+    st.lastAnswerKey = st.lastKey // changes-3: "again" compares it with the line just before
   }
   st.liveRows = got.rows && got.rows.length ? { key: st.lastKey, ids: got.rows } : null
   return r

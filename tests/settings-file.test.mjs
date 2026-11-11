@@ -4,6 +4,7 @@
 // the same message, the same record and the same box for every one.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { isDeepStrictEqual } from 'node:util'
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
@@ -17,15 +18,25 @@ test('the box Helper writes from a stored record is settings_read.py\'s, for eve
   for (const c of S.cases) assert.equal(renderKept(c.stored), c.rendered, c.id)
 })
 
+const WORK_LABEL = /^\s*(?:[-*\u2022]\s*)?(?:what you do|what i do|work|my work|job|my job)\s*:/im
 test('every one of hhcontent\'s 58 cases and the Builder\'s 35 boxes: the same result as settings_read.py', () => {
   assert.equal(S.cases.filter(c => c.from === 'hhcontent').length, 58)
   assert.ok(S.cases.filter(c => c.from === 'builder').length >= 35)
   const kinds = new Set()
+  const changed = []
   for (const c of S.cases) {
     const got = saveBox(c.stored, c.box, c.answer == null ? undefined : c.answer)
     kinds.add(got.result + (got.why ? ':' + got.why : ''))
+    // talk-live-2: live-v2 changes-4 made "job", "work", "what you do" ... the labels of a new line, What you do
+    // (keeps.settings_file.read.labels.work); settings_read.py (changes-12) predates it and refuses such a line
+    if (WORK_LABEL.test(c.box) && c.got.result === 'refused' && !isDeepStrictEqual(got, c.got)) {
+      changed.push(c.id)
+      continue
+    }
     assert.deepEqual(got, c.got, `${c.id}: ${c.what}`)
   }
+  assert.deepEqual(changed, ['R03'])
+  assert.deepEqual(saveBox({}, 'Job: teacher'), { result: 'saved', message: ['Saved.'], stored: { work: 'teacher' }, box: renderKept({ work: 'teacher' }) })
   // the cases reach every result and every reason a line can be refused
   for (const k of ['saved', 'ask', 'not_saved', 'refused:secret', 'refused:too_much', 'refused:no_label', 'refused:empty', 'refused:name_value', 'refused:mod_value', 'refused:msg_value', 'refused:svc_value',
     'refused:remember_short', 'refused:remember_long', 'refused:remember_bracket', 'refused:twice', 'refused:same_twice', 'refused:too_many']) assert.ok(kinds.has(k), k)

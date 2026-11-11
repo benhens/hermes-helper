@@ -8,8 +8,8 @@
 // always the text code shows for it.
 
 export const MODES = ['no_ai_step', 'ai_picks_line', 'ai_writes']
-// The check ids, in the data's order (c0 to c23); src/live-checks.js runs each of them.
-export const CHECK_IDS = Array.from({ length: 24 }, (_, i) => 'c' + i)
+// The check ids, in the data's order (c0 to c24; c24 added by live-v2 changes-4); src/live-checks.js runs each of them.
+export const CHECK_IDS = Array.from({ length: 25 }, (_, i) => 'c' + i)
 // Words no instruction text may hold (hhcontent's check_live.py: product words in an instruction).
 const PRODUCT = /\b(?:chatbot|assistant|tutor|guide|course|teacher|wizard|academy)\b/i
 
@@ -49,12 +49,23 @@ export function liveRows(talk, wants) {
   return rows
 }
 
+// The data's three switches: [where, value]
+const dataSwitches = (live, talk) => [['helper-talk-live-v2.json mode.use_now', live.mode && live.mode.use_now], ['helper-talk-v2.json small_talk.ai_line_by_build.use_now', talk.small_talk && talk.small_talk.ai_line_by_build && talk.small_talk.ai_line_by_build.use_now], ['helper-talk-v2.json keeps.disclosure_point_11.use_now', talk.keeps && talk.keeps.disclosure_point_11 && talk.keeps.disclosure_point_11.use_now]]
+// What the build prints but does not stop on: the data still naming another mode than src/ai-mode.js
+export function liveNotes(live, talk, mode) {
+  const v = dataSwitches(live, talk)[0][1]
+  return v === mode ? [] : [`note: the data's use_now says ${v}; this build is ${mode} by src/ai-mode.js (Lead, 11 Nov 04:40). Lines by mode are taken for ${mode}.`]
+}
+
 export function liveProblems(live, talk, wants, mode) {
   const problems = []
   if (!MODES.includes(mode)) problems.push(`AI_MODE is ${mode}: not one of ${MODES.join(', ')}`)
-  // the data's own switches must agree with each other and with src/ai-mode.js (talk-live row 1)
-  const switches = [['helper-talk-live-v2.json mode.use_now', live.mode && live.mode.use_now], ['helper-talk-v2.json small_talk.ai_line_by_build.use_now', talk.small_talk && talk.small_talk.ai_line_by_build && talk.small_talk.ai_line_by_build.use_now], ['helper-talk-v2.json keeps.disclosure_point_11.use_now', talk.keeps && talk.keeps.disclosure_point_11 && talk.keeps.disclosure_point_11.use_now]]
-  for (const [where, v] of switches) if (v !== mode) problems.push(`${where} is ${v}, src/ai-mode.js AI_MODE is ${mode}: data and code disagree`)
+  // the data's own switches must agree with each other (talk-live row 1). talk-live-2: src/ai-mode.js is the switch
+  // (Lead, 11 Nov 04:40: AI_MODE becomes ai_writes; hhcontent's changes-3, For lead: "the switch to ai_writes ... is
+  // the Builder's"); data that still says another mode is a note (liveNotes), not a stop
+  const sw = dataSwitches(live, talk)
+  if (new Set(sw.map(x => x[1])).size !== 1) problems.push(`the data's switches disagree: ${sw.map(([w, v]) => `${w} is ${v}`).join('; ')}`)
+  for (const [where, v] of sw) if (!MODES.includes(v)) problems.push(`${where} is ${v}: not one of ${MODES.join(', ')}`)
   const rows = liveRows(talk, wants)
   const ids = rows.map(r => r.id)
   const dup = ids.filter((id, i) => ids.indexOf(id) !== i)
@@ -80,6 +91,18 @@ export function liveProblems(live, talk, wants, mode) {
   }
   if (!/\{subjects[^}]*\}/.test((live.first_call || {}).text || '')) problems.push('first_call.text has no {subjects} slot')
   for (const k of ['writer', 'pick_only']) if (!/\{rows[^}]*\}/.test((live[k] || {}).text || '')) problems.push(`${k}.text has no {rows} slot`)
+  // live-v2 changes-4: the work line's slot, on a line of its own, in both AI ways; never in the first call
+  for (const k of ['writer', 'pick_only']) if (!/(^|\n)\{work_line\}\n/.test((live[k] || {}).text || '')) problems.push(`${k}.text has no {work_line} slot on a line of its own`)
+  if (/\{work_line\}/.test((live.first_call || {}).text || '') || /\{work_line\}/.test(((live.input || {}).text || '') + ((live.input || {}).text_no_lines || ''))) problems.push('the first call or the input has a {work_line} slot')
+  const wl = (live.input || {}).work_line || {}
+  if (!/^[^{}]*\{work\}[^{}]*$/.test(wl.text || '')) problems.push('input.work_line.text has no {work} slot (or another slot)')
+  const c24 = ((live.checks || {}).list || []).find(c => c.id === 'c24') || {}
+  try {
+    new RegExp(c24.person_pattern)
+  } catch {
+    problems.push('checks c24 person_pattern does not compile in JavaScript')
+  }
+  if (!(c24.person_ok || []).length) problems.push('checks c24 person_ok is empty')
   const inp = live.input || {}
   if (!/\{last_lines\}/.test(inp.text || '') || !/\{message\}/.test(inp.text || '') || !/\{message\}/.test(inp.text_no_lines || '')) problems.push('input.text or input.text_no_lines lacks its slots')
   const pats = [...((live.checks || {}).gloss || { list: [] }).list.flatMap(g => [g.term, g.explained_by]), talk.r9_pattern, talk.r6_pattern, ...(talk.r5_terms || []).map(r => r.pattern)]
@@ -118,7 +141,7 @@ export function slimLiveData(live, talk, wants) {
     stop_words: live.rows.stop_words.split(/\s+/).filter(Boolean),
     max_handed: live.rows.max_handed,
     subjects: live.subjects.list.map(s => ({ id: s.id, title: s.title })),
-    input: pick(live.input, ['text', 'text_no_lines', 'cut_at_chars', 'temperature']),
+    input: { ...pick(live.input, ['text', 'text_no_lines', 'cut_at_chars', 'temperature']), work_line: live.input.work_line.text },
     first_call: { text: live.first_call.text, max_tokens: live.first_call.max_tokens },
     writer: { text: live.writer.text, max_tokens: live.writer.max_tokens },
     pick_only: { text: live.pick_only.text, max_tokens: live.pick_only.max_tokens },
@@ -131,12 +154,16 @@ export function slimLiveData(live, talk, wants) {
       r6_pattern: talk.r6_pattern,
       r8_never: talk.r8_never,
       r5_patterns: talk.r5_terms.map(r => r.pattern),
-      skills: wants.skills.map(s => s.name).filter(n => n.length > 3)
+      skills: wants.skills.map(s => s.name).filter(n => n.length > 3),
+      // live-v2 changes-4: c24, a claim about the person beyond what was kept
+      c24: pick(live.checks.list.find(c => c.id === 'c24'), ['person_pattern', 'person_ok'])
     },
     lines_by_mode: {
       are_you_an_ai: byMode(m => lm.are_you_an_ai[m].id),
       first_time_grey: byMode(m => lm.first_time_grey[m].text),
-      settings_top_line_2: byMode(m => lm.settings_top_line_2[m] || null)
+      settings_top_line_2: byMode(m => lm.settings_top_line_2[m] || null),
+      // live-v2 changes-4: under the first Kept: of what the person does (null with no AI step)
+      work_told: byMode(m => lm.first_time_grey.work_told[m] || null)
     }
   }
 }

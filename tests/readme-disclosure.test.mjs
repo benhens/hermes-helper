@@ -18,12 +18,19 @@ const D = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/helper-talk-v2.jso
 const section = README.split('### What Helper keeps, and where it goes')[1].split('\n## ')[0]
 const points = section.split('\n').filter(l => /^\d+\. /.test(l))
 
-test('point 11 is the one the talk data marks for use now: no AI step', () => {
+// talk-live-2: the commit's mode is ai_writes (Lead, 11 Nov 04:40); the talk data still marks no_ai_step for use now
+// (its use_now is hhcontent's to change; changes-3, For lead). Point 11 is the committed mode's (lines_by_mode).
+test('point 11 is the committed mode\'s; the talk data\'s own no-AI point 11 is still the one lines_by_mode has for no_ai_step', () => {
   const p = D.keeps.disclosure_point_11
-  assert.equal(p.use_now, 'no_ai_step')
-  assert.equal(points[10], p.no_ai_step)
+  const live = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/helper-talk-live-v2.json'), 'utf8'))
+  assert.equal(points[10], live.lines_by_mode.readme_point_11[aiModeOf()])
+  assert.equal(p.no_ai_step, live.lines_by_mode.readme_point_11.no_ai_step)
   assert.doesNotMatch(section, /sent through Hermes to the AI model/)
 })
+
+// live-v2 changes-4 ("README points 2 to 4 still need what you do"; hhcontent: add "and what you do (one short
+// answer)" to point 2): the Builder's words, until section 7 of the team's file has them
+const POINT_2_C4 = ', and what you do (one short answer).'
 
 test('all twelve points are the team\'s section 7, word for word, as pinned (when the team\'s folder is there)', t => {
   if (!fs.existsSync(path.join(TEAM, 'content', 'helper-keeps-v1.md'))) return t.skip('the team\'s content folder is not here')
@@ -39,7 +46,11 @@ test('all twelve points are the team\'s section 7, word for word, as pinned (whe
     .map(l => l.replace(/\s{2,}\(changes-\d+\)$/, ''))
     .map(l => l.replace(' [IF THE SETTINGS PAGE SHIPS, add: You can also open Settings, then Plugins, then Helper.]', ' You can also open Settings, then Plugins, then Helper.'))
   assert.equal(team.length, 12)
-  assert.deepEqual(points, team)
+  // talk-live-2: point 2 gains what the person does (changes-4), point 11 is the committed mode's (test above)
+  const live = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/helper-talk-live-v2.json'), 'utf8'))
+  const want = team.map((l, i) => (i === 1 ? l.replace(/\.$/, POINT_2_C4) : i === 10 ? live.lines_by_mode.readme_point_11[aiModeOf()] : l))
+  assert.equal(want[1], '2. It keeps your name, if you give it, and what you do (one short answer).')
+  assert.deepEqual(points, want)
 })
 
 // talk-live (live-v2 changes-1): README's four lines that change with the mode are the data's, for the mode the
@@ -57,7 +68,11 @@ test('README\'s lines by mode (Status, the waiting dots, the model calls, point 
     // going there and back gives README again, and the lines that differ are the four (three with no window sentence)
     assert.equal(readmeForMode(other, live, mode), README, m)
     const diff = README.split('\n').filter((l, i) => l !== other.split('\n')[i]).length
-    assert.equal(diff, m === mode ? 0 : 4, m)
+    // the four lines, less those the data words alike for both modes (talk-live-2: the model-call bullet is the
+    // same for ai_picks_line and ai_writes)
+    const differ = ['readme_status_sentence_2', 'readme_window_sentence', 'readme_model_call_bullet', 'readme_point_11'].filter(k => lm[k][m] !== lm[k][mode]).length
+    assert.equal(diff, differ, m)
+    if (m !== mode) assert.ok(differ >= 3, m)
     if (lm.readme_window_sentence[m]) assert.ok(other.includes(lm.readme_window_sentence[m]), m)
   }
   // the clause hhcontent asked about: llm.oneshot is one plain request with no tools (Hermes's agent/oneshot.py run_oneshot:
