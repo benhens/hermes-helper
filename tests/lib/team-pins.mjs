@@ -3,7 +3,7 @@
 // this job names"). builder-qs + changes-14 to -18 (11 Nov 2026): each file at the newest checksum the team
 // named for it; the talk data at changes-18's. talk-live (11 Nov 2026): the talk data, the live data,
 // route2.py at live-v2 changes-2's, check.py at changes-1's; the wants and the skills list at changes-19's.
-// talk-live-2 (11 Nov 2026): the talk data and the live data at live-v2 changes-4's, route2.py at changes-3's. A test compares the plugin's copy with the pin, checks that
+// talk-live-2 (11 Nov 2026): the talk data and the live data at live-v2 changes-4's, route2.py at changes-3's. talk-live-3: the talk data and the live data at changes-5's. A test compares the plugin's copy with the pin, checks that
 // the pin is a checksum the team named (in its note, or its own "before" copy), and only reports when the
 // team's file on disk has moved on since.
 import fs from 'node:fs'
@@ -15,8 +15,8 @@ const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).di
 
 // file (in the team's folder) -> [the pinned sha256, where the team names it]
 export const PINS = {
-  'content/helper-talk-v2.json': ['2b1913352ce6ad8169dc046495b9dd9e3a1723a1868c2d23804df27c28eb59d9', 'content/helper-talk-live-v2-changes-4.md'],
-  'content/helper-talk-live-v2.json': ['53273862bf5d95056ded37fa6a1cd444421f40e9fcb0d4c9c494843a18e4697a', 'content/helper-talk-live-v2-changes-4.md'],
+  'content/helper-talk-v2.json': ['65bddf953d33a1ad04edf3ba19006c9c11885fe24014596c039ee9dbfa3ebced', 'content/helper-talk-live-v2-changes-5.md'],
+  'content/helper-talk-live-v2.json': ['f1cb4e5e9e197f96d39337f824b26dd7c19c88c7d04970d105b9a4a89f5b5284', 'content/helper-talk-live-v2-changes-5.md'],
   'content/helper-wants-v1.json': ['96530c154849c2dd34397eeadf74748620a45e21589b52be8aafe92800dbd4ac', 'content/helper-talk-v2-changes-19.md'],
   'content/skills-list-v1.json': ['678667bfa3277f54885b530297a782b7b297c823e0ce4583e6cf5bfe656d7eb9', 'content/helper-talk-v2-changes-19.md'],
   'dev/checks/hhcontent-talk-v2/route2.py': ['0356dfb91c0bfde85a56280434e6886a90e5b82a91bbfb27ddce1a1387e7ffbe', 'content/helper-talk-live-v2-changes-3.md'],

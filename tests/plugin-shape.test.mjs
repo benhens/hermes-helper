@@ -66,8 +66,14 @@ test('the old name is gone from everything a person can read', () => {
   const OLD = /helping[ -]?hand/i
   const files = ['plugin.yaml', 'package.json', 'README.md', 'content/README.md', 'content/steps-v1.json', 'scripts/build.mjs', 'desktop/plugin.js',
     ...fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js')).map(f => 'src/' + f)]
-  const found = files.flatMap(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l)).map(l => `${f}: ${l.trim().slice(0, 60)}`))
+  // talk-live-3: one known exception, reported to Lead, not hidden: live-v2 changes-5's slow_ai.paste_text (hhcontent's
+  // words, which Lead picked with SLOW_A) says "Helping Hand's short calls". Exactly that line of the data may hold it.
+  const KNOWN = 'Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \\"none\\". It switches thinking off only for Helping Hand\'s short calls, not for my own chats. Show me the change before you save it.'
+  const known = l => l.includes(KNOWN) && l.replace(KNOWN, '').replace(/helping_hand/g, '').search(OLD) < 0
+  const found = files.flatMap(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l) && !known(l)).map(l => `${f}: ${l.trim().slice(0, 60)}`))
   assert.deepEqual(found, [])
+  // the exception is exactly that line: in src/live-data.js and the built file, once each
+  assert.equal(['src/live-data.js', 'desktop/plugin.js'].map(f => fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => OLD.test(l)).length).join(','), '1,1')
 })
 
 test('helper panel is a div with role complementary, never an <aside>', () => {
@@ -151,8 +157,9 @@ test('model names, counts and source tags in normal letters: mono is only for te
   // mono, and hhdesign drew this box that way (design/talk-r5/settings.html, "like memory.md");
   // talk v2 look: a line of that box that cannot be read, shown in a mono chip under it (hhdesign's
   // review of e86b410, section 3 point 3), and text to paste inside Helper's bubble, Hermes's own
-  // small code card (notes-wants.md item 4), large and small
-  assert.deepEqual(mono, ['cardPasteText', 'settingsBox', 'settingsRefusedLine', 'bubblePasteText', 'bubblePasteTextOld'])
+  // small code card (notes-wants.md item 4), large and small; talk-live-3 (Lead's call on question 5 of the c18 report):
+  // text to type inside a Helper line (/usage), in the paste box's code style
+  assert.deepEqual(mono, ['cardPasteText', 'settingsBox', 'settingsRefusedLine', 'bubblePasteText', 'bubblePasteTextOld', 'typed'])
 })
 
 test('header clears Hermes\'s title-bar band, where its window buttons float (top-right corner stays empty)', () => {

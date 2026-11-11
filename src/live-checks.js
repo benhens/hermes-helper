@@ -23,17 +23,16 @@ const NOT_RX = Object.fromEntries(Object.entries(LC.not_words).map(([cls, ws]) =
 const MONEY_RX = LC.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
 const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
 
-// hhtech-weak-ai (For builder): a reply that is the model's thinking is no reply: an unclosed <think> (Hermes cuts a
-// closed block itself), or text that starts with "Thinking Process" or holds "**Analyze" (a managed local server
-// hands back the thinking with no tag at all). Constants: live-v2 changes-5, which would hold them as data, does not
-// exist (11 Nov 04:40).
-const THINK_START = /^\s*thinking process\b/i
-const THINK_ANYWHERE = '**Analyze'
-export function isThinking(raw) {
-  // a closed block is cut first (Hermes cuts it too); what is left is the reply (review)
-  const s = String(raw || '').replace(/<think>[\s\S]*?<\/think>/g, '')
-  if (s.includes('<think>')) return true
-  return THINK_START.test(s) || s.includes(THINK_ANYWHERE)
+// live-v2 changes-5, checks_c5.no_reply (it replaces talk-live-2's constants from hhtech-weak-ai): before any other
+// check, the text is no reply (the same as no answer in 12 s) when, after trimming, it starts with one of starts (any
+// case), holds one of holds (exact), or holds <think> with no </think>. As check_c5.py's no_reply(): a reply that
+// starts with a closed <think> block counts too (talk-live-2 cut a closed block first).
+const NR_STARTS = LIVE_DATA.no_reply.starts.map(s => s.toLowerCase())
+const NR_HOLDS = LIVE_DATA.no_reply.holds
+export function noReply(raw) {
+  const s = String(raw == null ? '' : raw).trim()
+  const low = s.toLowerCase()
+  return NR_STARTS.some(p => low.startsWith(p)) || NR_HOLDS.some(h => s.includes(h)) || (s.includes('<think>') && !s.includes('</think>'))
 }
 
 // <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
@@ -168,7 +167,31 @@ export function replyFlags(reply, rows, used, talk = {}) {
   // c24, after c23 (changes-4: "Run c24 after c23")
   const c24Word = c24Fails(reply, talk.work, talk.message, hand)
   if (c24Word) out.push('c24 about the person ' + c24Word)
+  // live-v2 changes-5: c26 and c27 after c24 (c25 has adopted: false and is not built)
+  const c26Word = c26Fails(reply)
+  if (c26Word) out.push('c26 notes shown ' + c26Word)
+  for (const id of c27Fails(reply, talk.message || '')) out.push('c27 ' + id)
   return out
+}
+
+// live-v2 changes-5 c26: the reply holds one of the words (any case): the model's own notes or an instruction label
+// shown to the person. "USED" counts only in capitals, as a word (check_c5.py). Returns the word found, or null.
+const C26_WORDS = LC.c26.filter(w => w !== 'USED').map(w => w.toLowerCase())
+export function c26Fails(reply) {
+  const low = String(reply).toLowerCase()
+  const w = C26_WORDS.find(x => low.includes(x))
+  if (w) return w
+  return /\bUSED\b/.test(reply) ? 'USED' : null
+}
+// live-v2 changes-5 c27: for each class, when the person's newest message (only that one) asks it (a word of asks, or
+// the whole message one of asks_whole), the reply must hold a word of gives. Returns the failed class ids, in order.
+// whole: as check_c5.py's whole(): lower case, end marks and spaces cut, then ok, okay, so, and, cool, right in front.
+// A word: not next to a letter or an apostrophe (check_c5.py's hasw).
+const c27Whole = t => String(t).toLowerCase().trim().replace(/[?.! ]+$/, '').replace(/^(?:(?:ok|okay|so|and|cool|right)\b[ ,]*)+/, '').trim()
+const c27Has = (t, w) => new RegExp("(^|[^a-z'])" + liveEsc(w.toLowerCase()) + "($|[^a-z'])").test(String(t).toLowerCase())
+export function c27Fails(reply, message) {
+  const w = c27Whole(message)
+  return LC.c27.filter(c => ((c.asks || []).some(x => c27Has(message, x)) || (c.asks_whole || []).includes(w)) && !c.gives.some(g => c27Has(reply, g))).map(c => c.id)
 }
 
 // The whole reading of a written reply: { word: 'NONE' | 'BUILD' } (c2), { fail } (empty after c0, or the

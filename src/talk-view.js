@@ -22,13 +22,14 @@ import { Codicon, CopyButton } from '@hermes/plugin-sdk'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, T, cx } from './look.js'
-import { Said, keepNamesWhole } from './reveal.js'
+import { Said, drawnWords } from './reveal.js'
 import { BubbleLink } from './bubble-link.js'
 import { columnsFor, linesAllowed } from './layout.js'
 import { noteForgotten } from './talk.js'
 import { curlyQuotes } from './quotes.js'
-// A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js)
-const drawn = (text, asTyped) => keepNamesWhole(curlyQuotes(text, asTyped))
+// A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js), and
+// (talk-live-3) text to type in the paste box's code style (src/reveal.js drawnWords)
+const drawn = (text, asTyped) => drawnWords(curlyQuotes(text, asTyped))
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
 // (talk v2 look: once its part is open, the style sheet turns the down arrow up.)
@@ -118,6 +119,10 @@ function notesOf(entry, onNote, kept) {
 function OldLine({ entry, onNext }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
+  // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
+  // line its label is plain faint text, not a link. A button that opens something under its line (text to paste,
+  // steps) or a Hermes screen stays a link, so it can be used again.
+  const done = next && entry.pressed && (next.kind === 'line' || next.kind === 'forget-all')
   return jsxs('div', {
     className: T.old,
     'data-hh': 'old',
@@ -129,7 +134,8 @@ function OldLine({ entry, onNext }) {
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
       next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: drawn(next.text) }, 'where') : null,
-      next && next.kind !== 'where'
+      done ? jsx('p', { className: T.where, 'data-hh': 'old-pressed', 'data-kind': next.kind, children: next.label }, 'next') : null,
+      next && next.kind !== 'where' && !done
         ? jsxs(
             'button',
             {

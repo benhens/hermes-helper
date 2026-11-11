@@ -1,6 +1,9 @@
 // talk-live rows 3, 5, 6 and 7 on the page: the AI step with a fake Hermes (llm.oneshot answered by the test) and
 // the 12 s timer held until the test fires it. The mode is set in the copy of the built file the test loads
 // (tests/lib/mode-loader.mjs), so these run the same in every run of scripts/test-modes.mjs.
+// talk-live-3: live-v2 changes-5 took "update" out of sch1's key words, so "how do I update hermes" finds no rows by
+// words any more and goes to the first call. Where a test needs a message that code answers with N1 and that finds
+// the schedule rows by words (as that one did), it now sends "send me a summary" (sch1 by words, N1 from code).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData } from './lib/render.mjs'
@@ -78,12 +81,12 @@ const N1 = curlyQuotes(TALK_DATA.fixed.N1.text) // as drawn
 test('ai_writes: a message code is not sure of shows at once, with the three dots and the busy face; the written reply replaces the dots', async () => {
   const d = deferred()
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'how do I update hermes')
+  send(view, 'send me a summary')
   assert.equal(line(view), null, 'no Helper line yet')
   assert.ok(dots(view), 'the three dots in the bubble')
   assert.equal(dots(view).props['aria-label'], 'Helper is working on an answer')
   assert.match(dots(view).props.className, /hh-wait/)
-  assert.equal(mine(view).at(-1), 'how do I update hermes')
+  assert.equal(mine(view).at(-1), 'send me a summary')
   assert.equal(expression(view), 'busy')
   await settle()
   // word matching found sch1, so the writer is the first and only call
@@ -91,7 +94,7 @@ test('ai_writes: a message code is not sure of shows at once, with the three dot
   const p = host.asks[0]
   assert.deepEqual([p.task, p.temperature, p.max_tokens, 'session_id' in p, 'profile' in p], ['helping_hand', 0.2, 200, false, false])
   assert.match(p.instructions, /\[sch1\] /)
-  assert.match(p.input, /The person's newest message: how do I update hermes$/)
+  assert.match(p.input, /The person's newest message: send me a summary$/)
   d.resolve(goodReply('sch1'))
   await settle()
   assert.equal(dots(view), null)
@@ -103,7 +106,7 @@ test('ai_writes: a message code is not sure of shows at once, with the three dot
 test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes still works on that call, the next message gets its no-AI line with no new call', async () => {
   const d = deferred()
   const { view, host, timers } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'how do I update hermes')
+  send(view, 'send me a summary')
   await settle()
   assert.equal(host.asks.length, 1)
   timers.fire(12000)
@@ -129,10 +132,10 @@ test('12 seconds: the no-AI line comes at 12 s and nothing later; while Hermes s
 test('a second message while Helper waits: the waiting one gets its no-AI line at once, then the new one is answered (by code: the first call is still in Hermes)', async () => {
   const d = deferred()
   const { view, host } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'how do I update hermes')
+  send(view, 'send me a summary')
   await settle()
   send(view, 'what is a skill')
-  assert.deepEqual(mine(view).slice(-2), ['how do I update hermes', 'what is a skill'])
+  assert.deepEqual(mine(view).slice(-2), ['send me a summary', 'what is a skill'])
   assert.equal(line(view), 'term-skill')
   const older = all(helper(view), n => n.props['data-hh'] === 'old').map(n => text(n))
   assert.ok(older.at(-1).includes(N1), 'the waiting message got the don\'t-know line')
@@ -146,7 +149,7 @@ test('failures show the no-AI line and nothing else: a 5030 "Loading model", a t
   const replies = [Object.assign(new Error('Error code: 503 - Loading model'), { code: 5030 }), new Error('Connection error.'), 'NONE\nUSED: none', 'See the docs (www.example.com) for that.\nUSED: sch1']
   for (const r of replies) {
     const { view } = await pastOpening('ai_writes', { host: { oneshot: () => r } })
-    send(view, 'how do I update hermes')
+    send(view, 'send me a summary')
     await settle()
     assert.equal(line(view), 'N1', String(r))
     assert.doesNotMatch(text(helper(view)), /Try again|didn.t answer|isn.t ready|couldn.t reach/)
@@ -164,14 +167,14 @@ test('no call when: code is sure, the model check is not ok, the message looks l
   }
   {
     const { view, host } = await pastOpening('ai_writes', { host: { runtime: { ok: false } } })
-    send(view, 'how do I update hermes')
+    send(view, 'send me a summary')
     assert.equal(line(view), 'N1', 'at once')
     await settle()
     assert.equal(host.asks.length, 0)
   }
   for (const mode of ['no_ai_step']) {
     const { view, host } = await pastOpening(mode)
-    for (const m of ['how do I update hermes', 'tell me a joke', 'what do you mean?', 'ok and then?', 'is it safe']) {
+    for (const m of ['send me a summary', 'tell me a joke', 'what do you mean?', 'ok and then?', 'is it safe']) {
       send(view, m)
       assert.ok(line(view), 'a line at once')
     }
@@ -184,7 +187,7 @@ test('nothing Helper keeps is ever sent, not even the name: a kept name, answers
   const storage = fakeStorage({ met: true, kept: { name: 'Peter', mod: 'mod1', msg: 'WhatsApp', svc: 'Gmail', asked: ['my club has six courts'], told: true } })
   const { view, host } = await open('ai_writes', { storage, host: { oneshot: () => 'NONE' } })
   finish(view)
-  for (const m of ['Hi, I\'m Peter', 'what do you know about me', 'remember that my coach is called Zanda', 'I use WhatsApp now', 'how do I update hermes', 'tell me a joke', 'is it safe', 'ok and then?']) {
+  for (const m of ['Hi, I\'m Peter', 'what do you know about me', 'remember that my coach is called Zanda', 'I use WhatsApp now', 'send me a summary', 'tell me a joke', 'is it safe', 'ok and then?']) {
     send(view, m)
     await settle()
     finish(view)
@@ -226,20 +229,20 @@ test('the first call when word matching finds nothing; build gives the hand-over
 
 test('ai_picks_line: a handed id shows that row as code shows it; TALK and NONE the no-AI line; a pick is never Helper\'s last line again', async () => {
   const { view, host } = await pastOpening('ai_picks_line', { host: { oneshot: () => ' [sch1].' } })
-  send(view, 'how do I update hermes')
+  send(view, 'send me a summary')
   await settle()
   assert.equal(host.asks[0].max_tokens, 20)
   assert.match(host.asks[0].instructions, /^\[sch1\] /m)
   assert.equal(line(view), 'sch1')
   assert.equal(said(view), LIVE_ROW.sch1.text.replace(/"([^"]*)"/g, '\u201c$1\u201d'))
   // the same message again: the same row would be Helper's last line again, so the no-AI line instead
-  send(view, 'how do I update hermes')
+  send(view, 'send me a summary')
   await settle()
   assert.notEqual(line(view), 'sch1')
   // TALK: the no-AI line unless that is a don't-know line, then OK (pick_only.read); NONE or anything else: the no-AI line
   for (const [r, want] of [['TALK', 'OK'], ['NONE', 'N1'], ['zzz', 'N1'], ['sch9', 'N1']]) {
     const o = await pastOpening('ai_picks_line', { host: { oneshot: () => r } })
-    send(o.view, 'how do I update hermes')
+    send(o.view, 'send me a summary')
     await settle()
     assert.equal(line(o.view), want, r)
   }
@@ -248,7 +251,7 @@ test('ai_picks_line: a handed id shows that row as code shows it; TALK and NONE 
 test('the waiting dots: still and all alike under reduce motion; the label is said once (the style sheet moves the lit dot, the page is not drawn again)', async () => {
   const d = deferred()
   const { view } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(view, 'how do I update hermes')
+  send(view, 'send me a summary')
   const node = dots(view)
   assert.equal(node.props.role, 'status')
   assert.deepEqual(all(node, n => n.type === 'i').map(n => n.props.className), [undefined, undefined, undefined])
@@ -316,7 +319,7 @@ test('a turn closed by the next message starts no second call when its first cal
 test('the page off screen and back during the wait: the line still lands, also when the new page was drawn before the old one let go', async () => {
   const d = deferred()
   const o = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-  send(o.view, 'how do I update hermes')
+  send(o.view, 'send me a summary')
   await settle()
   // a second page drawn first, then the first one leaves (React may do it in this order)
   const second = mount(o.Page)
@@ -333,7 +336,7 @@ test('the waiting dots under reduce motion: all three still and alike (hh-still)
   try {
     const d = deferred()
     const { view } = await pastOpening('ai_writes', { host: { oneshot: () => d.promise } })
-    send(view, 'how do I update hermes')
+    send(view, 'send me a summary')
     assert.match(dots(view).props.className, /hh-still/)
     assert.doesNotMatch(dots(view).props.className, /hh-wait/)
     d.resolve('NONE')

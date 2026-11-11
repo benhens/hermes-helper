@@ -3388,7 +3388,15 @@
       "news",
       "digest",
       "list",
-      "update",
+      "daily update",
+      "daily updates",
+      "weekly update",
+      "weekly updates",
+      "morning update",
+      "update every",
+      "updates every",
+      "update me every",
+      "an update each",
       "every morning",
       "daily",
       "weekly"
@@ -3399,7 +3407,8 @@
       "kind": "paste",
       "label": "Show me what to ask",
       "paste_text": "Every morning at 8, send me a short summary of <what>."
-     }
+     },
+     "key_words_note_c5": "live changes-5: plain \"update\" removed (\"how do I update hermes\" got this row). It counts only next to every, daily, weekly, morning or each."
     },
     {
      "id": "sch2",

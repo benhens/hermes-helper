@@ -26,7 +26,7 @@ import { MAX_INPUT_CHARS } from './key-check.js'
 import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
 import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
-import { liveWhyNot, askLive, liveApply, LIVE_SECONDS } from './live-turn.js'
+import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW, slowFollows } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
 import { makeSetupCards, renderYourSetup } from './setup-tab.js'
@@ -183,11 +183,24 @@ export function makePage(ctx, opts = {}) {
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
     const entry = { ...helperEntry(said), send: w.sendHelper }
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry, ...slowAfter(said)].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
     }
+  }
+  // live-v2 changes-5: the visit's first AI call (w.first) gave no answer in 12 s or gave no_reply text: the AI step is
+  // off for the rest of the visit and SLOW_A is owed, once. Any later call that fails so only turns the AI step off.
+  const slowFail = w => {
+    memory.visit.aiOff = true
+    if (w.first && memory.visit.slow !== 'said') memory.visit.slow = 'due'
+  }
+  // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
+  // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
+  const slowAfter = said => {
+    if (!slowFollows(memory.visit, said)) return []
+    memory.visit.slow = 'said'
+    return [{ ...helperEntry(SLOW), send: false }]
   }
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
@@ -448,7 +461,7 @@ export function makePage(ctx, opts = {}) {
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }, ...slowAfter(said)].filter(Boolean))
       setFocusAsk(true)
     }
 
@@ -479,11 +492,19 @@ export function makePage(ctx, opts = {}) {
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
       writeKept()
-      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {} }
+      // live-v2 changes-5: whether this is the visit's first AI call (only its failure owes SLOW_A)
+      const first = !visit.aiTried
+      visit.aiTried = true
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, first }
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
+      // no answer in 12 s: the written line, and (changes-5 no_reply's "the same as no answer in 12 s") no more calls in
+      // this visit
+      w.stopTimer = ctx.setTimeout(() => {
+        slowFail(w)
+        liveFinish(w, null)
+      }, LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
       // hhtech-weak-ai: a call with no answer 12 s after it started turns the AI step off for the rest of this visit
       // (also when the person moved on before), since a slow or thinking model is held by each abandoned call for minutes
@@ -491,7 +512,7 @@ export function makePage(ctx, opts = {}) {
         live.inHermes++
         let ended = false
         const stopWatch = ctx.setTimeout(() => {
-          if (!ended) visit.aiOff = true
+          if (!ended) slowFail(w)
         }, LIVE_SECONDS * 1000)
         let p
         try {
@@ -508,9 +529,9 @@ export function makePage(ctx, opts = {}) {
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
       askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
         .then(got => {
-          // hhtech-weak-ai: thinking text from any call turns the AI step off for the rest of this visit, also when
-          // it comes after the 12 s
-          if (got && got.thinking) visit.aiOff = true
+          // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
+          // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
+          if (got && got.thinking) slowFail(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })
@@ -554,7 +575,11 @@ export function makePage(ctx, opts = {}) {
       const next = entry.next
       if (!next) return
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
-      if (next.kind === 'line' || next.kind === 'forget-all') liveClose()
+      if (next.kind === 'line' || next.kind === 'forget-all') {
+        liveClose()
+        // talk-live-3: the button is done; its older line draws the label as plain faint text (src/talk-view.js)
+        setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
+      }
       if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)

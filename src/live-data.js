@@ -1049,7 +1049,15 @@ export const LIVE_DATA = {
         "news",
         "digest",
         "list",
-        "update",
+        "daily update",
+        "daily updates",
+        "weekly update",
+        "weekly updates",
+        "morning update",
+        "update every",
+        "updates every",
+        "update me every",
+        "an update each",
         "every morning",
         "daily",
         "weekly"
@@ -4953,18 +4961,18 @@ export const LIVE_DATA = {
     "text_no_lines": "The person's newest message: {message}",
     "cut_at_chars": 1500,
     "temperature": 0.2,
-    "work_line": "What the person does (they told Helper): {work}"
+    "work_line": "About them: {work}"
   },
   "first_call": {
     "text": "You sort messages for Helper, a part of the Hermes app that explains Hermes to newcomers.\nRead the person's newest message (and the conversation before it, if any). Reply with ONE word from this list and nothing else:\n{subjects: one per line, as id = title}",
     "max_tokens": 20
   },
   "writer": {
-    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line What the person does tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
+    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
     "max_tokens": 200
   },
   "pick_only": {
-    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{work_line}\nIf a line What the person does is given, use it only to choose the line that fits them best.\n{rows: one per line, as [id] text; or (no lines)}",
+    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{work_line}\nIf a line About them is given, use it only to choose the line that fits them best.\n{rows: one per line, as [id] text; or (no lines)}",
     "max_tokens": 20
   },
   "checks": {
@@ -5415,7 +5423,133 @@ export const LIVE_DATA = {
         "the",
         "one"
       ]
-    }
+    },
+    "c26": [
+      "the person",
+      "checked facts",
+      "USED",
+      "about them:",
+      "what the person does",
+      "the rows",
+      "the facts given",
+      "my notes"
+    ],
+    "c27": [
+      {
+        "id": "money",
+        "asks": [
+          "pay",
+          "paid",
+          "paying",
+          "cost",
+          "costs",
+          "price",
+          "money",
+          "free",
+          "subscription",
+          "expensive",
+          "cheap",
+          "charge"
+        ],
+        "gives": [
+          "pay",
+          "paid",
+          "free",
+          "cost",
+          "costs",
+          "price",
+          "money",
+          "charge",
+          "subscription",
+          "nothing extra"
+        ]
+      },
+      {
+        "id": "choice",
+        "asks": [
+          "best",
+          "which",
+          "pick",
+          "choose",
+          "recommend",
+          "should i use",
+          "what should i"
+        ],
+        "gives": [
+          "pick",
+          "choose",
+          "start",
+          "try",
+          "use",
+          "recommend",
+          "best",
+          "if you",
+          "free",
+          "paid",
+          "plan",
+          "open",
+          "not checked",
+          "haven't checked",
+          "do not say",
+          "don't say"
+        ]
+      },
+      {
+        "id": "next",
+        "asks_whole": [
+          "then",
+          "and then",
+          "then what",
+          "what then",
+          "what next",
+          "what's next",
+          "whats next",
+          "next",
+          "and next",
+          "what now",
+          "now what"
+        ],
+        "gives": [
+          "then",
+          "next",
+          "after",
+          "open",
+          "click",
+          "press",
+          "paste",
+          "copy",
+          "type",
+          "send",
+          "add",
+          "choose",
+          "pick",
+          "scan",
+          "not checked",
+          "haven't checked",
+          "do not say",
+          "don't say"
+        ]
+      }
+    ]
+  },
+  "no_reply": {
+    "starts": [
+      "Thinking Process",
+      "Thinking process:",
+      "Thought process",
+      "<think>"
+    ],
+    "holds": [
+      "**Analyze",
+      "**Analysis",
+      "**Task:**",
+      "**Request:**"
+    ]
+  },
+  "slow_ai": {
+    "id": "SLOW_A",
+    "text": "Your AI took too long to answer, so I answered from my own notes. To make it quicker for me, paste this into a new chat with your Hermes.",
+    "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helping Hand's short calls, not for my own chats. Show me the change before you save it."
   },
   "lines_by_mode": {
     "are_you_an_ai": {

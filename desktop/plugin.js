@@ -2818,7 +2818,15 @@ const TALK_DATA = {
             "news",
             "digest",
             "list",
-            "update",
+            "daily update",
+            "daily updates",
+            "weekly update",
+            "weekly updates",
+            "morning update",
+            "update every",
+            "updates every",
+            "update me every",
+            "an update each",
             "every morning",
             "daily",
             "weekly"
@@ -9203,7 +9211,15 @@ const LIVE_DATA = {
         "news",
         "digest",
         "list",
-        "update",
+        "daily update",
+        "daily updates",
+        "weekly update",
+        "weekly updates",
+        "morning update",
+        "update every",
+        "updates every",
+        "update me every",
+        "an update each",
         "every morning",
         "daily",
         "weekly"
@@ -13107,18 +13123,18 @@ const LIVE_DATA = {
     "text_no_lines": "The person's newest message: {message}",
     "cut_at_chars": 1500,
     "temperature": 0.2,
-    "work_line": "What the person does (they told Helper): {work}"
+    "work_line": "About them: {work}"
   },
   "first_call": {
     "text": "You sort messages for Helper, a part of the Hermes app that explains Hermes to newcomers.\nRead the person's newest message (and the conversation before it, if any). Reply with ONE word from this list and nothing else:\n{subjects: one per line, as id = title}",
     "max_tokens": 20
   },
   "writer": {
-    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line What the person does tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
+    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
     "max_tokens": 200
   },
   "pick_only": {
-    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{work_line}\nIf a line What the person does is given, use it only to choose the line that fits them best.\n{rows: one per line, as [id] text; or (no lines)}",
+    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{work_line}\nIf a line About them is given, use it only to choose the line that fits them best.\n{rows: one per line, as [id] text; or (no lines)}",
     "max_tokens": 20
   },
   "checks": {
@@ -13569,7 +13585,133 @@ const LIVE_DATA = {
         "the",
         "one"
       ]
-    }
+    },
+    "c26": [
+      "the person",
+      "checked facts",
+      "USED",
+      "about them:",
+      "what the person does",
+      "the rows",
+      "the facts given",
+      "my notes"
+    ],
+    "c27": [
+      {
+        "id": "money",
+        "asks": [
+          "pay",
+          "paid",
+          "paying",
+          "cost",
+          "costs",
+          "price",
+          "money",
+          "free",
+          "subscription",
+          "expensive",
+          "cheap",
+          "charge"
+        ],
+        "gives": [
+          "pay",
+          "paid",
+          "free",
+          "cost",
+          "costs",
+          "price",
+          "money",
+          "charge",
+          "subscription",
+          "nothing extra"
+        ]
+      },
+      {
+        "id": "choice",
+        "asks": [
+          "best",
+          "which",
+          "pick",
+          "choose",
+          "recommend",
+          "should i use",
+          "what should i"
+        ],
+        "gives": [
+          "pick",
+          "choose",
+          "start",
+          "try",
+          "use",
+          "recommend",
+          "best",
+          "if you",
+          "free",
+          "paid",
+          "plan",
+          "open",
+          "not checked",
+          "haven't checked",
+          "do not say",
+          "don't say"
+        ]
+      },
+      {
+        "id": "next",
+        "asks_whole": [
+          "then",
+          "and then",
+          "then what",
+          "what then",
+          "what next",
+          "what's next",
+          "whats next",
+          "next",
+          "and next",
+          "what now",
+          "now what"
+        ],
+        "gives": [
+          "then",
+          "next",
+          "after",
+          "open",
+          "click",
+          "press",
+          "paste",
+          "copy",
+          "type",
+          "send",
+          "add",
+          "choose",
+          "pick",
+          "scan",
+          "not checked",
+          "haven't checked",
+          "do not say",
+          "don't say"
+        ]
+      }
+    ]
+  },
+  "no_reply": {
+    "starts": [
+      "Thinking Process",
+      "Thinking process:",
+      "Thought process",
+      "<think>"
+    ],
+    "holds": [
+      "**Analyze",
+      "**Analysis",
+      "**Task:**",
+      "**Request:**"
+    ]
+  },
+  "slow_ai": {
+    "id": "SLOW_A",
+    "text": "Your AI took too long to answer, so I answered from my own notes. To make it quicker for me, paste this into a new chat with your Hermes.",
+    "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helping Hand's short calls, not for my own chats. Show me the change before you save it."
   },
   "lines_by_mode": {
     "are_you_an_ai": {
@@ -15271,9 +15413,11 @@ function byCode(text, st) {
 // live-v2 changes-3: lastAnswer, lastAnswerKey, lastByAgain: this visit's last answer line, for "again"
 // (small_talk.again_rule). changes-4: keepWork, the keep rule of keeps.work (false only for replaying route2.py,
 // which keeps nothing at "What do you do?"); workLong, WORK_LONG was said once at this question. aiOff: the AI step is
-// off for the rest of this visit (hhtech-weak-ai; set by src/page.js).
+// off for the rest of this visit (hhtech-weak-ai; set by src/page.js). live-v2 changes-5 (set by src/page.js): aiTried,
+// the visit has made its first AI call; slow, the slow-AI line SLOW_A: null, 'due' (owed after the next answer that
+// may have it, src/live-turn.js slowFollows), 'said'.
 function freshVisit(stage = 'open', kept = {}, met = false) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false, aiTried: false, slow: null }
 }
 // A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
 // earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,
@@ -16648,17 +16792,16 @@ const NOT_RX = Object.fromEntries(Object.entries(LC.not_words).map(([cls, ws]) =
 const MONEY_RX = LC.money_words.map(m => [m, new RegExp('(^|[^a-z])' + liveEsc(m) + '($|[^a-z])')])
 const ASKED_AGAIN = TALK_DATA.no_repeat.asked_again
 
-// hhtech-weak-ai (For builder): a reply that is the model's thinking is no reply: an unclosed <think> (Hermes cuts a
-// closed block itself), or text that starts with "Thinking Process" or holds "**Analyze" (a managed local server
-// hands back the thinking with no tag at all). Constants: live-v2 changes-5, which would hold them as data, does not
-// exist (11 Nov 04:40).
-const THINK_START = /^\s*thinking process\b/i
-const THINK_ANYWHERE = '**Analyze'
-function isThinking(raw) {
-  // a closed block is cut first (Hermes cuts it too); what is left is the reply (review)
-  const s = String(raw || '').replace(/<think>[\s\S]*?<\/think>/g, '')
-  if (s.includes('<think>')) return true
-  return THINK_START.test(s) || s.includes(THINK_ANYWHERE)
+// live-v2 changes-5, checks_c5.no_reply (it replaces talk-live-2's constants from hhtech-weak-ai): before any other
+// check, the text is no reply (the same as no answer in 12 s) when, after trimming, it starts with one of starts (any
+// case), holds one of holds (exact), or holds <think> with no </think>. As check_c5.py's no_reply(): a reply that
+// starts with a closed <think> block counts too (talk-live-2 cut a closed block first).
+const NR_STARTS = LIVE_DATA.no_reply.starts.map(s => s.toLowerCase())
+const NR_HOLDS = LIVE_DATA.no_reply.holds
+function noReply(raw) {
+  const s = String(raw == null ? '' : raw).trim()
+  const low = s.toLowerCase()
+  return NR_STARTS.some(p => low.startsWith(p)) || NR_HOLDS.some(h => s.includes(h)) || (s.includes('<think>') && !s.includes('</think>'))
 }
 
 // <think>...</think> blocks, and an unclosed <think> with everything after it (a reply cut off by max_tokens
@@ -16793,7 +16936,31 @@ function replyFlags(reply, rows, used, talk = {}) {
   // c24, after c23 (changes-4: "Run c24 after c23")
   const c24Word = c24Fails(reply, talk.work, talk.message, hand)
   if (c24Word) out.push('c24 about the person ' + c24Word)
+  // live-v2 changes-5: c26 and c27 after c24 (c25 has adopted: false and is not built)
+  const c26Word = c26Fails(reply)
+  if (c26Word) out.push('c26 notes shown ' + c26Word)
+  for (const id of c27Fails(reply, talk.message || '')) out.push('c27 ' + id)
   return out
+}
+
+// live-v2 changes-5 c26: the reply holds one of the words (any case): the model's own notes or an instruction label
+// shown to the person. "USED" counts only in capitals, as a word (check_c5.py). Returns the word found, or null.
+const C26_WORDS = LC.c26.filter(w => w !== 'USED').map(w => w.toLowerCase())
+function c26Fails(reply) {
+  const low = String(reply).toLowerCase()
+  const w = C26_WORDS.find(x => low.includes(x))
+  if (w) return w
+  return /\bUSED\b/.test(reply) ? 'USED' : null
+}
+// live-v2 changes-5 c27: for each class, when the person's newest message (only that one) asks it (a word of asks, or
+// the whole message one of asks_whole), the reply must hold a word of gives. Returns the failed class ids, in order.
+// whole: as check_c5.py's whole(): lower case, end marks and spaces cut, then ok, okay, so, and, cool, right in front.
+// A word: not next to a letter or an apostrophe (check_c5.py's hasw).
+const c27Whole = t => String(t).toLowerCase().trim().replace(/[?.! ]+$/, '').replace(/^(?:(?:ok|okay|so|and|cool|right)\b[ ,]*)+/, '').trim()
+const c27Has = (t, w) => new RegExp("(^|[^a-z'])" + liveEsc(w.toLowerCase()) + "($|[^a-z'])").test(String(t).toLowerCase())
+function c27Fails(reply, message) {
+  const w = c27Whole(message)
+  return LC.c27.filter(c => ((c.asks || []).some(x => c27Has(message, x)) || (c.asks_whole || []).includes(w)) && !c.gives.some(g => c27Has(reply, g))).map(c => c.id)
 }
 
 // The whole reading of a written reply: { word: 'NONE' | 'BUILD' } (c2), { fail } (empty after c0, or the
@@ -16920,6 +17087,20 @@ const SECOND_CALL_MIN_MS = 4000
 const LV_GO = LIVE_DATA.go_to_ai
 const LV_DONT_KNOW = ['N1', 'N1_AGAIN', 'AGAIN', 'MEAN_NONE']
 
+// live-v2 changes-5 slow_ai, Lead's pick SLOW_A (job talk-live-3, point 4): Helper's line right after the written
+// answer when the visit's first AI call gave no answer in 12 s or gave no_reply text; its text to paste shows at once
+// under it, as H1's. Said once per visit (src/page.js keeps visit.slow: 'due', then 'said'; never stored).
+const SLOW = { line: LIVE_DATA.slow_ai.id, text: LIVE_DATA.slow_ai.text, source: null, answers: null, next: null, paste: LIVE_DATA.slow_ai.paste_text, note: null, used: null, hint: null, rows: null, docs: null }
+// Not after a don't-know line (hhcontent's gap: "I answered from my own notes" + "I don't have checked information"
+// read oddly together; Lead: it waits for the next written answer of the visit that is not one). The don't-know lines
+// are no_repeat's dont_know groups (N1, N1a, N1_AGAIN, and AGAIN in its place). Decided by the Builder: also not after
+// a line with things to pick or a line that asks a question, since SLOW_A after it would take the picks' place and
+// leave the question above the newest line; it waits for the next answer then too.
+const SLOW_NOT_AFTER = new Set([...TALK_DATA.no_repeat.groups.dont_know, ...TALK_DATA.no_repeat.in_place.dont_know])
+function slowFollows(visit, said) {
+  return visit.slow === 'due' && !!said && !SLOW_NOT_AFTER.has(said.line) && !said.answers && !/\?\s*$/.test(String(said.text || ''))
+}
+
 // Step 2 (code_answers): only these no-AI results reach the AI, judged on the result before no_repeat, so a
 // plain line given for "what do you mean" keeps its why. N1_AGAIN and AGAIN are no_repeat's own lines in place
 // of an N1 or a repeat; they come only after a result this already sends.
@@ -16973,7 +17154,7 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
     try {
       const res = await request('llm.oneshot', liveParams(instructions, input, maxTokens), ONESHOT_TIMEOUT_MS)
       const t = res && typeof res.text === 'string' ? res.text : null
-      if (t !== null && isThinking(t)) {
+      if (t !== null && noReply(t)) {
         thinking = true
         return null
       }
@@ -17391,7 +17572,10 @@ const K = {
   bubblePaste: 'flex w-full min-w-0 items-start gap-2 rounded-md border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) py-1.5 pl-2.5 pr-1.5',
   bubblePasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
   // builder-qs (Lead, 11 Nov 00:55: the text to paste at least 12 px): the older line's too, as the bubble's
-  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)'
+  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
+  // talk-live-3 (Lead's call, 11 Nov 05:08): text the person is to type inside a line (/usage, "what can I ask you"),
+  // in the paste box's code style: its edge, fill, 12 px mono and text colour, as a small inline chip
+  typed: 'rounded-[2.5px] border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) px-1 font-mono text-xs text-(--ui-text-secondary)'
 }
 
 // Joins class names, skipping empty ones. Only K and T values go in.
@@ -17977,8 +18161,12 @@ function watchReducedMotion(onChange) {
 // The pace: one word every 120 ms (a first number; Pēteris has not seen a pace yet).
 const WORD_MS = 120
 
+// talk-live-3: in a line that says "type", a quoted phrase to type is one word (src/quotes.js typedParts), so it
+// appears whole in its code style and nothing jumps when its last word comes
 function wordsOf(text) {
-  return String(text ?? '').trim().split(/\s+/).filter(Boolean)
+  const s = String(text ?? '')
+  const kept = TYPE_WORD.test(s) ? s.replace(TYPED_PHRASE, m => m.replace(/\s/g, '\u0000')) : s
+  return kept.trim().split(/\s+/).filter(Boolean).map(w => w.replace(/\u0000/g, ' '))
 }
 
 // setInterval is the host's (ctx.setInterval: it returns the function that stops it).
@@ -18123,10 +18311,22 @@ const UNSEEN = { visibility: 'hidden' }
 // A name in curly marks with no space in it is kept on one line with its marks (src/quotes.js namesWhole;
 // hhdesign's review of d1ceddc, 3.1). text is already drawn by curlyQuotes.
 const NAME_WHOLE = { whiteSpace: 'nowrap' }
-function keepNamesWhole(text) {
+function keepNamesWhole(text, keyAt = '') {
   const parts = namesWhole(text)
   if (!parts) return text
-  return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `n${i}`)))
+  return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `${keyAt}n${i}`)))
+}
+// talk-live-3 (Lead's call on question 5 of the c18 report): a line's words to read, with text to type in the paste
+// box's code style (an inline <code>, its quote marks not drawn; kept on one line unless longer than NAME_WHOLE_MAX)
+// and names kept whole. typeLine: whether the whole line says "type" (src/quotes.js typedParts).
+function drawnWords(text, typeLine) {
+  const parts = typedParts(text, typeLine)
+  if (!parts) return keepNamesWhole(text)
+  return parts.flatMap((p, i) =>
+    typeof p === 'string'
+      ? [].concat(keepNamesWhole(p, `${i}-`))
+      : [jsx('code', { className: K.typed, style: Array.from(p.typed).length <= NAME_WHOLE_MAX ? NAME_WHOLE : undefined, 'data-hh': 'typed', children: p.typed }, `t${i}`)]
+  )
 }
 
 // One line Helper says. A screen reader gets the whole line once (Hermes's own sr-only class);
@@ -18138,6 +18338,8 @@ function Said({ clock, id, text, className, fresh = false }) {
   useEffect(() => clock.watch(id, () => redraw(n => n + 1)), [clock, id])
   const n = clock.shown(id, words.length, fresh)
   const rest = words.slice(n).join(' ')
+  // talk-live-3: text to type in code style; whether the line says "type" is judged on the whole line
+  const typeLine = TYPE_WORD.test(String(text ?? ''))
   return jsxs('p', {
     className,
     'data-hh': 'said',
@@ -18150,7 +18352,7 @@ function Said({ clock, id, text, className, fresh = false }) {
         {
           'aria-hidden': true,
           'data-hh': 'said-seen',
-          children: [keepNamesWhole(words.slice(0, n).join(' ')), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: keepNamesWhole((n ? ' ' : '') + rest) }, 'rest') : null]
+          children: [drawnWords(words.slice(0, n).join(' '), typeLine), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: drawnWords((n ? ' ' : '') + rest, typeLine) }, 'rest') : null]
         },
         'seen'
       )
@@ -18889,6 +19091,31 @@ function namesWhole(text) {
   return parts
 }
 
+// Text the person is to type (talk-live-3; Lead's call on question 5 of the c18 report, 11 Nov 05:08): in a line that
+// says "type" (the word, any case), a /command (a slash and letters, after a space or at the start, before a space, an
+// end mark or the end) and a phrase in quote marks (straight or curly). src/reveal.js draws each in the paste box's
+// code style, without its quote marks, and its word-by-word pace takes a quoted phrase as one word (TYPED_PHRASE).
+// A line that does not say "type" has none: "click “New session”" names a button, and "/home" may be a folder.
+//   typedParts(text, typeLine) -> null, or the parts in order: strings, and { typed: '/usage' } for each piece to type
+//   typeLine: whether the whole line says "type" (a part of a line, as Said draws it, is judged by its whole line)
+const TYPE_WORD = /\btype\b/i
+const TYPED_PHRASE = /(["\u201c])([^"\u201c\u201d\n]+)(["\u201d])/g
+const TYPED_RX = /(^|\s)(\/[a-z][a-z-]*)(?=$|[\s.,;:!?])|(["\u201c])([^"\u201c\u201d\n]+)(["\u201d])/g
+function typedParts(text, typeLine = TYPE_WORD.test(String(text))) {
+  if (typeof text !== 'string' || !typeLine) return null
+  const parts = []
+  let at = 0
+  for (const m of text.matchAll(TYPED_RX)) {
+    const start = m[2] ? m.index + m[1].length : m.index
+    if (start > at) parts.push(text.slice(at, start))
+    parts.push({ typed: m[2] || m[4] })
+    at = m.index + m[0].length
+  }
+  if (!parts.length) return null
+  if (at < text.length) parts.push(text.slice(at))
+  return parts
+}
+
 // ---- src/talk-view.js ----
 // The parts of Helper's conversation window (design/talk-r5: option 4, the things to pick inside the
 // message box), drawn from plain data. page.js holds the conversation and decides what is said;
@@ -18910,8 +19137,9 @@ function namesWhole(text) {
 //     used:    null | { text, link, topic }   the faint "From what I keep: ..." line, the same place
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
-// A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js)
-const drawn = (text, asTyped) => keepNamesWhole(curlyQuotes(text, asTyped))
+// A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js), and
+// (talk-live-3) text to type in the paste box's code style (src/reveal.js drawnWords)
+const drawn = (text, asTyped) => drawnWords(curlyQuotes(text, asTyped))
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
 // (talk v2 look: once its part is open, the style sheet turns the down arrow up.)
@@ -19001,6 +19229,10 @@ function notesOf(entry, onNote, kept) {
 function OldLine({ entry, onNext }) {
   const next = entry.next
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
+  // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
+  // line its label is plain faint text, not a link. A button that opens something under its line (text to paste,
+  // steps) or a Hermes screen stays a link, so it can be used again.
+  const done = next && entry.pressed && (next.kind === 'line' || next.kind === 'forget-all')
   return jsxs('div', {
     className: T.old,
     'data-hh': 'old',
@@ -19012,7 +19244,8 @@ function OldLine({ entry, onNext }) {
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
       entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
       next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: drawn(next.text) }, 'where') : null,
-      next && next.kind !== 'where'
+      done ? jsx('p', { className: T.where, 'data-hh': 'old-pressed', 'data-kind': next.kind, children: next.label }, 'next') : null,
+      next && next.kind !== 'where' && !done
         ? jsxs(
             'button',
             {
@@ -19415,11 +19648,24 @@ function makePage(ctx, opts = {}) {
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
     const entry = { ...helperEntry(said), send: w.sendHelper }
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry].slice(-LOG_MAX)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry, ...slowAfter(said)].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
     }
+  }
+  // live-v2 changes-5: the visit's first AI call (w.first) gave no answer in 12 s or gave no_reply text: the AI step is
+  // off for the rest of the visit and SLOW_A is owed, once. Any later call that fails so only turns the AI step off.
+  const slowFail = w => {
+    memory.visit.aiOff = true
+    if (w.first && memory.visit.slow !== 'said') memory.visit.slow = 'due'
+  }
+  // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
+  // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
+  const slowAfter = said => {
+    if (!slowFollows(memory.visit, said)) return []
+    memory.visit.slow = 'said'
+    return [{ ...helperEntry(SLOW), send: false }]
   }
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
@@ -19680,7 +19926,7 @@ function makePage(ctx, opts = {}) {
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }].filter(Boolean))
+      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }, ...slowAfter(said)].filter(Boolean))
       setFocusAsk(true)
     }
 
@@ -19711,11 +19957,19 @@ function makePage(ctx, opts = {}) {
       const message = pre.name_taken ? nameWithMore(typed)[1] : typed
       const may = sendable(result)
       writeKept()
-      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {} }
+      // live-v2 changes-5: whether this is the visit's first AI call (only its failure owes SLOW_A)
+      const first = !visit.aiTried
+      visit.aiTried = true
+      const w = { n: ++live.n, out: result, typed, sendHelper: may.helper, endBusy: busy.begin(), stopTimer: () => {}, first }
       live.waiting = w
       addToLog([{ ...youEntry(shown), send: may.you }])
       const started = Date.now()
-      w.stopTimer = ctx.setTimeout(() => liveFinish(w, null), LIVE_SECONDS * 1000)
+      // no answer in 12 s: the written line, and (changes-5 no_reply's "the same as no answer in 12 s") no more calls in
+      // this visit
+      w.stopTimer = ctx.setTimeout(() => {
+        slowFail(w)
+        liveFinish(w, null)
+      }, LIVE_SECONDS * 1000)
       // Helper's calls, counted while Hermes works on them (host.request keeps its 90 s limit)
       // hhtech-weak-ai: a call with no answer 12 s after it started turns the AI step off for the rest of this visit
       // (also when the person moved on before), since a slow or thinking model is held by each abandoned call for minutes
@@ -19723,7 +19977,7 @@ function makePage(ctx, opts = {}) {
         live.inHermes++
         let ended = false
         const stopWatch = ctx.setTimeout(() => {
-          if (!ended) visit.aiOff = true
+          if (!ended) slowFail(w)
         }, LIVE_SECONDS * 1000)
         let p
         try {
@@ -19740,9 +19994,9 @@ function makePage(ctx, opts = {}) {
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
       askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
         .then(got => {
-          // hhtech-weak-ai: thinking text from any call turns the AI step off for the rest of this visit, also when
-          // it comes after the 12 s
-          if (got && got.thinking) visit.aiOff = true
+          // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
+          // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
+          if (got && got.thinking) slowFail(w)
           if (live.waiting !== w) return
           liveFinish(w, liveApply(visit, got, result, before, typed))
         })
@@ -19786,7 +20040,11 @@ function makePage(ctx, opts = {}) {
       const next = entry.next
       if (!next) return
       if (next.kind === 'paste' || next.kind === 'steps') return setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, opened: !e.opened } : e))))
-      if (next.kind === 'line' || next.kind === 'forget-all') liveClose()
+      if (next.kind === 'line' || next.kind === 'forget-all') {
+        liveClose()
+        // talk-live-3: the button is done; its older line draws the label as plain faint text (src/talk-view.js)
+        setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
+      }
       if (next.kind === 'line') return answer(sayLine(next.line, visit), next.label)
       if (next.kind === 'settings') return go(settingsHref)
       if (next.kind === 'forget-all') return answer(askForgetAll(visit), next.label)
