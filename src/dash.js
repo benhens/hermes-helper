@@ -23,7 +23,7 @@ import { K, D, cx } from './look.js'
 import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
 import { botRows, mainBotName, openBotName, doneFlags, makeReader } from './setup-reads.js'
-import { pathStates, stopState, chatDays, activityGrid, daysSinceUsed, lastUsedLine, weeksThatFit, distinctSkills, tileWord } from './dash-rules.js'
+import { pathStates, stopState, distinctSkills, tileWord } from './dash-rules.js'
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -121,10 +121,6 @@ export function roadShape(width, compact, here, count = DASH_DATA.items.length) 
 export const ROAD_WIDTH_UNMEASURED = 560
 // The left side's width under which the tab takes hhdesign's narrow sizes (r5-r7: 720 px wide side at 1180, 580 at 940).
 export const DASH_COMPACT_UNDER_PX = 640
-// Activity's squares: 8 px, 2 px apart; until the grid is measured, 16 weeks (the job's number).
-const SQ = 8
-const SQ_GAP = 2
-const WEEKS_UNMEASURED = 16
 
 const fill = (s, map) => s.replace(/\{(\w+)\}/g, (m, k) => (k in map ? String(map[k]) : m))
 
@@ -216,6 +212,7 @@ export function makeDashboard(ctx) {
         ])
         if (!alive) return
         // sessionsDoor: whether this Hermes has the sessions read at all (without it First chat is marked by the person)
+        // (loom2: Activity is out; this read is now First chat's only, and goes with the other done reads in point 3)
         put({ model, soul, cron, status: st, sessions: ses, sessionsDoor: !!listSessions, pathRead: true })
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
@@ -234,7 +231,6 @@ export function makeDashboard(ctx) {
       setOpenNow(next)
     }
     const [roadWidth, roadRef] = useDashWidth()
-    const [gridWidth, gridRef] = useDashWidth()
     const stepsBox = useRef(null)
     // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
     // (a stop found open on coming back is brought into view the same way)
@@ -254,7 +250,7 @@ export function makeDashboard(ctx) {
       if (open !== id) setReveal(true)
     }
     // given: the app's own name for the open bot (loom-fixes: Helper's look reads the same bot, src/page.js)
-    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox, given }
+    return { reads, open, setOpen, toggle, roadWidth, roadRef, stepsBox, given }
   }
 
   // The tab, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
@@ -263,7 +259,7 @@ export function makeDashboard(ctx) {
   // writes the kept record)
   function renderDashboard(state, { compact = false, kept = {}, onMark = () => {} } = {}) {
     const W = DASH_DATA.words
-    const { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox } = state
+    const { reads, open, setOpen, toggle, roadWidth, roadRef, stepsBox } = state
 
     /* ---------- the top box: three tiles ---------- */
     const rows = reads.bots && reads.bots.ok ? botRows(reads.bots.value) : null
@@ -299,85 +295,6 @@ export function makeDashboard(ctx) {
       return jsxs('button', { type: 'button', className: cx(D.tile, D.tileBtn), 'data-hh': `tile-${key}`, 'data-to': TILE_GO[key], onClick: () => goTo(TILE_GO[key]), children: inner }, key)
     }
     const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
-
-    /* ---------- Activity: shown only when the read worked ---------- */
-    let activity = null
-    const ses = reads.sessions
-    if (ses && ses.ok && ses.value && Array.isArray(ses.value.sessions)) {
-      const today = new Date()
-      const days = chatDays(ses.value.sessions)
-      const weeks = gridWidth ? weeksThatFit(gridWidth - 22 - 6, SQ, SQ_GAP) : WEEKS_UNMEASURED
-      const grid = activityGrid(days, today, weeks)
-      const last = lastUsedLine(daysSinceUsed(days, today))
-      const level = n => [D.l0, D.l1, D.l2, D.l3][n]
-      activity = jsxs(
-        'section',
-        {
-          className: cx(D.card, D.act),
-          'data-hh': 'activity',
-          children: [
-            jsxs(
-              'div',
-              {
-                className: D.actWords,
-                children: [
-                  jsx('span', { className: D.title, children: W.activity.title }, 't'),
-                  last ? jsx('span', { className: D.lastUsed, 'data-hh': 'last-used', children: last }, 'lu') : null,
-                  jsxs(
-                    'span',
-                    {
-                      className: D.key,
-                      'aria-hidden': true,
-                      children: [
-                        W.activity.less,
-                        ...[0, 1, 2, 3].map(n => jsx('i', { className: cx(D.keySq, level(n), n === 0 && D.keyFirst, n === 3 && D.keyLast) }, n)),
-                        W.activity.more
-                      ]
-                    },
-                    'k'
-                  )
-                ]
-              },
-              'w'
-            ),
-            jsxs(
-              'div',
-              {
-                className: D.gridWrap,
-                ref: gridRef,
-                'aria-hidden': true,
-                children: [
-                  jsx('div', { className: D.dayNames, children: W.activity.days.map((d, i) => jsx('span', { children: d }, i)) }, 'd'),
-                  jsxs(
-                    'div',
-                    {
-                      children: [
-                        jsx('div', { className: D.months, children: grid.months.map(m => jsx('span', { className: D.month, style: { left: `${m.week * (SQ + SQ_GAP)}px` }, children: W.activity.months[m.month] }, m.week)) }, 'm'),
-                        jsx(
-                          'div',
-                          {
-                            className: D.grid,
-                            'data-hh': 'grid',
-                            'data-weeks': weeks,
-                            children: grid.cells.map(c =>
-                              jsx('i', { className: cx(D.sq, level(c.level), c.today && D.today), 'data-day': c.key, 'data-level': c.level, style: { gridColumn: c.week + 1, gridRow: c.day + 1 } }, c.key)
-                            )
-                          },
-                          'g'
-                        )
-                      ]
-                    },
-                    'mg'
-                  )
-                ]
-              },
-              'gw'
-            )
-          ]
-        },
-        'activity'
-      )
-    }
 
     /* ---------- Set up: the path ---------- */
     const items = DASH_DATA.items
@@ -710,7 +627,7 @@ export function makeDashboard(ctx) {
       className: cx(D.main, compact && D.compact),
       'data-hh': 'dashboard',
       'data-compact': compact,
-      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, activity, setup]
+      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, setup]
     })
   }
 

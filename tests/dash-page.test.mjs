@@ -232,55 +232,6 @@ test('the open bot changes while the tab is on screen: what was read goes, and e
   assert.equal(byData(dash(view), 'steps').props['data-stop'], 'memory')
 })
 
-test('Activity: GitHub\'s grid and "Last used ..."; Hermes\'s own work is not a day; a newcomer\'s first-run chat is not a day either', async () => {
-  const { view } = await open('all')
-  const act = byData(dash(view), 'activity')
-  assert.ok(act)
-  assert.equal(text(byData(act, 'last-used')), W.activity.last_used_today)
-  const grid = byData(act, 'grid')
-  assert.equal(grid.props['data-weeks'], 16, 'unmeasured: 16 weeks')
-  const cells = grid.props.children
-  assert.equal(cells.filter(c => c.props['data-level'] > 0).length, 12, '12 days of gui chats; cron left out; telegram 9 days ago is one of them')
-  assert.equal(cells.filter(c => c.props.className.split(' ').includes(D.today)).length, 1)
-  assert.match(text(act), new RegExp(`${W.activity.less}.*${W.activity.more}`))
-  assert.doesNotMatch(text(dash(view)), /streak|days with a chat|in a row/i)
-  // the newcomer: the box, an empty grid, no "Last used" line
-  const n = await open('just_installed')
-  const a2 = byData(dash(n.view), 'activity')
-  assert.ok(a2)
-  assert.equal(byData(a2, 'last-used'), null)
-  assert.equal(byData(a2, 'grid').props.children.filter(c => c.props['data-level'] > 0).length, 0)
-  // hhcontent's optional line for an empty Activity is not shown (Lead, 11 Nov), and is not in the built data
-  assert.doesNotMatch(text(dash(n.view)), /No chats/)
-  assert.equal(W.activity.no_chats, undefined)
-  assert.equal(text(all(a2, x => x.props.className === D.title)[0]), "This bot's activity")
-})
-
-test('a brand-new install whose first-run chat Hermes is still writing (stored as gui, 1 to 3 messages, titled Getting started) shows no "Last used today" and no lit day', async () => {
-  // as read in three brand-new homes on the first opening (dev/checks/dash-v2/fresh-probe-65b108b.out): 2 of 3 showed
-  // "Last used today" with these rows
-  for (const n of [1, 3, 4]) {
-    const { view } = await open('just_installed', { sessions: [{ source: 'gui', title: 'Getting started', started_at: NOW - 15, last_active: NOW - 2, message_count: n }] })
-    const act = byData(dash(view), 'activity')
-    assert.ok(act, 'the box is drawn')
-    assert.equal(byData(act, 'last-used'), null, `${n} messages`)
-    assert.equal(byData(act, 'grid').props.children.filter(c => c.props['data-level'] > 0).length, 0)
-  }
-  // the person's own first chat right after it is a day of use
-  const { view } = await open('just_installed', { sessions: [{ source: 'local', title: 'Getting started', started_at: NOW - 600, last_active: NOW - 500, message_count: 4 }, { source: 'gui', title: 'Plan my week', started_at: NOW - 60, last_active: NOW - 30, message_count: 2 }] })
-  assert.equal(text(byData(byData(dash(view), 'activity'), 'last-used')), 'Last used today')
-})
-
-
-test('Activity is not shown at all when the read is missing (not in the plugin docs) or fails: no error, no made-up squares', async () => {
-  for (const opts of [{ listPersisted: false }, { failing: ['listPersisted'] }]) {
-    const { view } = await open('all', opts)
-    assert.equal(byData(dash(view), 'activity'), null, JSON.stringify(opts))
-    assert.doesNotMatch(text(dash(view)), new RegExp(W.activity.title))
-    assert.ok(byData(dash(view), 'setup'), 'the rest of the tab is there')
-  }
-})
-
 test('person 1, just installed: "1 of 10", Model filled, You are here on First chat (Hermes\'s first-run chat has no preview), Next: First chat', async () => {
   const { view } = await open('just_installed')
   assert.equal(said(byData(dash(view), 'count')), '1 of 10')

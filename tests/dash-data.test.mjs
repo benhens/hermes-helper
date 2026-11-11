@@ -81,7 +81,7 @@ test('the path: 10 stops, Install off it; the page sees exactly the stops the co
 })
 
 test('every word on the tab is in the file: one missing stops the build; marks fit (at most 15 letters); routes go only where hhtech ran', () => {
-  for (const [part, key] of [['setup', 'you_are_here'], ['activity', 'last_used_today'], ['stats', 'plugins'], ['tabs', 'learn'], ['setup', 'mark_done'], ['setup', 'mark_undo'], ['setup', 'person_note'], ['helper_window', 'hide'], ['helper_window', 'clear_ask']]) {
+  for (const [part, key] of [['setup', 'you_are_here'], ['stats', 'plugins'], ['tabs', 'learn'], ['setup', 'mark_done'], ['setup', 'mark_undo'], ['setup', 'person_note'], ['helper_window', 'hide'], ['helper_window', 'clear_ask']]) {
     const a = copy()
     delete a.page_words[part][key]
     assert.match(dashProblems(a, DOCS).join('\n'), new RegExp(`page_words\\.${part}\\.${key} missing`))
@@ -164,7 +164,9 @@ test('the built data: "No chats with this bot yet" is not in it (Lead: not shown
   assert.equal(DATA.page_words.activity.no_chats, 'No chats with this bot yet', 'the team\'s file has the line')
   const built = JSON.stringify(DASH_DATA)
   assert.doesNotMatch(built, /No chats with this bot yet|not_seen|docs words, not seen|seen_note|"note"/)
-  assert.equal(DASH_DATA.words.activity.title, "This bot's activity")
+  // loom2: Activity is out (his Loom, 0:05): none of its words are built in
+  assert.equal(DASH_DATA.words.activity, undefined)
+  assert.doesNotMatch(built, /This bot's activity|Last used/)
   const personality = DATA.items.find(i => i.id === 'personality')
   assert.deepEqual(personality.steps.map(s => s.src === null), [false, false, true, false, true])
   assert.deepEqual(DASH_DATA.items.find(i => i.id === 'personality').steps.map(s => Object.keys(s)), [['text'], ['text'], ['text'], ['text'], ['text']])

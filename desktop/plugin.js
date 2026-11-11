@@ -28878,25 +28878,6 @@ const D = {
   tileBtn: 'hhd-tile-btn',
   tileName: 'hhd-tile-name',
   wait: 'hhd-wait',
-  // Activity
-  act: 'hhd-act',
-  actWords: 'hhd-act-words',
-  lastUsed: 'hhd-lu',
-  key: 'hhd-key',
-  keySq: 'hhd-key-sq',
-  keyFirst: 'hhd-key-first',
-  keyLast: 'hhd-key-last',
-  gridWrap: 'hhd-gridwrap',
-  dayNames: 'hhd-daynames',
-  months: 'hhd-months',
-  month: 'hhd-month',
-  grid: 'hhd-grid',
-  sq: 'hhd-sq',
-  l0: 'hhd-l0',
-  l1: 'hhd-l1',
-  l2: 'hhd-l2',
-  l3: 'hhd-l3',
-  today: 'hhd-today',
   // Set up
   head: 'hhd-head',
   count: 'hhd-count',
@@ -30411,37 +30392,6 @@ const DASH_DATA = {
       "clear_yes": "Yes",
       "clear_no": "No"
     },
-    "activity": {
-      "title": "This bot's activity",
-      "last_used_today": "Last used today",
-      "last_used_one": "Last used yesterday",
-      "last_used_n": "Last used {n} days ago",
-      "less": "Less",
-      "more": "More",
-      "months": [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ],
-      "days": [
-        "",
-        "Mon",
-        "",
-        "Wed",
-        "",
-        "Fri",
-        ""
-      ]
-    },
     "setup": {
       "title": "Set up",
       "count": "{n} of {total}",
@@ -30505,87 +30455,6 @@ function pathStates(stateOf, items = DASH_DATA.items, current = null) {
   return { states, here, done, total: items.length, allDone: done === items.length }
 }
 
-/* ---------- Activity: the days the open bot was used ---------- */
-// Rows of host.listPersistedSessions that are Hermes's own work, left out: scheduled jobs (cron), the task board
-// (kanban), tool and helper-agent runs. Chats with no message are left out too.
-// loom-fixes (hhtech-loom-n1 3, its correction): 'local' is no longer left out: a chat the person typed in a fresh home
-// came back as local. Hermes's own first-run chat is left out by its title (below).
-const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent']
-// dash-v2: while Hermes is still writing that first-run chat it is not 'local' yet. Read in three brand-new homes on
-// the first opening (dev/checks/dash-v2/fresh-probe-65b108b.out): source 'gui', 1 to 3 messages, title "Getting
-// started"; some seconds later 'local' with 4 messages. So a fresh install showed "Last used today" (hhtech-dash-run,
-// 2 of 3 homes). The field that tells it apart at once is its title (Hermes's CHAT_TITLE, agent/onboarding_text.py;
-// a repeated run is "Getting started #2"): a chat with that title and no more than Hermes's own four messages is
-// left out. With more messages the person has gone on in it, and it is a chat of theirs.
-const FIRST_RUN_TITLE = /^Getting started( #\d+)?$/
-const FIRST_RUN_MAX_MESSAGES = 4
-const isFirstRunChat = s => typeof s.title === 'string' && FIRST_RUN_TITLE.test(s.title.trim()) && s.message_count <= FIRST_RUN_MAX_MESSAGES
-// A time from a row as a Date: seconds (Hermes writes seconds); a number above 1e11 is read as milliseconds.
-const dashTime = v => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? new Date(v > 1e11 ? v : v * 1000) : null)
-// The person's own calendar day of a Date (their computer's clock), as 'YYYY-MM-DD'.
-const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-
-// The days with a chat, each with how many chats touched it: a chat marks the day it started and the day it was
-// last used (rows have no per-message dates, so the days between are not marked).
-function chatDays(sessions) {
-  const days = new Map()
-  for (const s of Array.isArray(sessions) ? sessions : []) {
-    if (!s || typeof s !== 'object') continue
-    if (NOT_THE_PERSON.includes(String(s.source || '').toLowerCase())) continue
-    if (!(typeof s.message_count === 'number' && s.message_count > 0)) continue
-    if (isFirstRunChat(s)) continue
-    const first = dashTime(s.started_at)
-    const last = dashTime(s.last_active) || dashTime(s.last_activity_at) || first
-    const keys = new Set([first, last].filter(Boolean).map(dayKey))
-    for (const k of keys) days.set(k, (days.get(k) || 0) + 1)
-  }
-  return days
-}
-
-// How bright a day's square is: no chat, 1, 2, 3 or more.
-const dayLevel = n => (n >= 3 ? 3 : n > 0 ? n : 0)
-
-// The grid: `weeks` columns, Sunday on top, the last column holds today; days after today are not drawn.
-// months: a month's name over the first column whose Sunday is in it (not over the first or the last column).
-function activityGrid(days, today, weeks) {
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - (weeks - 1) * 7)
-  const cells = []
-  const months = []
-  let prev = -1
-  for (let w = 0; w < weeks; w++) {
-    const sunday = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7)
-    if (sunday.getMonth() !== prev && w > 0 && w < weeks - 1) months.push({ week: w, month: sunday.getMonth() })
-    prev = sunday.getMonth()
-    for (let d = 0; d < 7; d++) {
-      const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7 + d)
-      if (day > today && dayKey(day) !== dayKey(today)) continue
-      const key = dayKey(day)
-      cells.push({ week: w, day: d, key, level: dayLevel(days.get(key) || 0), today: key === dayKey(today) })
-    }
-  }
-  return { cells, months }
-}
-
-// "Last used": whole calendar days between the newest day with a chat and today. null = no chat at all.
-function daysSinceUsed(days, today) {
-  if (!days.size) return null
-  const newest = [...days.keys()].sort().pop()
-  const [y, m, d] = newest.split('-').map(Number)
-  const then = new Date(y, m - 1, d)
-  const now = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  return Math.max(0, Math.round((now - then) / 86400000))
-}
-
-function lastUsedLine(n, words = DASH_DATA.words.activity) {
-  if (n === null) return null
-  if (n === 0) return words.last_used_today
-  if (n === 1) return words.last_used_one
-  return words.last_used_n.replace('{n}', String(n))
-}
-
-// How many weeks fit a width: squares of `cell` px with `gap` px between, after the room the day names take.
-const weeksThatFit = (width, cell, gap, maxWeeks = 52) => Math.max(1, Math.min(maxWeeks, Math.floor((width + gap) / (cell + gap))))
-
 /* ---------- the top box ---------- */
 // Skills: the different skill names across all bots (one read per bot, host.skills.list). One failed read: not
 // shown (a part would be too low).
@@ -30610,7 +30479,7 @@ function tileWord(key, n, words = DASH_DATA.words.stats, narrow = false) {
 // ---- src/dash-css.js ----
 // Generated by scripts/build.mjs from src/dash.css (the style sheet of the Dashboard tab).
 // Edit the CSS, then build; tests/dash-css.test.mjs checks it.
-const DASH_CSS = ".hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}\n.hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}\n.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:18px 22px}\n.hhd-compact .hhd-card{padding:14px 16px}\nhtml:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}\n.hhd-compact .hhd-stats{gap:8px}\n.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}\n.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}\nhtml:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}\n.hhd-compact .hhd-tile-icon{width:32px;height:32px}\n.hhd-tile-words{display:flex;flex-direction:column;min-width:0}\n.hhd-tile-btn{width:100%;border:0;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}\n.hhd-tile-btn:hover{background:var(--ui-bg-tertiary)}\n.hhd-tile-btn:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}\n.hhd-tile-name{font-size:15px;line-height:22px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}\n.hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}\n.hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-compact .hhd-tile-label{white-space:normal}\n.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}\n.hhd-compact .hhd-wait{margin:4px 0}\n.hhd-act{flex-direction:row;align-items:stretch;gap:24px;padding:12px 22px}\n.hhd-compact .hhd-act{gap:16px;padding:10px 16px}\n.hhd-act-words{flex:none;display:flex;flex-direction:column;gap:1px;min-width:0}\n.hhd-act-words .hhd-title{margin-bottom:3px}\n.hhd-lu{font-size:12px;line-height:17px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-key{margin-top:auto;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;line-height:14px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-key-sq{width:8px;height:8px;border-radius:2px}\n.hhd-key-first{margin-left:4px}\n.hhd-key-last{margin-right:4px}\n.hhd-gridwrap{flex:1;min-width:0;display:flex;align-items:flex-end;justify-content:flex-end;gap:6px}\n.hhd-daynames{flex:none;display:grid;grid-template-rows:repeat(7,8px);gap:2px;width:22px;font-size:9.5px;line-height:8px;color:var(--ui-text-tertiary)}\n.hhd-months{position:relative;height:13px;font-size:10px;line-height:12px;color:var(--ui-text-tertiary)}\n.hhd-month{position:absolute;top:0;white-space:nowrap}\n.hhd-grid{display:grid;grid-template-rows:repeat(7,8px);grid-auto-columns:8px;gap:2px}\n.hhd-sq{width:8px;height:8px;border-radius:2px}\n.hhd-l0{background:var(--ui-bg-tertiary)}\n.hhd-l1{background:color-mix(in srgb,var(--ui-accent) 35%,transparent)}\n.hhd-l2{background:color-mix(in srgb,var(--ui-accent) 65%,transparent)}\n.hhd-l3{background:var(--ui-accent)}\n.hhd-today{outline:1px solid var(--ui-text-secondary);outline-offset:1px}\n.hhd-head{display:flex;align-items:baseline;gap:12px;min-width:0}\n.hhd-count{font-size:13px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-count-n{font-size:15px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-road{position:relative;margin:4px 0 0;width:100%}\n.hhd-compact .hhd-road{margin-top:2px}\n.hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}\n.hhd-line{fill:none;stroke:var(--ui-text-quaternary);stroke-width:1;stroke-linecap:round}\n.hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}\n.hhd-stop:focus-visible{outline:none}\n.hhd-dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;box-sizing:border-box}\n.hhd-compact .hhd-dot{width:32px;height:32px}\n.hhd-done .hhd-dot{background:var(--ui-accent);color:var(--background)}\n.hhd-todo .hhd-dot{background:var(--ui-bg-tertiary);color:var(--ui-text-tertiary)}\n.hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}\n.hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}\n.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-text-quaternary);color:var(--ui-text-quaternary)}\n.hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}\n.hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}\n.hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}\n.hhd-up .hhd-label{bottom:calc(100% + 6px);flex-direction:column-reverse}\n.hhd-down .hhd-label{top:calc(100% + 6px)}\n.hhd-here.hhd-up .hhd-label{bottom:calc(100% + 9px)}\n.hhd-here.hhd-down .hhd-label{top:calc(100% + 9px)}\n.hhd-name{display:block;font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}\n.hhd-compact .hhd-name{font-size:11px;line-height:15px;white-space:normal}\n.hhd-done .hhd-name{color:var(--ui-text-secondary)}\n.hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}\n.hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}\n.hhd-you{display:block;font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}\n.hhd-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--ui-stroke-tertiary);min-width:0}\n.hhd-compact .hhd-next{margin-top:8px;padding-top:10px}\n.hhd-next-words{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}\n.hhd-next-line{display:flex;align-items:baseline;gap:10px;min-width:0}\n.hhd-next-label{font-size:11px;line-height:14px;letter-spacing:.8px;text-transform:uppercase;color:var(--ui-accent);font-weight:600}\n.hhd-next-name{font-size:13px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-alldone{color:var(--ui-accent)}\n.hhd-open-word{display:inline-flex;align-items:center}\n.hhd-open-chev{display:inline-flex;margin-left:4px}\n.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}\n.hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}\n.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}\n.hhd-compact .hhd-caret{display:none}\n.hhd-steps-head{display:flex;align-items:center;gap:10px;min-width:0}\n.hhd-steps-icon{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--ui-accent) 18%,transparent);color:var(--ui-accent)}\n.hhd-steps-name{font-size:14px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-steps-why{font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}\n.hhd-compact .hhd-ol{line-height:19px}\n.hhd-ol li::marker{color:var(--ui-accent);font-weight:600}\n.hhd-li{margin:0 0 2px}\n.hhd-route{margin:4px 0 2px}\n.hhd-term{display:flex;flex-direction:column;gap:6px;min-width:0}\n.hhd-term-when{font-size:12px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-paste{display:flex;flex-direction:column;gap:4px;min-width:0}\n.hhd-paste-text{min-width:0;flex:1 1 auto;overflow-x:auto;font-size:12px;line-height:18px;color:var(--ui-text-secondary)}\n.hhd-paste-box{flex-wrap:wrap}\n.hhd-word{white-space:nowrap}\n.hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-quietline{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}\n.hhd-foot .hhd-src{font-size:10.5px;color:var(--ui-text-quaternary)}\n.hhd-close{position:absolute;right:10px;top:10px}"
+const DASH_CSS = ".hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}\n.hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}\n.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:18px 22px}\n.hhd-compact .hhd-card{padding:14px 16px}\nhtml:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}\n.hhd-compact .hhd-stats{gap:8px}\n.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}\n.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}\nhtml:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}\n.hhd-compact .hhd-tile-icon{width:32px;height:32px}\n.hhd-tile-words{display:flex;flex-direction:column;min-width:0}\n.hhd-tile-btn{width:100%;border:0;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}\n.hhd-tile-btn:hover{background:var(--ui-bg-tertiary)}\n.hhd-tile-btn:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}\n.hhd-tile-name{font-size:15px;line-height:22px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}\n.hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}\n.hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-compact .hhd-tile-label{white-space:normal}\n.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}\n.hhd-compact .hhd-wait{margin:4px 0}\n.hhd-head{display:flex;align-items:baseline;gap:12px;min-width:0}\n.hhd-count{font-size:13px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-count-n{font-size:15px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-road{position:relative;margin:4px 0 0;width:100%}\n.hhd-compact .hhd-road{margin-top:2px}\n.hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}\n.hhd-line{fill:none;stroke:var(--ui-text-quaternary);stroke-width:1;stroke-linecap:round}\n.hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}\n.hhd-stop:focus-visible{outline:none}\n.hhd-dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;box-sizing:border-box}\n.hhd-compact .hhd-dot{width:32px;height:32px}\n.hhd-done .hhd-dot{background:var(--ui-accent);color:var(--background)}\n.hhd-todo .hhd-dot{background:var(--ui-bg-tertiary);color:var(--ui-text-tertiary)}\n.hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}\n.hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}\n.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-text-quaternary);color:var(--ui-text-quaternary)}\n.hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}\n.hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}\n.hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}\n.hhd-up .hhd-label{bottom:calc(100% + 6px);flex-direction:column-reverse}\n.hhd-down .hhd-label{top:calc(100% + 6px)}\n.hhd-here.hhd-up .hhd-label{bottom:calc(100% + 9px)}\n.hhd-here.hhd-down .hhd-label{top:calc(100% + 9px)}\n.hhd-name{display:block;font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}\n.hhd-compact .hhd-name{font-size:11px;line-height:15px;white-space:normal}\n.hhd-done .hhd-name{color:var(--ui-text-secondary)}\n.hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}\n.hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}\n.hhd-you{display:block;font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}\n.hhd-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--ui-stroke-tertiary);min-width:0}\n.hhd-compact .hhd-next{margin-top:8px;padding-top:10px}\n.hhd-next-words{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}\n.hhd-next-line{display:flex;align-items:baseline;gap:10px;min-width:0}\n.hhd-next-label{font-size:11px;line-height:14px;letter-spacing:.8px;text-transform:uppercase;color:var(--ui-accent);font-weight:600}\n.hhd-next-name{font-size:13px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-alldone{color:var(--ui-accent)}\n.hhd-open-word{display:inline-flex;align-items:center}\n.hhd-open-chev{display:inline-flex;margin-left:4px}\n.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}\n.hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}\n.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}\n.hhd-compact .hhd-caret{display:none}\n.hhd-steps-head{display:flex;align-items:center;gap:10px;min-width:0}\n.hhd-steps-icon{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--ui-accent) 18%,transparent);color:var(--ui-accent)}\n.hhd-steps-name{font-size:14px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-steps-why{font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}\n.hhd-compact .hhd-ol{line-height:19px}\n.hhd-ol li::marker{color:var(--ui-accent);font-weight:600}\n.hhd-li{margin:0 0 2px}\n.hhd-route{margin:4px 0 2px}\n.hhd-term{display:flex;flex-direction:column;gap:6px;min-width:0}\n.hhd-term-when{font-size:12px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-paste{display:flex;flex-direction:column;gap:4px;min-width:0}\n.hhd-paste-text{min-width:0;flex:1 1 auto;overflow-x:auto;font-size:12px;line-height:18px;color:var(--ui-text-secondary)}\n.hhd-paste-box{flex-wrap:wrap}\n.hhd-word{white-space:nowrap}\n.hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-quietline{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}\n.hhd-foot .hhd-src{font-size:10.5px;color:var(--ui-text-quaternary)}\n.hhd-close{position:absolute;right:10px;top:10px}"
 
 // ---- src/dash.js ----
 // The Dashboard tab (dash-v1, as Pēteris picked it: design/dash-r5 way (ii), r6 Activity, r7 tiles, icons and line).
@@ -30728,10 +30597,6 @@ function roadShape(width, compact, here, count = DASH_DATA.items.length) {
 const ROAD_WIDTH_UNMEASURED = 560
 // The left side's width under which the tab takes hhdesign's narrow sizes (r5-r7: 720 px wide side at 1180, 580 at 940).
 const DASH_COMPACT_UNDER_PX = 640
-// Activity's squares: 8 px, 2 px apart; until the grid is measured, 16 weeks (the job's number).
-const SQ = 8
-const SQ_GAP = 2
-const WEEKS_UNMEASURED = 16
 
 const fill = (s, map) => s.replace(/\{(\w+)\}/g, (m, k) => (k in map ? String(map[k]) : m))
 
@@ -30823,6 +30688,7 @@ function makeDashboard(ctx) {
         ])
         if (!alive) return
         // sessionsDoor: whether this Hermes has the sessions read at all (without it First chat is marked by the person)
+        // (loom2: Activity is out; this read is now First chat's only, and goes with the other done reads in point 3)
         put({ model, soul, cron, status: st, sessions: ses, sessionsDoor: !!listSessions, pathRead: true })
         const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
         if (!alive) return
@@ -30841,7 +30707,6 @@ function makeDashboard(ctx) {
       setOpenNow(next)
     }
     const [roadWidth, roadRef] = useDashWidth()
-    const [gridWidth, gridRef] = useDashWidth()
     const stepsBox = useRef(null)
     // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
     // (a stop found open on coming back is brought into view the same way)
@@ -30861,7 +30726,7 @@ function makeDashboard(ctx) {
       if (open !== id) setReveal(true)
     }
     // given: the app's own name for the open bot (loom-fixes: Helper's look reads the same bot, src/page.js)
-    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox, given }
+    return { reads, open, setOpen, toggle, roadWidth, roadRef, stepsBox, given }
   }
 
   // The tab, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
@@ -30870,7 +30735,7 @@ function makeDashboard(ctx) {
   // writes the kept record)
   function renderDashboard(state, { compact = false, kept = {}, onMark = () => {} } = {}) {
     const W = DASH_DATA.words
-    const { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox } = state
+    const { reads, open, setOpen, toggle, roadWidth, roadRef, stepsBox } = state
 
     /* ---------- the top box: three tiles ---------- */
     const rows = reads.bots && reads.bots.ok ? botRows(reads.bots.value) : null
@@ -30906,85 +30771,6 @@ function makeDashboard(ctx) {
       return jsxs('button', { type: 'button', className: cx(D.tile, D.tileBtn), 'data-hh': `tile-${key}`, 'data-to': TILE_GO[key], onClick: () => goTo(TILE_GO[key]), children: inner }, key)
     }
     const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
-
-    /* ---------- Activity: shown only when the read worked ---------- */
-    let activity = null
-    const ses = reads.sessions
-    if (ses && ses.ok && ses.value && Array.isArray(ses.value.sessions)) {
-      const today = new Date()
-      const days = chatDays(ses.value.sessions)
-      const weeks = gridWidth ? weeksThatFit(gridWidth - 22 - 6, SQ, SQ_GAP) : WEEKS_UNMEASURED
-      const grid = activityGrid(days, today, weeks)
-      const last = lastUsedLine(daysSinceUsed(days, today))
-      const level = n => [D.l0, D.l1, D.l2, D.l3][n]
-      activity = jsxs(
-        'section',
-        {
-          className: cx(D.card, D.act),
-          'data-hh': 'activity',
-          children: [
-            jsxs(
-              'div',
-              {
-                className: D.actWords,
-                children: [
-                  jsx('span', { className: D.title, children: W.activity.title }, 't'),
-                  last ? jsx('span', { className: D.lastUsed, 'data-hh': 'last-used', children: last }, 'lu') : null,
-                  jsxs(
-                    'span',
-                    {
-                      className: D.key,
-                      'aria-hidden': true,
-                      children: [
-                        W.activity.less,
-                        ...[0, 1, 2, 3].map(n => jsx('i', { className: cx(D.keySq, level(n), n === 0 && D.keyFirst, n === 3 && D.keyLast) }, n)),
-                        W.activity.more
-                      ]
-                    },
-                    'k'
-                  )
-                ]
-              },
-              'w'
-            ),
-            jsxs(
-              'div',
-              {
-                className: D.gridWrap,
-                ref: gridRef,
-                'aria-hidden': true,
-                children: [
-                  jsx('div', { className: D.dayNames, children: W.activity.days.map((d, i) => jsx('span', { children: d }, i)) }, 'd'),
-                  jsxs(
-                    'div',
-                    {
-                      children: [
-                        jsx('div', { className: D.months, children: grid.months.map(m => jsx('span', { className: D.month, style: { left: `${m.week * (SQ + SQ_GAP)}px` }, children: W.activity.months[m.month] }, m.week)) }, 'm'),
-                        jsx(
-                          'div',
-                          {
-                            className: D.grid,
-                            'data-hh': 'grid',
-                            'data-weeks': weeks,
-                            children: grid.cells.map(c =>
-                              jsx('i', { className: cx(D.sq, level(c.level), c.today && D.today), 'data-day': c.key, 'data-level': c.level, style: { gridColumn: c.week + 1, gridRow: c.day + 1 } }, c.key)
-                            )
-                          },
-                          'g'
-                        )
-                      ]
-                    },
-                    'mg'
-                  )
-                ]
-              },
-              'gw'
-            )
-          ]
-        },
-        'activity'
-      )
-    }
 
     /* ---------- Set up: the path ---------- */
     const items = DASH_DATA.items
@@ -31317,7 +31103,7 @@ function makeDashboard(ctx) {
       className: cx(D.main, compact && D.compact),
       'data-hh': 'dashboard',
       'data-compact': compact,
-      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, activity, setup]
+      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, setup]
     })
   }
 

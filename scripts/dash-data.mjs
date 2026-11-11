@@ -104,13 +104,7 @@ export function dashProblems(data, docs) {
   need(w.stats, ['bots', 'bots_one', 'skills', 'skills_one', 'plugins', 'plugins_one', 'not_known', 'waiting'], 'stats.')
   // the plugins label's short variant, for the narrow size (hhcontent's variant 3; Lead, 11 Nov)
   if (!shortPlugins(data)) fails.push('word_variants: no short variant (n: 3) of the plugins label with its word for one and for many')
-  need(w.activity, ['title', 'last_used_today', 'last_used_one', 'last_used_n', 'less', 'more'], 'activity.')
   need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_known', 'mark_done', 'mark_undo', 'person_note', 'state_said_done'], 'setup.')
-  if (w.activity) {
-    if (!Array.isArray(w.activity.months) || w.activity.months.length !== 12 || !w.activity.months.every(isText)) fails.push('page_words.activity.months: not 12 names')
-    if (!Array.isArray(w.activity.days) || w.activity.days.length !== 7 || !w.activity.days.every(d => typeof d === 'string')) fails.push('page_words.activity.days: not 7 (Sunday first; empty for no label)')
-    if (isText(w.activity.last_used_n) && !w.activity.last_used_n.includes('{n}')) fails.push('page_words.activity.last_used_n has no {n}')
-  }
   if (w.setup) {
     if (isText(w.setup.count) && !(w.setup.count.includes('{n}') && w.setup.count.includes('{total}'))) fails.push('page_words.setup.count needs {n} and {total}')
     if (isText(w.setup.source) && !(w.setup.source.includes('{file}') && w.setup.source.includes('{line}'))) fails.push('page_words.setup.source needs {file} and {line}')
@@ -163,8 +157,7 @@ export function slimDashData(data) {
       notBuilt: w.not_built,
       stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
       helperWindow: pickWords(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no']),
-      // activity.no_chats (hhcontent's optional line for an empty Activity) is not shown (Lead, 11 Nov): left out
-      activity: Object.fromEntries(Object.entries(w.activity).filter(([k]) => k !== 'no_chats')),
+      // loom2: Activity is out (his Loom of 11 Nov, 0:05 "just take it out"): its words are not built in
       setup: pickWords(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_known', 'mark_done', 'mark_undo', 'person_note', 'state_said_done'])
     }
   }

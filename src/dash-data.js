@@ -386,37 +386,6 @@ export const DASH_DATA = {
       "clear_yes": "Yes",
       "clear_no": "No"
     },
-    "activity": {
-      "title": "This bot's activity",
-      "last_used_today": "Last used today",
-      "last_used_one": "Last used yesterday",
-      "last_used_n": "Last used {n} days ago",
-      "less": "Less",
-      "more": "More",
-      "months": [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ],
-      "days": [
-        "",
-        "Mon",
-        "",
-        "Wed",
-        "",
-        "Fri",
-        ""
-      ]
-    },
     "setup": {
       "title": "Set up",
       "count": "{n} of {total}",

@@ -86,13 +86,11 @@ test('the stops show the state: filled accent = done, ringed and larger = You ar
   assert.doesNotMatch(rule(`.${D.quiet} .${D.dot}`), /--ui-accent/)
 })
 
-test('hhdesign\'s r7 sizes: tiles 3 across, icon square 40 px at 13% accent; Activity squares 8 px, 2 px apart; stops 40 px (32 narrow)', () => {
+test('hhdesign\'s r7 sizes: tiles 3 across, icon square 40 px at 13% accent; stops 40 px (32 narrow)', () => {
   const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
   assert.match(rule(`.${D.stats}`), /grid-template-columns:repeat\(3,minmax\(0,1fr\)\);gap:10px/)
   assert.match(rule(`.${D.tileIcon}`), /width:40px;height:40px;border-radius:calc\(10px\*var\(--hhd-round\)\);background:color-mix\(in srgb,var\(--ui-accent\) 13%,transparent\)/)
   assert.match(rule(`.${D.tileNum}`), /font-size:28px;line-height:32px;font-weight:600/)
-  assert.match(rule(`.${D.sq}`), /width:8px;height:8px;border-radius:2px/)
-  assert.match(rule(`.${D.grid}`), /grid-template-rows:repeat\(7,8px\);grid-auto-columns:8px;gap:2px/)
   assert.match(rule(`.${D.dot}`), /width:40px;height:40px/)
   assert.match(rule(`.${D.compact} .${D.dot}`), /width:32px;height:32px/)
 })
