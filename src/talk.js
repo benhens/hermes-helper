@@ -19,6 +19,7 @@
 import { TALK_DATA } from './talk-data.js'
 import { WANTS_DATA } from './wants-data.js'
 import { looksLikeKey } from './key-check.js'
+import { looksSecret } from './secret-rule.js'
 import { hasKept } from './kept.js'
 
 const TOPICS = Object.fromEntries(TALK_DATA.topics.map(t => [t.id, t]))
@@ -324,7 +325,7 @@ function remember(text, st, out) {
     const lim = KEEP_REMEMBER.limits
     const asked = st.kept.asked || []
     if (n < lim.min_words) out.kind = 'RM3'
-    else if (whichOf(talkNorm(thing), KEEP_REMEMBER.refuse.words).length || new RegExp(KEEP_REMEMBER.refuse.digits_pattern).test(thing)) out.kind = 'RM6'
+    else if (looksSecret(thing)) out.kind = 'RM6' // changes-12: keeps.remember.refuse.rule_12 (src/secret-rule.js), was: a refused word or 8 digits
     else if (n > lim.max_words || charCount(thing) > lim.max_chars) out.kind = 'RM5'
     // keeps.remember.same_thing (changes-10, the Builder's review fix now in route2.py): the same
     // thing in other capitals counts as kept already, as the settings page reads it.

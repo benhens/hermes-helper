@@ -24,10 +24,12 @@ export const PINS = {
   'dev/checks/hhcontent-talk-v2/check.py': ['83c807fdac78a1579386e03a8006f2d3c3afcd87dd536b6f323b4d04dce2de2f', 'dev/checks/hhcontent-changes-14/before/check.py'],
   // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs): changes-14 changes it
   'content/helper-keeps-v1.md': ['80ebe181341055d633fc469ce44495bf2130e15166f8ce765ebfeff40bb6140a', 'dev/checks/hhcontent-changes-14/before/helper-keeps-v1.md'],
-  // changes-12 and -13 (the secret rule) are not ported here (Lead: point 8 of the look job): the two
-  // settings files stay at hhcontent's own copies from before changes-12
-  'dev/checks/hhcontent-settings-edit/settings_read.py': ['470c4c774a34d4fa95915495f1365e7e3cd4ecefe9e93b46bd3e31a8a55cefdf', 'dev/checks/hhcontent-changes-12/before/dev/checks/hhcontent-settings-edit/settings_read.py'],
-  'dev/checks/hhcontent-settings-edit/tests.json': ['c2ac3bb4a32c1dd2a779a67636b16a5dfd35a2daa0e569c119eea29b34c6a8c7', 'dev/checks/hhcontent-changes-12/before/dev/checks/hhcontent-settings-edit/tests.json']
+  // changes-12 and -13 (the secret rule), ported in the look job: settings_read.py and tests.json at
+  // changes-12's checksums, secret_rule.py and refuse_tests.py at changes-13's
+  'dev/checks/hhcontent-settings-edit/settings_read.py': ['23b0ea4ea4ffba0ec22e335ad251c987da2b7137172b88056239f44387eb9bee', 'content/helper-talk-v2-changes-12.md'],
+  'dev/checks/hhcontent-settings-edit/tests.json': ['a59b234cda13acedc0fb13e62a503f496f7881eca725be0b7ea7f05a13a7078d', 'content/helper-talk-v2-changes-12.md'],
+  'dev/checks/hhcontent-talk-v2/secret_rule.py': ['d7f5f5512d319eae03e909a0a71edcd2d26935e3667d823b8f9c53dbb391a9b3', 'content/helper-talk-v2-changes-13.md'],
+  'dev/checks/hhcontent-changes-10/refuse_tests.py': ['3a56eda6e6262bfce020018795af6da5b8057dcc36ab86f41a8dc58a25f55afc', 'content/helper-talk-v2-changes-13.md']
 }
 
 // The sha256 a copy must have: the pin, after checking that the team names it. t: the test, for a note

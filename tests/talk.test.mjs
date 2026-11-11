@@ -79,12 +79,9 @@ function replay(conv) {
   return got
 }
 
-// talk v2 wants fixes: changes-12's secret rule (looks_secret) is not in this build (Lead: point 8 of the
-// look job). The replay uses route2_secret11.py, the team's route2.py with its one changes-12 line put back
-// (dev/checks/talk-v2-wf1/make_secret11.py); the team's own route2.py was run too (TEAM_RUN). These are the
-// conversations where the two differ, each only at a "remember that ..." turn: the plugin does here what
-// route2.py did before changes-12.
-const TEAM_RUN = fixture('route2-conversations-team.json')
+// talk v2 look: changes-12's secret rule (looks_secret, src/secret-rule.js) is ported, so the replay uses the
+// team's route2.py as it is (route2_secret11.py is gone) and every conversation must meet route2.py's own
+// expectation; the changes-12 ones are listed so that dropping them shows.
 const SECRET_12 = [
   'changes-12: where the passwords are is not a password, kept',
   'changes-12: where the logins are is kept',
@@ -99,37 +96,19 @@ const SECRET_12 = [
   'changes-12: a password manager is kept'
 ]
 
-test('the test files were made from the talk data this plugin holds, by one route2.py, and route2.py met every one of its own expectations (the wants under C1 included)', () => {
+test('the test files were made from the talk data this plugin holds, by one route2.py, and route2.py met every one of its own expectations (the wants under C1 and changes-12 included)', () => {
   const ours = sha(path.join(ROOT, 'content/helper-talk-v2.json'))
-  for (const f of [ON, TEAM_RUN, fixture('route2-set2.json'), fixture('route2-extra.json')]) {
-    assert.equal(f.json_sha256, ours, 'run bash dev/checks/talk-v2-wf1/recopy-wf1.sh again')
-    if (f !== TEAM_RUN) assert.equal(f.route2_sha256, ON.route2_sha256)
+  for (const f of [ON, fixture('route2-set2.json'), fixture('route2-extra.json')]) {
+    assert.equal(f.json_sha256, ours, 'run bash dev/checks/talk-v2-look/recopy-look.sh again')
+    assert.equal(f.route2_sha256, ON.route2_sha256)
   }
-  for (const f of [ON, TEAM_RUN]) {
-    assert.equal(f.keeps_off, false)
-    assert.equal(f.no_wants, false)
-  }
-  // the team's route2.py met all its expectations; the one with changes-12's line put back, all but those
-  const missed = f => f.conversations.filter(c => !c.failed && c.steps.length && c.steps[c.steps.length - 1].shown !== c.expect).map(c => c.name)
-  assert.deepEqual(missed(TEAM_RUN), [])
-  assert.deepEqual(missed(ON), SECRET_12)
-})
-
-test('changes-12 not ported: the team\'s route2.py and the replayed one differ only in the listed conversations, and there only at a "remember that ..." turn', () => {
-  assert.deepEqual(TEAM_RUN.conversations.map(c => c.name), ON.conversations.map(c => c.name))
-  const differ = []
-  ON.conversations.forEach((c, i) => {
-    const t = TEAM_RUN.conversations[i]
-    if (JSON.stringify(c.steps) === JSON.stringify(t.steps)) return
-    differ.push(c.name)
-    c.steps.forEach((s, j) => {
-      if (JSON.stringify(s) === JSON.stringify(t.steps[j])) return
-      assert.match(s.text || '', /^remember that /, `${c.name}: a turn that is not "remember that ..." differs`)
-      assert.ok(/^RM/.test(s.shown) && /^RM/.test(t.steps[j].shown), `${c.name}: ${s.shown} / ${t.steps[j].shown}`)
-    })
-  })
-  assert.deepEqual(differ, SECRET_12)
-  assert.deepEqual(TEAM_RUN.singles, ON.singles)
+  assert.equal(ON.route2_sha256, '46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368', 'the team\'s route2.py at the pin, not a changed copy')
+  assert.equal(ON.keeps_off, false)
+  assert.equal(ON.no_wants, false)
+  const missed = ON.conversations.filter(c => !c.failed && c.steps.length && c.steps[c.steps.length - 1].shown !== c.expect).map(c => c.name)
+  assert.deepEqual(missed, [])
+  const names = ON.conversations.map(c => c.name)
+  for (const n of SECRET_12) assert.ok(names.includes(n), n)
 })
 
 test('the plugin\'s copies are the team\'s files at the checksums this job names (when the team\'s folder is there): the talk data, the skills list and the wants', t => {
@@ -140,7 +119,7 @@ test('the plugin\'s copies are the team\'s files at the checksums this job names
 test('the reference scripts the test files were made from are the team\'s (when the team\'s folder is there): route2.py, check.py, settings_read.py and its cases, at the pins', t => {
   const checks = path.join(TEAM, 'dev', 'checks')
   if (!fs.existsSync(path.join(checks, 'hhcontent-talk-v2', 'route2.py'))) return t.skip('no team folder beside the plugin')
-  assert.equal(TEAM_RUN.route2_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/route2.py'), 'route2.py is not the pinned one: bash dev/checks/talk-v2-wf1/recopy-wf1.sh')
+  assert.equal(ON.route2_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/route2.py'), 'route2.py is not the pinned one: bash dev/checks/talk-v2-look/recopy-look.sh')
   assert.equal(fixture('check-py-lines.json').check_py_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/check.py'), 'check.py is not the pinned one')
   const s = fixture('settings-read.json')
   assert.equal(s.settings_read_sha256, pinned(t, 'dev/checks/hhcontent-settings-edit/settings_read.py'), 'settings_read.py is not the pinned one')

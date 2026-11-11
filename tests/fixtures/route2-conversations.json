@@ -7403,13 +7403,23 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "RM6"
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "my passwords are in the blue notebook"
      },
-     "shown": "RM6",
+     "shown": "RM1 +kept=asked +first",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {},
+      "kept": {
+       "asked": [
+        "my passwords are in the blue notebook"
+       ],
+       "told": true
+      },
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7499,13 +7509,23 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "RM6"
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "the logins are on the fridge"
      },
-     "shown": "RM6",
+     "shown": "RM1 +kept=asked +first",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {},
+      "kept": {
+       "asked": [
+        "the logins are on the fridge"
+       ],
+       "told": true
+      },
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7531,23 +7551,13 @@
      "model": null,
      "out": {
       "calls": 0,
-      "first": true,
-      "kept": [
-       "asked"
-      ],
-      "kind": "RM1",
-      "thing": "pw: hunter-7-blue"
+      "kind": "RM6"
      },
-     "shown": "RM1 +kept=asked +first",
+     "shown": "RM6",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {
-       "asked": [
-        "pw: hunter-7-blue"
-       ],
-       "told": true
-      },
+      "kept": {},
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7573,23 +7583,13 @@
      "model": null,
      "out": {
       "calls": 0,
-      "first": true,
-      "kept": [
-       "asked"
-      ],
-      "kind": "RM1",
-      "thing": "the wifi key is GreenHouse2026"
+      "kind": "RM6"
      },
-     "shown": "RM1 +kept=asked +first",
+     "shown": "RM6",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {
-       "asked": [
-        "the wifi key is GreenHouse2026"
-       ],
-       "told": true
-      },
+      "kept": {},
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7615,23 +7615,13 @@
      "model": null,
      "out": {
       "calls": 0,
-      "first": true,
-      "kept": [
-       "asked"
-      ],
-      "kind": "RM1",
-      "thing": "mana parole ir Riga2026"
+      "kind": "RM6"
      },
-     "shown": "RM1 +kept=asked +first",
+     "shown": "RM6",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {
-       "asked": [
-        "mana parole ir Riga2026"
-       ],
-       "told": true
-      },
+      "kept": {},
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7657,23 +7647,13 @@
      "model": null,
      "out": {
       "calls": 0,
-      "first": true,
-      "kept": [
-       "asked"
-      ],
-      "kind": "RM1",
-      "thing": "my pasword is sunflower12"
+      "kind": "RM6"
      },
-     "shown": "RM1 +kept=asked +first",
+     "shown": "RM6",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {
-       "asked": [
-        "my pasword is sunflower12"
-       ],
-       "told": true
-      },
+      "kept": {},
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7731,23 +7711,13 @@
      "model": null,
      "out": {
       "calls": 0,
-      "first": true,
-      "kept": [
-       "asked"
-      ],
-      "kind": "RM1",
-      "thing": "tiger lamp forest mango quiet river salt opera blanket cherry jump vivid"
+      "kind": "RM6"
      },
-     "shown": "RM1 +kept=asked +first",
+     "shown": "RM6",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {
-       "asked": [
-        "tiger lamp forest mango quiet river salt opera blanket cherry jump vivid"
-       ],
-       "told": true
-      },
+      "kept": {},
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7773,9 +7743,9 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "RM5"
+      "kind": "RM6"
      },
-     "shown": "RM5",
+     "shown": "RM6",
      "state": {
       "asked": [],
       "found": {},
@@ -7805,13 +7775,23 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "RM6"
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "I use Bitwarden for passwords"
      },
-     "shown": "RM6",
+     "shown": "RM1 +kept=asked +first",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {},
+      "kept": {
+       "asked": [
+        "I use Bitwarden for passwords"
+       ],
+       "told": true
+      },
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7837,13 +7817,23 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "RM6"
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "I want to learn about API keys"
      },
-     "shown": "RM6",
+     "shown": "RM1 +kept=asked +first",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {},
+      "kept": {
+       "asked": [
+        "I want to learn about API keys"
+       ],
+       "told": true
+      },
       "lastq": false,
       "name": null,
       "pending": null,
@@ -7869,13 +7859,23 @@
      "model": null,
      "out": {
       "calls": 0,
-      "kind": "RM6"
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "my password manager is 1Password"
      },
-     "shown": "RM6",
+     "shown": "RM1 +kept=asked +first",
      "state": {
       "asked": [],
       "found": {},
-      "kept": {},
+      "kept": {
+       "asked": [
+        "my password manager is 1Password"
+       ],
+       "told": true
+      },
       "lastq": false,
       "name": null,
       "pending": null,
@@ -10447,10 +10447,10 @@
  "last_printed_lines": [
   "ok    mail on schedule: gmail every morning: line sch5",
   "",
-  "conversations: 202 of 213 as expected"
+  "conversations: 213 of 213 as expected"
  ],
  "no_wants": false,
- "route2_sha256": "eb2d3ec5490712d6a88c30562e798e0619ce65028ab93b821051b5e8deddbc4c",
+ "route2_sha256": "46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368",
  "singles": [
   {
    "landed": "mem",

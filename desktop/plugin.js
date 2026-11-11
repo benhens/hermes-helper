@@ -2498,7 +2498,272 @@ const TALK_DATA = {
           "log-in",
           "credentials"
         ],
-        "digits_pattern": "(?:\\d[ -]?){8,}"
+        "digits_pattern": "(?:\\d[ -]?){8,}",
+        "secret_words": [
+          "password",
+          "passwords",
+          "passwd",
+          "pw",
+          "pwd",
+          "passcode",
+          "passcodes",
+          "passphrase",
+          "passphrases",
+          "login",
+          "logins",
+          "log-in",
+          "recovery phrase",
+          "recovery words",
+          "seed phrase",
+          "seed words",
+          "secret words",
+          "mnemonic",
+          "parole",
+          "paroles",
+          "passwort",
+          "kennwort",
+          "mot de passe",
+          "contraseña",
+          "contrasena",
+          "senha",
+          "wachtwoord",
+          "hasło",
+          "haslo",
+          "salasana",
+          "lösenord",
+          "losenord",
+          "passord",
+          "adgangskode",
+          "пароль",
+          "parola",
+          "heslo",
+          "jelszó",
+          "jelszo",
+          "slaptažodis",
+          "slaptazodis",
+          "parool",
+          "şifre",
+          "sifre",
+          "my pin",
+          "pin code",
+          "alarm code",
+          "door code",
+          "gate code",
+          "combination"
+        ],
+        "typo_words": [
+          "password",
+          "passwords",
+          "passcode",
+          "passphrase",
+          "passwort",
+          "wachtwoord"
+        ],
+        "typo_min_letters": 6,
+        "maybe_words": [
+          "pin",
+          "pins",
+          "pin code",
+          "pin number",
+          "key",
+          "keys",
+          "code",
+          "codes",
+          "token",
+          "tokens",
+          "secret",
+          "secrets",
+          "pass",
+          "card",
+          "cards",
+          "cvv",
+          "cvc",
+          "iban",
+          "ibans",
+          "account number",
+          "account numbers",
+          "sort code",
+          "routing number",
+          "social security",
+          "ssn",
+          "passport number",
+          "credentials",
+          "wifi",
+          "wi-fi"
+        ],
+        "link_words": [
+          "is",
+          "are",
+          "was",
+          "were",
+          "ir",
+          "ist",
+          "est",
+          "es",
+          "è",
+          "é",
+          "är",
+          "er",
+          "jest",
+          "je",
+          "yra",
+          "это"
+        ],
+        "link_within": 4,
+        "after_link_not_value": [
+          "in",
+          "on",
+          "at",
+          "under",
+          "inside",
+          "into",
+          "with",
+          "the",
+          "a",
+          "an",
+          "my",
+          "our",
+          "your",
+          "his",
+          "her",
+          "their",
+          "its",
+          "this",
+          "that",
+          "written",
+          "saved",
+          "stored",
+          "kept",
+          "somewhere",
+          "same",
+          "different",
+          "too",
+          "very",
+          "so",
+          "long",
+          "short",
+          "hard",
+          "easy",
+          "simple",
+          "not",
+          "never",
+          "always",
+          "still",
+          "old",
+          "new",
+          "weak",
+          "strong",
+          "safe",
+          "changed",
+          "reset",
+          "expired",
+          "lost",
+          "forgotten",
+          "also",
+          "all",
+          "required",
+          "needed",
+          "slow",
+          "broken",
+          "wrong",
+          "missing",
+          "gone",
+          "there",
+          "here",
+          "important",
+          "private",
+          "secret",
+          "~"
+        ],
+        "not_secret_phrases": [
+          "password manager",
+          "password managers",
+          "login page",
+          "login screen",
+          "log in page",
+          "password-free",
+          "product code",
+          "wifi is called",
+          "wi-fi is called"
+        ],
+        "value": {
+          "min_chars": 4,
+          "digits_alone": 4,
+          "digits_with_letters": 2,
+          "min_chars_with_letters": 6,
+          "signs": "!@#$%^&*_+=?~|<>",
+          "not_values": [
+            "^[0-9]{1,2}:[0-9]{2}$",
+            "^[0-9]{1,2}[./][0-9]{1,2}[./][0-9]{2,4}$",
+            "^[A-Z]{1,4}-?[0-9]{2,6}(-[0-9]{1,6})*$",
+            "^[^@\\s]+@[^@\\s]+\\.[A-Za-z]{2,}$",
+            "^(https?://|www\\.)",
+            "^[^\\s]*\\.[a-z]{2,}(/[^\\s]*)?$",
+            "^@[A-Za-z][A-Za-z0-9_.]{1,31}$"
+          ],
+          "not_values_are": [
+            "a time, 7:30",
+            "a date, 12.05.2015",
+            "capital letters then digits, like a postcode or flight number: LV-1050, BT602, ORD-2026-1145",
+            "an email address",
+            "a web address",
+            "a web address without http, example.com/shop",
+            "a user name with @ in front, @maria_bakes"
+          ]
+        },
+        "shape": {
+          "max_label_words": 4
+        },
+        "word_run": {
+          "min_words": 12,
+          "word": "[A-Za-z]{3,8}",
+          "not_these": [
+            "the",
+            "and",
+            "for",
+            "with",
+            "that",
+            "this",
+            "you",
+            "your",
+            "our",
+            "his",
+            "her",
+            "are",
+            "was",
+            "has",
+            "have",
+            "not",
+            "but",
+            "from",
+            "can",
+            "will",
+            "all",
+            "any",
+            "out",
+            "who",
+            "what",
+            "when",
+            "where",
+            "how",
+            "why",
+            "they",
+            "them",
+            "she",
+            "him",
+            "its",
+            "there",
+            "then",
+            "than",
+            "also",
+            "just",
+            "very",
+            "into",
+            "about",
+            "would",
+            "could"
+          ]
+        }
       },
       "unsure": {
         "about": [
@@ -6241,6 +6506,163 @@ function prepareInput(text, isBuildRequest = () => false) {
   return { kind: 'send', input: cut ? chars.slice(0, MAX_INPUT_CHARS).join('') : full, cut }
 }
 
+// ---- src/secret-rule.js ----
+// Does a text look like it holds a secret? hhcontent's changes-12 rule (with changes-13's data lines), ported
+// rule for rule from dev/checks/hhcontent-talk-v2/secret_rule.py (looks_secret), fixed rules, no model. The
+// lists come from the talk data (keeps.remember.refuse; the rule in plain words: refuse.rule_12).
+// Used by "remember that ..." (src/talk.js, after the K1 check, before the "too long" check) and by every line
+// of the settings box (src/settings-file.js: the whole line and the part after its first colon). Names keep
+// the old word list (refuse.words), not this rule.
+// tests/secret-rule.test.mjs puts refuse_tests.py's cases, three sets of made-up secrets and a few thousand
+// random strings to both and compares each result.
+//   looksSecret(text)  null (not a secret by these rules) or the Python's reason, such as "secret word and a value"
+// Python's idea of a letter is \p{L} here, of a digit \p{N} (Lead: "a letter and a digit must be \p{L} and \p{N}");
+// Python's str.isdigit() differs on a few signs that are numbers but not digits (½, Ⅳ): the port counts them,
+// the Python does not (a test lists it).
+// The build joins every src file into one scope, so every name here starts with SR_ or sr.
+
+const SR_RF = TALK_DATA.keeps.remember.refuse
+const SR_V = SR_RF.value
+const SR_WR = SR_RF.word_run
+
+// Python's whitespace (str.split, str.strip, \s on text): JavaScript's \s without U+FEFF, with U+001C to U+001F
+// and U+0085.
+const SR_WS = '\\t\\n\\v\\f\\r\\x1c-\\x1f \\x85\\xa0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000'
+const SR_WS_RUN = new RegExp(`[${SR_WS}]+`, 'gu')
+const SR_WS_EDGE = new RegExp(`^[${SR_WS}]+|[${SR_WS}]+$`, 'gu')
+const srSplit = s => s.split(SR_WS_RUN).filter(Boolean)
+const srStrip = s => s.replace(SR_WS_EDGE, '')
+
+// A pattern from the data, written for Python's re, as a JavaScript RegExp with the u flag: \d is any decimal
+// digit and \s Python's whitespace, as in Python on text. Exported for the tests (every pattern must compile).
+function pyRegExp(pattern, flags = '') {
+  let out = ''
+  let inClass = false
+  for (let i = 0; i < pattern.length; i++) {
+    const c = pattern[i]
+    if (c === '\\') {
+      const n = pattern[++i]
+      if (n === 'd') out += '\\p{Nd}'
+      else if (n === 's') out += inClass ? SR_WS : `[${SR_WS}]`
+      else out += '\\' + n
+    } else {
+      if (c === '[' && !inClass) inClass = true
+      else if (c === ']' && inClass) inClass = false
+      out += c
+    }
+  }
+  return new RegExp(out, 'u' + flags)
+}
+
+const srEscape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const srChars = s => Array.from(s)
+// Strips any of the signs in `set` from both ends (Python's str.strip(set)).
+function srStripSet(s, set) {
+  const a = srChars(s)
+  let i = 0
+  let j = a.length
+  while (i < j && set.includes(a[i])) i++
+  while (j > i && set.includes(a[j - 1])) j--
+  return a.slice(i, j).join('')
+}
+
+// taken off both ends of a token before it is compared with a word (step 2)
+const SR_EDGE = '"\'()[]{},.;!?'
+const srLow = s => srStrip(s.toLowerCase().replace(/\u2018/g, "'").replace(/\u2019/g, "'").replace(SR_WS_RUN, ' '))
+// step 2: ':' followed by a space (or the end) and '=' become tokens of their own
+const SR_COLON = new RegExp(`:(?=[${SR_WS}]|$)`, 'gu')
+const srTokens = s => srSplit(s.replace(SR_COLON, ' : ').split('=').join(' = '))
+const srBare = tok => srStripSet(tok, SR_EDGE).toLowerCase()
+
+// one letter added, missing, changed, or two neighbours swapped
+function srOneOff(x, y) {
+  if (x === y) return true
+  let a = srChars(x)
+  let b = srChars(y)
+  if (Math.abs(a.length - b.length) > 1) return false
+  if (a.length === b.length) {
+    const d = []
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) d.push(i)
+    return d.length === 1 || (d.length === 2 && d[1] === d[0] + 1 && a[d[0]] === b[d[1]] && a[d[1]] === b[d[0]])
+  }
+  if (a.length > b.length) [a, b] = [b, a]
+  const short = a.join('')
+  for (let i = 0; i < b.length; i++) if (b.slice(0, i).concat(b.slice(i + 1)).join('') === short) return true
+  return false
+}
+
+const SR_NOT_VALUES = SR_V.not_values.map(p => pyRegExp(p))
+const SR_LETTER = /\p{L}/u
+const SR_DIGIT = /\p{N}/u
+// step 3: a value is one run with no spaces that has enough digits, or letters with digits, or a sign
+function srIsValue(tok) {
+  const t = srStripSet(tok, '"\'(),.;')
+  const a = srChars(t)
+  if (a.length < SR_V.min_chars) return false
+  if (SR_NOT_VALUES.some(re => re.test(t))) return false
+  const digits = a.filter(c => SR_DIGIT.test(c)).length
+  const letters = a.filter(c => SR_LETTER.test(c)).length
+  return (
+    digits >= SR_V.digits_alone ||
+    (letters > 0 && digits >= SR_V.digits_with_letters && a.length >= SR_V.min_chars_with_letters) ||
+    (a.some(c => SR_V.signs.includes(c)) && (letters > 0 || digits > 0))
+  )
+}
+
+// positions just after each whole-word match of any of the words (multi-word words too)
+function srFind(words, toks) {
+  const b = toks.map(srBare)
+  const out = []
+  for (const w of words) {
+    const ws = srSplit(w)
+    const k = ws.length
+    for (let i = 0; i < b.length - k + 1; i++) if (ws.every((x, n) => b[i + n] === x)) out.push(i + k)
+  }
+  return out
+}
+const srFindTypo = toks => toks.flatMap((t, i) => (srChars(srBare(t)).length >= SR_RF.typo_min_letters && SR_RF.typo_words.some(w => srOneOff(srBare(t), w)) ? [i + 1] : []))
+
+const SR_DIGITS_RUN = pyRegExp(SR_RF.digits_pattern)
+const SR_PHRASES = SR_RF.not_secret_phrases.map(p => new RegExp('(?<![a-z0-9])' + srEscape(p) + '(?![a-z0-9])', 'gu'))
+const SR_WORD = pyRegExp(`^(?:${SR_WR.word})$`)
+const SR_LINKS = new Set([...SR_RF.link_words, ':', '='])
+
+function looksSecret(text) {
+  if (KEY_PATTERNS.some(re => re.test(text))) return 'key pattern'
+  if (SR_DIGITS_RUN.test(text)) return 'long number'
+  let t = ' ' + srLow(text) + ' '
+  for (const re of SR_PHRASES) t = t.replace(re, ' ~ ') // step 1
+  const toksCut = srTokens(t)
+  const toks = srTokens(text)
+  const hasValue = toks.some(srIsValue)
+  const strong = srFind(SR_RF.secret_words, toksCut).concat(srFindTypo(toksCut))
+  if (strong.length && hasValue) return 'secret word and a value' // step 4
+  // step 5: a secret word, then within a few words 'is' or ':' and something that is not a description
+  for (const end of strong) {
+    for (let j = end; j < Math.min(end + SR_RF.link_within + 1, toksCut.length); j++) {
+      if (SR_LINKS.has(srBare(toksCut[j])) || toksCut[j] === ':' || toksCut[j] === '=') {
+        if (j + 1 < toksCut.length && !SR_RF.after_link_not_value.includes(srBare(toksCut[j + 1]))) return 'secret word, is, and a word'
+        break
+      }
+    }
+  }
+  if (srFind(SR_RF.maybe_words, toksCut).length && hasValue) return 'maybe word and a value' // step 6
+  // step 7: a short label, 'is' or ':', one value at the end
+  for (let j = 1; j <= Math.min(SR_RF.shape.max_label_words, toks.length - 1); j++) {
+    if ((toks[j] === ':' || toks[j] === '=' || SR_RF.link_words.includes(srBare(toks[j]))) && j === toks.length - 2 && srIsValue(toks[toks.length - 1])) return 'label, is, and a value'
+  }
+  // step 8: many plain words in a row (recovery words)
+  let run = 0
+  for (const x of toks) {
+    const x2 = srStripSet(x, ',.;')
+    if (SR_WORD.test(x2) && !SR_WR.not_these.includes(x2.toLowerCase())) {
+      run += 1
+      if (run >= SR_WR.min_words) return 'many plain words in a row'
+    } else run = 0
+  }
+  return null
+}
+
 // ---- src/setup-cards.js ----
 // "Your setup": the seven cards' pass rules and fixed words (build-v1.md section 8). Pure code, no
 // Hermes calls: src/setup-tab.js does the read-only reads and hands the answers to the rules here.
@@ -7732,7 +8154,7 @@ function remember(text, st, out) {
     const lim = KEEP_REMEMBER.limits
     const asked = st.kept.asked || []
     if (n < lim.min_words) out.kind = 'RM3'
-    else if (whichOf(talkNorm(thing), KEEP_REMEMBER.refuse.words).length || new RegExp(KEEP_REMEMBER.refuse.digits_pattern).test(thing)) out.kind = 'RM6'
+    else if (looksSecret(thing)) out.kind = 'RM6' // changes-12: keeps.remember.refuse.rule_12 (src/secret-rule.js), was: a refused word or 8 digits
     else if (n > lim.max_words || charCount(thing) > lim.max_chars) out.kind = 'RM5'
     // keeps.remember.same_thing (changes-10, the Builder's review fix now in route2.py): the same
     // thing in other capitals counts as kept already, as the settings page reads it.
@@ -8504,7 +8926,6 @@ const FILE_R = FILE_SF.read
 const FILE_M = FILE_R.messages
 const FILE_WHY = FILE_SF.why
 const FILE_BL = FILE_SF.box_lines
-const FILE_RF = KEEPS_DATA.remember.refuse
 const FILE_LIM = KEEPS_DATA.remember.limits
 const FILE_MOD_IN = { chatgpt: 'mod1', claude: 'mod2', neither: 'mod4', free: 'mod3' }
 const FILE_MOD_OUT = Object.fromEntries(Object.entries(FILE_BL.mod.values).map(([word, need]) => [need, word]))
@@ -8521,14 +8942,12 @@ const FILE_LETTER = /[\p{L}\p{Nl}\p{No}]/u
 const FILE_NAME_CHARS = /^(?:[\p{L}\p{Nl}\p{No}]|[ '.-])+$/u
 const fileSqueeze = s => s.replace(/\s+/g, ' ').trim()
 const fileLen = s => Array.from(s).length
-const fileEscapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const fileHits = (t, p) => new RegExp('(^|[^a-z0-9])' + fileEscapeRe(p) + '($|[^a-z0-9])').test(t)
-const FILE_DIGITS = new RegExp(FILE_RF.digits_pattern)
 
-// A key, a refused word or a long number anywhere on the line.
+// changes-12: read step 4, the secret rule (src/secret-rule.js, keeps.remember.refuse.rule_12) on the whole line
+// and on the part after its first colon (settings_read.py secret()).
 function fileSecret(line) {
-  const low = fileSqueeze(line.toLowerCase().replace(/\u2019/g, "'"))
-  return KEY_PATTERNS.some(re => re.test(line)) || FILE_RF.words.some(w => fileHits(low, w)) || FILE_DIGITS.test(line)
+  const at = line.indexOf(':')
+  return looksSecret(line) !== null || (at >= 0 && looksSecret(line.slice(at + 1)) !== null)
 }
 
 // write_rules: one line per kept thing, in Helper's order; Remember lines in the order kept.

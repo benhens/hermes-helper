@@ -1172,23 +1172,24 @@
    "box": "Remember: my passwords are in the drawer",
    "from": "hhcontent",
    "got": {
-    "box": "Remember: my passwords are in the drawer",
-    "line": 1,
+    "box": "Remember: my passwords are in the drawer (you asked Helper to keep it)",
     "message": [
-     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+     "Saved."
     ],
-    "result": "refused",
+    "result": "saved",
     "stored": {
+     "asked": [
+      "my passwords are in the drawer"
+     ],
      "told": true
-    },
-    "why": "secret"
+    }
    },
    "id": "X07",
    "rendered": "",
    "stored": {
     "told": true
    },
-   "what": "changes-10: a plural refused word is refused"
+   "what": "changes-12: where the passwords are is not a password, so it is saved (was refused in changes-10)"
   },
   {
    "answer": null,
@@ -1262,6 +1263,122 @@
   },
   {
    "answer": null,
+   "box": "Remember: pw: hunter-7-blue",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: pw: hunter-7-blue",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X11",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-12: pw and a colon on a Remember line"
+  },
+  {
+   "answer": null,
+   "box": "Remember: mana parole ir Riga2026",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: mana parole ir Riga2026",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X12",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-12: another language, short label, is, one value"
+  },
+  {
+   "answer": null,
+   "box": "Remember: my pasword is sunflower12",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: my pasword is sunflower12",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X13",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-12: a typo of password"
+  },
+  {
+   "answer": null,
+   "box": "Remember: tiger lamp forest mango quiet river salt opera blanket cherry jump vivid",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: tiger lamp forest mango quiet river salt opera blanket cherry jump vivid",
+    "line": 1,
+    "message": [
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
+    ],
+    "result": "refused",
+    "stored": {
+     "told": true
+    },
+    "why": "secret"
+   },
+   "id": "X14",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-12: 12 plain words in a row"
+  },
+  {
+   "answer": null,
+   "box": "Remember: I use Bitwarden for passwords",
+   "from": "hhcontent",
+   "got": {
+    "box": "Remember: I use Bitwarden for passwords (you asked Helper to keep it)",
+    "message": [
+     "Saved."
+    ],
+    "result": "saved",
+    "stored": {
+     "asked": [
+      "I use Bitwarden for passwords"
+     ],
+     "told": true
+    }
+   },
+   "id": "X15",
+   "rendered": "",
+   "stored": {
+    "told": true
+   },
+   "what": "changes-12: talking about passwords is saved"
+  },
+  {
+   "answer": null,
    "box": "Remember: my key is sk-a1B2a1B2a1B2a1B2a1B2a1B2",
    "from": "builder",
    "got": {
@@ -1284,17 +1401,18 @@
    "box": "Name: Peter\nRemember: my Password is in the drawer",
    "from": "builder",
    "got": {
-    "box": "Name: Peter\nRemember: my Password is in the drawer",
-    "line": 2,
+    "box": "Name: Peter (Helper greets you with it)\nRemember: my Password is in the drawer (you asked Helper to keep it)",
     "message": [
-     "Nothing was saved. Line 2 looks like a password, a secret key or a long number. Delete it."
+     "Saved."
     ],
-    "result": "refused",
+    "result": "saved",
     "stored": {
+     "asked": [
+      "my Password is in the drawer"
+     ],
      "name": "Peter",
      "told": true
-    },
-    "why": "secret"
+    }
    },
    "id": "B02",
    "rendered": "Name: Peter (Helper greets you with it)",
@@ -1491,13 +1609,11 @@
     "box": "Remember: one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen",
     "line": 1,
     "message": [
-     "Nothing was saved. Helper could not read line 1:",
-     "\"Remember: one two three four five six seven eight nine ten e...\"",
-     "Keep it to 15 words and 100 letters or fewer."
+     "Nothing was saved. Line 1 looks like a password, a secret key or a long number. Delete it."
     ],
     "result": "refused",
     "stored": {},
-    "why": "remember_long"
+    "why": "secret"
    },
    "id": "B12",
    "rendered": "",
@@ -1998,6 +2114,6 @@
    "what": "the same Remember as stored kept in place"
   }
  ],
- "settings_read_sha256": "470c4c774a34d4fa95915495f1365e7e3cd4ecefe9e93b46bd3e31a8a55cefdf",
- "tests_sha256": "c2ac3bb4a32c1dd2a779a67636b16a5dfd35a2daa0e569c119eea29b34c6a8c7"
+ "settings_read_sha256": "23b0ea4ea4ffba0ec22e335ad251c987da2b7137172b88056239f44387eb9bee",
+ "tests_sha256": "a59b234cda13acedc0fb13e62a503f496f7881eca725be0b7ea7f05a13a7078d"
 }

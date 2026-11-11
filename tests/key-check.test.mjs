@@ -75,17 +75,6 @@ test('the fixed lines are hhcontent\'s words', () => {
   assert.equal(LONG_LINE, 'Your message was long, so I read only the first 500 characters.')
 })
 
-// changes-10: hhcontent's 57 refusal cases (refuse_tests.py, run in Python by
-// dev/checks/talk-v2-wants/dump_refuse.py), through the conversation's own "remember that ...":
-// a key shape gets K1, a refused word or a long number RM6, anything else is not refused.
-test('hhcontent\'s 57 refusal cases: "remember that ..." refuses exactly what the Python refuses, and a key shape is K1', () => {
-  const R = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'fixtures', 'refuse-cases.json'), 'utf8'))
-  assert.equal(R.cases.length, 57)
-  for (const c of R.cases) {
-    const o = turn('remember that ' + c.text, freshVisit())
-    const want = c.python === null ? 'kept or too short' : c.python.startsWith('key pattern') ? 'K1' : 'RM6'
-    const got = o.kind === 'K1' ? 'K1' : o.kind === 'RM6' ? 'RM6' : 'kept or too short'
-    assert.equal(got, want, `${c.text} (Python: ${c.python})`)
-    assert.equal(c.python !== null, c.want, `hhcontent's own expectation: ${c.text}`)
-  }
-})
+// changes-10's 57 refusal cases (refuse-cases.json) are gone with the changes-10 rule: refuse_tests.py now holds
+// changes-12/13's 144 cases, run through "remember that ..." (K1 or RM6) and the settings page in
+// tests/secret-rule.test.mjs.

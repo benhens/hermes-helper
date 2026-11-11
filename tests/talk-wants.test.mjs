@@ -87,8 +87,9 @@ test('the reference file was made from the team\'s scripts (when the team\'s fol
 
 test('wants fixes v1: the reference ran hhcontent\'s third layer after fixes6_step.py, and on the 296 messages it changes only "is there a skill for knitting", to N1', () => {
   assert.equal(O.wants_fixes_step_sha256, '9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a')
-  // the replay ran route2.py with changes-12's one remember line put back (tests/talk.test.mjs SECRET_12)
-  assert.equal(O.route2_run, 'route2_secret11.py')
+  // talk v2 look: route2.py run as the team has it (changes-12's secret rule is ported)
+  assert.equal(O.route2_run, 'route2.py')
+  assert.equal(O.route2_run_sha256, O.route2_sha256)
   const changed = O.sets.flatMap(s => s.messages.filter(wf1Changed).map(m => [s.name, m.text, m.oracle_f6.shown, m.oracle.shown]))
   assert.deepEqual(changed, [['test_wants40', 'is there a skill for knitting', 'term line skill', 'N1']])
   const knit = O.sets.flatMap(s => s.messages).find(m => m.text === 'is there a skill for knitting')

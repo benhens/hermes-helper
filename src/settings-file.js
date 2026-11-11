@@ -9,7 +9,7 @@
 //                                 answer: undefined (not asked yet), 'yes' or 'no'
 // Nothing here touches storage: the page writes `stored` when the result is 'saved'.
 import { TALK_DATA } from './talk-data.js'
-import { KEY_PATTERNS } from './key-check.js'
+import { looksSecret } from './secret-rule.js'
 
 const KEEPS_DATA = TALK_DATA.keeps
 const FILE_SF = KEEPS_DATA.settings_file
@@ -17,7 +17,6 @@ const FILE_R = FILE_SF.read
 const FILE_M = FILE_R.messages
 const FILE_WHY = FILE_SF.why
 const FILE_BL = FILE_SF.box_lines
-const FILE_RF = KEEPS_DATA.remember.refuse
 const FILE_LIM = KEEPS_DATA.remember.limits
 const FILE_MOD_IN = { chatgpt: 'mod1', claude: 'mod2', neither: 'mod4', free: 'mod3' }
 const FILE_MOD_OUT = Object.fromEntries(Object.entries(FILE_BL.mod.values).map(([word, need]) => [need, word]))
@@ -34,14 +33,12 @@ const FILE_LETTER = /[\p{L}\p{Nl}\p{No}]/u
 const FILE_NAME_CHARS = /^(?:[\p{L}\p{Nl}\p{No}]|[ '.-])+$/u
 const fileSqueeze = s => s.replace(/\s+/g, ' ').trim()
 const fileLen = s => Array.from(s).length
-const fileEscapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const fileHits = (t, p) => new RegExp('(^|[^a-z0-9])' + fileEscapeRe(p) + '($|[^a-z0-9])').test(t)
-const FILE_DIGITS = new RegExp(FILE_RF.digits_pattern)
 
-// A key, a refused word or a long number anywhere on the line.
+// changes-12: read step 4, the secret rule (src/secret-rule.js, keeps.remember.refuse.rule_12) on the whole line
+// and on the part after its first colon (settings_read.py secret()).
 function fileSecret(line) {
-  const low = fileSqueeze(line.toLowerCase().replace(/\u2019/g, "'"))
-  return KEY_PATTERNS.some(re => re.test(line)) || FILE_RF.words.some(w => fileHits(low, w)) || FILE_DIGITS.test(line)
+  const at = line.indexOf(':')
+  return looksSecret(line) !== null || (at >= 0 && looksSecret(line.slice(at + 1)) !== null)
 }
 
 // write_rules: one line per kept thing, in Helper's order; Remember lines in the order kept.

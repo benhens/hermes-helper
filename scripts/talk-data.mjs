@@ -300,7 +300,8 @@ function slimKeeps(K) {
     },
     remember: {
       ...pickKeys(K.remember, ['lead_ins', 'request_starts', 'thing_starts_at_last_word', 'limits']),
-      refuse: pickKeys(K.remember.refuse, ['words', 'digits_pattern']),
+      // changes-12/13: words (the 58) for names only; the secret rule (looks_secret, src/secret-rule.js) reads the rest
+      refuse: pickKeys(K.remember.refuse, ['words', 'digits_pattern', 'secret_words', 'typo_words', 'typo_min_letters', 'maybe_words', 'link_words', 'link_within', 'after_link_not_value', 'not_secret_phrases', 'value', 'shape', 'word_run']),
       unsure: pickKeys(K.remember.unsure, ['about', 'said_to']),
       lines: K.remember.lines.map(l => ({ ...pickKeys(l, ['id', 'kind', 'text']), ...(l.answers ? { answers: slimAnswers(l.answers) } : {}) }))
     },
