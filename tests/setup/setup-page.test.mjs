@@ -6,7 +6,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, byData, spoken } from '../lib/render.mjs'
-import { aiModeSource, setupBuiltSource } from '../lib/mode-loader.mjs'
+import { aiModeSource, setupBuiltSource, setupAiSource } from '../lib/mode-loader.mjs'
 import { SETUP_BUILT } from '../../src/setup-built.js'
 import { LOOK_READ_MS } from '../../src/setup-look.js'
 
@@ -318,9 +318,12 @@ test('the person types again before the reads are back: the first message is ans
 })
 
 // find-v1 (review): the recommendation's call that is slow (12 s) and then fails is ONE failed try, not two
+// loom-fixes (find-v1 joined with setup-chat-2): the committed build has the recommendation's AI step off
+// (SETUP_AI_BUILT false), so these three tests switch it on in the copy they load, as tests/setup/setup-rec.test.mjs does
+const AI_REC = src => setupAiSource(src, 'true')
 test('a recommendation call that gives no answer in 12 s and then fails counts once: the next question still asks the AI', opt, async () => {
   let fail = null
-  const { view, host, timers } = await open({ hermes: { oneshot: (p, n) => (n === 1 ? new Promise((_, no) => (fail = no)) : 'NONE') } })
+  const { view, host, timers } = await open({ hermes: { oneshot: (p, n) => (n === 1 ? new Promise((_, no) => (fail = no)) : 'NONE') }, change: AI_REC })
   finish(view)
   await send(view, 'Peter')
   await send(view, 'I run a tennis club')
@@ -341,7 +344,7 @@ test('a recommendation call that gives no answer in 12 s and then fails counts o
 // and a typed question meets it: that is the second slow try, as when a typed message's own call is the stuck one.
 // The answer comes at once, with no dots; the slow-AI line after it, once; no call after that
 test('a recommendation call that never answers, then a question that cannot be asked because of it: two slow tries, the slow-AI line once after the answer', opt, async () => {
-  const { view, host, timers } = await open({ hermes: { oneshot: () => new Promise(() => {}) } })
+  const { view, host, timers } = await open({ hermes: { oneshot: () => new Promise(() => {}) }, change: AI_REC })
   finish(view)
   await send(view, 'Peter')
   await send(view, 'I run a tennis club')
@@ -366,7 +369,7 @@ test('a recommendation call that never answers, then a question that cannot be a
 
 // the same when the person moved on before the 12 s were over (as in the app run): the watch on the call runs on
 test('the person moved on before the recommendation call\'s 12 s, and the call never answers: a question after the 12 s is the second slow try', opt, async () => {
-  const { view, host, timers } = await open({ hermes: { oneshot: () => new Promise(() => {}) } })
+  const { view, host, timers } = await open({ hermes: { oneshot: () => new Promise(() => {}) }, change: AI_REC })
   finish(view)
   await send(view, 'Peter')
   await send(view, 'I run a tennis club')
