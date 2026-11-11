@@ -6,6 +6,7 @@
 // not keep. The page and the settings page do the reading and writing with their own storage
 // calls (tests/state.test.mjs lists them); nothing here touches storage.
 import { TALK_DATA } from './talk-data.js'
+import { SETUP_DATA } from './setup-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
 
@@ -30,6 +31,10 @@ export function workOk(v, { withSecretRule = true } = {}) {
 }
 const keptPlain = (v, max) => typeof v === 'string' && v.trim() !== '' && Array.from(v).length <= max && !looksLikeKey(v)
 
+const KEPT_SETUP_NEW = SETUP_DATA.questions.Q_NEW.answers.filter(a => a.kept_as).map(a => a.id)
+const KEPT_SETUP_GOALS = SETUP_DATA.questions.Q_GOAL.answers.map(a => a.id)
+const KEPT_SETUP_ITEMS = SETUP_DATA.rule_order
+
 export function cleanKept(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
   const out = {}
@@ -42,12 +47,24 @@ export function cleanKept(v) {
     const asked = v.asked.filter(t => keptPlain(t, KEPT_LIM.max_chars)).slice(0, KEPT_LIM.max_things)
     if (asked.length) out.asked = asked
   }
+  // setup-chat (content/helper-setup-chat-v1.json keeps.rows): the Q_NEW answer, what the person wants (a picked label
+  // or a typed text that passes the What you do rule) with its goal, the things said done, the thing recommended last
+  if (KEPT_SETUP_NEW.includes(v.setup_new)) out.setup_new = v.setup_new
+  if (KEPT_SETUP_GOALS.includes(v.setup_goal_id) && workOk(v.setup_goal)) {
+    out.setup_goal = v.setup_goal
+    out.setup_goal_id = v.setup_goal_id
+  }
+  if (Array.isArray(v.setup_done_said)) {
+    const said = [...new Set(v.setup_done_said.filter(x => KEPT_SETUP_ITEMS.includes(x)))]
+    if (said.length) out.setup_done_said = said
+  }
+  if (KEPT_SETUP_ITEMS.includes(v.setup_current) || v.setup_current === 'model') out.setup_current = v.setup_current
   if (Object.keys(out).length && v.told === true) out.told = true
-  if (out.work && v.told_work === true) out.told_work = true
+  if ((out.work || out.setup_new || out.setup_goal) && v.told_work === true) out.told_work = true
   return out
 }
 
-export const hasKept = kept => ['name', 'work', 'mod', 'msg', 'svc'].some(k => kept[k]) || (kept.asked || []).length > 0
+export const hasKept = kept => ['name', 'work', 'mod', 'msg', 'svc', 'setup_new', 'setup_goal', 'setup_current'].some(k => kept[k]) || (kept.asked || []).length > 0 || (kept.setup_done_said || []).length > 0
 
 // What goes to storage: the cleaned record, or null when nothing is left (then the key is removed,
 // told with it, as "Forget all" does).

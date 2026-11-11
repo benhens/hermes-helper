@@ -136,9 +136,10 @@ test('132 px when Helper\'s window is under 420 px wide or the page is under 600
   assert.equal(face(view).props.width, CHARACTER_SMALL_PX)
   assert.equal(CHARACTER_SMALL_PX, 132)
   assert.equal(helper(view).props.className, `${T.win} ${T.winSmall}`)
-  // 760 px of page: the step list is numbers only and Helper's window is 392 px
-  resize(view, 760, 822)
-  assert.equal(helper(view).props.style.width, '392px')
+  // 730 px of page: Helper's window is 410 px (dash-v1: no tab has a step list now, so the 760 px page this used,
+  // where the numbers-only step list made Helper 392 px, leaves Helper 440 px; 730 px gives the same case, under 420)
+  resize(view, 730, 822)
+  assert.equal(helper(view).props.style.width, '410px')
   assert.equal(face(view).props.width, 132)
   assert.equal(helper(view).props.className, `${T.win} ${T.winTight} ${T.winSmall}`)
   resize(view, 1180, 822)

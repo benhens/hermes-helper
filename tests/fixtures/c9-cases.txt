@@ -1,0 +1,14 @@
+# copied from dev/checks/hhcontent-live-v2-changes-9/check-c9-out.txt, section 2 (hhcontent's check_c9.py, sha256 43550e86...), by job setup-chat
+
+  bad  FAILS   work: I run a tennis club      You can then start playing tennis.
+  bad  FAILS   work: I run a tennis club      Hermes has a tennis mode.
+  bad  FAILS   work: I run a tennis club      Then open your tennis club in Telegram.
+  bad  FAILS   work: I run a tennis club      Tennis clubs use Hermes a lot.
+  bad  passes  work: I am a baker             Next, bake the bot.
+  bad  passes  work: I run a tennis club      Hermes is great for your tennis club.
+  good passes  work: I coach tennis training  Reminders about training fit a Scheduled job.
+  good passes  work: I run a tennis club      Hermes can send reminders for your tennis club on a schedule.
+  good passes  work: I run a tennis club      Telegram has a quick setup. Open Messaging and press Create with QR.
+  good passes  work: I run a tennis club      A Scheduled job fits things like tennis lessons that repeat.
+  good FAILS   work: I run a tennis club      For your tennis club, open Messaging and press Create with QR.
+  {('bad', 'fails'): 4, ('bad', 'passes'): 2, ('good', 'passes'): 4, ('good', 'fails'): 1}

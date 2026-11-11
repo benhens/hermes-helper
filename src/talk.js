@@ -19,6 +19,8 @@
 import { TALK_DATA } from './talk-data.js'
 import { WANTS_DATA } from './wants-data.js'
 import { AI_MODE } from './ai-mode.js'
+import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
+import { openQNew } from './setup-chat.js'
 import { LIVE_DATA } from './live-data.js'
 import { looksLikeKey } from './key-check.js'
 import { looksSecret } from './secret-rule.js'
@@ -279,7 +281,7 @@ function byCode(text, st) {
     const unsure = whichOf(t, TALK_DATA.unsure_words).length > 0
     if (ns.length === 1) r.need = ns[0]
     else if (!ns.length) {
-      if (topic === 'svc' && answering && !strong.length && !unsure && !t.includes('?')) r.need = 'svc1'
+      if (topic === 'svc' && answering && !strong.length && !unsure && !t.includes('?') && !questionForm(t)) r.need = 'svc1' // ask-fix-t1: a question is not a service name
       else if (st.found[topic] && !unsure) r.need = st.found[topic]
     }
   }
@@ -304,7 +306,7 @@ function byCode(text, st) {
 // the visit has made its first AI call; slow, the slow-AI line SLOW_A: null, 'due' (owed after the next answer that
 // may have it, src/live-turn.js slowFollows), 'said'.
 export function freshVisit(stage = 'open', kept = {}, met = false) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false, aiTried: false, slow: null }
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [], lastAnswer: null, lastAnswerKey: null, lastByAgain: false, keepWork: true, workLong: false, aiOff: false, aiTried: false, slow: null, lastOffer: null, lastParts: null, c9: true }
 }
 // A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
 // earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,
@@ -326,7 +328,7 @@ export function opening(st) {
     out = { kind: 'OPEN' }
   }
   noteLast(st, out)
-  return out
+  return attachOffer(out, st, null) // offer-t1: BACK carries the offer general
 }
 // route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
 // wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
@@ -335,12 +337,14 @@ export const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || n
 // data's wants is this plugin's want; its "skill by name", the skills-by-name line S1 or S2, is this plugin's skill)
 const AGAIN_BACK = (TALK_DATA.small_talk.again_brings_back || []).map(k => (k === 'wants' ? 'want' : k === 'skill by name' ? 'skill' : k))
 // what a line brought back by "again" leaves out: its faint Kept: line and what only that moment had
-const AGAIN_DROP = ['kept', 'first', 'name_taken', 'thing', 'repeat_of', 'by_again', 'code', 'work_first']
+const AGAIN_DROP = ['kept', 'first', 'name_taken', 'thing', 'repeat_of', 'by_again', 'code', 'work_first', 'weak_hit', 'offer']
 export function noteLast(st, o) {
   if (!o) return o
   st.last = o.kind
   st.lastKey = lineKey(o)
-  st.lastTopic = ['row', 'question', 'plain'].includes(o.kind) ? o.topic || null : null
+  st.lastTopic = ['row', 'question', 'plain', 'then'].includes(o.kind) ? o.topic || null : null // live changes-6: then
+  // ask-fix-t1 (route2.py last_next reads last_key's fields): the parts of Helper's last line, for its then line and its button
+  st.lastParts = { kind: o.kind, topic: o.topic || null, need: o.need || null, term: o.term || null, row: o.row || null, line: o.line || o.id || null }
   st.lastByAgain = !!o.by_again
   if (AGAIN_BACK.includes(o.kind)) {
     st.lastAnswer = Object.fromEntries(Object.entries(o).filter(([k]) => !AGAIN_DROP.includes(k)))
@@ -684,9 +688,10 @@ const ST = TALK_DATA.small_talk
 // talk-live: the first-time faint line under the first "Kept:" (lines_by_mode.first_time_grey, by src/ai-mode.js)
 export const FIRST_TIME = LIVE_DATA.lines_by_mode.first_time_grey[AI_MODE]
 // live-v2 changes-4: under the first Kept: of what the person does, in a build that calls an AI
-export const WORK_TOLD = LIVE_DATA.lines_by_mode.work_told[AI_MODE]
+// live changes-6: once the set-up conversation sends its two answers too, setup_told takes work_told's place
+export const WORK_TOLD = LIVE_DATA.lines_by_mode[SETUP_BUILT && SETUP_AI_BUILT ? 'setup_told' : 'work_told'][AI_MODE]
 // live-v2 changes-1: the kinds after which "how" is kind mean; the data's "wants" is this plugin's want
-const HOW_AFTER = ST.how_after_rows.after.map(k => (k === 'wants' ? 'want' : k))
+const HOW_AFTER = ST.how_after_rows.after.flatMap(k => (k === 'wants' ? ['want'] : k === 'then' ? ['then', 'rowthen'] : [k]))
 const NR = TALK_DATA.no_repeat
 const LETTER = /\p{L}/u
 const ONE_WORD = /^(?:\p{L}|['-]){2,30}$/u
@@ -735,6 +740,8 @@ export function smallTalk(text, st) {
       }
     }
   }
+  if (kind === null && !opening) kind = greetMore(t) // live changes-6: live_c6.greet_more
+  if (kind === null && !opening && !st.pending && correction(t, st)) kind = 'wrong' // live changes-6: live_c6.correction_rule
   if (kind === null) {
     const letters = /[a-z0-9]/.test(t)
     const one = /^[a-z]+$/.test(t)
@@ -760,11 +767,184 @@ export function smallTalk(text, st) {
   if (st.pending && (kind === 'ok' || kind === 'mean' || kind === 'again')) return null
   return kind
 }
+/* ---------- live changes-6 (route2.py greet_more, correction, c6_line), offer-t1 and ask-fix-t1 (offer_route, how_that, about_ok) ---------- */
+const C6 = TALK_DATA.live_c6
+const knownWords = tc => strongTopics(tc).length > 0 || anyTerm(tc) || whichOf(tc, WEAK_ALL).length > 0
+// live_c6.greet_more: a greeting, thanks or bye with a few more words
+function greetMore(t) {
+  if (t.includes('?') || typedWords(t).length > 9 || knownWords(cutIgnored(t))) return null
+  let first = null
+  let rest = ''
+  for (const k of ['hello', 'thanks', 'bye', 'ok']) {
+    for (const w of [...ST.kinds[k]].sort((a, b) => b.length - a.length)) {
+      if (startsWith(t, [w])) {
+        first = k
+        rest = t.slice(w.length)
+        break
+      }
+    }
+    if (first) break
+  }
+  if (!first) return null
+  if (C6.greet_more.question_words.some(q => hits(rest, q))) return null
+  const has = k => ST.kinds[k].some(w => w.length > 2 && hits(t, w))
+  if (has('bye')) return 'bye'
+  if (has('thanks')) return 'thanks'
+  return first === 'ok' ? null : first
+}
+// live_c6.correction_rule: a correction right after a topic's plain line or its then line (or with only Helper's
+// not-clear or cut-off line between), naming no other topic
+function correction(t, st) {
+  const la = st.lastAnswer || {}
+  let topic
+  if (['plain', 'then'].includes(st.last) && st.lastTopic) topic = st.lastTopic
+  else if (['MEAN_NONE', 'CUT', 'CUT_SAME'].includes(st.last) && ['plain', 'then'].includes(la.kind)) topic = la.topic
+  else return false
+  if (!startsWith(t, NR.wrong_starts) || ST.no_words.includes(t.trim())) return false
+  const tc = cutIgnored(t)
+  let ts = strongTopics(tc)
+  if (!ts.length) ts = TOPIC_IDS.filter(k => whichOf(tc, TOPICS[k].weak_key_words).length)
+  return ts.length > 0 && ts.every(x => x === topic)
+}
+// live_c6: PRIV, POWER, HVC, or null
+function c6Line(t) {
+  if (whichOf(t, C6.privacy_words).length) return 'PRIV'
+  if (whichOf(t, C6.power_words).length) return 'POWER'
+  if (whichOf(t, C6.vs_names).length && whichOf(t, C6.vs_words).length) return 'HVC'
+  return null
+}
+const THEN_W = ['how', 'and', 'and then', 'then', 'what next', 'next', 'now what', 'then what', 'what then', 'and next']
+// ask-fix-t1 (about_rule): a row found by key words is final only when the message has one of its about words
+const ABOUT_ROWS = TALK_DATA.about_rule.rows
+const aboutOk = (t, need) => !ABOUT_ROWS[need] || whichOf(t, ABOUT_ROWS[need]).length > 0
+// offer-t1 and ask-fix-t1 (route2.py offer_route): the kind of a new line, 'ROW:<need>', or null. tw: cut, normed message
+const OW = TALK_DATA.offer_words
+function offerRoute(tw) {
+  const t = tw.replace(/[ ?!.]+$/, '')
+  const has = k => whichOf(t, OW[k]).length > 0
+  if (has('migrate') || (has('computer') && /\b(?:move|moving|migrate|transfer|copy)\b/.test(t))) {
+    if (has('computer')) return 'MIG_PC'
+    if (has('listed_apps')) return 'MIG_APP'
+    if (has('chatgpt_names')) return 'MIG_CHATGPT'
+    if (has('not_listed_apps')) return 'MIG_NOT_LISTED'
+    return 'MIG'
+  }
+  const m = WHAT_IS && WHAT_IS.exec(t)
+  if (m && OW.agent_what.includes(m[1].replace(/^[ ?.!]+|[ ?.!]+$/g, ''))) return 'AGENT'
+  if (has('key')) return has('key_where') ? 'KEY_WHERE' : startsWith(t, OW.key_what_starts) ? 'KEY_WHAT' : 'KEY'
+  if (has('personality')) return 'PERSONALITY'
+  if (has('stuck_more')) return 'STUCK'
+  if (has('free')) return 'FREE'
+  if (has('model_change')) return 'MODEL_CHANGE'
+  if (has('model_for') && hits(t, 'for')) return 'MODEL_FOR'
+  if (has('own_ai') && whichOf(t, ABOUT_ROWS.mod3).length) return 'ROW:mod3'
+  if (has('skill_add')) return 'SKILL_ADD'
+  if (has('plugin_which')) return 'PLUGIN_WHICH'
+  if (has('plugin_add')) return 'PLUGIN_ADD'
+  if (has('coding_ask')) return 'CODING'
+  if (has('what_hermes_any')) return 'HERMES'
+  if (knownWords(t)) return null // a strong, weak or term key word: the topics answer it
+  if (has('laptop_off')) return 'ROW:msg3'
+  if (OW.what_hermes.includes(t)) return 'HERMES'
+  if (has('update')) return 'UPDATE'
+  if (has('safe')) return 'SAFE'
+  if (has('start')) return 'START'
+  return null
+}
+// ask-fix-t1 (small_talk.how_that, route2.py last_next and how_that): "ok and how do I do that", by Helper's last line
+const HT = ST.how_that
+const HT_CUT = new RegExp('^(?:(?:' + HT.cut_first.map(escapeRe).join('|') + ')\\b[ ,]*)+(?=\\S)')
+// the then line and the button (next) of Helper's last line: [then or null, next or null]
+function lastNext(st) {
+  const p = st.lastParts || {}
+  if (p.kind === 'row') {
+    const n = TOPICS[p.topic].needs.find(x => x.id === p.need)
+    return [n.then || null, n.next || null]
+  }
+  if (p.kind === 'plain') return [TOPICS[p.topic].plain.then || null, TOPICS[p.topic].plain.next || null]
+  if (p.kind === 'term') return [null, TERMS[p.term].next || null]
+  // Builder: a row of the wants (route2.py has none) with text to paste counts as a line whose button is a paste box
+  if (p.kind === 'want' && WANT_ROWS[p.row] && WANT_ROWS[p.row].next && WANT_ROWS[p.row].next.kind === 'paste') return [null, { kind: 'paste', label: WANT_ROWS[p.row].next.label, paste_text: WANT_ROWS[p.row].next.paste_text }]
+  if (FIXED[p.kind]) return [null, FIXED[p.kind].next || null]
+  return [null, null]
+}
+function howThat(text, st) {
+  let t = talkNorm(text).replace(/[ ?!.,]+$/, '')
+  t = t.replace(HT_CUT, '').trim() || t
+  if (!HT.phrases.includes(t)) return null
+  // (1) the things to pick stay
+  if (st.pending || st.lastq || st.lastOffer || ['TP', 'W1', 'W2', 'C1', 'can-q'].includes(st.last)) return { kind: 'PICK_FIRST', same_picks: true }
+  const [then, nx] = lastNext(st)
+  const p = st.lastParts || {}
+  if (then) {
+    st.pending = null
+    return p.kind === 'row' ? { kind: 'rowthen', topic: p.topic, need: p.need } : { kind: 'then', topic: p.topic }
+  }
+  if (nx && nx.kind === 'line') return { kind: 'nextline', of: p.kind, topic: p.topic, need: p.need, term: p.term, text: nx.text, id: nx.id }
+  if (nx && nx.kind === 'paste') return { kind: 'HOW_PASTE', label: nx.label, button: nx, topic: p.topic }
+  if (nx && nx.kind === 'part') return { kind: 'HOW_PART', label: nx.label, button: nx, topic: p.topic }
+  return null
+}
+// live changes-9 (not in route2.py): a next line's second wording (use1-next-mean), by the next line's id
+const NEXT_MEAN = Object.fromEntries(TALK_DATA.topics.flatMap(t => [t.plain.next, ...t.needs.map(n => n.next)]).filter(n => n && n.mean).map(n => [n.id, n.mean]))
+
+/* ---------- offer-t1 (JSON offers; route2.py offer_set, attach_offer, press_offer) ---------- */
+const OF = TALK_DATA.offers
+// the offer a line carries: a fixed line's own, or keeps.work.offer_t1's (WORK_LONG_2, WORK_SECRET)
+const offerOfLine = kind => (FIXED[kind] && FIXED[kind].offer) || (KEEPS.work.offers || {})[kind] || null
+// [set id, question text, pick ids]
+function offerSet(sid, prevTopic = null) {
+  const S = OF.sets
+  if (sid === 'after_topic') {
+    const bt = S.after_topic.by_topic
+    if (prevTopic && bt[prevTopic]) {
+      const [a, b] = bt[prevTopic]
+      return ['after_topic:' + prevTopic, S.after_topic.template.replace('{say1}', OF.things[a].say).replace('{say2}', OF.things[b].say), [a, b]]
+    }
+    sid = 'general'
+  }
+  const s = S[sid]
+  if (!SETUP_BUILT && s.text_no_setup) return [sid, s.text_no_setup, s.picks_no_setup]
+  return [sid, s.text, s.picks]
+}
+// A line with an offer gets it (o.offer: { set, text, picks }); never the same set twice in a row (its instead set).
+// prevTopic: the topic of Helper's last answer before this line, for after_topic.
+export function attachOffer(o, st, prevTopic = null) {
+  const of = o && !setupOpens(o.kind, st) && offerOfLine(o.kind)
+  if (!of) {
+    st.lastOffer = null
+    return o
+  }
+  let [sid, text, picks] = offerSet(of, prevTopic)
+  if (sid === st.lastOffer) [sid, text, picks] = offerSet(sid.startsWith('after_topic:') ? OF.sets.after_topic.instead : OF.sets[sid].instead)
+  o.offer = { set: sid, text, picks }
+  st.lastOffer = sid
+  return o
+}
+// setup-chat: with the set-up conversation built, the four lines that end the opening (F2, F3, WORK_SECRET,
+// WORK_LONG_2) ask Q_NEW in place of their offer, until that question has been answered or is kept
+const SETUP_OPENERS = ['F2', 'F3', 'WORK_SECRET', 'WORK_LONG_2']
+const setupOpens = (kind, st) => SETUP_BUILT && SETUP_OPENERS.includes(kind) && !st.kept.setup_new && !(st.setup && st.setup.newAnswered)
+// An offer by its set id, as a line carries it (the set-up conversation's NOT_NOW, ALL_DONE and BACK end with one)
+export function offerSaid(sid, st) {
+  let [id, text, picks] = offerSet(sid)
+  if (id === st.lastOffer) [id, text, picks] = offerSet(OF.sets[id].instead)
+  st.lastOffer = id
+  return { set: id, text, answers: { kind: 'offer', hint: OF.hint, items: picks.map(p => ({ id: 'offer-' + p, label: OF.things[p].label, offer: p })) } }
+}
+// whether a thing picked under an offer starts the set-up conversation (offers.things.setup)
+export const offerIsSetup = thing => OF.things[thing].gives.kind === 'setup_chat'
+// the message holds a key word of a topic or a Hermes term
+export const hasTopicWord = text => knownWords(cutIgnored(talkNorm(text)))
+// Every offer question this build can show: [set id, text, pick ids] (tests; the after_topic sets by topic)
+export const offerSets = () => [...Object.keys(OF.sets).filter(k => k !== 'after_topic').map(k => offerSet(k)), ...Object.keys(OF.sets.after_topic.by_topic).map(t => offerSet('after_topic', t))]
+
 // The fixed line for a small-talk kind: [line, the name for HELLO or the topic for a plain line].
 function smallLine(kind, st) {
   const name = st.name || st.kept.name || null
   if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
   if (kind === 'ai') return [LIVE_DATA.lines_by_mode.are_you_an_ai[AI_MODE], null] // talk-live: AI, AI_PICK or AI_WRITES
+  if (kind === 'mean' && (st.last === 'then' || st.last === 'rowthen')) return ['MEAN_NONE', null] // live changes-6
   if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
   return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG', stuck: 'STUCK' }[kind], null] // changes-3: stuck
 }
@@ -882,11 +1062,14 @@ export function turn(text, st) {
 // step is asked (src/live-turn.js goesToAi); out is the line shown when it is not, and the fallback when it is.
 export function turnParts(text, st) {
   const wasOpening = st.stage === 'name' || st.stage === 'work'
+  const prevTopic = st.lastTopic // offer-t1: the topic of Helper's last line, for offers.sets.after_topic
   const steps = turnSteps(text, st)
   const pre = { ...steps }
+  if (steps.kind === 'PICK_FIRST') return { pre, out: steps } // ask-fix-t1: nothing changes, the same things to pick stay
   const out = noRepeat(steps, st, text)
   if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
-  return { pre, out: noteLast(st, out) }
+  noteLast(st, out)
+  return { pre, out: attachOffer(out, st, prevTopic) }
 }
 // The order of steps is route2.py's _turn(), with no model.
 function turnSteps(text, st) {
@@ -903,13 +1086,45 @@ function turnSteps(text, st) {
     out.kind = 'K1'
     return out
   }
+  // ask-fix-t1 (small_talk.how_that): "ok and how do I do that", first at stage open, before small talk and any AI call
+  if (st.stage === 'open') {
+    const hw = howThat(text, st)
+    if (hw) return Object.assign(out, hw)
+  }
   // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
   const sk = smallTalk(text, st)
+  // ask-fix-t1 (mean_rule_ask_fix_t1): the mean words themselves right after a word line with a mean field
+  if (sk === 'mean' && st.last === 'term' && TERMS[st.lastParts.term].mean && ST.kinds.mean.some(w => w.length > 4 && hits(talkNorm(text), w))) {
+    st.stage = 'open'
+    return done('termmean', { term: st.lastParts.term })
+  }
   // live-v2 changes-3 (small_talk.again_rule): this visit's last answer line again, or AGAIN or MEAN_NONE
   if (sk === 'again') {
     st.stage = 'open'
     const { kind, ...more } = againLine(st)
     return done(kind, { ...more, by_again: true })
+  }
+  if (sk === 'mean') {
+    const bare = talkNorm(text).replace(/[ ?!.]+$/, '')
+    const w = bare.replace(/^(?:(?:ok|okay|so|and|cool|right)\b[ ,]*)+(?=\S)/, '').trim() || bare
+    const thenWord = THEN_W.includes(w) || THEN_W.includes(bare)
+    // live changes-6 (then_rule): the then words right after a plain line that has a then line
+    if (thenWord && st.last === 'plain' && st.lastTopic && TOPICS[st.lastTopic].plain.then) {
+      st.stage = 'open'
+      return done('then', { topic: st.lastTopic })
+    }
+    // live changes-9 (not in route2.py; st.c9 false only for replaying it): the then words right after a row with a then
+    // line (msg1), and right after a topic's then line when one row of that topic has one (msg0-then, then msg1-then)
+    if (st.c9 !== false && thenWord && st.last === 'row') {
+      const n = TOPICS[st.lastParts.topic].needs.find(x => x.id === st.lastParts.need)
+      if (n && n.then) return done('rowthen', { topic: st.lastParts.topic, need: n.id })
+    }
+    if (st.c9 !== false && thenWord && st.last === 'then' && st.lastTopic) {
+      const ns = TOPICS[st.lastTopic].needs.filter(x => x.then)
+      if (ns.length === 1) return done('rowthen', { topic: st.lastTopic, need: ns[0].id })
+    }
+    // live changes-9: kind mean right after a next line with a second wording (use1-next, use3-next)
+    if (st.c9 !== false && ['extra', 'nextline'].includes(st.last) && NEXT_MEAN[st.lastParts.line]) return done('nextmean', { id: NEXT_MEAN[st.lastParts.line].id })
   }
   if (sk) {
     const [line, x] = smallLine(sk, st)
@@ -1020,15 +1235,32 @@ function turnSteps(text, st) {
     const nl = nameLater(text, st, out)
     if (nl) return done(nl.kind, { name: nl.name })
     const tw = cutIgnored(talkNorm(text))
+    // offer-t1: offer_words, new lines from the docs; ask-fix-t1 (offer_words.pending_rule): while a question is open,
+    // only a message in question form, and never FREE or a row
+    let orr = offerRoute(tw)
+    if (st.pending && !(orr && questionForm(tw) && orr !== 'FREE' && !orr.startsWith('ROW:'))) orr = null
+    if (orr && orr.startsWith('ROW:')) return done('row', { topic: orr.slice(4, 7), need: orr.slice(4) })
+    if (orr) return done(orr)
     const wi = whatIs(tw)
     if (wi) return done('plain', { topic: wi, why: 'what is' })
+    // live changes-6: PRIV, POWER, HVC; not as the answer to Helper's own question
+    const c6 = st.pending ? null : c6Line(tw)
+    if (c6) return done(c6)
     const fx = fixedByWords(tw, st)
     if (fx) return done(fx)
   }
   // 4 and 5. the topic and the need, by key words
   const code = byCode(text, st)
   out.code = code
-  const { topic, need, several } = code
+  const { topic, several } = code
+  let { need } = code
+  // live changes-6 (mod3_guard): mod3 is not the answer when the message names a hosted or free AI
+  if (need === 'mod3' && whichOf(t, C6.hosted_words).length) need = code.need = null
+  // ask-fix-t1 (about_rule): a key word alone never shows the row (a weak hit)
+  if (need && topic && st.pending !== topic && !aboutOk(t, need)) {
+    out.weak_hit = need
+    need = code.need = null
+  }
   // the rows: one is shown; two or more, "Which one do you mean?" with their labels (three and
   // "More" when over four; wants_step.py shows the first four)
   if (code.rows) return code.rows.length === 1 ? done('want', { row: code.rows[0] }) : done('W1', { buttons: code.rows })
@@ -1047,6 +1279,17 @@ function turnSteps(text, st) {
     return withServiceLine(done('row', { topic, need }), st)
   }
   if (several) return done('W1', { buttons: several.slice(0, TALK_DATA.answers.max_at_once) })
+  // ask-fix-t1 (about_rule.weak_hit_then.no_ai): the topic's own question again, also when it was asked before; only if
+  // that question was Helper's last line, the don't-know line. A kept answer is not shown for a weak hit.
+  if (out.weak_hit && topic) {
+    if (TOPICS[topic].question.answers.length && st.lastKey !== lineKey({ kind: 'question', topic })) {
+      if (!st.asked.includes(topic)) st.asked.push(topic)
+      const r = done('question', { topic })
+      st.pending = topic
+      return r
+    }
+    return done('N1')
+  }
   // keeps.use: something is kept for this topic, so its question is not asked
   if (topic && keptNeed(topic, st)) {
     const r = fromKept(topic, st)
@@ -1170,7 +1413,7 @@ export function skip(st) {
   const out = { kind: 'F3' }
   noteLast(st, out)
   if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
-  return out
+  return attachOffer(out, st, null) // offer-t1: F3 carries the offer general
 }
 
 // A button that makes Helper say one more pre-written line.
@@ -1178,6 +1421,27 @@ function sayLineSteps(line, st) {
   st.lastq = false
   st.pending = null
   return { kind: 'extra', line }
+}
+
+// offer-t1 (route2.py press_offer): a thing picked under an offer, by its id only, never by key words.
+// ask-fix-t1 point 8 (not in route2.py): a pick of the pay offer (ChatGPT, Claude, Neither, I want it free) is kept
+// as a picked answer to the model question is.
+export function pressOffer(thing, st) {
+  const g = OF.things[thing].gives
+  const prevTopic = st.lastTopic
+  let o
+  if (g.kind === 'topic_pick') o = pickTopicSteps(g.id, st)
+  else if (g.kind === 'term') o = { kind: 'term', term: g.id }
+  else if (g.kind === 'row') {
+    o = { kind: 'row', topic: g.id.slice(0, 3), need: g.id }
+    if (thing.startsWith('pay_')) {
+      st.found.mod = g.id
+      keep(st, o, 'mod', g.id)
+    }
+  } else if (g.kind === 'setup_chat') o = { kind: 'SETUP_' + g.id }
+  else o = { kind: g.id }
+  noteLast(st, o)
+  return attachOffer(o, st, prevTopic)
 }
 
 // "See what I keep" pressed where Helper's settings page cannot open: the list, as for A1.
@@ -1238,6 +1502,7 @@ export const EXTRA_LINES = (() => {
     t.needs.forEach(n => take(n.next))
   }
   TALK_DATA.terms.forEach(t => take(t.next))
+  Object.values(FIXED).forEach(f => take(f.next)) // ask-fix-t1: PRIV-next, SAFE-next
   return lines
 })()
 
@@ -1363,12 +1628,20 @@ export function keptWasShown(log) {
   const done = [KEEPS.tell.see.delete_all.after_yes, KEEP_TYPED.forget_one.after_yes]
   return log.some(e => e.who === 'helper' && !!(e.note || e.used || (e.rows && e.rows.length) || done.includes(e.text)))
 }
+// setup-chat: the text and the Q_NEW answers of a line that opens the set-up conversation
+const setupOpener = (kind, st) => {
+  const q = openQNew(kind, st)
+  return [q.text, { answers: q.answers }]
+}
 export function lineFor(result, st, typed = '', opts = {}) {
   // asTyped: the person's own name as filled into the line, for the view to leave as typed (src/quotes.js)
   const asTyped = [st.name, result.name].filter(s => typeof s === 'string' && /['"]/.test(s))
-  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(asTyped.length ? { asTyped } : {}), ...more })
+  // offer-t1: the offer a line carries, shown by the page as a second bubble with its things to pick
+  const offer = result.offer ? { set: result.offer.set, text: result.offer.text, answers: { kind: 'offer', hint: OF.hint, items: result.offer.picks.map(id => ({ id: 'offer-' + id, label: OF.things[id].label, offer: id })) } } : null
+  const said = (line, text, more = {}) => ({ line, text, source: null, answers: null, next: null, paste: null, note: keptNote(result, st), used: null, hint: null, rows: null, docs: null, ...(offer ? { offer } : {}), ...(asTyped.length ? { asTyped } : {}), ...more })
   const named = f => (st.name ? fillSlots(f.text, { name: st.name }) : f.text_no_name || f.text)
-  const dontKnowLine = id => said(id, FIXED[id].text, { hint: FIXED.N_HINT.text })
+  // offer-t1: the faint hint N_HINT is no longer shown; the offer dont_know takes its place
+  const dontKnowLine = id => said(id, FIXED[id].text)
   const RM = Object.fromEntries(KEEP_REMEMBER.lines.map(l => [l.id, l]))
   const ONE = KEEP_TYPED.forget_one
   const ALL = KEEPS.tell.see.delete_all
@@ -1417,14 +1690,18 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'WORK_SECRET':
     case 'WORK_LONG':
     case 'WORK_LONG_2':
-    case 'WORK_ASK':
+    case 'WORK_ASK': {
+      if (setupOpens(result.kind, st)) return said(result.kind, ...setupOpener(result.kind, st))
       return said(result.kind, WORK.lines[result.kind])
+    }
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
+      if (setupOpens('F2', st)) return said('F2', ...setupOpener('F2', st))
       // talk-live-2: on a later visit (WORK_ASK, a typed change) the result carries the kept name
       return said('F2', result.name && !st.name ? fillSlots(FIXED.F2.text, { name: result.name }) : named(FIXED.F2))
     case 'F3':
+      if (setupOpens('F3', st)) return said('F3', ...setupOpener('F3', st))
       return said('F3', FIXED.F3.text)
     case 'TP':
       return said('TP', FIXED.TP.text, { answers: topicPicks() })
@@ -1501,6 +1778,35 @@ export function lineFor(result, st, typed = '', opts = {}) {
       const x = EXTRA_LINES[result.line]
       return said(x.id, x.text, { source: x.source })
     }
+    // live changes-6 and -9: a then line (msg0-then, msg1-then); ask-fix-t1: the text of the last line's button, a word
+    // line's second wording with the word line's button; live changes-9: a next line's second wording
+    case 'then': {
+      const x = TOPICS[result.topic].plain.then
+      return said(x.id, x.text, { source: x.source || null })
+    }
+    case 'rowthen': {
+      const x = TOPICS[result.topic].needs.find(n => n.id === result.need).then
+      return said(x.id, x.text, { source: x.source || null })
+    }
+    case 'nextline':
+      return said(result.id, result.text, { source: (EXTRA_LINES[result.id] || {}).source || null })
+    case 'termmean': {
+      const t = TERMS[result.term]
+      return said(t.mean.id, t.mean.text, { source: t.mean.source || null, next: nextFor(t.next, null, st) })
+    }
+    case 'nextmean': {
+      const x = Object.values(NEXT_MEAN).find(m => m.id === result.id)
+      return said(x.id, x.text, { source: x.source || null })
+    }
+    // ask-fix-t1: the same things to pick stay under it (the page shows the last line's again)
+    case 'PICK_FIRST':
+      return said('PICK_FIRST', FIXED.PICK_FIRST.text, { samePicks: true })
+    // ask-fix-t1: the last line's button again, named in the line
+    case 'HOW_PASTE':
+    case 'HOW_PART': {
+      const next = nextFor(result.button, result.topic || null, st)
+      return said(result.kind, fillSlots(FIXED[result.kind].text, { label: next && next.label ? next.label : result.label }), { next })
+    }
     case 'RM1':
     case 'RM3':
     case 'RM4':
@@ -1532,6 +1838,8 @@ export function lineFor(result, st, typed = '', opts = {}) {
       // a line that shows the topics it holds ("What Hermes can do")
       const f = FIXED[result.kind]
       if (!f) return dontKnowLine('N1')
+      // live changes-6, offer-t1, ask-fix-t1: a fixed line from the docs (PRIV, MIG, KEY ...), with its button if it has one
+      if (!result.buttons) return said(result.kind, f.text, { source: f.source || null, next: nextFor(f.next, null, st) })
       return said(result.kind, f.text, { source: f.source || null, answers: { kind: 'pair', hint: TALK_DATA.answers.hint_under_topics, items: (result.buttons || []).map(id => ({ id, label: labelOf(id), topic: id })) } })
     }
   }

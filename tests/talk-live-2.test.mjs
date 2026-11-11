@@ -176,7 +176,7 @@ test('changes-4: F2 says Kept: under it; the first time, the line that the AI is
   const st = atWork()
   const o = turn('I run a tennis club', st)
   const said = lineFor(o, st)
-  assert.equal(said.text, 'Thanks, Peter. Ask me anything about Hermes.')
+  assert.equal(said.text, 'Thanks, Peter.') // offer-t1 (changes-8)
   assert.equal(said.note.text, 'Kept: I run a tennis club.')
   assert.equal(said.note.workTold || null, WORK_TOLD)
   if (AI_MODE === 'no_ai_step') assert.equal('workTold' in said.note, false)
@@ -226,7 +226,7 @@ test('changes-4: "change what I do" asks WORK_ASK, and the reply goes through st
   assert.equal(f2.kind, 'F2')
   assert.equal(st.kept.work, 'I teach piano')
   // review: on a later visit F2 greets by the kept name
-  assert.equal(lineFor(f2, st).text, 'Thanks, Peter. Ask me anything about Hermes.')
+  assert.equal(lineFor(f2, st).text, 'Thanks, Peter.')
   // review: the ask-again words typed again at that question are no answer, never kept as the job
   const st2 = laterVisit({ name: 'Peter', work: 'I run a tennis club', told: true }, true)
   turn('change what I do', st2)
@@ -318,8 +318,8 @@ test('changes-4 request: with a kept name and work, the writer gets the work lin
     return { text: asks.length === 1 ? 'sch' : 'NONE' }
   }
   const st = laterVisit({ name: 'Peter', work: 'I run a tennis club', told: true }, true)
-  const { pre, out } = turnParts('what should I set up first', st)
-  await askLive({ mode: 'ai_writes', text: 'what should I set up first', pre, out, before: { last: 'BACK', lastKey: null }, lines: ['Helper: Hi again. What would you like Hermes to help you with?'], request, work: st.kept.work })
+  const { pre, out } = turnParts('can it fly a kite', st)
+  await askLive({ mode: 'ai_writes', text: 'can it fly a kite', pre, out, before: { last: 'BACK', lastKey: null }, lines: ['Helper: Hi again. What would you like Hermes to help you with?'], request, work: st.kept.work })
   assert.equal(asks.length, 2)
   assert.doesNotMatch(asks[0].instructions, /tennis/)
   assert.match(asks[1].instructions, /About them: I run a tennis club\nChecked facts:/)
@@ -336,15 +336,15 @@ const C24 = [
   ['For your club members, start a new chat for each task.', 'how can I use less tokens', HAND_USE, true],
   ['You run a busy club, so start a new chat for each task.', 'how can I use less tokens', HAND_USE, true],
   ['For your tennis club, start a new chat for each task to use fewer tokens, the pieces of words AI counts.', 'how can I use less tokens', HAND_USE, false],
-  ['First Hermes needs an AI to think with. Then you can message it from your phone with Telegram.', 'what should I set up first', HAND_FIRST, false],
-  ['For your coaching schedule, first Hermes needs an AI to think with.', 'what should I set up first', HAND_FIRST, true],
-  ['Since you manage bookings, first Hermes needs an AI to think with.', 'what should I set up first', HAND_FIRST, true],
+  ['First Hermes needs an AI to think with. Then you can message it from your phone with Telegram.', 'can it fly a kite', HAND_FIRST, false],
+  ['For your coaching schedule, first Hermes needs an AI to think with.', 'can it fly a kite', HAND_FIRST, true],
+  ['Since you manage bookings, first Hermes needs an AI to think with.', 'can it fly a kite', HAND_FIRST, true],
   ["You're welcome. Ask me anything about Hermes.", 'thanks', '', false],
-  ['Your players could message your Hermes from your phone.', 'what should I set up first', HAND_FIRST, true],
-  ['As a coach, first Hermes needs an AI to think with.', 'what should I set up first', HAND_FIRST, true],
-  ['Your own Hermes needs an AI to think with first.', 'what should I set up first', HAND_FIRST, false],
-  ['You are new here, so first Hermes needs an AI to think with.', 'what should I set up first', HAND_FIRST, false],
-  ['In your tennis club, Telegram lets you message your Hermes from your phone.', 'what should I set up first', HAND_FIRST, false]
+  ['Your players could message your Hermes from your phone.', 'can it fly a kite', HAND_FIRST, true],
+  ['As a coach, first Hermes needs an AI to think with.', 'can it fly a kite', HAND_FIRST, true],
+  ['Your own Hermes needs an AI to think with first.', 'can it fly a kite', HAND_FIRST, false],
+  ['You are new here, so first Hermes needs an AI to think with.', 'can it fly a kite', HAND_FIRST, false],
+  ['In your tennis club, Telegram lets you message your Hermes from your phone.', 'can it fly a kite', HAND_FIRST, false]
 ]
 test('changes-4 c24: apply_c4_check.py\'s 14 written replies, kept \"I run a tennis club\": 14 of 14 as hhcontent expects', () => {
   for (const [reply, msg, hand, fails] of C24) assert.equal(!!c24Fails(reply, 'I run a tennis club', msg, hand), fails, reply)
@@ -386,8 +386,8 @@ test('weak AI: a first call or a writer that sends thinking text gives the fallb
     let n = 0
     const request = async () => ({ text: answers[n++] })
     const st = freshVisit('open', {}, true)
-    const { pre, out } = turnParts('what should I set up first', st)
-    const got = await askLive({ mode: 'ai_writes', text: 'what should I set up first', pre, out, before: { last: null, lastKey: null }, request })
+    const { pre, out } = turnParts('can it fly a kite', st)
+    const got = await askLive({ mode: 'ai_writes', text: 'can it fly a kite', pre, out, before: { last: null, lastKey: null }, request })
     assert.equal(got.thinking, true, answers.join(' / '))
     assert.ok(got.fallback)
     assert.equal(n, answers.length, 'no call after the thinking text')
@@ -407,7 +407,7 @@ test('weak AI: a reply that sits on the USED: line falls back, and is not thinki
 
 test('weak AI: the AI step is off for the rest of the visit once marked (liveWhyNot)', () => {
   const st = freshVisit('open', {}, true)
-  const { pre } = turnParts('what should I set up first', st)
+  const { pre } = turnParts('can it fly a kite', st)
   assert.equal(liveWhyNot({ mode: 'ai_writes', pre, text: 'x', status: { state: 'ok' } }), null)
   assert.equal(liveWhyNot({ mode: 'ai_writes', pre, text: 'x', status: { state: 'ok' }, off: true }), 'AI off for this visit')
 })

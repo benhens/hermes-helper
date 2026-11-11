@@ -5,7 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { H } from '../fakes/react.mjs'
-import { aiModeSource } from './mode-loader.mjs'
+import { aiModeSource, setupBuiltSource } from './mode-loader.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..')
 const FAKES = path.join(ROOT, 'tests', 'fakes')
@@ -19,7 +19,9 @@ export async function loadPlugin(change = null) {
   const built = fs.readFileSync(path.join(ROOT, 'desktop', 'plugin.js'), 'utf8')
   // talk-live: HELPER_AI_MODE (scripts/test-modes.mjs) sets the switch in the copy that is loaded
   const moded = process.env.HELPER_AI_MODE ? aiModeSource(built, process.env.HELPER_AI_MODE) : built
-  const src = (change ? change(moded) : moded)
+  // setup-chat: HELPER_SETUP_BUILT (scripts/test-modes.mjs) sets that switch in the copy that is loaded
+  const switched = process.env.HELPER_SETUP_BUILT ? setupBuiltSource(moded, process.env.HELPER_SETUP_BUILT) : moded
+  const src = (change ? change(switched) : switched)
     .replace("from '@hermes/plugin-sdk'", `from '${sdkUrl}'`)
     .replace("from 'react/jsx-runtime'", `from '${reactUrl}'`)
     .replace("from 'react'", `from '${reactUrl}'`)

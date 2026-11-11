@@ -27,17 +27,28 @@ export function liveRows(talk, wants) {
   const next = []
   const noteNext = (of, subject, n) => {
     if (n && n.kind === 'line') next.push({ id: n.id, subject, title: '', text: n.text, kw: [], weak: [], next_of: of })
+    // live changes-9: a next line's second wording (use1-next-mean), handed after it on a follow-up
+    if (n && n.kind === 'line' && n.mean) next.push({ id: n.mean.id, subject, title: '', text: n.mean.text, kw: [], weak: [], next_of: n.id, follow_only: true })
+  }
+  // live changes-6 and -9 (follow_up.rows_c6): a row's then line; ask-fix-t1 (follow_up.ask_fix_t1): a term's mean line
+  const noteMore = (of, subject, x) => {
+    for (const k of ['then', 'mean']) if (x[k]) next.push({ id: x[k].id, subject, title: '', text: x[k].text, kw: [], weak: [], next_of: of, ...(k === 'mean' ? { follow_only: true } : {}) })
   }
   for (const tp of talk.topics) {
     const p = tp.plain
     rows.push({ id: p.id, subject: tp.id, title: tp.label, text: p.text, kw: [...tp.key_words, ...(tp.misspellings || [])], weak: [], shows: { kind: 'plain', topic: tp.id } })
     noteNext(p.id, tp.id, p.next)
+    noteMore(p.id, tp.id, p)
     for (const n of tp.needs) {
       rows.push({ id: n.id, subject: tp.id, title: `${tp.label}: ${n.when || ''}`, text: n.text, kw: n.key_words || [], weak: tp.key_words, shows: { kind: 'row', topic: tp.id, need: n.id } })
       noteNext(n.id, tp.id, n.next)
+      noteMore(n.id, tp.id, n)
     }
   }
-  for (const tm of talk.terms) rows.push({ id: tm.id, subject: 'words', title: tm.label, text: tm.text, kw: tm.key_words, weak: [], shows: { kind: 'term', term: tm.id } })
+  for (const tm of talk.terms) {
+    rows.push({ id: tm.id, subject: 'words', title: tm.label, text: tm.text, kw: tm.key_words, weak: [], shows: { kind: 'term', term: tm.id } })
+    noteMore(tm.id, 'words', tm)
+  }
   for (const w of wants.wants) {
     const pairs = (w.actions || []).flatMap(a => (w.things || []).map(t => `${a} ${t}`))
     rows.push({ id: w.id, subject: w.group, title: w.label, text: w.text, kw: [...(w.key_words || []), ...pairs], weak: w.things || [], shows: { kind: 'want', row: w.id } })
@@ -75,8 +86,8 @@ export function liveProblems(live, talk, wants, mode) {
     if (/\n/.test(r.text)) problems.push(`row ${r.id} has a line break (rows are sent one per line)`)
   }
   const nexts = rows.filter(r => r.next_of).map(r => r.id).sort()
-  const want4 = ['bot1-next', 'use-more', 'use1-next', 'use3-next']
-  if (JSON.stringify(nexts) !== JSON.stringify(want4)) problems.push(`the next lines handed as rows are ${nexts.join(', ')}, not the data's four (${want4.join(', ')})`)
+  const want4 = ['bot1-next', 'msg0-then', 'msg1-then', 'plugin-mean', 'skill-mean', 'use-more', 'use1-next', 'use1-next-mean', 'use3-next', 'use3-next-mean']
+  if (JSON.stringify(nexts) !== JSON.stringify(want4)) problems.push(`the next lines handed as rows are ${nexts.join(', ')}, not the data's ten (${want4.join(', ')})`)
   const subjects = ((live.subjects || {}).list || []).map(s => s.id)
   if (subjects.length !== 16) problems.push(`${subjects.length} subjects, not 16`)
   for (const s of subjects) if (!['talk', 'build', 'none'].includes(s) && !rows.some(r => r.subject === s)) problems.push(`subject ${s} has no rows`)
@@ -119,6 +130,9 @@ export function liveProblems(live, talk, wants, mode) {
     else if (!(talk.fixed_lines || []).some(f => f.id === lm.are_you_an_ai[m].id && f.text === lm.are_you_an_ai[m].text)) problems.push(`lines_by_mode.are_you_an_ai.${m} is not the talk data's fixed line ${lm.are_you_an_ai[m].id} word for word`)
     if (!(lm.first_time_grey && lm.first_time_grey[m] && lm.first_time_grey[m].text)) problems.push(`lines_by_mode.first_time_grey.${m} is missing`)
     if (!(lm.readme_point_11 && lm.readme_point_11[m])) problems.push(`lines_by_mode.readme_point_11.${m} is missing`)
+    // setup-chat-2 (setup-chat changes-1): the words for a build that sends only what the person does
+    if (!(lm.readme_point_11_work_only && lm.readme_point_11_work_only[m])) problems.push(`lines_by_mode.readme_point_11_work_only.${m} is missing`)
+    if (lm.settings_top_line_2 && lm.settings_top_line_2[m] && !(lm.settings_top_line_2_work_only && lm.settings_top_line_2_work_only[m])) problems.push(`lines_by_mode.settings_top_line_2_work_only.${m} is missing`)
   }
   if (lm.first_time_grey && lm.first_time_grey.no_ai_step && talk.keeps.tell.first_time_if_no_model_call !== lm.first_time_grey.no_ai_step.text) problems.push('the no-AI first-time line differs from keeps.tell.first_time_if_no_model_call')
   const fb = (live.order || {}).fallback || {}
@@ -130,7 +144,7 @@ export function liveProblems(live, talk, wants, mode) {
   const nr = c5.no_reply || {}
   if (!(nr.starts || []).length || !(nr.holds || []).length) problems.push('checks_c5.no_reply has no starts or no holds')
   const c5ids = (c5.list || []).map(c => c.id)
-  if (JSON.stringify(c5ids) !== JSON.stringify(['c25', 'c26', 'c27'])) problems.push(`checks_c5.list is ${c5ids.join(', ')}, not c25, c26, c27`)
+  if (JSON.stringify(c5ids) !== JSON.stringify(['c25', 'c26', 'c27', 'c28', 'c29'])) problems.push(`checks_c5.list is ${c5ids.join(', ')}, not c25 to c29`)
   for (const c of c5.list || []) if ((c.id === 'c25') === (c.adopted !== false)) problems.push(`checks_c5 ${c.id}: adopted is ${c.adopted}; this build runs c26 and c27 only`)
   const c26 = (c5.list || []).find(c => c.id === 'c26') || {}
   if (!(c26.words || []).length) problems.push('checks_c5 c26 has no words')
@@ -158,7 +172,7 @@ export function slimLiveData(live, talk, wants) {
     code_answers: live.code_answers.kinds,
     go_to_ai: live.code_answers.go_to_ai,
     follow_up: { phrases: live.follow_up.phrases },
-    rows: liveRows(talk, wants).map(r => pick(r, ['id', 'subject', 'title', 'text', 'kw', 'weak', 'next_of', 'shows'])),
+    rows: liveRows(talk, wants).map(r => pick(r, ['id', 'subject', 'title', 'text', 'kw', 'weak', 'next_of', 'follow_only', 'shows'])),
     stop_words: live.rows.stop_words.split(/\s+/).filter(Boolean),
     max_handed: live.rows.max_handed,
     subjects: live.subjects.list.map(s => ({ id: s.id, title: s.title })),
@@ -180,7 +194,13 @@ export function slimLiveData(live, talk, wants) {
       c24: pick(live.checks.list.find(c => c.id === 'c24'), ['person_pattern', 'person_ok']),
       // live-v2 changes-5: c26 (the model's notes shown) and c27 (the asked kind not given), after c24; c25 is not built
       c26: live.checks_c5.list.find(c => c.id === 'c26').words,
-      c27: live.checks_c5.list.find(c => c.id === 'c27').classes.map(c => pick(c, ['id', 'asks', 'asks_whole', 'gives']))
+      c27: live.checks_c5.list.find(c => c.id === 'c27').classes.map(c => pick(c, ['id', 'asks', 'asks_whole', 'gives'])),
+      // live changes-6: guide and guides fail c16 only in a sentence that speaks of Helper
+      c16_allow: pick(live.checks.list.find(c => c.id === 'c16').allow_c6, ['words', 'speaks_of_helper']),
+      // offer-t1 (changes-8) c28: a reply that ends on an invitation or a question; live changes-9 c29: what the person
+      // does used as a step or a fact about Hermes
+      c28: live.checks_c5.list.find(c => c.id === 'c28').ends,
+      c29: pick(live.checks_c5.list.find(c => c.id === 'c29'), ['skip', 'step_words', 'lead_ins'])
     },
     // live-v2 changes-5: no reply (thinking text), checked before anything else on every call
     no_reply: { starts: live.checks_c5.no_reply.starts, holds: live.checks_c5.no_reply.holds },
@@ -190,8 +210,14 @@ export function slimLiveData(live, talk, wants) {
       are_you_an_ai: byMode(m => lm.are_you_an_ai[m].id),
       first_time_grey: byMode(m => lm.first_time_grey[m].text),
       settings_top_line_2: byMode(m => lm.settings_top_line_2[m] || null),
+      // live changes-6: the line above names the set-up conversation's three rows; a build without that conversation's
+      // AI step (src/setup-built.js) sends only what the person does and says so (setup-chat changes-1's words, in
+      // place of the data's was_c6, which had a 17-word sentence)
+      settings_top_line_2_work_only: byMode(m => (lm.settings_top_line_2[m] ? lm.settings_top_line_2_work_only[m] : null)),
       // live-v2 changes-4: under the first Kept: of what the person does (null with no AI step)
-      work_told: byMode(m => lm.first_time_grey.work_told[m] || null)
+      work_told: byMode(m => lm.first_time_grey.work_told[m] || null),
+      // live changes-6: once the set-up conversation is built, in place of work_told (src/setup-built.js)
+      setup_told: byMode(m => lm.first_time_grey.setup_told[m] || null)
     }
   }
 }
@@ -200,7 +226,9 @@ export function slimLiveData(live, talk, wants) {
 // Status line, a sentence in the conversation window's bullet after "see the rest at once.", the bullet about
 // the "The model answers" card, and point 11 of the disclosure. The build writes them for src/ai-mode.js's
 // mode (tests/readme-disclosure.test.mjs checks them); everything else in README is the Builder's.
-export function readmeForMode(readme, live, mode) {
+// setup-chat-2: point 11 names the set-up conversation's lines only when the build sends them (setupAi: its AI step is
+// built, scripts/build.mjs setupAiOf); else setup-chat changes-1's readme_point_11_work_only.
+export function readmeForMode(readme, live, mode, setupAi = false) {
   const lm = live.lines_by_mode
   const lines = readme.split('\n')
   const at = (test, what) => {
@@ -221,6 +249,6 @@ export function readmeForMode(readme, live, mode) {
   const c = at(l => l.startsWith('- The "The model answers" card makes one call'), '"The model answers" bullet')
   lines[c] = `- ${lm.readme_model_call_bullet[mode]}`
   const p = at(l => l.startsWith('11. '), 'point 11')
-  lines[p] = lm.readme_point_11[mode]
+  lines[p] = (setupAi ? lm.readme_point_11 : lm.readme_point_11_work_only)[mode]
   return lines.join('\n')
 }

@@ -1,0 +1,293 @@
+{
+  "id": "dash-setup-list-v2",
+  "written": "2026-11-11 hhcontent; changed 2026-11-11 07:30 UTC (job hhcontent-dash-words-lk): Chat apps counted, steps corrected against docs/answers/hhtech-dash-run.md; changed 2026-11-11 08:48 UTC (setup-chat changes-1): Scheduled jobs has 3 steps",
+  "replaces": "nothing; dash-setup-list-v1 stays as the first look",
+  "docs_copy": "/hermes-docs (Hermes v0.23.0 mounted copy; the server runs v0.23.1; live docs not compared)",
+  "quote_check": "dev/checks/hhcontent-dash-list-v2/check.py finds every quote on its cited line",
+  "seen_marks": "A source in /root/projects/helping-hand/ is a team file reporting what was seen in the running app (Desktop v0.23.0, Linux). A source in /hermes-docs is the docs.",
+  "count_rule": "N = items with counts=true (6). The count shows how many of those 6 are done. Items with counts=false are shown and never counted.",
+  "cannot_tell_words": [
+    "Helper can't see this one, so it isn't counted.",
+    "Not counted. Hermes doesn't show this to Helper.",
+    "Not counted here. You'll see it work in Hermes."
+  ],
+  "order_source": [
+    {"file": "getting-started/quickstart.md", "line": 49, "quote": "if Hermes cannot complete a normal chat, do not add more features yet"},
+    {"file": "getting-started/quickstart.md", "line": 84, "quote": "The single most important setup step."},
+    {"file": "getting-started/learning-path.md", "line": 30, "quote": "[Sessions](../user-guide/sessions.md) → [Messaging](../user-guide/messaging/index.md) → [Tools](../user-guide/features/tools.md) → [Skills](../user-guide/features/skills.md) → [Memory](../user-guide/features/memory.md) → [Cron](../user-guide/features/cron.md)"},
+    {"file": "getting-started/learning-path.md", "line": 161, "quote": "to customize your setup"},
+    {"file": "getting-started/learning-path.md", "line": 163, "quote": "**Setting up for a team?** → Read [Security]"}
+  ],
+  "items": [
+    {
+      "id": "install",
+      "order": 1,
+      "kind": "main",
+      "card_name": "Install Hermes",
+      "why": "Hermes is the program itself. It works only while its computer is on.",
+      "sources": [
+        {"file": "getting-started/quickstart.md", "line": 53, "quote": "## 1. Install Hermes Agent"},
+        {"file": "guides/team-telegram-assistant.md", "line": 27, "quote": "not your laptop — the bot needs to stay running"}
+      ],
+      "steps": [
+        {"text": "Go to hermes-agent.nousresearch.com and download Hermes for your computer.", "src": {"file": "getting-started/installation.md", "line": 24, "quote": "Download the package for your platform from the"}, "not_seen": "docs words, not seen"},
+        {"text": "On a Mac: open the download and drag Hermes into Applications.", "src": {"file": "getting-started/installation.md", "line": 30, "quote": "open the DMG, then copy `Hermes.app` to Applications"}, "not_seen": "docs words, not seen"},
+        {"text": "On Windows: open the download, and Windows installs it.", "src": {"file": "getting-started/installation.md", "line": 27, "quote": "open the `.appinstaller` download with Windows App Installer"}, "not_seen": "docs words, not seen"},
+        {"text": "Open Hermes. Its first screens take you to your first message.", "src": {"file": "user-guide/desktop.md", "line": 445, "quote": "First-run onboarding gets you to your first message in seconds."}, "not_seen": "docs words, not seen"}
+      ],
+      "terminal": {"when": "Only for Linux, a server, or without the app. The docs give only these commands.", "paste": [{"for": "Linux, Mac or Windows WSL2", "text": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash", "src": {"file": "getting-started/installation.md", "line": 54, "quote": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash"}}, {"for": "Windows, in PowerShell", "text": "iex (irm https://hermes-agent.nousresearch.com/install.ps1)", "src": {"file": "getting-started/installation.md", "line": 61, "quote": "iex (irm https://hermes-agent.nousresearch.com/install.ps1)"}}], "seen_note": "Copy was seen putting exactly these texts on the clipboard (hhtech-dash-run.md line 23). The commands themselves were not run."},
+      "where_it_can_run": [
+        {"text": "Your own Mac or Windows computer, with the Hermes app.", "src": {"file": "getting-started/installation.md", "line": 22, "quote": "### Desktop packages on macOS or Windows"}, "note_src": {"file": "getting-started/installation.md", "line": 46, "quote": "The macOS installer is **Apple Silicon only**."}, "note": "Newer Macs only (Apple chips)."},
+        {"text": "Any Mac, Windows or Linux computer, set up by typing commands.", "src": {"file": "getting-started/installation.md", "line": 52, "quote": "#### Linux / macOS / WSL2"}},
+        {"text": "A computer that stays on, at home or rented online. Your app connects to it.", "src": {"file": "user-guide/desktop.md", "line": 638, "quote": "a VPS, a home server, or a Mini behind Tailscale"}, "app_place_src": {"file": "user-guide/desktop.md", "line": 642, "quote": "**Settings → Gateways → Connection mode** offers the alternatives to the local gateway"}},
+        {"text": "Hermes Cloud: a Hermes kept online for you. You sign in from the app.", "src": {"file": "user-guide/desktop.md", "line": 645, "quote": "sign in once to Hermes Cloud and pick from the agents on your account"}, "gap": "How to get a Hermes Cloud account and what it costs: not in the docs pages read."},
+        {"text": "Inside Docker, a closed box on a computer. For people who already use it.", "src": {"file": "user-guide/docker.md", "line": 11, "quote": "the agent itself runs inside a container"}},
+        {"text": "An Android phone, through the Termux app. Best effort: it may break.", "src": {"file": "getting-started/platform-support.md", "line": 36, "quote": "**Android / [Termux](./termux.md)** (aarch64)"}, "note_src": {"file": "getting-started/platform-support.md", "line": 28, "quote": "These platforms are maintained in-tree only as a best effort."}}
+      ],
+      "counts": true,
+      "done_rule": "Always done: this page runs only inside an installed Hermes.",
+      "read": "none",
+      "card_shown": false
+    },
+    {
+      "id": "model",
+      "order": 2,
+      "kind": "main",
+      "card_name": "A model",
+      "why": "The AI that does the thinking. Your app may already have a free one.",
+      "sources": [
+        {"file": "getting-started/quickstart.md", "line": 84, "quote": "The single most important setup step."}
+      ],
+      "steps": [
+        {"text": "Open Settings (Ctrl and comma; Cmd and comma on a Mac). Click Providers.", "src": {"file": "user-guide/desktop.md", "line": 549, "quote": "**Cmd/Ctrl+,** Settings"}, "not_seen": "docs words, not seen", "note": "\"Click Providers\" not checked in the app (hhtech-dash-run.md line 68)."},
+        {"text": "Sign in to the AI company you use, or paste its key.", "src": {"file": "user-guide/desktop.md", "line": 447, "quote": "with an Accounts / API-keys UX for signing in and storing credentials per provider"}, "not_seen": "docs words, not seen"},
+        {"text": "Go to Model, then Main model. Pick the company, then the model.", "src": {"file": "user-guide/desktop.md", "line": 288, "quote": "Choose a provider and model in their labeled rows"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 25, "quote": "Hermes's Settings on Model, Main model"}, "seen_note": "Seen: the button opens Settings on Model, Main model. Not seen: picking a company and a model there."},
+        {"text": "Click Apply under the model list.", "src": {"file": "user-guide/desktop.md", "line": 288, "quote": "then click **Apply** below the model selector"}, "not_seen": "docs words, not seen"},
+        {"text": "Check: open a new chat. The model's name shows in the typing box, left of the microphone.", "src": {"file": "user-guide/desktop.md", "line": 283, "quote": "The model picker lives in the **composer**, just left of the microphone."}, "not_seen": "docs words, not seen"}
+      ],
+      "terminal": {"when": "Same thing in a terminal.", "paste": [{"for": "any computer", "text": "hermes model", "src": {"file": "getting-started/quickstart.md", "line": 87, "quote": "hermes model"}}]},
+      "counts": true,
+      "done_rule": "Done when setup.runtime_check for the main bot returns ok: true. Hermes's own free model counts (Lead, 11 Nov). Not done when ok: false.",
+      "read": "setup.runtime_check {profile: main bot}",
+      "read_status": "ran in app (hhtech-dash-reads.md line 43)",
+      "box_words": "Model: {name}. When runtime_check.free_tier_route is true: Model: Nous · free tier (Hermes's own label, hhtech-model-display-name.md line 13).",
+      "known_case": "A person who pressed nothing is on Nous · free tier and shows done. True: Hermes can answer there.",
+      "card_name_was": "Pick a model (changed: on a fresh install this stop is done though the person picked nothing)",
+      "why_seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 9, "quote": "Hermes switched its free model on by itself"}
+    },
+    {
+      "id": "first_chat",
+      "order": 3,
+      "kind": "main",
+      "card_name": "First chat",
+      "why": "Ask Hermes one small thing, to see that it works.",
+      "sources": [
+        {"file": "getting-started/quickstart.md", "line": 182, "quote": "## 3. Run Your First Chat"}
+      ],
+      "steps": [
+        {"text": "Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).", "src": {"file": "user-guide/desktop.md", "line": 549, "quote": "**Cmd/Ctrl+N** new session"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-desk-usage.md", "line": 15, "quote": "the left list's top item \"New session\""}},
+        {"text": "Ask something small you can check yourself.", "src": {"file": "getting-started/quickstart.md", "line": 189, "quote": "Use a prompt that's specific and easy to verify"}, "not_seen": "docs words, not seen"},
+        {"text": "Check: Hermes answers, with no error.", "src": {"file": "getting-started/quickstart.md", "line": 210, "quote": "Hermes replies without error"}, "not_seen": "docs words, not seen"},
+        {"text": "Check: ask one more thing in the same chat. It carries on.", "src": {"file": "getting-started/quickstart.md", "line": 212, "quote": "The conversation continues normally for more than one turn"}, "not_seen": "docs words, not seen"},
+        {"text": "To come back: click Helper in the left list.", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 26, "quote": "Back only through the Helper row"}}
+      ],
+      "counts": false,
+      "done_rule": "Cannot be told. Hermes makes its own first chat (\"Getting started\") at first start, so a read says done for a person who typed nothing; older chats are missed (hhtech-dash-reads.md lines 13 to 14, 44).",
+      "read": "none trusted"
+    },
+    {
+      "id": "personality",
+      "order": 4,
+      "kind": "main",
+      "card_name": "Its personality",
+      "why": "A short text that tells your Hermes who it is and how to talk.",
+      "sources": [
+        {"file": "user-guide/features/personality.md", "line": 9, "quote": "`SOUL.md` is the **primary identity**"},
+        {"file": "user-guide/features/personality.md", "line": 33, "quote": "Hermes creates a starter `SOUL.md` automatically if one does not exist yet"}
+      ],
+      "steps": [
+        {"text": "Click Bots at the top of the left list.", "src": {"file": "user-guide/bot-mode.md", "line": 10, "quote": "It appears as a **Bots** tab next to Sessions in the left sidebar"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 12, "quote": "Bots tab, right-click the bot, \"Edit…\", \"Advanced — model, skills, toolsets, SOUL.md\", typed a personality, Save"}},
+        {"text": "Right-click your main bot, then click \"Edit…\".", "src": {"file": "user-guide/bot-mode.md", "line": 84, "quote": "**Edit Profile** (right-click a Bot) reopens the same surface on the live profile any time"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-reads2.md", "line": 70, "quote": "right-click \"Hermes\", menu item \"Edit…\""}, "note": "The docs say Edit Profile; the app shows Edit… and the window that opens is titled Edit profile (seen). In the home hhtech ran, the main bot's row was named Hermes."},
+        {"text": "Click the button \"Advanced — model, skills, toolsets, SOUL.md\".", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 12, "quote": "Bots tab, right-click the bot, \"Edit…\", \"Advanced — model, skills, toolsets, SOUL.md\", typed a personality, Save"}, "note": "The label is the app's own, dash included. Not in the docs."},
+        {"text": "The big box under the skills list is SOUL.md. Write who your bot is and how it talks.", "src": {"file": "user-guide/bot-mode.md", "line": 68, "quote": "the Bot's persona and standing instructions"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 64, "quote": "the text box has no label, it is the large box under the skills list; the button is \"Save\""}},
+        {"text": "Click Save. To come back: click Sessions at the top of the left list, then Helper.", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 64, "quote": "click \"Sessions\" at the top of the left list, then \"Helper\""}}
+      ],
+      "counts": true,
+      "done_rule": "Done when the main bot's SOUL.md is not empty and is not one of Hermes's starter texts (hermes_cli/default_soul.py, same normalising).",
+      "read": "profiles.describe {name: main bot}, field soul",
+      "read_status": "ran in app, right for all three test people (hhtech-dash-reads.md line 45). Risk: a new Hermes starter text reads as the person's own; fails toward done.",
+      "seen_whole": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 13, "quote": "\"4 of 6\"; You are here: Chat apps"},
+      "seen_whole_note": "hhtech followed these clicks by hand in a fresh home; afterwards the stop was filled and \"You are here\" moved on."
+    },
+    {
+      "id": "chat_apps",
+      "order": 5,
+      "kind": "main",
+      "card_name": "Chat apps",
+      "why": "Talk to your Hermes from Telegram or another chat app on your phone.",
+      "sources": [
+        {"file": "getting-started/quickstart.md", "line": 45, "quote": "Connect Telegram, Discord, Slack, or another platform"}
+      ],
+      "steps": [
+        {"text": "Click Messaging in the left list.", "src": {"file": "user-guide/desktop.md", "line": 487, "quote": "**Messaging** — set up gateway channels."}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 27, "quote": "the Messaging screen with the Telegram card"}},
+        {"text": "On the Telegram card, click Create with QR. Scan the code with Telegram on your phone.", "src": {"file": "user-guide/desktop.md", "line": 487, "quote": "Telegram has a **Quick setup** card: click **Create with QR**"}, "src2": {"file": "user-guide/desktop.md", "line": 487, "quote": "scan the code (or open the link) in Telegram"}, "note": "The Telegram card was seen; Create with QR was read in the app's source (hhtech-live-run2.md line 52), not pressed.", "not_seen": "docs words, not seen"},
+        {"text": "Hermes makes the bot, lets only you in, and restarts by itself.", "src": {"file": "user-guide/desktop.md", "line": 487, "quote": "Hermes creates the bot, detects your user ID for the allowlist, saves the credentials, and restarts the gateway for you."}, "not_seen": "docs words, not seen"},
+        {"text": "Check: send your new Telegram bot a message. It answers while this computer is on.", "src": {"file": "guides/team-telegram-assistant.md", "line": 27, "quote": "the bot needs to stay running"}, "not_seen": "docs words, not seen"},
+        {"text": "To come back: click Helper in the left list.", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 26, "quote": "Back only through the Helper row"}}
+      ],
+      "terminal": {"when": "For Discord, Slack, WhatsApp and the others the docs give a terminal command.", "paste": [{"for": "any computer", "text": "hermes gateway setup", "src": {"file": "getting-started/quickstart.md", "line": 264, "quote": "hermes gateway setup    # Interactive platform configuration"}}]},
+      "counts": true,
+      "done_rule": "Done when host.status().gateway_platforms names at least one chat app: Hermes lists one only when it is switched on and has its key (hhtech-dash-reads2.md lines 29 to 34). Reads the bot the app has open.",
+      "read": "host.status(), field gateway_platforms, at least one name",
+      "read_status": "ran in app: Telegram with a token listed, Telegram switched on without one not listed (hhtech-dash-reads2.md section 2)"
+    },
+    {
+      "id": "tools_apps",
+      "order": 6,
+      "kind": "main",
+      "card_name": "Tools and apps",
+      "why": "Actions Hermes can take, and outside apps like Gmail it can use.",
+      "sources": [
+        {"file": "user-guide/features/tools.md", "line": 13, "quote": "Tools are functions that extend the agent's capabilities."},
+        {"file": "user-guide/features/tool-gateway.md", "line": 124, "quote": "Connectors are hosted apps such as Gmail"}
+      ],
+      "steps": [
+        {"text": "Click Capabilities in the left list, then Tools. Each group of actions has a switch.", "src": {"file": "user-guide/features/tools.md", "line": 13, "quote": "organized into logical **toolsets** that can be enabled or disabled per platform"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-setup-read.md", "line": 141, "quote": "Tabs inside Capabilities: \"Skills\", \"Plugins\", \"Connectors\", \"Tools\"."}, "seen_note": "Seen: the tab names inside Capabilities. Not seen: the switches."},
+        {"text": "Most are on already. Switch one off only if you never want it used.", "src": {"file": "getting-started/quickstart.md", "line": 107, "quote": "everything starts **off** except the bare minimum"}, "note": "Quoted line says only the Blank Slate setup starts them off, so the others start on; reading, marked.", "not_seen": "docs words, not seen"},
+        {"text": "Click Connectors to link an app such as Gmail.", "src": {"file": "user-guide/features/tool-gateway.md", "line": 139, "quote": "The desktop app's **Connectors** page."}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-setup-read.md", "line": 141, "quote": "Tabs inside Capabilities: \"Skills\", \"Plugins\", \"Connectors\", \"Tools\"."}, "seen_note": "Seen: a tab named Connectors. Not seen: linking an app."},
+        {"text": "With no Nous account, linking your first app makes a free one for you.", "src": {"file": "user-guide/features/tool-search.md", "line": 187, "quote": "creates a free Nous identity for you"}, "not_seen": "docs words, not seen"}
+      ],
+      "counts": false,
+      "done_rule": "Cannot be told. Tools are on from the start, and which apps are linked is not readable by the page.",
+      "read": "none trusted"
+    },
+    {
+      "id": "skills",
+      "order": 7,
+      "kind": "main",
+      "card_name": "Skills",
+      "why": "Written know-how that teaches Hermes one task. Many come already installed.",
+      "sources": [
+        {"file": "getting-started/quickstart.md", "line": 295, "quote": "Skills are on-demand instruction documents that teach Hermes how to do a specific task"},
+        {"file": "getting-started/quickstart.md", "line": 297, "quote": "Hermes ships with a catalog of bundled skills already installed"}
+      ],
+      "steps": [
+        {"text": "Click Capabilities in the left list, then Skills. Each skill has a switch.", "src": {"file": "user-guide/desktop.md", "line": 483, "quote": "The Skills tab lists your installed skills with enable/disable toggles"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-setup-read.md", "line": 141, "quote": "Tabs inside Capabilities: \"Skills\", \"Plugins\", \"Connectors\", \"Tools\"."}, "seen_note": "Seen: the tab names inside Capabilities. Not seen: the switches."},
+        {"text": "To add one: Source, then Optional. Open the skill's card and click Install.", "src": {"file": "user-guide/desktop.md", "line": 483, "quote": "each entry has a one-click **Install** button"}, "seen": {"file": "/root/projects/helping-hand/docs/BRIEF.md", "line": 54, "quote": "Capabilities, Skills, Source, \"Optional\", the skill's card, Install"}},
+        {"text": "You don't need to add any first. Hermes picks a fitting skill by itself.", "src": {"file": "getting-started/quickstart.md", "line": 316, "quote": "the agent picks the right bundled skill on its own during normal conversation when a task matches one"}, "not_seen": "docs words, not seen"}
+      ],
+      "counts": false,
+      "done_rule": "Not a step with a done state: skills are there from the start.",
+      "read": "none"
+    },
+    {
+      "id": "memory",
+      "order": 8,
+      "kind": "main",
+      "card_name": "Memory",
+      "why": "Short notes Hermes keeps about you, so it remembers between chats.",
+      "sources": [
+        {"file": "user-guide/features/memory.md", "line": 9, "quote": "Hermes Agent has bounded, curated memory that persists across sessions."}
+      ],
+      "steps": [
+        {"text": "Nothing to switch on. Memory is on from the start.", "src": {"file": "user-guide/features/memory.md", "line": 288, "quote": "memory_enabled: true"}, "not_seen": "docs words, not seen"},
+        {"text": "In a chat, say what to keep, like: Remember that I run a tennis club.", "src": {"file": "user-guide/features/memory.md", "line": 166, "quote": "**Explicit requests:**"}, "not_seen": "docs words, not seen"},
+        {"text": "Check: start a new chat and ask what it remembers about you.", "src": {"file": "user-guide/features/memory.md", "line": 20, "quote": "injected into the system prompt as a frozen snapshot at session start"}, "not_seen": "docs words, not seen"},
+        {"text": "To see everything it keeps, type /journey in a chat.", "src": {"file": "user-guide/desktop.md", "line": 484, "quote": "type `/journey`"}, "not_seen": "docs words, not seen", "note": "/journey not checked in the app (hhtech-dash-run.md line 68)."}
+      ],
+      "counts": false,
+      "done_rule": "Cannot be told. It is on from the start; how much it holds is not readable (hhtech-setup-read.md line 26).",
+      "read": "none trusted"
+    },
+    {
+      "id": "scheduled_job",
+      "order": 9,
+      "kind": "main",
+      "card_name": "Scheduled jobs",
+      "why": "Hermes does a job for you at set times, like every morning.",
+      "sources": [
+        {"file": "getting-started/learning-path.md", "line": 80, "quote": "Cron jobs let Hermes Agent run tasks on a schedule"},
+        {"file": "getting-started/quickstart.md", "line": 273, "quote": "Cron — only after your bot or CLI setup is stable"}
+      ],
+      "steps": [
+        {"text": "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.", "src": {"file": "user-guide/features/cron.md", "line": 86, "quote": "Every morning at 9am, check Hacker News for AI news and send me a summary on Telegram."}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-setup-run.md", "line": 32, "quote": "I then asked Hermes's own chat for a job and it made one in 32 s"}, "seen_note": "Seen: a job asked for in Hermes's own chat was made (free model). Not seen: this exact sentence typed."},
+        {"text": "Check: open Scheduled jobs. The job Hermes made is there.", "src": {"file": "user-guide/desktop.md", "line": 485, "quote": "view and manage [scheduled jobs]"}, "src2": {"file": "user-guide/features/cron.md", "line": 24, "quote": "by asking in plain language — no CLI required"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 28, "quote": "the Scheduled jobs screen (#/cron), \"0 jobs\", blueprints, \"New cron\""}, "note": "Does not say \"in the left list\": Hermes shows that row only in Advanced mode (design/dash-r7/notes.md line 45, read in source). The button on this step opens the screen. \"The job Hermes made\" carries the old step 2 (cron.md 24)."},
+        {"text": "No job? Make one by hand: click New cron, type a name and the job, then Create cron.", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 12, "quote": "Scheduled jobs, \"New cron\", name and prompt, \"Create cron\""}}
+      ],
+      "after": {"text": "There you can also pause, change or delete a job.", "src": {"file": "user-guide/desktop.md", "line": 485, "quote": "actions (pause, resume, edit, delete)"}, "not_seen": "docs words, not seen", "note": "Was step 5. Not a step: nothing to do. The Dashboard may show it as one quiet line under the steps; the set-up conversation does not show it."},
+      "steps_were": ["In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.", "Hermes makes the job for you.", "Check: open Scheduled jobs. Your job is there.", "Or make one by hand there: click New cron, type a name and the job, then Create cron.", "There you can also pause, change or delete a job."],
+      "steps_changed": "2026-11-11 setup-chat changes-1: 5 steps to 3 (docs/answers/hhtech-setup-run.md lines 99 and 115). The same 3 steps show on the Dashboard.",
+      "counts": true,
+      "done_rule": "Done when the main bot has at least one scheduled job, paused ones included (Lead, 11 Nov).",
+      "read": "cron.manage {action: \"list\", profile: main bot, include_disabled: true}, count >= 1. Always pass profile.",
+      "read_status": "ran in app, right for all three test people (hhtech-dash-reads.md lines 15 to 19, 47)"
+    },
+    {
+      "id": "second_bot",
+      "order": 10,
+      "kind": "main",
+      "card_name": "A second bot",
+      "why": "A bot is one separate Hermes, with its own name, memory and skills.",
+      "sources": [
+        {"file": "user-guide/bot-mode.md", "line": 8, "quote": "Each Bot has its own role, model, memory, skills, and avatar"},
+        {"file": "user-guide/bot-mode.md", "line": 13, "quote": "a Bot **is** a Hermes profile"},
+        {"file": "getting-started/learning-path.md", "line": 83, "quote": "### \"I want a team of specialist Bots\""}
+      ],
+      "steps": [
+        {"text": "Click Bots at the top of the left list.", "src": {"file": "user-guide/bot-mode.md", "line": 10, "quote": "It appears as a **Bots** tab next to Sessions in the left sidebar"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 12, "quote": "Bots tab, right-click the bot, \"Edit…\", \"Advanced — model, skills, toolsets, SOUL.md\", typed a personality, Save"}},
+        {"text": "Press + (New bot or group chat), then New bot.", "src": {"file": "user-guide/bot-mode.md", "line": 61, "quote": "Hit **New Agent** in the roster."}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-talk-v2.md", "line": 44, "quote": "a \"+\" button (screen-reader name \"New bot or group chat\"), then a menu with \"New bot\""}, "note": "The docs say New Agent; the app shows New bot (seen)."},
+        {"text": "Fill in its Name, Title and Description, then click Create Bot.", "src": {"file": "user-guide/bot-mode.md", "line": 61, "quote": "three fields — **Name**, **Title**, **Description**"}, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-talk-v2.md", "line": 44, "quote": "\"New bot\" opens a box titled \"New bot\" with Name, Title, Description and a \"Create Bot\" button"}, "seen_note": "The box and its button were seen; hhtech did not report pressing Create Bot."},
+        {"text": "Check: the new bot says hello in its own chat.", "src": {"file": "user-guide/bot-mode.md", "line": 61, "quote": "introducing itself as the first message of its new Bot Chat"}, "not_seen": "docs words, not seen"},
+        {"text": "To come back: click Sessions at the top of the left list, then Helper.", "src": null, "seen": {"file": "/root/projects/helping-hand/docs/answers/hhtech-dash-run.md", "line": 64, "quote": "click \"Sessions\" at the top of the left list, then \"Helper\""}}
+      ],
+      "counts": true,
+      "done_rule": "Done when there are 2 or more bots.",
+      "read": "profiles.list, number of rows >= 2",
+      "read_status": "ran in app, right for 1, 3 and 30 bots (hhtech-dash-reads.md line 62)"
+    },
+    {
+      "id": "safety",
+      "order": 11,
+      "kind": "main",
+      "card_name": "Safety",
+      "why": "Hermes asks you first before it runs anything risky on your computer.",
+      "sources": [
+        {"file": "user-guide/security.md", "line": 26, "quote": "If a match is found, the user must explicitly approve it."},
+        {"file": "getting-started/learning-path.md", "line": 163, "quote": "**Setting up for a team?** → Read [Security]"}
+      ],
+      "steps": [
+        {"text": "Nothing to switch on. Asking first is on from the start.", "src": {"file": "user-guide/security.md", "line": 59, "quote": "| **smart** (default) |"}, "not_seen": "docs words, not seen"},
+        {"text": "When Hermes asks, read what it wants to run. Then say yes or no.", "src": {"file": "user-guide/security.md", "line": 26, "quote": "the user must explicitly approve it"}, "not_seen": "docs words, not seen"},
+        {"text": "Keep YOLO off. It is a switch in the bar under the chat that stops the asking.", "src": {"file": "user-guide/desktop.md", "line": 248, "quote": "YOLO bypasses the dangerous-command approval prompts, so know what you're turning off"}, "not_seen": "docs words, not seen", "note": "YOLO in the bar under the chat not checked in the app (hhtech-dash-run.md line 68)."},
+        {"text": "In a chat app, only people on its allowed list can talk to it.", "src": {"file": "user-guide/security.md", "line": 15, "quote": "who can talk to the agent (allowlists, DM pairing)"}, "not_seen": "docs words, not seen"},
+        {"text": "These choices live in Settings, Safety.", "src": {"file": "user-guide/desktop.md", "line": 470, "quote": "**Model, Workspace, Safety, Memory & Context"}, "not_seen": "docs words, not seen"}
+      ],
+      "counts": false,
+      "done_rule": "Cannot be told. It is on from the start; the setting sits only in the settings file, which the page does not read (it can hold keys).",
+      "read": "none"
+    }
+  ],
+  "later": [
+    {"id": "mcp", "name": "MCP servers", "line": "A way to plug in outside tools, like GitHub or a database.", "src": {"file": "user-guide/features/mcp.md", "line": 13, "quote": "connect to external tool servers"}},
+    {"id": "plugins", "name": "Plugins", "line": "Add-ons that give Hermes new tools and features.", "src": {"file": "user-guide/features/plugins.md", "line": 10, "quote": "Hermes has a plugin system for adding custom tools, hooks, and integrations"}},
+    {"id": "voice", "name": "Voice", "line": "Talk to Hermes out loud and hear it answer.", "src": {"file": "user-guide/features/voice-mode.md", "line": 9, "quote": "Talk to the agent using your microphone, hear spoken replies"}},
+    {"id": "group_chats", "name": "Bot group chats", "line": "Several bots talk together in one chat.", "src": {"file": "user-guide/bot-mode.md", "line": 8, "quote": "deliberate together in group chats"}},
+    {"id": "subagents", "name": "Subagents", "line": "Hermes hands parts of a big job to helper copies of itself.", "src": {"file": "user-guide/features/delegation.md", "line": 9, "quote": "spawns child AIAgent instances with isolated context"}},
+    {"id": "kanban", "name": "Kanban", "line": "A shared task board where several bots pass work to each other.", "src": {"file": "user-guide/features/kanban.md", "line": 11, "quote": "Hermes Kanban is a durable task board, shared across all your Hermes profiles"}},
+    {"id": "sandbox", "name": "Sandbox", "line": "Hermes runs its commands inside a closed box, for safety.", "src": {"file": "getting-started/quickstart.md", "line": 277, "quote": "For safety, run the agent in a Docker container or on a remote server:"}},
+    {"id": "fallback", "name": "Backup model", "line": "A second AI that takes over when the first one fails.", "src": {"file": "getting-started/quickstart.md", "line": 47, "quote": "I want multi-provider fallback"}},
+    {"id": "web_access", "name": "Phone access", "line": "Open your Hermes app from your phone's browser.", "src": {"file": "user-guide/desktop.md", "line": 130, "quote": "**Settings → Web Access** turns the Webapp on for other devices"}},
+    {"id": "move", "name": "Move or back up", "line": "Take your whole setup to another computer.", "src": {"file": "getting-started/quickstart.md", "line": 397, "quote": "`hermes backup` migrates your whole setup"}},
+    {"id": "editor", "name": "Code editor", "line": "Use Hermes inside a code editor. For people who write code.", "src": {"file": "getting-started/quickstart.md", "line": 332, "quote": "### Editor integration (ACP)"}}
+  ],
+  "dashboard_numbers": {
+    "bots": "profiles.list, number of rows. Whole Hermes.",
+    "skills": "Different skill names across all bots (host.skills.list per bot). Whole Hermes.",
+    "plugins": "The open bot only: plugins.manage list rows that are switched on (status enabled; Lead, 11 Nov: switched-off ones are not counted) plus 1 for Helper. Changes when the open bot changes, so its label says \"this bot\".",
+    "activity": "The open bot only: host.listPersistedSessions. Its title says \"this bot\".",
+    "count": "Four of the six counted things read the main bot (model, personality, scheduled jobs; a second bot reads the list of bots); Chat apps reads the open bot; Install is always done. No word on the tab says this yet (gap, for Lead).",
+    "dropped": "chats in 30 days and \"days with a chat\" (his words, inputs/pb-words-11nov-dash-r6-reply.md)."
+  },
+  "step_marks": "Every step has either \"seen\" (a team file where that screen or label was seen in the running app, Desktop v0.23.0, Linux) or \"not_seen\": \"docs words, not seen\". A \"seen\" covers the labels named in the step, not that a person followed it to the end.",
+  "words_file": "content/dash-words-v1.json holds every other word on the Dashboard tab (page_words)."
+}

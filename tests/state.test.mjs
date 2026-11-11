@@ -3,24 +3,25 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import { readState, STEP_COUNT, STORED_KEYS } from '../src/state.js'
+import { readState, STORED_KEYS, TAB_IDS } from '../src/state.js'
+import { PARKED } from '../scripts/build.mjs'
 
 const store = obj => (k, d) => (k in obj ? obj[k] : d)
 
-test('first open: Setup tab, step 1, no answers yet, Helper\'s window 460 px wide', () => {
-  assert.deepEqual(readState(store({})), { tab: 'setup', step: 1, answers: {}, helperWidth: 460 })
+// dash-v1: the tabs are Dashboard, Learn and My setup; the first build's step and answers are no longer read
+test('first open: the Dashboard tab, Helper\'s window 460 px wide', () => {
+  assert.deepEqual(TAB_IDS, ['dashboard', 'learn', 'my_setup'])
+  assert.deepEqual(readState(store({})), { tab: 'dashboard', helperWidth: 460 })
 })
 
 test('remembered values come back, the dragged width too', () => {
-  const s = readState(store({ tab: 'yours', step: 3, answers: { s1: 'o_phone', s2: 'o_key' }, helperWidth: 512 }))
-  assert.deepEqual(s, { tab: 'yours', step: 3, answers: { s1: 'o_phone', s2: 'o_key' }, helperWidth: 512 })
+  for (const tab of TAB_IDS) assert.deepEqual(readState(store({ tab, helperWidth: 512 })), { tab, helperWidth: 512 })
 })
 
-test('junk in storage falls back to the defaults; a width outside 360 to 600 is brought inside', () => {
+test('junk in storage falls back to the defaults; a width outside 360 to 600 is brought inside; the first build\'s tabs open the Dashboard', () => {
   const s = readState(store({ tab: 'x', step: 99, answers: 'o_phone', helperWidth: 'wide' }))
-  assert.deepEqual(s, { tab: 'setup', step: 1, answers: {}, helperWidth: 460 })
-  assert.equal(readState(store({ step: 0 })).step, 1)
-  assert.equal(readState(store({ step: STEP_COUNT })).step, STEP_COUNT)
+  assert.deepEqual(s, { tab: 'dashboard', helperWidth: 460 })
+  for (const tab of ['setup', 'yours']) assert.equal(readState(store({ tab })).tab, 'dashboard')
   assert.equal(readState(store({ helperWidth: 90 })).helperWidth, 360)
   assert.equal(readState(store({ helperWidth: 4000 })).helperWidth, 600)
   assert.equal(readState(store({ helperWidth: 400.6 })).helperWidth, 401)
@@ -28,18 +29,20 @@ test('junk in storage falls back to the defaults; a width outside 360 to 600 is 
 
 test('what the old helper header stored (side, hidden or closed, chat log) is no longer read', () => {
   const s = readState(store({ side: 'left', helper: 'closed', chatlog: true }))
-  assert.deepEqual(Object.keys(s).sort(), ['answers', 'helperWidth', 'step', 'tab'])
+  assert.deepEqual(Object.keys(s).sort(), ['helperWidth', 'tab'])
 })
 
 test('every key the plugin stores is on the allowed list: about the person, only the one record of what Helper keeps', () => {
-  // The allowed list: the page's own state, the answer to the memory test on Your setup, and
+  // The allowed list: the page's own state, and
   // 'kept', the record of what Helper keeps by fixed rules (src/kept.js; talk v2 row 3), and 'met'
   // (changes-14: Helper has said hello; true or nothing, never removed).
-  assert.deepEqual([...STORED_KEYS].sort(), ['answers', 'helperWidth', 'kept', 'met', 'remember', 'step', 'tab'])
+  // (dash-v1: the Dashboard stores nothing; the step list's step and answers left with it)
+  assert.deepEqual([...STORED_KEYS].sort(), ['helperWidth', 'kept', 'met', 'tab'])
   const dir = path.resolve(import.meta.dirname, '..', 'src')
   const found = new Set()
   let calls = 0
-  for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js'))) {
+  // (dash-v1: the parked files are not in the built plugin, so not read here; the parked Your setup stored 'remember')
+  for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js') && !PARKED.includes(x))) {
     const src = fs.readFileSync(path.join(dir, f), 'utf8')
     for (const m of src.matchAll(/storage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) {
       calls++
@@ -74,12 +77,9 @@ test('every key the plugin stores is on the allowed list: about the person, only
   assert.doesNotMatch(built, /localStorage|sessionStorage|indexedDB|document\s*\.\s*cookie|caches\s*\.\s*open|navigator\s*\.\s*storage/)
 })
 
-test('answers keep only real options of real steps (an old or made-up id is dropped)', () => {
-  const s = readState(store({ answers: { s1: 'o_tasks', s2: 'o_tasks', s9: 'o_keep', s3: 42, s4: 'o_enough' } }))
-  assert.deepEqual(s.answers, { s1: 'o_tasks', s4: 'o_enough' })
-  assert.deepEqual(readState(store({ answers: ['o_tasks'] })).answers, {})
-})
-
-test('four steps, from the step data', () => {
-  assert.equal(STEP_COUNT, 4)
+test('the Dashboard keeps nothing about the person\'s bots between visits: src/dash.js and src/dash-rules.js never touch storage', () => {
+  for (const f of ['dash.js', 'dash-rules.js']) {
+    const src = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'src', f), 'utf8')
+    assert.doesNotMatch(src, /storage/, f)
+  }
 })

@@ -10,31 +10,33 @@
 // Look: the left side wears Hermes's own UI kit components and the class strings its own screens
 // use (K in src/look.js). Helper's window has the one style sheet of our own (src/talk.css, the T
 // table), put into a <style> element inside our own page.
-import { host, Button, Codicon, RowButton, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
+import { host, Button, Codicon, Textarea, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
-import { K, T, cx } from './look.js'
+import { K, T, cx, TAB_LOOK, TAB_LOOKS } from './look.js'
 import { TALK_CSS } from './talk-css.js'
 import { Character } from './character.js'
 import { RISE, expressionFor, asksQuestion, makeBusy } from './expressions.js'
 import { makeEyes } from './eyes.js'
 import { makeRevealClock, wordsOf } from './reveal.js'
 import { prefersReducedMotion, watchReducedMotion } from './motion.js'
-import { readState } from './state.js'
+import { readState, TAB_IDS } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
-import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
-import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
+import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
+import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
+import { recInstructions, judgeRec, askRec } from './setup-rec.js'
+import { AI_MODE } from './ai-mode.js'
+import { setupTyped, setupPress, setupAfter, setupStepOpen, setupOpening, setupAskMove, setupRestartMove } from './setup-chat.js'
+import { makeLook, LOOK_UNSEEN } from './setup-look.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
-import { makeSetupCards, renderYourSetup } from './setup-tab.js'
-import { layoutFor, clampHelperWidth, RAIL_PX, RAIL_NUMBERS_PX, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
+import { makeDashboard, DASH_COMPACT_UNDER_PX, openHermesDocs } from './dash.js'
+import { DASH_DATA } from './dash-data.js'
+import { layoutFor, clampHelperWidth, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
 
-// Column widths (layout only; every colour, font and line comes from Hermes's classes).
-const RAIL_WIDTH = `${RAIL_PX}px`
-const RAIL_NUMBERS_WIDTH = `${RAIL_NUMBERS_PX}px`
 // One press of an arrow key on the edge to drag moves it this far.
 const GRIP_KEY_PX = 16
 // Keys that are not typing by themselves: pressing one alone does not end the word-by-word reveal.
@@ -42,10 +44,9 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-export const TABS = [
-  { id: 'setup', label: 'Setup' },
-  { id: 'yours', label: 'Your setup' }
-]
+// dash-v1: three tabs, Dashboard, Learn, My setup (Pēteris's pick, 11 Nov 2026); their names from the Dashboard's
+// data (content/dash-setup-list-v2.json page_words). Only Dashboard is built: Learn and My setup show one quiet line.
+export const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
 // function is made once, so React doesn't detach and re-attach it on every render; React calls it
@@ -85,7 +86,7 @@ export function makePage(ctx, opts = {}) {
   // clock = which words of Helper's lines are visible (a line is revealed once, then stays whole).
   const busy = makeBusy()
   const clock = makeRevealClock({ setInterval: (fn, ms) => ctx.setInterval(fn, ms) })
-  const useSetupCards = makeSetupCards(ctx, { busy })
+  const { useDashboard, renderDashboard } = makeDashboard(ctx)
   const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
@@ -116,7 +117,18 @@ export function makePage(ctx, opts = {}) {
       // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
       const metStored = readMet()
       memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
-      memory.log = [helperEntry(openingLine(memory.visit))]
+      memory.log = saidEntries(openingLine(memory.visit), true)
+      // setup-chat: a later visit opens with the set-up conversation's returning line (BACK_REC, BACK_Q ...). It is said
+      // at once from what is kept, as if nothing could be read; the page then reads Hermes (the look) and, when the
+      // person has done nothing yet and the reads change the line (the thing is now done: BACK_DONE), says that instead.
+      // What the first, unread line would keep is not kept.
+      if (SETUP_BUILT && memory.visit.met) {
+        const before = JSON.stringify(memory.visit.kept)
+        memory.log = setupOpening(memory.visit, LOOK_UNSEEN).flatMap(setupEntries)
+        memory.opening = { kept: before, ids: memory.log.map(e => e.id) }
+        for (const k of Object.keys(memory.visit.kept)) delete memory.visit.kept[k]
+        Object.assign(memory.visit.kept, JSON.parse(before))
+      }
       writeKept()
     }
     return memory
@@ -125,6 +137,10 @@ export function makePage(ctx, opts = {}) {
   const rereadKept = () => {
     const m = remembered()
     const kept = readKept()
+    // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
+    // questions again", or each row deleted): the conversation starts the questions again (RESTART)
+    const had = k => ['setup_new', 'setup_goal', 'setup_current'].some(x => k[x])
+    if (SETUP_BUILT && had(m.visit.kept) && !had(kept)) m.setupRestart = true
     for (const k of Object.keys(m.visit.kept)) delete m.visit.kept[k]
     Object.assign(m.visit.kept, kept)
     m.stored = JSON.stringify(keptToStore(kept))
@@ -153,6 +169,35 @@ export function makePage(ctx, opts = {}) {
     return { id, key: `h${id}`, who: 'helper', opened: false, ...said }
   }
   const youEntry = text => ({ id: memory.nextId++, who: 'you', text })
+  // offer-t1: what Helper says for one result, as the entries of the conversation: its line and, when the line carries
+  // an offer, a second bubble with the offer's question, whose things to pick show in the message box as every other
+  // pick. send: whether the line may ever be sent to the AI; the offer's question never is. ask-fix-t1 (PICK_FIRST):
+  // the things to pick of the line before stay under it.
+  const saidEntries = (said, send) => {
+    const { offer, samePicks, ...line } = said
+    if (samePicks) {
+      const last = [...memory.log].reverse().find(e => e.who === 'helper')
+      if (last && last.answers) line.answers = last.answers
+    }
+    const out = [{ ...helperEntry(line), send }]
+    if (offer) out.push({ ...helperEntry({ line: 'offer-' + offer.set, text: offer.text, source: null, answers: offer.answers, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false, offer: true })
+    return out
+  }
+
+  // setup-chat: one line of the set-up conversation (src/setup-chat.js) as the entries of the conversation. Nothing
+  // of the set-up conversation is ever among the lines sent to the AI (send: false). A line that ends with an offer
+  // (NOT_NOW, ALL_DONE, BACK) gets the offer's bubble under it.
+  const setupEntries = s => {
+    const { setupOffer, rec, recBy, pasteLabel, ...line } = s
+    const out = [{ ...helperEntry(line), send: false }]
+    if (setupOffer) {
+      const offer = offerSaid(setupOffer, memory.visit)
+      out.push({ ...helperEntry({ line: 'offer-' + offer.set, text: offer.text, source: null, answers: offer.answers, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }), send: false, offer: true })
+    }
+    return out
+  }
+  // The look: Helper reads what is set up, on this computer (src/setup-look.js). No AI call, nothing sent.
+  const look = makeLook(ctx, host)
 
   /* ---------- talk-live: Helper's AI step (src/live-turn.js; none at all when AI_MODE is no_ai_step) ---------- */
   // Kept while the plugin is loaded, like the conversation: the turn that waits for the person's AI (one at a
@@ -173,8 +218,25 @@ export function makePage(ctx, opts = {}) {
     }
     return out.filter(s => typeof s === 'string' && s.trim())
   }
+  // setup-chat: after the ordinary talk answered a message typed in place of an answer to Q_NEW or Q_GOAL, the line
+  // that asks that question again, once (SETUP_REASK, SETUP_REASK_GOAL); not after the lines that ask it themselves
+  // setup-chat-2 (changes-1 STEP_BACK): while a step is open, after every answer of the ordinary talk, typed or picked,
+  // the step again with its own answers ("Back to step 2 of 5: ..."), in place of that answer's offer; an answer with
+  // things of its own to pick keeps them, and the step comes back after the answer to those (src/setup-chat.js).
+  // Returns [the answer's line as it is to be shown, the entries after it].
+  const setupAfterSaid = (result, said, typed) => {
+    if (!SETUP_BUILT || !result || ['F1', 'F2', 'F3', 'WORK_SECRET', 'WORK_LONG', 'WORK_LONG_2', 'WORK_ASK', 'K1', 'OPEN'].includes(result.kind)) return [said, []]
+    const step = setupStepOpen(memory.visit)
+    if (!step && !typed) return [said, []]
+    const again = setupAfter(memory.visit, { picks: !!said.answers })
+    if (!again) return [said, []]
+    return [again.line === 'STEP_BACK' ? { ...said, offer: null } : said, setupEntries(again)]
+  }
   // The waiting turn ends: with the AI's line (final) or its no-AI line. Only once, and only if it still waits.
-  const liveFinish = (w, final) => {
+  // quiet (setup-chat-2): the person did something else meanwhile (liveClose), so no set-up line follows this answer:
+  // what they did next is answered at once and brings its own (a step answer typed then must not get "Back to step"
+  // in front of it)
+  const liveFinish = (w, final, quiet = false) => {
     if (live.waiting !== w) return
     live.waiting = null
     w.stopTimer()
@@ -182,8 +244,8 @@ export function makePage(ctx, opts = {}) {
     const result = final || w.out
     const said = lineFor(result, memory.visit, w.typed, { settingsPage, keptShown: keptWasShown(memory.log) })
     writeKept()
-    const entry = { ...helperEntry(said), send: w.sendHelper }
-    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), entry, ...slowAfter(said)].slice(-LOG_MAX)
+    const [shown, after] = quiet ? [said, []] : setupAfterSaid(result, said, w.typed)
+    memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...saidEntries(shown, w.sendHelper), ...slowAfter(said), ...after].slice(-LOG_MAX)
     if (live.view) {
       live.view.setLog(memory.log)
       live.view.setFocusAsk(true)
@@ -192,31 +254,36 @@ export function makePage(ctx, opts = {}) {
   // live-v2 changes-5: the visit's first AI call (w.firstTurn: the first message that went to the AI, its one or two
   // calls) gave no answer in 12 s or gave no_reply text: the AI step is off for the rest of the visit and SLOW_A is owed,
   // once. A later message whose call fails so only turns the AI step off.
+  // setup-chat (hhtech-live-run2, For builder 2; Lead's points 15 and 16): SLOW_A is owed to the written answer that
+  // replaced the slow one, so it shows right after that answer or not at all in this visit: when the turn was already
+  // closed (the person moved on before the 12 s) it is dropped, never hung under a later, unrelated line.
   const slowFail = w => {
     memory.visit.aiOff = true
-    if (w.firstTurn && memory.visit.slow !== 'said') memory.visit.slow = 'due'
+    if (w.firstTurn && !memory.visit.slow) memory.visit.slow = live.waiting === w ? 'due' : 'dropped'
   }
   // The entry of SLOW_A right after the line just said, when it is owed and may follow that line (src/live-turn.js
   // slowFollows); it is then said for this visit. It is never sent to the AI (no call follows it in this visit).
+  // Called only for the written answer of the turn that failed (liveFinish): when SLOW_A may not follow that answer (a
+  // don't-know line, a question, things to pick or an offer, a paste box), it is dropped for this visit.
   const slowAfter = said => {
-    if (!slowFollows(memory.visit, said)) return []
+    if (memory.visit.slow !== 'due') return []
+    if (!slowFollows(memory.visit, said)) {
+      memory.visit.slow = 'dropped'
+      return []
+    }
     memory.visit.slow = 'said'
     return [{ ...helperEntry(SLOW_LINE), send: false }]
   }
   // Something the person does while a turn waits (a new message, Skip, a button that makes Helper speak): the
   // waiting message gets its no-AI line at once (content/helper-talk-live-v2.json order.fallback.one_at_a_time).
   const liveClose = () => {
-    if (live.waiting) liveFinish(live.waiting, null)
+    if (live.waiting) liveFinish(live.waiting, null, true)
+    // setup-chat: a move of the set-up conversation that still waits for the look is answered at once from what was
+    // read last (or as "couldn't check"), and a recommendation that still waits for the AI's sentence gets its
+    // written one at once: every message is answered, in order, before the next thing the person does
+    if (memory && memory.lookWait) memory.lookWait()
+    if (memory && memory.recWait) memory.recWait(null)
   }
-  // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
-  const openDocs = url => {
-    if (!isDocsUrl(url)) return
-    try {
-      const done = ctx.os && typeof ctx.os.openExternal === 'function' ? ctx.os.openExternal(url) : null
-      if (done && typeof done.catch === 'function') done.catch(() => {})
-    } catch {}
-  }
-
   function useModelStatus() {
     const fresh = lastCheck && Date.now() - lastCheck.at < RECHECK_AFTER_MS
     const [status, setStatus] = useState(() => (fresh ? lastCheck.result : { state: 'checking' }))
@@ -253,8 +320,6 @@ export function makePage(ctx, opts = {}) {
   return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
     const [tab, setTab] = useState(initial.tab)
-    const [step, setStep] = useState(initial.step)
-    const [answers, setAnswers] = useState(initial.answers)
     // The width the person dragged Helper's window to (remembered), and whether Helper is folded
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
@@ -297,7 +362,9 @@ export function makePage(ctx, opts = {}) {
     const [focusStrip, setFocusStrip] = useState(false)
     const [size, measureRef] = useOwnSize()
     const width = size.width
-    const [modelStatus, recheck] = useModelStatus()
+    const [modelStatus] = useModelStatus()
+    // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
+    const dashboard = useDashboard({ active: tab === 'dashboard' })
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
     // (review) the page drawn last holds the view; a page that leaves lets go only of its own
@@ -310,7 +377,6 @@ export function makePage(ctx, opts = {}) {
       },
       []
     )
-    const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
     // The conversation's scrolling area: kept at the bottom, where the newest words are.
     const helperScroll = useRef(null)
@@ -331,9 +397,8 @@ export function makePage(ctx, opts = {}) {
       ctx.storage.set(key, value)
     }
     const saveTab = keep('tab', setTab)
-    const saveStep = keep('step', setStep)
 
-    // The message box takes the keyboard when asked to (a pick, "Ask about this step", Helper
+    // The message box takes the keyboard when asked to (a pick, Helper
     // opened from its strip); a request that finds no box is dropped, so it can't steal focus later.
     useEffect(() => {
       if (!focusAsk) return
@@ -366,11 +431,10 @@ export function makePage(ctx, opts = {}) {
       if (folded && !fit.narrow) setFolded(false)
     }, [width])
 
-    const currentStep = stepByNumber(step) || STEPS[0]
     const helperShown = fit.helper !== 'strip'
 
     // Puts Helper away or brings it back, with the keyboard following (to the strip, or to the
-    // message box). The strip, Escape and "Ask about this step" all go through it; only the
+    // message box). The strip and Escape go through it; only the
     // unfolding by a wider window (the effect above) sets the state itself, and moves no focus.
     function foldHelper(away) {
       setFolded(away)
@@ -455,16 +519,133 @@ export function makePage(ctx, opts = {}) {
     }
     // Helper's answer to something the person did. shown: the person's side of it, as their message.
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
-    function answer(result, shown, typed = '') {
+    // pressed: shown is the label of a button or pick the person pressed, not their words: never sent to the AI as
+    // "Person: ..." (hhtech-live-run: "Person: Skip")
+    function answer(result, shown, typed = '', pressed = false) {
       if (!result) return
       // live-v2 changes-2: the conversation shows that something was kept (src/talk.js keptWasShown)
       const said = lineFor(result, visit, typed, { settingsPage, keptShown: keptWasShown(memory.log) })
       writeKept()
       // talk-live: each line notes whether it may ever be sent to the AI (src/live-request.js sendable)
       const may = sendable(result)
-      addToLog([shown ? { ...youEntry(shown), send: may.you } : null, { ...helperEntry(said), send: may.helper }, ...slowAfter(said)].filter(Boolean))
+      const [line, after] = setupAfterSaid(result, said, typed)
+      addToLog([shown ? { ...youEntry(shown), send: pressed ? false : may.you } : null, ...saidEntries(line, may.helper), ...after].filter(Boolean))
       setFocusAsk(true)
     }
+
+    // setup-chat: one move of the set-up conversation (src/setup-chat.js): the person's side shows at once; when the
+    // move needs the look, Hermes is read first (no AI call; the character shows busy meanwhile), then Helper's lines.
+    function runSetup(mv, shown) {
+      liveClose()
+      memory.opening = null
+      if (shown) addToLog([{ ...youEntry(shown), send: false }])
+      const finish = seen => {
+        const says = mv.go(seen)
+        writeKept()
+        const put = list => {
+          memory.log = [...memory.log.map(e => (e.opened ? { ...e, opened: false } : e)), ...list.flatMap(setupEntries)].slice(-LOG_MAX)
+          if (live.view) {
+            live.view.setLog(memory.log)
+            live.view.setFocusAsk(true)
+          }
+        }
+        // setup-chat point 6: only the recommendation's sentence may be the AI's. One call, at most 12 s (the dots
+        // show meanwhile: the person's message is still the newest line); the reply stands only when it passes
+        // no_reply, c26, the name check and s1 to s8 (src/setup-rec.js); else the written sentence, and nothing says
+        // so. No call: with no AI step, with no model ready, after a call failed in this visit, or while Hermes
+        // still works on an earlier call of Helper's.
+        // (only where the AI writes, ai_writes: with ai_picks_line the AI only ever picks one of Helper's lines)
+        const i = SETUP_AI_BUILT && AI_MODE === 'ai_writes' && shown ? says.findIndex(s => s.rec) : -1
+        if (i < 0 || visit.aiOff === true || !live.status || live.status.state !== 'ok' || live.inHermes > 0) return put(says)
+        const names = [visit.name, visit.kept.name]
+        const instructions = recInstructions(says[i].rec, visit.kept, seen, names)
+        const first = !visit.aiTried
+        visit.aiTried = true
+        const off = () => {
+          visit.aiOff = true
+          // the slow-AI line may not follow a line with things to pick, so it is dropped for this visit (as after any
+          // such answer), never hung under a later line
+          if (first && !visit.slow) visit.slow = 'dropped'
+        }
+        let ended = false
+        const endBusy = busy.begin()
+        const end = text => {
+          if (ended) return
+          ended = true
+          stop()
+          endBusy()
+          memory.recWait = null
+          put(says.map((s, k) => (k === i && text ? { ...s, text: text + s.text.slice(s.text.lastIndexOf(' Want the steps?')), recBy: 'ai' } : s)))
+        }
+        const stop = ctx.setTimeout(() => {
+          off()
+          end(null)
+        }, LIVE_SECONDS * 1000)
+        memory.recWait = end
+        live.inHermes++
+        Promise.resolve()
+          .then(() => askRec((method, params, timeout) => host.request(method, params, timeout), instructions))
+          .then(
+            res => {
+              const j = judgeRec(res && res.text, says[i].rec.item, names, instructions)
+              if (j.noReply) off()
+              end(j.text || null)
+            },
+            () => {
+              off()
+              end(null)
+            }
+          )
+          .finally(() => {
+            live.inHermes--
+          })
+      }
+      if (!mv.look) return finish(memory.seen || LOOK_UNSEEN)
+      const endLook = busy.begin()
+      let looked = false
+      const once = seen => {
+        if (looked) return
+        looked = true
+        memory.lookWait = null
+        endLook()
+        finish(seen)
+      }
+      // the person does something else before the reads are back (see liveClose)
+      memory.lookWait = () => once(memory.seen || LOOK_UNSEEN)
+      look().then(seen => {
+        memory.seen = seen
+        once(seen)
+      })
+    }
+    // setup-chat: "Ask me the set-up questions again" was pressed on Helper's settings page (see rereadKept)
+    useEffect(() => {
+      if (!memory.setupRestart) return
+      memory.setupRestart = false
+      runSetup(setupRestartMove(visit), null)
+    }, [])
+    // setup-chat: the opening of a later visit, once the look has come back (see remembered())
+    useEffect(() => {
+      const o = memory.opening
+      if (!SETUP_BUILT || !o || o.started) return
+      o.started = true
+      look().then(seen => {
+        memory.seen = seen
+        if (memory.opening !== o) return
+        memory.opening = null
+        // only while the opening lines are still all there is
+        if (memory.log.length !== o.ids.length || memory.log.some((e, i) => e.id !== o.ids[i])) return
+        const was = memory.log.map(e => [e.line, e.text])
+        for (const k of Object.keys(visit.kept)) delete visit.kept[k]
+        Object.assign(visit.kept, JSON.parse(o.kept))
+        visit.setup = undefined
+        visit.lastOffer = null
+        const entries = setupOpening(visit, seen).flatMap(setupEntries)
+        writeKept()
+        if (JSON.stringify(entries.map(e => [e.line, e.text])) === JSON.stringify(was)) return
+        memory.log = entries
+        if (live.view) live.view.setLog(memory.log)
+      })
+    }, [])
 
     // The message box: Send or Enter (Shift+Enter makes a new line). Code decides the answer
     // (src/talk.js): a pasted key first, on the full text. A key is never shown back or kept.
@@ -476,8 +657,18 @@ export function makePage(ctx, opts = {}) {
       if (!typed.trim()) return
       setDraft('')
       liveClose()
-      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null }
-      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper')
+      // setup-chat: an answer to the set-up conversation's open question, a step word, "what should I set up first",
+      // "start again": taken by its fixed rules, with no AI call
+      if (SETUP_BUILT) {
+        const mv = setupTyped(typed, visit, hasTopicWord)
+        if (mv) {
+          const cs = Array.from(typed.trim())
+          return runSetup(mv, cs.length > MAX_INPUT_CHARS ? cs.slice(0, MAX_INPUT_CHARS).join('') + '…' : cs.join(''))
+        }
+      }
+      const before = { last: visit.last, lastKey: visit.lastKey, liveRows: visit.liveRows || null, lastAnswer: visit.lastAnswer || null, lastAnswerKey: visit.lastAnswerKey || null, lastOffer: visit.lastOffer || null, lastTopic: visit.lastTopic || null }
+      // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
+      const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
       const lines = lastLines(memory.log, keptValues())
       const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
@@ -521,11 +712,24 @@ export function makePage(ctx, opts = {}) {
         } catch (err) {
           p = Promise.reject(err)
         }
-        return p.finally(() => {
-          ended = true
-          stopWatch()
-          live.inHermes--
-        })
+        // setup-chat (hhtech-live-run section 6 point 1, live-run2 and ask-run: with no AI that answers Helper's calls,
+        // every message still tried one, each failing at once): a call that fails makes no AI answer for this visit, so
+        // no further call is tried and no dots show. Why the model check let them through is NOT found: the page already
+        // makes no call unless setup.runtime_check said ok (liveWhyNot), so in hhtech's home D that check must have
+        // said ok while llm.oneshot had no provider; what it answered there is in no record the Builder can read.
+        // So the first call of a visit is still tried (dots once). Lead (setup-chat-2): it stays so; hhtech found that
+        // setup.runtime_check answers the same in a home where the call works and in one where it fails, so it cannot
+        // gate the call.
+        return p
+          .catch(err => {
+            visit.aiOff = true
+            throw err
+          })
+          .finally(() => {
+            ended = true
+            stopWatch()
+            live.inHermes--
+          })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
       askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
@@ -550,6 +754,11 @@ export function makePage(ctx, opts = {}) {
         setFocusPick(true)
         return setLog(old => (memory.log = old.map((e, i) => (i === old.length - 1 && e.answers ? { ...e, answers: { ...e.answers, items } } : e))))
       }
+      // setup-chat: an answer of the set-up conversation, or the pick "Set up Hermes" under an offer
+      if (item.setup || (SETUP_BUILT && item.offer && offerIsSetup(item.offer))) {
+        const mv = item.setup ? setupPress(item.setup, visit) : setupAskMove(visit)
+        return mv ? runSetup(mv, item.label) : undefined
+      }
       liveClose()
       let result
       if (item.answer) result = pick(item.answer[0], item.answer[1], visit)
@@ -558,8 +767,9 @@ export function makePage(ctx, opts = {}) {
       else if (item.forget) result = forgetAnswer(item.forget[0], item.forget[1], visit)
       else if (item.group) result = pickGroup(item.group, visit)
       else if (item.want) result = pickWant(item.want, visit)
+      else if (item.offer) result = pressOffer(item.offer, visit) // offer-t1: a thing picked under an offer, by its id
       else result = pickTopic(item.topic, visit)
-      answer(result, item.label)
+      answer(result, item.label, '', true)
     }
 
     // Opens one of Hermes's own screens (a missing door is ignored).
@@ -582,9 +792,17 @@ export function makePage(ctx, opts = {}) {
         if (!result) return
         // talk-live-3: the button is done; its older line draws the label as plain faint text (src/talk-view.js)
         setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
-        return answer(result, next.label)
+        return answer(result, next.label, '', true)
       }
       if (next.kind === 'settings') return go(settingsHref)
+      // setup-chat: "What did you look at?" under the look line; "Open the Quickstart" (the docs page, in the browser)
+      if (next.kind === 'setup') {
+        const mv = setupPress(next.setup, visit)
+        if (!mv) return
+        setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
+        return runSetup(mv, next.label)
+      }
+      if (next.kind === 'docs') return openHermesDocs(ctx, next.url)
       if (next.kind === 'part') go(next.to)
     }
 
@@ -593,39 +811,18 @@ export function makePage(ctx, opts = {}) {
     function pressNote(entry, which) {
       if (which === 'change' && entry.used) {
         liveClose()
-        return answer(change(entry.used.topic, visit), entry.used.link)
+        return answer(change(entry.used.topic, visit), entry.used.link, '', true)
       }
       if (which !== 'see' || !entry.note) return
       if (settingsPage) return go(settingsHref)
       liveClose()
-      answer(seeKept(visit), entry.note.link)
+      answer(seeKept(visit), entry.note.link, '', true)
     }
 
     // Skip, at "What's your name?" and "What do you do?".
     function skipOpening() {
       liveClose()
-      answer(skip(visit), 'Skip')
-    }
-
-    // Picking an answer on a step: saved. Helper stays silent: its lines come from the conversation only.
-    function choose(option) {
-      if (answers[currentStep.id] === option.id) return
-      const next = { ...answers, [currentStep.id]: option.id }
-      setAnswers(next)
-      ctx.storage.set('answers', next)
-    }
-
-    // "I understand, next step": the step's next_rule picks the next step (code, not the model).
-    // After the last step it opens Your setup.
-    function finishStep() {
-      const to = nextAfter(currentStep, answers[currentStep.id])
-      if (to !== 'done') return saveStep(to)
-      saveTab('yours')
-    }
-
-    // "Ask about this step": the keyboard goes to the message box; a folded Helper opens first.
-    function askAboutStep() {
-      foldHelper(false)
+      answer(skip(visit), 'Skip', '', true)
     }
 
     /* ---------- Helper's edge to drag: between 360 and 600 px, remembered ---------- */
@@ -689,10 +886,12 @@ export function makePage(ctx, opts = {}) {
       if (el) el.focus()
     }
 
+    // the tab names' look: one value in src/look.js (TAB_LOOK)
+    const tabLook = TAB_LOOKS[TAB_LOOK]
     const tabRow = jsx('div', {
       className: K.tabs,
       role: 'tablist',
-      'aria-label': 'Helper',
+      'aria-label': DASH_DATA.words.tabListLabel,
       'data-hh': 'tabs',
       children: TABS.map((t, i) => {
         const on = tab === t.id
@@ -706,11 +905,11 @@ export function makePage(ctx, opts = {}) {
             'aria-controls': 'hh-tabpanel',
             tabIndex: on ? 0 : -1,
             'data-active': on,
-            className: cx(K.textTab, on ? K.textTabOn : K.textTabIdle),
+            className: cx(tabLook.tab, on ? tabLook.on : tabLook.idle),
             ref: tabRefs.current.set[t.id],
             onClick: () => saveTab(t.id),
             onKeyDown: e => onTabKey(e, i),
-            children: jsx('span', { className: on ? K.textTabLabelOn : K.textTabLabel, children: t.label })
+            children: jsx('span', { className: on ? tabLook.labelOn : tabLook.label, children: t.label })
           },
           t.id
         )
@@ -719,255 +918,11 @@ export function makePage(ctx, opts = {}) {
 
     const header = jsx('div', { className: K.head, 'data-hh': 'header', children: tabRow })
 
-    /* ---------- step list (numbers only when the window is narrow) ---------- */
-    const numbersOnly = fit.rail === 'numbers'
-    const stepRow = s => {
-      const on = s.number === step
-      const rail = railLines(s)
-      const number = jsx('span', { className: on ? K.rowNumberOn : K.rowNumber, children: s.number }, 'n')
-      const button = jsxs(RowButton, {
-        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
-        'aria-current': on ? 'step' : undefined,
-        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}` : undefined,
-        onClick: () => saveStep(s.number),
-        children: numbersOnly
-          ? [number]
-          : [
-              number,
-              jsxs(
-                'span',
-                {
-                  className: K.rowText,
-                  children: [
-                    jsx('span', { className: K.rowTitle, children: rail.title }),
-                    rail.sub ? jsx('span', { className: K.rowSub, children: jsx('span', { className: K.truncate, children: rail.sub }) }) : null
-                  ]
-                },
-                't'
-              )
-            ]
-      })
-      return jsx(
-        'div',
-        {
-          className: cx(K.row, on ? K.rowActive : K.rowIdle),
-          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}`, children: button }) : button
-        },
-        s.number
-      )
-    }
-
-    // Steps that come later: not buttons. With numbers only, the number carries its title for
-    // screen readers (role img + label) and as a tip on hover.
-    const laterRow = s => {
-      const inner = jsxs('div', {
-        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
-        role: numbersOnly ? 'img' : undefined,
-        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}, comes later` : undefined,
-        children: [
-          jsx('span', { className: K.rowNumber, children: s.number }, 'n'),
-          numbersOnly ? null : jsx('span', { className: K.rowText, children: jsx('span', { className: K.rowTitleOff, children: s.title }) }, 't')
-        ]
-      })
-      return jsx(
-        'div',
-        {
-          className: cx(K.row, K.rowIdle),
-          'aria-disabled': true,
-          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}, comes later`, children: inner }) : inner
-        },
-        s.number
-      )
-    }
-
-    const rail = jsxs(
-      'nav',
-      {
-        className: K.rail,
-        style: { width: numbersOnly ? RAIL_NUMBERS_WIDTH : RAIL_WIDTH },
-        'aria-label': 'Steps',
-        'data-hh': 'steps',
-        'data-numbers-only': numbersOnly,
-        children: [
-          jsxs('div', {
-            className: K.railScroll,
-            children: [
-              numbersOnly ? null : jsx('div', { className: cx(K.sectionLabel, K.sectionLabelPad), children: 'Steps' }),
-              jsx('div', { className: K.rowList, children: STEPS.map(stepRow) }),
-              jsx('div', { className: cx(K.sectionLabel, numbersOnly ? K.sectionLabelPad : K.sectionLabelGap), children: numbersOnly ? null : 'After these' }),
-              jsx('div', { className: K.rowList, children: LATER_STEPS.map(laterRow) })
-            ]
-          }),
-          numbersOnly ? null : jsx('div', { className: K.railFoot, children: VERSION_LINE })
-        ]
-      },
-      'rail'
-    )
-
-    /* ---------- open step ---------- */
-    // One primary button per screen (hhdesign fix 6): "I understand, next step"; the rest are secondary.
-    const stepActions = jsxs(
-      'div',
-      {
-        className: K.actions,
-        children: [
-          jsx(Button, { size: 'sm', onClick: finishStep, children: 'I understand, next step' }),
-          jsx(Button, { variant: 'secondary', size: 'sm', onClick: askAboutStep, children: 'Ask about this step' })
-        ]
-      },
-      'actions'
-    )
-
-    // A source tag that opens its docs page: "Hermes docs › {section}" (v1-strings part 5).
-    const sourceLink = (url, label, key) =>
-      jsx(
-        'a',
-        {
-          className: K.chipLink,
-          href: url,
-          target: '_blank',
-          rel: 'noreferrer',
-          title: url,
-          'data-hh': 'source',
-          onClick: e => {
-            e.preventDefault()
-            openDocs(url)
-          },
-          onAuxClick: e => {
-            e.preventDefault()
-            openDocs(url)
-          },
-          children: label
-        },
-        key
-      )
-    const factSource = f => sourceLink(f.url || docsUrl(f.source), chipLabel(f.section), f.id || f.source + f.section)
-
-    // The open step is wide enough for two columns (the comparison, and the answer cards).
-    const wideStep = fit.columns === 2
-    const here = currentStep
-    const picked = answers[here.id]
-    const fits = fitsGoal(answers, here.id)
-    const introSources = []
-    for (const src of here.intro_sources || []) {
-      const key = `${src.source}#${src.section}`
-      if (!introSources.some(x => x.key === key)) introSources.push({ key, url: docsUrl(src.source), label: chipLabel(src.section) })
-    }
-
-    const stepView = [
-      jsxs(
-        'header',
-        {
-          children: [
-            jsx('div', { className: K.sectionLabel, children: `Step ${here.number} of ${STEPS.length}` }),
-            jsx('h3', { className: K.stepTitle, children: here.title }),
-            jsx('p', { className: K.prose, 'data-hh': 'intro', children: here.intro })
-          ]
-        },
-        'head'
-      ),
-      introSources.length
-        ? jsxs(
-            'div',
-            {
-              className: K.chips,
-              'data-hh': 'intro-sources',
-              children: [jsx('span', { className: K.chipsLabel, children: 'Source' }, 'l'), ...introSources.map(x => sourceLink(x.url, x.label, x.key))]
-            },
-            'intro-sources'
-          )
-        : null,
-      here.compare
-        ? jsx(
-            'dl',
-            {
-              className: cx(K.pairGrid, wideStep && K.twoColumns),
-              'data-hh': 'compare',
-              'data-columns': fit.columns,
-              children: ['left', 'right'].map(side => {
-                const c = here.compare[side]
-                return jsxs(
-                  'div',
-                  {
-                    className: K.pairSide,
-                    children: [jsx('dt', { className: K.pairTitle, children: c.title }), jsx('dd', { className: K.caption, children: c.text }), factSource(c)]
-                  },
-                  side
-                )
-              })
-            },
-            'compare'
-          )
-        : null,
-      jsx(
-        'ul',
-        {
-          className: K.factList,
-          'data-hh': 'facts',
-          children: here.facts.map(f =>
-            jsxs('li', { className: K.fact, 'data-fact': f.id, children: [jsx('p', { className: K.factText, children: f.text }), factSource(f)] }, f.id)
-          )
-        },
-        'facts'
-      ),
-      jsxs(
-        'div',
-        {
-          className: K.scaffold,
-          'data-hh': 'video',
-          children: [
-            jsx('span', { className: K.scaffoldGlyph, children: jsx(Codicon, { name: 'play-circle', size: '0.875rem' }) }),
-            jsx('span', { children: LINES.videoLater })
-          ]
-        },
-        'video'
-      ),
-      jsxs(
-        'section',
-        {
-          children: [
-            jsx('div', { className: K.question, children: here.question }),
-            jsx('div', {
-              className: cx(K.choices, wideStep && K.twoColumns),
-              role: 'group',
-              'aria-label': here.question,
-              'data-hh': 'choices',
-              'data-columns': fit.columns,
-              children: here.options.map(o =>
-                jsxs(
-                  'button',
-                  {
-                    type: 'button',
-                    'aria-pressed': picked === o.id,
-                    className: cx(K.choice, picked === o.id ? K.choiceOn : K.choiceOff),
-                    'data-option': o.id,
-                    onClick: () => choose(o),
-                    children: [
-                      jsxs('span', {
-                        className: K.choiceText,
-                        children: [jsx('span', { className: K.choiceLabel, children: o.label }), o.hint ? jsx('span', { className: K.choiceSub, children: o.hint }) : null]
-                      }, 't'),
-                      fits === o.id ? jsx('span', { className: K.fitTag, 'data-hh': 'fits-goal', children: LINES.fitsGoal }, 'fit') : null
-                    ]
-                  },
-                  o.id
-                )
-              )
-            })
-          ]
-        },
-        'question'
-      ),
-      stepActions
-    ]
-
-    const yoursView = renderYourSetup(setup, {
-      openStep: n => {
-        saveStep(n)
-        saveTab('setup')
-      },
-      cardColumns: fit.cardColumns
-    })
+    /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
+    const panel =
+      tab === 'dashboard'
+        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX })
+        : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
 
     const main = jsx(
       'main',
@@ -978,7 +933,7 @@ export function makePage(ctx, opts = {}) {
         role: 'tabpanel',
         id: 'hh-tabpanel',
         'aria-labelledby': `hh-tab-${tab}`,
-        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
+        children: jsx('div', { className: K.detailScroll, 'data-hh': 'scroll', children: panel })
       },
       'main'
     )
@@ -1134,13 +1089,13 @@ export function makePage(ctx, opts = {}) {
           )
         : null
 
-    // The left side: the tabs, and under them the step list and the open step (or Your setup).
+    // The left side: the tabs, and under them the open tab.
     const left = jsxs(
       'div',
       {
         className: K.left,
         'data-hh': 'left',
-        children: [header, jsx('div', { className: K.body, 'data-hh': 'body', children: tab === 'setup' ? [rail, main] : [main] }, 'body')]
+        children: [header, jsx('div', { className: K.body, 'data-hh': 'body', children: [main] }, 'body')]
       },
       'left'
     )

@@ -12,6 +12,7 @@ import { TALK_DATA } from '../src/talk-data.js'
 import { renderKept } from '../src/settings-file.js'
 import { curlyQuotes } from '../src/quotes.js'
 import { AI_MODE } from '../src/ai-mode.js'
+import { SETUP_BUILT, SETUP_AI_BUILT } from '../src/setup-built.js'
 
 const SF = TALK_DATA.keeps.settings_file
 
@@ -60,7 +61,10 @@ test('the page: hhcontent\'s top line, the box drawn from the stored record with
   assert.equal(row.props.wide, true)
   // talk-live: a second top line only in a build with an AI step (lines_by_mode.settings_top_line_2)
   // live-v2 changes-4: the What you do line is sent, so the AI builds' second top line says so
-  assert.equal(row.props.description, AI_MODE === 'no_ai_step' ? undefined : 'Only the What you do line is sent to your AI, when Helper asks it for help.')
+  // setup-chat (live changes-6): with the set-up conversation built, the line names its three rows
+  // setup-chat-2: the AI step of the recommendation is off (SETUP_AI_BUILT false), so only What you do goes to the AI, in
+  // changes-1's words (settings_top_line_2_work_only); the three rows only where that step is built
+  assert.equal(row.props.description, AI_MODE === 'no_ai_step' ? undefined : SETUP_BUILT && SETUP_AI_BUILT ? 'These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.' : 'Only What you do goes to your AI. Only when Helper asks it for help.')
   assert.equal(box(view).type, 'sdk:Textarea')
   assert.equal(box(view).props.value, renderKept(PETER))
   assert.match(box(view).props.value, /^Name: Peter \(Helper greets you with it\)$/m)
@@ -74,7 +78,8 @@ test('the page: hhcontent\'s top line, the box drawn from the stored record with
   for (const f of SF.facts) assert.ok(shown(view, 'facts').includes(curlyQuotes(f)), f)
   // no AI step: neither "Only your name goes to your AI" nor "already sent to your AI" (talk-live-2: apart from the AI
   // builds' second top line of changes-4, checked above)
-  assert.doesNotMatch(text(inside(view)).split('Only the What you do line is sent to your AI, when Helper asks it for help.').join(''), /your AI/)
+  // (setup-chat-2: the second top line is changes-1's settings_top_line_2_work_only)
+  assert.doesNotMatch(text(inside(view)).split('Only What you do goes to your AI. Only when Helper asks it for help.').join(''), /your AI/)
   // an empty record: the empty line as the box's hint, and no "Forget all of this"
   const empty = await openSettings()
   assert.equal(box(empty.view).props.value, '')

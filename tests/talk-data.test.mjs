@@ -103,8 +103,10 @@ test('the build stops on any list of things to pick longer than four (his words 
 })
 
 test('answers to pick only under the questions that carry them (answers.when_shown): the build stops on answers under an open question, or none under a question that carries them', () => {
-  const extra = broken(d => (topic(d, 'mem').question.answers = [{ label: 'Things about me', gives: 'mem1' }]))
-  assert.ok(talkProblems(extra).includes('mem-q: answers to pick, but when_shown says it carries none'))
+  // offer-t1 (changes-8): mem-q, sch-q and bot-q carry answers now; the questions that must carry none are those on
+  // answers.no_answers (OPEN, F1)
+  const extra = broken(d => d.answers.no_answers.push('mem-q'))
+  assert.ok(talkProblems(extra).includes('mem-q: answers to pick, but answers.no_answers lists it'))
   const none = broken(d => (topic(d, 'msg').question.answers = []))
   assert.ok(talkProblems(none).includes('msg-q: no answers to pick, but when_shown says it carries them'))
   const missing = broken(d => delete d.answers.when_shown.questions['sch-q What should Hermes do on a schedule, such as a daily summary?'])

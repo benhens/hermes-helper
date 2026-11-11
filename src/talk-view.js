@@ -122,7 +122,7 @@ function OldLine({ entry, onNext }) {
   // talk-live-3 (hhtech-run-c18, Lead's call): a button whose press made Helper say its line is done; in the older
   // line its label is plain faint text, not a link. A button that opens something under its line (text to paste,
   // steps) or a Hermes screen stays a link, so it can be used again.
-  const done = next && entry.pressed && (next.kind === 'line' || next.kind === 'forget-all')
+  const done = next && entry.pressed && (next.kind === 'line' || next.kind === 'forget-all' || next.kind === 'setup')
   return jsxs('div', {
     className: T.old,
     'data-hh': 'old',

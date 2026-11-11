@@ -6,9 +6,14 @@ import path from 'node:path'
 import { colourFindings, styleFindings, paletteClassFindings } from './lib/colour-lint.mjs'
 import { K, T } from '../src/look.js'
 import { TALK_CSS } from '../src/talk-css.js'
+import { DASH_CSS } from '../src/dash-css.js'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
-const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8')
+// setup-chat: one docs quote in a line's source (POWER, live changes-6) holds a colour word of the docs' own screen
+// ("**Memory fit** — green (*Fits your GPU*"); it is the docs' sentence, not a colour of ours, so exactly that phrase
+// is read without its colour word
+const DOCS_QUOTE = '**Memory fit** \u2014 green (*Fits your GPU*'
+const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8').split(DOCS_QUOTE).join('**Memory fit** (*Fits your GPU*')
 const srcFiles = fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js')).map(f => 'src/' + f)
 const plugin = read('desktop/plugin.js')
 
@@ -50,20 +55,24 @@ test('the style lint catches fonts and shadows of our own (it bites)', () => {
   assert.deepEqual(styleFindings('.a{font:400 14px/20px var(--font-sans);box-shadow:var(--shadow-sm)}'), [])
 })
 
-test('one style sheet of our own, for Helper\'s window only (row 11 of the talk v1 plan): one <style> element, made in one place from the built sheet; no fonts, no font or shadow styles inline', () => {
-  // The sheet's own rules (hh- classes, Hermes variables only, no fonts, no shadows) are
-  // tests/talk-css.test.mjs. Here: the built file makes exactly one style element, and its text
-  // is the built sheet, never text put together at run time.
+test('two style sheets of our own: Helper\'s window (row 11 of the talk v1 plan) and, since dash-v1, the Dashboard tab: one <style> element each, made in one place from its built sheet; no fonts, no font or shadow styles inline', () => {
+  // The sheets' own rules (hh- and hhd- classes, Hermes variables only, no fonts, no shadows) are
+  // tests/talk-css.test.mjs and tests/dash-css.test.mjs. Here: the built file makes exactly two style elements, each
+  // text a built sheet, never text put together at run time. (dash-v1: Lead's job adds the Dashboard; its sheet
+  // lives in the tab, so it leaves with the tab.)
   const made = [...plugin.matchAll(/jsxs?\(\s*['"]style['"]\s*,\s*\{([^}]*)\}/g)]
-  assert.equal(made.length, 1)
-  assert.match(made[0][1], /children:\s*TALK_CSS\b/)
+  assert.equal(made.length, 2)
+  assert.match(made[0][1], /children:\s*DASH_CSS\b/)
+  assert.match(made[1][1], /children:\s*TALK_CSS\b/)
   assert.doesNotMatch(plugin, /dangerouslySetInnerHTML|createElement\(\s*['"]style|insertRule|adoptedStyleSheets|\.styleSheets|document\.head/)
-  assert.equal(srcFiles.filter(f => /['"]style['"]\s*,/.test(read(f))).join(), 'src/page.js')
+  assert.equal(srcFiles.filter(f => /['"]style['"]\s*,/.test(read(f))).join(), 'src/dash.js,src/page.js')
   assert.doesNotMatch(plugin, /@font-face|\.woff|\.ttf/)
   assert.doesNotMatch(plugin, /fontFamily|boxShadow|textShadow/)
-  // and the sheet inside the built file passes the same lints as every source file
+  // and the sheets inside the built file pass the same lints as every source file
   assert.deepEqual(colourFindings(TALK_CSS), [])
   assert.deepEqual(styleFindings(TALK_CSS), [])
+  assert.deepEqual(colourFindings(DASH_CSS), [])
+  assert.deepEqual(styleFindings(DASH_CSS), [])
 })
 
 test('the page paints no background of its own (the root and page columns carry no bg-*)', () => {

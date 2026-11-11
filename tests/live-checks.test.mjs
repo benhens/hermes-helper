@@ -11,8 +11,10 @@ import { readWritten, replyFlags, judgeWritten, readSubject, readPick, replyWord
 const O = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, 'fixtures', 'live-checks-oracle.json'), 'utf8'))
 // talk-live-2: c24 (live-v2 changes-4) is newer than check_live.py; its own cases are in tests/talk-live-2.test.mjs and
 // what it does to these recordings is pinned below
-const plain = flags => flags.filter(f => !/^c1[8]|^c23|^c24/.test(f)).map(f => (f.startsWith('c22') ? 'c22' : f))
-const notC24 = flags => flags.filter(f => !f.startsWith('c24'))
+// setup-chat: c28 (offer-t1) and c29 (live changes-9) are not in check_live.py (hhcontent's check_offers.py and
+// check_c9.py hold them; tests/setup-chat-checks.test.mjs has their cases), so they are left out of this comparison
+const plain = flags => flags.filter(f => !/^c1[8]|^c23|^c24|^c28|^c29/.test(f)).map(f => (f.startsWith('c22') ? 'c22' : f))
+const notC24 = flags => flags.filter(f => !/^c24|^c28|^c29/.test(f))
 const find = part => {
   const c = O.cases.find(x => x.reply.includes(part))
   assert.ok(c, part)
@@ -31,7 +33,7 @@ test(`all ${O.cases.length} recorded written replies: the same text after the fi
   }
 })
 
-test('the counts hhcontent reported for its checks are the plugin\'s too (free model way c: 16 good, none stopped; 2B way c: 7 of 12 bad stopped, 2 good stopped)', () => {
+test('the counts hhcontent reported for its checks are the plugin\'s too (free model way c: 16 good, none stopped; 2B way c: 7 of 12 bad stopped by c0 to c23, 2 good stopped)', () => {
   const tally = {}
   for (const c of O.cases) {
     if (c.word) continue
@@ -50,6 +52,15 @@ test('the counts hhcontent reported for its checks are the plugin\'s too (free m
   assert.deepEqual(tally['free c'], { written: 17, good: 16, goodStopped: 0, bad: 1, badStopped: 0 })
   assert.deepEqual(tally['free b'], { written: 17, good: 17, goodStopped: 1, bad: 0, badStopped: 0 })
   assert.deepEqual(tally['2b c'], { written: 17, good: 5, goodStopped: 2, bad: 12, badStopped: 7 })
+})
+
+// setup-chat: what c28 (a reply that ends on an invitation or a question) does to the same recordings, which were made
+// with the old rule 5 ("... and invite a question about Hermes"): it stops good replies of the free model too. Told to
+// Lead in the report; with rule 5b in the instructions the model is asked not to end so (not run on a model).
+test('c28 on the recordings made under the old rule 5: how many good replies it stops (a count for the report)', () => {
+  const stopped = O.cases.filter(c => !c.word && ['G', 'R'].includes(c.judge) && replyFlags(c.reply, c.rows, c.used).some(f => f.startsWith('c28'))).map(c => c.key)
+  assert.deepEqual(stopped.filter(k => k.startsWith('free|c')).length, 5)
+  assert.ok(stopped.length >= 5)
 })
 
 test('c24 on the 61 recordings (nothing was kept; the person\'s message given): it stops two, both marked wrong by the judge, one already stopped by c5 and c6', () => {

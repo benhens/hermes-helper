@@ -24,7 +24,19 @@ export const host = {
   },
   skills: { list: profile => call('skills', profile) },
   toolsets: { list: profile => call('toolsets', profile) },
-  profiles: { list: () => call('profiles') }
+  profiles: { list: () => call('profiles') },
+  // dash-v1: host.status() (in the SDK docs) and host.listPersistedSessions (in the SDK, not in its docs): each is a
+  // function only when the test gives a fake for it, so a Hermes without them can be stood in for too.
+  get status() {
+    return typeof live().status === 'function' ? () => call('status') : undefined
+  },
+  get listPersistedSessions() {
+    return typeof live().listPersisted === 'function' ? (route, options) => call('listPersisted', { route, ...options }) : undefined
+  },
+  // host.newChat opens a new chat in Hermes; the test reads that it was asked for
+  newChat: profile => {
+    ;(live().newChats ||= []).push(profile === undefined ? null : profile)
+  }
 }
 
 function call(name, arg) {
@@ -59,3 +71,5 @@ export const Switch = 'sdk:Switch'
 export const Textarea = 'sdk:Textarea'
 export const ListRow = 'sdk:ListRow'
 export const Tip = 'sdk:Tip'
+// dash-v1: Hermes's Tabler icons, as the SDK hands them out (`export * as icons from '@/lib/icons'`)
+export const icons = { Box: 'sdk:icons.Box', Brain: 'sdk:icons.Brain', Lock: 'sdk:icons.Lock' }

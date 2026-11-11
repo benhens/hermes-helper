@@ -4781,6 +4781,32 @@ export const LIVE_DATA = {
       }
     },
     {
+      "id": "msg0-then",
+      "subject": "msg",
+      "title": "",
+      "text": "In the Hermes app, open Messaging and pick your chat app. For Telegram, press Create with QR.",
+      "kw": [],
+      "weak": [],
+      "next_of": "msg0",
+      "shows": {
+        "kind": "extra",
+        "line": "msg0-then"
+      }
+    },
+    {
+      "id": "msg1-then",
+      "subject": "msg",
+      "title": "",
+      "text": "Scan the code with Telegram on your phone. Hermes makes the bot, lets only you in, and restarts by itself.",
+      "kw": [],
+      "weak": [],
+      "next_of": "msg1",
+      "shows": {
+        "kind": "extra",
+        "line": "msg1-then"
+      }
+    },
+    {
       "id": "bot1-next",
       "subject": "bot",
       "title": "",
@@ -4820,6 +4846,20 @@ export const LIVE_DATA = {
       }
     },
     {
+      "id": "use1-next-mean",
+      "subject": "use",
+      "title": "",
+      "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+      "kw": [],
+      "weak": [],
+      "next_of": "use1-next",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "use1-next-mean"
+      }
+    },
+    {
       "id": "use3-next",
       "subject": "use",
       "title": "",
@@ -4830,6 +4870,48 @@ export const LIVE_DATA = {
       "shows": {
         "kind": "extra",
         "line": "use3-next"
+      }
+    },
+    {
+      "id": "use3-next-mean",
+      "subject": "use",
+      "title": "",
+      "text": "Open a chat with Hermes and type /usage as your message. Hermes answers with a list of what takes up room in that chat.",
+      "kw": [],
+      "weak": [],
+      "next_of": "use3-next",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "use3-next-mean"
+      }
+    },
+    {
+      "id": "skill-mean",
+      "subject": "words",
+      "title": "",
+      "text": "Think of a skill as a recipe. Hermes follows its steps when a task needs it.",
+      "kw": [],
+      "weak": [],
+      "next_of": "skill",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "skill-mean"
+      }
+    },
+    {
+      "id": "plugin-mean",
+      "subject": "words",
+      "title": "",
+      "text": "It is like an app on your phone. You add it, and Hermes gets one more feature.",
+      "kw": [],
+      "weak": [],
+      "next_of": "plugin",
+      "follow_only": true,
+      "shows": {
+        "kind": "extra",
+        "line": "plugin-mean"
       }
     }
   ],
@@ -4968,7 +5050,7 @@ export const LIVE_DATA = {
     "max_tokens": 20
   },
   "writer": {
-    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
+    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence. Add no fact.\n5b. End with a statement. Never end with \"ask me\", \"let me know\", \"feel free to ask\" or a question. Helper shows things to pick under your reply.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
     "max_tokens": 200
   },
   "pick_only": {
@@ -5161,8 +5243,10 @@ export const LIVE_DATA = {
       },
       {
         "term": "\\btokens?\\b",
-        "explained_by": "pieces of words|word pieces",
-        "ignore_case": true
+        "explained_by": "pieces? of (?:a )?words?|word[- ]?pieces?|(?:text|word) units?|units? of (?:text|words?)|(?:small|short|tiny) (?:pieces?|bits?|chunks?|parts?) of (?:text|a word|words)|bits? of text|chunks? of text",
+        "ignore_case": true,
+        "was_c6": "pieces of words|word pieces",
+        "changed": "live changes-6: hhtech-ai-share section 4 point 1: \"small text units\" and \"a small piece of a word\" explain tokens and were refused."
       }
     ],
     "r9_pattern": "\\bI(?:'ll| will| can)?\\s+(?:set up|install|connect|build|create)\\b",
@@ -5530,7 +5614,67 @@ export const LIVE_DATA = {
           "don't say"
         ]
       }
-    ]
+    ],
+    "c16_allow": {
+      "words": [
+        "guide",
+        "guides"
+      ],
+      "speaks_of_helper": "\\b(?:I|I'm|me|my|Helper|Helper's)\\b|\\byour guides?\\b"
+    },
+    "c28": [
+      "ask me",
+      "let me know",
+      "feel free to ask",
+      "feel free to",
+      "just ask",
+      "any questions",
+      "any other questions",
+      "anything else",
+      "happy to help",
+      "here to help"
+    ],
+    "c29": {
+      "skip": [
+        "run",
+        "runs",
+        "work",
+        "works",
+        "own",
+        "teach",
+        "study",
+        "manage",
+        "coach",
+        "sell",
+        "have",
+        "small",
+        "big",
+        "local"
+      ],
+      "step_words": [
+        "then",
+        "next",
+        "after",
+        "first",
+        "now",
+        "step",
+        "steps",
+        "start",
+        "open",
+        "press",
+        "click",
+        "type",
+        "paste",
+        "scan",
+        "go"
+      ],
+      "lead_ins": [
+        "your",
+        "about",
+        "for",
+        "like"
+      ]
+    }
   },
   "no_reply": {
     "starts": [
@@ -5549,7 +5693,7 @@ export const LIVE_DATA = {
   "slow_ai": {
     "id": "SLOW_A",
     "text": "Your AI took too long to answer, so I answered from my own notes. To make it quicker for me, paste this into a new chat with your Hermes.",
-    "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helping Hand's short calls, not for my own chats. Show me the change before you save it."
+    "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helper's short calls, not for my own chats. Show me the change before you save it."
   },
   "lines_by_mode": {
     "are_you_an_ai": {
@@ -5564,13 +5708,23 @@ export const LIVE_DATA = {
     },
     "settings_top_line_2": {
       "no_ai_step": null,
-      "ai_picks_line": "Only the What you do line is sent to your AI, when Helper asks it for help.",
-      "ai_writes": "Only the What you do line is sent to your AI, when Helper asks it for help."
+      "ai_picks_line": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.",
+      "ai_writes": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help."
+    },
+    "settings_top_line_2_work_only": {
+      "no_ai_step": null,
+      "ai_picks_line": "Only What you do goes to your AI. Only when Helper asks it for help.",
+      "ai_writes": "Only What you do goes to your AI. Only when Helper asks it for help."
     },
     "work_told": {
       "no_ai_step": null,
       "ai_picks_line": "I also tell your AI what you do when I ask it for help.",
       "ai_writes": "I also tell your AI what you do when I ask it for help."
+    },
+    "setup_told": {
+      "no_ai_step": null,
+      "ai_picks_line": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help.",
+      "ai_writes": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help."
     }
   }
 }

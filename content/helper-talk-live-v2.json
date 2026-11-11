@@ -1,278 +1,1270 @@
 {
-  "about": "Done: the data for Helper's AI step, both ways (his AI writes, his AI only picks a line), no AI as the fallback. Ran: hhtech's parts as marked; the checks on hhtech's recorded replies in Python. Not run: the whole order of steps on any model, and every change marked not_run. One source for the Builder: how rows are chosen, the three instruction texts, the checks on a written reply, and what shows when anything fails. hhcontent, 11 Nov 2026, Lead's job of 00:55 UTC. Built on hhtech's run (docs/answers/hhtech-live-reply.md, dev/checks/hhtech-live-reply/live.py). Every item says ran_by_hhtech (seen in hhtech's live run on a model), ran_on_recorded (hhcontent ran it in Python on hhtech's recorded replies, no new model call) or not_run. Explained in content/helper-talk-live-v2.md.",
-  "status": "Nothing of this is built. Nothing of this file has run on a model as one whole; the parts that ran are marked. Option 3 (no AI) is content/helper-talk-v2.json with route2.py as before.",
-  "uses": ["content/helper-talk-v2.json", "content/helper-wants-v1.json", "content/skills-list-v1.json"],
-
-  "mode": {
-    "values": ["ai_writes", "ai_picks_line", "no_ai_step"],
-    "use_now": "no_ai_step",
-    "note": "One switch. It must equal helper-talk-v2.json small_talk.ai_line_by_build.use_now and keeps.disclosure_point_11.use_now, and it picks the lines in lines_by_mode. Pēteris has not chosen; the Builder builds ai_writes with a switch to ai_picks_line, with no_ai_step's result as the fallback inside both (Lead, 11 Nov 00:55). no_ai_step: no call is ever made."
-  },
-
-  "order": {
-    "about": "For one typed message. Pressed picks and buttons never call the AI.",
-    "steps": [
-      {"n": 1, "do": "Run the no-AI turn exactly as today (route2.py _turn with changes-15, before no_repeat). Keep its result: this is the fallback for this message.", "status": "ran_by_hhtech (route2.py as option 3, on a copy before changes-14)"},
-      {"n": 2, "do": "If the no-AI result's kind is in code_answers.kinds, show it (through no_repeat) and stop. No AI call.", "status": "not_run (hhtech's way c called the writer on every word-match hit; here code's sure answers come first, as Lead's job says)"},
-      {"n": 3, "do": "If the message is a follow-up (follow_up.rule), hand the rows of the person's previous message (follow_up.rows) and go to step 6.", "status": "ran_by_hhtech for follow-ups found by the first call; finding them by code first is not_run"},
-      {"n": 4, "do": "Word matching (rows.score): the rows with score 2 or more, best first, at most 4. If any, go to step 6.", "status": "ran_by_hhtech (live.py by_words, k=4)"},
-      {"n": 5, "do": "First call: instructions first_call.text, input input.text, max_tokens 20. Read the first word of the reply that is a subject id. build: H1 with its paste box, unless the message starts with a build.skip_starts or has a build.how_phrases (then the fallback). none, or no subject id found: the fallback. talk: the rows of the person's previous message (follow_up.rows), or no rows if there is none. Any other subject: rows.rank_in of that subject's rows, at most 5.", "status": "ran_by_hhtech (way c); the how-phrase guard on build is route2.py's (ran there), not_run in this path; subject use is new, not_run"},
-      {"n": 6, "do": "ai_writes: the writer call (writer.text, max_tokens 200), then the checks. ai_picks_line: the pick call (pick_only.text, max_tokens 20), then pick_only.read.", "status": "ran_by_hhtech (texts as run, without the changes listed under each text)"},
-      {"n": 7, "do": "Whatever line is chosen goes through no_repeat (helper-talk-v2.json, with asked_again) and is noted as Helper's last line. The rows handed in this turn are noted as this message's rows (for a follow-up next time).", "status": "not_run"}
-    ],
-    "fallback": {
-      "rule": "The person sees the no-AI result of step 1 (passed through no_repeat) when: the call fails or no AI is set up; the AI answers NONE; the AI answers BUILD and the message is a how-question; any check fails; 12 seconds pass from the moment the message is sent (first call and writer together). A reply that comes after 12 seconds is dropped, never shown, never under a later message. The person is never told a check failed.",
-      "seconds": 12,
-      "seconds_source": "hhtech, docs/answers/hhtech-live-reply.md section 5: every free-model and 2B reply came within 13.2 s; no 9B reply did. Replaces hhcontent's 8.",
-      "one_at_a_time": "One AI turn at a time. If the person sends a new message while Helper waits, the waiting message gets its no-AI result at once and the new message starts its own turn. Proposal, not_run; hhtech and hhdesign to confirm.",
-      "while_waiting": "The character's busy face (plugin/src/expressions.js lines 120 to 124, per hhtech). No text promises a time.",
-      "status": "not_run (proposal of hhtech and hhcontent)"
-    }
-  },
-
-  "code_answers": {
-    "about": "No-AI result kinds that are shown with no AI call: code is sure, or the line asks the person something it needs.",
-    "kinds": ["K1", "HELLO", "HELLO_SAME", "THANKS", "OK", "HOW", "WHO", "AI", "AI_PICK", "AI_WRITES", "BYE", "CUT", "WRONG", "RM1", "RM2", "RM3", "RM4", "RM5", "RM6", "TP", "H1", "F1", "F2", "F3", "N1a", "NAME_AGAIN", "NAME_NEW", "COST", "WHERE", "W1", "W2", "term", "row", "question", "plain", "skill", "wants", "OK_SAME", "THANKS_SAME", "HOW_SAME", "BYE_SAME", "CUT_SAME", "WRONG_SAME", "anything from small_talk kind again"],
-    "go_to_ai": ["N1", "N1_AGAIN", "MEAN_NONE", "AGAIN", "plain with why \"what do you mean\"", "STUCK", "STUCK_SAME"],
-    "changes_3": "live-v2 changes-3: the _SAME lines are small talk, answered by code like their kind's first line. Kind again (helper-talk-v2.json small_talk.again_rule) is code's whatever it shows, AGAIN and MEAN_NONE included: it brings back a line word for word, so there is nothing for an AI to write, and it is not passed through no_repeat again. STUCK and STUCK_SAME (that didn't work ...) go to the AI as a follow-up (follow_up.rule), with STUCK or STUCK_SAME as the fallback. I'm confused stays kind mean, so it reaches the AI as before.",
-    "note": "plain is code's only when it came from what_is or a topic with no need; the plain line that answers \"what do you mean\" goes to the AI as a follow-up. skill and wants: the skills-by-name line (S1, S2) and a wants row found by code (helper-wants-v1.json). Kinds not listed in either list: code's, no call.",
+ "about": "Done: the data for Helper's AI step, both ways (his AI writes, his AI only picks a line), no AI as the fallback. Ran: hhtech's parts as marked; the checks on hhtech's recorded replies in Python. Not run: the whole order of steps on any model, and every change marked not_run. One source for the Builder: how rows are chosen, the three instruction texts, the checks on a written reply, and what shows when anything fails. hhcontent, 11 Nov 2026, Lead's job of 00:55 UTC. Built on hhtech's run (docs/answers/hhtech-live-reply.md, dev/checks/hhtech-live-reply/live.py). Every item says ran_by_hhtech (seen in hhtech's live run on a model), ran_on_recorded (hhcontent ran it in Python on hhtech's recorded replies, no new model call) or not_run. Explained in content/helper-talk-live-v2.md.",
+ "status": "Nothing of this is built. Nothing of this file has run on a model as one whole; the parts that ran are marked. Option 3 (no AI) is content/helper-talk-v2.json with route2.py as before.",
+ "uses": [
+  "content/helper-talk-v2.json",
+  "content/helper-wants-v1.json",
+  "content/skills-list-v1.json"
+ ],
+ "mode": {
+  "values": [
+   "ai_writes",
+   "ai_picks_line",
+   "no_ai_step"
+  ],
+  "use_now": "no_ai_step",
+  "note": "One switch. It must equal helper-talk-v2.json small_talk.ai_line_by_build.use_now and keeps.disclosure_point_11.use_now, and it picks the lines in lines_by_mode. Pēteris has not chosen; the Builder builds ai_writes with a switch to ai_picks_line, with no_ai_step's result as the fallback inside both (Lead, 11 Nov 00:55). no_ai_step: no call is ever made."
+ },
+ "order": {
+  "about": "For one typed message. Pressed picks and buttons never call the AI.",
+  "steps": [
+   {
+    "n": 1,
+    "do": "Run the no-AI turn exactly as today (route2.py _turn with changes-15, before no_repeat). Keep its result: this is the fallback for this message.",
+    "status": "ran_by_hhtech (route2.py as option 3, on a copy before changes-14)"
+   },
+   {
+    "n": 2,
+    "do": "If the no-AI result's kind is in code_answers.kinds, show it (through no_repeat) and stop. No AI call.",
+    "status": "not_run (hhtech's way c called the writer on every word-match hit; here code's sure answers come first, as Lead's job says)"
+   },
+   {
+    "n": 3,
+    "do": "If the message is a follow-up (follow_up.rule), hand the rows of the person's previous message (follow_up.rows) and go to step 6.",
+    "status": "ran_by_hhtech for follow-ups found by the first call; finding them by code first is not_run"
+   },
+   {
+    "n": 4,
+    "do": "Word matching (rows.score): the rows with score 2 or more, best first, at most 4. If any, go to step 6.",
+    "status": "ran_by_hhtech (live.py by_words, k=4)"
+   },
+   {
+    "n": 5,
+    "do": "First call: instructions first_call.text, input input.text, max_tokens 20. Read the first word of the reply that is a subject id. build: H1 with its paste box, unless the message starts with a build.skip_starts or has a build.how_phrases (then the fallback). none, or no subject id found: the fallback. talk: the rows of the person's previous message (follow_up.rows), or no rows if there is none. Any other subject: rows.rank_in of that subject's rows, at most 5.",
+    "status": "ran_by_hhtech (way c); the how-phrase guard on build is route2.py's (ran there), not_run in this path; subject use is new, not_run"
+   },
+   {
+    "n": 6,
+    "do": "ai_writes: the writer call (writer.text, max_tokens 200), then the checks. ai_picks_line: the pick call (pick_only.text, max_tokens 20), then pick_only.read.",
+    "status": "ran_by_hhtech (texts as run, without the changes listed under each text)"
+   },
+   {
+    "n": 7,
+    "do": "Whatever line is chosen goes through no_repeat (helper-talk-v2.json, with asked_again) and is noted as Helper's last line. The rows handed in this turn are noted as this message's rows (for a follow-up next time).",
     "status": "not_run"
-  },
-
-  "follow_up": {
-    "rule": "A message is a follow-up when Helper's last line came from rows (row, plain, term, wants, COST, WHERE, or a written reply that used rows) and either the no-AI turn found small_talk kind mean or kind stuck (live-v2 changes-3), or the whole message (after cutting ok, okay, so, and, cool, right and end marks) is one of phrases.",
-    "phrases": ["and then", "then what", "what then", "what next", "what's next", "whats next", "next", "and next", "what now", "now what", "then", "how", "how?", "what do you mean", "what does that mean", "meaning", "i don't get it", "i dont get it", "explain", "explain that", "tell me more", "more", "go on", "and", "like what", "for example", "such as"],
-    "rows": "The rows handed for the person's previous message, in the same order, plus for each of them its next line when helper-talk-v2.json gives it as kind line (bot1-next, use-more, use1-next, use3-next), as a row of its own. If the previous message got a line with no rows (a code line), the row of that line and its next line. At most 5.",
-    "why": "hhtech's finding: the AI can answer \"and then?\" only when the next step is inside the handed rows (docs/answers/hhtech-live-reply.md, For hhcontent).",
-    "gap": "Most rows carry their next step as a button (a paste box or Open Model), not as text, so for them the AI can only say it has not checked what comes next. The paste texts are not handed: they hold <slots> and are written for the person's own Hermes.",
-    "how_note": "live-v2 changes-1: how and how? right after a line from rows are kind mean in the no-AI turn (helper-talk-v2.json small_talk.how_after_rows), no longer CUT, so step 2 does not stop them: their result is plain with why \"what do you mean\" or MEAN_NONE, both in code_answers.go_to_ai. live-v2 changes-2: and, and? and and then, and then? join them (how_after_rows.words), so and is no longer CUT there; and then was N1 before and was already a follow-up with an AI step.",
-    "status": "not_run"
-  },
-
-  "rows": {
-    "about": "The rows the AI may be handed. Built from the data as hhtech's live.py builds them (FACTS), plus the next lines. Sent as one line each: [id] text. No docs quote is sent (as run).",
-    "from": [
-      {"source": "helper-talk-v2.json topics[].plain and topics[].needs[]", "subject": "the topic id", "key_words": "plain: the topic's key_words and misspellings; need: the need's key_words, with the topic's key_words as weak words"},
-      {"source": "helper-talk-v2.json topics[].plain.next and needs[].next, kind line only", "subject": "the topic id", "id": "the next's id", "key_words": "none of its own; handed only as a follow-up or with its row"},
-      {"source": "helper-talk-v2.json terms[]", "subject": "words", "key_words": "the term's key_words"},
-      {"source": "helper-wants-v1.json wants[]", "subject": "the want's group", "key_words": "key_words plus every action + thing pair; things as weak words"},
-      {"source": "helper-talk-v2.json fixed_lines COST", "subject": "cost", "key_words": ["cost", "costs", "price", "pay", "free", "money"]},
-      {"source": "helper-talk-v2.json fixed_lines WHERE", "subject": "cost", "key_words": ["cloud", "server", "vps", "laptop", "always on", "24/7"]},
-      {"source": "helper-wants-v1.json fixed_lines CN1", "subject": "svc", "key_words": ["gmail", "google calendar", "google drive", "calendar", "drive"]}
-    ],
-    "score": "2 for each key word of the row found in the message (helper-talk-v2.json match_rule), plus 0.5 if any weak word is found, plus 0.5 for each word of 3 letters or more, not in stop_words, that the message shares with the row's text and title. A row counts in word matching only with a score of 2 or more.",
-    "stop_words": "a an the i me my it is are to of for and or in on do does can could how what which who why when you your this that with be have has about so if at by from as not just get use using want will would there any its it's i'm",
-    "rank_in": "After the first call picks a subject: that subject's rows sorted by the same score, the first 5 (rows with score 0 included).",
-    "max_handed": 5,
-    "never_all": "Never more than 5 rows, never a whole list.",
-    "status": "ran_by_hhtech (live.py score, by_words, rank_in), on a copy without topic use and without next lines; those two are not_run"
-  },
-
-  "subjects": {
-    "about": "The short list for the first call. Ids and titles as sent.",
-    "list": [
-      {"id": "mem", "title": "Memory", "status": "ran_by_hhtech"},
-      {"id": "mod", "title": "Choosing a model", "status": "ran_by_hhtech"},
-      {"id": "msg", "title": "From a phone or chat app", "status": "ran_by_hhtech"},
-      {"id": "sch", "title": "On a schedule", "status": "ran_by_hhtech"},
-      {"id": "svc", "title": "A service you use", "status": "ran_by_hhtech"},
-      {"id": "bot", "title": "More than one bot", "status": "ran_by_hhtech"},
-      {"id": "use", "title": "Using less: fewer tokens, limits, slow answers", "status": "not_run (new topic of changes-14)"},
-      {"id": "words", "title": "What a word means: tools, skills, plugins, MCP, SOUL.md, bots", "status": "ran_by_hhtech"},
-      {"id": "web", "title": "Search and use the web", "status": "ran_by_hhtech"},
-      {"id": "files", "title": "Files and my computer", "status": "ran_by_hhtech"},
-      {"id": "pics", "title": "Pictures and video", "status": "ran_by_hhtech"},
-      {"id": "voice", "title": "Voice and sound", "status": "ran_by_hhtech"},
-      {"id": "cost", "title": "Cost, and which computer", "status": "ran_by_hhtech"},
-      {"id": "talk", "title": "ordinary talk: hello, thanks, ok, a cut-off word, \"what do you mean\", \"and then?\" about the conversation so far", "status": "ran_by_hhtech"},
-      {"id": "build", "title": "the person asks Helper to make, build, install, connect or do something for them", "status": "ran_by_hhtech"},
-      {"id": "none", "title": "anything else, or a question about Hermes that none of the words above covers", "status": "ran_by_hhtech"}
+   }
+  ],
+  "fallback": {
+   "rule": "The person sees the no-AI result of step 1 (passed through no_repeat) when: the call fails or no AI is set up; the AI answers NONE; the AI answers BUILD and the message is a how-question; any check fails; 12 seconds pass from the moment the message is sent (first call and writer together). A reply that comes after 12 seconds is dropped, never shown, never under a later message. The person is never told a check failed.",
+   "seconds": 12,
+   "seconds_source": "hhtech, docs/answers/hhtech-live-reply.md section 5: every free-model and 2B reply came within 13.2 s; no 9B reply did. Replaces hhcontent's 8.",
+   "one_at_a_time": "One AI turn at a time. If the person sends a new message while Helper waits, the waiting message gets its no-AI result at once and the new message starts its own turn. Proposal, not_run; hhtech and hhdesign to confirm.",
+   "while_waiting": "The character's busy face (plugin/src/expressions.js lines 120 to 124, per hhtech). No text promises a time.",
+   "status": "not_run (proposal of hhtech and hhcontent)"
+  }
+ },
+ "code_answers": {
+  "about": "No-AI result kinds that are shown with no AI call: code is sure, or the line asks the person something it needs.",
+  "kinds": [
+   "K1",
+   "HELLO",
+   "HELLO_SAME",
+   "THANKS",
+   "OK",
+   "HOW",
+   "WHO",
+   "AI",
+   "AI_PICK",
+   "AI_WRITES",
+   "BYE",
+   "CUT",
+   "WRONG",
+   "RM1",
+   "RM2",
+   "RM3",
+   "RM4",
+   "RM5",
+   "RM6",
+   "TP",
+   "H1",
+   "F1",
+   "F2",
+   "F3",
+   "N1a",
+   "NAME_AGAIN",
+   "NAME_NEW",
+   "COST",
+   "WHERE",
+   "W1",
+   "W2",
+   "term",
+   "row",
+   "question",
+   "plain",
+   "skill",
+   "wants",
+   "OK_SAME",
+   "THANKS_SAME",
+   "HOW_SAME",
+   "BYE_SAME",
+   "CUT_SAME",
+   "WRONG_SAME",
+   "anything from small_talk kind again"
+  ],
+  "go_to_ai": [
+   "N1",
+   "N1_AGAIN",
+   "MEAN_NONE",
+   "AGAIN",
+   "plain with why \"what do you mean\"",
+   "STUCK",
+   "STUCK_SAME"
+  ],
+  "changes_3": "live-v2 changes-3: the _SAME lines are small talk, answered by code like their kind's first line. Kind again (helper-talk-v2.json small_talk.again_rule) is code's whatever it shows, AGAIN and MEAN_NONE included: it brings back a line word for word, so there is nothing for an AI to write, and it is not passed through no_repeat again. STUCK and STUCK_SAME (that didn't work ...) go to the AI as a follow-up (follow_up.rule), with STUCK or STUCK_SAME as the fallback. I'm confused stays kind mean, so it reaches the AI as before.",
+  "note": "plain is code's only when it came from what_is or a topic with no need; the plain line that answers \"what do you mean\" goes to the AI as a follow-up. skill and wants: the skills-by-name line (S1, S2) and a wants row found by code (helper-wants-v1.json). Kinds not listed in either list: code's, no call.",
+  "status": "not_run"
+ },
+ "follow_up": {
+  "rule": "A message is a follow-up when Helper's last line came from rows (row, plain, term, wants, COST, WHERE, or a written reply that used rows) and either the no-AI turn found small_talk kind mean or kind stuck (live-v2 changes-3), or the whole message (after cutting ok, okay, so, and, cool, right and end marks) is one of phrases.",
+  "phrases": [
+   "and then",
+   "then what",
+   "what then",
+   "what next",
+   "what's next",
+   "whats next",
+   "next",
+   "and next",
+   "what now",
+   "now what",
+   "then",
+   "how",
+   "how?",
+   "what do you mean",
+   "what does that mean",
+   "meaning",
+   "i don't get it",
+   "i dont get it",
+   "explain",
+   "explain that",
+   "tell me more",
+   "more",
+   "go on",
+   "and",
+   "like what",
+   "for example",
+   "such as"
+  ],
+  "rows": "The rows handed for the person's previous message, in the same order, plus for each of them its next line when helper-talk-v2.json gives it as kind line (bot1-next, use-more, use1-next, use3-next), as a row of its own. If the previous message got a line with no rows (a code line), the row of that line and its next line. At most 5.",
+  "why": "hhtech's finding: the AI can answer \"and then?\" only when the next step is inside the handed rows (docs/answers/hhtech-live-reply.md, For hhcontent).",
+  "gap": "Most rows carry their next step as a button (a paste box or Open Model), not as text, so for them the AI can only say it has not checked what comes next. The paste texts are not handed: they hold <slots> and are written for the person's own Hermes.",
+  "how_note": "live-v2 changes-1: how and how? right after a line from rows are kind mean in the no-AI turn (helper-talk-v2.json small_talk.how_after_rows), no longer CUT, so step 2 does not stop them: their result is plain with why \"what do you mean\" or MEAN_NONE, both in code_answers.go_to_ai. live-v2 changes-2: and, and? and and then, and then? join them (how_after_rows.words), so and is no longer CUT there; and then was N1 before and was already a follow-up with an AI step.",
+  "status": "not_run",
+  "rows_c6": "live changes-6: a row's then line (helper-talk-v2.json topics[].plain.then, now only msg0-then) is handed after the row, as a next line of kind line is.",
+  "work_line_c9": "live changes-9: on a follow-up the About them line is NOT handed (the slot {work_line} is left out in the writer call). The line is there only to choose which facts fit, and on a follow-up the rows are already fixed: the rows of the message before. hhtech-live-run2 run C call 53 is the case: one row, a follow-up, and the 2B turned the line into a step. status: not_run",
+  "ask_fix_t1": "ask-fix-t1 (helper-talk-v2.json small_talk.how_that and mean_rule_ask_fix_t1): the how_that phrases (ok and how do I do that ...) are answered by code before any AI call, with or without an AI: PICK_FIRST while things to pick show, else the last line's then line, its next line, HOW_PASTE or HOW_PART. Only when none of these exists does the message go on as a follow-up. Kind mean right after a term line with a mean field shows that field with no AI call; when the turn does go to the AI as a follow-up, the mean text (skill-mean, plugin-mean) is handed as a row after the term line, as use1-next-mean is."
+ },
+ "rows": {
+  "about": "The rows the AI may be handed. Built from the data as hhtech's live.py builds them (FACTS), plus the next lines. Sent as one line each: [id] text. No docs quote is sent (as run).",
+  "from": [
+   {
+    "source": "helper-talk-v2.json topics[].plain and topics[].needs[]",
+    "subject": "the topic id",
+    "key_words": "plain: the topic's key_words and misspellings; need: the need's key_words, with the topic's key_words as weak words"
+   },
+   {
+    "source": "helper-talk-v2.json topics[].plain.next and needs[].next, kind line only",
+    "subject": "the topic id",
+    "id": "the next's id",
+    "key_words": "none of its own; handed only as a follow-up or with its row"
+   },
+   {
+    "source": "helper-talk-v2.json terms[]",
+    "subject": "words",
+    "key_words": "the term's key_words"
+   },
+   {
+    "source": "helper-wants-v1.json wants[]",
+    "subject": "the want's group",
+    "key_words": "key_words plus every action + thing pair; things as weak words"
+   },
+   {
+    "source": "helper-talk-v2.json fixed_lines COST",
+    "subject": "cost",
+    "key_words": [
+     "cost",
+     "costs",
+     "price",
+     "pay",
+     "free",
+     "money"
     ]
-  },
-
-  "input": {
-    "text": "Conversation so far:\n{last_lines}\n\nThe person's newest message: {message}",
-    "text_no_lines": "The person's newest message: {message}",
-    "last_lines": "The last 4 lines of this visit's conversation, oldest first, one per line, \"Person: ...\" or \"Helper: ...\", each cut at 200 characters. Helper's lines are its shown text only (no grey line, no button, no paste box).",
-    "never_sent": [
-      "anything Helper keeps except work: the name, the three kept answers, things kept on request (Lead, 11 Nov 00:55). changes-4: work (what the person does) is the one exception, sent only as work_line in the instructions",
-      "Helper's lines with the name slot filled: send the no-name text (BACK text_no_name, HELLO and F2 without the name; F1 as \"Nice to meet you. What do you do?\")",
-      "the person's line that gave the name (the answer to What's your name?, a NAME_NEW or NAME_AGAIN message): left out of last_lines",
-      "the person's \"remember that ...\" lines and Helper's RM lines: left out",
-      "a line that got K1 (a key): left out",
-      "the grey Kept: and From what I keep: lines"
-    ],
-    "name_check": "Before sending, code looks for the kept name as a whole word in last_lines (any case). If found, that line is left out. Not in the new message: what the person types now is theirs to send.",
-    "work_line": {
-      "text": "About them: {work}",
-      "where": "writer.text and pick_only.text, at the slot {work_line}: one line of its own, right before Checked facts: (writer) or before the list (pick_only). Never in input.text, never in the first call.",
-      "max_words": 12,
-      "max_words_note": "{work} is at most 12 words and 80 characters (helper-talk-v2.json keeps.work.limits), so the whole line is at most 19 words.",
-      "when": "Only when keeps.work holds a value. No value: the slot and its line break are left out; nothing like (none) is sent.",
-      "guard": "Right before sending, code checks the value again: looks_secret false, K1 patterns no match, within the limits. If any fails, the slot is left out (the value could only get there by an older build or a hand-edited store).",
-      "never": "The name is never in this line or anywhere in the request (name_check as before).",
-      "added": "live-v2 changes-4 (Lead's call told to Pēteris, 11 Nov; his words of 03:50 and 03:58)",
-      "status": "not_run"
-    },
-    "cut_at_chars": 1500,
-    "temperature": 0.2,
-    "status": "ran_by_hhtech (the form, 0.2, 1500 characters); never_sent and name_check are not_run"
-  },
-
-  "first_call": {
-    "text": "You sort messages for Helper, a part of the Hermes app that explains Hermes to newcomers.\nRead the person's newest message (and the conversation before it, if any). Reply with ONE word from this list and nothing else:\n{subjects: one per line, as id = title}",
-    "max_tokens": 20,
-    "read": "Lower-case the reply, cut a <think>...</think> block, take the first word that is a subject id. None found: none.",
-    "changes_from_run": ["subject use added (not_run)"],
+   },
+   {
+    "source": "helper-talk-v2.json fixed_lines WHERE",
+    "subject": "cost",
+    "key_words": [
+     "cloud",
+     "server",
+     "vps",
+     "laptop",
+     "always on",
+     "24/7"
+    ]
+   },
+   {
+    "source": "helper-wants-v1.json fixed_lines CN1",
+    "subject": "svc",
+    "key_words": [
+     "gmail",
+     "google calendar",
+     "google drive",
+     "calendar",
+     "drive"
+    ]
+   }
+  ],
+  "score": "2 for each key word of the row found in the message (helper-talk-v2.json match_rule), plus 0.5 if any weak word is found, plus 0.5 for each word of 3 letters or more, not in stop_words, that the message shares with the row's text and title. A row counts in word matching only with a score of 2 or more.",
+  "stop_words": "a an the i me my it is are to of for and or in on do does can could how what which who why when you your this that with be have has about so if at by from as not just get use using want will would there any its it's i'm",
+  "rank_in": "After the first call picks a subject: that subject's rows sorted by the same score, the first 5 (rows with score 0 included).",
+  "max_handed": 5,
+  "never_all": "Never more than 5 rows, never a whole list.",
+  "status": "ran_by_hhtech (live.py score, by_words, rank_in), on a copy without topic use and without next lines; those two are not_run"
+ },
+ "subjects": {
+  "about": "The short list for the first call. Ids and titles as sent.",
+  "list": [
+   {
+    "id": "mem",
+    "title": "Memory",
     "status": "ran_by_hhtech"
+   },
+   {
+    "id": "mod",
+    "title": "Choosing a model",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "msg",
+    "title": "From a phone or chat app",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "sch",
+    "title": "On a schedule",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "svc",
+    "title": "A service you use",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "bot",
+    "title": "More than one bot",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "use",
+    "title": "Using less: fewer tokens, limits, slow answers",
+    "status": "not_run (new topic of changes-14)"
+   },
+   {
+    "id": "words",
+    "title": "What a word means: tools, skills, plugins, MCP, SOUL.md, bots",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "web",
+    "title": "Search and use the web",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "files",
+    "title": "Files and my computer",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "pics",
+    "title": "Pictures and video",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "voice",
+    "title": "Voice and sound",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "cost",
+    "title": "Cost, and which computer",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "talk",
+    "title": "ordinary talk: hello, thanks, ok, a cut-off word, \"what do you mean\", \"and then?\" about the conversation so far",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "build",
+    "title": "the person asks Helper to make, build, install, connect or do something for them",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "none",
+    "title": "anything else, or a question about Hermes that none of the words above covers",
+    "status": "ran_by_hhtech"
+   }
+  ]
+ },
+ "input": {
+  "text": "Conversation so far:\n{last_lines}\n\nThe person's newest message: {message}",
+  "text_no_lines": "The person's newest message: {message}",
+  "last_lines": "The last 4 lines of this visit's conversation, oldest first, one per line, \"Person: ...\" or \"Helper: ...\", each cut at 200 characters. Helper's lines are its shown text only (no grey line, no button, no paste box).",
+  "never_sent": [
+   "anything Helper keeps except work: the name, the three kept answers, things kept on request (Lead, 11 Nov 00:55). changes-4: work (what the person does) is the one exception, sent only as work_line in the instructions",
+   "Helper's lines with the name slot filled: send the no-name text (BACK text_no_name, HELLO and F2 without the name; F1 as \"Nice to meet you. What do you do?\")",
+   "the person's line that gave the name (the answer to What's your name?, a NAME_NEW or NAME_AGAIN message): left out of last_lines",
+   "the person's \"remember that ...\" lines and Helper's RM lines: left out",
+   "a line that got K1 (a key): left out",
+   "the grey Kept: and From what I keep: lines"
+  ],
+  "name_check": "Before sending, code looks for the kept name as a whole word in last_lines (any case). If found, that line is left out. Not in the new message: what the person types now is theirs to send.",
+  "work_line": {
+   "text": "About them: {work}",
+   "where": "writer.text and pick_only.text, at the slot {work_line}: one line of its own, right before Checked facts: (writer) or before the list (pick_only). Never in input.text, never in the first call.",
+   "max_words": 12,
+   "max_words_note": "{work} is at most 12 words and 80 characters (helper-talk-v2.json keeps.work.limits), so the whole line is at most 19 words.",
+   "when": "Only when keeps.work holds a value. No value: the slot and its line break are left out; nothing like (none) is sent. Never on a follow-up (follow_up.work_line_c9, live changes-9).",
+   "guard": "Right before sending, code checks the value again: looks_secret false, K1 patterns no match, within the limits. If any fails, the slot is left out (the value could only get there by an older build or a hand-edited store).",
+   "never": "The name is never in this line or anywhere in the request (name_check as before).",
+   "added": "live-v2 changes-4 (Lead's call told to Pēteris, 11 Nov; his words of 03:50 and 03:58)",
+   "status": "not_run"
   },
-
-  "writer": {
-    "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence and invite a question about Hermes. Add no fact.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
-    "max_tokens": 200,
-    "read": "Cut a <think>...</think> block. The last line starting USED: gives the used ids (missing: no ids, not a failure, as run). The rest is the reply. A reply that starts with NONE or BUILD (any case) is that word.",
-    "changes_from_run": [
-      "rule 2 is new: no \"cannot\" or \"does not\" unless a fact says so (hhtech's finding: the 2B's \"Hermes does not have a built-in skill to export chats to PDF\" passed every check). not_run",
-      "rule 5 gains \"Add no fact.\" (hhcontent B1 rule 3). not_run",
-      "rule 6 (was 5) splits \"what you meant\" from \"what comes next\" and asks for the next step from the facts (hhtech's finding on \"ok and then?\"). not_run",
-      "rule 7 is new: the no-repeat rule of changes-15 for written replies, with the asked-again exemption. not_run",
-      "rule 8 (was 6) gains: no \"!\" (the free model used it in 5 of 17 replies) and no name (Lead: nothing kept is sent, so there is no name to use; the person's own message may hold one). not_run",
-      "kept from the run, word for word: the opening two lines, rules 1, 3, 4, 9 and the word limits 2 sentences and 40 words"
-    ],
-    "status": "ran_by_hhtech without the changes listed"
-  },
-
-  "pick_only": {
-    "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{work_line}\nIf a line About them is given, use it only to choose the line that fits them best.\n{rows: one per line, as [id] text; or (no lines)}",
-    "max_tokens": 20,
-    "rows": "The same rows as the writer gets (order steps 3 to 5).",
-    "read": "Cut a <think> block, then spaces, full stops, brackets, backticks and quote marks at both ends. An id that was handed: show that row's line with its next and buttons, as code would show the row. TALK: the no-AI result if it is not a don't-know line (N1, N1_AGAIN, AGAIN, MEAN_NONE), else OK. BUILD: H1 with its paste box, unless the message is a how-question (then the fallback). NONE or anything else: the fallback. The chosen line then goes through no_repeat.",
-    "changes_from_run": [
-      "the line \"If they ask what comes next, choose the line that gives the next step.\" is new. not_run",
-      "TALK shows a real line of the data, not hhtech's stand-in \"Hi. Ask me anything about Hermes.\" not_run"
-    ],
-    "status": "ran_by_hhtech without the changes listed (21 of 24 right on the free model, way c)"
-  },
-
-  "checks": {
-    "about": "Run in this order on a written reply (mode ai_writes) before it is shown. The first failed check stops: the person sees the fallback. hand = the text of every row handed this turn, lower-cased. A check marked fix changes the reply and does not fail it.",
-    "list": [
-      {"id": "c0", "kind": "fix", "what": "Cut a <think>...</think> block, the USED: line, a code fence around the whole reply, and quote marks around the whole reply. Trim spaces.", "status": "ran_by_hhtech (think, USED); fence and quotes not_run"},
-      {"id": "c1", "kind": "fix", "what": "Turn \"!\" into \".\", curly quotes into straight ones, an em dash or en dash between words into \", \", and \";\" into \",\".", "status": "ran_on_recorded"},
-      {"id": "c2", "kind": "word", "what": "The whole reply is NONE: fallback. BUILD: H1 with its paste box, or the fallback for a how-question.", "status": "ran_by_hhtech"},
-      {"id": "c3", "kind": "fail", "what": "An id after USED: that was not handed.", "status": "ran_by_hhtech"},
-      {"id": "c4", "kind": "fail", "what": "More than 40 words (a word is a run of non-spaces).", "max": 40, "status": "ran_by_hhtech"},
-      {"id": "c5", "kind": "fail", "what": "More than 2 sentences (split after . ! or ? followed by a space).", "max": 2, "status": "ran_by_hhtech"},
-      {"id": "c6", "kind": "fail", "what": "More than one \"?\".", "status": "ran_by_hhtech"},
-      {"id": "c7", "kind": "fail", "what": "An offer to set up or build: helper-talk-v2.json r9_pattern.", "status": "ran_by_hhtech"},
-      {"id": "c8", "kind": "fail", "what": "A number (\\b\\d[\\d.,:]*\\b) that is not in hand.", "status": "ran_by_hhtech"},
-      {"id": "c9", "kind": "fail", "what": "A quoted run of 2 to 40 characters that is not in hand.", "status": "ran_by_hhtech"},
-      {"id": "c10", "kind": "fail", "what": "A command not in hand: anything in backticks, a word starting with /, or \"hermes <word> <word>\".", "status": "ran_by_hhtech"},
-      {"id": "c11", "kind": "fail", "what": "A skill name of more than 3 letters (helper-wants-v1.json skills) as a whole word, not in hand.", "status": "ran_by_hhtech"},
-      {"id": "c12", "kind": "fail", "what": "A word with a capital letter, not first in the reply and not right after . ! or ?, that is not in ok_caps and not in hand.", "status": "ran_by_hhtech"},
-      {"id": "c13", "kind": "fail", "what": "A word of helper-talk-v2.json r6_pattern (profile, provider, session, context ...) not in hand.", "status": "ran_by_hhtech"},
-      {"id": "c14", "kind": "fail", "what": "A \"no\" claim no handed row holds: the reply has a form from not_words of one class, and no handed row has a form of the same class. The words \"not checked\" and \"haven't checked\" are cut first (writer rule 6 asks for them).", "status": "ran_on_recorded (proposed by hhtech, not run by it)"},
-      {"id": "c15", "kind": "fail", "what": "A link (http, www.) or a \"(\".", "status": "ran_on_recorded"},
-      {"id": "c16", "kind": "fail", "what": "A product word: helper-talk-v2.json r8_never (course, tutor, chatbot, assistant, guide ...).", "status": "ran_on_recorded"},
-      {"id": "c17", "kind": "fail", "what": "A test question: one of test_phrases.", "status": "ran_on_recorded"},
-      {"id": "c18", "kind": "fail", "what": "A \"?\" when Helper's last line ended with \"?\".", "status": "not_run (needs the conversation; the recorded replies hold it only in part)"},
-      {"id": "c19", "kind": "fail", "what": "A money word (money_words) that is not in hand, after cutting money_cut_first.", "status": "ran_on_recorded"},
-      {"id": "c20", "kind": "fail", "what": "Kept limits: a used row has \"only\" or \"never\", and the reply has neither.", "status": "ran_on_recorded"},
-      {"id": "c21", "kind": "fail", "what": "Ordinary talk: USED: none (or no row handed) and the reply has a number, a quoted word, a money word or a Hermes term (helper-talk-v2.json r5_terms).", "status": "ran_on_recorded"},
-      {"id": "c22", "kind": "fail", "what": "A Hermes term (gloss.list term) with none of its plain words (gloss.list explained_by) in the same reply.", "status": "ran_on_recorded"},
-      {"id": "c23", "kind": "fail", "what": "The reply is Helper's last line again: the same words after lower-casing and dropping marks, unless the message has one of no_repeat.asked_again.words.", "status": "not_run (needs the conversation)"},
-      {"id": "c24", "kind": "fail", "what": "A claim about the person beyond what was kept. For each match of person_pattern (any case), take the up to 3 words after it, stopping at the first . , ; ! or ?. Each such word of 3 letters or more that is not in stop_words or person_ok, and is not (with or without a final s) a word of work, of the person's newest message or of hand, fails the reply. Runs with or without a kept work value.", "person_pattern": "\\b(?:you are|you're|youre|you work|you run|you own|you teach|you study|you manage|you coach|you sell|you have|you've got|as an?|being an?|for your|with your|at your|in your|your)\\s+", "person_ok": ["welcome", "right", "new", "here", "sure", "ready", "able", "asking", "looking", "trying", "own", "hermes", "bot", "bots", "computer", "phone", "messages", "message", "question", "questions", "chats", "chat", "notes", "files", "first", "next", "setup", "model", "settings", "screen", "laptop", "browser", "time", "way", "choice", "free", "glad", "happy", "very", "all", "set", "the", "one"], "added": "live-v2 changes-4", "status": "ran_on_written (apply_c4_check.py, 14 written replies, none from a model)"}
-    ],
-    "ok_caps": ["Hermes", "Helper", "I", "Hi", "Hello", "Yes", "No", "You", "It", "That", "This", "Sure", "Thanks", "Ok", "OK", "Sorry", "Glad", "What", "Which", "Any", "Feel", "Ask", "Happy", "Nice", "There", "Then", "First", "Just", "Let", "Welcome", "Great", "So", "In", "If", "For", "To", "The", "A", "Is", "Do", "Can", "Hermes's", "Of", "Not", "AI", "Hey"],
-    "not_words": {
-      "cannot": ["can't", "cant", "cannot", "can not", "unable"],
-      "does_not": ["doesn't", "doesnt", "does not", "don't", "dont", "do not", "didn't", "did not"],
-      "is_not": ["isn't", "is not", "aren't", "are not", "won't", "will not"],
-      "no_have": ["no built-in", "not have", "has no", "have no", "there is no", "there are no"],
-      "not": ["not", "never"]
-    },
-    "not_cut_first": ["not checked", "haven't checked", "have not checked", "don't have checked", "doesn't say", "does not say", "don't say", "do not say"],
-    "test_phrases": ["do you know", "what do you know", "have you heard", "can you tell me what", "do you understand", "can you guess", "try to remember"],
-    "money_cut_first": ["feel free", "free to ask"],
-    "money_words": ["free", "paid", "pay", "price", "prices", "cost", "costs", "cheap", "cheaper", "expensive", "subscription", "plan", "plans", "$", "€", "£", "dollar", "euro"],
-    "gloss": {
-      "about": "For c22, and for R5 of every pre-written line (dev/checks/hhcontent-talk-v2/check.py reads it from here; it was check.py's GLOSS until live-v2 changes-1). Each Hermes term must have one of its plain words in the same line or reply. Patterns are Python regular expressions (the plugin's pyRegExp). ignore_case false: the term counts only as written (MCP, not mcp). explained_by is always matched in any case. A line's text inside double quotes (a Hermes screen name) is not checked for terms in pre-written lines (check.py); a written reply is checked whole (check_live.py).",
-      "list": [
-        {"term": "\\bmodels?\\b", "explained_by": "\\bAIs?\\b", "ignore_case": true},
-        {"term": "\\bmemory\\b", "explained_by": "\\bnotes?\\b|\\bremembers?\\b", "ignore_case": true},
-        {"term": "\\bskills?\\b", "explained_by": "\\bsteps\\b|\\bteach", "ignore_case": true},
-        {"term": "\\btools?\\b", "explained_by": "\\bactions?\\b", "ignore_case": true},
-        {"term": "\\bplugins?\\b", "explained_by": "\\badd-on", "ignore_case": true},
-        {"term": "\\bMCP\\b", "explained_by": "\\bservices?\\b", "ignore_case": false},
-        {"term": "\\bbots?\\b", "explained_by": "separate Hermes|\\b(?:its|their) own\\b", "ignore_case": true},
-        {"term": "\\bkeys?\\b", "explained_by": "\\bsecret\\b", "ignore_case": true},
-        {"term": "\\bsubscriptions?\\b", "explained_by": "\\bplan\\b", "ignore_case": true},
-        {"term": "SOUL\\.md", "explained_by": "\\bfile\\b", "ignore_case": true},
-        {"term": "\\btokens?\\b", "explained_by": "pieces of words|word pieces", "ignore_case": true}
-      ],
-      "status": "ran_on_recorded (the same 11 patterns as check.py's GLOSS, moved; check_live.py now honours ignore_case false for MCP, as check.py always did)"
-    },
-    "what_no_check_catches": [
-      "a wrong claim made only of words that are in the rows (\"Hermes can read your Gmail messages through its Connectors page\")",
-      "a comparison the rows do not make (\"like a recipe book\")",
-      "plain-word advice with no name or number in it (\"You can update Hermes by asking it to do so.\")",
-      "a reply that is true but does not answer",
-      "a different wording of the same reply on another model or another day"
-    ]
-  },
-
-  "lines_by_mode": {
-    "about": "The lines the person reads that change with mode. Each line passes R1 to R9 (dev/checks/hhcontent-live-v2/check_live.py runs check.py on them). The README lines are exempt from R1 to R9, as before.",
-    "are_you_an_ai": {
-      "no_ai_step": {"id": "AI", "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs.", "changed": false},
-      "ai_picks_line": {"id": "AI_PICK", "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits.", "was": "I'm a small program inside Hermes, not a person. Your own AI only picks which checked line fits.", "why": "Code answers most messages itself; the AI is asked only when code is not sure."},
-      "ai_writes": {"id": "AI_WRITES", "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong.", "was": "I'm a small program inside Hermes, not a person. Your own AI writes my words from checked facts.", "why": "Only some replies are written; the checks do not stop every wrong claim (hhtech's 2B run)."}
-    },
-    "first_time_grey": {
-      "about": "keeps.tell first-time line: under the first Kept: line, once.",
-      "no_ai_step": {"text": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.", "changed": false},
-      "ai_picks_line": {"text": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.", "was_c4": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords."},
-      "ai_writes": {"text": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.", "was_c4": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords."},
-      "work_told": {"no_ai_step": null, "ai_picks_line": "I also tell your AI what you do when I ask it for help.", "ai_writes": "I also tell your AI what you do when I ask it for help.", "when": "helper-talk-v2.json keeps.tell.work_told.when: under the Kept: line that holds what the person does, the first time. changes-4."},
-      "same_for_both": "One line for both AI modes: the difference between picking and writing is told in the AI line and the README; 25 words leave no room here. It starts as the no-AI line does (check_json.py checks that).",
-      "replaces": "keeps.tell.first_time (\"Only your name goes to your AI, and no one else.\"), false since Lead's rule of 11 Nov 00:55. helper-talk-v2.json keeps.tell.first_time now holds this line."
-    },
-    "settings_top_line_2": {
-      "no_ai_step": null,
-      "ai_picks_line": "Only the What you do line is sent to your AI, when Helper asks it for help.",
-      "ai_writes": "Only the What you do line is sent to your AI, when Helper asks it for help.",
-      "was_c4": "Nothing on this page is sent to any AI.",
-      "replaces": "keeps.settings_file.top_line_2 (\"Only your name goes to your AI, when you type to Helper.\"), false now"
-    },
-    "readme_point_11": {
-      "no_ai_step": "11. Nothing you type to Helper is sent to any AI, including the AI your Hermes uses. Helper answers with fixed text, picked by fixed rules on this computer. Of what you type, it keeps only the things in points 2 to 4, in the Hermes app's own storage on this computer. You can see and delete them as point 10 says.",
-      "ai_picks_line": "11. Helper answers most messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI only picks which of Helper's checked lines to show. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent.",
-      "ai_writes": "11. Helper answers many messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI writes Helper's reply in its own words from those checked lines, and Helper checks each reply by fixed rules before showing it. On a small AI on your own computer, Helper can still say things that are not true, and the checks do not catch all of them. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent.",
-      "source": "hhtech's sentence, docs/answers/hhtech-live-reply.md section 7; Lead's rule of 11 Nov 00:55",
-      "true_when": "ai modes: the Builder's test shows the request holds no kept value and no name (input.never_sent). no_ai_step: as before (the page makes no request when a message is typed)."
-    },
-    "readme_status_sentence_2": {
-      "about": "live-v2 changes-1. README line 5 (Status) keeps its first sentence as the Builder writes it (what is built); its second sentence is this, by AI_MODE. Exempt from R1 to R9, as all README lines.",
-      "no_ai_step": "Helper's conversation has no AI step: it answers from pre-written lines chosen by fixed rules on your computer.",
-      "ai_picks_line": "Helper's conversation answers from pre-written lines chosen by fixed rules on your computer. When those rules are not sure, the AI your Hermes uses picks which of those lines to show (point 11).",
-      "ai_writes": "Helper's conversation answers many messages from pre-written lines chosen by fixed rules on your computer. When those rules are not sure, the AI your Hermes uses writes the reply from Helper's checked lines, and fixed rules check it before it is shown (point 11).",
-      "true_when": "no_ai_step: today's line, unchanged. ai_picks_line: every line shown is one of the data's lines (pick_only.read). ai_writes: a written reply is shown only after checks c0 to c23 pass; otherwise the pre-written line (order.fallback)."
-    },
-    "readme_window_sentence": {
-      "about": "live-v2 changes-1. Added to the README bullet that starts \"Helper's conversation window on the right\" (README line 13), right after the sentence that ends \"see the rest at once.\" Guess: Lead's \"point 13\" is this bullet, because README has no numbered point 13 (its numbered list ends at 12). no_ai_step: nothing is added.",
-      "no_ai_step": null,
-      "ai_picks_line": "When Helper asks your AI, three dots show in the speech bubble while it waits, for at most 12 seconds. If your AI is slow, not set up, or gives no clear answer, Helper shows its own pre-written line instead, and says nothing about it.",
-      "ai_writes": "When Helper asks your AI, three dots show in the speech bubble while it waits, for at most 12 seconds. If your AI is slow, not set up, or its reply fails Helper's checks, Helper shows its own pre-written line instead, and says nothing about it.",
-      "true_when": "the dots: the Builder's row 7 (the dots bubble). 12 seconds and the silent fallback: order.fallback. not set up: no call when the model status is not ok (the Builder's row 5). Both AI lines are false until those rows are built."
-    },
-    "readme_model_call_bullet": {
-      "about": "live-v2 changes-1. README line 24, the bullet about the \"The model answers\" card. Its first sentence says the card is the only call; in the AI modes the conversation calls too. no_ai_step: unchanged.",
-      "no_ai_step": "The \"The model answers\" card makes one call to your own model through Hermes, and only when you press Check. It asks the model to reply \"OK\", which spends a little of your model credit. Nothing is saved to your chats and no tools run.",
-      "ai_picks_line": "The \"The model answers\" card makes one call to your own model through Hermes, and only when you press Check. It asks the model to reply \"OK\", which spends a little of your model credit. Helper's conversation also calls your own model through Hermes, one or two short calls for a message its fixed rules are not sure of (point 11). These calls spend a little of your model credit too. Nothing is saved to your chats and no tools run.",
-      "ai_writes": "The \"The model answers\" card makes one call to your own model through Hermes, and only when you press Check. It asks the model to reply \"OK\", which spends a little of your model credit. Helper's conversation also calls your own model through Hermes, one or two short calls for a message its fixed rules are not sure of (point 11). These calls spend a little of your model credit too. Nothing is saved to your chats and no tools run.",
-      "true_when": "one or two calls: order steps 5 and 6 (first call, then the writer or pick call). Nothing saved to chats and no tools: true of the card's call as built; for the conversation's calls the Builder's row 3 says no session, no profile, the same llm.oneshot. Not checked by hhcontent that llm.oneshot runs no tools; the Builder confirms or the last sentence is cut in the AI modes."
+  "cut_at_chars": 1500,
+  "temperature": 0.2,
+  "status": "ran_by_hhtech (the form, 0.2, 1500 characters); never_sent and name_check are not_run"
+ },
+ "first_call": {
+  "text": "You sort messages for Helper, a part of the Hermes app that explains Hermes to newcomers.\nRead the person's newest message (and the conversation before it, if any). Reply with ONE word from this list and nothing else:\n{subjects: one per line, as id = title}",
+  "max_tokens": 20,
+  "read": "Lower-case the reply, cut a <think>...</think> block, take the first word that is a subject id. None found: none.",
+  "changes_from_run": [
+   "subject use added (not_run)"
+  ],
+  "status": "ran_by_hhtech"
+ },
+ "writer": {
+  "text": "You are Helper, inside the Hermes app. You help a newcomer understand Hermes, in plain words.\nReply to the person's newest message. Rules:\n1. Use only the checked facts below. Add nothing that is not in them: no other steps, commands, names, numbers, prices or screen names.\n2. Never say that Hermes cannot do something, does not have something or does not work, unless a fact below says so.\n3. If none of the facts answers the message, reply with only the word NONE.\n4. If the person asks you to make, build, install, connect or do something for them, reply with only the word BUILD.\n5. If the message is ordinary talk (hello, thanks, ok, a cut-off word), reply with one short friendly sentence. Add no fact.\n5b. End with a statement. Never end with \"ask me\", \"let me know\", \"feel free to ask\" or a question. Helper shows things to pick under your reply.\n6. If they ask what you meant, answer again from the facts in other words. If they ask what comes next, give the next step from the facts. If the facts do not say what comes next, say you have not checked that yet.\n7. Do not repeat Helper's last line. Say it in other words, unless the person asks you to say it again.\n8. At most two sentences and 40 words. At most one question. Do not use \"!\". Do not use the person's name. Never offer to do anything for them. Never test them.\n9. On the last line write USED: and the ids of the facts you used, or USED: none.\n10. Do not guess anything about the person: not their job, place, plans, team, customers or needs. Only their own messages and the line About them tell you about them. Use that line only to choose which facts fit best.\n{work_line}\nChecked facts:\n{rows: one per line, as [id] text; or (none)}",
+  "max_tokens": 200,
+  "read": "Cut a <think>...</think> block. The last line starting USED: gives the used ids (missing: no ids, not a failure, as run). The rest is the reply. A reply that starts with NONE or BUILD (any case) is that word.",
+  "changes_from_run": [
+   "rule 2 is new: no \"cannot\" or \"does not\" unless a fact says so (hhtech's finding: the 2B's \"Hermes does not have a built-in skill to export chats to PDF\" passed every check). not_run",
+   "rule 5 gains \"Add no fact.\" (hhcontent B1 rule 3). not_run",
+   "rule 6 (was 5) splits \"what you meant\" from \"what comes next\" and asks for the next step from the facts (hhtech's finding on \"ok and then?\"). not_run",
+   "rule 7 is new: the no-repeat rule of changes-15 for written replies, with the asked-again exemption. not_run",
+   "rule 8 (was 6) gains: no \"!\" (the free model used it in 5 of 17 replies) and no name (Lead: nothing kept is sent, so there is no name to use; the person's own message may hold one). not_run",
+   "kept from the run, word for word: the opening two lines, rules 1, 3, 4, 9 and the word limits 2 sentences and 40 words"
+  ],
+  "status": "ran_by_hhtech without the changes listed",
+  "changed_offer_t1": "Rule 5 no longer invites a question; rule 5b added (his words 11 Nov: Do you want this or do you want that, not Ask me)."
+ },
+ "pick_only": {
+  "text": "You are Helper, inside the Hermes app. Choose which one of Helper's checked lines answers the person's newest message.\nReply with only one id from the list, or TALK if it is ordinary talk (hello, thanks, ok, a cut-off word), or BUILD if they ask Helper to make, install or do something, or NONE if no line answers it. Nothing else.\nIf they ask what comes next, choose the line that gives the next step.\n{work_line}\nIf a line About them is given, use it only to choose the line that fits them best.\n{rows: one per line, as [id] text; or (no lines)}",
+  "max_tokens": 20,
+  "rows": "The same rows as the writer gets (order steps 3 to 5).",
+  "read": "Cut a <think> block, then spaces, full stops, brackets, backticks and quote marks at both ends. An id that was handed: show that row's line with its next and buttons, as code would show the row. TALK: the no-AI result if it is not a don't-know line (N1, N1_AGAIN, AGAIN, MEAN_NONE), else OK. BUILD: H1 with its paste box, unless the message is a how-question (then the fallback). NONE or anything else: the fallback. The chosen line then goes through no_repeat.",
+  "changes_from_run": [
+   "the line \"If they ask what comes next, choose the line that gives the next step.\" is new. not_run",
+   "TALK shows a real line of the data, not hhtech's stand-in \"Hi. Ask me anything about Hermes.\" not_run"
+  ],
+  "status": "ran_by_hhtech without the changes listed (21 of 24 right on the free model, way c)"
+ },
+ "checks": {
+  "about": "Run in this order on a written reply (mode ai_writes) before it is shown. The first failed check stops: the person sees the fallback. hand = the text of every row handed this turn, lower-cased. A check marked fix changes the reply and does not fail it.",
+  "list": [
+   {
+    "id": "c0",
+    "kind": "fix",
+    "what": "Cut a <think>...</think> block, the USED: line, a code fence around the whole reply, and quote marks around the whole reply. Trim spaces.",
+    "status": "ran_by_hhtech (think, USED); fence and quotes not_run"
+   },
+   {
+    "id": "c1",
+    "kind": "fix",
+    "what": "Turn \"!\" into \".\", curly quotes into straight ones, an em dash or en dash between words into \", \", and \";\" into \",\".",
+    "status": "ran_on_recorded"
+   },
+   {
+    "id": "c2",
+    "kind": "word",
+    "what": "The whole reply is NONE: fallback. BUILD: H1 with its paste box, or the fallback for a how-question.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c3",
+    "kind": "fail",
+    "what": "An id after USED: that was not handed.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c4",
+    "kind": "fail",
+    "what": "More than 40 words (a word is a run of non-spaces).",
+    "max": 40,
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c5",
+    "kind": "fail",
+    "what": "More than 2 sentences (split after . ! or ? followed by a space).",
+    "max": 2,
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c6",
+    "kind": "fail",
+    "what": "More than one \"?\".",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c7",
+    "kind": "fail",
+    "what": "An offer to set up or build: helper-talk-v2.json r9_pattern.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c8",
+    "kind": "fail",
+    "what": "A number (\\b\\d[\\d.,:]*\\b) that is not in hand.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c9",
+    "kind": "fail",
+    "what": "A quoted run of 2 to 40 characters that is not in hand.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c10",
+    "kind": "fail",
+    "what": "A command not in hand: anything in backticks, a word starting with /, or \"hermes <word> <word>\".",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c11",
+    "kind": "fail",
+    "what": "A skill name of more than 3 letters (helper-wants-v1.json skills) as a whole word, not in hand.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c12",
+    "kind": "fail",
+    "what": "A word with a capital letter, not first in the reply and not right after . ! or ?, that is not in ok_caps and not in hand.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c13",
+    "kind": "fail",
+    "what": "A word of helper-talk-v2.json r6_pattern (profile, provider, session, context ...) not in hand.",
+    "status": "ran_by_hhtech"
+   },
+   {
+    "id": "c14",
+    "kind": "fail",
+    "what": "A \"no\" claim no handed row holds: the reply has a form from not_words of one class, and no handed row has a form of the same class. The words \"not checked\" and \"haven't checked\" are cut first (writer rule 6 asks for them).",
+    "status": "ran_on_recorded (proposed by hhtech, not run by it)"
+   },
+   {
+    "id": "c15",
+    "kind": "fail",
+    "what": "A link (http, www.) or a \"(\".",
+    "status": "ran_on_recorded"
+   },
+   {
+    "id": "c16",
+    "kind": "fail",
+    "what": "A product word: helper-talk-v2.json r8_never (course, tutor, chatbot, assistant, guide ...).",
+    "status": "ran_on_recorded",
+    "allow_c6": {
+     "rule": "live changes-6. The words guide and guides fail only when their sentence speaks of Helper: it holds I, I'm, me, my, Helper or Helper's, or the words your guide. Every other product word fails as before.",
+     "why": "hhtech-ai-share section 2 item 12: \"It's a written guide that shows Hermes how to handle one task.\" (about a skill) was refused; the fallback MEAN_NONE was worse.",
+     "words": [
+      "guide",
+      "guides"
+     ],
+     "speaks_of_helper": "\\b(?:I|I'm|me|my|Helper|Helper's)\\b|\\byour guides?\\b"
     }
+   },
+   {
+    "id": "c17",
+    "kind": "fail",
+    "what": "A test question: one of test_phrases.",
+    "status": "ran_on_recorded"
+   },
+   {
+    "id": "c18",
+    "kind": "fail",
+    "what": "A \"?\" when Helper's last line ended with \"?\".",
+    "status": "not_run (needs the conversation; the recorded replies hold it only in part)"
+   },
+   {
+    "id": "c19",
+    "kind": "fail",
+    "what": "A money word (money_words) that is not in hand, after cutting money_cut_first.",
+    "status": "ran_on_recorded"
+   },
+   {
+    "id": "c20",
+    "kind": "fail",
+    "what": "Kept limits: a used row has \"only\" or \"never\", and the reply has neither.",
+    "status": "ran_on_recorded"
+   },
+   {
+    "id": "c21",
+    "kind": "fail",
+    "what": "Ordinary talk: no row handed, or a USED: line that lists only none; and the reply has a number, a quoted word, a money word or a Hermes term (helper-talk-v2.json r5_terms). A reply with NO USED: line after rows were handed is NOT ordinary talk: it gets every other check, as a reply from rows does (c3 is skipped, as there is nothing to compare).",
+    "status": "ran_on_recorded",
+    "changed": "live changes-6: hhtech-ai-share section 4 point 1 (the 2B's follow-up reply with no USED: line was read as small talk)."
+   },
+   {
+    "id": "c22",
+    "kind": "fail",
+    "what": "A Hermes term (gloss.list term) with none of its plain words (gloss.list explained_by) in the same reply.",
+    "status": "ran_on_recorded"
+   },
+   {
+    "id": "c23",
+    "kind": "fail",
+    "what": "The reply is Helper's last line again: the same words after lower-casing and dropping marks, unless the message has one of no_repeat.asked_again.words.",
+    "status": "not_run (needs the conversation)"
+   },
+   {
+    "id": "c24",
+    "kind": "fail",
+    "what": "A claim about the person beyond what was kept. For each match of person_pattern (any case), take the up to 3 words after it, stopping at the first . , ; ! or ?. Each such word of 3 letters or more that is not in stop_words or person_ok, and is not (with or without a final s) a word of work, of the person's newest message or of hand, fails the reply. Runs with or without a kept work value.",
+    "person_pattern": "\\b(?:you are|you're|youre|you work|you run|you own|you teach|you study|you manage|you coach|you sell|you have|you've got|as an?|being an?|for your|with your|at your|in your|your)\\s+",
+    "person_ok": [
+     "welcome",
+     "right",
+     "new",
+     "here",
+     "sure",
+     "ready",
+     "able",
+     "asking",
+     "looking",
+     "trying",
+     "own",
+     "hermes",
+     "bot",
+     "bots",
+     "computer",
+     "phone",
+     "messages",
+     "message",
+     "question",
+     "questions",
+     "chats",
+     "chat",
+     "notes",
+     "files",
+     "first",
+     "next",
+     "setup",
+     "model",
+     "settings",
+     "screen",
+     "laptop",
+     "browser",
+     "time",
+     "way",
+     "choice",
+     "free",
+     "glad",
+     "happy",
+     "very",
+     "all",
+     "set",
+     "the",
+     "one"
+    ],
+    "added": "live-v2 changes-4",
+    "status": "ran_on_written (apply_c4_check.py, 14 written replies, none from a model)"
+   }
+  ],
+  "ok_caps": [
+   "Hermes",
+   "Helper",
+   "I",
+   "Hi",
+   "Hello",
+   "Yes",
+   "No",
+   "You",
+   "It",
+   "That",
+   "This",
+   "Sure",
+   "Thanks",
+   "Ok",
+   "OK",
+   "Sorry",
+   "Glad",
+   "What",
+   "Which",
+   "Any",
+   "Feel",
+   "Ask",
+   "Happy",
+   "Nice",
+   "There",
+   "Then",
+   "First",
+   "Just",
+   "Let",
+   "Welcome",
+   "Great",
+   "So",
+   "In",
+   "If",
+   "For",
+   "To",
+   "The",
+   "A",
+   "Is",
+   "Do",
+   "Can",
+   "Hermes's",
+   "Of",
+   "Not",
+   "AI",
+   "Hey"
+  ],
+  "not_words": {
+   "cannot": [
+    "can't",
+    "cant",
+    "cannot",
+    "can not",
+    "unable"
+   ],
+   "does_not": [
+    "doesn't",
+    "doesnt",
+    "does not",
+    "don't",
+    "dont",
+    "do not",
+    "didn't",
+    "did not"
+   ],
+   "is_not": [
+    "isn't",
+    "is not",
+    "aren't",
+    "are not",
+    "won't",
+    "will not"
+   ],
+   "no_have": [
+    "no built-in",
+    "not have",
+    "has no",
+    "have no",
+    "there is no",
+    "there are no"
+   ],
+   "not": [
+    "not",
+    "never"
+   ]
   },
-  "checks_c5": {"note": "live changes-5. no_reply runs first, before c0. c25 to c27 run after c24, same fallback.", "no_reply": {"added": "live changes-5", "rule": "Before any other check: the text is NO reply (the same as no answer in 12 s) when, after trimming, it starts with one of starts (any case) or holds one of holds (exact), or holds <think> with no </think>.", "starts": ["Thinking Process", "Thinking process:", "Thought process", "<think>"], "holds": ["**Analyze", "**Analysis", "**Task:**", "**Request:**"], "why": "hhtech weak-ai section 3: on a managed local server Hermes returns the model's thinking with no tag (agent/auxiliary_client.py lines 8154 to 8183).", "then": "Show the written line, and make no more AI calls in this visit (slow_ai line, once).", "status": "ran_on_written (check_c5.py: hhtech's two recorded thinking texts)"}, "list": [{"id": "c25", "kind": "fail", "added": "live changes-5", "what": "The reply shares no content word with the asked text. Content word: a run of letters of 3 or more, lower-cased, not in stop_words or no_count, compared after cutting a final s, es, ing or ed. The asked text is the person's message; when the message is a follow-up (follow_up.phrases, or 2 content words or fewer) it is that message plus the person's message before it.", "no_count": ["hermes", "can", "use", "using", "used", "get", "make", "want", "need", "know", "like", "just", "really", "does", "did", "doing", "thing", "things", "something", "anything", "way", "good", "best", "newest", "new", "version", "total", "beginner", "ok", "okay", "thanks", "please", "tell", "say", "said", "mean", "means", "explain", "then", "next", "more", "what", "how", "why", "when", "where", "which", "who", "this", "that", "with", "for", "the", "and", "you", "your", "are", "have", "will", "would", "should", "could", "there", "here", "all", "too", "much", "many", "very", "even", "still", "also", "into", "from", "about", "not", "don't", "dont", "i'm", "it's", "its", "what's", "whats"], "skip_when": "Ordinary talk (USED: none, or no row handed): c25 does not run.", "status": "NOT ADOPTED. Ran on recorded (check_c5.py): it drops good replies on every model (free 5 of 16, 9B 6 of 15, 2B 5 of 13), because people ask in their words and the rows answer in Hermes's (phone / Telegram, remember / saves, internet / web). Kept here so nobody adds it again without this count. Do not build.", "adopted": false}, {"id": "c26", "kind": "fail", "added": "live changes-5", "what": "The reply holds one of words (any case): the model's own notes or the instruction labels shown to the person.", "words": ["the person", "checked facts", "USED", "about them:", "what the person does", "the rows", "the facts given", "my notes"], "status": "ran_on_recorded (check_c5.py)"}, {"id": "c27", "kind": "fail", "added": "live changes-5", "what": "The message asks a kind of thing the reply does not give. For each class: when the person's message (only the message, never the earlier one) holds one of asks, the reply must hold one of gives.", "classes": [{"id": "money", "asks": ["pay", "paid", "paying", "cost", "costs", "price", "money", "free", "subscription", "expensive", "cheap", "charge"], "gives": ["pay", "paid", "free", "cost", "costs", "price", "money", "charge", "subscription", "nothing extra"]}, {"id": "choice", "asks": ["best", "which", "pick", "choose", "recommend", "should i use", "what should i"], "gives": ["pick", "choose", "start", "try", "use", "recommend", "best", "if you", "free", "paid", "plan", "open", "not checked", "haven't checked", "do not say", "don't say"]}, {"id": "next", "asks_whole": ["then", "and then", "then what", "what then", "what next", "what's next", "whats next", "next", "and next", "what now", "now what"], "gives": ["then", "next", "after", "open", "click", "press", "paste", "copy", "type", "send", "add", "choose", "pick", "scan", "not checked", "haven't checked", "do not say", "don't say"]}], "note": "asks_whole: the whole message, after cutting ok, okay, so, and, cool, right and end marks, as in follow_up.", "status": "ran_on_recorded (check_c5.py)"}]},
-  "slow_ai": {"added": "live changes-5", "when": "The first AI call of a visit gives no answer in 12 s, or no_reply text. Lead's decision 11 Nov: said once per visit, never again in that visit; after it, written lines only for the rest of the visit.", "where": "As Helper's line right after the written answer to that message (the written answer comes first). A paste box under it with paste_text, as H1's box.", "variants": [{"id": "SLOW_A", "text": "Your AI took too long to answer, so I answered from my own notes. To make it quicker for me, paste this into a new chat with your Hermes."}, {"id": "SLOW_B", "text": "Your AI was still thinking after 12 seconds, so this answer is from my own checked notes. If you want it faster, paste this into a new chat with your Hermes."}], "recommended": "SLOW_A", "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helping Hand's short calls, not for my own chats. Show me the change before you save it.", "paste_label": "Text for your own Hermes", "source": "/hermes-docs/user-guide/configuration.md lines 1606 to 1612: \"Auxiliary task blocks additionally accept a reasoning_effort knob\" ... \"Thinking level for that task's LLM calls: none, minimal, low, medium, high, xhigh, max, ultra\" ... \"the per-task counterpart of the global agent.reasoning_effort ... without touching your main chat behavior.\" The task name helping_hand: hhtech weak-ai section 1 (ran).", "status": "written; not run in the app"}
+  "not_cut_first": [
+   "not checked",
+   "haven't checked",
+   "have not checked",
+   "don't have checked",
+   "doesn't say",
+   "does not say",
+   "don't say",
+   "do not say"
+  ],
+  "test_phrases": [
+   "do you know",
+   "what do you know",
+   "have you heard",
+   "can you tell me what",
+   "do you understand",
+   "can you guess",
+   "try to remember"
+  ],
+  "money_cut_first": [
+   "feel free",
+   "free to ask"
+  ],
+  "money_words": [
+   "free",
+   "paid",
+   "pay",
+   "price",
+   "prices",
+   "cost",
+   "costs",
+   "cheap",
+   "cheaper",
+   "expensive",
+   "subscription",
+   "plan",
+   "plans",
+   "$",
+   "€",
+   "£",
+   "dollar",
+   "euro"
+  ],
+  "gloss": {
+   "about": "For c22, and for R5 of every pre-written line (dev/checks/hhcontent-talk-v2/check.py reads it from here; it was check.py's GLOSS until live-v2 changes-1). Each Hermes term must have one of its plain words in the same line or reply. Patterns are Python regular expressions (the plugin's pyRegExp). ignore_case false: the term counts only as written (MCP, not mcp). explained_by is always matched in any case. A line's text inside double quotes (a Hermes screen name) is not checked for terms in pre-written lines (check.py); a written reply is checked whole (check_live.py).",
+   "list": [
+    {
+     "term": "\\bmodels?\\b",
+     "explained_by": "\\bAIs?\\b",
+     "ignore_case": true
+    },
+    {
+     "term": "\\bmemory\\b",
+     "explained_by": "\\bnotes?\\b|\\bremembers?\\b",
+     "ignore_case": true
+    },
+    {
+     "term": "\\bskills?\\b",
+     "explained_by": "\\bsteps\\b|\\bteach",
+     "ignore_case": true
+    },
+    {
+     "term": "\\btools?\\b",
+     "explained_by": "\\bactions?\\b",
+     "ignore_case": true
+    },
+    {
+     "term": "\\bplugins?\\b",
+     "explained_by": "\\badd-on",
+     "ignore_case": true
+    },
+    {
+     "term": "\\bMCP\\b",
+     "explained_by": "\\bservices?\\b",
+     "ignore_case": false
+    },
+    {
+     "term": "\\bbots?\\b",
+     "explained_by": "separate Hermes|\\b(?:its|their) own\\b",
+     "ignore_case": true
+    },
+    {
+     "term": "\\bkeys?\\b",
+     "explained_by": "\\bsecret\\b",
+     "ignore_case": true
+    },
+    {
+     "term": "\\bsubscriptions?\\b",
+     "explained_by": "\\bplan\\b",
+     "ignore_case": true
+    },
+    {
+     "term": "SOUL\\.md",
+     "explained_by": "\\bfile\\b",
+     "ignore_case": true
+    },
+    {
+     "term": "\\btokens?\\b",
+     "explained_by": "pieces? of (?:a )?words?|word[- ]?pieces?|(?:text|word) units?|units? of (?:text|words?)|(?:small|short|tiny) (?:pieces?|bits?|chunks?|parts?) of (?:text|a word|words)|bits? of text|chunks? of text",
+     "ignore_case": true,
+     "was_c6": "pieces of words|word pieces",
+     "changed": "live changes-6: hhtech-ai-share section 4 point 1: \"small text units\" and \"a small piece of a word\" explain tokens and were refused."
+    }
+   ],
+   "status": "ran_on_recorded (the same 11 patterns as check.py's GLOSS, moved; check_live.py now honours ignore_case false for MCP, as check.py always did)"
+  },
+  "what_no_check_catches": [
+   "a wrong claim made only of words that are in the rows (\"Hermes can read your Gmail messages through its Connectors page\")",
+   "a comparison the rows do not make (\"like a recipe book\")",
+   "plain-word advice with no name or number in it (\"You can update Hermes by asking it to do so.\")",
+   "a reply that is true but does not answer",
+   "a different wording of the same reply on another model or another day"
+  ]
+ },
+ "lines_by_mode": {
+  "about": "The lines the person reads that change with mode. Each line passes R1 to R9 (dev/checks/hhcontent-live-v2/check_live.py runs check.py on them). The README lines are exempt from R1 to R9, as before.",
+  "are_you_an_ai": {
+   "no_ai_step": {
+    "id": "AI",
+    "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs.",
+    "changed": false
+   },
+   "ai_picks_line": {
+    "id": "AI_PICK",
+    "text": "I'm a small program inside Hermes, not a person. When I'm not sure, your own AI picks which checked line fits.",
+    "was": "I'm a small program inside Hermes, not a person. Your own AI only picks which checked line fits.",
+    "why": "Code answers most messages itself; the AI is asked only when code is not sure."
+   },
+   "ai_writes": {
+    "id": "AI_WRITES",
+    "text": "I'm a small program inside Hermes, not a person. Your own AI writes some replies from checked facts. It can still get things wrong.",
+    "was": "I'm a small program inside Hermes, not a person. Your own AI writes my words from checked facts.",
+    "why": "Only some replies are written; the checks do not stop every wrong claim (hhtech's 2B run)."
+   }
+  },
+  "first_time_grey": {
+   "about": "keeps.tell first-time line: under the first Kept: line, once.",
+   "no_ai_step": {
+    "text": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.",
+    "changed": false
+   },
+   "ai_picks_line": {
+    "text": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.",
+    "was_c4": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords."
+   },
+   "ai_writes": {
+    "text": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not your name. Never tell me passwords.",
+    "was_c4": "I keep this in the Hermes app on this computer. Your messages can go to your AI, but not this. Never tell me passwords."
+   },
+   "work_told": {
+    "no_ai_step": null,
+    "ai_picks_line": "I also tell your AI what you do when I ask it for help.",
+    "ai_writes": "I also tell your AI what you do when I ask it for help.",
+    "when": "helper-talk-v2.json keeps.tell.work_told.when: under the Kept: line that holds what the person does, the first time. changes-4."
+   },
+   "same_for_both": "One line for both AI modes: the difference between picking and writing is told in the AI line and the README; 25 words leave no room here. It starts as the no-AI line does (check_json.py checks that).",
+   "replaces": "keeps.tell.first_time (\"Only your name goes to your AI, and no one else.\"), false since Lead's rule of 11 Nov 00:55. helper-talk-v2.json keeps.tell.first_time now holds this line.",
+   "setup_told": {
+    "about": "live changes-6: the setup chat (content/helper-setup-chat-v1.md line 67) sends two more kept answers to the person's AI. Replaces work_told in AI builds once the setup chat is built; until then work_told stays.",
+    "no_ai_step": null,
+    "ai_picks_line": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help.",
+    "ai_writes": "Your AI also gets what you do, what you want and if you're new. It gets them only when I ask it for help.",
+    "when": "Under the first Kept: line that holds one of the three (What you do, New to Hermes, What you want Hermes to do), once.",
+    "entry_note_c1": "setup-chat changes-1: not used in the entry (SETUP_AI_BUILT false). work_told is the true line there."
+   }
+  },
+  "settings_top_line_2": {
+   "no_ai_step": null,
+   "ai_picks_line": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.",
+   "ai_writes": "These go to your AI: What you do, New to Hermes, What you want. Only when Helper asks it for help.",
+   "was_c4": "Nothing on this page is sent to any AI.",
+   "replaces": "keeps.settings_file.top_line_2 (\"Only your name goes to your AI, when you type to Helper.\"), false now",
+   "was_c6": "Only the What you do line is sent to your AI, when Helper asks it for help.",
+   "note_c6": "live changes-6: the changes-4 line failed R1-R9 (a 17-word sentence) and named only one line; the setup chat sends three. The row names are the Settings rows of content/helper-setup-chat-v1.md lines 24 to 26 (the third row's full label is What you want Hermes to do)."
+  },
+  "settings_top_line_2_work_only": {
+   "about": "setup-chat changes-1: the build with the set-up conversation and its AI step off (SETUP_AI_BUILT false). Only What you do is handed to the AI, on typed questions. Takes the place of was_c6, which had a 17-word sentence.",
+   "no_ai_step": null,
+   "ai_picks_line": "Only What you do goes to your AI. Only when Helper asks it for help.",
+   "ai_writes": "Only What you do goes to your AI. Only when Helper asks it for help."
+  },
+  "readme_point_11": {
+   "no_ai_step": "11. Nothing you type to Helper is sent to any AI, including the AI your Hermes uses. Helper answers with fixed text, picked by fixed rules on this computer. Of what you type, it keeps only the things in points 2 to 4, in the Hermes app's own storage on this computer. You can see and delete them as point 10 says.",
+   "ai_picks_line": "11. Helper answers most messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI only picks which of Helper's checked lines to show. Nothing is sent anywhere else. Of what Helper keeps about you, only three short lines are sent: what you do, whether you are new to Hermes, and what you want Hermes to do. Your name and the rest never are. When Helper recommends where to start, it also sends what it read about your Hermes setup on this computer, such as whether a model answers and whether you have scheduled jobs. Deleting does not take back what was already sent.",
+   "ai_writes": "11. Helper answers many messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI writes Helper's reply in its own words from those checked lines, and Helper checks each reply by fixed rules before showing it. On a small AI on your own computer, Helper can still say things that are not true, and the checks do not catch all of them. Nothing is sent anywhere else. Of what Helper keeps about you, only three short lines are sent: what you do, whether you are new to Hermes, and what you want Hermes to do. Your name and the rest never are. When Helper recommends where to start, it also sends what it read about your Hermes setup on this computer, such as whether a model answers and whether you have scheduled jobs. Deleting does not take back what was already sent.",
+   "source": "hhtech's sentence, docs/answers/hhtech-live-reply.md section 7; Lead's rule of 11 Nov 00:55",
+   "true_when": "ai modes: the Builder's test shows the request holds no kept value and no name (input.never_sent). no_ai_step: as before (the page makes no request when a message is typed).",
+   "was_c6_ai_picks_line": "11. Helper answers most messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI only picks which of Helper's checked lines to show. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent.",
+   "was_c6_ai_writes": "11. Helper answers many messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI writes Helper's reply in its own words from those checked lines, and Helper checks each reply by fixed rules before showing it. On a small AI on your own computer, Helper can still say things that are not true, and the checks do not catch all of them. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent."
+  },
+  "readme_point_11_work_only": {
+   "about": "setup-chat changes-1: point 11 for the build with SETUP_AI_BUILT false. The same words as was_c6: only what you do is sent; no sentence about the set-up read, because no recommendation call is made.",
+   "no_ai_step": "11. Nothing you type to Helper is sent to any AI, including the AI your Hermes uses. Helper answers with fixed text, picked by fixed rules on this computer. Of what you type, it keeps only the things in points 2 to 4, in the Hermes app's own storage on this computer. You can see and delete them as point 10 says.",
+   "ai_picks_line": "11. Helper answers most messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI only picks which of Helper's checked lines to show. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent.",
+   "ai_writes": "11. Helper answers many messages with fixed text, picked by fixed rules on this computer. When those rules are not sure, your message, the last few lines of your talk with Helper and a few of Helper's checked lines are sent to the AI your Hermes uses: the company whose AI you chose, or the AI on your own computer. Your chats with Hermes go there the same way. That AI writes Helper's reply in its own words from those checked lines, and Helper checks each reply by fixed rules before showing it. On a small AI on your own computer, Helper can still say things that are not true, and the checks do not catch all of them. Nothing is sent anywhere else. Of what Helper keeps about you, only what you do is sent, as one short line; your name and the rest never are. Deleting does not take back what was already sent."
+  },
+  "readme_status_sentence_2": {
+   "about": "live-v2 changes-1. README line 5 (Status) keeps its first sentence as the Builder writes it (what is built); its second sentence is this, by AI_MODE. Exempt from R1 to R9, as all README lines.",
+   "no_ai_step": "Helper's conversation has no AI step: it answers from pre-written lines chosen by fixed rules on your computer.",
+   "ai_picks_line": "Helper's conversation answers from pre-written lines chosen by fixed rules on your computer. When those rules are not sure, the AI your Hermes uses picks which of those lines to show (point 11).",
+   "ai_writes": "Helper's conversation answers many messages from pre-written lines chosen by fixed rules on your computer. When those rules are not sure, the AI your Hermes uses writes the reply from Helper's checked lines, and fixed rules check it before it is shown (point 11).",
+   "true_when": "no_ai_step: today's line, unchanged. ai_picks_line: every line shown is one of the data's lines (pick_only.read). ai_writes: a written reply is shown only after checks c0 to c23 pass; otherwise the pre-written line (order.fallback)."
+  },
+  "readme_window_sentence": {
+   "about": "live-v2 changes-1. Added to the README bullet that starts \"Helper's conversation window on the right\" (README line 13), right after the sentence that ends \"see the rest at once.\" Guess: Lead's \"point 13\" is this bullet, because README has no numbered point 13 (its numbered list ends at 12). no_ai_step: nothing is added.",
+   "no_ai_step": null,
+   "ai_picks_line": "When Helper asks your AI, three dots show in the speech bubble while it waits, for at most 12 seconds. If your AI is slow, not set up, or gives no clear answer, Helper shows its own pre-written line instead. If your AI is too slow, Helper stops asking it for the rest of the visit. When that happens with the first message Helper sends it in a visit, Helper says so once, with a text you can paste into your own Hermes to make it quicker. Otherwise it says nothing about it.",
+   "ai_writes": "When Helper asks your AI, three dots show in the speech bubble while it waits, for at most 12 seconds. If your AI is slow, not set up, or its reply fails Helper's checks, Helper shows its own pre-written line instead. If your AI is too slow, Helper stops asking it for the rest of the visit. When that happens with the first message Helper sends it in a visit, Helper says so once, with a text you can paste into your own Hermes to make it quicker. Otherwise it says nothing about it.",
+   "true_when": "the dots: the Builder's row 7 (the dots bubble). 12 seconds and the silent fallback: order.fallback. not set up: no call when the model status is not ok (the Builder's row 5). Both AI lines are false until those rows are built.",
+   "was_c6_ai_picks_line": "When Helper asks your AI, three dots show in the speech bubble while it waits, for at most 12 seconds. If your AI is slow, not set up, or gives no clear answer, Helper shows its own pre-written line instead, and says nothing about it.",
+   "was_c6_ai_writes": "When Helper asks your AI, three dots show in the speech bubble while it waits, for at most 12 seconds. If your AI is slow, not set up, or its reply fails Helper's checks, Helper shows its own pre-written line instead, and says nothing about it.",
+   "true_when_c7": "live changes-7. Too slow: no answer in 12 s or no_reply text (slow_ai.when). Off for the rest of the visit: src/page.js line 193 comment (talk-live-3). Said once, only when it was the visit's first message to the AI, after the written answer or, when that line may not follow, after the next answer: slow_ai.when and .where, talk-live-3 report section 5. Not set up, a failed check, or a later slow message: nothing is said."
+  },
+  "readme_model_call_bullet": {
+   "about": "live-v2 changes-1. README line 24, the bullet about the \"The model answers\" card. Its first sentence says the card is the only call; in the AI modes the conversation calls too. no_ai_step: unchanged.",
+   "no_ai_step": "The \"The model answers\" card makes one call to your own model through Hermes, and only when you press Check. It asks the model to reply \"OK\", which spends a little of your model credit. Nothing is saved to your chats and no tools run.",
+   "ai_picks_line": "The \"The model answers\" card makes one call to your own model through Hermes, and only when you press Check. It asks the model to reply \"OK\", which spends a little of your model credit. Helper's conversation also calls your own model through Hermes, one or two short calls for a message its fixed rules are not sure of (point 11). These calls spend a little of your model credit too. Nothing is saved to your chats and no tools run.",
+   "ai_writes": "The \"The model answers\" card makes one call to your own model through Hermes, and only when you press Check. It asks the model to reply \"OK\", which spends a little of your model credit. Helper's conversation also calls your own model through Hermes, one or two short calls for a message its fixed rules are not sure of (point 11). These calls spend a little of your model credit too. Nothing is saved to your chats and no tools run.",
+   "true_when": "one or two calls: order steps 5 and 6 (first call, then the writer or pick call). Nothing saved to chats and no tools: true of the card's call as built; for the conversation's calls the Builder's row 3 says no session, no profile, the same llm.oneshot. Not checked by hhcontent that llm.oneshot runs no tools; the Builder confirms or the last sentence is cut in the AI modes."
+  }
+ },
+ "checks_c5": {
+  "note": "live changes-5. no_reply runs first, before c0. c25 to c27 run after c24, same fallback.",
+  "no_reply": {
+   "added": "live changes-5",
+   "rule": "Before any other check: the text is NO reply (the same as no answer in 12 s) when, after trimming, it starts with one of starts (any case) or holds one of holds (exact), or holds <think> with no </think>.",
+   "starts": [
+    "Thinking Process",
+    "Thinking process:",
+    "Thought process",
+    "<think>"
+   ],
+   "holds": [
+    "**Analyze",
+    "**Analysis",
+    "**Task:**",
+    "**Request:**"
+   ],
+   "why": "hhtech weak-ai section 3: on a managed local server Hermes returns the model's thinking with no tag (agent/auxiliary_client.py lines 8154 to 8183).",
+   "then": "Show the written line, and make no more AI calls in this visit (slow_ai line, once).",
+   "status": "ran_on_written (check_c5.py: hhtech's two recorded thinking texts)"
+  },
+  "list": [
+   {
+    "id": "c25",
+    "kind": "fail",
+    "added": "live changes-5",
+    "what": "The reply shares no content word with the asked text. Content word: a run of letters of 3 or more, lower-cased, not in stop_words or no_count, compared after cutting a final s, es, ing or ed. The asked text is the person's message; when the message is a follow-up (follow_up.phrases, or 2 content words or fewer) it is that message plus the person's message before it.",
+    "no_count": [
+     "hermes",
+     "can",
+     "use",
+     "using",
+     "used",
+     "get",
+     "make",
+     "want",
+     "need",
+     "know",
+     "like",
+     "just",
+     "really",
+     "does",
+     "did",
+     "doing",
+     "thing",
+     "things",
+     "something",
+     "anything",
+     "way",
+     "good",
+     "best",
+     "newest",
+     "new",
+     "version",
+     "total",
+     "beginner",
+     "ok",
+     "okay",
+     "thanks",
+     "please",
+     "tell",
+     "say",
+     "said",
+     "mean",
+     "means",
+     "explain",
+     "then",
+     "next",
+     "more",
+     "what",
+     "how",
+     "why",
+     "when",
+     "where",
+     "which",
+     "who",
+     "this",
+     "that",
+     "with",
+     "for",
+     "the",
+     "and",
+     "you",
+     "your",
+     "are",
+     "have",
+     "will",
+     "would",
+     "should",
+     "could",
+     "there",
+     "here",
+     "all",
+     "too",
+     "much",
+     "many",
+     "very",
+     "even",
+     "still",
+     "also",
+     "into",
+     "from",
+     "about",
+     "not",
+     "don't",
+     "dont",
+     "i'm",
+     "it's",
+     "its",
+     "what's",
+     "whats"
+    ],
+    "skip_when": "Ordinary talk (USED: none, or no row handed): c25 does not run.",
+    "status": "NOT ADOPTED. Ran on recorded (check_c5.py): it drops good replies on every model (free 5 of 16, 9B 6 of 15, 2B 5 of 13), because people ask in their words and the rows answer in Hermes's (phone / Telegram, remember / saves, internet / web). Kept here so nobody adds it again without this count. Do not build.",
+    "adopted": false
+   },
+   {
+    "id": "c26",
+    "kind": "fail",
+    "added": "live changes-5",
+    "what": "The reply holds one of words (any case): the model's own notes or the instruction labels shown to the person.",
+    "words": [
+     "the person",
+     "checked facts",
+     "USED",
+     "about them:",
+     "what the person does",
+     "the rows",
+     "the facts given",
+     "my notes"
+    ],
+    "status": "ran_on_recorded (check_c5.py)",
+    "skip_in_hand": "live changes-6: a word of words that is also in hand (any case) does not fail the reply. USED written in capitals always fails. Why: AI_WRITES holds \"checked facts\", so the AI's correct rewording of \"are you an AI?\" was refused (hhtech-ai-share, For hhcontent)."
+   },
+   {
+    "id": "c27",
+    "kind": "fail",
+    "added": "live changes-5",
+    "what": "The message asks a kind of thing the reply does not give. For each class: when the person's message (only the message, never the earlier one) holds one of asks, the reply must hold one of gives.",
+    "classes": [
+     {
+      "id": "money",
+      "asks": [
+       "pay",
+       "paid",
+       "paying",
+       "cost",
+       "costs",
+       "price",
+       "money",
+       "free",
+       "subscription",
+       "expensive",
+       "cheap",
+       "charge"
+      ],
+      "gives": [
+       "pay",
+       "paid",
+       "free",
+       "cost",
+       "costs",
+       "price",
+       "money",
+       "charge",
+       "subscription",
+       "nothing extra"
+      ]
+     },
+     {
+      "id": "choice",
+      "asks": [
+       "best",
+       "which",
+       "pick",
+       "choose",
+       "recommend",
+       "should i use",
+       "what should i"
+      ],
+      "gives": [
+       "pick",
+       "choose",
+       "start",
+       "try",
+       "use",
+       "recommend",
+       "best",
+       "if you",
+       "free",
+       "paid",
+       "plan",
+       "open",
+       "not checked",
+       "haven't checked",
+       "do not say",
+       "don't say"
+      ]
+     },
+     {
+      "id": "next",
+      "asks_whole": [
+       "then",
+       "and then",
+       "then what",
+       "what then",
+       "what next",
+       "what's next",
+       "whats next",
+       "next",
+       "and next",
+       "what now",
+       "now what"
+      ],
+      "gives": [
+       "then",
+       "next",
+       "after",
+       "open",
+       "click",
+       "press",
+       "paste",
+       "copy",
+       "type",
+       "send",
+       "add",
+       "choose",
+       "pick",
+       "scan",
+       "not checked",
+       "haven't checked",
+       "do not say",
+       "don't say"
+      ]
+     }
+    ],
+    "note": "asks_whole: the whole message, after cutting ok, okay, so, and, cool, right and end marks, as in follow_up.",
+    "status": "ran_on_recorded (check_c5.py)",
+    "apostrophes": "live changes-7: before c27 matches, the curly apostrophes ’ and ‘ in the message and in the reply are read as ' (so \"what’s next\", typed on a Mac, is \"what's next\"). Only c27; the other checks are unchanged."
+   },
+   {
+    "id": "c28",
+    "kind": "fail",
+    "added": "offer-t1",
+    "what": "The written reply ends on an invitation or a question. After trimming and cutting the USED: line, fail when the reply's last sentence ends with ? or holds one of ends (any case). A failed reply is dropped and Helper's pre-written line shows, with its offer.",
+    "ends": [
+     "ask me",
+     "let me know",
+     "feel free to ask",
+     "feel free to",
+     "just ask",
+     "any questions",
+     "any other questions",
+     "anything else",
+     "happy to help",
+     "here to help"
+    ],
+    "cases": [
+     {
+      "reply": "Hermes keeps short notes about you. Ask me if you want more.",
+      "result": "c28"
+     },
+     {
+      "reply": "You're welcome. Let me know if you need anything else.",
+      "result": "c28"
+     },
+     {
+      "reply": "Hermes can run jobs on a schedule. Feel free to ask about it.",
+      "result": "c28"
+     },
+     {
+      "reply": "Telegram has a quick setup. Which app do you use?",
+      "result": "c28"
+     },
+     {
+      "reply": "You're welcome.",
+      "result": "passes"
+     },
+     {
+      "reply": "Hermes keeps short notes about you and reads them in each new chat.",
+      "result": "passes"
+     }
+    ]
+   },
+   {
+    "id": "c29",
+    "kind": "fail",
+    "added": "live changes-9",
+    "what": "What the person does, used as a step or as a fact about Hermes. Runs only when the About them line was handed. Work words: each run of 3 letters or more in the kept work value, lower-cased, that is not in rows.stop_words or skip, and not a word of hand. A work word matches in the reply as a whole word, also with a final s, es or ing. The reply fails when a sentence that holds a work word (a) also holds one of step_words as a whole word, or (b) has a work word that is not led in: none of lead_ins stands among the 3 words before it in the same sentence, and the word before it is not another work word that is led in.",
+    "skip": [
+     "run",
+     "runs",
+     "work",
+     "works",
+     "own",
+     "teach",
+     "study",
+     "manage",
+     "coach",
+     "sell",
+     "have",
+     "small",
+     "big",
+     "local"
+    ],
+    "step_words": [
+     "then",
+     "next",
+     "after",
+     "first",
+     "now",
+     "step",
+     "steps",
+     "start",
+     "open",
+     "press",
+     "click",
+     "type",
+     "paste",
+     "scan",
+     "go"
+    ],
+    "lead_ins": [
+     "your",
+     "about",
+     "for",
+     "like"
+    ],
+    "good_example": "Reminders about training fit a Scheduled job. (work: I coach tennis training)",
+    "bad_example": "You can then start playing tennis. (work: I run a tennis club; hhtech-live-run2 run C, call 53)",
+    "fallback": "As for c24: the written line.",
+    "limit": "It reads words, not meaning. A made-up sentence that leads the work word in and has no step word passes (Hermes is great for your tennis club). That is why follow_up.work_line_c9 also stands.",
+    "status": "ran_on_recorded and ran_on_written (check_c9.py)"
+   }
+  ],
+  "used_reader": {
+   "added": "live changes-6",
+   "rule": "Find the label USED in any case (USED, Used, used) followed by a colon, anywhere in the reply, the last one found. Everything from the label to the end of that line is the USED list (ids split by spaces, commas and full stops). Cut it from the reply. Then trim spaces, full stops and commas. If nothing is left, or only the word none, there is NO reply: show the written line (not a slow-AI case, AI calls go on). If the reply still holds the label (a second one), the reply fails as c26.",
+   "why": "hhtech-ai-share section 2 item 4: the 2B wrote \"Used: none.\" as its whole reply and the build's reader (src/live-checks.js line 64) looks only for capitals, so the label could be shown.",
+   "label_choice": "Keep USED. A different label (for example FACTS: or a tag like <used>) was not run on any model, and the 2B also wrote \"USED: thanks, USED: none.\", so it copies whatever label it is shown. The reader rule above makes any echo harmless; a new label would make the earlier counts invalid. Not run on a model."
+  }
+ },
+ "slow_ai": {
+  "added": "live changes-5",
+  "when": "The first AI call of a visit gives no answer in 12 s, or no_reply text. Lead's decision 11 Nov: said once per visit, never again in that visit; after it, written lines only for the rest of the visit.",
+  "where": "As Helper's line right after the written answer to that message (the written answer comes first). A paste box under it with paste_text, as H1's box.",
+  "variants": [
+   {
+    "id": "SLOW_A",
+    "text": "Your AI took too long to answer, so I answered from my own notes. To make it quicker for me, paste this into a new chat with your Hermes."
+   },
+   {
+    "id": "SLOW_B",
+    "text": "Your AI was still thinking after 12 seconds, so this answer is from my own checked notes. If you want it faster, paste this into a new chat with your Hermes."
+   }
+  ],
+  "recommended": "SLOW_A",
+  "paste_text": "Please add this to my config.yaml, under auxiliary: a block helping_hand: with reasoning_effort: \"none\". It switches thinking off only for Helper's short calls, not for my own chats. Show me the change before you save it.",
+  "paste_label": "Text for your own Hermes",
+  "source": "/hermes-docs/user-guide/configuration.md lines 1606 to 1612: \"Auxiliary task blocks additionally accept a reasoning_effort knob\" ... \"Thinking level for that task's LLM calls: none, minimal, low, medium, high, xhigh, max, ultra\" ... \"the per-task counterpart of the global agent.reasoning_effort ... without touching your main chat behavior.\" The task name helping_hand: hhtech weak-ai section 1 (ran).",
+  "status": "written; not run in the app",
+  "changed_c7": "live changes-7: the paste text now names Helper (the name on screen) where it named the old working name. The task key helping_hand is unchanged."
+ },
+ "changed_offer_t1": "hhcontent, 11 Nov 2026 (changes-8): writer rule 5 and 5b, check c28.",
+ "changed_c9": "live changes-9: checks_c5.list c29, follow_up.work_line_c9, input.work_line.when. See content/helper-talk-live-v2-changes-9.md.",
+ "order_ask_fix_t1": "ask-fix-t1 (helper-talk-v2.json about_rule): a weak hit is not a code answer. It goes on to the first call like a message with no row found; the AI may choose that row from the facts. With no AI, or when the AI says none or fails: the topic's own question with its picks (about_rule.weak_hit_then.no_ai). offer_words lines (FREE, MODEL_CHANGE, KEY_WHERE ...) are code answers and come before any AI call, as the offer-t1 lines do.",
+ "changed_ask_fix_t1": "hhcontent, 11 Nov 2026 (content/helper-talk-live-v2-changes-10.md): follow_up.ask_fix_t1 and order_ask_fix_t1 added. Nothing removed."
 }

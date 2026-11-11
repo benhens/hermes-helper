@@ -1,0 +1,2275 @@
+{
+ "id": "helper-setup-chat-v1",
+ "written": "2026-11-11 hhcontent, job from Lead 05:22 UTC",
+ "builds_on": [
+  "content/dash-setup-list-v2.json (items, steps, reads; used as they are)",
+  "content/helper-talk-v2.json (F1, F2, F3, BACK, keeps, limits)",
+  "content/helper-talk-live-v2.json (AI call, checks_c5, slow_ai)"
+ ],
+ "his_words": [
+  "inputs/pb-words-11nov-helper-setup-chat.md",
+  "inputs/pb-words-11nov-helper-q123.md"
+ ],
+ "docs_copy": "/hermes-docs (v0.23.0 copy; server runs v0.23.1; live docs not compared)",
+ "limits": {
+  "line_words": 25,
+  "question_words": 12,
+  "sentence_words": 14,
+  "sentences": 3,
+  "answers_max": 4,
+  "word_letters": 12,
+  "ai_words": 35,
+  "ai_sentences": 2,
+  "note": "from helper-talk-v2.json limits; step texts are list v2's own (18 words). REC adds Want the steps? to the list's why sentence, so REC is checked at line_words + 3 for the why sentence it quotes word for word."
+ },
+ "flow": [
+  "F1 What do you do?",
+  "F2/F3 + Q_NEW (one question)",
+  "Q_GOAL",
+  "SEEN (the look, by itself, no AI)",
+  "REC (rule; written sentence only for the entry, ai.status)",
+  "STEP x n (written)",
+  "DONE_SEEN / NOT_SEEN / DONE_SAID / STUCK",
+  "REC next ..."
+ ],
+ "questions": [
+  {
+   "id": "Q_NEW",
+   "text": "Are you new to Hermes?",
+   "asked_in": "the same message as F2/F3 (it is that message's one question)",
+   "answers": [
+    {
+     "id": "new",
+     "label": "Yes, I'm new",
+     "kept_as": "Yes, I'm new"
+    },
+    {
+     "id": "some",
+     "label": "I've used it a bit",
+     "kept_as": "I've used it a bit"
+    },
+    {
+     "id": "well",
+     "label": "I know it well",
+     "kept_as": "I know it well"
+    },
+    {
+     "id": "skip",
+     "label": "Skip",
+     "kept_as": null
+    }
+   ],
+   "typed": {
+    "order": [
+     "well",
+     "some",
+     "new"
+    ],
+    "well": [
+     "not new",
+     "no",
+     "nope",
+     "know it",
+     "know hermes",
+     "used it a lot",
+     "for months",
+     "for a while",
+     "expert",
+     "very well"
+    ],
+    "some": [
+     "a bit",
+     "a little",
+     "some",
+     "sometimes",
+     "a few times",
+     "kind of",
+     "sort of",
+     "somewhat"
+    ],
+    "new": [
+     "yes",
+     "yeah",
+     "yep",
+     "new",
+     "just started",
+     "first time",
+     "beginner",
+     "never used",
+     "just installed"
+    ],
+    "rule": "Lower-case, cut end marks. Try the lists in order well, some, new; a list matches when one of its phrases is the whole message or a whole-word part of it. A question (has ? or a topic key word) is answered first by the existing routing, then SETUP_REASK asks again once. Anything else counts as skip and is not kept."
+   },
+   "changes_later": {
+    "new": "Rule R2: First chat comes before the goal (quickstart.md 49). Helper explains each word the first time (it does this for everyone already).",
+    "skip": "Same as new for R2 (the docs' order starts with a first chat); nothing is kept.",
+    "some": "First chat counts as done (they have used it). Goes straight to the goal.",
+    "well": "First chat counts as done. Goes straight to the goal."
+   },
+   "why_it_earns_place": "It is the only thing that decides whether First chat comes before the person's goal. Helper cannot see First chat (dash-setup-list-v2: cannot be told), and the docs say to get one normal chat working before adding features.",
+   "sources": [
+    {
+     "file": "getting-started/quickstart.md",
+     "line": 49,
+     "quote": "if Hermes cannot complete a normal chat, do not add more features yet"
+    },
+    {
+     "file": "getting-started/learning-path.md",
+     "line": 160,
+     "quote": "**Just finished installing?** → Head to the [Quickstart](./quickstart.md) to run your first conversation."
+    }
+   ]
+  },
+  {
+   "id": "Q_GOAL",
+   "text": "Do you want jobs at set times, phone chats, or something else?",
+   "answers": [
+    {
+     "id": "schedule",
+     "label": "Do things at set times",
+     "kept_as": "Do things at set times",
+     "item": "scheduled_job",
+     "src": {
+      "file": "getting-started/learning-path.md",
+      "line": 80,
+      "quote": "Cron jobs let Hermes Agent run tasks on a schedule — daily summaries, periodic checks, automated reports"
+     }
+    },
+    {
+     "id": "phone",
+     "label": "Talk to it from my phone",
+     "kept_as": "Talk to it from my phone",
+     "item": "chat_apps",
+     "src": {
+      "file": "getting-started/learning-path.md",
+      "line": 52,
+      "quote": "### \"I want a Telegram/Discord bot\""
+     }
+    },
+    {
+     "id": "bots",
+     "label": "Several bots, one per job",
+     "kept_as": "Several bots, one per job",
+     "item": "second_bot",
+     "src": {
+      "file": "getting-started/learning-path.md",
+      "line": 83,
+      "quote": "### \"I want a team of specialist Bots\""
+     }
+    },
+    {
+     "id": "unsure",
+     "label": "Not sure yet",
+     "kept_as": null,
+     "item": null,
+     "src": {
+      "file": "getting-started/learning-path.md",
+      "line": 21,
+      "quote": "**Know your level?** Jump to the [experience-level table](#by-experience-level) and follow the reading order for your tier."
+     }
+    }
+   ],
+   "typed": {
+    "order": [
+     "schedule",
+     "phone",
+     "bots"
+    ],
+    "schedule": [
+     "every morning",
+     "every evening",
+     "every day",
+     "every week",
+     "each morning",
+     "each day",
+     "daily",
+     "weekly",
+     "remind",
+     "reminder",
+     "reminders",
+     "schedule",
+     "scheduled",
+     "set times",
+     "briefing",
+     "summary every",
+     "summaries"
+    ],
+    "phone": [
+     "phone",
+     "mobile",
+     "telegram",
+     "whatsapp",
+     "discord",
+     "slack",
+     "signal",
+     "chat app",
+     "text me",
+     "message me"
+    ],
+    "bots": [
+     "bots",
+     "several bots",
+     "second bot",
+     "another bot",
+     "more than one bot",
+     "team of bots",
+     "a bot for",
+     "profiles"
+    ],
+    "rule": "Lower-case. Try schedule, phone, bots in that order; the first list with a whole-word phrase in the message wins. The typed text is kept as typed (same limits and secret check as What you do: 12 words, 80 letters) and shown as typed. No match: goal is unsure, but the typed text is still kept and shown, and still goes to the AI line What they want.",
+    "tie": "A message that hits two lists (\"send reminders to my phone every morning\") takes the first in order: schedule. Reason: a scheduled job runs without a chat app (results can go to local files, cron.md 19); the chat app comes up later in the docs' order."
+   },
+   "left_out": "The docs' other use cases (a coding assistant in the terminal, building tools, training models, Python library: learning-path.md 37, 93, 111, 125) are for developers; a typed answer about them gets goal unsure and the docs' order.",
+   "changes_later": "Rule R3: the goal's thing comes next, before the docs' order (learning-path.md 22: \"Have a specific goal? Skip to By Use Case\"). It also picks the part of the SEEN line about the goal, and fills the reason in the recommendation.",
+   "why_it_earns_place": "His own question. It is the one answer that moves a thing ahead of the docs' order. Three answers are the three docs use cases a non-developer can do from the app; with Not sure yet that is four.",
+   "sources": [
+    {
+     "file": "getting-started/learning-path.md",
+     "line": 22,
+     "quote": "**Have a specific goal?** Skip to [By Use Case](#by-use-case) and find the scenario that matches."
+    }
+   ],
+   "text_was_offer_t1": "What would you like Hermes to do for you?"
+  }
+ ],
+ "questions_not_asked": [
+  "Where Hermes runs (own computer, a computer that stays on, Hermes Cloud): it changes no recommendation in the table. It is inside Install Hermes, which is always done.",
+  "Which chat app: asked by Hermes's own Messaging page, not by Helper.",
+  "Which AI company: Pick a model only comes up when the model does not answer, and its steps cover it."
+ ],
+ "look": {
+  "when": "By itself, right after the answer to Q_GOAL (recommended; see md section 2). Also on every return visit and after It worked. No AI call. Reads exactly as in dash-setup-list-v2 items[].read, main bot only.",
+  "reads_used": [
+   "install (always done)",
+   "model: setup.runtime_check ok",
+   "personality: SOUL.md not empty and not a starter text",
+   "scheduled_job: cron.manage list, include_disabled true, 1 or more",
+   "second_bot: profiles.list 2 or more rows"
+  ],
+  "not_used": "chat_apps: host.status().gateway_platforms gave the right key for Telegram in hhtech-dash-reads2.md section 2, but list v2 keeps Chat apps as cannot be told, and the job says use the list as it is. If Lead adopts that read, add one SEEN part (see md).",
+  "seen_line": "SEEN = LOOK_OPEN + model part + goal part. Goal part: the goal item's part if it can be seen; for goal phone the chat-app part; for goal unsure the personality part.",
+  "parts": {
+   "LOOK_OPEN": "I looked at your Hermes.",
+   "model_ok": "You have a model, the AI that thinks, and it answers.",
+   "model_not": "You have no model that answers yet (the AI that thinks).",
+   "model_unread": "I couldn't check your model this time.",
+   "scheduled_job_done": "You have {n} scheduled job.",
+   "scheduled_job_done_plural": "You have {n} scheduled jobs.",
+   "scheduled_job_not": "You have no scheduled jobs yet.",
+   "second_bot_done": "You have {n} bots.",
+   "second_bot_not": "You have one bot so far.",
+   "personality_done": "Your Hermes has its own personality text.",
+   "personality_not": "Its personality text is still the starter one.",
+   "chat_apps_cannot": "I can't see whether you use a chat app.",
+   "read_failed": "I couldn't read that part this time."
+  },
+  "under": {
+   "grey": "Read from your Hermes on this computer. Nothing was sent, and no AI was used.",
+   "button": "What did you look at?"
+  },
+  "look_list": {
+   "shown_after": "the button What did you look at?",
+   "lines": [
+    "Hermes installed: yes",
+    "A model that answers: {yes|no|couldn't check}",
+    "Its own personality text: {yes|no}",
+    "Scheduled jobs: {n}",
+    "Bots: {n}",
+    "I can't see: first chat, chat apps, tools, memory, safety."
+   ],
+   "note": "Only the main bot is read. Line 6 is fixed text."
+  }
+ },
+ "rule": {
+  "inputs": {
+   "model": "ok | not | unread (setup.runtime_check; unread = the read failed or timed out)",
+   "new": "new | some | well | skip (Q_NEW; skip also when never answered)",
+   "goal": "schedule | phone | bots | unsure (Q_GOAL; unsure also for Not sure yet, skip, a typed answer with no match)",
+   "done": "items done = seen done by a read (personality, scheduled_job, second_bot; model is its own input) + said done by the person (kept) + Something else pressed this visit (not kept)"
+  },
+  "rules_in_order": [
+   {
+    "id": "R1",
+    "if": "model = not",
+    "then": "model",
+    "src": {
+     "file": "getting-started/quickstart.md",
+     "line": 84,
+     "quote": "The single most important setup step."
+    }
+   },
+   {
+    "id": "R2",
+    "if": "new is new or skip, and first_chat not done",
+    "then": "first_chat",
+    "src": {
+     "file": "getting-started/quickstart.md",
+     "line": 49,
+     "quote": "if Hermes cannot complete a normal chat, do not add more features yet"
+    }
+   },
+   {
+    "id": "R3",
+    "if": "goal is not unsure, and its item not done",
+    "then": "the goal's item (schedule: scheduled_job, phone: chat_apps, bots: second_bot)",
+    "src": {
+     "file": "getting-started/learning-path.md",
+     "line": 22,
+     "quote": "**Have a specific goal?** Skip to [By Use Case](#by-use-case) and find the scenario that matches."
+    }
+   },
+   {
+    "id": "R4",
+    "if": "otherwise",
+    "then": "the first item not done in the list's order: first_chat, personality, chat_apps, tools_apps, memory, scheduled_job, second_bot, safety, skills (first_chat skipped when new is some or well). Install is always done; skills is last because its steps say there is nothing to do first (quickstart.md 316)",
+    "src": {
+     "file": "getting-started/learning-path.md",
+     "line": 30,
+     "quote": "Set up messaging bots, use advanced features like memory, cron jobs, and skills"
+    }
+   },
+   {
+    "id": "R5",
+    "if": "everything done",
+    "then": "no item: line ALL_DONE",
+    "src": null
+   }
+  ],
+  "model_unread": "Treated like ok for the rule (it does not block), and the SEEN line says model_unread."
+ },
+ "rule_order": [
+  "first_chat",
+  "personality",
+  "chat_apps",
+  "tools_apps",
+  "memory",
+  "scheduled_job",
+  "second_bot",
+  "safety",
+  "skills"
+ ],
+ "goal_item": {
+  "schedule": "scheduled_job",
+  "phone": "chat_apps",
+  "bots": "second_bot",
+  "unsure": null
+ },
+ "seeable": [
+  "personality",
+  "scheduled_job",
+  "second_bot"
+ ],
+ "reasons": {
+  "R1": "Hermes needs a model before anything else.",
+  "R2_new": "You're new, so first check that Hermes answers you.",
+  "R2_skip": "The usual first step is to check that Hermes answers.",
+  "R3_schedule": "You want Hermes to do things at set times.",
+  "R3_phone": "You want to talk to Hermes from your phone.",
+  "R3_bots": "You want several bots, one per job.",
+  "R4": "This is next in the order the Hermes docs suggest."
+ },
+ "lines": {
+  "F2": {
+   "text": "Thanks, {name}. I'll help you set up Hermes for that. Are you new to Hermes?",
+   "text_no_name": "Thanks. I'll help you set up Hermes for that. Are you new to Hermes?",
+   "answers": "Q_NEW",
+   "under": "the grey Kept: {work}. line, as now",
+   "replaces": "Thanks, {name}. Ask me anything about Hermes."
+  },
+  "F3": {
+   "text": "That's fine. I'll help you set up Hermes. Are you new to Hermes?",
+   "answers": "Q_NEW",
+   "replaces": "That's fine. Ask me anything about Hermes."
+  },
+  "WORK_SECRET": {
+   "text": "Thanks. I didn't keep that, because it looks like a password or a long number. Are you new to Hermes?",
+   "answers": "Q_NEW",
+   "replaces": "... Ask me anything about Hermes."
+  },
+  "WORK_LONG_2": {
+   "text": "Thanks. I didn't keep that, because it is too long. Are you new to Hermes?",
+   "answers": "Q_NEW",
+   "replaces": "... Ask me anything about Hermes."
+  },
+  "Q_GOAL": {
+   "text": "Do you want jobs at set times, phone chats, or something else?",
+   "answers": "Q_GOAL",
+   "text_was_offer_t1": "What would you like Hermes to do for you?"
+  },
+  "SETUP_REASK": {
+   "text": "When you're ready: are you new to Hermes?",
+   "answers": "Q_NEW",
+   "when": "After answering a question typed in place of an answer to Q_NEW. Once only; the same form for Q_GOAL is SETUP_REASK_GOAL."
+  },
+  "SETUP_REASK_GOAL": {
+   "text": "When you're ready: do you want jobs, phone chats, or more?",
+   "answers": "Q_GOAL",
+   "text_was_offer_t1": "When you're ready: what would you like Hermes to do for you?"
+  },
+  "REC": {
+   "text": "{reason} Next: {card}. {why} Want the steps?",
+   "answers": [
+    "Show me the steps",
+    "I've done this already",
+    "Something else",
+    "Not now"
+   ],
+   "ai": "OFF for the entry (ai.status): always the written text. Was: With the AI, {reason} Next: {card}. {why} is replaced by the AI's text if it passes the checks; Want the steps? is always written."
+  },
+  "STEP": {
+   "text": "Step {n} of {total}: {step}",
+   "answers": [
+    "Done",
+    "I'm stuck",
+    "Stop for now"
+   ],
+   "last_step_answers": [
+    "It worked",
+    "It didn't work",
+    "Stop for now"
+   ],
+   "note": "Steps are the list's steps, word for word, one per message. The last step gets the last_step_answers, whatever it starts with. (changes-1: Scheduled jobs has 3 steps and its Check: is step 2.)"
+  },
+  "STUCK": {
+   "text": "Your own Hermes can help with this. Paste this into a new chat there.",
+   "paste_label": "Text for your own Hermes",
+   "paste": "I'm setting up {card} in Hermes. I'm stuck at this step: {step} Please help me, one small step at a time.",
+   "answers": [
+    "Done, it works now",
+    "Stop for now"
+   ],
+   "when": "I'm stuck, or It didn't work. Not for the model item (its Hermes cannot answer yet): STUCK_MODEL."
+  },
+  "STUCK_MODEL": {
+   "text": "Your Hermes can't answer yet, so it can't help here. The docs page Quickstart walks through it.",
+   "button": "Open the Quickstart",
+   "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart",
+   "url_status": "not checked live; the page is getting-started/quickstart.md in the mounted docs"
+  },
+  "DONE_SEEN": {
+   "text": "I can see it now. {seen_part}",
+   "when": "It worked (or Done, it works now) on a seeable item, and the read now says done. Then REC for the next item."
+  },
+  "NOT_SEEN": {
+   "text": "I can't see it yet. I only look at your main bot.",
+   "answers": [
+    "Show me the steps",
+    "I did it on another bot",
+    "Not now"
+   ],
+   "when": "It worked on a seeable item, but the read still says not done. I did it on another bot marks it said done.",
+   "answers_second_bot": [
+    "Show me the steps",
+    "Not now"
+   ],
+   "text_second_bot": "I can't see it yet. You have one bot so far.",
+   "note_c1": "changes-1: for second_bot the line and the other-bot answer were untrue (bots are counted across the whole Hermes, list v2 read profiles.list)."
+  },
+  "DONE_SAID": {
+   "text": "Good. I'll remember that you did it.",
+   "when": "It worked on an item that cannot be seen, or I've done this already. The item is kept as said done. Then REC for the next item."
+  },
+  "ALREADY_SEEABLE": {
+   "text": "I can't see that yet. {not_part}",
+   "not_part": {
+    "personality": "look.parts.personality_not",
+    "scheduled_job": "look.parts.scheduled_job_not",
+    "second_bot": "look.parts.second_bot_not"
+   },
+   "answers": [
+    "Show me the steps",
+    "I did it on another bot",
+    "Count it as done",
+    "Not now"
+   ],
+   "answers_second_bot": [
+    "Show me the steps",
+    "Count it as done",
+    "Not now"
+   ],
+   "when": "I've done this already on a seeable item. First a fresh read. Read says done: DONE_SEEN. Read says not done: this line; nothing is kept yet. I did it on another bot: kept as said done, DONE_SAID. Count it as done: kept as said done, ALREADY_COUNT. Then REC for the next item. For second_bot the bots are counted across the whole Hermes, so the other-bot answer is left out.",
+   "text_was": "Thanks. I'll take your word for it.",
+   "why_changed": "hhtech-setup-run.md line 116: it came right after the look said the personality text is still the starter one."
+  },
+  "SOMETHING_ELSE": {
+   "text": "Fine, here's another.",
+   "when": "Something else: the item counts as done for this visit only (not kept). Then REC for the next item."
+  },
+  "NOT_NOW": {
+   "text": "That's fine. I'll keep your place.",
+   "when": "Not now, or Stop for now. The current item stays kept for next time.",
+   "text_was_offer_t1": "That's fine. When you're ready, ask me what to set up next.",
+   "offer": "general_2",
+   "offer_note": "helper-talk-v2.json offers.sets.general_2: not the set-up again right after Not now."
+  },
+  "ALL_DONE": {
+   "text": "That's everything on my list.",
+   "when": "R5.",
+   "text_was_offer_t1": "That's everything on my list. Ask me about any part of Hermes.",
+   "offer": "general_2"
+  },
+  "BACK_DONE": {
+   "text": "Hi again, {name}. I can see it now. {seen_part}",
+   "text_no_name": "Hi again. I can see it now. {seen_part}",
+   "when": "Return visit; the kept current item is seeable and its read now says done. Then REC for the next item. Wins over BACK_SEEN (never both)."
+  },
+  "BACK_REC": {
+   "text": "Hi again, {name}. We stopped at {card}. {why} Want the steps?",
+   "text_no_name": "Hi again. We stopped at {card}. {why} Want the steps?",
+   "answers": [
+    "Show me the steps",
+    "I've done this already",
+    "Something else",
+    "Not now"
+   ],
+   "when": "Return visit; a current item is kept, its fresh read does not say done, and no seeable item is seen done (else BACK_SEEN then BACK_NEXT). The same line whether the person pressed Not now, Stop for now, or closed the window: all three are a stop. {why} is the list's why sentence, so the thing is explained again.",
+   "text_was": "Hi again, {name}. Last time we picked {card}. Want to go on?",
+   "why_changed": "hhtech-setup-run.md line 43: it came right after Not now on that thing; he did not pick it. The old line also did not say what the thing is."
+  },
+  "BACK_Q": {
+   "text": "Hi again, {name}. Before we go on: are you new to Hermes?",
+   "text_no_name": "Hi again. Before we go on: are you new to Hermes?",
+   "answers": "Q_NEW",
+   "when": "Return visit; met is true but Q_NEW was never shown (closed before it). If Q_NEW was answered and Q_GOAL never shown: Q_GOAL with the Hi again opening."
+  },
+  "BACK": {
+   "text": "Hi again, {name}.",
+   "when": "Unchanged, for R5 (all done) only.",
+   "text_was_offer_t1": "Hi again, {name}. What would you like Hermes to help you with?",
+   "offer": "general_2",
+   "text_no_name": "Hi again."
+  },
+  "RESTART": {
+   "text": "Sure, let's start again. Are you new to Hermes?",
+   "answers": "Q_NEW",
+   "when": "Typed restart phrase, or Settings button Ask me the set-up questions again. Clears new, goal and current item; keeps name, work and said-done items."
+  },
+  "BACK_SEEN": {
+   "text": "Hi again, {name}. {back_part}",
+   "text_no_name": "Hi again. {back_part}",
+   "when": "Return visit, after the fresh look, when BACK_DONE does not apply and at least one seeable item is seen done. One part only: the goal's item if it is seen done, else the first seen done in the order scheduled_job, personality, second_bot. Then BACK_NEXT as the next message (or REC for a new item, or ALL_DONE).",
+   "parts": {
+    "scheduled_job": "I can see you have {n} scheduled job.",
+    "scheduled_job_plural": "I can see you have {n} scheduled jobs.",
+    "personality": "I can see your Hermes has its own personality text.",
+    "second_bot": "I can see you have {n} bots."
+   },
+   "guess": "It says what is seen now, not what changed since last time: Helper keeps nothing of what the reads saw (keeps.not_kept), so it cannot know since. It shows on every return visit while the thing is there. Only-when-new needs one more kept thing and a Settings row; not written."
+  },
+  "BACK_NEXT": {
+   "text": "We stopped at {card}. {why} Want the steps?",
+   "answers": [
+    "Show me the steps",
+    "I've done this already",
+    "Something else",
+    "Not now"
+   ],
+   "when": "Right after BACK_SEEN, when a current item is kept and not seen done. BACK_REC without the greeting."
+  },
+  "ALREADY_COUNT": {
+   "text": "Fine. I'll count it as done.",
+   "when": "Count it as done under ALREADY_SEEABLE. Kept as said done. Then REC for the next item."
+  },
+  "STEP_BACK": {
+   "text": "Back to step {n} of {total}: {step}",
+   "answers": "the step's own: STEP.answers, or STEP.last_step_answers on the last step",
+   "when": "A question typed while a STEP is the open line: the answer is shown as now, then this line as the next message with the step's answers. Needed: without it Done sits under an answer about something else and the step's words are scrolled away. Not shown after I'm stuck (STUCK has its own answers) and not after Stop for now."
+  }
+ },
+ "restart_phrases": [
+  "start again",
+  "start over",
+  "ask me again",
+  "set up again",
+  "redo the questions",
+  "ask the questions again",
+  "restart"
+ ],
+ "setup_ask": {
+  "phrases": [
+   "what should i set up",
+   "what do i set up",
+   "what should i do first",
+   "where do i start",
+   "where should i start",
+   "what should i do next",
+   "what to set up",
+   "help me set up",
+   "set up hermes",
+   "help me get started",
+   "what next",
+   "now what",
+   "how do i get started",
+   "get started",
+   "where do i begin",
+   "where to begin",
+   "what do i need to set up",
+   "set up first",
+   "i'm lost",
+   "im lost",
+   "i don't know where to begin",
+   "i dont know where to begin"
+  ],
+  "rule": "Lower-case, end marks cut. A whole-word phrase in the message, and no topic key word: the look runs and REC for the rule's item, no AI needed for the choice. While a STEP is the last line, what next / next / done mean the next step instead. If Q_NEW or Q_GOAL is not answered yet, that question is asked first.",
+  "replaces": "N1 (the don't-know line) for these messages. Written phrases what next and now what are taken from c27 next here only when no row answer is open: c27 still judges AI replies.",
+  "phrases_added_offer_t1": [
+   "how do i get started",
+   "get started",
+   "where do i begin",
+   "where to begin",
+   "what do i need to set up",
+   "set up first",
+   "i'm lost",
+   "im lost",
+   "i don't know where to begin",
+   "i dont know where to begin"
+  ]
+ },
+ "ai": {
+  "status": "OFF for the entry (Lead, 11 Nov, from hhtech-setup-run.md): SETUP_AI_BUILT false. REC is the written sentence only. No call is made for a recommendation, so goal, new and the SEEN line are sent to no AI. Everything below is kept for a later build and is not in the entry.",
+  "where": "Only REC (and BACK_DONE/DONE_SEEN followed by REC) has an AI step. Every question, the look, the choice, the steps and every other line are written lines.",
+  "call": "One llm call per REC, max_tokens 120, the same 12 s and slow_ai rule as the live answers (helper-talk-live-v2 slow_ai).",
+  "instructions": "You are Helper, inside the Hermes app. Write one short message that recommends the next thing to set up.\nRules:\n1. Recommend only this: {card}. Use that name exactly.\n2. Say why it fits the person, using the lines About them and What they want. If both say (not told), use The reason.\n3. Do not write steps, clicks, commands or screen names. The steps are shown under your message.\n4. Do not name any other thing to set up, any app, company, price, time or number.\n5. Do not ask a question. Do not use \"!\". Do not use the person's name.\n6. Never say you will set anything up. The person does it.\n7. At most two sentences and 35 words.\nAbout them: {work or (not told)}\nWhat they want: {goal kept_as, or the typed text, or (not told)}\nNew to Hermes: {Q_NEW kept_as or (not told)}\nWhat I can see: {SEEN line without LOOK_OPEN}\nThe thing: {card}: {why}\nThe reason: {reason}",
+  "handed": [
+   "work (already sent today as About them)",
+   "goal: the picked label or the typed text",
+   "new: the picked label",
+   "the SEEN sentences (facts read, no numbers beyond the job/bot count)",
+   "the chosen item's card name and why sentence",
+   "the written reason"
+  ],
+  "not_handed": [
+   "the name",
+   "the steps (they are shown as written lines; the AI never writes them)",
+   "said-done items",
+   "anything else kept"
+  ],
+  "change_to_never_sent": "Today input.never_sent lists every kept thing but work. This adds goal and new for the REC call only. Reason: they are picked labels or a short typed text, and they are what the reason is made of.",
+  "it_may_write": "One or two sentences that name {card} and say why it fits this person. Nothing else. Want the steps? and the answers are added in code.",
+  "checks": {
+   "order": "no_reply (checks_c5) first, then c26 (notes shown), the existing name check, then s1 to s8. Any fail: the written REC text; a no-reply or 12 s timeout also follows slow_ai.",
+   "s1_names_thing": "The reply holds the chosen item's name or one of its aliases (any case).",
+   "s2_no_other_thing": "The reply holds no alias of any other item and no name from the list's later items.",
+   "s3_no_steps": "None of these words: click, press, tap, open, type, paste, scan, settings, menu, button, tab, ctrl, cmd, terminal, command; no ` and no http or www.",
+   "s4_size": "At most 35 words and at most 2 sentences.",
+   "s5_no_question": "No ?",
+   "s6_no_bang": "No !",
+   "s7_not_doing_it": "No I'll / I will / I can / I could / let me followed within 3 words by set, install, connect, create, make, add, build, do; no set (it) (up) for you, do it for you and the like. A bare for you passes: the list's own why sentence for Scheduled jobs has it.",
+   "s8_no_numbers": "No digits."
+  },
+  "aliases": {
+   "model": [
+    "model"
+   ],
+   "first_chat": [
+    "first chat"
+   ],
+   "personality": [
+    "personality",
+    "soul.md"
+   ],
+   "chat_apps": [
+    "chat app",
+    "telegram",
+    "whatsapp",
+    "discord",
+    "slack",
+    "signal"
+   ],
+   "tools_apps": [
+    "tools and apps",
+    "connector",
+    "gmail"
+   ],
+   "skills": [
+    "skill"
+   ],
+   "memory": [
+    "memory"
+   ],
+   "scheduled_job": [
+    "scheduled job"
+   ],
+   "second_bot": [
+    "second bot"
+   ],
+   "safety": [
+    "safety",
+    "yolo"
+   ]
+  },
+  "later_names": [
+   "mcp servers",
+   "plugins",
+   "voice",
+   "bot group chats",
+   "subagents",
+   "kanban",
+   "sandbox",
+   "backup model",
+   "phone access",
+   "move or back up",
+   "code editor"
+  ],
+  "failed_line": "The written REC text, the same as in a build with no AI. Nothing tells the person the AI failed (as the live answers do today), except the slow_ai line once per visit."
+ },
+ "keeps": {
+  "rows": [
+   {
+    "key": "setup_new",
+    "value": "the Q_NEW answer id",
+    "settings_row": "New to Hermes",
+    "shows": "the picked label, e.g. Yes, I'm new",
+    "grey_kept_line": "Kept: new to Hermes: {label}."
+   },
+   {
+    "key": "setup_goal",
+    "value": "goal id and the label or typed text",
+    "settings_row": "What you want Hermes to do",
+    "shows": "the label or the typed text",
+    "grey_kept_line": "Kept: {label or typed}."
+   },
+   {
+    "key": "setup_done_said",
+    "value": "item ids the person said are done",
+    "settings_row": "You said you've done",
+    "shows": "card names, comma-separated, e.g. First chat, Chat apps",
+    "grey_kept_line": "none (DONE_SAID says it)"
+   },
+   {
+    "key": "setup_current",
+    "value": "the item id of the last REC",
+    "settings_row": "Next to set up",
+    "shows": "the card name",
+    "grey_kept_line": "none"
+   }
+  ],
+  "not_kept": [
+   "Skip and Not sure yet (nothing kept)",
+   "what the reads saw (read fresh every time)",
+   "Something else (this visit only)"
+  ],
+  "settings_page": "Four new rows under What you do, each with Change and Delete like the rows there today; a Change on New to Hermes or What you want shows the same four answers. One new button at the bottom of that group: Ask me the set-up questions again (RESTART).",
+  "rules": "Fixed, no AI decides: written the moment the answer is picked or the typed answer passes the keep checks (the What you do checks: 12 words, 80 letters, not secret-looking). Delete all removes them with the rest."
+ },
+ "table_nothing_done": [
+  {
+   "model": "ok",
+   "new": "new",
+   "goal": "schedule",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "ok",
+   "new": "new",
+   "goal": "phone",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "ok",
+   "new": "new",
+   "goal": "bots",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "ok",
+   "new": "new",
+   "goal": "unsure",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "ok",
+   "new": "some",
+   "goal": "schedule",
+   "nothing_done": "scheduled_job"
+  },
+  {
+   "model": "ok",
+   "new": "some",
+   "goal": "phone",
+   "nothing_done": "chat_apps"
+  },
+  {
+   "model": "ok",
+   "new": "some",
+   "goal": "bots",
+   "nothing_done": "second_bot"
+  },
+  {
+   "model": "ok",
+   "new": "some",
+   "goal": "unsure",
+   "nothing_done": "personality"
+  },
+  {
+   "model": "ok",
+   "new": "well",
+   "goal": "schedule",
+   "nothing_done": "scheduled_job"
+  },
+  {
+   "model": "ok",
+   "new": "well",
+   "goal": "phone",
+   "nothing_done": "chat_apps"
+  },
+  {
+   "model": "ok",
+   "new": "well",
+   "goal": "bots",
+   "nothing_done": "second_bot"
+  },
+  {
+   "model": "ok",
+   "new": "well",
+   "goal": "unsure",
+   "nothing_done": "personality"
+  },
+  {
+   "model": "ok",
+   "new": "skip",
+   "goal": "schedule",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "ok",
+   "new": "skip",
+   "goal": "phone",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "ok",
+   "new": "skip",
+   "goal": "bots",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "ok",
+   "new": "skip",
+   "goal": "unsure",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "not",
+   "new": "new",
+   "goal": "schedule",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "new",
+   "goal": "phone",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "new",
+   "goal": "bots",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "new",
+   "goal": "unsure",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "some",
+   "goal": "schedule",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "some",
+   "goal": "phone",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "some",
+   "goal": "bots",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "some",
+   "goal": "unsure",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "well",
+   "goal": "schedule",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "well",
+   "goal": "phone",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "well",
+   "goal": "bots",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "well",
+   "goal": "unsure",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "skip",
+   "goal": "schedule",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "skip",
+   "goal": "phone",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "skip",
+   "goal": "bots",
+   "nothing_done": "model"
+  },
+  {
+   "model": "not",
+   "new": "skip",
+   "goal": "unsure",
+   "nothing_done": "model"
+  },
+  {
+   "model": "unread",
+   "new": "new",
+   "goal": "schedule",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "unread",
+   "new": "new",
+   "goal": "phone",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "unread",
+   "new": "new",
+   "goal": "bots",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "unread",
+   "new": "new",
+   "goal": "unsure",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "unread",
+   "new": "some",
+   "goal": "schedule",
+   "nothing_done": "scheduled_job"
+  },
+  {
+   "model": "unread",
+   "new": "some",
+   "goal": "phone",
+   "nothing_done": "chat_apps"
+  },
+  {
+   "model": "unread",
+   "new": "some",
+   "goal": "bots",
+   "nothing_done": "second_bot"
+  },
+  {
+   "model": "unread",
+   "new": "some",
+   "goal": "unsure",
+   "nothing_done": "personality"
+  },
+  {
+   "model": "unread",
+   "new": "well",
+   "goal": "schedule",
+   "nothing_done": "scheduled_job"
+  },
+  {
+   "model": "unread",
+   "new": "well",
+   "goal": "phone",
+   "nothing_done": "chat_apps"
+  },
+  {
+   "model": "unread",
+   "new": "well",
+   "goal": "bots",
+   "nothing_done": "second_bot"
+  },
+  {
+   "model": "unread",
+   "new": "well",
+   "goal": "unsure",
+   "nothing_done": "personality"
+  },
+  {
+   "model": "unread",
+   "new": "skip",
+   "goal": "schedule",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "unread",
+   "new": "skip",
+   "goal": "phone",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "unread",
+   "new": "skip",
+   "goal": "bots",
+   "nothing_done": "first_chat"
+  },
+  {
+   "model": "unread",
+   "new": "skip",
+   "goal": "unsure",
+   "nothing_done": "first_chat"
+  }
+ ],
+ "conversations": {
+  "a_written": [
+   {
+    "who": "Helper",
+    "text": "Hi. I'm Helper. What's your name?",
+    "words": 6,
+    "picks": null,
+    "grey": null,
+    "line": "OPEN (unchanged)"
+   },
+   {
+    "who": "Person",
+    "text": "Peter",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Nice to meet you, Peter. What do you do?",
+    "words": 9,
+    "picks": null,
+    "grey": null,
+    "line": "F1"
+   },
+   {
+    "who": "Person",
+    "text": "I run a tennis club",
+    "words": 5
+   },
+   {
+    "who": "Helper",
+    "text": "Thanks, Peter. I'll help you set up Hermes for that. Are you new to Hermes?",
+    "words": 15,
+    "picks": [
+     "Yes, I'm new",
+     "I've used it a bit",
+     "I know it well",
+     "Skip"
+    ],
+    "grey": "Kept: I run a tennis club.",
+    "line": "F2"
+   },
+   {
+    "who": "Person",
+    "text": "Yes, I'm new",
+    "words": 3
+   },
+   {
+    "who": "Helper",
+    "text": "What would you like Hermes to do for you?",
+    "words": 9,
+    "picks": [
+     "Do things at set times",
+     "Talk to it from my phone",
+     "Several bots, one per job",
+     "Not sure yet"
+    ],
+    "grey": "Kept: new to Hermes: Yes, I'm new.",
+    "line": "Q_GOAL"
+   },
+   {
+    "who": "Person",
+    "text": "send reminders to my members about training",
+    "words": 7
+   },
+   {
+    "who": "Helper",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "words": 22,
+    "picks": null,
+    "grey": "Kept: send reminders to my members about training. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
+    "line": "SEEN"
+   },
+   {
+    "who": "Helper",
+    "text": "You're new, so first check that Hermes answers you. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?",
+    "words": 25,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R2 first_chat (written)"
+   },
+   {
+    "who": "Person",
+    "text": "Show me the steps",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Step 1 of 5: Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).",
+    "words": 20,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 1)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 2 of 5: Ask something small you can check yourself.",
+    "words": 11,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 2)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 3 of 5: Check: Hermes answers, with no error.",
+    "words": 10,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 3)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 4 of 5: Check: ask one more thing in the same chat. It carries on.",
+    "words": 16,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 4)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 5 of 5: To come back: click Helper in the left list.",
+    "words": 13,
+    "picks": [
+     "It worked",
+     "It didn't work",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 5)"
+   },
+   {
+    "who": "Person",
+    "text": "It worked",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "Good. I'll remember that you did it.",
+    "words": 7,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SAID"
+   },
+   {
+    "who": "Helper",
+    "text": "You want Hermes to do things at set times. Next: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?",
+    "words": 27,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R3 scheduled_job (written)"
+   },
+   {
+    "who": "Person",
+    "text": "Show me the steps",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "words": 22,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 1)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 2)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
+    "picks": [
+     "It worked",
+     "It didn't work",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 3)"
+   },
+   {
+    "who": "Person",
+    "text": "It worked",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "I can see it now. You have 1 scheduled job.",
+    "words": 10,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SEEN (fresh read)"
+   },
+   {
+    "who": "Helper",
+    "text": "This is next in the order the Hermes docs suggest. Next: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?",
+    "words": 30,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R4 personality (written)"
+   },
+   {
+    "who": "Person",
+    "text": "Not now",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. When you're ready, ask me what to set up next.",
+    "words": 12,
+    "picks": null,
+    "grey": null,
+    "line": "NOT_NOW"
+   }
+  ],
+  "a_ai": [
+   {
+    "who": "Helper",
+    "text": "Hi. I'm Helper. What's your name?",
+    "words": 6,
+    "picks": null,
+    "grey": null,
+    "line": "OPEN (unchanged)"
+   },
+   {
+    "who": "Person",
+    "text": "Peter",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Nice to meet you, Peter. What do you do?",
+    "words": 9,
+    "picks": null,
+    "grey": null,
+    "line": "F1"
+   },
+   {
+    "who": "Person",
+    "text": "I run a tennis club",
+    "words": 5
+   },
+   {
+    "who": "Helper",
+    "text": "Thanks, Peter. I'll help you set up Hermes for that. Are you new to Hermes?",
+    "words": 15,
+    "picks": [
+     "Yes, I'm new",
+     "I've used it a bit",
+     "I know it well",
+     "Skip"
+    ],
+    "grey": "Kept: I run a tennis club.",
+    "line": "F2"
+   },
+   {
+    "who": "Person",
+    "text": "Yes, I'm new",
+    "words": 3
+   },
+   {
+    "who": "Helper",
+    "text": "What would you like Hermes to do for you?",
+    "words": 9,
+    "picks": [
+     "Do things at set times",
+     "Talk to it from my phone",
+     "Several bots, one per job",
+     "Not sure yet"
+    ],
+    "grey": "Kept: new to Hermes: Yes, I'm new.",
+    "line": "Q_GOAL"
+   },
+   {
+    "who": "Person",
+    "text": "send reminders to my members about training",
+    "words": 7
+   },
+   {
+    "who": "Helper",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "words": 22,
+    "picks": null,
+    "grey": "Kept: send reminders to my members about training. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
+    "line": "SEEN"
+   },
+   {
+    "who": "Helper",
+    "text": "You're new and want Hermes to help run your tennis club. First make sure it answers you well, with a First chat: one small question. Want the steps?",
+    "words": 28,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R2 first_chat (AI, mine; checks: pass)"
+   },
+   {
+    "who": "Person",
+    "text": "Show me the steps",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Step 1 of 5: Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).",
+    "words": 20,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 1)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 2 of 5: Ask something small you can check yourself.",
+    "words": 11,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 2)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 3 of 5: Check: Hermes answers, with no error.",
+    "words": 10,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 3)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 4 of 5: Check: ask one more thing in the same chat. It carries on.",
+    "words": 16,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 4)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 5 of 5: To come back: click Helper in the left list.",
+    "words": 13,
+    "picks": [
+     "It worked",
+     "It didn't work",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (first_chat 5)"
+   },
+   {
+    "who": "Person",
+    "text": "It worked",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "Good. I'll remember that you did it.",
+    "words": 7,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SAID"
+   },
+   {
+    "who": "Helper",
+    "text": "Reminders about training fit a Scheduled job: Hermes does the job at set times, like every morning. Want the steps?",
+    "words": 20,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R3 scheduled_job (AI, mine; checks: pass)"
+   },
+   {
+    "who": "Person",
+    "text": "Show me the steps",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "words": 22,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 1)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 2)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
+    "picks": [
+     "It worked",
+     "It didn't work",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 3)"
+   },
+   {
+    "who": "Person",
+    "text": "It worked",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "I can see it now. You have 1 scheduled job.",
+    "words": 10,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SEEN (fresh read)"
+   },
+   {
+    "who": "Helper",
+    "text": "Next is its personality, so Hermes talks the way your club does. Want the steps?",
+    "words": 15,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R4 personality (AI, mine; checks: pass)"
+   },
+   {
+    "who": "Person",
+    "text": "Not now",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. When you're ready, ask me what to set up next.",
+    "words": 12,
+    "picks": null,
+    "grey": null,
+    "line": "NOT_NOW"
+   }
+  ],
+  "a_ai_bad_reply_example": {
+   "reply": "Great idea! I can set up a Scheduled job for you on Telegram. Click Scheduled jobs and type your reminder.",
+   "item": "scheduled_job",
+   "fails": [
+    "s2",
+    "s3",
+    "s4",
+    "s6",
+    "s7"
+   ],
+   "shown_instead": "You want Hermes to do things at set times. Next: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?"
+  },
+  "a_next_day": [
+   {
+    "who": "Helper",
+    "text": "Hi again, Peter. I can see you have 1 scheduled job.",
+    "words": 11,
+    "picks": null,
+    "line": "BACK_SEEN (fresh read: 1 job)"
+   },
+   {
+    "who": "Helper",
+    "text": "We stopped at Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?",
+    "words": 22,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "line": "BACK_NEXT"
+   }
+  ],
+  "b_written": [
+   {
+    "who": "Helper",
+    "text": "Hi. I'm Helper. What's your name?",
+    "words": 6,
+    "picks": null,
+    "grey": null,
+    "line": "OPEN (unchanged)"
+   },
+   {
+    "who": "Person",
+    "text": "Ana",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Nice to meet you, Ana. What do you do?",
+    "words": 9,
+    "picks": null,
+    "grey": null,
+    "line": "F1"
+   },
+   {
+    "who": "Person",
+    "text": "I work in sales",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Thanks, Ana. I'll help you set up Hermes for that. Are you new to Hermes?",
+    "words": 15,
+    "picks": [
+     "Yes, I'm new",
+     "I've used it a bit",
+     "I know it well",
+     "Skip"
+    ],
+    "grey": "Kept: I work in sales.",
+    "line": "F2"
+   },
+   {
+    "who": "Person",
+    "text": "I've used it a bit",
+    "words": 5
+   },
+   {
+    "who": "Helper",
+    "text": "What would you like Hermes to do for you?",
+    "words": 9,
+    "picks": [
+     "Do things at set times",
+     "Talk to it from my phone",
+     "Several bots, one per job",
+     "Not sure yet"
+    ],
+    "grey": "Kept: new to Hermes: I've used it a bit.",
+    "line": "Q_GOAL"
+   },
+   {
+    "who": "Person",
+    "text": "a summary of my emails every morning",
+    "words": 7
+   },
+   {
+    "who": "Helper",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "words": 22,
+    "picks": null,
+    "grey": "Kept: a summary of my emails every morning. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
+    "line": "SEEN"
+   },
+   {
+    "who": "Helper",
+    "text": "You want Hermes to do things at set times. Next: Scheduled jobs. Hermes does a job for you at set times, like every morning. Want the steps?",
+    "words": 27,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R3 scheduled_job (written)"
+   },
+   {
+    "who": "Person",
+    "text": "Show me the steps",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "words": 22,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 1)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 2)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
+    "picks": [
+     "It worked",
+     "It didn't work",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 3)"
+   },
+   {
+    "who": "Person",
+    "text": "It worked",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "I can see it now. You have 1 scheduled job.",
+    "words": 10,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SEEN (fresh read)"
+   },
+   {
+    "who": "Helper",
+    "text": "This is next in the order the Hermes docs suggest. Next: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?",
+    "words": 30,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R4 personality (written)"
+   },
+   {
+    "who": "Person",
+    "text": "Not now",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. When you're ready, ask me what to set up next.",
+    "words": 12,
+    "picks": null,
+    "grey": null,
+    "line": "NOT_NOW"
+   }
+  ],
+  "b_ai": [
+   {
+    "who": "Helper",
+    "text": "Hi. I'm Helper. What's your name?",
+    "words": 6,
+    "picks": null,
+    "grey": null,
+    "line": "OPEN (unchanged)"
+   },
+   {
+    "who": "Person",
+    "text": "Ana",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Nice to meet you, Ana. What do you do?",
+    "words": 9,
+    "picks": null,
+    "grey": null,
+    "line": "F1"
+   },
+   {
+    "who": "Person",
+    "text": "I work in sales",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Thanks, Ana. I'll help you set up Hermes for that. Are you new to Hermes?",
+    "words": 15,
+    "picks": [
+     "Yes, I'm new",
+     "I've used it a bit",
+     "I know it well",
+     "Skip"
+    ],
+    "grey": "Kept: I work in sales.",
+    "line": "F2"
+   },
+   {
+    "who": "Person",
+    "text": "I've used it a bit",
+    "words": 5
+   },
+   {
+    "who": "Helper",
+    "text": "What would you like Hermes to do for you?",
+    "words": 9,
+    "picks": [
+     "Do things at set times",
+     "Talk to it from my phone",
+     "Several bots, one per job",
+     "Not sure yet"
+    ],
+    "grey": "Kept: new to Hermes: I've used it a bit.",
+    "line": "Q_GOAL"
+   },
+   {
+    "who": "Person",
+    "text": "a summary of my emails every morning",
+    "words": 7
+   },
+   {
+    "who": "Helper",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. You have no scheduled jobs yet.",
+    "words": 22,
+    "picks": null,
+    "grey": "Kept: a summary of my emails every morning. Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
+    "line": "SEEN"
+   },
+   {
+    "who": "Helper",
+    "text": "A morning summary is exactly what a Scheduled job is for. Hermes does the job at the time you choose, every day. Want the steps?",
+    "words": 25,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R3 scheduled_job (AI, mine; checks: pass)"
+   },
+   {
+    "who": "Person",
+    "text": "Show me the steps",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Step 1 of 3: In a chat, ask in plain words, like: Every morning at 9, send me a short news summary.",
+    "words": 22,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 1)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 2 of 3: Check: open Scheduled jobs. The job Hermes made is there.",
+    "words": 14,
+    "picks": [
+     "Done",
+     "I'm stuck",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 2)"
+   },
+   {
+    "who": "Person",
+    "text": "Done",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Step 3 of 3: No job? Make one by hand: click New cron, type a name and the job, then Create cron.",
+    "words": 22,
+    "picks": [
+     "It worked",
+     "It didn't work",
+     "Stop for now"
+    ],
+    "grey": null,
+    "line": "STEP (scheduled_job 3)"
+   },
+   {
+    "who": "Person",
+    "text": "It worked",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "I can see it now. You have 1 scheduled job.",
+    "words": 10,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SEEN (fresh read)"
+   },
+   {
+    "who": "Helper",
+    "text": "Now give your Hermes its personality: a few lines on who it is and how it talks, so your summaries sound the way you like. Want the steps?",
+    "words": 28,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R4 personality (AI, mine; checks: pass)"
+   },
+   {
+    "who": "Person",
+    "text": "Not now",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. When you're ready, ask me what to set up next.",
+    "words": 12,
+    "picks": null,
+    "grey": null,
+    "line": "NOT_NOW"
+   }
+  ],
+  "c_written": [
+   {
+    "who": "Helper",
+    "text": "Hi. I'm Helper. What's your name?",
+    "words": 6,
+    "picks": null,
+    "grey": null,
+    "line": "OPEN (unchanged)"
+   },
+   {
+    "who": "Person",
+    "text": "Skip",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Nice to meet you. What do you do?",
+    "words": 8,
+    "picks": null,
+    "grey": null,
+    "line": "F1 text_no_name"
+   },
+   {
+    "who": "Person",
+    "text": "Skip",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. I'll help you set up Hermes. Are you new to Hermes?",
+    "words": 13,
+    "picks": [
+     "Yes, I'm new",
+     "I've used it a bit",
+     "I know it well",
+     "Skip"
+    ],
+    "grey": null,
+    "line": "F3"
+   },
+   {
+    "who": "Person",
+    "text": "Skip",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "What would you like Hermes to do for you?",
+    "words": 9,
+    "picks": [
+     "Do things at set times",
+     "Talk to it from my phone",
+     "Several bots, one per job",
+     "Not sure yet"
+    ],
+    "grey": null,
+    "line": "Q_GOAL"
+   },
+   {
+    "who": "Person",
+    "text": "Not sure yet",
+    "words": 3
+   },
+   {
+    "who": "Helper",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. Its personality text is still the starter one.",
+    "words": 24,
+    "picks": null,
+    "grey": "Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
+    "line": "SEEN"
+   },
+   {
+    "who": "Helper",
+    "text": "The usual first step is to check that Hermes answers. Next: First chat. Ask Hermes one small thing, to see that it works. Want the steps?",
+    "words": 26,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R2 first_chat (written)"
+   },
+   {
+    "who": "Person",
+    "text": "I've done this already",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Good. I'll remember that you did it.",
+    "words": 7,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SAID"
+   },
+   {
+    "who": "Helper",
+    "text": "This is next in the order the Hermes docs suggest. Next: Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?",
+    "words": 30,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R4 personality (written)"
+   },
+   {
+    "who": "Person",
+    "text": "Not now",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. When you're ready, ask me what to set up next.",
+    "words": 12,
+    "picks": null,
+    "grey": null,
+    "line": "NOT_NOW"
+   }
+  ],
+  "c_ai": [
+   {
+    "who": "Helper",
+    "text": "Hi. I'm Helper. What's your name?",
+    "words": 6,
+    "picks": null,
+    "grey": null,
+    "line": "OPEN (unchanged)"
+   },
+   {
+    "who": "Person",
+    "text": "Skip",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "Nice to meet you. What do you do?",
+    "words": 8,
+    "picks": null,
+    "grey": null,
+    "line": "F1 text_no_name"
+   },
+   {
+    "who": "Person",
+    "text": "Skip",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. I'll help you set up Hermes. Are you new to Hermes?",
+    "words": 13,
+    "picks": [
+     "Yes, I'm new",
+     "I've used it a bit",
+     "I know it well",
+     "Skip"
+    ],
+    "grey": null,
+    "line": "F3"
+   },
+   {
+    "who": "Person",
+    "text": "Skip",
+    "words": 1
+   },
+   {
+    "who": "Helper",
+    "text": "What would you like Hermes to do for you?",
+    "words": 9,
+    "picks": [
+     "Do things at set times",
+     "Talk to it from my phone",
+     "Several bots, one per job",
+     "Not sure yet"
+    ],
+    "grey": null,
+    "line": "Q_GOAL"
+   },
+   {
+    "who": "Person",
+    "text": "Not sure yet",
+    "words": 3
+   },
+   {
+    "who": "Helper",
+    "text": "I looked at your Hermes. You have a model, the AI that thinks, and it answers. Its personality text is still the starter one.",
+    "words": 24,
+    "picks": null,
+    "grey": "Read from your Hermes on this computer. Nothing was sent, and no AI was used. [What did you look at?]",
+    "line": "SEEN"
+   },
+   {
+    "who": "Helper",
+    "text": "The usual first step is a First chat: ask Hermes one small thing and see that it answers. Want the steps?",
+    "words": 21,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R2 first_chat (AI, mine; checks: pass)"
+   },
+   {
+    "who": "Person",
+    "text": "I've done this already",
+    "words": 4
+   },
+   {
+    "who": "Helper",
+    "text": "Good. I'll remember that you did it.",
+    "words": 7,
+    "picks": null,
+    "grey": null,
+    "line": "DONE_SAID"
+   },
+   {
+    "who": "Helper",
+    "text": "Next is its personality: a few lines that tell your Hermes who it is and how to talk. Want the steps?",
+    "words": 21,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "grey": null,
+    "line": "REC R4 personality (AI, mine; checks: pass)"
+   },
+   {
+    "who": "Person",
+    "text": "Not now",
+    "words": 2
+   },
+   {
+    "who": "Helper",
+    "text": "That's fine. When you're ready, ask me what to set up next.",
+    "words": 12,
+    "picks": null,
+    "grey": null,
+    "line": "NOT_NOW"
+   }
+  ],
+  "a_next_day_nothing_seen": [
+   {
+    "who": "Helper",
+    "text": "Hi again, Peter. We stopped at Its personality. A short text that tells your Hermes who it is and how to talk. Want the steps?",
+    "words": 25,
+    "picks": [
+     "Show me the steps",
+     "I've done this already",
+     "Something else",
+     "Not now"
+    ],
+    "line": "BACK_REC (no seeable thing done)"
+   }
+  ]
+ },
+ "gaps": [
+  "Nothing here has run in the app or on a model. The reads are hhtech's (ran), the rule and lines are Python only.",
+  "Chat apps could be seen (gateway_platforms) but list v2 says cannot be told; Helper asks instead.",
+  "First chat and four more cannot be seen: the person's word is kept as said done.",
+  "Only the main bot is read; a job on another bot does not count (NOT_SEEN offers I did it on another bot).",
+  "Whether a scheduled job can message other people (club members) is not checked; no line says it can.",
+  "STUCK_MODEL's live URL not checked."
+ ],
+ "changed_offer_t1": "hhcontent, 11 Nov 2026, changes-8: NOT_NOW, ALL_DONE, BACK end with an offer (helper-talk-v2.json offers); Q_GOAL and SETUP_REASK_GOAL in his either/or shape, same four answers; setup_ask phrases widened.",
+ "changes_1": "2026-11-11 08:48 UTC, Lead's job from docs/answers/hhtech-setup-run.md: content/helper-setup-chat-v1-changes-1.md",
+ "conversations_note_c1": "changes-1: a_ai, b_ai and c_ai are examples of the AI step, which is off for the entry; nothing in them is shown. Their REC lines marked (AI, mine) are not checked facts."
+}

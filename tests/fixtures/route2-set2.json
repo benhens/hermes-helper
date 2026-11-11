@@ -1,6 +1,6 @@
 {
  "about": "Written by dev/checks/talk-v2/dump_set2.py: single messages through hhcontent's route2.py, keeping on. Do not edit: make it again.",
- "json_sha256": "65bddf953d33a1ad04edf3ba19006c9c11885fe24014596c039ee9dbfa3ebced",
+ "json_sha256": "06eda70cdbf3a667f455c8a0e93f6bfd2eae509d473cdd8d533e3abdf7d5879f",
  "messages": [
   {
    "after": "",
@@ -115,17 +115,15 @@
   {
    "after": "",
    "n": 6,
-   "shown": "question mod",
+   "shown": "MODEL_FOR",
    "state": {
-    "asked": [
-     "mod"
-    ],
+    "asked": [],
     "found": {},
     "kept": {},
-    "lastq": true,
+    "lastq": false,
     "met": false,
     "name": null,
-    "pending": "mod",
+    "pending": null,
     "stage": "open",
     "work": null
    },
@@ -241,17 +239,17 @@
   {
    "after": "",
    "n": 12,
-   "shown": "line mod3",
+   "shown": "question mod",
    "state": {
-    "asked": [],
-    "found": {
-     "mod": "mod3"
-    },
+    "asked": [
+     "mod"
+    ],
+    "found": {},
     "kept": {},
-    "lastq": false,
+    "lastq": true,
     "met": false,
     "name": null,
-    "pending": null,
+    "pending": "mod",
     "stage": "open",
     "work": null
    },
@@ -736,17 +734,15 @@
   {
    "after": "",
    "n": 35,
-   "shown": "question mod",
+   "shown": "MODEL_CHANGE",
    "state": {
-    "asked": [
-     "mod"
-    ],
+    "asked": [],
     "found": {},
     "kept": {},
-    "lastq": true,
+    "lastq": false,
     "met": false,
     "name": null,
-    "pending": "mod",
+    "pending": null,
     "stage": "open",
     "work": null
    },
@@ -924,7 +920,7 @@
   {
    "after": "",
    "n": 44,
-   "shown": "N1",
+   "shown": "START",
    "state": {
     "asked": [],
     "found": {},
@@ -984,7 +980,7 @@
   {
    "after": "",
    "n": 47,
-   "shown": "N1",
+   "shown": "UPDATE",
    "state": {
     "asked": [],
     "found": {},
@@ -1124,7 +1120,7 @@
   {
    "after": "",
    "n": 54,
-   "shown": "term line plugin",
+   "shown": "PLUGIN_WHICH",
    "state": {
     "asked": [],
     "found": {},
@@ -1282,5 +1278,5 @@
    ]
   }
  ],
- "route2_sha256": "0356dfb91c0bfde85a56280434e6886a90e5b82a91bbfb27ddce1a1387e7ffbe"
+ "route2_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9"
 }

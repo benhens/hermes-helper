@@ -1,5 +1,5 @@
 {
- "made_by": "dev/checks/talk-live/dump_live.py: hhtech's live.py on the pinned team copy team-root-c5 (talk-live-3: part 1 only)",
+ "made_by": "dev/checks/talk-live/dump_live.py: hhtech's live.py on the pinned team copy dev/checks/setup-chat/team-root-c10 (live-v2 changes-10)",
  "facts": [
   "mem0",
   "mem1",
@@ -30300,6 +30300,1480 @@
    }
   },
   {
+   "text": "can I use it on my phone",
+   "by_words": [
+    "msg0"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "is my data private if I use the free model",
+   "by_words": [
+    "mod3",
+    "mod0",
+    "COST",
+    "svc2"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem4",
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3"
+    ],
+    "mod": [
+     "mod3",
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc2",
+     "svc0",
+     "svc1",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_aloud",
+     "w_voice",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "who can see my chats",
+   "by_words": [
+    "svc2"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot3",
+     "bot0",
+     "bot1",
+     "bot2"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem2",
+     "mem0",
+     "mem1",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc2",
+     "svc0",
+     "svc1",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "is the free model any good",
+   "by_words": [
+    "mod0",
+    "mod3",
+    "COST"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod3",
+     "mod1",
+     "mod2",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_aloud",
+     "w_voice",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "what's the difference between hermes and chatgpt",
+   "by_words": [
+    "mod1",
+    "mod0"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod1",
+     "mod0",
+     "mod3",
+     "mod2",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg2",
+     "msg1",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "why use hermes instead of claude",
+   "by_words": [
+    "mod2",
+    "mod0"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod2",
+     "mod0",
+     "mod1",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg2",
+     "msg1",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "can I use my chatgpt plan",
+   "by_words": [
+    "mod1",
+    "mod0"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod1",
+     "mod0",
+     "mod2",
+     "mod4",
+     "mod3"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "and then?",
+   "by_words": [],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch5",
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3"
+    ],
+    "svc": [
+     "CN1",
+     "svc0",
+     "svc1",
+     "svc2"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "no, that's not right, it works on my phone already",
+   "by_words": [
+    "msg0",
+    "mod4"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod4",
+     "mod2",
+     "mod0",
+     "mod1",
+     "mod3"
+    ],
+    "msg": [
+     "msg0",
+     "msg2",
+     "msg1",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "mcp",
+     "tool",
+     "skill",
+     "plugin",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "no, I meant does it remember my chats",
+   "by_words": [
+    "mod4",
+    "mem0"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot3",
+     "bot0",
+     "bot1",
+     "bot2"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem2",
+     "mem1",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod4",
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "do I need a powerful computer for this",
+   "by_words": [],
+   "rank_in": {
+    "bot": [
+     "bot3",
+     "bot0",
+     "bot1",
+     "bot2"
+    ],
+    "cost": [
+     "WHERE",
+     "COST"
+    ],
+    "files": [
+     "w_code",
+     "w_computer",
+     "w_docs",
+     "w_pdf",
+     "w_office"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod3",
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod4"
+    ],
+    "msg": [
+     "msg3",
+     "msg0",
+     "msg1",
+     "msg2"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch4",
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "what hardware do I need",
+   "by_words": [],
+   "rank_in": {
+    "bot": [
+     "bot3",
+     "bot0",
+     "bot1",
+     "bot2"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "thank you so much, that helps",
+   "by_words": [],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use2",
+     "use0",
+     "use1",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "ok thanks bye",
+   "by_words": [],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg1",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_voice",
+     "w_aloud",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_browser",
+     "w_xpost",
+     "w_reddit",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "hi, how do I add telegram",
+   "by_words": [
+    "msg1",
+    "msg0"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot0",
+     "bot1",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_pdf",
+     "w_office",
+     "w_notes",
+     "w_meeting"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod2",
+     "mod3",
+     "mod4"
+    ],
+    "msg": [
+     "msg1",
+     "msg0",
+     "msg2",
+     "msg3"
+    ],
+    "pics": [
+     "w_presenter",
+     "w_meme",
+     "w_image",
+     "w_see",
+     "w_video"
+    ],
+    "sch": [
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3",
+     "sch4"
+    ],
+    "svc": [
+     "svc1",
+     "svc2",
+     "svc0",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_stt",
+     "w_voice",
+     "w_aloud",
+     "w_music"
+    ],
+    "web": [
+     "w_reddit",
+     "w_stocks",
+     "w_web",
+     "w_browser",
+     "w_xpost"
+    ],
+    "words": [
+     "plugin",
+     "tool",
+     "skill",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
+   "text": "thanks, can hermes read my emails",
+   "by_words": [
+    "sch5",
+    "bot1"
+   ],
+   "rank_in": {
+    "bot": [
+     "bot1",
+     "bot0",
+     "bot2",
+     "bot3"
+    ],
+    "cost": [
+     "COST",
+     "WHERE"
+    ],
+    "files": [
+     "w_docs",
+     "w_notes",
+     "w_code",
+     "w_pdf",
+     "w_office"
+    ],
+    "mem": [
+     "mem0",
+     "mem1",
+     "mem2",
+     "mem3",
+     "mem4"
+    ],
+    "mod": [
+     "mod0",
+     "mod1",
+     "mod3",
+     "mod2",
+     "mod4"
+    ],
+    "msg": [
+     "msg0",
+     "msg2",
+     "msg1",
+     "msg3"
+    ],
+    "pics": [
+     "w_image",
+     "w_see",
+     "w_video",
+     "w_anim",
+     "w_presenter"
+    ],
+    "sch": [
+     "sch5",
+     "sch0",
+     "sch1",
+     "sch2",
+     "sch3"
+    ],
+    "svc": [
+     "svc0",
+     "svc1",
+     "svc2",
+     "CN1"
+    ],
+    "use": [
+     "use0",
+     "use1",
+     "use2",
+     "use3",
+     "use4"
+    ],
+    "voice": [
+     "w_aloud",
+     "w_voice",
+     "w_stt",
+     "w_music"
+    ],
+    "web": [
+     "w_web",
+     "w_reddit",
+     "w_browser",
+     "w_xpost",
+     "w_papers"
+    ],
+    "words": [
+     "tool",
+     "skill",
+     "plugin",
+     "mcp",
+     "soul"
+    ]
+   }
+  },
+  {
    "text": "and",
    "by_words": [],
    "rank_in": {
@@ -30481,96 +31955,6 @@
   },
   {
    "text": "and then",
-   "by_words": [],
-   "rank_in": {
-    "bot": [
-     "bot0",
-     "bot1",
-     "bot2",
-     "bot3"
-    ],
-    "cost": [
-     "COST",
-     "WHERE"
-    ],
-    "files": [
-     "w_docs",
-     "w_pdf",
-     "w_office",
-     "w_notes",
-     "w_meeting"
-    ],
-    "mem": [
-     "mem0",
-     "mem1",
-     "mem2",
-     "mem3",
-     "mem4"
-    ],
-    "mod": [
-     "mod0",
-     "mod1",
-     "mod2",
-     "mod3",
-     "mod4"
-    ],
-    "msg": [
-     "msg0",
-     "msg1",
-     "msg2",
-     "msg3"
-    ],
-    "pics": [
-     "w_image",
-     "w_see",
-     "w_video",
-     "w_anim",
-     "w_presenter"
-    ],
-    "sch": [
-     "sch5",
-     "sch0",
-     "sch1",
-     "sch2",
-     "sch3"
-    ],
-    "svc": [
-     "CN1",
-     "svc0",
-     "svc1",
-     "svc2"
-    ],
-    "use": [
-     "use0",
-     "use1",
-     "use2",
-     "use3",
-     "use4"
-    ],
-    "voice": [
-     "w_voice",
-     "w_aloud",
-     "w_stt",
-     "w_music"
-    ],
-    "web": [
-     "w_web",
-     "w_browser",
-     "w_xpost",
-     "w_reddit",
-     "w_papers"
-    ],
-    "words": [
-     "tool",
-     "skill",
-     "plugin",
-     "mcp",
-     "soul"
-    ]
-   }
-  },
-  {
-   "text": "and then?",
    "by_words": [],
    "rank_in": {
     "bot": [

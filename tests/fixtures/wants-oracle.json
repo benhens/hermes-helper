@@ -1,8 +1,8 @@
 {
  "about": "Written by dev/checks/talk-v2-wants/dump_oracle.py. Do not edit: make it again.",
- "route2_sha256": "0356dfb91c0bfde85a56280434e6886a90e5b82a91bbfb27ddce1a1387e7ffbe",
+ "route2_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9",
  "route2_run": "route2.py",
- "route2_run_sha256": "0356dfb91c0bfde85a56280434e6886a90e5b82a91bbfb27ddce1a1387e7ffbe",
+ "route2_run_sha256": "62c75487cf82758fda6fee40c908551916b1c022de41f80c3f87a04903abe3a9",
  "wants_step_sha256": "491b7f75865c4d61219476632e5d56270081ef6146f77c5fbd5323fed420a23f",
  "fixes6_step_sha256": "cd6d53f51b1bcac27fc2436c1ac0431199a650d6cb6c5a120c47e02d02ba9142",
  "wants_fixes_step_sha256": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e",
@@ -515,14 +515,14 @@
      "after": "",
      "text": "is there a free one",
      "route2": {
-      "shown": "line mod3",
-      "kind": "row",
+      "shown": "question mod",
+      "kind": "question",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": "mod",
-      "need": "mod3",
+      "need": null,
       "why": null
      },
      "oracle": {
@@ -591,14 +591,14 @@
      "after": "",
      "text": "I dont want to pay for anything",
      "route2": {
-      "shown": "line mod3",
-      "kind": "row",
+      "shown": "FREE",
+      "kind": "FREE",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mod",
-      "need": "mod3",
+      "topic": null,
+      "need": null,
       "why": null
      },
      "oracle": {
@@ -2380,13 +2380,13 @@
       "mod"
      ],
      "route2": {
-      "shown": "question mod",
-      "kind": "question",
+      "shown": "MODEL_FOR",
+      "kind": "MODEL_FOR",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mod",
+      "topic": null,
       "need": null,
       "why": null
      },
@@ -2635,14 +2635,14 @@
       "mod"
      ],
      "route2": {
-      "shown": "line mod3",
-      "kind": "row",
+      "shown": "question mod",
+      "kind": "question",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": "mod",
-      "need": "mod3",
+      "need": null,
       "why": null
      },
      "oracle": {
@@ -3615,13 +3615,13 @@
       "mod"
      ],
      "route2": {
-      "shown": "question mod",
-      "kind": "question",
+      "shown": "MODEL_CHANGE",
+      "kind": "MODEL_CHANGE",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
-      "topic": "mod",
+      "topic": null,
       "need": null,
       "why": null
      },
@@ -3984,8 +3984,8 @@
       "none"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "START",
+      "kind": "START",
       "row": null,
       "skill": null,
       "group": null,
@@ -4107,8 +4107,8 @@
       "none"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "UPDATE",
+      "kind": "UPDATE",
       "row": null,
       "skill": null,
       "group": null,
@@ -4394,8 +4394,8 @@
       "word:plugin"
      ],
      "route2": {
-      "shown": "term line plugin",
-      "kind": "term",
+      "shown": "PLUGIN_WHICH",
+      "kind": "PLUGIN_WHICH",
       "row": null,
       "skill": null,
       "group": null,
@@ -5055,8 +5055,8 @@
       "bot"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "PRIV",
+      "kind": "PRIV",
       "row": null,
       "skill": null,
       "group": null,
@@ -6301,8 +6301,8 @@
       "none"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "THANKS",
+      "kind": "THANKS",
       "row": null,
       "skill": null,
       "group": null,
@@ -6921,8 +6921,8 @@
       "word:plugin"
      ],
      "route2": {
-      "shown": "term line plugin",
-      "kind": "term",
+      "shown": "PLUGIN_ADD",
+      "kind": "PLUGIN_ADD",
       "row": null,
       "skill": null,
       "group": null,

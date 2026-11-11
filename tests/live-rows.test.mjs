@@ -11,9 +11,11 @@ import { LIVE_DATA } from '../src/live-data.js'
 
 const O = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, 'fixtures', 'live-rows-oracle.json'), 'utf8'))
 
-test('the rows are live.py\'s FACTS, in its order, plus the four next lines of the data (handed only with their row)', () => {
+// setup-chat: live changes-6 and -9 (then lines), ask-fix-t1 and live changes-9 (second wordings, handed on a follow-up only)
+test('the rows are live.py\'s FACTS, in its order, plus the ten next lines of the data (handed only with their row; a second wording only on a follow-up)', () => {
   assert.deepEqual(LIVE_ROWS.filter(r => !r.next_of).map(r => r.id), O.facts)
-  assert.deepEqual(LIVE_ROWS.filter(r => r.next_of).map(r => r.id).sort(), ['bot1-next', 'use-more', 'use1-next', 'use3-next'])
+  assert.deepEqual(LIVE_ROWS.filter(r => r.next_of).map(r => r.id).sort(), ['bot1-next', 'msg0-then', 'msg1-then', 'plugin-mean', 'skill-mean', 'use-more', 'use1-next', 'use1-next-mean', 'use3-next', 'use3-next-mean'])
+  assert.deepEqual(LIVE_ROWS.filter(r => r.follow_only).map(r => r.id).sort(), ['plugin-mean', 'skill-mean', 'use1-next-mean', 'use3-next-mean'])
   assert.deepEqual([...new Set(LIVE_ROWS.filter(r => !r.next_of).map(r => r.subject))].sort(), O.subjects)
   assert.equal(O.subjects.length, 13)
   // every subject the first call can name is a group of rows, or talk, build or none

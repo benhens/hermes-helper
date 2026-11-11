@@ -52,8 +52,8 @@ test('changes-5 no_reply runs on every call before anything else: a first call, 
     let n = 0
     const request = async () => ({ text: answers[n++] })
     const st = freshVisit('open', {}, true)
-    const { pre, out } = turnParts('what should I set up first', st)
-    const got = await askLive({ mode, text: 'what should I set up first', pre, out, before: { last: null, lastKey: null }, request })
+    const { pre, out } = turnParts('can it fly a kite', st)
+    const got = await askLive({ mode, text: 'can it fly a kite', pre, out, before: { last: null, lastKey: null }, request })
     assert.equal(got.thinking, true, answers.join(' / '))
     assert.equal(n, answers.length, 'no call after it')
   }
