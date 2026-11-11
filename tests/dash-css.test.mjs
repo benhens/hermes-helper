@@ -33,12 +33,13 @@ test('every selector is one of our own hhd- classes (in the light theme, under H
     // (a container query measures the content box: 600 less the banner's 2 x 20 px padding)
     `@container (max-width:559px){.${D.bannerChar}{display:none}.${D.bannerArt}{width:100%;opacity:.3}.${D.bannerTitle},.${D.bannerLine},.${D.bannerOpen}{max-width:100%}}`,
     `@media (prefers-reduced-motion:reduce){.${D.tile}::after,.${D.scard}::after,.${D.steps}::after{animation:none}}`,
-    // look-fix (PICK.md way 3): the card's sign 96 px (140 x .686) at .5 under 300 px of card, gone under 240 px
+    // look-fix (PICK.md way 3), follow-up 19:55 (REVIEW.md 2): the card's sign 66 px at .5 under 300 px of card, gone
+    // under 240 px, and the words' free room at the right follows it
     // (content box: 300 and 240 less 2 x 20 px padding and 2 x 1 px border; the compact card's padding is 2 x 12 px)
-    `@container (max-width:257px){.${D.scardSign}{right:-4px;transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
-    `@container (max-width:197px){.${D.scardSign}{display:none}.${D.scardWhy}{max-width:none}}`,
-    `@container (max-width:273px){.${D.compact} .${D.scardSign}{right:-4px;transform:scale(.686);transform-origin:100% 50%;opacity:.5}}`,
-    `@container (max-width:213px){.${D.compact} .${D.scardSign}{display:none}.${D.compact} .${D.scardWhy}{max-width:none}}`
+    `@container (max-width:257px){.${D.scardTop},.${D.scardWhy},.${D.scardSign}{--hhd-sign:66px}.${D.scardSign}{opacity:.5}}`,
+    `@container (max-width:197px){.${D.scardSign}{display:none}.${D.scardTop},.${D.scardWhy}{--hhd-room:0px}}`,
+    `@container (max-width:273px){.${D.compact} .${D.scardTop},.${D.compact} .${D.scardWhy},.${D.compact} .${D.scardSign}{--hhd-sign:66px}.${D.compact} .${D.scardSign}{opacity:.5}}`,
+    `@container (max-width:213px){.${D.compact} .${D.scardSign}{display:none}.${D.compact} .${D.scardTop},.${D.compact} .${D.scardWhy}{--hhd-room:0px}}`
   ])
   for (const rule of rules.filter(r => !r.startsWith('@'))) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
   for (const c of classesIn(rules.map(r => r.slice(0, r.indexOf('{'))).join('\n'))) assert.ok(c.startsWith('hhd-') || c === 'dark', c)
@@ -172,14 +173,17 @@ test('the pointer over an opened card: only its half above the panel is drawn (i
 
 /* ---------- loom2: the set-up as cards ---------- */
 test('no path and no line: nothing in the sheet draws a stroke or a path; the hairline is only the light edge of tiles and cards', () => {
-  assert.doesNotMatch(DASH_CSS, /[{;]stroke|hhd-line|hhd-road|hhd-stop|hhd-dot/)
+  // follow-up 19:55 (REVIEW.md 1 for Model and Memory): the one stroke is the drawn signs' line width
+  assert.doesNotMatch(DASH_CSS.replace(`.${D.scardSign} svg{width:100%;height:100%;stroke-width:3}`, ''), /[{;]stroke|hhd-line|hhd-road|hhd-stop|hhd-dot/)
+  assert.ok(DASH_CSS.includes(`.${D.scardSign} svg{width:100%;height:100%;stroke-width:3}`))
   assert.deepEqual(rules.filter(r => r.includes('--ui-stroke-tertiary')).map(r => r.slice(0, r.indexOf('{'))), [`html:not(.dark) .${D.tile}`, `html:not(.dark) .${D.scard}`])
   assert.doesNotMatch(read('src/dash.js'), /'svg'|'path'|stroke/)
 })
 
 test('look-fix: a marked card: its icon square filled with --ui-green and "Done" in --ui-green, whatever the card\'s accent; "Start here" in the theme\'s accent; the opened card keeps the ring on (no outline, no shadow)', () => {
   assert.equal(ruleOf(`.${D.done} .${D.tileIcon}`), `.${D.done} .${D.tileIcon}{background:var(--ui-green);color:var(--background)}`)
-  assert.match(ruleOf(`.${D.doneLine}`), /font-weight:600;color:var\(--ui-green\)/)
+  // follow-up 19:55: the word Done a green that reaches 4.5:1 in both themes (measured in the app), mixed from --ui-green
+  assert.match(ruleOf(`.${D.doneLine}`), /font-weight:600;color:color-mix\(in srgb,var\(--ui-green\) 72%,var\(--ui-text-primary\)\)/)
   assert.match(ruleOf(`.${D.start}`), /color:var\(--ui-accent\)/)
   assert.equal(ruleOf(`.${D.scard}.${D.sel}`), '')
   assert.ok(rules.some(r => selectorsOf(r).includes(`.${D.scard}.${D.sel}::after`) && r.endsWith('{opacity:1;animation-play-state:running}')))
@@ -217,11 +221,19 @@ test('look-fix: tiles keep the icon left of the words at every width; the line u
   assert.match(ruleOf(`.${D.tileLine}`), /-webkit-line-clamp:2;overflow:hidden/)
 })
 
-test('look-fix (PICK.md way 3): each set-up card draws its sign large in dots at its right: 140 px, right -8px, centred, behind the words at .8 in the card\'s accent, masked by a 4 px dot grid and a fade from the left; the card clips; the why-line keeps 64%', () => {
+test('look-fix (PICK.md way 3), follow-up 19:55 (REVIEW.md 2): each set-up card draws its sign in dots at its right, 96 px (72 narrow), 13 px inside the edge, centred, behind the words at .8 in the card\'s accent, masked by a 4 px dot grid and a fade from the left; the card is at least the sign + 26 px tall; the words keep the sign + 20 px free', () => {
   const s = ruleOf(`.${D.scardSign}`)
-  for (const part of ['position:absolute', 'right:-8px', 'top:calc(50% - 70px)', 'z-index:-1', 'width:140px', 'height:140px', 'opacity:.8', 'color:var(--hhd-accent)', 'pointer-events:none', 'mask-size:4px 4px,100% 100%', 'mask-composite:intersect']) assert.ok(s.includes(part), part)
+  for (const part of ['position:absolute', 'right:13px', 'top:calc(50% - var(--hhd-sign) / 2)', 'z-index:-1', 'width:var(--hhd-sign)', 'height:var(--hhd-sign)', 'font-size:var(--hhd-sign)', 'opacity:.8', 'color:var(--hhd-accent)', 'pointer-events:none', 'mask-size:4px 4px,100% 100%', 'mask-composite:intersect']) assert.ok(s.includes(part), part)
   assert.match(ruleOf(`.${D.scard}`), /position:relative;isolation:isolate;overflow:hidden/)
-  assert.match(ruleOf(`.${D.scardWhy}`), /max-width:64%/)
+  assert.match(ruleOf(`.${D.scard}`), /--hhd-sign:96px;--hhd-room:calc\(var\(--hhd-sign\) \+ 20px\);min-height:calc\(96px \+ 26px\)/)
+  assert.match(ruleOf(`.${D.compact} .${D.scard}`), /--hhd-sign:72px;min-height:calc\(72px \+ 26px\)/)
+  assert.match(ruleOf(`.${D.scardWhy}`), /margin-right:var\(--hhd-room\)/)
+  assert.match(ruleOf(`.${D.scardTop}`), /margin-right:var\(--hhd-room\)/)
+})
+
+test('follow-up 19:55 (REVIEW.md 5): at the narrow size no tile line is cut with an ellipsis; it wraps', () => {
+  assert.equal(ruleOf(`.${D.compact} .${D.tileLine}`), `.${D.compact} .${D.tileLine}{display:block;overflow:visible}`)
+  assert.match(ruleOf(`.${D.compact} .${D.tileWords}`), /overflow-wrap:anywhere/)
 })
 
 test('follow-up 19:47 (REVIEW.md 1 and 3): titles at the top of the icon square on every card; the sign font line thickened in its own colour', () => {

@@ -486,7 +486,8 @@ test('Done is the person\'s: every card has a Done button; pressed, the card say
     click(stop(view, id))
     const mark = byData(byData(dash(view), 'steps'), 'mark')
     assert.equal(mark.type, 'sdk:Button', id)
-    assert.equal(mark.props.variant, 'secondary')
+    // follow-up 19:55 (REVIEW.md 4): Done is the opened card's main button
+    assert.equal(mark.props.variant, 'default')
     assert.equal(said(mark), 'Done', id)
     assert.equal(mark.props['data-marked'], false)
     click(stop(view, id))
@@ -496,6 +497,7 @@ test('Done is the person\'s: every card has a Done button; pressed, the card say
     click(stop(view, id))
     click(byData(byData(dash(view), 'steps'), 'mark'))
     assert.equal(said(byData(byData(dash(view), 'steps'), 'mark')), 'Not done yet')
+    assert.equal(byData(byData(dash(view), 'steps'), 'mark').props.variant, 'secondary')
     click(stop(view, id))
   }
   assert.equal(said(byData(dash(view), 'count')), '2 of 9')
@@ -756,7 +758,7 @@ test('look: the head under the tiles is a section heading "Set up" and no longer
   assert.equal(byData(setup, 'count'), null)
 })
 
-test('look-fix: the opened card holds the video place, then the steps beside it; Done is Hermes\'s Button, secondary, small, with the check icon', async () => {
+test('look-fix: the opened card holds the video place, then the steps beside it; Done is Hermes\'s Button, default (the main button, REVIEW.md 4), small, with the check icon', async () => {
   const { view } = await open('half')
   click(stop(view, 'model'))
   const panel = byData(dash(view), 'steps')
@@ -764,7 +766,7 @@ test('look-fix: the opened card holds the video place, then the steps beside it;
   assert.ok(kids.some(n => n.props.className === D.stepsBody))
   const mark = byData(panel, 'mark')
   assert.equal(mark.type, 'sdk:Button')
-  assert.equal(mark.props.variant, 'secondary')
+  assert.equal(mark.props.variant, 'default')
   assert.equal(mark.props.size, 'sm')
   // the check icon before the word
   assert.equal(mark.props.children.length, 2)

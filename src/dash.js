@@ -51,10 +51,10 @@ export const DASH_ICONS = {
   plugins: { codicon: 'extensions', hermes: 'app/settings/plugin-settings.tsx:67' },
   install: { codicon: 'cloud-download', hermes: 'components/update-status.tsx:389', nearest: true },
   model: { tabler: 'Box', hermes: 'app/settings/constants.ts:714' },
-  first_chat: { codicon: 'robot', hermes: 'app/chat/sidebar/index.tsx:216' },
+  first_chat: { codicon: 'comment-discussion', hermes: 'app/chat/sidebar/index.tsx:216', nearest: true },
   personality: { codicon: 'edit', hermes: 'app/chat/sidebar/profile-switcher.tsx:1374' },
   chat_apps: { codicon: 'comment', hermes: 'app/chat/sidebar/index.tsx:230' },
-  tools_apps: { codicon: 'symbol-misc', hermes: 'app/chat/sidebar/index.tsx:223' },
+  tools_apps: { codicon: 'tools', hermes: 'app/chat/sidebar/index.tsx:223', nearest: true },
   skills_stop: { codicon: 'zap', hermes: 'components/assistant-ui/reference-kinds.ts:107' },
   memory: { tabler: 'Brain', hermes: 'app/settings/constants.ts:776' },
   scheduled_job: { codicon: 'watch', hermes: 'app/chat/sidebar/index.tsx:247' },
@@ -370,7 +370,7 @@ export function makeDashboard(ctx) {
             ),
             jsx('span', { className: D.scardWhy, 'data-hh': 'card-why', children: it.why }, 'w'),
             // his pick (PICK.md, way 3): the same sign once more, large, in dots, behind the words
-            jsx('span', { className: D.scardSign, 'data-hh': 'card-sign', 'aria-hidden': true, children: jsx(DashIcon, { icon: cardIcon(it.id), size: 140 }) }, 'sign')
+            jsx('span', { className: D.scardSign, 'data-hh': 'card-sign', 'aria-hidden': true, children: jsx(DashIcon, { icon: cardIcon(it.id), size: '1em' }) }, 'sign')
           ]
         },
         it.id
@@ -476,7 +476,8 @@ export function makeDashboard(ctx) {
               {
                 className: D.route,
                 children: jsx(Button, {
-                  variant: 'secondary',
+                  // REVIEW.md 4: Done is the opened card's main button; Not done yet stays quiet
+                  variant: marked ? 'secondary' : 'default',
                   size: 'sm',
                   'data-hh': 'mark',
                   'data-marked': marked,
