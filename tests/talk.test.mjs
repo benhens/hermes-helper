@@ -435,12 +435,15 @@ test('the first-time line is the one for a build with no AI step: nothing about 
   assert.doesNotMatch(JSON.stringify(TALK_DATA), /Only your name goes to your AI/)
 })
 
-test('a later visit: a kept name skips the opening; its line is the greeting without the question', () => {
+test('a later visit: a kept name skips the opening and greets by the name (NAME_AGAIN\'s words); with no kept name, the opening is asked again', () => {
   const st = laterVisit({ name: 'Peter', told: true })
   assert.equal(st.stage, 'open')
   const said = openingLine(st)
-  assert.equal(said.text, "Hi, I'm Helper. I can help you learn about Hermes and set it up.")
+  assert.equal(said.line, 'OPEN-again')
+  assert.equal(said.text, 'Hi again, Peter. Ask me anything about Hermes.')
+  assert.equal(said.text, TALK_DATA.fixed.NAME_AGAIN.text.replace('{name}', 'Peter'))
   assert.equal(laterVisit({ mod: 'mod1', told: true }).stage, 'name', 'no kept name: the name is asked again')
+  assert.equal(openingLine(laterVisit({ mod: 'mod1', told: true })).line, 'OPEN')
   assert.equal(laterVisit(null).stage, 'name')
 })
 

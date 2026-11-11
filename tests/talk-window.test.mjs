@@ -629,6 +629,9 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   const fresh = mount(second.Page)
   await settle()
   assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'OPEN-again')
+  // talk v2 look, point 7 (hhtech: no name after a full restart): it greets by the kept name
+  finish(fresh)
+  assert.equal(spoken(byData(byData(fresh.tree, 'bubble'), 'said')).trim(), 'Hi again, Peter. Ask me anything about Hermes.')
   assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children, [])
   assert.equal(byData(fresh.tree, 'skip'), null, 'no question to skip')
   assert.doesNotMatch(text(fresh.tree), /tennis/)
@@ -1027,6 +1030,8 @@ test('a later visit (the name question skipped), then the name typed anyway: "Hi
   const { view, storage } = await open({ storage: fakeStorage({ kept: ANNA() }) })
   assert.equal(line(view), 'OPEN-again')
   finish(view)
+  // talk v2 look, point 7: the window starts from the stored record alone and greets by its name
+  assert.equal(said(view), 'Hi again, Anna. Ask me anything about Hermes.')
   send(view, 'Anna')
   assert.equal(line(view), 'NAME_AGAIN')
   assert.equal(said(view), 'Hi again, Anna. Ask me anything about Hermes.')

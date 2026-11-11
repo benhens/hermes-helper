@@ -935,11 +935,18 @@ export function noteForgotten(note, kept) {
   return items.length > 0 && !items.some(item => stillKept(kept, item))
 }
 
-// The opening line. On a later visit with a kept name, the opening's question is not asked: the
-// same line without it (the data has no line of its own for a later visit: Questions for Lead).
+// The opening line. On a later visit (stage open: a name is kept, src/talk.js laterVisit) the opening's
+// question is not asked. With the kept name, Helper greets by it with the data's one line for a person it
+// knows, NAME_AGAIN ("Hi again, {name}. Ask me anything about Hermes."; talk v2 look, point 7: hhtech saw no
+// name). changes-14's BACK line, written for exactly this, is not ported here (Lead, 11 Nov 00:35).
+// Without a name: the opening line without its question.
 export function openingLine(st = null) {
   const said = { line: 'OPEN', text: FIXED.OPEN.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }
-  if (st && st.stage === 'open') return { ...said, line: 'OPEN-again', text: FIXED.OPEN.text.replace(/\s*[^.?]*\?\s*$/, '') }
+  if (st && st.stage === 'open') {
+    const name = st.kept && st.kept.name
+    if (name) return { ...said, line: 'OPEN-again', text: fillSlots(FIXED.NAME_AGAIN.text, { name }) }
+    return { ...said, line: 'OPEN-again', text: FIXED.OPEN.text.replace(/\s*[^.?]*\?\s*$/, '') }
+  }
   return said
 }
 
