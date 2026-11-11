@@ -23697,6 +23697,8 @@ function talkKeepOne(e) {
   // an offer's question is not kept: its picks were in the message box, and without them it would ask for nothing
   // (Decided myself, in the report)
   if (typeof e.line === 'string' && e.line.startsWith('offer-')) return null
+  // loom-fixes-2 (Lead's answer): the slow-AI line belongs to its moment, not to the kept conversation
+  if (e.line === 'SLOW_A') return null
   const out = { who: 'helper', text, line: talkStr(e.line, 120) || 'kept' }
   const n = e.next
   if (n && typeof n === 'object' && typeof n.label === 'string') {
@@ -30915,7 +30917,7 @@ function makePage(ctx, opts = {}) {
       // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
       // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
       const metStored = readMet()
-      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null' }
+      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored, before: [], talkStored: 'null', forgotUpTo: 0 }
       // loom-fixes (Lead's point 17b): the conversation of earlier visits, the last 50 lines, shown above this visit's
       // (never sent to the AI: they are not in memory.log)
       memory.before = readTalk().map(e => ({ ...e, id: memory.nextId++, key: `r${memory.nextId}` }))
@@ -30947,7 +30949,8 @@ function makePage(ctx, opts = {}) {
   // Written after every change of the conversation: the earlier visits' lines and this visit's, the last 50 that may be
   // kept; the key goes when none is left. Not written when nothing changed.
   const writeTalk = () => {
-    const next = talkToStore([...memory.before, ...memory.log])
+    // loom-fixes-2 (hhtech-loom-run fault 2): what was said up to a Forget all is never written again
+    const next = talkToStore([...memory.before, ...memory.log.filter(e => !(e.id <= memory.forgotUpTo))])
     const text = JSON.stringify(next)
     if (text === memory.talkStored) return
     try {
@@ -30966,14 +30969,25 @@ function makePage(ctx, opts = {}) {
     memory.talkStored = 'stale'
     writeTalk()
   }
+  // loom-fixes-2 (hhtech-loom-run fault 2: after Forget all and a restart the 6 old lines came back, because this
+  // visit's lines were written back the moment Helper's page was drawn again): Forget all forgets the conversation up to
+  // now, the earlier visits' lines and this visit's, in the store; the window in this visit shows only its newest line
+  // (as Clear chat). Typed ("forget everything", Yes) the lines stay on screen in this visit but are not kept.
+  const forgetTalk = (inWindow = true) => {
+    memory.before = []
+    if (inWindow) {
+      const last = memory.log[memory.log.length - 1]
+      memory.log = last ? [last] : []
+    }
+    memory.forgotUpTo = memory.nextId
+    memory.talkStored = 'stale'
+    writeTalk()
+  }
   // The page is on screen again (Hermes draws it fresh after Settings): the record as stored now.
   const rereadKept = () => {
     const m = remembered()
     // loom-fixes: Forget all on Helper's settings page removes the kept conversation too: it goes from the window
-    if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) {
-      m.before = []
-      m.talkStored = 'null'
-    }
+    if (m.talkStored !== 'null' && ctx.storage.get('talk', null) === null) forgetTalk()
     const kept = readKept()
     // setup-chat: the set-up answers were there and are all gone now (Helper's settings page: "Ask me the set-up
     // questions again", or each row deleted): the conversation starts the questions again (RESTART)
@@ -31752,6 +31766,7 @@ function makePage(ctx, opts = {}) {
       else if (item.near) result = pressNear(item.near, visit) // breadth-t1: a line picked under the near offer
       else result = pickTopic(item.topic, visit)
       answer(result, item.label, '', true)
+      if (result && result.kind === 'A-yes' && result.what === 'all') forgetTalk(false)
     }
 
     // Opens one of Hermes's own screens (a missing door is ignored).

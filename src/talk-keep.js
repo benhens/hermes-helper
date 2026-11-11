@@ -25,6 +25,8 @@ export function talkKeepOne(e) {
   // an offer's question is not kept: its picks were in the message box, and without them it would ask for nothing
   // (Decided myself, in the report)
   if (typeof e.line === 'string' && e.line.startsWith('offer-')) return null
+  // loom-fixes-2 (Lead's answer): the slow-AI line belongs to its moment, not to the kept conversation
+  if (e.line === 'SLOW_A') return null
   const out = { who: 'helper', text, line: talkStr(e.line, 120) || 'kept' }
   const n = e.next
   if (n && typeof n === 'object' && typeof n.label === 'string') {
