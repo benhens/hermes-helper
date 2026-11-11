@@ -658,6 +658,9 @@ export function makePage(ctx, opts = {}) {
       // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
       const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
       const lines = lastLines(memory.log, keptValues())
+      // find-v1: the person's own typed messages of this visit, for check c12 (a name they typed themselves); never
+      // stored, never sent
+      visit.typedSaid = [...(visit.typedSaid || []), typed]
       const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
       // pick that answers it. A message
@@ -718,7 +721,7 @@ export function makePage(ctx, opts = {}) {
           })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
         .then(got => {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A

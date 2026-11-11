@@ -90,7 +90,8 @@ function isHowQuestion(text) {
 // the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
 // USED: line) is an ordinary fallback.
 //   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
-export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [] }) {
+//   typed: the person's own typed messages of this visit, this one included (find-v1, check c12: a name they typed)
+export async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [], typed = [text] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -108,11 +109,11 @@ export async function askLive({ mode = AI_MODE, text, message = text, pre, out, 
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names })
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed })
   return thinking ? { fallback: 'thinking text', thinking: true } : got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed }) {
   let ids = null
   // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
   let follow = false
@@ -146,7 +147,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
   }
   const raw = await call('writer', writerText(ids, handed, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names) })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names), typed })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }

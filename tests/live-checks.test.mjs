@@ -29,17 +29,19 @@ test(`all ${O.cases.length} recorded written replies: the same text after the fi
     if (c.word) continue
     assert.equal(r.text, c.reply, c.key)
     assert.deepEqual(r.used, c.used, c.key)
-    assert.deepEqual(plain(replyFlags(r.text, c.rows, r.used)), plain(c.flags), c.key)
+    // find-v1: the four allowances newer than check_live.py are switched off for this comparison (asCheckLive)
+    assert.deepEqual(plain(replyFlags(r.text, c.rows, r.used, { asCheckLive: true })), plain(c.flags), c.key)
   }
 })
 
 test('the counts hhcontent reported for its checks are the plugin\'s too (free model way c: 16 good, none stopped; 2B way c: 7 of 12 bad stopped by c0 to c23, 2 good stopped)', () => {
+  const tallyOf = talk => {
   const tally = {}
   for (const c of O.cases) {
     if (c.word) continue
     const way = c.key.split('|').slice(0, 2).join(' ')
     const t = (tally[way] = tally[way] || { written: 0, good: 0, goodStopped: 0, bad: 0, badStopped: 0 })
-    const stopped = notC24(replyFlags(c.reply, c.rows, c.used)).length > 0
+    const stopped = notC24(replyFlags(c.reply, c.rows, c.used, talk)).length > 0
     t.written++
     if (['G', 'R'].includes(c.judge)) {
       t.good++
@@ -49,9 +51,24 @@ test('the counts hhcontent reported for its checks are the plugin\'s too (free m
       t.badStopped += stopped
     }
   }
+  return tally
+  }
+  const tally = tallyOf({ asCheckLive: true })
   assert.deepEqual(tally['free c'], { written: 17, good: 16, goodStopped: 0, bad: 1, badStopped: 0 })
   assert.deepEqual(tally['free b'], { written: 17, good: 17, goodStopped: 1, bad: 0, badStopped: 0 })
   assert.deepEqual(tally['2b c'], { written: 17, good: 5, goodStopped: 2, bad: 12, badStopped: 7 })
+  // find-v1 (the four allowances for c12, c14, c22, c24, with the person's message as their only typed one): every bad
+  // reply stopped before is still stopped (7 of 12, none on the free model before or after); one good reply of the 2B
+  // that was stopped is now shown
+  const after = tallyOf({})
+  assert.deepEqual(after['free c'], tally['free c'])
+  assert.deepEqual(after['free b'], tally['free b'])
+  assert.deepEqual(after['2b c'], { written: 17, good: 5, goodStopped: 1, bad: 12, badStopped: 7 })
+  for (const c of O.cases.filter(x => !x.word && !['G', 'R'].includes(x.judge))) {
+    const was = notC24(replyFlags(c.reply, c.rows, c.used, { asCheckLive: true })).length > 0
+    const now = notC24(replyFlags(c.reply, c.rows, c.used, { message: c.message, typed: [c.message] })).length > 0
+    if (was) assert.ok(now, c.key + ': a bad reply that was stopped must still be stopped')
+  }
 })
 
 // setup-chat: what c28 (a reply that ends on an invitation or a question) does to the same recordings, which were made

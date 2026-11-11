@@ -21384,20 +21384,42 @@ const sameWords = s => talkNorm(s).replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s
 const C24_RX = new RegExp(LC.c24.person_pattern, 'gi')
 const C24_STOP = new Set([...LIVE_DATA.stop_words, ...LC.c24.person_ok])
 const c24Words = s => new Set((String(s || '').toLowerCase().match(/[a-z']+/g) || []).map(w => w.replace(/s+$/, '')))
-function c24Fails(reply, work, message, hand) {
+function c24Fails(reply, work, message, hand, forms = false) {
   const allowed = new Set([...c24Words(work), ...c24Words(message), ...c24Words(hand)])
+  const handed = forms ? c24Words(hand) : null
   C24_RX.lastIndex = 0
   for (const m of String(reply).matchAll(C24_RX)) {
     const part = reply.slice(m.index + m[0].length).split(/[.,;!?]/)[0]
     for (const w of (part.match(/[A-Za-z']+/g) || []).slice(0, 3)) {
       const lw = w.toLowerCase()
-      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, ''))) return w
+      if (lw.length >= 3 && !C24_STOP.has(lw) && !allowed.has(lw.replace(/s+$/, '')) && !(handed && c24SameForm(lw, handed))) return w
     }
   }
   return null
 }
 
+/* ---------- find-v1 (Lead, 11 Nov; hhtech find-run section 4): four checks dropped replies that were true to the handed lines ----------
+   These four allowances are newer than hhcontent's check_live.py; talk.asCheckLive switches them off (the comparison
+   with check_live.py's flags in tests/live-checks.test.mjs).
+   c12  a name passes when it stands as a word in one of the person's own typed messages of this visit (talk.typed)
+        AND Helper's checked data knows that word (Mac, Siri, Signal). Builder: the second half keeps today's stop for
+        a name nobody checked ("Hermes works with Zorbo").
+   c24  a word after "your" that is a form of a word in the handed lines is no guess about the person ("asks for your
+        approval first" from "asks you to approve it first"): the same first five letters, both six letters or more.
+   c22  a Hermes word needs no plain word beside it when one handed line holds the word and its plain word.
+   c14  "the checked information does not mention ..." says what Helper has not checked; it is no claim about Hermes. */
+const LC_KNOWN_WORDS = new Set(JSON.stringify([TALK_DATA.facts, TALK_DATA.fixed, TALK_DATA.topics, TALK_DATA.terms, TALK_DATA.chat_apps, WANTS_DATA.rows]).toLowerCase().match(/[a-z0-9]+/g))
+function c12Typed(name, typed) {
+  const n = String(name).toLowerCase()
+  if (!LC_KNOWN_WORDS.has(n)) return false
+  const re = new RegExp('(^|[^a-z0-9])' + liveEsc(n) + '($|[^a-z0-9])')
+  return (typed || []).some(m => re.test(String(m).toLowerCase()))
+}
+const c24SameForm = (w, allowed) => w.length >= 6 && [...allowed].some(a => a.length >= 6 && a.slice(0, 5) === w.slice(0, 5))
+const C14_HONEST = /\b(?:the |my |helper's )?checked (?:information|info|facts?|lines?|notes?)(?: i have| that i have)? (?:doesn't|doesnt|does not|don't|dont|do not|didn't|did not)(?: specifically| explicitly| actually| really)? (?:mention|say|cover|include|list|name|state|talk about|go into)\b/g
+
 function replyFlags(reply, rows, used, talk = {}) {
+  const allow = !talk.asCheckLive
   const ids = rows.map(r => r.id)
   const textOf = Object.fromEntries(rows.map(r => [r.id, r.text]))
   const hand = rows.map(r => r.text).join(' ').toLowerCase()
@@ -21417,11 +21439,11 @@ function replyFlags(reply, rows, used, talk = {}) {
   }
   const low = reply.toLowerCase()
   for (const [s, re] of SKILL_RX) if (re.test(low) && !hand.includes(s)) out.push('c11 skill ' + s)
-  for (const m of reply.matchAll(/(?<![.!?]\s)(?<!^)\b([A-Z][A-Za-z0-9]+)/g)) if (!OK_CAPS.has(m[1]) && !hand.includes(m[1].toLowerCase())) out.push('c12 name ' + m[1])
+  for (const m of reply.matchAll(/(?<![.!?]\s)(?<!^)\b([A-Z][A-Za-z0-9]+)/g)) if (!OK_CAPS.has(m[1]) && !hand.includes(m[1].toLowerCase()) && !(allow && c12Typed(m[1], talk.typed))) out.push('c12 name ' + m[1])
   LC_R6.lastIndex = 0
   for (const m of reply.matchAll(LC_R6)) if (!hand.includes(m[0].toLowerCase())) out.push('c13 jargon ' + m[0])
   const hc = notClasses(hand)
-  for (const cls of [...notClasses(reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
+  for (const cls of [...notClasses(allow ? reply.toLowerCase().replace(C14_HONEST, ' ') : reply)].filter(c => !hc.has(c)).sort()) out.push('c14 no-claim ' + cls)
   if (/http|www\.|\(/.test(reply)) out.push('c15 link or (')
   if (c16Fails(reply)) out.push('c16 product word')
   if (LC.test_phrases.some(p => low.includes(p))) out.push('c17 test')
@@ -21435,10 +21457,10 @@ function replyFlags(reply, rows, used, talk = {}) {
   if (!ids.length || (used && (!used.length || (used.length === 1 && used[0].toLowerCase() === 'none')))) {
     if (/\d/.test(reply) || reply.includes('"') || LC_R5.some(rx => rx.test(reply)) || MONEY_RX.some(([, re]) => re.test(mc))) out.push('c21 talk with a fact word')
   }
-  for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply)) out.push('c22 term unexplained ' + rx.source)
+  for (const [rx, gl] of GLOSS_RX) if (rx.test(reply) && !gl.test(reply) && !(allow && rows.some(r => rx.test(r.text) && gl.test(r.text)))) out.push('c22 term unexplained ' + rx.source)
   if (talk.lastLine && sameWords(reply) === sameWords(talk.lastLine) && !whichOf(talkNorm(talk.message || ''), ASKED_AGAIN).length) out.push('c23 the same as the last line')
   // c24, after c23 (changes-4: "Run c24 after c23")
-  const c24Word = c24Fails(reply, talk.work, talk.message, hand)
+  const c24Word = c24Fails(reply, talk.work, talk.message, hand, allow)
   if (c24Word) out.push('c24 about the person ' + c24Word)
   // live-v2 changes-5: c26 and c27 after c24 (c25 has adopted: false and is not built)
   const c26Word = c26Fails(reply, hand)
@@ -21706,7 +21728,8 @@ function isHowQuestion(text) {
 // the page can turn the AI step off for the rest of the visit. A reply that is empty after reading (it sat on the
 // USED: line) is an ordinary fallback.
 //   names: the kept name and this visit's name: a work value holding one is not sent (src/live-request.js workLine)
-async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [] }) {
+//   typed: the person's own typed messages of this visit, this one included (find-v1, check c12: a name they typed)
+async function askLive({ mode = AI_MODE, text, message = text, pre, out, before, lines = [], lastLine = '', request, msLeft = () => Infinity, alive = () => true, onCall = () => {}, work = null, names = [], typed = [text] }) {
   const input = inputText(message, lines)
   let thinking = false
   const call = async (name, instructions, maxTokens) => {
@@ -21724,11 +21747,11 @@ async function askLive({ mode = AI_MODE, text, message = text, pre, out, before,
       return null
     }
   }
-  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names })
+  const got = await askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed })
   return thinking ? { fallback: 'thinking text', thinking: true } : got
 }
 
-async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names }) {
+async function askSteps({ mode, text, message, pre, out, before, lastLine, msLeft, call, work, names, typed }) {
   let ids = null
   // live changes-9 (follow_up.work_line_c9): on a follow-up the About them line is not handed
   let follow = false
@@ -21762,7 +21785,7 @@ async function askSteps({ mode, text, message, pre, out, before, lastLine, msLef
   }
   const raw = await call('writer', writerText(ids, handed, names), LIVE_DATA.writer.max_tokens)
   if (raw === null) return { fallback: 'writer call failed' }
-  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names) })
+  const j = judgeWritten(raw, rows, { lastLine, message: text, work, workHanded: !!workLine(handed, names), typed })
   if (j.word === 'NONE') return { fallback: 'writer: NONE' }
   if (j.word === 'BUILD') return isHowQuestion(text) ? { fallback: 'build to a how-question' } : { result: { kind: 'H1', why: 'ai' }, rows: [] }
   if (j.fail) return { fallback: 'check ' + j.fail }
@@ -25845,6 +25868,9 @@ function makePage(ctx, opts = {}) {
       // Helper's last line for the checks c18 and c23: its line, not the offer's question under it
       const lastHelper = [...memory.log].reverse().find(e => e.who === 'helper' && !e.offer)
       const lines = lastLines(memory.log, keptValues())
+      // find-v1: the person's own typed messages of this visit, for check c12 (a name they typed themselves); never
+      // stored, never sent
+      visit.typedSaid = [...(visit.typedSaid || []), typed]
       const { pre, out: result } = turnParts(typed, visit)
       // Kept only while "Which one do you mean?" (or W2, skill and plugin compared) is open, for the
       // pick that answers it. A message
@@ -25905,7 +25931,7 @@ function makePage(ctx, opts = {}) {
           })
       }
       // live-v2 changes-4: what the person does, as kept, for the work line (src/live-request.js checks it again)
-      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name] })
+      askLive({ text: typed, message, pre, out: result, before, lines, lastLine: lastHelper ? lastHelper.text : '', request, msLeft: () => LIVE_SECONDS * 1000 - (Date.now() - started), alive: () => live.waiting === w, work: visit.kept.work || null, names: [visit.name, visit.kept.name], typed: visit.typedSaid })
         .then(got => {
           // hhtech-weak-ai, changes-5 no_reply: thinking text from any call turns the AI step off for the rest of this
           // visit, also when it comes after the 12 s; from the visit's first call it owes SLOW_A
