@@ -180,7 +180,7 @@ test('the instructions: one step at a time, the 80-word rule, quick replies, the
   assert.match(CHAT_INSTRUCTIONS, /Tell me when that's done, or tell me what you see\./)
   assert.match(CHAT_INSTRUCTIONS, /No headings, no tables/)
   assert.match(CHAT_INSTRUCTIONS, /ask which one first/)
-  assert.match(CHAT_INSTRUCTIONS, /\[\[Claude Code\]\] \[\[The Claude app\]\]/)
+  assert.match(CHAT_INSTRUCTIONS, /\[\[Claude Code setup\]\] \[\[A Claude Code conversation\]\]/) // round 20:12: the example no longer offers the Claude app (point 6)
   assert.match(CHAT_INSTRUCTIONS, /\[\[card:ID\]\]/)
   assert.deepEqual(CHAT_CARDS.map(c => c[0]), DASH_DATA.items.map(it => it.id), 'the nine ids, in the Dashboard\'s order')
   assert.equal(CHAT_CARDS.length, 9)

@@ -24245,7 +24245,7 @@ How to answer:
 - Go one step at a time. When the answer takes several steps, first say in one line what you will do together and how many steps it takes ("This takes 3 short steps. Here's the first."). Then give ONLY the first step: exactly what to click or what to type, with anything to type in \`code\`. End with a short check such as "Tell me when that's done, or tell me what you see." Give the next step in your next reply; the conversation so far shows which step they are on. If they say it didn't work, help with that step before going on.
 - For "What is X?": say what it is in one or two plain sentences, then where it is in the app (the exact place to click), then what to do first.
 - When the question has two readings that change the answer (for example "Claude" can mean the Claude app or Claude Code), don't assume: ask which one first, and give the choices as quick replies.
-- Quick replies: you may end a reply with up to three choices on one last line, each in double square brackets, like this: [[Claude Code]] [[The Claude app]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
+- Quick replies: you may end a reply with two or three choices, each in double square brackets, all together on the very last line of the reply, after the "Read more:" line, like this: [[Claude Code setup]] [[A Claude Code conversation]]. The person sees them as buttons, and a click sends that text as their message. Use them only for real choices, and use double square brackets for nothing else.
 - Dashboard cards: Helper's Dashboard has nine set-up cards, each with its steps and a place for a video. When the question is about one of these subjects, end your reply with [[card:ID]] on its own line, with that card's id (one card at most):
 ${CHAT_CARDS.map(([id, subject]) => `  ${id} = ${subject}`).join('\n')}
 - Do it for me: Helper can run one kind of step for the person: bringing a setup over from another agent. When that import is the step to do now and you know which agent, end your reply with [[do:import AGENT]] on its own line, where AGENT is one of claude-code, codex, cursor, openclaw. The person then sees a button "Do it for me": it first shows a preview and changes nothing until they press "Import it". Tell them in one line that they can press it. For every other step, give the step to do by hand, and never write [[do:...]] for anything else.
@@ -24269,6 +24269,7 @@ Write in markdown: short paragraphs, \`code\` for anything to type.`
 const CHAT_MARK_ANY = /\[\[([^\n]*?)\]\]/g
 const CHAT_MARK_NAMED = /\[\[\s*(card|do)\s*:([^[\]\n]*)\]\]/gi
 const CHAT_MARKS_TAIL = /(?:\s*\[\[[^[\]\n`]*\]\])+\s*$/
+const CHAT_MARKS_RUN = /[ \t]*\[\[[^[\]\n`]*\]\](?:[ \t]*\[\[[^[\]\n`]*\]\])+[ \t]*/g
 const CHAT_QUICK_CHARS = 60
 function chatParts(reply) {
   const lines = String(reply || '').replace(/\r\n?/g, '\n').split('\n')
@@ -24323,7 +24324,15 @@ function chatParts(reply) {
   const out = []
   kept.forEach((k, i) => {
     if (k.typed) return out.push(k.line)
-    let shown = k.line
+    // round 20:12 (hhtech's point 1): a run of two or three marks is a set of choices wherever it stands in the reply
+    // (mid-line, before or after "Read more"); it leaves no trace in the words
+    let shown = outside(k.line, part =>
+      part.replace(CHAT_MARKS_RUN, (run, at, all) => {
+        for (const m of run.matchAll(CHAT_MARK_ANY)) choice(m[1])
+        return all.slice(0, at).trim() && all.slice(at + run.length).trim() ? ' ' : ''
+      })
+    )
+    if (k.line.trim() && !shown.trim()) return
     const tail = shown.match(CHAT_MARKS_TAIL)
     if (tail && (i === last || !shown.slice(0, tail.index).trim())) {
       for (const m of tail[0].matchAll(CHAT_MARK_ANY)) choice(m[1])
