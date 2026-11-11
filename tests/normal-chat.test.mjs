@@ -57,7 +57,9 @@ test('one call per message: task helping_hand, no session, 900 tokens, the messa
   assert.equal('session_id' in p, false)
   // (chat-fix: the instructions grew with the step-by-step rules, the quick replies and the nine cards: 3,362
   // characters; the limit keeps them from growing unseen)
-  assert.ok(p.instructions.length < 4500, `instructions ${p.instructions.length} characters`)
+  // round 20:12: points 4, 5, 6 add the What-is order, each card's place line and the cards-only-where-they-fit rule:
+  // 5,728 characters, so the limit is raised to 6,000 on purpose (reported)
+  assert.ok(p.instructions.length < 6000, `instructions ${p.instructions.length} characters`)
   assert.match(p.input, /New message from the person:\nHow can I move from Claude to Hermes\?/)
   assert.match(p.input, /URL: https:\/\/hermes-agent\.nousresearch\.com\/docs\/user-guide\/import-from-other-agents\n/)
   assert.equal((p.input.match(/^URL: /gm) || []).length, 5, 'five chunks')

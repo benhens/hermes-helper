@@ -50,3 +50,30 @@ test('1: the instructions put the choices on the last line, after "Read more"', 
   const { CHAT_INSTRUCTIONS } = await loadSrc('chat.js')
   assert.match(CHAT_INSTRUCTIONS, /on the very last line of the reply, after the "Read more:" line/)
 })
+
+// ---- points 4, 5, 6: the instructions ----
+test('4: "What is X?": what it is, what it needs, where it is (each card\'s place line with its id), then the first step only if asked; installs as text for their own bot', async () => {
+  const { CHAT_INSTRUCTIONS, CHAT_CARDS } = await loadSrc('chat.js')
+  const { DASH_DATA } = await loadSrc('dash-data.js')
+  assert.match(CHAT_INSTRUCTIONS, /For "What is X\?", in this order: first what it is, in one or two plain sentences\. Then what it needs, if the excerpts say it needs an account, a key or money\. Then where it is in the app, naming the place to click/)
+  assert.match(CHAT_INSTRUCTIONS, /Only if the person then asks how, give the first step\. Never open a "What is" answer with a terminal command, and never count the steps before giving one\./)
+  assert.match(CHAT_INSTRUCTIONS, /An install is given as text the person pastes to their own bot in a chat, never as "type this in your terminal", unless it is the Do it for me action/)
+  for (const [id] of CHAT_CARDS) {
+    const first = DASH_DATA.items.find(x => x.id === id).steps[0].text
+    assert.ok(CHAT_INSTRUCTIONS.includes(`  ${id} = `) && CHAT_INSTRUCTIONS.includes(`Place: ${first}`), id)
+  }
+  assert.match(CHAT_INSTRUCTIONS, /skills = [^\n]*Place: Click Capabilities in the left list, then Skills/)
+})
+
+test('5: a card only for its own subject; [[card:memory]] is the built-in memory, a memory provider such as Hindsight gets no card', async () => {
+  const { CHAT_INSTRUCTIONS } = await loadSrc('chat.js')
+  assert.match(CHAT_INSTRUCTIONS, /Add a card only when your reply is about that card's own subject/)
+  assert.match(CHAT_INSTRUCTIONS, /\[\[card:memory\]\] is for Hermes's built-in memory, so a reply about a memory provider such as Hindsight carries no card/)
+  assert.match(CHAT_INSTRUCTIONS, /memory = Hermes's built-in memory: what it remembers between chats \(not memory providers such as Hindsight\)/)
+})
+
+test('6: only choices the docs cover: for Claude, Claude Code setup and a Claude Code conversation; the Claude app is not covered', async () => {
+  const { CHAT_INSTRUCTIONS } = await loadSrc('chat.js')
+  assert.match(CHAT_INSTRUCTIONS, /Offer only choices the doc excerpts can answer\. For Claude, that is Claude Code's setup and a Claude Code conversation, never "The Claude app"\. If the person asks about the Claude app, say the docs cover Claude Code only\./)
+  assert.doesNotMatch(CHAT_INSTRUCTIONS, /\[\[The Claude app\]\]/)
+})
