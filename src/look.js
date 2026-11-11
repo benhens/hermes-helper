@@ -192,7 +192,93 @@ export const K = {
   bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
   // talk-live-3 (Lead's call, 11 Nov 05:08): text the person is to type inside a line (/usage, "what can I ask you"),
   // in the paste box's code style: its edge, fill, 12 px mono and text colour, as a small inline chip
-  typed: 'rounded-[2.5px] border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) px-1 font-mono text-xs text-(--ui-text-secondary)'
+  typed: 'rounded-[2.5px] border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) px-1 font-mono text-xs text-(--ui-text-secondary)',
+
+  // ---- dash-v1: the Dashboard tab's own shapes are the D table below (src/dash.css); from Hermes it wears these ----
+  // Hermes's Tabler icons at the sizes Hermes draws them (hhtech-dash-icons.md point 1: 16 px in Settings' rows,
+  // 14 px in its sub-rows); 20 px on the tiles (hhdesign's r7 size)
+  icon14: 'size-3.5',
+  icon16: 'size-4',
+  icon20: 'size-5',
+  // Learn and My setup are not built: one quiet line, in the caption tone, at the open step's text edge
+  notBuilt: 'px-6 py-4 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)'
+}
+
+// dash-v1: every class of the Dashboard tab's sheet (src/dash.css, from hhdesign's design/dash-r7/build.js), in one
+// table; each starts with hhd-. tests/dash-css.test.mjs checks that every name here has a rule in the sheet and
+// that the sheet has no class nothing uses.
+export const D = {
+  main: 'hhd-main',
+  compact: 'hhd-compact',
+  card: 'hhd-card',
+  title: 'hhd-title',
+  // the top box
+  stats: 'hhd-stats',
+  tile: 'hhd-tile',
+  tileIcon: 'hhd-tile-icon',
+  tileWords: 'hhd-tile-words',
+  tileNum: 'hhd-tile-num',
+  tileLabel: 'hhd-tile-label',
+  wait: 'hhd-wait',
+  // Activity
+  act: 'hhd-act',
+  actWords: 'hhd-act-words',
+  lastUsed: 'hhd-lu',
+  key: 'hhd-key',
+  keySq: 'hhd-key-sq',
+  keyFirst: 'hhd-key-first',
+  keyLast: 'hhd-key-last',
+  gridWrap: 'hhd-gridwrap',
+  dayNames: 'hhd-daynames',
+  months: 'hhd-months',
+  month: 'hhd-month',
+  grid: 'hhd-grid',
+  sq: 'hhd-sq',
+  l0: 'hhd-l0',
+  l1: 'hhd-l1',
+  l2: 'hhd-l2',
+  l3: 'hhd-l3',
+  today: 'hhd-today',
+  // Set up
+  head: 'hhd-head',
+  count: 'hhd-count',
+  countN: 'hhd-count-n',
+  road: 'hhd-road',
+  lines: 'hhd-lines',
+  line: 'hhd-line',
+  stop: 'hhd-stop',
+  dot: 'hhd-dot',
+  done: 'hhd-done',
+  todo: 'hhd-todo',
+  here: 'hhd-here',
+  quiet: 'hhd-quiet',
+  sel: 'hhd-sel',
+  up: 'hhd-up',
+  down: 'hhd-down',
+  name: 'hhd-name',
+  you: 'hhd-you',
+  next: 'hhd-next',
+  nextWords: 'hhd-next-words',
+  nextLine: 'hhd-next-line',
+  nextLabel: 'hhd-next-label',
+  nextName: 'hhd-next-name',
+  nextWhy: 'hhd-next-why',
+  allDone: 'hhd-alldone',
+  steps: 'hhd-steps',
+  caret: 'hhd-caret',
+  stepsHead: 'hhd-steps-head',
+  stepsIcon: 'hhd-steps-icon',
+  stepsName: 'hhd-steps-name',
+  stepsWhy: 'hhd-steps-why',
+  ol: 'hhd-ol',
+  li: 'hhd-li',
+  route: 'hhd-route',
+  term: 'hhd-term',
+  termWhen: 'hhd-term-when',
+  pasteFor: 'hhd-paste-for',
+  quietLine: 'hhd-quietline',
+  foot: 'hhd-foot',
+  close: 'hhd-close'
 }
 
 // Joins class names, skipping empty ones. Only K and T values go in.
@@ -267,6 +353,9 @@ export const T = {
 
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
-export const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'play-circle']
+// dash-v1: and the Dashboard's (src/dash.js DASH_ICONS, design/dash-r7/notes.md's table), each Hermes's own.
+export const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'robot', 'edit', 'comment', 'symbol-misc', 'watch', 'close', 'check']
+// dash-v1: the Tabler icons the Dashboard takes from Hermes through the SDK's `icons` (hhtech-dash-icons.md point 1)
+export const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // Hermes's look has one primary button per screen (hhdesign fix 6); every other button of
 // ours is secondary or ghost. tests/page-render.test.mjs counts them per screen.

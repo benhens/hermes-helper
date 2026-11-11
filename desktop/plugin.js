@@ -1,6 +1,6 @@
 // Helper: a Hermes Desktop plugin. Built by scripts/build.mjs from src/; edit src/, not this file.
 // Licence: MIT (see LICENSE).
-import { Button, Codicon, CopyButton, GlyphSpinner, ListRow, PRIMARY_ICON_BTN, ROUTES_AREA, RowButton, SIDEBAR_NAV_AREA, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Tip, composerInputBacking, composerSurfaceRing, host, useValue } from '@hermes/plugin-sdk'
+import { Button, Codicon, CopyButton, ListRow, PRIMARY_ICON_BTN, ROUTES_AREA, SIDEBAR_NAV_AREA, Textarea, composerInputBacking, composerSurfaceRing, host, icons, useValue } from '@hermes/plugin-sdk'
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 
@@ -13932,1131 +13932,28 @@ function looksSecret(text) {
   return null
 }
 
-// ---- src/setup-cards.js ----
-// "Your setup": the seven cards' pass rules and fixed words (build-v1.md section 8). Pure code, no
-// Hermes calls: src/setup-tab.js does the read-only reads and hands the answers to the rules here.
-// Code decides every status; no model judges anything.
-// Words: content/v1-strings.md part 3 (cards 2 and 4) and content/checks-base.md (cards 1, 3, 5, 6, 7),
-// "Passes when" lines from hhdesign's design/hermes-look-r3/your-setup.html. Lines marked
-// "(builder)" had no source text yet; they are listed for hhcontent in docs/build/b2-report.md.
-
-
-// One status per card, always shown as a coloured dot plus its word.
-const STATUS = {
-  works: 'Works',
-  fix: 'Needs a fix',
-  notset: 'Not set up yet',
-  unchecked: 'Not checked yet',
-  cant: "Can't check right now",
-  count: 'Just a count, no pass or fail',
-  checking: 'Checking'
-}
-
-const CARD_TITLES = {
-  gateway: 'Hermes is connected',
-  model: 'A model is connected',
-  answers: 'The model answers',
-  soul: 'Personality file (SOUL.md)',
-  skills: 'Skills are switched on',
-  memory: 'Memory can be used',
-  remember: 'Does it really remember?'
-}
-
-// Card titles never carry a bot name (B3a, Lead: "A model is connected for default" read badly).
-// With several bots, the picker line above the cards names the bot once.
-function cardTitle(id) {
-  return CARD_TITLES[id]
-}
-
-const PASSES = {
-  gateway: 'Passes when: this app is connected to your Hermes',
-  model: "Passes when: your provider's sign-in is found. This doesn't ask the model anything.",
-  // A no-break space keeps "90 s" on one line.
-  answers: 'Passes when: asked to reply "OK", it does within 90\u00a0s. Uses a little of your credit.',
-  soul: "Passes when: SOUL.md has your own text, not Hermes's default", // (builder)
-  skills: null, // a count only, no pass rule
-  memory: 'Passes when: the memory tool is on',
-  remember: 'Passes when: another new chat can tell you the test note' // (builder)
-}
-
-const OPEN_STEP_2 = { kind: 'step', step: 2, label: 'Open step 2' }
-const OPEN_STEP_4 = { kind: 'step', step: 4, label: 'Open step 4' } // (builder) checks-base: "Step 4"
-const CHECK_AGAIN = { kind: 'recheck', label: 'Check again' }
-const cant = () => ({ status: 'cant', lines: [CANT_CHECK_LINE], action: CHECK_AGAIN })
-const checking = () => ({ status: 'checking', lines: [] })
-
-/* ---- card 1: Hermes is connected (host.state.gateway) ---- */
-function gatewayCard(gatewayState) {
-  if (gatewayState === 'open') return { status: 'works', lines: ['This page can talk to your Hermes.'] }
-  return { status: 'fix', lines: ["This page can't reach your Hermes right now. Try closing and opening the app."] }
-}
-
-/* ---- card 2: A model is connected (setup.runtime_check, then setup.status after ok false) ---- */
-const MODEL_LINES = {
-  works: name => `Your Hermes has a model: ${name}. The model is the AI that does the thinking.`,
-  worksNoName: 'Your Hermes has a model connected. The model is the AI that does the thinking.',
-  notset:
-    'No model connected yet. The model is the AI that does the thinking, and Hermes needs one before it can answer. Step 2 explains the ways to connect one.',
-  fix: "A model is chosen, but Hermes can't use it. Most often the sign-in has ended or the key is wrong. Open Settings, then Providers, and sign in or paste the key again."
-}
-
-// check = checkModel()'s answer, or null / { state: 'checking' } while it runs.
-function modelCard(check) {
-  if (!check || check.state === 'checking') return checking()
-  if (check.state === 'ok') {
-    return check.name
-      ? { status: 'works', value: check.name, lines: [MODEL_LINES.works(check.name)] }
-      : { status: 'works', lines: [MODEL_LINES.worksNoName] }
-  }
-  if (check.state === 'none') {
-    // v1-strings part 3: ok false and provider_configured false = Not set up yet; any other ok false
-    // (including a setup.status that couldn't be read) = Needs a fix.
-    if (check.configured === false) return { status: 'notset', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
-    return { status: 'fix', lines: [MODEL_LINES.fix], action: OPEN_STEP_2 }
-  }
-  return cant()
-}
-
-/* ---- card 3: The model answers (one llm.oneshot, only when the person presses Check) ---- */
-const ANSWER_CALL = { instructions: 'Reply with exactly: OK', input: 'Reply with exactly: OK', temperature: 0, max_tokens: 300 }
-const ANSWER_WAIT_LIMIT_S = 90
-
-// "contains OK": the word OK on its own, any case ("OK", "OK.", "ok"), not inside another word ("token").
-function answerPasses(text) {
-  return typeof text === 'string' && /(^|[^A-Za-z0-9])ok([^A-Za-z0-9]|$)/i.test(text)
-}
-
-function seconds(ms) {
-  const s = Math.max(0, ms) / 1000
-  return s < 10 ? s.toFixed(1) : String(Math.round(s))
-}
-
-// run = { phase: 'idle' } | { phase: 'calling', waited } | { phase: 'countdown', left }
-//     | { phase: 'done', result }   (result = askModel()'s answer)
-// model = card 2's check for the same bot: the button only works when that says ok.
-function answersCard(run, model) {
-  const ready = !!model && model.state === 'ok'
-  // A button that asks the model works only while card 2 says ok for this bot.
-  const button = (label, disabled = !ready) => ({ kind: 'ask', label, disabled })
-  const phase = run ? run.phase : 'idle'
-  if (phase === 'calling') return { status: 'checking', lines: [`Waiting for your model, ${run.waited || 0} s`] }
-  if (phase === 'countdown') return { status: 'checking', lines: failLines('not_ready', 'card', run.left) }
-  if (phase === 'done' && run.result) {
-    const r = run.result
-    const name = modelLabel(ready ? model.name : '')
-    if (r.ok && answerPasses(r.text)) {
-      // A model id keeps its own spelling; only the fallback "your model" starts the sentence capitalised.
-      const lead = ready && model.name ? name : 'Your model'
-      return { status: 'works', lines: [`${lead} answered a short test in ${seconds(r.ms)} seconds.`], action: button('Check again') }
-    }
-    if (r.ok) return { status: 'fix', lines: ['Your model answered, but not with OK. Press Try again.'], action: button('Try again') } // (builder)
-    // The call found no usable model (runtime_check asked again): card 2's own line and Open step 2.
-    // Status stays "Needs a fix": build-v1.md section 8 gives card 3 only Works / Needs a fix / Not checked yet.
-    if (r.kind === 'no_model') return { status: 'fix', lines: [MODEL_LINES.notset], action: OPEN_STEP_2 }
-    if (r.kind === 'model_broken') return { status: 'fix', lines: [MODEL_LINES.fix], action: OPEN_STEP_2 }
-    return { status: 'fix', lines: failLines(r.kind, 'card'), action: button('Try again') }
-  }
-  if (!model || model.state === 'checking') return { status: 'unchecked', lines: [], action: button('Check') }
-  if (!ready) return { status: 'unchecked', lines: ['This check needs a connected model first.'], action: button('Check') } // (builder)
-  return { status: 'unchecked', lines: [], action: button('Check') }
-}
-
-/* ---- card 4: Personality file (SOUL.md) (profiles.describe -> soul) ---- */
-// Hermes's own default text and the older auto-seeded texts, copied from hermes_cli/default_soul.py
-// (Hermes v0.23.0, DEFAULT_SOUL_MD and _LEGACY_TEMPLATE_SOULS). A file equal to any of them, after
-// the same clean-up Hermes does, is "the built-in personality". Known risk: if Hermes changes its
-// default text, an untouched file would show Works (README, known issues).
-const DEFAULT_SOUL_MD =
-  'You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply to the weight of ' +
-  'the ask \u2014 a one-line question gets a one-line answer, and finished work gets a short report of what ' +
-  "changed, what's verified, and what's left, never a replay of the process. No filler (\"Great question,\" " +
-  '"I\'d be happy to"), no restating the request back, no re-summarizing what you already said, no narrating ' +
-  "tool calls the user can see. Plain claims over adjectives; when unsure, say so plainly. Agree because it's " +
-  'right, not because the user said it. Depth is earned \u2014 give it when the user asks for detail, teaches, or ' +
-  'the stakes demand it, not by default.'
-const SCAFFOLD_HEAD =
-  "# Hermes Agent Persona\n\n<!--\nThis file defines the agent's personality and tone.\n" +
-  'The agent will embody whatever you write here.\nEdit this to customize how Hermes communicates with you.\n\n'
-const SCAFFOLD_TAIL =
-  'This file is loaded fresh each message -- no restart needed.\n' + 'Delete the contents (or this file) to use the default personality.\n-->'
-const DEFAULT_SOULS = [
-  DEFAULT_SOUL_MD,
-  SCAFFOLD_HEAD +
-    'Examples:\n' +
-    '  - "You are a warm, playful assistant who uses kaomoji occasionally."\n' +
-    '  - "You are a concise technical expert. No fluff, just facts."\n' +
-    '  - "You speak like a friendly coworker who happens to know everything."\n\n' +
-    SCAFFOLD_TAIL,
-  SCAFFOLD_HEAD + SCAFFOLD_TAIL,
-  'You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, ' +
-    'knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, ' +
-    'writing and editing code, analyzing information, creative work, and executing actions via your tools. ' +
-    'You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over ' +
-    'being verbose unless otherwise directed below. Be targeted and efficient in your exploration and ' +
-    'investigations.',
-  DEFAULT_SOUL_MD.replaceAll('\u2014', '--')
-]
-
-// Hermes's _normalize_soul: unify line endings, drop a leading BOM, trim.
-function normalizeSoul(text) {
-  return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/^\uFEFF/, '').trim()
-}
-const DEFAULT_SET = new Set(DEFAULT_SOULS.map(normalizeSoul))
-
-function isDefaultSoul(text) {
-  return DEFAULT_SET.has(normalizeSoul(text))
-}
-
-const SOUL_LINES = {
-  works:
-    'Your Hermes has its own personality file. SOUL.md is the first thing Hermes reads, and it sets who your Hermes is and how it talks.',
-  notset:
-    "Your Hermes uses the built-in personality. That's fine; nothing is wrong. SOUL.md is a short text file where you can describe how you want it to talk. Help with writing one comes in a later step."
-}
-
-// read = { ok: true, value: <profiles.describe answer> } | { ok: false } (rejected or timed out) | null (running)
-function soulCard(read) {
-  if (!read) return checking()
-  if (!read.ok) return cant()
-  const soul = read.value && typeof read.value === 'object' ? read.value.soul : undefined
-  if (typeof soul !== 'string') return cant()
-  // Empty text means Hermes uses its built-in personality (hhtech point 3), so it is "Not set up yet".
-  if (!soul.trim() || isDefaultSoul(soul)) return { status: 'notset', lines: [SOUL_LINES.notset] }
-  return { status: 'works', lines: [SOUL_LINES.works] }
-}
-
-/* ---- card 5: Skills (host.skills.list): a count, no pass or fail ---- */
-function skillsCard(read) {
-  if (!read) return checking()
-  if (!read.ok || !Array.isArray(read.value)) return cant()
-  const on = read.value.filter(s => s && s.enabled === true).length
-  if (on === 0) {
-    return { status: 'count', value: '0 switched on', lines: ['No skills are on. Hermes still works; skills add know-how for certain tasks. Step 4 explains them.'], action: OPEN_STEP_4 }
-  }
-  const lead = on === 1 ? '1 skill is on.' : `${on} skills are on.`
-  return {
-    status: 'count',
-    value: `${on} switched on`,
-    lines: [`${lead} A skill is written know-how your Hermes loads when a task needs it.`],
-    action: OPEN_STEP_4
-  }
-}
-
-/* ---- card 6: Memory switch (host.toolsets.list -> "memory") ---- */
-const MEMORY_HANDOFF = 'Please switch my memory on and tell me how to check it worked.'
-function memoryCard(read) {
-  if (!read) return checking()
-  if (!read.ok || !Array.isArray(read.value)) return cant()
-  const memory = read.value.find(t => t && t.name === 'memory')
-  if (!memory || typeof memory.enabled !== 'boolean') return cant()
-  if (memory.enabled) return { status: 'works', lines: ['Memory is on. Your Hermes can save notes about you that come back in later chats.'] }
-  return {
-    status: 'fix',
-    lines: ["Memory is switched off. Your Hermes can't save anything, whatever it says."],
-    handoff: { lead: 'Paste this into a new chat with your Hermes:', text: MEMORY_HANDOFF }
-  }
-}
-
-/* ---- card 7: Does it really remember? (the person runs the test in their own chat) ---- */
-const REMEMBER = {
-  intro: "A test you run in your own chat, because this page can't write to your memory.",
-  part1: 'Use the memory tool to save this exact note: Helper test 7Q4.',
-  part2: 'What is the Helper test note?',
-  steps: ['Paste the test text into a new chat.', 'Open another new chat and ask for the note.', 'Tell us what it said.'],
-  yes: 'It said 7Q4',
-  no: "It didn't",
-  worked: 'It found the note in a new chat, so memory works for this bot.', // (builder)
-  reasonsLead: 'Three likely reasons, most likely first:', // (builder)
-  reasons: [
-    "It said it saved but didn't. Small models do this often. A stronger model for setup fixes it.",
-    'The note is waiting for your OK. Type /memory pending, then /memory approve all.',
-    'The note went to another bot. Each bot (profile) has its own memory.'
-  ]
-}
-
-// answer = 'yes' | 'no' | undefined (kept per bot in ctx.storage)
-function rememberCard(answer) {
-  if (answer === 'yes') return { status: 'works', lines: [REMEMBER.worked] }
-  if (answer === 'no') return { status: 'fix', lines: [], reasonsLead: REMEMBER.reasonsLead, reasons: REMEMBER.reasons }
-  return { status: 'unchecked', lines: [] }
-}
-
-// ---- src/steps-data.js ----
-// Generated by scripts/build.mjs from content/steps-v1.json (hhcontent's fixed step text). Edit the
-// JSON, then build; tests/steps.test.mjs checks the data (build-v1.md section 6).
-const STEPS_DATA = {
-  "about": "Helper v1 step data, steps 1-4. Written by hhcontent, 9 Nov 2026. Shape: docs/plan/build-v1.md section 6, plus optional fields listed in content/v1-strings.md part 4. All text is fixed; code fills only the {slots}. Checked by dev/checks/hhcontent/check-steps-v1.mjs.",
-  "docs_version": "v0.23.0",
-  "docs_root": "/hermes-docs",
-  "live_base": "https://hermes-agent.nousresearch.com/docs/",
-  "build_word_rule": "Lower-case the person's words, turn curly quotes into straight ones, squeeze spaces. If the words start with one of build_word_skip_starts, skip this check and let the model decide. Otherwise, if any phrase from build_words_common or from the open step's build_words appears with a word boundary on both sides, go straight to the hand-over text with no model call.",
-  "build_word_skip_starts": [
-    "what is",
-    "what's",
-    "whats",
-    "what are",
-    "what does",
-    "what do",
-    "why",
-    "is it",
-    "is that",
-    "is this",
-    "are there",
-    "does it",
-    "does that",
-    "do i need",
-    "should i",
-    "which"
-  ],
-  "build_words_common": [
-    "do it for me",
-    "do this for me",
-    "do that for me",
-    "can you install",
-    "could you install",
-    "would you install",
-    "please install",
-    "install it",
-    "install this",
-    "install that",
-    "install them",
-    "can you connect",
-    "could you connect",
-    "please connect",
-    "connect it",
-    "connect this",
-    "can you build",
-    "could you build",
-    "please build",
-    "build me",
-    "build it",
-    "can you set up",
-    "could you set up",
-    "please set up",
-    "set it up",
-    "set this up",
-    "set everything up",
-    "set it all up",
-    "can you configure",
-    "please configure",
-    "configure it",
-    "can you enable",
-    "please enable",
-    "enable it",
-    "turn it on",
-    "switch it on",
-    "deploy it",
-    "just do it",
-    "do it now",
-    "build an app",
-    "make an app",
-    "build a website",
-    "make a website",
-    "build a bot",
-    "make a bot",
-    "write the code"
-  ],
-  "key_pattern_note": "Separate from build words: if the words contain something that looks like a secret key, never send them to the model. See content/v1-strings.md, line K1.",
-  "steps": [
-    {
-      "id": "s1",
-      "number": 1,
-      "title": "What do you want Hermes to do for you?",
-      "rail_subtitle": "What you want Hermes to do",
-      "intro": "Hermes is an AI agent: an AI that can do things for you, not only talk. You talk to it in plain words, as you would with ChatGPT. The difference is what it can do around the chat. It can take actions on the computer it runs on, it remembers you from one chat to the next, and it can work on a schedule or answer you in a chat app on your phone. What you want from it decides which of these parts you need, so this is the first question. Pick the answer closest to yours. You can change it later.",
-      "intro_sources": [
-        {
-          "source": "index.mdx",
-          "section": "Hermes Agent",
-          "quote": "builds a deepening model of who you are across sessions"
-        },
-        {
-          "source": "user-guide/features/tools.md",
-          "section": "Tools & Toolsets",
-          "quote": "Tools are functions that extend the agent's capabilities."
-        },
-        {
-          "source": "user-guide/messaging/index.md",
-          "section": "Messaging Gateway",
-          "quote": "The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs"
-        }
-      ],
-      "compare": null,
-      "facts": [
-        {
-          "id": "s1f1",
-          "text": "Hermes remembers what it learns about you from one chat to the next. It also writes down new skills (step-by-step know-how for one kind of task) from what it does, and improves them as it uses them.",
-          "source": "index.mdx",
-          "section": "Hermes Agent",
-          "url": "https://hermes-agent.nousresearch.com/docs/",
-          "quote": "creates skills from experience, improves them during use, nudges itself to persist knowledge, and builds a deepening model of who you are across sessions"
-        },
-        {
-          "id": "s1f2",
-          "text": "Hermes can take actions, not only answer: run programs, read and change files, search the web, and more. Each kind of action is called a tool.",
-          "source": "user-guide/features/tools.md",
-          "section": "Available Tools",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tools",
-          "quote": "covering web search, browser automation, terminal execution, file editing, memory, delegation, scheduled tasks, and more"
-        },
-        {
-          "id": "s1f3",
-          "text": "You can message Hermes from chat apps such as Telegram, WhatsApp, Discord or Slack, not only from this app. A part of Hermes called the gateway keeps running in the background to answer you there.",
-          "source": "user-guide/messaging/index.md",
-          "section": "Messaging Gateway",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/messaging/",
-          "quote": "The gateway is a single background process that connects to all your configured platforms"
-        },
-        {
-          "id": "s1f4",
-          "text": "Hermes can do jobs on a schedule without you being there, such as a summary every morning or a regular check. The docs call these cron jobs.",
-          "source": "getting-started/learning-path.md",
-          "section": "I want to automate tasks",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path",
-          "quote": "Cron jobs let Hermes Agent run tasks on a schedule — daily summaries, periodic checks, automated reports — without you being present."
-        },
-        {
-          "id": "s1f5",
-          "text": "The official docs sort what people do with Hermes into a few kinds: help with writing and running code, a bot in a chat app, jobs that run on a schedule, and a team of specialist bots. They advise getting one plain chat working first, then adding one thing at a time.",
-          "source": "getting-started/learning-path.md",
-          "section": "By Use Case",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path",
-          "quote": "I want a team of specialist Bots",
-          "more_sources": [
-            {
-              "source": "getting-started/quickstart.md",
-              "section": "The fastest path",
-              "quote": "Get one clean conversation working first, then layer on gateway, cron, skills, voice, or routing."
-            }
-          ]
-        }
-      ],
-      "question": "What would you most like Hermes to do for you first?",
-      "options": [
-        {
-          "id": "o_tasks",
-          "label": "Help with tasks on this computer",
-          "hint": "Files, writing, research, code",
-          "fact": "s1f2",
-          "goal_text": "help me with tasks on my computer (files, writing, research, code)",
-          "fits": {
-            "s3": "o_here"
-          }
-        },
-        {
-          "id": "o_phone",
-          "label": "Answer me from my phone",
-          "hint": "In Telegram, WhatsApp, Discord or Slack",
-          "fact": "s1f3",
-          "goal_text": "answer me from my phone in a chat app",
-          "fits": {
-            "s3": "o_always"
-          }
-        },
-        {
-          "id": "o_schedule",
-          "label": "Do jobs on its own, on a schedule",
-          "hint": "A summary every morning, a regular check",
-          "fact": "s1f4",
-          "goal_text": "do jobs on its own on a schedule",
-          "fits": {
-            "s3": "o_always"
-          }
-        },
-        {
-          "id": "o_unsure",
-          "label": "I don't know yet",
-          "hint": "See what people use it for",
-          "fact": "s1f5",
-          "goal_text": "not decided yet",
-          "fits": {}
-        }
-      ],
-      "next_rule": {
-        "o_tasks": "s2",
-        "o_phone": "s2",
-        "o_schedule": "s2",
-        "o_unsure": "s2"
-      },
-      "build_words": [
-        "do it all",
-        "make it work",
-        "do everything"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will do and why, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/getting-started/learning-path"
-      },
-      "video": null
-    },
-    {
-      "id": "s2",
-      "number": 2,
-      "title": "The brain: what a model is, and where it runs",
-      "rail_subtitle": "What a model is, where it runs",
-      "intro": "Hermes doesn't think by itself. It sends your words to a model: the AI that does the thinking, like the one inside ChatGPT. A provider is the company that runs a model for you. If Hermes already answers you, you already have a model, and this step shows what you have and what else you could use. There are four ways to connect a model: a subscription you may already pay for, an API key (a secret code from a model company), a model on your own computer, or a Nous account (Nous Research makes Hermes). You can switch at any time.",
-      "intro_sources": [
-        {
-          "source": "user-guide/configuring-models.md",
-          "section": "Configuring Models",
-          "quote": "Main model — what the agent thinks with."
-        },
-        {
-          "source": "integrations/providers.md",
-          "section": "Subscription plans: what your plan pays for",
-          "quote": "Several providers let you sign in to Hermes with a consumer subscription"
-        },
-        {
-          "source": "getting-started/quickstart.md",
-          "section": "2. Choose a Provider",
-          "quote": "You can switch providers at any time with hermes model — no lock-in."
-        }
-      ],
-      "compare": {
-        "left": {
-          "title": "On a provider's computers",
-          "text": "Your words go to that provider and nowhere else. You pay through a subscription or for what you use.",
-          "source": "reference/faq.md",
-          "section": "Is my data sent anywhere?",
-          "quote": "API calls go only to the LLM provider you configure"
-        },
-        "right": {
-          "title": "On this computer",
-          "text": "Nothing leaves your computer, and it costs nothing to run. It needs a fairly strong computer.",
-          "source": "user-guide/local-models.md",
-          "section": "Local Models",
-          "quote": "Nothing leaves your computer: no account, no API key, and no network access"
-        }
-      },
-      "facts": [
-        {
-          "id": "s2f1",
-          "text": "The name of the model you use shows in the message box, and you can change it there for one chat. The model for new chats is set in Settings, then Model, then Main model, and you can switch to another one at any time.",
-          "source": "user-guide/desktop.md",
-          "section": "Choosing a model",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#choosing-a-model",
-          "quote": "Set the default in Settings → Model → Main model."
-        },
-        {
-          "id": "s2f2",
-          "text": "Some subscriptions can be used instead of a key: a ChatGPT plan (you sign in with ChatGPT) or SuperGrok (the paid plan for Grok). For Claude, only the Max plan works, and only with extra usage credits bought on top; Claude Pro can't be used this way. The docs name ChatGPT Plus and Pro, but don't yet say how much of your plan Hermes uses.",
-          "source": "integrations/providers.md",
-          "section": "Subscription plans: what your plan pays for",
-          "url": "https://hermes-agent.nousresearch.com/docs/integrations/providers#subscription-plans-what-your-plan-pays-for",
-          "quote": "Pro subscribers cannot use the OAuth path",
-          "more_sources": [
-            {
-              "source": "integrations/providers.md",
-              "section": "Subscription plans: what your plan pays for",
-              "quote": "Which ChatGPT plan tiers are eligible, and how Hermes usage counts against your plan's Codex limits, are not currently documented"
-            },
-            {
-              "source": "user-guide/configuration.md",
-              "section": "Common Setups",
-              "quote": "Using Codex OAuth (ChatGPT Pro/Plus account — no API key needed)"
-            }
-          ]
-        },
-        {
-          "id": "s2f3",
-          "text": "An API key is a long secret code from a model company, such as OpenRouter, OpenAI, Anthropic or Google. It works like a password that lets Hermes use your account there, and you usually pay for what you use. Keep it secret: it goes in Settings, then Providers, then API keys, never into a chat.",
-          "source": "getting-started/quickstart.md",
-          "section": "2. Choose a Provider",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#2-choose-a-provider",
-          "quote": "or API key for pay-per-token",
-          "more_sources": [
-            {
-              "source": "reference/faq.md",
-              "section": "How much does it cost?",
-              "quote": "You pay only for the LLM API usage from your chosen provider."
-            },
-            {
-              "source": "user-guide/desktop.md",
-              "section": "Settings & onboarding",
-              "quote": "with an Accounts / API-keys UX for signing in and storing credentials per provider"
-            }
-          ]
-        },
-        {
-          "id": "s2f4",
-          "text": "Hermes can download a model and run it on this computer: no account, no key, and nothing leaves your computer. A graphics card with 8 GB of memory or more runs the small models well, and Hermes shows which models fit before you download. Small models sometimes say they saved something to Hermes's memory when they didn't.",
-          "source": "user-guide/local-models.md",
-          "section": "Requirements and limits",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/local-models",
-          "quote": "A GPU with 8 GB+ of memory runs the small catalog models comfortably",
-          "more_sources": [
-            {
-              "source": "user-guide/local-models.md",
-              "section": "How Hermes picks what to download",
-              "quote": "Every model in the catalog is priced against your machine before you download anything."
-            },
-            {
-              "source": "user-guide/features/memory.md",
-              "section": "Troubleshooting",
-              "quote": "Small local models (roughly under 30B parameters) and models with weak tool-calling do this often"
-            }
-          ]
-        },
-        {
-          "id": "s2f5",
-          "text": "Nous Portal is an account with Nous Research, the makers of Hermes. One sign-in gives you hundreds of models and extra tools such as web search, on a paid subscription, and the docs call it the recommended way to run Hermes. There is also a free Nous plan, with limits on how much you can use it.",
-          "source": "integrations/nous-portal.md",
-          "section": "Nous Portal",
-          "url": "https://hermes-agent.nousresearch.com/docs/integrations/nous-portal",
-          "quote": "the recommended way to run Hermes Agent",
-          "more_sources": [
-            {
-              "source": "integrations/providers.md",
-              "section": "Nous Portal",
-              "quote": "One OAuth login covers 300+ frontier agentic models"
-            },
-            {
-              "source": "user-guide/configuration.md",
-              "section": "Iteration Budget",
-              "quote": "on the free Nous tier (no sign-in)"
-            }
-          ]
-        }
-      ],
-      "question": "Which of these fits you best?",
-      "options": [
-        {
-          "id": "o_keep",
-          "label": "Keep the model I have",
-          "hint": "It already answers me",
-          "fact": "s2f1"
-        },
-        {
-          "id": "o_sub",
-          "label": "Use a subscription I pay for",
-          "hint": "ChatGPT, SuperGrok or Claude Max",
-          "fact": "s2f2"
-        },
-        {
-          "id": "o_key",
-          "label": "Use an API key",
-          "hint": "Pay for what I use",
-          "fact": "s2f3"
-        },
-        {
-          "id": "o_local",
-          "label": "Run a model on this computer",
-          "hint": "Private and free to run",
-          "fact": "s2f4"
-        },
-        {
-          "id": "o_nous",
-          "label": "Use a Nous account",
-          "hint": "Many models in one sign-in",
-          "fact": "s2f5"
-        }
-      ],
-      "next_rule": {
-        "o_keep": "s3",
-        "o_sub": "s3",
-        "o_key": "s3",
-        "o_local": "s3",
-        "o_nous": "s3"
-      },
-      "build_words": [
-        "connect my chatgpt",
-        "connect my claude",
-        "connect chatgpt",
-        "connect claude",
-        "add my key",
-        "add my api key",
-        "use my key",
-        "here is my key",
-        "here's my key",
-        "my key is",
-        "switch my model",
-        "change my model",
-        "change the model",
-        "set my model",
-        "download a model",
-        "download the model",
-        "install a model",
-        "install the model",
-        "sign me in",
-        "log me in",
-        "sign in for me",
-        "log in for me"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will change in my model settings and why, and wait for my OK. If a key or a sign-in is needed, tell me where to enter it in Settings; don't ask me to paste a key into this chat. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/integrations/providers"
-      },
-      "video": null
-    },
-    {
-      "id": "s3",
-      "number": 3,
-      "title": "Where Hermes runs: this computer, or one that is always on",
-      "rail_subtitle": "This computer, or one that is always on",
-      "intro": "Hermes itself also runs on a computer, and that is a separate choice from the model in step 2. By default, this app runs Hermes on this computer. Hermes can also run on another computer that stays on all the time, and this app then connects to it. Where Hermes runs decides when it can work for you. Answering your messages and running scheduled jobs happen in the background on that computer, so they need it to be on and awake.",
-      "intro_sources": [
-        {
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "quote": "By default the app starts and manages its own local backend."
-        },
-        {
-          "source": "user-guide/messaging/index.md",
-          "section": "Messaging Gateway",
-          "quote": "The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs"
-        },
-        {
-          "source": "user-guide/desktop.md",
-          "section": "Settings & onboarding",
-          "quote": "stops the machine from sleeping so long or overnight agent runs keep going"
-        }
-      ],
-      "compare": {
-        "left": {
-          "title": "This computer",
-          "text": "Simplest: nothing extra to set up. It works only while this computer is on and awake.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "quote": "By default the app starts and manages its own local backend."
-        },
-        "right": {
-          "title": "A computer that is always on",
-          "text": "A rented server, a home server, or Hermes Cloud. It keeps working while your own computer is off.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "quote": "a VPS, a home server, or a Mini behind Tailscale"
-        }
-      },
-      "facts": [
-        {
-          "id": "s3f1",
-          "text": "By default, the app starts and looks after its own Hermes on this computer. Nothing else is needed to begin.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
-          "quote": "By default the app starts and manages its own local backend."
-        },
-        {
-          "id": "s3f2",
-          "text": "Hermes works only while the computer it runs on is awake. In the app, Settings, then Advanced, then Keep computer awake stops the computer from sleeping during long jobs. Closing the lid still puts it to sleep.",
-          "source": "user-guide/desktop.md",
-          "section": "Settings & onboarding",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#settings--onboarding",
-          "quote": "Closing the lid or choosing Sleep still sleeps the machine",
-          "more_sources": [
-            {
-              "source": "guides/cron-troubleshooting.md",
-              "section": "Cron Troubleshooting",
-              "quote": "Scheduled fires work as long as the gateway is running"
-            }
-          ]
-        },
-        {
-          "id": "s3f3",
-          "text": "Hermes can also run on another computer that stays on, such as a server you rent (a computer in a data centre that stays on) or one at home. You connect this app to it in Settings, then Gateways, and use it the same way. Setting up that other computer takes some technical steps with typed commands.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
-          "quote": "point it at a Hermes backend running on another machine — a VPS, a home server, or a Mini behind Tailscale",
-          "more_sources": [
-            {
-              "source": "user-guide/desktop.md",
-              "section": "On the backend (the remote machine)",
-              "quote": "Set a username and password, then start the backend bound to a reachable address."
-            }
-          ]
-        },
-        {
-          "id": "s3f4",
-          "text": "Hermes Cloud runs Hermes for you on a computer that is hosted for you. You sign in once in Settings, then Gateways, and pick your Hermes from a list, with no address to type in. The Hermes docs don't list its price.",
-          "source": "user-guide/desktop.md",
-          "section": "Connecting to a remote backend",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend",
-          "quote": "sign in once to Hermes Cloud and pick from the agents on your account; no URL to paste",
-          "more_sources": [
-            {
-              "source": "user-guide/multi-connection-desktop.md",
-              "section": "The gateway registry",
-              "quote": "A hosted instance discovered through your Hermes Cloud account."
-            }
-          ]
-        },
-        {
-          "id": "s3f5",
-          "text": "Your chats, memory and skills are kept on the computer where Hermes runs. Hermes sends your words only to your model's provider, and it collects no usage data.",
-          "source": "reference/faq.md",
-          "section": "Is my data sent anywhere?",
-          "url": "https://hermes-agent.nousresearch.com/docs/reference/faq#is-my-data-sent-anywhere",
-          "quote": "Hermes Agent does not collect telemetry, usage data, or analytics. Your conversations, memory, and skills are stored locally in ~/.hermes/."
-        }
-      ],
-      "question": "Where should your Hermes run?",
-      "options": [
-        {
-          "id": "o_here",
-          "label": "This computer is fine for now",
-          "hint": "Simplest to start",
-          "fact": "s3f1"
-        },
-        {
-          "id": "o_always",
-          "label": "A computer that is always on",
-          "hint": "My own server",
-          "fact": "s3f3"
-        },
-        {
-          "id": "o_cloud",
-          "label": "Hermes Cloud",
-          "hint": "Hosted for me",
-          "fact": "s3f4"
-        },
-        {
-          "id": "o_unsure",
-          "label": "I'm not sure yet",
-          "hint": "What decides it?",
-          "fact": "s3f2"
-        }
-      ],
-      "next_rule": {
-        "o_here": "s4",
-        "o_always": "s4",
-        "o_cloud": "s4",
-        "o_unsure": "s4"
-      },
-      "build_words": [
-        "set up a server",
-        "set up my server",
-        "rent a server",
-        "rent me a server",
-        "deploy hermes",
-        "move hermes",
-        "move it to",
-        "connect to my server",
-        "connect my server",
-        "set up hermes cloud",
-        "sign up for hermes cloud",
-        "sign me up",
-        "install hermes",
-        "keep my computer awake"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words what you will do, what it needs (another computer, an account, any cost) and why, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/desktop#connecting-to-a-remote-backend"
-      },
-      "video": null
-    },
-    {
-      "id": "s4",
-      "number": 4,
-      "title": "Connecting things: tools, skills, plugins, MCP",
-      "rail_subtitle": "Tools, skills, plugins, MCP",
-      "intro": "Hermes does things through tools: actions it can take, like searching the web. You can give it more abilities in three ways: skills, plugins and MCP. The names sound alike, but they are different kinds of things. Knowing which kind fits your goal tells you what to ask your Hermes for. This page explains and advises. Your own Hermes does the adding, after you say yes.",
-      "intro_sources": [
-        {
-          "source": "user-guide/features/tools.md",
-          "section": "Tools & Toolsets",
-          "quote": "Tools are functions that extend the agent's capabilities."
-        },
-        {
-          "source": "getting-started/learning-path.md",
-          "section": "I want to build custom tools/skills",
-          "quote": "Extend Hermes Agent with your own tools and reusable skill packages."
-        }
-      ],
-      "compare": null,
-      "facts": [
-        {
-          "id": "s4f1",
-          "text": "A tool is one kind of action Hermes can take, such as searching the web, running a program or reading a file. Hermes comes with many, grouped into toolsets that you can switch on or off.",
-          "source": "user-guide/features/tools.md",
-          "section": "Tools & Toolsets",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tools",
-          "quote": "They're organized into logical toolsets that can be enabled or disabled per platform."
-        },
-        {
-          "id": "s4f2",
-          "text": "A skill is written know-how: a document with step-by-step instructions for one kind of task. Hermes reads only each skill's short description until a task needs it, so having many doesn't slow it down. It comes with many skills, and you can add more from the Skills Hub.",
-          "source": "getting-started/quickstart.md",
-          "section": "Skills",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#skills",
-          "quote": "The agent reads the short descriptions for free and only loads a skill's full content when a task actually calls for it",
-          "more_sources": [
-            {
-              "source": "user-guide/features/skills.md",
-              "section": "Skills System",
-              "quote": "Skills are on-demand knowledge documents the agent can load when needed."
-            }
-          ]
-        },
-        {
-          "id": "s4f3",
-          "text": "A plugin is an add-on made of code. It can give Hermes new tools or features without changing Hermes itself. The plugin catalog lists plugins that people have reviewed, and each one installs with one command or one click.",
-          "source": "user-guide/features/plugins.md",
-          "section": "Plugins",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/plugins",
-          "quote": "Hermes has a plugin system for adding custom tools, hooks, and integrations without modifying core code.",
-          "more_sources": [
-            {
-              "source": "user-guide/features/plugin-catalog.md",
-              "section": "Plugin Catalog",
-              "quote": "The plugin catalog is a curated, human-reviewed directory of Hermes plugins you can install by name with a single command"
-            }
-          ]
-        },
-        {
-          "id": "s4f4",
-          "text": "MCP (Model Context Protocol) is a shared standard, a bit like a plug that fits many sockets. It lets Hermes use tools that live outside it, such as GitHub or a database, without anyone writing a new Hermes tool first.",
-          "source": "user-guide/features/mcp.md",
-          "section": "MCP (Model Context Protocol)",
-          "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp",
-          "quote": "Access to external tool ecosystems without writing a native Hermes tool first",
-          "more_sources": [
-            {
-              "source": "user-guide/features/mcp.md",
-              "section": "MCP (Model Context Protocol)",
-              "quote": "MCP lets Hermes Agent connect to external tool servers so the agent can use tools that live outside Hermes itself — GitHub, databases"
-            }
-          ]
-        },
-        {
-          "id": "s4f5",
-          "text": "Add only what your goal needs, one thing at a time. The official quickstart says to get a normal chat working first, then add skills, scheduled jobs or messaging one layer at a time.",
-          "source": "getting-started/quickstart.md",
-          "section": "The fastest path",
-          "url": "https://hermes-agent.nousresearch.com/docs/getting-started/quickstart#the-fastest-path",
-          "quote": "Get one clean conversation working first, then layer on gateway, cron, skills, voice, or routing."
-        }
-      ],
-      "question": "What would you like Hermes to be able to do next?",
-      "options": [
-        {
-          "id": "o_knowhow",
-          "label": "Do a task my way, every time",
-          "hint": "Written know-how: a skill",
-          "fact": "s4f2"
-        },
-        {
-          "id": "o_service",
-          "label": "Use a service I already use",
-          "hint": "Such as GitHub or a database",
-          "fact": "s4f4"
-        },
-        {
-          "id": "o_feature",
-          "label": "Get a new feature",
-          "hint": "An add-on: a plugin",
-          "fact": "s4f3"
-        },
-        {
-          "id": "o_actions",
-          "label": "See what it can already do",
-          "hint": "Its built-in tools",
-          "fact": "s4f1"
-        },
-        {
-          "id": "o_enough",
-          "label": "Nothing more for now",
-          "hint": "Keep it simple",
-          "fact": "s4f5"
-        }
-      ],
-      "next_rule": {
-        "o_knowhow": "done",
-        "o_service": "done",
-        "o_feature": "done",
-        "o_actions": "done",
-        "o_enough": "done"
-      },
-      "build_words": [
-        "install a skill",
-        "install the skill",
-        "install a plugin",
-        "install the plugin",
-        "add a skill",
-        "add the skill",
-        "add this skill",
-        "add a plugin",
-        "add the plugin",
-        "add this plugin",
-        "add an mcp",
-        "add the mcp",
-        "set up mcp",
-        "set up an mcp",
-        "connect gmail",
-        "connect my gmail",
-        "connect my email",
-        "connect my calendar",
-        "connect github",
-        "connect my github",
-        "connect notion",
-        "connect my notion",
-        "write a skill",
-        "create a skill",
-        "make a skill",
-        "build a plugin",
-        "make a plugin",
-        "write a plugin",
-        "turn on the",
-        "switch on the",
-        "enable the"
-      ],
-      "handoff": {
-        "template": "I'm setting up Hermes. My goal: {goal}. I'd like you to: \"{request}\". Before you change anything, tell me in plain words whether this is a skill, a plugin or an MCP server, what it will be able to read or change, and why it fits my goal, and wait for my OK. Afterwards, tell me how I can check that it worked. Official page: {docs_url}",
-        "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/plugin-catalog"
-      },
-      "video": null
-    }
-  ]
-}
-
-// ---- src/steps.js ----
-// Setup steps 1-4 (B3): hhcontent's fixed text (content/steps-v1.json, built into src/steps-data.js)
-// and the small rules around it, all plain code with no model: which step comes next
-// (next_rule), the build-word rule (straight to the hand-over text), the hand-over text itself,
-// the "Fits your goal" tag and the docs links. Every sentence the page shows comes from the data
-// or from content/v1-strings.md part 4, word for word.
-
-const STEPS = STEPS_DATA.steps
-const STEP_IDS = STEPS.map(s => s.id)
-
-// Steps 5-7 show greyed under "After these", with no content (build-v1.md section 6).
-const LATER_STEPS = [
-  { number: 5, title: 'Personality and memory' },
-  { number: 6, title: 'Messaging' },
-  { number: 7, title: 'Several bots' }
-]
-const VERSION_LINE = 'Hermes v0.23 · docs checked 9 Nov 2026'
-
-// content/v1-strings.md part 4 (hhcontent). {slots} are filled by code only.
-const LINES = {
-  greeting: "Open a step and ask me about it here. I explain things; I don't change your settings.",
-  yourAnswer: 'Your answer: {option_label}',
-  fitsGoal: 'Fits your goal',
-  afterLast: "That's the first four steps. Your setup shows what you have now.",
-  noCheckedAnswer: "I don't have a checked answer for that yet. The closest official page is: {docs_url}",
-  handoffLead: ["I don't do that here. I help you understand and decide; your own Hermes does the doing.", 'Paste this into a new chat with your Hermes:'],
-  handoffAfter: "When it's done, come back and check it under Your setup.",
-  // The video slot (build-v1.md section 6: video is null in v1, the slot stays).
-  videoLater: 'A short video for this step comes later. It will need the internet when you press Play.'
-}
-
-const fill = (line, slots) => line.replace(/\{(\w+)\}/g, (m, k) => (k in slots ? String(slots[k]) : m))
-
-function stepByNumber(n) {
-  return STEPS.find(s => s.number === n) || null
-}
-
-function stepById(id) {
-  return STEPS.find(s => s.id === id) || null
-}
-
-// The step list's two lines. The title up to its colon ("The brain"); a title without one (step 1
-// is a question) gives its place to the data's own short line, which then isn't repeated below.
-function railLines(step) {
-  const colon = step.title.indexOf(':')
-  if (colon > 0) return { title: step.title.slice(0, colon), sub: step.rail_subtitle || '' }
-  return { title: step.rail_subtitle || step.title, sub: '' }
-}
-
-// A docs path ("user-guide/desktop.md") as its live page, the same rule hhcontent's check uses
-// for every fact url (dev/checks/hhcontent/check-steps-v1.mjs, checkUrl).
-function docsUrl(source) {
-  const rel = String(source).replace(/\.(md|mdx)$/, '').replace(/^index$/, '').replace(/\/index$/, '/')
-  return STEPS_DATA.live_base + rel
-}
-
-// The label on a source chip (v1-strings part 5: "Hermes docs › {section}").
-const chipLabel = section => `Hermes docs › ${section}`
-
-// Only the official Hermes docs open from the page (a content slip can't open anything else).
-const isDocsUrl = url => typeof url === 'string' && url.startsWith(STEPS_DATA.live_base) && !/[\s"'<>]/.test(url)
-
-// The step after this one, by the step's next_rule (code, not the model). No answer picked yet:
-// the next step in order (every rule in v1 leads there too). Returns a step number, or 'done'.
-function nextAfter(step, optionId) {
-  const target = optionId && step.next_rule ? step.next_rule[optionId] : undefined
-  if (target === 'done') return 'done'
-  const byRule = target ? stepById(target) : null
-  if (byRule) return byRule.number
-  const following = stepByNumber(step.number + 1)
-  return following ? following.number : 'done'
-}
-
-// answers: { [stepId]: optionId }, the person's picks. The step-1 answer can tag one option of a
-// later step "Fits your goal" (its `fits`).
-function fitsGoal(answers, stepId) {
-  const first = STEPS[0]
-  const picked = first.options.find(o => o.id === (answers || {})[first.id])
-  return picked && picked.fits ? picked.fits[stepId] || null : null
-}
-
-// The build-word rule, as steps-v1.json's build_word_rule says it: lower-case, straight quotes,
-// squeezed spaces; a question start skips the check; otherwise any phrase from the common list or
-// the open step's list, with a word boundary on both sides, means "go straight to the hand-over".
-const normalise = s =>
-  String(s).toLowerCase().replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/\s+/g, ' ').trim()
-const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-function isBuildRequest(step, text) {
-  const t = normalise(text)
-  if (STEPS_DATA.build_word_skip_starts.some(p => t.startsWith(p + ' ') || t === p)) return false
-  const phrases = [...STEPS_DATA.build_words_common, ...((step && step.build_words) || [])]
-  return phrases.some(p => new RegExp(`(^|[^a-z0-9])${escape(p)}($|[^a-z0-9])`).test(t))
-}
-
-// The hand-over text (v1-strings part 4, "Slots in the hand-over template"):
-//   {goal}     the step-1 answer's goal_text, else "not chosen yet"
-//   {request}  the person's words, cut to 300 characters, double quotes turned into single ones
-//   {docs_url} the step's handoff.docs_url
-const REQUEST_MAX_CHARS = 300
-function handoffText(step, answers, request) {
-  const first = STEPS[0]
-  const picked = first.options.find(o => o.id === (answers || {})[first.id])
-  const words = Array.from(String(request || '').replace(/["\u201c\u201d]/g, "'").trim())
-  return fill(step.handoff.template, {
-    goal: picked && picked.goal_text ? picked.goal_text : 'not chosen yet',
-    request: words.slice(0, REQUEST_MAX_CHARS).join(''),
-    docs_url: step.handoff.docs_url
-  })
-}
-
-// Only answers that are real options of real steps survive (storage can hold anything).
-function cleanAnswers(value) {
-  const out = {}
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return out
-  for (const s of STEPS) {
-    const v = value[s.id]
-    if (typeof v === 'string' && s.options.some(o => o.id === v)) out[s.id] = v
-  }
-  return out
-}
-
 // ---- src/state.js ----
 // What the page keeps in ctx.storage on the person's computer.
-// Keys: tab (setup | yours), step (1-4), answers ({ stepId: optionId }, the person's picks on the
-// steps), helperWidth (the width Helper's window was dragged to, 360 to 600 px).
-// Anything unexpected in storage falls back to the default.
-// About the person, only the record of what Helper keeps (talk v2 row 3): never what they do,
-// never the conversation. STORED_KEYS is every key the plugin may
-// write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
+// Keys the page reads back: tab (dashboard | learn | my_setup), helperWidth (the width Helper's window was dragged
+// to, 360 to 600 px). Anything unexpected in storage falls back to the default.
+// dash-v1: the first build's tabs (Setup, Your setup) left the page; their keys step, answers and remember are no
+// longer read or written by the page (their parked files, src/steps.js and src/setup-tab.js, still name them).
+// About the person, only the record of what Helper keeps (talk v2 row 3): never what they do, never the
+// conversation, nothing about their bots (the Dashboard reads Hermes each time it opens). STORED_KEYS is every key
+// the plugin may write; tests/state.test.mjs reads every storage call in src/ and fails on a key outside it.
 
-const STEP_COUNT = STEPS.length
-// 'remember' is the person's answer to the memory test on Your setup (src/setup-tab.js).
+// 'remember' is the person's answer to the memory test on the parked Your setup (src/setup-tab.js).
 // 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
 // 'met' (changes-14, keeps.met): true once Helper has said hello, so the name is asked only on the first
 // visit; nothing about the person, and no Forget removes it (src/page.js).
-const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept', 'met']
+const STORED_KEYS = ['tab', 'helperWidth', 'remember', 'kept', 'met']
+// dash-v1: the three tabs, Dashboard first (only it is built)
+const TAB_IDS = ['dashboard', 'learn', 'my_setup']
 
 function readState(get) {
-  const pick = (key, allowed, fallback) => {
-    const v = get(key, fallback)
-    return allowed.includes(v) ? v : fallback
-  }
-  const step = get('step', 1)
+  const tab = get('tab', TAB_IDS[0])
   return {
-    tab: pick('tab', ['setup', 'yours'], 'setup'),
-    step: Number.isInteger(step) && step >= 1 && step <= STEP_COUNT ? step : 1,
-    answers: cleanAnswers(get('answers', {})),
+    tab: TAB_IDS.includes(tab) ? tab : TAB_IDS[0],
     helperWidth: clampHelperWidth(get('helperWidth', HELPER_PX))
   }
 }
@@ -17577,7 +16474,93 @@ const K = {
   bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
   // talk-live-3 (Lead's call, 11 Nov 05:08): text the person is to type inside a line (/usage, "what can I ask you"),
   // in the paste box's code style: its edge, fill, 12 px mono and text colour, as a small inline chip
-  typed: 'rounded-[2.5px] border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) px-1 font-mono text-xs text-(--ui-text-secondary)'
+  typed: 'rounded-[2.5px] border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) px-1 font-mono text-xs text-(--ui-text-secondary)',
+
+  // ---- dash-v1: the Dashboard tab's own shapes are the D table below (src/dash.css); from Hermes it wears these ----
+  // Hermes's Tabler icons at the sizes Hermes draws them (hhtech-dash-icons.md point 1: 16 px in Settings' rows,
+  // 14 px in its sub-rows); 20 px on the tiles (hhdesign's r7 size)
+  icon14: 'size-3.5',
+  icon16: 'size-4',
+  icon20: 'size-5',
+  // Learn and My setup are not built: one quiet line, in the caption tone, at the open step's text edge
+  notBuilt: 'px-6 py-4 text-[length:var(--conversation-caption-font-size)] leading-(--conversation-caption-line-height) text-(--ui-text-tertiary)'
+}
+
+// dash-v1: every class of the Dashboard tab's sheet (src/dash.css, from hhdesign's design/dash-r7/build.js), in one
+// table; each starts with hhd-. tests/dash-css.test.mjs checks that every name here has a rule in the sheet and
+// that the sheet has no class nothing uses.
+const D = {
+  main: 'hhd-main',
+  compact: 'hhd-compact',
+  card: 'hhd-card',
+  title: 'hhd-title',
+  // the top box
+  stats: 'hhd-stats',
+  tile: 'hhd-tile',
+  tileIcon: 'hhd-tile-icon',
+  tileWords: 'hhd-tile-words',
+  tileNum: 'hhd-tile-num',
+  tileLabel: 'hhd-tile-label',
+  wait: 'hhd-wait',
+  // Activity
+  act: 'hhd-act',
+  actWords: 'hhd-act-words',
+  lastUsed: 'hhd-lu',
+  key: 'hhd-key',
+  keySq: 'hhd-key-sq',
+  keyFirst: 'hhd-key-first',
+  keyLast: 'hhd-key-last',
+  gridWrap: 'hhd-gridwrap',
+  dayNames: 'hhd-daynames',
+  months: 'hhd-months',
+  month: 'hhd-month',
+  grid: 'hhd-grid',
+  sq: 'hhd-sq',
+  l0: 'hhd-l0',
+  l1: 'hhd-l1',
+  l2: 'hhd-l2',
+  l3: 'hhd-l3',
+  today: 'hhd-today',
+  // Set up
+  head: 'hhd-head',
+  count: 'hhd-count',
+  countN: 'hhd-count-n',
+  road: 'hhd-road',
+  lines: 'hhd-lines',
+  line: 'hhd-line',
+  stop: 'hhd-stop',
+  dot: 'hhd-dot',
+  done: 'hhd-done',
+  todo: 'hhd-todo',
+  here: 'hhd-here',
+  quiet: 'hhd-quiet',
+  sel: 'hhd-sel',
+  up: 'hhd-up',
+  down: 'hhd-down',
+  name: 'hhd-name',
+  you: 'hhd-you',
+  next: 'hhd-next',
+  nextWords: 'hhd-next-words',
+  nextLine: 'hhd-next-line',
+  nextLabel: 'hhd-next-label',
+  nextName: 'hhd-next-name',
+  nextWhy: 'hhd-next-why',
+  allDone: 'hhd-alldone',
+  steps: 'hhd-steps',
+  caret: 'hhd-caret',
+  stepsHead: 'hhd-steps-head',
+  stepsIcon: 'hhd-steps-icon',
+  stepsName: 'hhd-steps-name',
+  stepsWhy: 'hhd-steps-why',
+  ol: 'hhd-ol',
+  li: 'hhd-li',
+  route: 'hhd-route',
+  term: 'hhd-term',
+  termWhen: 'hhd-term-when',
+  pasteFor: 'hhd-paste-for',
+  quietLine: 'hhd-quietline',
+  foot: 'hhd-foot',
+  close: 'hhd-close'
 }
 
 // Joins class names, skipping empty ones. Only K and T values go in.
@@ -17652,7 +16635,10 @@ const T = {
 
 // Every codicon the plugin names (sidebar row and page). scripts/check-hermes-classes.mjs checks
 // they exist in the codicon font Hermes ships; a test checks the code names no others.
-const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'play-circle']
+// dash-v1: and the Dashboard's (src/dash.js DASH_ICONS, design/dash-r7/notes.md's table), each Hermes's own.
+const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arrow-right', 'arrow-up', 'hubot', 'zap', 'extensions', 'cloud-download', 'robot', 'edit', 'comment', 'symbol-misc', 'watch', 'close', 'check']
+// dash-v1: the Tabler icons the Dashboard takes from Hermes through the SDK's `icons` (hhtech-dash-icons.md point 1)
+const TABLER_ICONS = ['Box', 'Brain', 'Lock']
 // Hermes's look has one primary button per screen (hhdesign fix 6); every other button of
 // ours is secondary or ghost. tests/page-render.test.mjs counts them per screen.
 
@@ -18642,379 +17628,1261 @@ function Character({ size = CHARACTER_PX, expression = 'resting', rising = false
   })
 }
 
-// ---- src/setup-tab.js ----
-// The "Your setup" tab: reads the person's Hermes through read-only calls, hands each answer to the
-// fixed rules in src/setup-cards.js, and draws the cards (build-v1.md section 8).
-// Reads (all read-only; never .env, auth.json or config.get):
-//   card 1  host.state.gateway                      card 4  profiles.describe { name } -> soul
-//   card 2  setup.runtime_check (+ setup.status)    card 5  host.skills.list(profile)
-//   card 3  llm.oneshot, only when Check is pressed card 6  host.toolsets.list(profile) -> memory
-//   card 7  nothing: the person runs the test in their own chat and presses a button
-// Reads start the first time the tab is opened, and again on "Check again". Nothing polls.
-
-// profiles.describe's own limit is Hermes's 30 s default; host.skills/toolsets get the same limit here.
-const READ_TIMEOUT_MS = 30000
-
-// The bot (profile) Hermes is running now; '' from Hermes means the default one.
-function runningBotName(profile) {
-  return typeof profile === 'string' && profile.trim() ? profile.trim() : 'default'
-}
-
-// What ctx.storage keeps for card 7: { [bot]: 'yes' | 'no' }. Anything else is dropped.
-function readRemember(value) {
-  const out = {}
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    for (const [k, v] of Object.entries(value)) if (v === 'yes' || v === 'no') out[k] = v
-  }
-  return out
-}
-
-const DOT = { works: K.dotWorks, fix: K.dotFix, cant: K.dotCant }
-
-function makeSetupCards(ctx, { busy = null } = {}) {
-  const request = (method, params, timeout) => host.request(method, params, timeout)
-  const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
-  // A read that rejects after `ms` if Hermes hasn't answered; the timer is the host's, so it is
-  // cleaned up with the plugin.
-  const limit = (promise, ms) =>
-    new Promise((resolve, reject) => {
-      const stop = ctx.setTimeout(() => reject(new Error(`no answer within ${ms / 1000} s`)), ms)
-      Promise.resolve(promise).then(
-        v => {
-          stop()
-          resolve(v)
+// ---- src/dash-data.js ----
+// Generated by scripts/build.mjs from content/dash-setup-list-v2.json (the Dashboard tab: hhcontent's 11 things and
+// the tab's other words), checked against content/dash-docs-lines-v0.23.0.json. Only the fields the code reads.
+// Edit the JSON, then build.
+const DASH_DATA = {
+  "items": [
+    {
+      "id": "install",
+      "counts": true,
+      "name": "Install Hermes",
+      "mark": "Install",
+      "why": "Hermes is the program itself. It works only while its computer is on.",
+      "steps": [
+        {
+          "text": "Go to hermes-agent.nousresearch.com and download Hermes for your computer."
         },
-        e => {
-          stop()
-          reject(e)
+        {
+          "text": "On a Mac: open the download and drag Hermes into Applications."
+        },
+        {
+          "text": "On Windows: open the download, and Windows installs it."
+        },
+        {
+          "text": "Open Hermes. Its first screens take you to your first message."
         }
+      ],
+      "terminal": {
+        "when": "Only for Linux, a server, or without the app. The docs give only these commands.",
+        "paste": [
+          {
+            "for": "Linux, Mac or Windows WSL2",
+            "text": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash"
+          },
+          {
+            "for": "Windows, in PowerShell",
+            "text": "iex (irm https://hermes-agent.nousresearch.com/install.ps1)"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 53
+        },
+        {
+          "file": "guides/team-telegram-assistant.md",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "id": "model",
+      "counts": true,
+      "name": "Pick a model",
+      "mark": "Model",
+      "why": "The model is the AI that does the thinking. Hermes needs one to answer.",
+      "steps": [
+        {
+          "text": "Open Settings (Ctrl and comma; Cmd and comma on a Mac). Click Providers."
+        },
+        {
+          "text": "Sign in to the AI company you use, or paste its key."
+        },
+        {
+          "text": "Go to Model, then Main model. Pick the company, then the model.",
+          "route": {
+            "label": "Open Model settings",
+            "to": "/settings?tab=config:model"
+          }
+        },
+        {
+          "text": "Click Apply under the model list."
+        },
+        {
+          "text": "Check: open a new chat. The model's name shows in the typing box, left of the microphone."
+        }
+      ],
+      "terminal": {
+        "when": "Same thing in a terminal.",
+        "paste": [
+          {
+            "for": "any computer",
+            "text": "hermes model"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "id": "first_chat",
+      "counts": false,
+      "name": "First chat",
+      "mark": "First chat",
+      "why": "Ask Hermes one small thing, to see that it works.",
+      "steps": [
+        {
+          "text": "Click New session at the top of the left list (or Ctrl+N; Cmd+N on a Mac).",
+          "route": {
+            "label": "New session",
+            "to": "new-chat"
+          }
+        },
+        {
+          "text": "Ask something small you can check yourself."
+        },
+        {
+          "text": "Check: Hermes answers, with no error."
+        },
+        {
+          "text": "Check: ask one more thing in the same chat. It carries on."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 182
+        }
+      ]
+    },
+    {
+      "id": "personality",
+      "counts": true,
+      "name": "Its personality",
+      "mark": "Personality",
+      "why": "A short text that tells your Hermes who it is and how to talk.",
+      "steps": [
+        {
+          "text": "Click the Bots tab at the top of the left list."
+        },
+        {
+          "text": "Right-click your main bot and choose Edit Profile."
+        },
+        {
+          "text": "Find SOUL.md, its personality text. Write a few lines: who it is and how it talks to you."
+        },
+        {
+          "text": "Save it."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "user-guide/features/personality.md",
+          "line": 9
+        },
+        {
+          "file": "user-guide/features/personality.md",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "id": "chat_apps",
+      "counts": true,
+      "name": "Chat apps",
+      "mark": "Chat apps",
+      "why": "Talk to your Hermes from Telegram or another chat app on your phone.",
+      "steps": [
+        {
+          "text": "Click Messaging in the left list.",
+          "route": {
+            "label": "Open Messaging",
+            "to": "/messaging"
+          }
+        },
+        {
+          "text": "On the Telegram card, click Create with QR."
+        },
+        {
+          "text": "Scan the code with Telegram on your phone."
+        },
+        {
+          "text": "Hermes makes the bot, lets only you in, and restarts by itself."
+        },
+        {
+          "text": "Check: send your new Telegram bot a message. It answers while this computer is on."
+        }
+      ],
+      "terminal": {
+        "when": "For Discord, Slack, WhatsApp and the others the docs give a terminal command.",
+        "paste": [
+          {
+            "for": "any computer",
+            "text": "hermes gateway setup"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "id": "tools_apps",
+      "counts": false,
+      "name": "Tools and apps",
+      "mark": "Tools and apps",
+      "why": "Actions Hermes can take, and outside apps like Gmail it can use.",
+      "steps": [
+        {
+          "text": "Click Capabilities in the left list, then Tools. Each group of actions has a switch."
+        },
+        {
+          "text": "Most are on already. Switch one off only if you never want it used."
+        },
+        {
+          "text": "Click Connectors to link an app such as Gmail."
+        },
+        {
+          "text": "With no Nous account, linking your first app makes a free one for you."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "user-guide/features/tools.md",
+          "line": 13
+        },
+        {
+          "file": "user-guide/features/tool-gateway.md",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "counts": false,
+      "name": "Skills",
+      "mark": "Skills",
+      "why": "Written know-how that teaches Hermes one task. Many come already installed.",
+      "steps": [
+        {
+          "text": "Click Capabilities in the left list, then Skills. Each skill has a switch."
+        },
+        {
+          "text": "To add one: Source, then Optional. Open the skill's card and click Install."
+        },
+        {
+          "text": "You don't need to add any first. Hermes picks a fitting skill by itself."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 295
+        },
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 297
+        }
+      ]
+    },
+    {
+      "id": "memory",
+      "counts": false,
+      "name": "Memory",
+      "mark": "Memory",
+      "why": "Short notes Hermes keeps about you, so it remembers between chats.",
+      "steps": [
+        {
+          "text": "Nothing to switch on. Memory is on from the start."
+        },
+        {
+          "text": "In a chat, say what to keep, like: Remember that I run a tennis club."
+        },
+        {
+          "text": "Check: start a new chat and ask what it remembers about you."
+        },
+        {
+          "text": "To see everything it keeps, type /journey in a chat."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "user-guide/features/memory.md",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "id": "scheduled_job",
+      "counts": true,
+      "name": "Scheduled jobs",
+      "mark": "Scheduled jobs",
+      "why": "Hermes does a job for you at set times, like every morning.",
+      "steps": [
+        {
+          "text": "In a chat, ask in plain words, like: Every morning at 9, send me a short news summary."
+        },
+        {
+          "text": "Hermes makes the job for you."
+        },
+        {
+          "text": "Check: click Scheduled jobs in the left list. Your job is there.",
+          "route": {
+            "label": "Open Scheduled jobs",
+            "to": "/cron"
+          }
+        },
+        {
+          "text": "There you can pause, change or delete it."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "getting-started/learning-path.md",
+          "line": 80
+        },
+        {
+          "file": "getting-started/quickstart.md",
+          "line": 273
+        }
+      ]
+    },
+    {
+      "id": "second_bot",
+      "counts": true,
+      "name": "A second bot",
+      "mark": "Second bot",
+      "why": "A bot is one separate Hermes, with its own name, memory and skills.",
+      "steps": [
+        {
+          "text": "Click the Bots tab at the top of the left list."
+        },
+        {
+          "text": "Press +, then New bot."
+        },
+        {
+          "text": "Fill in its Name, Title and Description."
+        },
+        {
+          "text": "Check: the new bot says hello in its own chat."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "user-guide/bot-mode.md",
+          "line": 8
+        },
+        {
+          "file": "user-guide/bot-mode.md",
+          "line": 13
+        },
+        {
+          "file": "getting-started/learning-path.md",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "id": "safety",
+      "counts": false,
+      "name": "Safety",
+      "mark": "Safety",
+      "why": "Hermes asks you first before it runs anything risky on your computer.",
+      "steps": [
+        {
+          "text": "Nothing to switch on. Asking first is on from the start."
+        },
+        {
+          "text": "When Hermes asks, read what it wants to run. Then say yes or no."
+        },
+        {
+          "text": "Keep YOLO off. It is a switch in the bar under the chat that stops the asking."
+        },
+        {
+          "text": "In a chat app, only people on its allowed list can talk to it."
+        },
+        {
+          "text": "These choices live in Settings, Safety."
+        }
+      ],
+      "terminal": null,
+      "sources": [
+        {
+          "file": "user-guide/security.md",
+          "line": 26
+        },
+        {
+          "file": "getting-started/learning-path.md",
+          "line": 163
+        }
+      ]
+    }
+  ],
+  "total": 6,
+  "words": {
+    "tabs": {
+      "dashboard": "Dashboard",
+      "learn": "Learn",
+      "my_setup": "My setup"
+    },
+    "tabListLabel": "Helper",
+    "notBuilt": "Not built yet.",
+    "stats": {
+      "bots": "bots",
+      "skills": "skills",
+      "plugins": "plugins"
+    },
+    "activity": {
+      "title": "Activity",
+      "last_used_today": "Last used today",
+      "last_used_one": "Last used yesterday",
+      "last_used_n": "Last used {n} days ago",
+      "less": "Less",
+      "more": "More",
+      "months": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ],
+      "days": [
+        "",
+        "Mon",
+        "",
+        "Wed",
+        "",
+        "Fri",
+        ""
+      ]
+    },
+    "setup": {
+      "title": "Set up",
+      "count": "{n} of {total}",
+      "you_are_here": "You are here",
+      "next": "Next",
+      "open": "Open",
+      "all_done": "Everything Helper can see is set up.",
+      "not_counted": "Helper can't see this one, so it isn't counted.",
+      "close": "Close",
+      "copy": "Copy",
+      "source": "{file}, line {line}",
+      "state_done": "done",
+      "state_not_done": "not done yet",
+      "state_not_counted": "not counted"
+    }
+  }
+}
+
+// ---- src/dash-rules.js ----
+// The Dashboard tab's fixed rules (dash-v1). Pure code, no React, no Hermes: src/dash.js reads Hermes and hands
+// the answers here. No AI anywhere. What each rule reads (content/dash-setup-list-v2.json, docs/answers/
+// hhtech-dash-reads.md and -reads2.md, "For builder:"):
+//   install        always done: this page runs only inside an installed Hermes
+//   model          setup.runtime_check { profile: main bot } says ok: true (Hermes's own free plan counts)
+//   personality    profiles.describe { name: main bot }: soul is not empty and not one of Hermes's starter texts
+//   chat_apps      host.status(): gateway_platforms names at least one chat app (switched on, with its key)
+//   scheduled_job  cron.manage { action: 'list', profile: main bot, include_disabled: true }: at least one job
+//   second_bot     profiles.list: two or more bots
+// A read that failed or has not come back is "not known" (null): never shown as done, never "You are here".
+
+/* ---------- Hermes's starter personality texts (hermes_cli/default_soul.py, Hermes v0.23.0) ---------- */
+// DEFAULT_SOUL_MD and the four _LEGACY_TEMPLATE_SOULS, copied as hhtech copied them into its test page
+// (hhtech-dash-reads.md 1.5); tests/dash-rules.test.mjs compares them with tests/fixtures/hermes-default-souls.json.
+const STARTER_HEAD =
+  "# Hermes Agent Persona\n\n<!--\nThis file defines the agent's personality and tone.\nThe agent will embody whatever you write here.\nEdit this to customize how Hermes communicates with you.\n\n"
+const STARTER_TAIL = 'This file is loaded fresh each message -- no restart needed.\nDelete the contents (or this file) to use the default personality.\n-->'
+const STARTER_NOW =
+  'You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply to the weight of the ask \u2014 a one-line question gets a one-line answer, and finished work gets a short report of what changed, what\'s verified, and what\'s left, never a replay of the process. No filler ("Great question," "I\'d be happy to"), no restating the request back, no re-summarizing what you already said, no narrating tool calls the user can see. Plain claims over adjectives; when unsure, say so plainly. Agree because it\'s right, not because the user said it. Depth is earned \u2014 give it when the user asks for detail, teaches, or the stakes demand it, not by default.'
+const STARTER_SOULS = [
+  STARTER_NOW,
+  STARTER_HEAD +
+    'Examples:\n  - "You are a warm, playful assistant who uses kaomoji occasionally."\n  - "You are a concise technical expert. No fluff, just facts."\n  - "You speak like a friendly coworker who happens to know everything."\n\n' +
+    STARTER_TAIL,
+  STARTER_HEAD + STARTER_TAIL,
+  'You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and investigations.',
+  STARTER_NOW.replaceAll('\u2014', '--')
+]
+// Hermes's own normalising (_normalize_soul): one kind of line end, no leading BOM, trimmed.
+const soulNormal = text => String(text).replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/^\ufeff/, '').trim()
+const STARTER_SET = new Set(STARTER_SOULS.map(soulNormal))
+const isStarterSoul = text => STARTER_SET.has(soulNormal(text))
+
+/* ---------- which bot ---------- */
+// The bots from profiles.list ({ profiles: [{ name, is_default }] }), or null when the read gave none.
+function botRows(value) {
+  const list = value && Array.isArray(value.profiles) ? value.profiles : null
+  if (!list) return null
+  const rows = list.filter(p => p && typeof p.name === 'string' && p.name.trim())
+  return rows.length ? rows : null
+}
+// The main bot: the one Hermes marks as default; else the one called default; else the first.
+function mainBotName(rows) {
+  if (!rows || !rows.length) return null
+  const marked = rows.find(p => p.is_default === true) || rows.find(p => p.name === 'default') || rows[0]
+  return marked.name
+}
+// The bot the app has open (host.state.profile; '' from Hermes means the default one).
+const openBotName = profile => (typeof profile === 'string' && profile.trim() ? profile.trim() : 'default')
+
+/* ---------- the six rules ---------- */
+// reads: { bots, model, soul, status, cron }, each { ok: true, value } | { ok: false } | undefined (still waiting).
+// Returns { install, model, personality, chat_apps, scheduled_job, second_bot }: true, false, or null (not known).
+function doneFlags(reads) {
+  const got = r => (r && r.ok ? r.value : undefined)
+  const known = r => !!(r && r.ok)
+  const rows = known(reads.bots) ? botRows(got(reads.bots)) : null
+  const soul = known(reads.soul) && got(reads.soul) && typeof got(reads.soul).soul === 'string' ? got(reads.soul).soul : null
+  const platforms = known(reads.status) && got(reads.status) ? got(reads.status).gateway_platforms : undefined
+  const cron = known(reads.cron) ? got(reads.cron) : null
+  const jobs = cron && typeof cron === 'object' ? (Number.isInteger(cron.count) ? cron.count : Array.isArray(cron.jobs) ? cron.jobs.length : null) : null
+  return {
+    install: true,
+    model: known(reads.model) && got(reads.model) && typeof got(reads.model) === 'object' ? got(reads.model).ok === true : null,
+    personality: known(reads.soul) ? (soul === null ? null : soulNormal(soul) !== '' && !isStarterSoul(soul)) : null,
+    chat_apps: known(reads.status) && got(reads.status) && typeof got(reads.status) === 'object' ? !!platforms && typeof platforms === 'object' && Object.keys(platforms).length > 0 : null,
+    scheduled_job: jobs === null ? null : jobs >= 1,
+    second_bot: rows ? rows.length >= 2 : null
+  }
+}
+
+/* ---------- the path ---------- */
+// Each of the 11 stops: 'done' (seen done: filled), 'todo' (seen, not done), 'here' (the first seen stop not done:
+// "You are here"), 'unknown' (seen, but its read failed or is still out: drawn as not done, never "You are here"),
+// or 'quiet' (Helper cannot see it: the smaller mark that never fills). The line itself has no state.
+function pathStates(flags, items = DASH_DATA.items) {
+  const states = items.map(it => {
+    if (!it.counts) return 'quiet'
+    const f = flags[it.id]
+    return f === true ? 'done' : f === false ? 'todo' : 'unknown'
+  })
+  const here = states.indexOf('todo')
+  if (here >= 0) states[here] = 'here'
+  const counted = items.filter(it => it.counts)
+  const done = counted.filter(it => flags[it.id] === true).length
+  return { states, here, done, total: counted.length, allDone: done === counted.length }
+}
+
+/* ---------- Activity: the days the open bot was used ---------- */
+// Rows of host.listPersistedSessions that are Hermes's own work, left out: scheduled jobs (cron), the task board
+// (kanban), tool and helper-agent runs, and 'local', the source Hermes's own first-run chat ("Getting started") came
+// back with (hhtech-dash-reads2.md section 3). Chats with no message are left out too.
+const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent', 'local']
+// A time from a row as a Date: seconds (Hermes writes seconds); a number above 1e11 is read as milliseconds.
+const dashTime = v => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? new Date(v > 1e11 ? v : v * 1000) : null)
+// The person's own calendar day of a Date (their computer's clock), as 'YYYY-MM-DD'.
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+// The days with a chat, each with how many chats touched it: a chat marks the day it started and the day it was
+// last used (rows have no per-message dates, so the days between are not marked).
+function chatDays(sessions) {
+  const days = new Map()
+  for (const s of Array.isArray(sessions) ? sessions : []) {
+    if (!s || typeof s !== 'object') continue
+    if (NOT_THE_PERSON.includes(String(s.source || '').toLowerCase())) continue
+    if (!(typeof s.message_count === 'number' && s.message_count > 0)) continue
+    const first = dashTime(s.started_at)
+    const last = dashTime(s.last_active) || dashTime(s.last_activity_at) || first
+    const keys = new Set([first, last].filter(Boolean).map(dayKey))
+    for (const k of keys) days.set(k, (days.get(k) || 0) + 1)
+  }
+  return days
+}
+
+// How bright a day's square is: no chat, 1, 2, 3 or more.
+const dayLevel = n => (n >= 3 ? 3 : n > 0 ? n : 0)
+
+// The grid: `weeks` columns, Sunday on top, the last column holds today; days after today are not drawn.
+// months: a month's name over the first column whose Sunday is in it (not over the first or the last column).
+function activityGrid(days, today, weeks) {
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - (weeks - 1) * 7)
+  const cells = []
+  const months = []
+  let prev = -1
+  for (let w = 0; w < weeks; w++) {
+    const sunday = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7)
+    if (sunday.getMonth() !== prev && w > 0 && w < weeks - 1) months.push({ week: w, month: sunday.getMonth() })
+    prev = sunday.getMonth()
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + w * 7 + d)
+      if (day > today && dayKey(day) !== dayKey(today)) continue
+      const key = dayKey(day)
+      cells.push({ week: w, day: d, key, level: dayLevel(days.get(key) || 0), today: key === dayKey(today) })
+    }
+  }
+  return { cells, months }
+}
+
+// "Last used": whole calendar days between the newest day with a chat and today. null = no chat at all.
+function daysSinceUsed(days, today) {
+  if (!days.size) return null
+  const newest = [...days.keys()].sort().pop()
+  const [y, m, d] = newest.split('-').map(Number)
+  const then = new Date(y, m - 1, d)
+  const now = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  return Math.max(0, Math.round((now - then) / 86400000))
+}
+
+function lastUsedLine(n, words = DASH_DATA.words.activity) {
+  if (n === null) return null
+  if (n === 0) return words.last_used_today
+  if (n === 1) return words.last_used_one
+  return words.last_used_n.replace('{n}', String(n))
+}
+
+// How many weeks fit a width: squares of `cell` px with `gap` px between, after the room the day names take.
+const weeksThatFit = (width, cell, gap, maxWeeks = 52) => Math.max(1, Math.min(maxWeeks, Math.floor((width + gap) / (cell + gap))))
+
+/* ---------- the top box ---------- */
+// Skills: the different skill names across all bots (one read per bot, host.skills.list). One failed read: not
+// shown (a part would be too low).
+function distinctSkills(perBot) {
+  if (!Array.isArray(perBot) || !perBot.length) return null
+  const names = new Set()
+  for (const r of perBot) {
+    if (!r || !r.ok || !Array.isArray(r.value)) return null
+    for (const s of r.value) if (s && typeof s.name === 'string' && s.name.trim()) names.add(s.name.trim())
+  }
+  return names.size
+}
+// Plugins: what plugins.manage list gives as installed by the person (user_count) for the open bot, plus 1 for
+// Helper itself (Helper is never in that list: hhtech-dash-icons.md point 2). A failed read: not shown, never a
+// bare 1.
+function pluginCount(read) {
+  if (!read || !read.ok || !read.value || typeof read.value !== 'object') return null
+  const n = read.value.user_count
+  return Number.isInteger(n) && n >= 0 ? n + 1 : null
+}
+
+// ---- src/dash-css.js ----
+// Generated by scripts/build.mjs from src/dash.css (the style sheet of the Dashboard tab).
+// Edit the CSS, then build; tests/dash-css.test.mjs checks it.
+const DASH_CSS = ".hhd-main{display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}\n.hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}\n.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:12px;padding:18px 22px}\n.hhd-compact .hhd-card{padding:14px 16px}\nhtml:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}\n.hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}\n.hhd-compact .hhd-stats{gap:8px}\n.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:12px;padding:14px 16px}\n.hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}\nhtml:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}\n.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}\n.hhd-compact .hhd-tile-icon{width:32px;height:32px}\n.hhd-tile-words{display:flex;flex-direction:column;min-width:0}\n.hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}\n.hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}\n.hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:7px;background:var(--ui-bg-tertiary)}\n.hhd-compact .hhd-wait{margin:4px 0}\n.hhd-act{flex-direction:row;align-items:stretch;gap:24px;padding:12px 22px}\n.hhd-compact .hhd-act{gap:16px;padding:10px 16px}\n.hhd-act-words{flex:none;display:flex;flex-direction:column;gap:1px;min-width:0}\n.hhd-act-words .hhd-title{margin-bottom:3px}\n.hhd-lu{font-size:12px;line-height:17px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-key{margin-top:auto;display:inline-flex;align-items:center;gap:3px;font-size:10.5px;line-height:14px;color:var(--ui-text-tertiary);white-space:nowrap}\n.hhd-key-sq{width:8px;height:8px;border-radius:2px}\n.hhd-key-first{margin-left:4px}\n.hhd-key-last{margin-right:4px}\n.hhd-gridwrap{flex:1;min-width:0;display:flex;align-items:flex-end;justify-content:flex-end;gap:6px}\n.hhd-daynames{flex:none;display:grid;grid-template-rows:repeat(7,8px);gap:2px;width:22px;font-size:9.5px;line-height:8px;color:var(--ui-text-tertiary)}\n.hhd-months{position:relative;height:13px;font-size:10px;line-height:12px;color:var(--ui-text-tertiary)}\n.hhd-month{position:absolute;top:0;white-space:nowrap}\n.hhd-grid{display:grid;grid-template-rows:repeat(7,8px);grid-auto-columns:8px;gap:2px}\n.hhd-sq{width:8px;height:8px;border-radius:2px}\n.hhd-l0{background:var(--ui-bg-tertiary)}\n.hhd-l1{background:color-mix(in srgb,var(--ui-accent) 35%,transparent)}\n.hhd-l2{background:color-mix(in srgb,var(--ui-accent) 65%,transparent)}\n.hhd-l3{background:var(--ui-accent)}\n.hhd-today{outline:1px solid var(--ui-text-secondary);outline-offset:1px}\n.hhd-head{display:flex;align-items:baseline;gap:12px;min-width:0}\n.hhd-count{font-size:13px;color:var(--ui-text-secondary);white-space:nowrap}\n.hhd-count-n{font-size:15px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-road{position:relative;margin:4px 0 0;width:100%}\n.hhd-compact .hhd-road{margin-top:2px}\n.hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}\n.hhd-line{fill:none;stroke:var(--ui-stroke-tertiary);stroke-width:1.5;stroke-linecap:round}\n.hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}\n.hhd-stop:focus-visible{outline:none}\n.hhd-dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;box-sizing:border-box}\n.hhd-compact .hhd-dot{width:32px;height:32px}\n.hhd-done .hhd-dot{background:var(--ui-accent);color:var(--background)}\n.hhd-todo .hhd-dot{background:var(--ui-bg-tertiary);color:var(--ui-text-tertiary)}\n.hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}\n.hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}\n.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-stroke-tertiary);color:var(--ui-text-quaternary)}\n.hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}\n.hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}\n.hhd-name{position:absolute;left:50%;transform:translateX(-50%);font-size:12px;line-height:16px;color:var(--ui-text-tertiary);text-align:center;white-space:nowrap}\n.hhd-done .hhd-name{color:var(--ui-text-secondary)}\n.hhd-here .hhd-name{color:var(--ui-text-primary);font-weight:600}\n.hhd-quiet .hhd-name{color:var(--ui-text-quaternary)}\n.hhd-up .hhd-name{bottom:calc(100% + 6px)}\n.hhd-down .hhd-name{top:calc(100% + 6px)}\n.hhd-here.hhd-up .hhd-name{bottom:calc(100% + 9px)}\n.hhd-here.hhd-down .hhd-name{top:calc(100% + 9px)}\n.hhd-you{position:absolute;left:50%;transform:translateX(-50%);font-size:11px;line-height:15px;font-weight:600;letter-spacing:.2px;color:var(--ui-accent);white-space:nowrap}\n.hhd-up .hhd-you{bottom:calc(100% + 28px)}\n.hhd-down .hhd-you{top:calc(100% + 28px)}\n.hhd-next{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid var(--ui-stroke-tertiary);min-width:0}\n.hhd-compact .hhd-next{margin-top:8px;padding-top:10px}\n.hhd-next-words{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}\n.hhd-next-line{display:flex;align-items:baseline;gap:10px;min-width:0}\n.hhd-next-label{font-size:11px;line-height:14px;letter-spacing:.8px;text-transform:uppercase;color:var(--ui-accent);font-weight:600}\n.hhd-next-name{font-size:13px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hhd-alldone{color:var(--ui-accent)}\n.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:12px;background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}\n.hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}\n.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px}\n.hhd-steps-head{display:flex;align-items:center;gap:10px;min-width:0}\n.hhd-steps-icon{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--ui-accent) 18%,transparent);color:var(--ui-accent)}\n.hhd-steps-name{font-size:14px;font-weight:600;color:var(--ui-text-primary)}\n.hhd-steps-why{font-size:12.5px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}\n.hhd-compact .hhd-ol{line-height:19px}\n.hhd-ol li::marker{color:var(--ui-accent);font-weight:600}\n.hhd-li{margin:0 0 2px}\n.hhd-route{margin:4px 0 2px}\n.hhd-term{display:flex;flex-direction:column;gap:6px;min-width:0}\n.hhd-term-when{font-size:12px;line-height:17px;color:var(--ui-text-secondary)}\n.hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-quietline{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}\n.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}\n.hhd-close{position:absolute;right:10px;top:10px}"
+
+// ---- src/dash.js ----
+// The Dashboard tab (dash-v1, as Pēteris picked it: design/dash-r5 way (ii), r6 Activity, r7 tiles, icons and line).
+// Three parts, top to bottom: the top box (three numbers for the whole Hermes), Activity (the open bot's days with a
+// chat, GitHub's grid), Set up (the path of 11 stops). Every word comes from content/dash-setup-list-v2.json
+// (src/dash-data.js); every rule from src/dash-rules.js; every class from the K and D tables (src/look.js).
+// No AI call, no warning colours, nothing stored: the reads run each time the tab is put on screen.
+// Reads, all read-only, always naming the bot (hhtech-dash-reads.md and -reads2.md, "For builder:"):
+//   first   profiles.list (the bots; the main bot is the one Hermes marks as default)
+//   then    setup.runtime_check, profiles.describe, cron.manage list for the main bot; host.status();
+//           host.listPersistedSessions for the bot the app has open (not in the SDK docs: feature-checked)
+//   then    host.skills.list for each bot (the skills number)
+//   last    plugins.manage list for the open bot (slow: up to a second)
+
+// Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
+// codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
+// shows that icon for the same thing (apps/desktop/src/..., v0.23.0); nearest: Hermes has no icon for this thing.
+const DASH_ICONS = {
+  bots: { codicon: 'hubot', hermes: 'plugins/hermes-bots/roster-pane-toolbar.tsx:139' },
+  skills: { codicon: 'zap', hermes: 'components/assistant-ui/reference-kinds.ts:107' },
+  plugins: { codicon: 'extensions', hermes: 'app/settings/plugin-settings.tsx:67' },
+  install: { codicon: 'cloud-download', hermes: 'components/update-status.tsx:389', nearest: true },
+  model: { tabler: 'Box', hermes: 'app/settings/constants.ts:714' },
+  first_chat: { codicon: 'robot', hermes: 'app/chat/sidebar/index.tsx:216' },
+  personality: { codicon: 'edit', hermes: 'app/chat/sidebar/profile-switcher.tsx:1374' },
+  chat_apps: { codicon: 'comment', hermes: 'app/chat/sidebar/index.tsx:230' },
+  tools_apps: { codicon: 'symbol-misc', hermes: 'app/chat/sidebar/index.tsx:223' },
+  skills_stop: { codicon: 'zap', hermes: 'components/assistant-ui/reference-kinds.ts:107' },
+  memory: { tabler: 'Brain', hermes: 'app/settings/constants.ts:776' },
+  scheduled_job: { codicon: 'watch', hermes: 'app/chat/sidebar/index.tsx:247' },
+  second_bot: { codicon: 'hubot', hermes: 'plugins/hermes-bots/roster-pane-toolbar.tsx:139' },
+  safety: { tabler: 'Lock', hermes: 'app/settings/constants.ts:756' },
+  // the page's own small controls: the close mark on an opened stop, the tick of "everything is set up"
+  close: { codicon: 'close', hermes: 'components/ui/sheet.tsx:76' },
+  check: { codicon: 'check', hermes: 'components/ui/select.tsx:113' }
+}
+const stopIcon = id => DASH_ICONS[id === 'skills' ? 'skills_stop' : id]
+
+// Icon sizes (px) at the places Hermes draws them: 16 in its sidebar and Settings rows, 14 in Settings' sub-rows
+// (hhtech-dash-icons.md point 1); 20 on the tiles (hhdesign's r7 size).
+const ICON_CLASS = { 14: K.icon14, 16: K.icon16, 20: K.icon20 }
+function DashIcon({ icon, size }) {
+  if (icon.tabler) {
+    const Tabler = icons && icons[icon.tabler]
+    return Tabler ? jsx(Tabler, { className: ICON_CLASS[size], 'aria-hidden': true }) : null
+  }
+  return jsx(Codicon, { name: icon.codicon, size, 'aria-hidden': true })
+}
+
+// A read that gives up after `ms` (the host's own timer, cleaned up with the plugin). A host door that throws
+// instead of rejecting counts as a failed read. Every read ends as { ok: true, value } or { ok: false }.
+function makeReader(ctx) {
+  return (fn, ms) =>
+    new Promise(resolve => {
+      let done = false
+      const end = r => {
+        if (done) return
+        done = true
+        stop()
+        resolve(r)
+      }
+      const stop = ctx.setTimeout(() => end({ ok: false }), ms)
+      Promise.resolve()
+        .then(fn)
+        .then(
+          value => end({ ok: true, value }),
+          () => end({ ok: false })
+        )
+    })
+}
+const DASH_READ_MS = 30000
+const DASH_SLOW_READ_MS = 60000
+
+// The element's own width, from a ResizeObserver on our own markup (0 until measured).
+function useDashWidth() {
+  const [width, setWidth] = useState(0)
+  const holder = useRef(null)
+  if (!holder.current) {
+    const box = { observer: null }
+    box.ref = node => {
+      if (box.observer) box.observer.disconnect()
+      box.observer = null
+      if (!node || typeof ResizeObserver !== 'function') return
+      box.observer = new ResizeObserver(entries => {
+        const e = entries[entries.length - 1]
+        if (e) setWidth(old => (old === Math.round(e.contentRect.width) ? old : Math.round(e.contentRect.width)))
+      })
+      box.observer.observe(node)
+    }
+    holder.current = box
+  }
+  return [width, holder.current.ref]
+}
+
+// The path's shape (r5/r7 build.js setup()): 11 points across the road, high and low in turn, joined by soft curves.
+function roadShape(width, compact, here, count = DASH_DATA.items.length) {
+  const A = compact ? 16 : 20
+  const NAMEH = 22
+  const YOUH = compact ? 18 : 19
+  const RB = compact ? 22 : 26
+  const pad = compact ? 24 : 30
+  const yu = here >= 0 && here % 2 === 0
+  const yd = here >= 0 && here % 2 === 1
+  const top = RB + NAMEH + (yu ? YOUH : 0) + 2
+  const height = top + 2 * A + RB + NAMEH + (yd ? YOUH : 0) + 2
+  const points = Array.from({ length: count }, (_, i) => [pad + (i * (width - 2 * pad)) / (count - 1), top + (i % 2 ? 2 * A : 0)])
+  const segments = points.slice(1).map((b, i) => {
+    const a = points[i]
+    const dx = (b[0] - a[0]) / 2
+    return `M ${a[0]} ${a[1]} C ${a[0] + dx} ${a[1]} ${b[0] - dx} ${b[1]} ${b[0]} ${b[1]}`
+  })
+  return { points, segments, height }
+}
+// Before the road is measured (and in the tests, which have no layout): this width.
+const ROAD_WIDTH_UNMEASURED = 560
+// The left side's width under which the tab takes hhdesign's narrow sizes (r5-r7: 720 px wide side at 1180, 580 at 940).
+const DASH_COMPACT_UNDER_PX = 640
+// Activity's squares: 8 px, 2 px apart; until the grid is measured, 16 weeks (the job's number).
+const SQ = 8
+const SQ_GAP = 2
+const WEEKS_UNMEASURED = 16
+
+const fill = (s, map) => s.replace(/\{(\w+)\}/g, (m, k) => (k in map ? String(map[k]) : m))
+
+function makeDashboard(ctx) {
+  const read = makeReader(ctx)
+  const request = (method, params, ms = DASH_READ_MS) => read(() => host.request(method, params, ms), ms)
+
+  // Opens a docs page in the person's browser (the SDK's door to the OS; only the official docs).
+  const DOCS_BASE = 'https://hermes-agent.nousresearch.com/docs/'
+  const docsHref = file => DOCS_BASE + String(file).replace(/\.(md|mdx)$/, '').replace(/(^|\/)index$/, '$1')
+  const openDocs = url => {
+    if (typeof url !== 'string' || !url.startsWith(DOCS_BASE)) return
+    try {
+      const p = ctx.os && typeof ctx.os.openExternal === 'function' ? ctx.os.openExternal(url) : null
+      if (p && typeof p.catch === 'function') p.catch(() => {})
+    } catch {}
+  }
+  // Opens one of Hermes's own places (a route hhtech ran); a missing door is ignored. Nothing is changed.
+  const goTo = to => {
+    try {
+      if (to === 'new-chat') host.newChat()
+      else host.navigate(to)
+    } catch {}
+  }
+
+  // The tab's state. The page holds it (src/page.js calls useDashboard on every draw, as it held the first build's
+  // tabs), so it lives while the page is on screen. active: the Dashboard is the open tab. Each time it is opened
+  // (and when the app opens another bot), everything is read again from the start: nothing is kept between visits.
+  function useDashboard({ active }) {
+    const openBot = openBotName(useValue(host.state.profile))
+    const [reads, setReads] = useState({})
+    useEffect(() => {
+      if (!active) return undefined
+      let alive = true
+      setReads({})
+      const put = patch => alive && setReads(r => ({ ...r, ...patch }))
+      // A host door that is missing or throws when looked at counts as missing (not every Hermes has every door).
+      const door = get => {
+        try {
+          const fn = get()
+          return typeof fn === 'function' ? fn : null
+        } catch {
+          return null
+        }
+      }
+      ;(async () => {
+        const bots = await read(() => host.profiles.list(), DASH_READ_MS)
+        if (!alive) return
+        const rows = bots.ok ? botRows(bots.value) : null
+        const main = mainBotName(rows) || openBot
+        put({ bots: rows ? bots : { ok: false } })
+        const listSessions = door(() => host.listPersistedSessions)
+        const getStatus = door(() => host.status)
+        const sessions = listSessions ? read(() => listSessions(null, { profile: openBot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
+        const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
+        const [model, soul, cron, st, ses] = await Promise.all([
+          request('setup.runtime_check', { profile: main }),
+          request('profiles.describe', { name: main }),
+          request('cron.manage', { action: 'list', profile: main, include_disabled: true }),
+          status,
+          sessions
+        ])
+        if (!alive) return
+        put({ model, soul, cron, status: st, sessions: ses, pathRead: true })
+        const skills = rows ? await Promise.all(rows.map(b => read(() => host.skills.list(b.name), DASH_READ_MS))) : null
+        if (!alive) return
+        put({ skills: skills || [{ ok: false }] })
+        const plugins = await request('plugins.manage', { action: 'list', profile: openBot }, DASH_SLOW_READ_MS)
+        put({ plugins })
+      })().catch(() => {})
+      return () => {
+        alive = false
+      }
+    }, [active, openBot])
+    const [open, setOpen] = useState(null)
+    const [roadWidth, roadRef] = useDashWidth()
+    const [gridWidth, gridRef] = useDashWidth()
+    const stepsBox = useRef(null)
+    // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
+    const [reveal, setReveal] = useState(false)
+    useEffect(() => {
+      if (!reveal) return
+      setReveal(false)
+      const el = stepsBox.current
+      if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' })
+    }, [reveal])
+    const toggle = id => {
+      setOpen(o => (o === id ? null : id))
+      setReveal(true)
+    }
+    return { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox }
+  }
+
+  // The tab, drawn from that state. compact: the left side is narrow (hhdesign's 940 px sizes).
+  function renderDashboard(state, { compact = false } = {}) {
+    const W = DASH_DATA.words
+    const { reads, open, setOpen, toggle, roadWidth, roadRef, gridWidth, gridRef, stepsBox } = state
+
+    /* ---------- the top box: three tiles ---------- */
+    const rows = reads.bots && reads.bots.ok ? botRows(reads.bots.value) : null
+    const numbers = {
+      // undefined = still reading (the waiting block); null = the read failed (no number at all)
+      bots: reads.bots ? (rows ? rows.length : null) : undefined,
+      skills: reads.skills ? distinctSkills(reads.skills) : undefined,
+      plugins: reads.plugins ? pluginCount(reads.plugins) : undefined
+    }
+    const tile = key =>
+      jsxs(
+        'div',
+        {
+          className: D.tile,
+          'data-hh': `tile-${key}`,
+          children: [
+            jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'),
+            jsxs(
+              'span',
+              {
+                className: D.tileWords,
+                children: [
+                  numbers[key] === undefined
+                    ? jsx('i', { className: D.wait, 'data-hh': 'wait', 'aria-hidden': true }, 'n')
+                    : numbers[key] === null
+                      ? null
+                      : jsx('b', { className: D.tileNum, 'data-hh': 'number', children: String(numbers[key]) }, 'n'),
+                  jsx('span', { className: D.tileLabel, children: W.stats[key] }, 'l')
+                ]
+              },
+              'w'
+            )
+          ]
+        },
+        key
+      )
+    const stats = jsx('section', { className: D.stats, 'data-hh': 'stats', children: ['bots', 'skills', 'plugins'].map(tile) }, 'stats')
+
+    /* ---------- Activity: shown only when the read worked ---------- */
+    let activity = null
+    const ses = reads.sessions
+    if (ses && ses.ok && ses.value && Array.isArray(ses.value.sessions)) {
+      const today = new Date()
+      const days = chatDays(ses.value.sessions)
+      const weeks = gridWidth ? weeksThatFit(gridWidth - 22 - 6, SQ, SQ_GAP) : WEEKS_UNMEASURED
+      const grid = activityGrid(days, today, weeks)
+      const last = lastUsedLine(daysSinceUsed(days, today))
+      const level = n => [D.l0, D.l1, D.l2, D.l3][n]
+      activity = jsxs(
+        'section',
+        {
+          className: cx(D.card, D.act),
+          'data-hh': 'activity',
+          children: [
+            jsxs(
+              'div',
+              {
+                className: D.actWords,
+                children: [
+                  jsx('span', { className: D.title, children: W.activity.title }, 't'),
+                  last ? jsx('span', { className: D.lastUsed, 'data-hh': 'last-used', children: last }, 'lu') : null,
+                  jsxs(
+                    'span',
+                    {
+                      className: D.key,
+                      'aria-hidden': true,
+                      children: [
+                        W.activity.less,
+                        ...[0, 1, 2, 3].map(n => jsx('i', { className: cx(D.keySq, level(n), n === 0 && D.keyFirst, n === 3 && D.keyLast) }, n)),
+                        W.activity.more
+                      ]
+                    },
+                    'k'
+                  )
+                ]
+              },
+              'w'
+            ),
+            jsxs(
+              'div',
+              {
+                className: D.gridWrap,
+                ref: gridRef,
+                'aria-hidden': true,
+                children: [
+                  jsx('div', { className: D.dayNames, children: W.activity.days.map((d, i) => jsx('span', { children: d }, i)) }, 'd'),
+                  jsxs(
+                    'div',
+                    {
+                      children: [
+                        jsx('div', { className: D.months, children: grid.months.map(m => jsx('span', { className: D.month, style: { left: `${m.week * (SQ + SQ_GAP)}px` }, children: W.activity.months[m.month] }, m.week)) }, 'm'),
+                        jsx(
+                          'div',
+                          {
+                            className: D.grid,
+                            'data-hh': 'grid',
+                            'data-weeks': weeks,
+                            children: grid.cells.map(c =>
+                              jsx('i', { className: cx(D.sq, level(c.level), c.today && D.today), 'data-day': c.key, 'data-level': c.level, style: { gridColumn: c.week + 1, gridRow: c.day + 1 } }, c.key)
+                            )
+                          },
+                          'g'
+                        )
+                      ]
+                    },
+                    'mg'
+                  )
+                ]
+              },
+              'gw'
+            )
+          ]
+        },
+        'activity'
+      )
+    }
+
+    /* ---------- Set up: the path ---------- */
+    const items = DASH_DATA.items
+    const ready = !!reads.pathRead
+    const flags = ready ? doneFlags(reads) : { install: true }
+    const path = pathStates(ready ? flags : {}, items)
+    // before the path's reads are back: every counted stop waits as not done, nobody is "here", no count
+    const states = ready ? path.states : items.map(it => (it.counts ? 'todo' : 'quiet'))
+    const here = ready ? path.here : -1
+    const width = roadWidth || ROAD_WIDTH_UNMEASURED
+    const shape = roadShape(width, compact, here)
+    const stateClass = { done: D.done, todo: D.todo, unknown: D.todo, here: D.here, quiet: D.quiet }
+    const stateWord = { done: W.setup.state_done, todo: W.setup.state_not_done, unknown: W.setup.state_not_done, here: W.setup.you_are_here, quiet: W.setup.state_not_counted }
+    const stops = items.map((it, i) => {
+      const s = states[i]
+      const size = s === 'quiet' ? 14 : 16
+      return jsxs(
+        'button',
+        {
+          type: 'button',
+          className: cx(D.stop, stateClass[s], i % 2 ? D.down : D.up, open === it.id && D.sel),
+          style: { left: `${shape.points[i][0]}px`, top: `${shape.points[i][1]}px` },
+          'aria-label': `${it.mark}: ${stateWord[s]}`,
+          'aria-expanded': open === it.id,
+          'aria-controls': open === it.id ? 'helper-dash-steps' : undefined,
+          'data-hh': 'stop',
+          'data-stop': it.id,
+          'data-state': s,
+          onClick: () => toggle(it.id),
+          children: [
+            jsx('span', { className: D.dot, children: jsx(DashIcon, { icon: stopIcon(it.id), size }) }, 'd'),
+            jsx('span', { className: D.name, 'aria-hidden': true, children: it.mark }, 'n'),
+            s === 'here' ? jsx('span', { className: D.you, 'aria-hidden': true, 'data-hh': 'you-are-here', children: W.setup.you_are_here }, 'y') : null
+          ]
+        },
+        it.id
       )
     })
-  const outcome = p => p.then(value => ({ ok: true, value }), () => ({ ok: false }))
-
-  // State and actions for the tab. Lives in the page (always mounted), so switching tabs keeps the
-  // answers. launch = { model, recheck }: the page's own model check for the bot Hermes runs, so the
-  // helper and card 2 never disagree.
-  function useSetupCards({ active, launchModel, recheckLaunch }) {
-    const runningBot = runningBotName(useValue(host.state.profile))
-    const gateway = useValue(host.state.gateway)
-    const [bots, setBots] = useState(null)
-    const [picked, setPicked] = useState(null)
-    const [reads, setReads] = useState({})
-    const [runs, setRuns] = useState({})
-    const [remember, setRemember] = useState(() => readRemember(ctx.storage.get('remember', {})))
-    const alive = useRef(true)
-    // Per bot: a number that goes up with every new read, so an answer from an older read (or from
-    // before the running bot changed) is dropped instead of landing on the card.
-    const generation = useRef({})
-    const started = useRef(false)
-    const loadedFor = useRef(null)
-    // Card 3: the bots with a model call in flight, and the stop functions of running counters.
-    const asking = useRef(new Set())
-    const counters = useRef(new Set())
-
-    const bot = picked && bots && bots.includes(picked) ? picked : runningBot
-    const isRunning = b => b === runningBot
-    const params = b => (isRunning(b) ? {} : { profile: b })
-    const scope = b => (isRunning(b) ? undefined : b)
-    // A host call that throws instead of rejecting must not stop the reads after it.
-    const attempt = fn => Promise.resolve().then(fn)
-
-    function patchRead(b, gen, key, value) {
-      if (!alive.current || generation.current[b] !== gen) return
-      setReads(r => ({ ...r, [b]: { ...(r[b] || {}), [key]: value } }))
-    }
-
-    // reuseLaunch: on the first open, the page's own model check (run when the page opened) is
-    // still fresh, so card 2 uses it instead of asking Hermes again.
-    function load(b, { reuseLaunch = false } = {}) {
-      const gen = (generation.current[b] || 0) + 1
-      generation.current[b] = gen
-      setReads(r => ({ ...r, [b]: { model: isRunning(b) ? null : { state: 'checking' }, soul: null, skills: null, memory: null } }))
-      if (!isRunning(b)) {
-        attempt(() => checkModel(request, { params: params(b), sleep })).then(
-          m => patchRead(b, gen, 'model', m),
-          () => patchRead(b, gen, 'model', { state: 'error' })
-        )
-      } else if (!(reuseLaunch && launchModel && (launchModel.state === 'ok' || launchModel.state === 'none'))) {
-        recheckLaunch()
-      }
-      outcome(attempt(() => request('profiles.describe', { name: b }, READ_TIMEOUT_MS))).then(v => patchRead(b, gen, 'soul', v))
-      outcome(limit(attempt(() => host.skills.list(scope(b))), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'skills', v))
-      outcome(limit(attempt(() => host.toolsets.list(scope(b))), READ_TIMEOUT_MS)).then(v => patchRead(b, gen, 'memory', v))
-    }
-
-    // A failed list keeps the bots we already know, so the picked bot stays on screen.
-    function loadBots() {
-      outcome(limit(attempt(() => host.profiles.list()), READ_TIMEOUT_MS)).then(r => {
-        if (!alive.current) return
-        const list = r.ok && r.value && Array.isArray(r.value.profiles) ? r.value.profiles : null
-        if (!list) return
-        const names = list.map(p => p && typeof p.name === 'string' && p.name.trim()).filter(Boolean)
-        if (names.length) setBots(names)
-      })
-    }
-
-    useEffect(() => {
-      alive.current = true
-      return () => {
-        alive.current = false
-        for (const stop of counters.current) stop()
-        counters.current.clear()
-      }
-    }, [])
-
-    // First open of the tab, and again whenever Hermes switches to another bot: the old answers
-    // belonged to the old running bot, so they are dropped and read again.
-    useEffect(() => {
-      if (!active && !started.current) return
-      if (loadedFor.current === runningBot) return
-      const first = !started.current
-      started.current = true
-      loadedFor.current = runningBot
-      if (!first) {
-        generation.current = Object.fromEntries(Object.entries(generation.current).map(([k, v]) => [k, v + 1]))
-        setReads({})
-        setRuns(r => Object.fromEntries(Object.entries(r).filter(([k]) => asking.current.has(k))))
-      }
-      loadBots()
-      load(bot, { reuseLaunch: first })
-    }, [active, runningBot])
-
-    function pick(b) {
-      setPicked(b)
-      if (!reads[b]) load(b)
-    }
-
-    // "Check again" under the cards: every read again for the shown bot. Card 3's last answer is
-    // dropped too (it may no longer be true); a call still running is left alone.
-    function checkAgain() {
-      loadBots()
-      load(bot)
-      if (!asking.current.has(bot)) setRuns(r => ({ ...r, [bot]: undefined }))
-    }
-
-    // Card 3: one model call, only on a press, only when card 2 says ok for this bot.
-    function ask(b) {
-      const model = isRunning(b) ? launchModel : reads[b] && reads[b].model
-      if (!model || model.state !== 'ok') return
-      if (asking.current.has(b)) return
-      asking.current.add(b)
-      // The page's busy value (src/expressions.js makeBusy): up for the whole wait on the model,
-      // the "trying again" countdown included; the character shows busy while it is up.
-      const endBusy = busy ? busy.begin() : () => {}
-      const setRun = run => alive.current && setRuns(r => ({ ...r, [b]: run }))
-      let startedAt = 0
-      let stopTick = null
-      const stopTicking = () => {
-        if (stopTick) {
-          stopTick()
-          counters.current.delete(stopTick)
-        }
-        stopTick = null
-      }
-      let lastCheck = null
-      askModel({
-        request,
-        sleep,
-        call: { ...ANSWER_CALL, profile: params(b).profile },
-        recheck: async () => (lastCheck = await checkModel(request, { params: params(b), sleep })),
-        cancelled: () => !alive.current,
-        onState: s => {
-          stopTicking()
-          if (s.phase === 'calling') {
-            startedAt = Date.now()
-            setRun({ phase: 'calling', waited: 0 })
-            stopTick = ctx.setInterval(() => setRun({ phase: 'calling', waited: Math.round((Date.now() - startedAt) / 1000) }), 1000)
-            counters.current.add(stopTick)
-          } else {
-            setRun({ phase: 'countdown', left: s.left })
-          }
-        }
-      })
-        .then(
-          result => {
-            if (!result) return
-            setRun({ phase: 'done', result })
-            // The call found the model gone: card 2 takes the answer of that same re-check, so
-            // both cards agree without asking Hermes a third time.
-            if (!result.ok && lastCheck && (result.kind === 'no_model' || result.kind === 'model_broken')) {
-              if (isRunning(b)) recheckLaunch()
-              else patchRead(b, generation.current[b], 'model', lastCheck)
-            }
-          },
-          () => setRun({ phase: 'done', result: { ok: false, kind: 'other' } })
-        )
-        .finally(() => {
-          stopTicking()
-          asking.current.delete(b)
-          endBusy()
-        })
-    }
-
-    function answerRemember(b, answer) {
-      const next = { ...remember, [b]: answer }
-      setRemember(next)
-      ctx.storage.set('remember', next)
-    }
-
-    const shown = reads[bot] || {}
-    const model = isRunning(bot) ? launchModel : shown.model
-    return {
-      bot,
-      bots: bots || [runningBot],
-      cards: {
-        gateway: gatewayCard(gateway),
-        model: modelCard(model),
-        answers: answersCard(runs[bot], model),
-        soul: soulCard(shown.soul),
-        skills: skillsCard(shown.skills),
-        memory: memoryCard(shown.memory),
-        remember: rememberCard(remember[bot])
-      },
-      pick,
-      checkAgain,
-      ask: () => ask(bot),
-      reload: () => load(bot),
-      answerRemember: answer => answerRemember(bot, answer)
-    }
-  }
-
-  return useSetupCards
-}
-
-/* ---------- the view (no hooks: plain functions of the state above) ---------- */
-
-function StatusLane({ status }) {
-  return jsxs('span', {
-    className: K.cardState,
-    'data-hh': 'status',
-    children: [
-      status === 'checking' ? jsx(GlyphSpinner, {}) : jsx('span', { 'aria-hidden': true, className: cx(K.dot, DOT[status] || K.dotNeutral) }),
-      jsx('span', { children: STATUS[status] })
-    ]
-  })
-}
-
-function PasteBox({ text, label }) {
-  return jsxs('div', {
-    className: K.cardPaste,
-    children: [
-      jsx('span', { className: K.cardPasteText, children: text }),
-      jsx(CopyButton, { text, label, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' })
-    ]
-  })
-}
-
-function renderYourSetup(s, { openStep, cardColumns = 2 }) {
-  const botCount = s.bots.length
-  const actionButton = (action, id) => {
-    if (!action) return null
-    if (action.kind === 'step') return jsx(Button, { size: 'xs', variant: 'secondary', onClick: () => openStep(action.step), children: action.label }, id + '-step')
-    if (action.kind === 'recheck') return jsx(Button, { size: 'xs', variant: 'secondary', onClick: () => s.reload(), children: action.label }, id + '-recheck')
-    if (action.kind === 'ask') return jsx(Button, { size: 'xs', variant: 'secondary', disabled: action.disabled, onClick: () => s.ask(), children: action.label }, id + '-ask')
-    return null
-  }
-
-  const card = (id, { extra = [], more = [], wide = false } = {}) => {
-    const c = s.cards[id]
-    const passes = PASSES[id]
-    const buttons = [actionButton(c.action, id), ...more].filter(Boolean)
-    return jsxs(
-      'section',
-      {
-        className: cx(K.card, wide && K.cardWide),
-        'data-hh': `card-${id}`,
-        'data-status': c.status,
-        'aria-label': cardTitle(id),
-        children: [
-          jsxs('div', {
-            className: K.cardHead,
-            children: [jsx('h4', { className: K.cardTitle, children: cardTitle(id) }), jsx(StatusLane, { status: c.status })]
-          }),
-          c.value ? jsx('div', { className: K.cardValue, children: c.value }) : null,
-          ...c.lines.map((line, i) => jsx('p', { className: K.cardText, children: line }, `l${i}`)),
-          c.reasons ? jsx('p', { className: K.cardText, children: c.reasonsLead }) : null,
-          c.reasons ? jsx('ol', { className: K.cardList, children: c.reasons.map((t, i) => jsx('li', { children: t }, i)) }) : null,
-          c.handoff
-            ? jsxs('div', { className: K.cardStack, children: [jsx('p', { className: K.cardText, children: c.handoff.lead }), jsx(PasteBox, { text: c.handoff.text, label: 'Copy' })] })
-            : null,
-          ...extra,
-          passes ? jsx('p', { className: K.cardPasses, children: passes }) : null,
-          buttons.length ? jsx('div', { className: K.cardActions, children: buttons }) : null
-        ]
-      },
-      id
-    )
-  }
-
-  // Card 7: the person's own two-part test, then their answer.
-  const rememberSteps = [
-    jsx('p', { className: K.cardText, children: REMEMBER.intro }, 'intro'),
-    jsxs(
-      'ol',
-      {
-        className: K.cardList,
-        children: [
-          jsxs('li', { children: [REMEMBER.steps[0], jsx(PasteBox, { text: REMEMBER.part1, label: 'Copy test text' })] }, 1),
-          jsxs('li', { children: [REMEMBER.steps[1], jsx(PasteBox, { text: REMEMBER.part2, label: 'Copy question' })] }, 2),
-          jsx('li', { children: REMEMBER.steps[2] }, 3)
-        ]
-      },
-      'steps'
-    )
-  ]
-  const answered = s.cards.remember.status
-  const rememberButtons = [
-    jsx(Button, { size: 'xs', variant: 'secondary', 'aria-pressed': answered === 'works', onClick: () => s.answerRemember('yes'), children: REMEMBER.yes }, 'yes'),
-    jsx(Button, { size: 'xs', variant: 'secondary', 'aria-pressed': answered === 'fix', onClick: () => s.answerRemember('no'), children: REMEMBER.no }, 'no')
-  ]
-
-  const picker =
-    botCount > 1
-      ? jsxs('div', {
-          className: K.botPicker,
-          'data-hh': 'bot-picker',
-          children: [
-            jsx('span', { className: K.botPickerLabel, children: 'Showing bot' }),
-            jsxs(Select, {
-              value: s.bot,
-              onValueChange: s.pick,
-              children: [
-                jsx(SelectTrigger, { className: K.botPickerTrigger, 'aria-label': 'Showing bot', children: jsx(SelectValue, {}) }),
-                jsx(SelectContent, { children: s.bots.map(b => jsx(SelectItem, { value: b, children: b }, b)) })
-              ]
-            }),
-            jsx('span', { className: K.botPickerLabel, children: `${botCount} bots on this Hermes` })
-          ]
-        })
-      : null
-
-  return [
-    // No heading: the open tab already says "Your setup", as Capabilities' tabs name their page.
-    jsx('p', { className: K.caption, 'data-hh': 'yours-lead', children: 'Read from your Hermes. Nothing is changed.' }, 'head'),
-    picker,
-    jsx(
+    const road = jsxs(
       'div',
       {
-        // Two columns only when the column is wide enough (src/layout.js), else one.
-        className: cx(K.cardGrid, cardColumns === 2 && K.twoColumns),
-        'data-hh': 'cards',
-        'data-columns': cardColumns,
+        className: D.road,
+        ref: roadRef,
+        style: { height: `${shape.height}px` },
+        'data-hh': 'road',
         children: [
-          card('gateway'),
-          card('model'),
-          card('answers'),
-          card('soul'),
-          card('skills'),
-          card('memory'),
-          card('remember', { extra: rememberSteps, more: rememberButtons, wide: true })
+          jsx(
+            'svg',
+            {
+              className: D.lines,
+              width,
+              height: shape.height,
+              'aria-hidden': true,
+              children: shape.segments.map((d, i) => jsx('path', { d, className: D.line, 'data-hh': 'line' }, i))
+            },
+            'svg'
+          ),
+          ...stops
         ]
       },
-      'cards'
-    ),
-    jsx('div', { className: K.pageActions, children: jsx(Button, { size: 'sm', variant: 'secondary', onClick: () => s.checkAgain(), children: 'Check again' }) }, 'again')
-  ]
+      'road'
+    )
+
+    let under = null
+    const openItem = open ? items.find(it => it.id === open) : null
+    if (openItem) {
+      const i = items.indexOf(openItem)
+      under = jsxs(
+        'div',
+        {
+          className: D.steps,
+          id: 'helper-dash-steps',
+          ref: stepsBox,
+          'data-hh': 'steps',
+          'data-stop': openItem.id,
+          children: [
+            jsx('i', { className: D.caret, style: { left: `${shape.points[i][0] - 7}px` }, 'aria-hidden': true }, 'caret'),
+            jsxs(
+              'div',
+              {
+                className: D.stepsHead,
+                children: [
+                  jsx('span', { className: D.stepsIcon, children: jsx(DashIcon, { icon: stopIcon(openItem.id), size: 14 }) }, 'i'),
+                  jsx('h3', { className: D.stepsName, children: openItem.name }, 'n')
+                ]
+              },
+              'head'
+            ),
+            jsx('p', { className: D.stepsWhy, children: openItem.why }, 'why'),
+            jsx(
+              'ol',
+              {
+                className: D.ol,
+                children: openItem.steps.map((s, k) =>
+                  jsxs(
+                    'li',
+                    {
+                      className: D.li,
+                      children: [
+                        jsx('span', { children: s.text }, 't'),
+                        s.route
+                          ? jsx('div', { className: D.route, children: jsx(Button, { variant: 'secondary', size: 'xs', 'data-hh': 'route', onClick: () => goTo(s.route.to), children: s.route.label }) }, 'r')
+                          : null
+                      ]
+                    },
+                    k
+                  )
+                )
+              },
+              'ol'
+            ),
+            openItem.terminal
+              ? jsxs(
+                  'div',
+                  {
+                    className: D.term,
+                    'data-hh': 'terminal',
+                    children: [
+                      jsx('p', { className: D.termWhen, children: openItem.terminal.when }, 'w'),
+                      ...openItem.terminal.paste.map((p, k) =>
+                        jsxs(
+                          'div',
+                          {
+                            className: D.term,
+                            children: [
+                              jsx('span', { className: D.pasteFor, children: p.for }, 'f'),
+                              jsxs(
+                                'div',
+                                {
+                                  className: K.bubblePaste,
+                                  'data-hh': 'paste',
+                                  children: [
+                                    jsx('code', { className: K.bubblePasteText, 'data-hh': 'paste-text', children: p.text }, 't'),
+                                    jsx(CopyButton, { text: p.text, label: W.setup.copy, appearance: 'button', buttonSize: 'xs', buttonVariant: 'ghost' }, 'c')
+                                  ]
+                                },
+                                'p'
+                              )
+                            ]
+                          },
+                          k
+                        )
+                      )
+                    ]
+                  },
+                  'term'
+                )
+              : null,
+            openItem.counts ? null : jsx('p', { className: D.quietLine, 'data-hh': 'not-counted', children: W.setup.not_counted }, 'nc'),
+            jsx(
+              'div',
+              {
+                className: D.foot,
+                children: openItem.sources.map(src => {
+                  const url = docsHref(src.file)
+                  return jsx(
+                    'a',
+                    {
+                      className: K.chipLink,
+                      href: url,
+                      target: '_blank',
+                      rel: 'noreferrer',
+                      title: url,
+                      'data-hh': 'source',
+                      onClick: e => {
+                        e.preventDefault()
+                        openDocs(url)
+                      },
+                      children: fill(W.setup.source, { file: src.file, line: src.line })
+                    },
+                    `${src.file}:${src.line}`
+                  )
+                })
+              },
+              'foot'
+            ),
+            jsx(
+              'div',
+              {
+                className: D.close,
+                children: jsx(Button, { variant: 'ghost', size: 'icon-xs', 'aria-label': W.setup.close, 'data-hh': 'close', onClick: () => setOpen(null), children: jsx(DashIcon, { icon: DASH_ICONS.close, size: 14 }) })
+              },
+              'x'
+            )
+          ]
+        },
+        'steps'
+      )
+    } else if (ready && here >= 0) {
+      const it = items[here]
+      under = jsxs(
+        'div',
+        {
+          className: D.next,
+          'data-hh': 'next',
+          children: [
+            jsxs(
+              'span',
+              {
+                className: D.nextWords,
+                children: [
+                  jsxs(
+                    'span',
+                    {
+                      className: D.nextLine,
+                      children: [jsx('span', { className: D.nextLabel, children: W.setup.next }, 'l'), jsx('b', { className: D.nextName, children: it.name }, 'n')]
+                    },
+                    'a'
+                  ),
+                  jsx('span', { className: D.nextWhy, children: it.why }, 'w')
+                ]
+              },
+              'words'
+            ),
+            jsx(Button, { variant: 'link', size: 'inline', 'data-hh': 'open-next', onClick: () => toggle(it.id), children: W.setup.open }, 'open')
+          ]
+        },
+        'next'
+      )
+    } else if (ready && path.allDone) {
+      under = jsxs(
+        'div',
+        {
+          className: D.next,
+          'data-hh': 'all-done',
+          children: [jsx('span', { className: D.allDone, children: jsx(DashIcon, { icon: DASH_ICONS.check, size: 16 }) }, 'i'), jsx('span', { className: D.nextWhy, children: W.setup.all_done }, 't')]
+        },
+        'done'
+      )
+    }
+
+    const setup = jsxs(
+      'section',
+      {
+        className: D.card,
+        'data-hh': 'setup',
+        children: [
+          jsxs(
+            'div',
+            {
+              className: D.head,
+              children: [
+                jsx('h2', { className: D.title, children: W.setup.title }, 't'),
+                ready
+                  ? jsx(
+                      'span',
+                      {
+                        className: D.count,
+                        'data-hh': 'count',
+                        // "{n} of {total}": the number done in bold, as r5 to r7 draw it
+                        children: W.setup.count.split('{n}').flatMap((part, k) =>
+                          k === 0 ? fill(part, { total: path.total }) : [jsx('b', { className: D.countN, children: String(path.done) }, 'n'), fill(part, { total: path.total })]
+                        )
+                      },
+                      'c'
+                    )
+                  : null
+              ]
+            },
+            'head'
+          ),
+          road,
+          under
+        ]
+      },
+      'setup'
+    )
+
+    return jsxs('div', {
+      className: cx(D.main, compact && D.compact),
+      'data-hh': 'dashboard',
+      'data-compact': compact,
+      children: [jsx('style', { 'data-hh': 'dash-css', children: DASH_CSS }, 'css'), stats, activity, setup]
+    })
+  }
+
+  return { useDashboard, renderDashboard }
 }
 
 // ---- src/bubble-link.js ----
@@ -19505,9 +19373,6 @@ function Grip({ width, min, max, onDown, onMove, onUp, onCancel, onKey }) {
 // use (K in src/look.js). Helper's window has the one style sheet of our own (src/talk.css, the T
 // table), put into a <style> element inside our own page.
 
-// Column widths (layout only; every colour, font and line comes from Hermes's classes).
-const RAIL_WIDTH = `${RAIL_PX}px`
-const RAIL_NUMBERS_WIDTH = `${RAIL_NUMBERS_PX}px`
 // One press of an arrow key on the edge to drag moves it this far.
 const GRIP_KEY_PX = 16
 // Keys that are not typing by themselves: pressing one alone does not end the word-by-word reveal.
@@ -19515,10 +19380,9 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-const TABS = [
-  { id: 'setup', label: 'Setup' },
-  { id: 'yours', label: 'Your setup' }
-]
+// dash-v1: three tabs, Dashboard, Learn, My setup (Pēteris's pick, 11 Nov 2026); their names from the Dashboard's
+// data (content/dash-setup-list-v2.json page_words). Only Dashboard is built: Learn and My setup show one quiet line.
+const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
 // function is made once, so React doesn't detach and re-attach it on every render; React calls it
@@ -19558,7 +19422,7 @@ function makePage(ctx, opts = {}) {
   // clock = which words of Helper's lines are visible (a line is revealed once, then stays whole).
   const busy = makeBusy()
   const clock = makeRevealClock({ setInterval: (fn, ms) => ctx.setInterval(fn, ms) })
-  const useSetupCards = makeSetupCards(ctx, { busy })
+  const { useDashboard, renderDashboard } = makeDashboard(ctx)
   const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
@@ -19681,15 +19545,6 @@ function makePage(ctx, opts = {}) {
   const liveClose = () => {
     if (live.waiting) liveFinish(live.waiting, null)
   }
-  // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
-  const openDocs = url => {
-    if (!isDocsUrl(url)) return
-    try {
-      const done = ctx.os && typeof ctx.os.openExternal === 'function' ? ctx.os.openExternal(url) : null
-      if (done && typeof done.catch === 'function') done.catch(() => {})
-    } catch {}
-  }
-
   function useModelStatus() {
     const fresh = lastCheck && Date.now() - lastCheck.at < RECHECK_AFTER_MS
     const [status, setStatus] = useState(() => (fresh ? lastCheck.result : { state: 'checking' }))
@@ -19726,8 +19581,6 @@ function makePage(ctx, opts = {}) {
   return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
     const [tab, setTab] = useState(initial.tab)
-    const [step, setStep] = useState(initial.step)
-    const [answers, setAnswers] = useState(initial.answers)
     // The width the person dragged Helper's window to (remembered), and whether Helper is folded
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
@@ -19770,7 +19623,9 @@ function makePage(ctx, opts = {}) {
     const [focusStrip, setFocusStrip] = useState(false)
     const [size, measureRef] = useOwnSize()
     const width = size.width
-    const [modelStatus, recheck] = useModelStatus()
+    const [modelStatus] = useModelStatus()
+    // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
+    const dashboard = useDashboard({ active: tab === 'dashboard' })
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
     // (review) the page drawn last holds the view; a page that leaves lets go only of its own
@@ -19783,7 +19638,6 @@ function makePage(ctx, opts = {}) {
       },
       []
     )
-    const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
     // The conversation's scrolling area: kept at the bottom, where the newest words are.
     const helperScroll = useRef(null)
@@ -19804,9 +19658,8 @@ function makePage(ctx, opts = {}) {
       ctx.storage.set(key, value)
     }
     const saveTab = keep('tab', setTab)
-    const saveStep = keep('step', setStep)
 
-    // The message box takes the keyboard when asked to (a pick, "Ask about this step", Helper
+    // The message box takes the keyboard when asked to (a pick, Helper
     // opened from its strip); a request that finds no box is dropped, so it can't steal focus later.
     useEffect(() => {
       if (!focusAsk) return
@@ -19839,11 +19692,10 @@ function makePage(ctx, opts = {}) {
       if (folded && !fit.narrow) setFolded(false)
     }, [width])
 
-    const currentStep = stepByNumber(step) || STEPS[0]
     const helperShown = fit.helper !== 'strip'
 
     // Puts Helper away or brings it back, with the keyboard following (to the strip, or to the
-    // message box). The strip, Escape and "Ask about this step" all go through it; only the
+    // message box). The strip and Escape go through it; only the
     // unfolding by a wider window (the effect above) sets the state itself, and moves no focus.
     function foldHelper(away) {
       setFolded(away)
@@ -20080,27 +19932,6 @@ function makePage(ctx, opts = {}) {
       answer(skip(visit), 'Skip')
     }
 
-    // Picking an answer on a step: saved. Helper stays silent: its lines come from the conversation only.
-    function choose(option) {
-      if (answers[currentStep.id] === option.id) return
-      const next = { ...answers, [currentStep.id]: option.id }
-      setAnswers(next)
-      ctx.storage.set('answers', next)
-    }
-
-    // "I understand, next step": the step's next_rule picks the next step (code, not the model).
-    // After the last step it opens Your setup.
-    function finishStep() {
-      const to = nextAfter(currentStep, answers[currentStep.id])
-      if (to !== 'done') return saveStep(to)
-      saveTab('yours')
-    }
-
-    // "Ask about this step": the keyboard goes to the message box; a folded Helper opens first.
-    function askAboutStep() {
-      foldHelper(false)
-    }
-
     /* ---------- Helper's edge to drag: between 360 and 600 px, remembered ---------- */
     // The drag starts from the width on screen (in a squeezed window that is less than the
     // remembered one). Only a drag that moved the edge is saved; a press without a move, a drag
@@ -20165,7 +19996,7 @@ function makePage(ctx, opts = {}) {
     const tabRow = jsx('div', {
       className: K.tabs,
       role: 'tablist',
-      'aria-label': 'Helper',
+      'aria-label': DASH_DATA.words.tabListLabel,
       'data-hh': 'tabs',
       children: TABS.map((t, i) => {
         const on = tab === t.id
@@ -20192,255 +20023,11 @@ function makePage(ctx, opts = {}) {
 
     const header = jsx('div', { className: K.head, 'data-hh': 'header', children: tabRow })
 
-    /* ---------- step list (numbers only when the window is narrow) ---------- */
-    const numbersOnly = fit.rail === 'numbers'
-    const stepRow = s => {
-      const on = s.number === step
-      const rail = railLines(s)
-      const number = jsx('span', { className: on ? K.rowNumberOn : K.rowNumber, children: s.number }, 'n')
-      const button = jsxs(RowButton, {
-        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
-        'aria-current': on ? 'step' : undefined,
-        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}` : undefined,
-        onClick: () => saveStep(s.number),
-        children: numbersOnly
-          ? [number]
-          : [
-              number,
-              jsxs(
-                'span',
-                {
-                  className: K.rowText,
-                  children: [
-                    jsx('span', { className: K.rowTitle, children: rail.title }),
-                    rail.sub ? jsx('span', { className: K.rowSub, children: jsx('span', { className: K.truncate, children: rail.sub }) }) : null
-                  ]
-                },
-                't'
-              )
-            ]
-      })
-      return jsx(
-        'div',
-        {
-          className: cx(K.row, on ? K.rowActive : K.rowIdle),
-          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}`, children: button }) : button
-        },
-        s.number
-      )
-    }
-
-    // Steps that come later: not buttons. With numbers only, the number carries its title for
-    // screen readers (role img + label) and as a tip on hover.
-    const laterRow = s => {
-      const inner = jsxs('div', {
-        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
-        role: numbersOnly ? 'img' : undefined,
-        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}, comes later` : undefined,
-        children: [
-          jsx('span', { className: K.rowNumber, children: s.number }, 'n'),
-          numbersOnly ? null : jsx('span', { className: K.rowText, children: jsx('span', { className: K.rowTitleOff, children: s.title }) }, 't')
-        ]
-      })
-      return jsx(
-        'div',
-        {
-          className: cx(K.row, K.rowIdle),
-          'aria-disabled': true,
-          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}, comes later`, children: inner }) : inner
-        },
-        s.number
-      )
-    }
-
-    const rail = jsxs(
-      'nav',
-      {
-        className: K.rail,
-        style: { width: numbersOnly ? RAIL_NUMBERS_WIDTH : RAIL_WIDTH },
-        'aria-label': 'Steps',
-        'data-hh': 'steps',
-        'data-numbers-only': numbersOnly,
-        children: [
-          jsxs('div', {
-            className: K.railScroll,
-            children: [
-              numbersOnly ? null : jsx('div', { className: cx(K.sectionLabel, K.sectionLabelPad), children: 'Steps' }),
-              jsx('div', { className: K.rowList, children: STEPS.map(stepRow) }),
-              jsx('div', { className: cx(K.sectionLabel, numbersOnly ? K.sectionLabelPad : K.sectionLabelGap), children: numbersOnly ? null : 'After these' }),
-              jsx('div', { className: K.rowList, children: LATER_STEPS.map(laterRow) })
-            ]
-          }),
-          numbersOnly ? null : jsx('div', { className: K.railFoot, children: VERSION_LINE })
-        ]
-      },
-      'rail'
-    )
-
-    /* ---------- open step ---------- */
-    // One primary button per screen (hhdesign fix 6): "I understand, next step"; the rest are secondary.
-    const stepActions = jsxs(
-      'div',
-      {
-        className: K.actions,
-        children: [
-          jsx(Button, { size: 'sm', onClick: finishStep, children: 'I understand, next step' }),
-          jsx(Button, { variant: 'secondary', size: 'sm', onClick: askAboutStep, children: 'Ask about this step' })
-        ]
-      },
-      'actions'
-    )
-
-    // A source tag that opens its docs page: "Hermes docs › {section}" (v1-strings part 5).
-    const sourceLink = (url, label, key) =>
-      jsx(
-        'a',
-        {
-          className: K.chipLink,
-          href: url,
-          target: '_blank',
-          rel: 'noreferrer',
-          title: url,
-          'data-hh': 'source',
-          onClick: e => {
-            e.preventDefault()
-            openDocs(url)
-          },
-          onAuxClick: e => {
-            e.preventDefault()
-            openDocs(url)
-          },
-          children: label
-        },
-        key
-      )
-    const factSource = f => sourceLink(f.url || docsUrl(f.source), chipLabel(f.section), f.id || f.source + f.section)
-
-    // The open step is wide enough for two columns (the comparison, and the answer cards).
-    const wideStep = fit.columns === 2
-    const here = currentStep
-    const picked = answers[here.id]
-    const fits = fitsGoal(answers, here.id)
-    const introSources = []
-    for (const src of here.intro_sources || []) {
-      const key = `${src.source}#${src.section}`
-      if (!introSources.some(x => x.key === key)) introSources.push({ key, url: docsUrl(src.source), label: chipLabel(src.section) })
-    }
-
-    const stepView = [
-      jsxs(
-        'header',
-        {
-          children: [
-            jsx('div', { className: K.sectionLabel, children: `Step ${here.number} of ${STEPS.length}` }),
-            jsx('h3', { className: K.stepTitle, children: here.title }),
-            jsx('p', { className: K.prose, 'data-hh': 'intro', children: here.intro })
-          ]
-        },
-        'head'
-      ),
-      introSources.length
-        ? jsxs(
-            'div',
-            {
-              className: K.chips,
-              'data-hh': 'intro-sources',
-              children: [jsx('span', { className: K.chipsLabel, children: 'Source' }, 'l'), ...introSources.map(x => sourceLink(x.url, x.label, x.key))]
-            },
-            'intro-sources'
-          )
-        : null,
-      here.compare
-        ? jsx(
-            'dl',
-            {
-              className: cx(K.pairGrid, wideStep && K.twoColumns),
-              'data-hh': 'compare',
-              'data-columns': fit.columns,
-              children: ['left', 'right'].map(side => {
-                const c = here.compare[side]
-                return jsxs(
-                  'div',
-                  {
-                    className: K.pairSide,
-                    children: [jsx('dt', { className: K.pairTitle, children: c.title }), jsx('dd', { className: K.caption, children: c.text }), factSource(c)]
-                  },
-                  side
-                )
-              })
-            },
-            'compare'
-          )
-        : null,
-      jsx(
-        'ul',
-        {
-          className: K.factList,
-          'data-hh': 'facts',
-          children: here.facts.map(f =>
-            jsxs('li', { className: K.fact, 'data-fact': f.id, children: [jsx('p', { className: K.factText, children: f.text }), factSource(f)] }, f.id)
-          )
-        },
-        'facts'
-      ),
-      jsxs(
-        'div',
-        {
-          className: K.scaffold,
-          'data-hh': 'video',
-          children: [
-            jsx('span', { className: K.scaffoldGlyph, children: jsx(Codicon, { name: 'play-circle', size: '0.875rem' }) }),
-            jsx('span', { children: LINES.videoLater })
-          ]
-        },
-        'video'
-      ),
-      jsxs(
-        'section',
-        {
-          children: [
-            jsx('div', { className: K.question, children: here.question }),
-            jsx('div', {
-              className: cx(K.choices, wideStep && K.twoColumns),
-              role: 'group',
-              'aria-label': here.question,
-              'data-hh': 'choices',
-              'data-columns': fit.columns,
-              children: here.options.map(o =>
-                jsxs(
-                  'button',
-                  {
-                    type: 'button',
-                    'aria-pressed': picked === o.id,
-                    className: cx(K.choice, picked === o.id ? K.choiceOn : K.choiceOff),
-                    'data-option': o.id,
-                    onClick: () => choose(o),
-                    children: [
-                      jsxs('span', {
-                        className: K.choiceText,
-                        children: [jsx('span', { className: K.choiceLabel, children: o.label }), o.hint ? jsx('span', { className: K.choiceSub, children: o.hint }) : null]
-                      }, 't'),
-                      fits === o.id ? jsx('span', { className: K.fitTag, 'data-hh': 'fits-goal', children: LINES.fitsGoal }, 'fit') : null
-                    ]
-                  },
-                  o.id
-                )
-              )
-            })
-          ]
-        },
-        'question'
-      ),
-      stepActions
-    ]
-
-    const yoursView = renderYourSetup(setup, {
-      openStep: n => {
-        saveStep(n)
-        saveTab('setup')
-      },
-      cardColumns: fit.cardColumns
-    })
+    /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
+    const panel =
+      tab === 'dashboard'
+        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX })
+        : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
 
     const main = jsx(
       'main',
@@ -20451,7 +20038,7 @@ function makePage(ctx, opts = {}) {
         role: 'tabpanel',
         id: 'hh-tabpanel',
         'aria-labelledby': `hh-tab-${tab}`,
-        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
+        children: jsx('div', { className: K.detailScroll, 'data-hh': 'scroll', children: panel })
       },
       'main'
     )
@@ -20607,13 +20194,13 @@ function makePage(ctx, opts = {}) {
           )
         : null
 
-    // The left side: the tabs, and under them the step list and the open step (or Your setup).
+    // The left side: the tabs, and under them the open tab.
     const left = jsxs(
       'div',
       {
         className: K.left,
         'data-hh': 'left',
-        children: [header, jsx('div', { className: K.body, 'data-hh': 'body', children: tab === 'setup' ? [rail, main] : [main] }, 'body')]
+        children: [header, jsx('div', { className: K.body, 'data-hh': 'body', children: [main] }, 'body')]
       },
       'left'
     )

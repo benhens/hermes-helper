@@ -179,7 +179,8 @@ test('no call when: code is sure, the model check is not ok, the message looks l
       assert.ok(line(view), 'a line at once')
     }
     await settle()
-    assert.deepEqual(host.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'nothing sent')
+    // (dash-v1: less the Dashboard's read-only reads when the page opens on it: profiles.describe, cron.manage, plugins.manage)
+    assert.deepEqual(host.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status' && !['profiles.describe', 'cron.manage', 'plugins.manage'].includes(m)), [], 'nothing sent')
   }
 })
 

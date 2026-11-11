@@ -1,0 +1,204 @@
+{
+ "about": "Lines of the Hermes docs quoted by content/dash-setup-list-v2.json (the Dashboard tab), cut by dev/checks/dash-v1/docs-lines.mjs from the docs of Hermes v0.23.0 (website/docs). The build checks every quote against these lines; tests/dash-data.test.mjs compares them with the docs when the checkout is there. moved: a line the data names (read by hhcontent in its /hermes-docs copy) -> the one line of this file that holds the quote.",
+ "docs_version": "v0.23.0",
+ "commit": "2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19",
+ "files": {
+  "getting-started/installation.md": {
+   "sha256": "52b70c967305ce82856bb203937dea31121bb5349670032c6ea0c05e33221cf4",
+   "lines": {
+    "22": "### Desktop packages on macOS or Windows",
+    "24": "Download the package for your platform from the",
+    "27": "- **Windows:** open the `.appinstaller` download with Windows App Installer.",
+    "30": "- **macOS:** open the DMG, then copy `Hermes.app` to Applications. The ZIP",
+    "46": "The macOS installer is **Apple Silicon only**. macOS on x86 (Intel) processors is [not a supported platform](./platform-support.md#unsupported).",
+    "52": "#### Linux / macOS / WSL2",
+    "54": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash",
+    "61": "iex (irm https://hermes-agent.nousresearch.com/install.ps1) "
+   }
+  },
+  "getting-started/learning-path.md": {
+   "sha256": "b3961f9169b4b8d5f32351a2655a80f61d843767d9c513feb8c6fdf29b31313c",
+   "lines": {
+    "30": "| **Intermediate** | Set up messaging bots, use advanced features like memory, cron jobs, and skills | [Sessions](../user-guide/sessions.md) → [Messaging](../user-guide/messaging/index.md) → [Tools](../user-guide/features/tools.md) → [Skills](../user-guide/features/skills.md) → [Memory](../user-guide/features/memory.md) → [Cron](../user-guide/features/cron.md) | ~2–3 hours |",
+    "80": "Cron jobs let Hermes Agent run tasks on a schedule — daily summaries, periodic checks, automated reports — without you being present.",
+    "83": "### \"I want a team of specialist Bots\"",
+    "161": "- **Completed the Quickstart?** → Read [CLI Usage](../user-guide/cli.md) and [Configuration](../user-guide/configuration.md) to customize your setup.",
+    "163": "- **Setting up for a team?** → Read [Security](../user-guide/security.md) and [Sessions](../user-guide/sessions.md) to understand access control and conversation management."
+   }
+  },
+  "getting-started/platform-support.md": {
+   "sha256": "7bb66966c8dc19842a885eea4243bbf0862c9098dbc5107c49940292f00ceec8",
+   "lines": {
+    "28": "These platforms are maintained in-tree only as a best effort.",
+    "36": "| **Android / [Termux](./termux.md)** (aarch64) | [Signed APT repository](./termux.md), then `pkg install hermes-agent` | Prerelease package with Python, Node, and TUI. Not built by default: only releases cut with `--with termux` (and `windows` and `macos-arm64`) update the APT channel. Run the gateway in a Termux session; Android can terminate background processes. |"
+   }
+  },
+  "getting-started/quickstart.md": {
+   "sha256": "25270b5fbf920053c4b240932531a4f0614cd587561f8cf6cfc8db68cdce9d3e",
+   "lines": {
+    "45": "| I want a bot or always-on setup | `hermes gateway setup` after CLI works | Connect Telegram, Discord, Slack, or another platform |",
+    "47": "| I want multi-provider fallback | `hermes model` first | Add routing and fallback only after the base chat works |",
+    "49": "**Rule of thumb:** if Hermes cannot complete a normal chat, do not add more features yet. Get one clean conversation working first, then layer on gateway, cron, skills, voice, or routing.",
+    "53": "## 1. Install Hermes Agent",
+    "84": "The single most important setup step. Use `hermes model` to walk through the choice interactively:",
+    "87": "hermes model",
+    "107": "- **Blank Slate** — everything starts **off** except the bare minimum needed to run an agent: **provider & model, the File Operations toolset, and the Terminal toolset**. No web, browser, code execution, vision, memory, delegation, cron, skills, plugins, or MCP servers — and compression, checkpoints, smart routing, and memory capture are all disabled. After the minimal baseline is applied, you choose one of two paths: **start with everything disabled** (finish now with the minimal agent), or **walk through all configurations** (opt in to tools, skills, plugins, MCP, and messaging). Pick this when you want a minimal, fully-controlled agent and intend to enable only exactly what you need.",
+    "182": "## 3. Run Your First Chat",
+    "189": "You'll see a welcome banner with your model, available tools, and skills. Use a prompt that's specific and easy to verify:",
+    "210": "- Hermes replies without error",
+    "212": "- The conversation continues normally for more than one turn",
+    "264": "hermes gateway setup    # Interactive platform configuration",
+    "273": "- Cron — only after your bot or CLI setup is stable",
+    "277": "For safety, run the agent in a Docker container or on a remote server:",
+    "295": "Skills are on-demand instruction documents that teach Hermes how to do a specific task — deploy to Kubernetes, open a GitHub PR, fine-tune a model, search for GIFs. Each is a `SKILL.md` file with a name, a description, and a step-by-step procedure. The agent reads the short descriptions for free and only loads a skill's full content when a task actually calls for it, so adding skills doesn't bloat every request.",
+    "297": "Hermes ships with a catalog of bundled skills already installed in `~/.hermes/skills/`. You can add more from the Skills Hub, or write your own.",
+    "316": "This works in the CLI and in any connected messaging platform. You don't have to install everything up front — the agent picks the right bundled skill on its own during normal conversation when a task matches one.",
+    "332": "### Editor integration (ACP)",
+    "397": "- **[Moving to another machine](../reference/faq.md#exporting-hermes-to-another-machine)** — `hermes backup` migrates your whole setup (or [a single profile](../reference/faq.md#moving-a-single-profile-to-another-machine)); no need to rebuild from scratch"
+   }
+  },
+  "guides/team-telegram-assistant.md": {
+   "sha256": "9019db23c8d762321dba45e08b9c8de1cf9e9a1cee02de53f20d7a0dc03fda37",
+   "lines": {
+    "27": "- **Hermes Agent installed** on a server or VPS (not your laptop — the bot needs to stay running). Follow the [installation guide](../getting-started/installation.md) if you haven't yet."
+   }
+  },
+  "user-guide/bot-mode.md": {
+   "sha256": "e4e19e150999cc5c78a4168a41e548e9feed590d038778dea3ee478b2f0f4564",
+   "lines": {
+    "8": "**Bot Mode** turns your [Hermes profiles](./profiles.md) into a roster of named **Bots**. Each Bot has its own role, model, memory, skills, and avatar; Bots run recurring routines, deliberate together in group chats, and message each other directly. Build a specialist Bot once and it is there forever, one click away.",
+    "10": "Bot Mode ships **built into the [desktop app](./desktop.md)** and is **on by default** — no install needed. It appears as a **Bots** tab next to Sessions in the left sidebar, with a **Routines** tile docked beside the conversation while the Bots tab is active.",
+    "13": "There is no new primitive to learn: a Bot **is** a Hermes profile — isolated config, memory, skills, credentials, and chat history under `~/.hermes/profiles/<name>/`. Bot Mode is a UI over that primitive, so everything you do in it is visible from the CLI too: `hermes -p <bot> chat` opens the same agent, and Bot routines appear in `hermes cron list`. No core patches, no background daemons, no extra storage.",
+    "61": "Hit **New Agent** in the roster. The quick path is three fields — **Name**, **Title**, **Description** — and the Bot exists in seconds, introducing itself as the first message of its new Bot Chat.",
+    "68": "- **Custom SOUL.md** — the Bot's persona and standing instructions.",
+    "84": "**Edit Profile** (right-click a Bot) reopens the same surface on the live profile any time: avatar, title, description, model pin, skills, toolsets, MCP servers, and the full SOUL.md."
+   }
+  },
+  "user-guide/desktop.md": {
+   "sha256": "3d5d00025d8359deb26898cd6ec91c1819e9843aed96bb957f886361f0cccc89",
+   "lines": {
+    "128": "In the native app, **Settings → Web Access** turns the Webapp on for other devices, behind sign-in with",
+    "212": "- **Per-session YOLO toggle** — flip YOLO on or off for just this session (matching the TUI). YOLO bypasses the dangerous-command approval prompts, so know what you're turning off — see [Security → YOLO Mode](./security.md#yolo-mode).",
+    "247": "The model picker lives in the **composer**, just left of the microphone. Click it to switch the model; hover a model row for its options (thinking, effort, fast). Next to it, a **reasoning pill** shows the active model's effort level (`Med`, `High`, …) and opens the same options directly, so you can change effort without finding the model's row. The pill is hidden for models whose catalog reports no reasoning control. When the route clamps a Hermes-internal step (`ultra` is sent as the route's strongest level, e.g. `max`), the pill shows both ends (`Ultra→Max`) and its tooltip spells out the same wording as the CLI, `Ultra (sends Max on this route)`, so the level you see is the level that is sent. When the gateway flags a switch as risky (a large cached context, an expensive model, a data-training tier), the app asks first in a dialog: **Switch anyway** applies it, **Keep current model** (or Esc) leaves everything as it was.",
+    "252": "- **Set the default in Settings → Model → Main model.** Choose a provider and model in their labeled rows, then click **Apply** below the model selector. Controls align to the right on wide windows and stack below their labels on narrow windows. The **Defaults** section has separate reasoning and speed controls where the model supports them. That \"main\" model is your **per-profile global default**, which new chats, crons, subagents, and auxiliary tasks start from. Each [profile](#sessions--profiles) keeps its own default.",
+    "409": "Manage providers, models, tools, and credentials from a real UI instead of editing YAML. First-run onboarding gets you to your first message in seconds. The settings panes cover providers/keys, model selection, toolset configuration, MCP servers, the gateway, and session management.",
+    "411": "- **Providers settings pane** — a dedicated place to manage inference providers, with an Accounts / API-keys UX for signing in and storing credentials per provider. Accounts, API keys, and Custom Endpoints share the Settings **Applies to** selection: credential reads and edits, OAuth account removal, custom-endpoint save/test, and sign-in launched here target the selected profile, not the active chat profile. The sign-in flow keeps that target through credential saving and model selection. Changing **Applies to** discards unsaved credential drafts. Closing sign-in cancels polling and ignores late results; a credential write already sent may still finish in its original profile. Externally managed CLI credentials use their own CLI and are not covered by this profile selector. Its **Local Models** view installs and manages an on-device llama.cpp runtime — see [Local Models](./local-models.md).",
+    "434": "When you have two or more [profiles](./profiles.md), the config-backed settings pages — **Model, Workspace, Safety, Memory & Context, Voice, Chat, Advanced, and Tools & Keys** — plus **Providers → Custom Endpoints** and the **Messaging** overlay show a shared **Applies to** chip row at the top. It selects which profile your edits target:",
+    "447": "- **Skills** — browse, install, and manage [skills](./features/skills.md). The Skills tab lists your installed skills with enable/disable toggles, and below them the full built-in optional-skills catalog that ships with Hermes — each entry has a one-click **Install** button that flips the row into the installed list once it finishes. The public Skills Hub's **Install in Hermes** buttons open `hermes://skill/install?identifier=...` links that install through the same pipeline after you confirm (see [skill links](./features/skills.md#install-from-the-website)).",
+    "448": "- **Memory graph (Star Map)** — type `/journey` (aliases `/learning`, `/memory-graph`) in chat to open an interactive constellation of learned skills and memories over time, with a playback scrubber. Nodes can be edited or deleted right from the panel (skills are archived, memories removed). See [Learning Journey](./features/memory.md#learning-journey-journey).",
+    "449": "- **Cron** — view and manage [scheduled jobs](../reference/cli-commands.md#hermes-cron). With **All profiles** on, the list aggregates every profile's jobs; a job's run history and actions (pause, resume, edit, delete) always go to the profile that owns the job, whichever profile is active.",
+    "451": "- **Messaging** — set up gateway channels. Telegram has a **Quick setup** card: click **Create with QR**, scan the code (or open the link) in Telegram, and Hermes creates the bot, detects your user ID for the allowlist, saves the credentials, and restarts the gateway for you. Any credential save, clear, or enable toggle keeps a **Restart now** banner on the page until the gateway has actually restarted; if a restart fails, the banner stays so you can retry or restart manually.",
+    "513": "- **Rebindable shortcuts** — **Settings → Keyboard Shortcuts** (or **Cmd/Ctrl+/**) opens the shortcuts panel where you can remap almost every binding — profile switching, session navigation, view toggles, and any shortcuts contributed by desktop plugins. Duplicate assignments are flagged as conflicts. A few defaults worth knowing: **Cmd/Ctrl+N** new session, **Cmd/Ctrl+.** Command Center, **Cmd/Ctrl+,** Settings, **Cmd/Ctrl+Shift+F** search sessions, **Cmd/Ctrl+1–9** switch to the Nth tab of the pane under the pointer (or the focused pane) and switch profiles when no pane has a tab strip, **Shift+X** toggle light/dark.",
+    "602": "By default the app starts and manages its own **local** backend. You can instead point it at a Hermes backend running on another machine — a VPS, a home server, or a Mini behind Tailscale.",
+    "606": "**Settings → Gateways → Connection mode** offers the alternatives to the local gateway:",
+    "609": "- **Hermes Cloud** — sign in once to Hermes Cloud and pick from the agents on your account; no URL to paste. The app discovers your agents (with an organization picker if your account spans several orgs), and connecting to one switches the session over automatically. The status bar shows the cloud connection while it's active."
+   },
+   "moved": {
+    "130": 128,
+    "248": 212,
+    "283": 247,
+    "288": 252,
+    "445": 409,
+    "447": 411,
+    "470": 434,
+    "483": 447,
+    "484": 448,
+    "485": 449,
+    "487": 451,
+    "549": 513,
+    "638": 602,
+    "642": 606,
+    "645": 609
+   }
+  },
+  "user-guide/docker.md": {
+   "sha256": "b816be4e81b44a36e28e463030c727172c8c488d499c63793f6c3dd6c7d90538",
+   "lines": {
+    "11": "1. **Running Hermes IN Docker** — the agent itself runs inside a container (this page's primary focus)"
+   }
+  },
+  "user-guide/features/cron.md": {
+   "sha256": "1b17c9fbf28d883bcc3622dd9337a82c721ef05f40e3c989892759323c0ad45d",
+   "lines": {
+    "24": "All of this is available to Hermes itself through the `cronjob_manage` tool, so you can create, pause, edit, and remove jobs by asking in plain language — no CLI required.",
+    "86": "Every morning at 9am, check Hacker News for AI news and send me a summary on Telegram."
+   }
+  },
+  "user-guide/features/delegation.md": {
+   "sha256": "d1cf3a3bfe723092c33631b33c352c2d4c20b214e94cd8f1f082c94b71fdefe2",
+   "lines": {
+    "9": "The `delegate_task` tool spawns child AIAgent instances with isolated context, inherited tool access, and their own terminal sessions. Each child gets a fresh conversation and works independently — only its final summary enters the parent's context."
+   }
+  },
+  "user-guide/features/kanban.md": {
+   "sha256": "1ac2cd8b14d3f8ef3e18035ba66ca12b88a6c83a63ed68df0277ef20397b1204",
+   "lines": {
+    "11": "Hermes Kanban is a durable task board, shared across all your Hermes profiles, that lets multiple named agents collaborate on work without fragile in-process subagent swarms. Every task is a row in `~/.hermes/kanban.db`; every handoff is a row anyone can read and write; every worker is a full OS process with its own identity."
+   }
+  },
+  "user-guide/features/mcp.md": {
+   "sha256": "3fb96620a28c6a20ec13b3d05e3dab721626d81e2f6af38786b0d7a125622cdd",
+   "lines": {
+    "13": "MCP lets Hermes Agent connect to external tool servers so the agent can use tools that live outside Hermes itself — GitHub, databases, file systems, browser stacks, internal APIs, and more."
+   }
+  },
+  "user-guide/features/memory.md": {
+   "sha256": "979cb02df938e3bcb003195e465487aa0cdf5a3e8690ac86eb1ccd96cd69fdd4",
+   "lines": {
+    "9": "Hermes Agent has bounded, curated memory that persists across sessions. This lets it remember your preferences, your projects, your environment, and things it has learned.",
+    "20": "Both are stored in `~/.hermes/memories/` and are injected into the system prompt as a frozen snapshot at session start. The agent manages its own memory via the `memory` tool — it can add, patch, or remove entries.",
+    "166": "- **Explicit requests:** \"Remember that my API key rotation happens monthly\" → save to `memory`",
+    "288": "  memory_enabled: true"
+   }
+  },
+  "user-guide/features/personality.md": {
+   "sha256": "b51062d5888fec6babae8bd8e36b7efaab3e5165c1876c2cde08beca2f0ac1e6",
+   "lines": {
+    "9": "Hermes Agent's personality is fully customizable. `SOUL.md` is the **primary identity** — it's the first thing in the system prompt and defines who the agent is.",
+    "33": "- Hermes creates a starter `SOUL.md` automatically if one does not exist yet"
+   }
+  },
+  "user-guide/features/plugins.md": {
+   "sha256": "33d7c347454a8458dba70cc92486cdbcb089db72bb7a2ee8b1276477fed7a5b0",
+   "lines": {
+    "10": "Hermes has a plugin system for adding custom tools, hooks, and integrations without modifying core code."
+   }
+  },
+  "user-guide/features/tool-gateway.md": {
+   "sha256": "0e69147e2a9e46969666d60c2f3481be0abb423ae5e8366c48afa02ca59ae8ad",
+   "lines": {
+    "124": "Connectors are hosted apps such as Gmail that the agent reaches through the Nous tool gateway (see [Tool Search → Connectors](./tool-search.md#connectors-remote-tools)). You can connect two or more accounts of one app, for example a Gmail `home` and a Gmail `work`.",
+    "139": "- The desktop app's **Connectors** page."
+   }
+  },
+  "user-guide/features/tool-search.md": {
+   "sha256": "3e78e79c43eb362a8482a0d6f6ba095bb3342318d8eda99092493cf4dd45125e",
+   "lines": {
+    "187": "app from the desktop Connectors page) creates a free Nous identity for you, on"
+   }
+  },
+  "user-guide/features/tools.md": {
+   "sha256": "a9636832d7f4481191c4e3bf52bb95419cb36f10d67bd9dde353b75fcd77ba4e",
+   "lines": {
+    "13": "Tools are functions that extend the agent's capabilities. They're organized into logical **toolsets** that can be enabled or disabled per platform."
+   }
+  },
+  "user-guide/features/voice-mode.md": {
+   "sha256": "4e2cf63b0d901ab12873f57614aa54bed9b254687b723b0567f60bcb6c61a9ae",
+   "lines": {
+    "9": "Hermes Agent supports full voice interaction across CLI and messaging platforms. Talk to the agent using your microphone, hear spoken replies, and have live voice conversations in Discord voice channels."
+   }
+  },
+  "user-guide/security.md": {
+   "sha256": "eb3bd4530b4f5e9f3820b1dd44fcb5a348ad1e46e500b06326dde518238dcaac",
+   "lines": {
+    "15": "1. **User authorization** — who can talk to the agent (allowlists, DM pairing)",
+    "26": "Before executing any command, Hermes checks it against a curated list of dangerous patterns. If a match is found, the user must explicitly approve it.",
+    "58": "| **smart** (default) | Use an auxiliary LLM to assess risk. Low-risk commands (e.g., `python -c \"print('hello')\"`) are auto-approved for that command only. Genuinely dangerous commands are auto-denied. Uncertain cases escalate to a manual prompt. |"
+   },
+   "moved": {
+    "59": 58
+   }
+  }
+ }
+}

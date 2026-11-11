@@ -629,7 +629,8 @@ test('what is kept about the person: one stored record ("kept") by fixed rules, 
   assert.equal(storage.data.get('met'), true)
   assert.deepEqual(storage.data.get('kept'), { name: 'Peter', work: 'I run a tennis club', msg: 'WhatsApp', asked: ['my club has six courts'], told: true, ...(WORK_TOLD ? { told_work: true } : {}) })
   assert.doesNotMatch(JSON.stringify([...storage.data]), /install|skill/)
-  assert.deepEqual(globalThis.__hhHost.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'and nothing was sent to Hermes')
+  // (dash-v1: less the Dashboard's read-only reads when the page opens on it: profiles.describe, cron.manage, plugins.manage)
+  assert.deepEqual(globalThis.__hhHost.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status' && !['profiles.describe', 'cron.manage', 'plugins.manage'].includes(m)), [], 'and nothing was sent to Hermes')
 })
 
 test('no AI step: the conversation\'s code reaches no model and no request; the built file has no model call in the conversation', () => {
