@@ -77,6 +77,13 @@ export const DASH_READ_MS = 30000
 export const DASH_SLOW_READ_MS = 60000
 
 // The element's own width, from a ResizeObserver on our own markup (0 until measured).
+// A long word with a "/" before its end (a web address) may break after its last "/" only.
+function pathBreak(word) {
+  const at = word.lastIndexOf('/')
+  if (word.length < 24 || at <= 0 || at >= word.length - 1) return word
+  return [word.slice(0, at + 1), jsx('wbr', {}, 'b'), word.slice(at + 1)]
+}
+
 function useDashWidth() {
   const [width, setWidth] = useState(0)
   const holder = useRef(null)
@@ -491,13 +498,15 @@ export function makeDashboard(ctx) {
                                   'data-hh': 'paste',
                                   children: [
                                     // a command breaks only at its spaces, each word kept whole (a web address broke at
-                                    // its hyphen and read as two words); Copy goes under it when there is no room beside
+                                    // its hyphen and read as two words), except that a web address may break after its last
+                                    // "/" (an invisible <wbr>: copied by hand it is the same text); Copy goes under it when
+                                    // there is no room beside
                                     jsx(
                                       'code',
                                       {
                                         className: `${K.mono} ${D.pasteText}`,
                                         'data-hh': 'paste-text',
-                                        children: p.text.split(' ').flatMap((word, i) => [i ? ' ' : null, jsx('span', { className: D.word, children: word }, i)])
+                                        children: p.text.split(' ').flatMap((word, i) => [i ? ' ' : null, jsx('span', { className: D.word, children: pathBreak(word) }, i)])
                                       },
                                       't'
                                     ),
