@@ -42,7 +42,8 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 84
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "first_chat",
@@ -75,7 +76,8 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 182
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "personality",
@@ -108,7 +110,8 @@ export const DASH_DATA = {
           "file": "user-guide/features/personality.md",
           "line": 33
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "chat_apps",
@@ -149,7 +152,8 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 45
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "tools_apps",
@@ -179,7 +183,8 @@ export const DASH_DATA = {
           "file": "user-guide/features/tool-gateway.md",
           "line": 124
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "skills",
@@ -206,7 +211,8 @@ export const DASH_DATA = {
           "file": "getting-started/quickstart.md",
           "line": 297
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "memory",
@@ -232,7 +238,8 @@ export const DASH_DATA = {
           "file": "user-guide/features/memory.md",
           "line": 9
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "second_bot",
@@ -269,7 +276,8 @@ export const DASH_DATA = {
           "file": "getting-started/learning-path.md",
           "line": 83
         }
-      ]
+      ],
+      "video": null
     },
     {
       "id": "safety",
@@ -302,7 +310,8 @@ export const DASH_DATA = {
           "file": "getting-started/learning-path.md",
           "line": 163
         }
-      ]
+      ],
+      "video": null
     }
   ],
   "total": 9,
@@ -356,7 +365,8 @@ export const DASH_DATA = {
       "mark_undo": "Not done yet",
       "start_here": "Start here",
       "state_done": "Done",
-      "mark_done": "Done"
+      "mark_done": "Done",
+      "video_soon": "Video coming soon"
     }
   }
 }

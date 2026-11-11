@@ -362,6 +362,53 @@ test('leaving the page drops what was read; coming back reads everything again f
   assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileNumber(view, k)), ['3', '45', 'none'])
 })
 
+/* ---------- loom2 point 6: a place for one video at the top of each opened card ---------- */
+test('an empty address gives a quiet 16:9 box with the card\'s name and "Video coming soon" (no play button); an address gives the browser\'s own player that loads nothing before Play', async () => {
+  const { view } = await open('half')
+  click(stop(view, 'model'))
+  const box = byData(dash(view), 'steps')
+  const first = box.props.children.filter(Boolean)[1]
+  assert.equal(first.props['data-hh'], 'video-soon', 'at the top of the opened card')
+  assert.equal(first.props.className, D.videoSoon)
+  assert.equal(said(first), 'A model Video coming soon')
+  assert.equal(all(first, n => n.type === 'video' || n.type === 'sdk:Button' || n.type === 'button').length, 0)
+  assert.equal(byData(box, 'video'), null)
+  // the same build with an address for A model (as content/videos.json would give it)
+  useHost('half')
+  const VIDEO = { url: 'https://example.com/model.mp4', poster: 'https://example.com/model.jpg', captions: 'https://example.com/model.vtt' }
+  const reg = await registerPlugin(fakeStorage(), fakeTimers(), {}, src => {
+    const at = src.indexOf('"video": null')
+    assert.ok(at > 0 && src.indexOf('"id": "model"') < at && at < src.indexOf('"id": "first_chat"'))
+    return src.slice(0, at) + `"video": ${JSON.stringify(VIDEO)}` + src.slice(at + '"video": null'.length)
+  })
+  const v2 = mount(reg.Page)
+  await settle(12)
+  click(stop(v2, 'model'))
+  const player = byData(byData(dash(v2), 'steps'), 'video')
+  assert.equal(player.type, 'video')
+  assert.equal(player.props.className, D.video)
+  assert.deepEqual([player.props.src, player.props.poster, player.props.controls, player.props.preload, player.props.controlsList, player.props.disablePictureInPicture], [VIDEO.url, VIDEO.poster, true, 'none', 'nodownload', true])
+  assert.equal(player.props.autoPlay, undefined)
+  const track = player.props.children
+  assert.deepEqual([track.type, track.props.kind, track.props.src, track.props.default], ['track', 'captions', VIDEO.captions, true])
+  assert.equal(byData(byData(dash(v2), 'steps'), 'video-soon'), null)
+  // another card in that build still has its quiet box
+  click(stop(v2, 'memory'))
+  assert.ok(byData(byData(dash(v2), 'steps'), 'video-soon'))
+})
+
+test('a video address that is not https:// is never handed to the player, also if it reached the built file', async () => {
+  for (const bad of ['http://example.com/a.mp4', 'javascript:alert(1)', 'https://example.com/a b.mp4']) {
+    useHost('half')
+    const reg = await registerPlugin(fakeStorage(), fakeTimers(), {}, src => src.replace('"video": null', `"video": ${JSON.stringify({ url: bad, poster: '', captions: '' })}`))
+    const v = mount(reg.Page)
+    await settle(12)
+    click(stop(v, 'model'))
+    assert.equal(byData(byData(dash(v), 'steps'), 'video'), null, bad)
+    assert.ok(byData(byData(dash(v), 'steps'), 'video-soon'), bad)
+  }
+})
+
 /* ---------- loom2: the set-up as cards ---------- */
 // His Loom of 11 Nov (1:56, "these kind of cards"; 2:13 "scheduled jobs are not part of the setup") and his words at
 // 17:10 UTC: "By default no card should be shown as done, only if the person clicks Done. Otherwise it doesn't show."

@@ -120,6 +120,17 @@ export function openHermesDocs(ctx, url) {
   } catch {}
 }
 
+// loom2: a video's address from content/videos.json, checked again where it is used: an https:// address that reads
+// back exactly as written (the build has checked it too)
+export function isVideoUrl(url) {
+  if (typeof url !== 'string' || !url.startsWith('https://') || /[\s"'<>\\]/.test(url)) return false
+  try {
+    return new URL(url).href === url
+  } catch {
+    return false
+  }
+}
+
 export function makeDashboard(ctx) {
   const read = makeReader(ctx)
 
@@ -298,6 +309,38 @@ export function makeDashboard(ctx) {
       )
     }
 
+    // loom2 point 6: the card's video at the top of the opened card (content/videos.json). With an address: the browser's
+    // own player, nothing loaded before Play, no Download and no Picture-in-picture, captions when given. Without: a
+    // quiet 16:9 box with the card's name and "Video coming soon", and no play button that does nothing.
+    const cardVideo = it =>
+      it.video && isVideoUrl(it.video.url)
+        ? jsx(
+            'video',
+            {
+              className: D.video,
+              'data-hh': 'video',
+              src: it.video.url,
+              poster: isVideoUrl(it.video.poster) ? it.video.poster : undefined,
+              controls: true,
+              preload: 'none',
+              controlsList: 'nodownload',
+              disablePictureInPicture: true,
+              playsInline: true,
+              'aria-label': it.name,
+              children: isVideoUrl(it.video.captions) ? jsx('track', { kind: 'captions', src: it.video.captions, srcLang: 'en', label: 'English', default: true }) : null
+            },
+            'video'
+          )
+        : jsxs(
+            'div',
+            {
+              className: D.videoSoon,
+              'data-hh': 'video-soon',
+              children: [jsx('span', { className: D.videoName, children: it.name }, 'n'), jsx('span', { children: W.setup.video_soon }, 's')]
+            },
+            'video'
+          )
+
     // What an opened card holds, full width under its row: the steps (with their route buttons), the text to paste,
     // the Done or Not done yet button, the sources, the close button.
     let panel = null
@@ -317,6 +360,7 @@ export function makeDashboard(ctx) {
           children: [
             // the pointer to the opened card: over the middle of its column
             jsx('i', { className: D.caret, style: { left: `calc(${(((openAt % columns) + 0.5) * 100) / columns}% - 7px)` }, 'aria-hidden': true }, 'caret'),
+            cardVideo(openItem),
             jsx(
               'ol',
               {

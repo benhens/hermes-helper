@@ -103,6 +103,32 @@ test('every word on the tab is in the file: one missing stops the build; marks f
   assert.match(dashProblems(t, DOCS).join('\n'), /not exactly Dashboard and Learn/)
 })
 
+test('loom2: content/videos.json has every card and only https:// addresses; all empty now; a bad one stops the build; an address becomes the card\'s video', () => {
+  const file = read('content/videos.json')
+  assert.deepEqual(Object.keys(file.videos), DASH_DATA.items.map(i => i.id))
+  for (const v of Object.values(file.videos)) assert.deepEqual(v, { url: '', poster: '', captions: '' })
+  assert.ok(DASH_DATA.items.every(i => i.video === null))
+  for (const [k, bad] of [['url', 'http://example.com/a.mp4'], ['url', 'javascript:alert(1)'], ['poster', 'https://example.com/a b.jpg'], ['captions', 'data:text/vtt,x'], ['url', 'https://example.com/"a.mp4']]) {
+    const d = copy()
+    d.videos.model = { url: 'https://example.com/a.mp4', poster: '', captions: '', [k]: bad }
+    assert.match(dashProblems(d, DOCS).join('\n'), new RegExp(`videos\\.json: model\\.${k} is not an https:// address`), bad)
+  }
+  const missing = copy()
+  delete missing.videos.safety
+  assert.match(dashProblems(missing, DOCS).join('\n'), /no entry for safety/)
+  const extra = copy()
+  extra.videos.scheduled_job = { url: '', poster: '', captions: '' }
+  assert.match(dashProblems(extra, DOCS).join('\n'), /scheduled_job is no card/)
+  const orphan = copy()
+  orphan.videos.memory = { url: '', poster: 'https://example.com/p.jpg', captions: '' }
+  assert.match(dashProblems(orphan, DOCS).join('\n'), /memory has a poster or captions but no url/)
+  const good = copy()
+  good.videos.memory = { url: 'https://example.com/memory.mp4', poster: 'https://example.com/memory.jpg', captions: '' }
+  assert.deepEqual(dashProblems(good, DOCS), [])
+  assert.deepEqual(slimDashData(good).items.find(i => i.id === 'memory').video, { url: 'https://example.com/memory.mp4', poster: 'https://example.com/memory.jpg', captions: '' })
+  assert.equal(slimDashData(good).items.find(i => i.id === 'model').video, null)
+})
+
 test('the words he took out are not in the file: no "chats in 30 days", no "days with a chat", no "streak"', () => {
   const words = JSON.stringify(DATA.page_words)
   assert.doesNotMatch(words, /30 days|days with a chat|streak|Journey/i)

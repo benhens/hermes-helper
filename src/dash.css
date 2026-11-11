@@ -68,6 +68,10 @@ html:not(.dark) .hhd-scard{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 /* the pointer to the opened card: only its half above the panel is drawn (--ui-bg-tertiary is see-through, so the
    half over the panel showed lighter) */
 .hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}
+/* loom2: the card's video, 16:9, at the top of the opened card; until it has an address a quiet box of the same shape */
+.hhd-video{display:block;width:100%;max-width:560px;aspect-ratio:16/9;border-radius:calc(8px*var(--hhd-round));background:var(--ui-bg-elevated)}
+.hhd-video-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;max-width:560px;aspect-ratio:16/9;border-radius:calc(8px*var(--hhd-round));background:var(--ui-bg-elevated);font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}
+.hhd-video-name{font-size:13px;font-weight:600;color:var(--ui-text-secondary)}
 .hhd-ol{margin:0;padding:0 0 0 20px;list-style:decimal;font-size:13px;line-height:20px;color:var(--ui-text-primary)}
 .hhd-compact .hhd-ol{line-height:19px}
 .hhd-ol li::marker{color:var(--ui-accent);font-weight:600}

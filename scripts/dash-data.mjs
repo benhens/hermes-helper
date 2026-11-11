@@ -92,6 +92,8 @@ export function dashProblems(data, docs) {
   const seen = [...new Set([...byPage, ...SEEN_OVER_DATA])]
   if (seen.slice().sort().join() !== SEEN_IDS.slice().sort().join()) fails.push(`stops the page sees are ${seen.join(', ')}; the code has rules for exactly ${SEEN_IDS.join(', ')}`)
 
+  // loom2: the cards' videos (content/videos.json)
+  fails.push(...videoProblems(data.videos, path.filter(i => !CARDS_OUT.includes(i.id)).map(i => i.id)))
   const w = data.page_words
   if (!w || typeof w !== 'object') return [...fails, 'page_words missing']
   const need = (obj, keys, where) => keys.forEach(k => isText(obj && obj[k]) || fails.push(`page_words.${where}${k} missing`))
@@ -142,6 +144,35 @@ export const LOOM2_WORDS = { start_here: 'Start here', state_done: 'Done', mark_
 // loom2 point 4 (his Loom, 0:20 "why is it just saying Plugins, Skills, Bots? Why?"): one plain line under each tile, as
 // Lead wrote them: bots from the second-bot card's sentence, skills from the skills card's, plugins from
 // content/helper-talk-v2.json fixed_lines 63 ("A plugin is an add-on.")
+// loom2 point 6: the words of a card whose video is not there yet (Lead's words)
+export const VIDEO_WORDS = { video_soon: 'Video coming soon' }
+// A video's address, its poster and its captions file (content/videos.json): empty, or an https:// address that reads
+// back exactly as written, with no space, quote or angle bracket in it.
+export function videoUrlOk(v) {
+  if (v === '') return true
+  if (typeof v !== 'string' || !v.startsWith('https://') || /[\s"'<>\\]/.test(v)) return false
+  try {
+    return new URL(v).href === v
+  } catch {
+    return false
+  }
+}
+export function videoProblems(videos, cardIds) {
+  const fails = []
+  if (!videos || typeof videos !== 'object' || Array.isArray(videos)) return ['videos.json: no "videos" object']
+  for (const id of Object.keys(videos)) if (!cardIds.includes(id)) fails.push(`videos.json: ${id} is no card`)
+  for (const id of cardIds) {
+    const v = videos[id]
+    if (!v || typeof v !== 'object') {
+      fails.push(`videos.json: no entry for ${id}`)
+      continue
+    }
+    for (const k of Object.keys(v)) if (!['url', 'poster', 'captions'].includes(k)) fails.push(`videos.json: ${id}.${k} is not url, poster or captions`)
+    for (const k of ['url', 'poster', 'captions']) if (!videoUrlOk(v[k] === undefined ? '' : v[k])) fails.push(`videos.json: ${id}.${k} is not an https:// address`)
+    if (v.url === '' && (v.poster || v.captions)) fails.push(`videos.json: ${id} has a poster or captions but no url`)
+  }
+  return fails
+}
 export const TILE_LINES = { bots: 'Each bot is a separate Hermes.', skills: 'Each skill teaches Hermes one task.', plugins: 'Each plugin is an add-on for Hermes.' }
 
 // What src/dash.js reads: the cards (no done rules or reads: since loom2 nothing is read for them) and the page words.
@@ -159,7 +190,9 @@ export function slimDashData(data) {
         return r ? { text: s.text, route: { label: r.label, to: r.to } } : { text: s.text }
       }),
       terminal: it.terminal ? { when: it.terminal.when, paste: it.terminal.paste.map(p => ({ for: p.for, text: p.text })) } : null,
-      sources: it.sources.map(s => ({ file: s.file, line: s.line }))
+      sources: it.sources.map(s => ({ file: s.file, line: s.line })),
+      // loom2: its video (content/videos.json), or null while it has no address
+      video: data.videos && data.videos[it.id] && data.videos[it.id].url ? { url: data.videos[it.id].url, poster: data.videos[it.id].poster || '', captions: data.videos[it.id].captions || '' } : null
     })),
     total: data.items.filter(i => i.on_path === true && !CARDS_OUT.includes(i.id)).length,
     // the path's 10 stops in order, for Helper's set-up conversation only (src/setup-chat.js: its "next" stop, as before
@@ -171,7 +204,7 @@ export function slimDashData(data) {
       helperWindow: pickWords(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no']),
       // loom2: Activity is out (his Loom of 11 Nov, 0:05 "just take it out"): its words are not built in
       // loom2: no path, so no "You are here", Next, Open, all done line or seen states; no "Helper can't see this one"
-      setup: { ...pickWords(w.setup, ['title', 'count', 'close', 'copy', 'copied', 'source', 'mark_undo']), ...LOOM2_WORDS }
+      setup: { ...pickWords(w.setup, ['title', 'count', 'close', 'copy', 'copied', 'source', 'mark_undo']), ...LOOM2_WORDS, ...VIDEO_WORDS }
     }
   }
 }

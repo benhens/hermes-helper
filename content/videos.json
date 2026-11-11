@@ -1,0 +1,14 @@
+{
+  "about": "Helper's set-up cards on the Dashboard: one video per card, shown at the top of the card when it is opened. Lead fills this in; nothing else changes. For each card: url = the video's https:// address (an .mp4 or .webm file the browser can play; empty = the card shows a quiet 'Video coming soon' box), poster = an https:// picture shown before Play (may stay empty), captions = an https:// .vtt captions file (may stay empty). Only https:// addresses are taken; the build stops on anything else. After a change: cd plugin && node scripts/build.mjs && npm test. A video loads from the web only when the person presses Play.",
+  "videos": {
+    "model": { "url": "", "poster": "", "captions": "" },
+    "first_chat": { "url": "", "poster": "", "captions": "" },
+    "personality": { "url": "", "poster": "", "captions": "" },
+    "chat_apps": { "url": "", "poster": "", "captions": "" },
+    "tools_apps": { "url": "", "poster": "", "captions": "" },
+    "skills": { "url": "", "poster": "", "captions": "" },
+    "memory": { "url": "", "poster": "", "captions": "" },
+    "second_bot": { "url": "", "poster": "", "captions": "" },
+    "safety": { "url": "", "poster": "", "captions": "" }
+  }
+}

@@ -321,7 +321,11 @@ test('the character is one swappable component, used only through <Character>', 
 test('the character is drawn, not loaded: no picture, no data URL, no sprite sheet anywhere in the built file', () => {
   assert.doesNotMatch(code, /data:image|base64|\.(png|webp|gif|jpe?g|svg)['"`)?#]/)
   assert.doesNotMatch(code, /maskImage|WebkitMask|background-image|backgroundImage/)
-  assert.doesNotMatch(code, /jsxs?\(\s*['"](img|image|canvas|picture|video|object|embed|use)['"]/)
+  assert.doesNotMatch(code, /jsxs?\(\s*['"](img|image|canvas|picture|object|embed|use)['"]/)
+  // loom2 point 6 (Lead's job): one <video>, the set-up card's own video in src/dash.js, never in the character
+  assert.equal([...code.matchAll(/jsxs?\(\s*['"]video['"]/g)].length, 1)
+  assert.equal([...src('dash.js').matchAll(/jsxs?\(\s*['"]video['"]/g)].length, 1)
+  assert.doesNotMatch(src('character.js'), /video/)
   // the 9 Nov sprite-sheet slot and the drawn hand's poses are gone (commit cff33f6 has them)
   assert.equal(fs.existsSync(path.join(ROOT, 'src', 'pet-sheet.js')), false)
   // (loom-fixes: the names from the Hermes docs hold "pets (petdex mascots)", a docs page's title, so the word is

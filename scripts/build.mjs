@@ -220,8 +220,10 @@ const DASH_JS = path.join(ROOT, 'src', 'dash-data.js')
 // dash-v2: the list is the team's file as it is (no builder block any more: the team's file holds Lead's rulings), and
 // every other word on the tab is the team's content/dash-words-v1.json (page_words); the two are joined here.
 const DASH_WORDS_JSON = path.join(ROOT, 'content', 'dash-words-v1.json')
+// loom2: the plugin's own file of the cards' videos (all empty until Lead adds addresses)
+const VIDEOS_JSON = path.join(ROOT, 'content', 'videos.json')
 // word_variants: the words file's other wordings; the build takes the plugins label's short one for the narrow size.
-export const dashJoined = (list = readJson(DASH_JSON), words = readJson(DASH_WORDS_JSON)) => ({ ...list, page_words: words.page_words, word_variants: words.variants })
+export const dashJoined = (list = readJson(DASH_JSON), words = readJson(DASH_WORDS_JSON), videos = readJson(VIDEOS_JSON)) => ({ ...list, page_words: words.page_words, word_variants: words.variants, videos: videos.videos })
 export function dashDataSource(data = dashJoined(), docs = readJson(DASH_DOCS_JSON)) {
   const problems = dashProblems(data, docs)
   if (problems.length) throw new Error(`content/dash-setup-list-v2.json or content/dash-words-v1.json has ${problems.length} problem(s); the build stops and nothing is written:\n  ` + problems.join('\n  '))

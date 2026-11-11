@@ -232,7 +232,10 @@ export const D = {
   doneLine: 'hhd-done-line',
   start: 'hhd-start',
   sel: 'hhd-sel',
-  // what an opened card holds, full width under its row
+  // what an opened card holds, full width under its row; loom2 point 6: its video, or the quiet box until there is one
+  video: 'hhd-video',
+  videoSoon: 'hhd-video-soon',
+  videoName: 'hhd-video-name',
   steps: 'hhd-steps',
   caret: 'hhd-caret',
   ol: 'hhd-ol',
