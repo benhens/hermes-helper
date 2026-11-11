@@ -21345,12 +21345,12 @@ const fill = (s, map) => s.replace(/\{(\w+)\}/g, (m, k) => (k in map ? String(ma
 // The official Hermes docs: the only web address the page ever hands to the person's browser (the Dashboard's source
 // tags; Helper's "Open the Quickstart").
 const HERMES_DOCS_BASE = 'https://hermes-agent.nousresearch.com/docs/'
-// (read as a web address, so a path with ".." that leaves /docs/, another port or a name before an @ is refused)
+// It must begin with that address as written, and be a web address that reads back exactly as given: one with ".."
+// in its path (a way out of /docs/) reads back shorter and is refused.
 function isHermesDocsUrl(url) {
   if (typeof url !== 'string' || !url.startsWith(HERMES_DOCS_BASE) || /[\s"'<>\\%@]/.test(url)) return false
   try {
-    const u = new URL(url)
-    return u.origin + '/docs/' === HERMES_DOCS_BASE && u.pathname.startsWith('/docs/') && !u.username && u.href === url
+    return new URL(url).href === url
   } catch {
     return false
   }
