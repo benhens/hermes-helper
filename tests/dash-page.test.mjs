@@ -282,6 +282,9 @@ test('person 1, just installed: "2 of 6", Install and Model filled, You are here
   assert.equal(text(openNext).trim(), 'Open')
   assert.deepEqual(all(openNext, x => x.type === 'sdk:Codicon').map(x => [x.props.name, x.props.size, x.props['aria-hidden']]), [['chevron-down', 12, true]])
   assert.equal(all(openNext, x => x.props.className === D.openChev).length, 1)
+  // the word and the arrow are one child of the Button, the arrow last
+  assert.equal(openNext.props.children.props.className, D.openWord)
+  assert.equal(openNext.props.children.props.children.at(-1).props.className, D.openChev)
   // the names under the stops are the data's short names
   assert.deepEqual(stops(view).map(s => text(all(s, n => n.props.className === D.name)[0])), DASH_DATA.items.map(i => i.mark))
 })

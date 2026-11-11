@@ -63,11 +63,13 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-road{position:relative;margin:4px 0 0;width:100%}
 .hhd-compact .hhd-road{margin-top:2px}
 .hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}
-/* the line: one thin neutral line through all 11 stops, the same in every state; never the accent. Its colour is
-   Hermes's own neutral edge line, --sidebar-edge-border (the text colour at 7.5% in light, 12% in dark), because
-   Hermes's hairline --ui-stroke-tertiary is 10% accent and read as a pale blue thread (hhdesign's review of 65b108b).
-   Where a Hermes has no such variable: the grey of the quiet stops' pictures and names. */
-.hhd-line{fill:none;stroke:var(--sidebar-edge-border,var(--ui-text-quaternary));stroke-width:1.5;stroke-linecap:round}
+/* the line: one thin neutral line through all 11 stops, the same in every state; never the accent. Hermes's
+   hairline --ui-stroke-tertiary is 10% accent and read as a pale blue thread (hhdesign's review of 65b108b). Its
+   first choice, Hermes's edge line --sidebar-edge-border at 1.5 px, was built and run: set on our page, 1.38:1 on the
+   card in dark, but 1.15:1 in light, where the path looked broken. So its second choice: the grey of the quiet
+   stops' pictures and names, at 1 px. (The first choice again: stroke:var(--sidebar-edge-border);stroke-width:1.5,
+   and the same variable in the quiet ring below.) */
+.hhd-line{fill:none;stroke:var(--ui-text-quaternary);stroke-width:1;stroke-linecap:round}
 /* a stop: a button centred on its point; its name above (up) or below (down) */
 .hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}
 .hhd-stop:focus-visible{outline:none}
@@ -79,7 +81,7 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}
 .hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}
 /* (ii) the quieter mark for what Helper cannot see: smaller, the card's own colour, a thin ring of the line's colour */
-.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--sidebar-edge-border,var(--ui-text-quaternary));color:var(--ui-text-quaternary)}
+.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-text-quaternary);color:var(--ui-text-quaternary)}
 .hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}
 .hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}
 .hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -104,6 +106,7 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}
 .hhd-alldone{color:var(--ui-accent)}
 /* the small down arrow after "Open": the steps open below, they do not lead away */
+.hhd-open-word{display:inline-flex;align-items:center}
 .hhd-open-chev{display:inline-flex;margin-left:4px}
 .hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}
 .hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}

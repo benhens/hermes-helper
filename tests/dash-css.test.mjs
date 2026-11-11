@@ -15,7 +15,8 @@ const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8')
 const sheet = read('src/dash.css')
 const rules = DASH_CSS.split('\n')
 const selectorsOf = rule => rule.slice(0, rule.indexOf('{')).split(',').map(s => s.trim())
-const EDGE = 'var(--sidebar-edge-border,var(--ui-text-quaternary))'
+// the line's colour: hhdesign's second choice (see the line's test below)
+const EDGE = 'var(--ui-text-quaternary)'
 const classesIn = text => [...new Set([...text.matchAll(/\.([a-zA-Z][\w-]*)/g)].map(m => m[1]))]
 
 test('the built string is the sheet with its comments and line breaks dropped, nothing else changed', () => {
@@ -58,10 +59,11 @@ test('every class the code names has a rule in the sheet, and the sheet has no c
   }
 })
 
-test('the path\'s line: one thin neutral line through all 11 stops, in Hermes\'s neutral edge colour (--sidebar-edge-border, hhdesign\'s review: the hairline --ui-stroke-tertiary is 10% accent, so blue); no rule colours it, in any state', () => {
+test('the path\'s line: one thin neutral line through all 11 stops, in a Hermes colour with no accent in it (hhdesign\'s review: the hairline --ui-stroke-tertiary is 10% accent, so blue; its first choice --sidebar-edge-border could hardly be seen in light, so its second: --ui-text-quaternary at 1 px); no rule colours it, in any state', () => {
   const lineRules = rules.filter(r => selectorsOf(r).some(s => /\.hhd-line(?![\w-])/.test(s)))
-  assert.deepEqual(lineRules, [`.${D.line}{fill:none;stroke:${EDGE};stroke-width:1.5;stroke-linecap:round}`])
-  // (its fallback, where a Hermes has no such variable, is the grey of the quiet stops' pictures and names)
+  assert.deepEqual(lineRules, [`.${D.line}{fill:none;stroke:${EDGE};stroke-width:1;stroke-linecap:round}`])
+  assert.doesNotMatch(DASH_CSS, /--sidebar-edge-border/)
+  // (the grey the quiet stops' pictures and names already wear)
   // the quiet stops' ring is the line's colour, so ring and line stay one colour
   assert.ok(rules.find(r => r.startsWith(`.${D.quiet} .${D.dot}{`)).includes(`border:1.5px solid ${EDGE};`))
   // the hairline stays where Hermes itself uses it: the cards' edge in light, the divider above "Next"
@@ -79,7 +81,7 @@ test('the stops show the state: filled accent = done, ringed and larger = You ar
   const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
   assert.match(rule(`.${D.done} .${D.dot}`), /background:var\(--ui-accent\)/)
   assert.match(rule(`.${D.here} .${D.dot}`), /width:50px;height:50px;.*border:2px solid var\(--ui-accent\);outline:5px solid color-mix\(in srgb,var\(--ui-accent\) 14%,transparent\)/)
-  assert.match(rule(`.${D.quiet} .${D.dot}`), /width:30px;height:30px;background:var\(--ui-bg-elevated\);border:1\.5px solid var\(--sidebar-edge-border,/)
+  assert.match(rule(`.${D.quiet} .${D.dot}`), /width:30px;height:30px;background:var\(--ui-bg-elevated\);border:1\.5px solid var\(--ui-text-quaternary\);/)
   assert.match(rule(`.${D.todo} .${D.dot}`), /background:var\(--ui-bg-tertiary\)/)
   assert.doesNotMatch(rule(`.${D.quiet} .${D.dot}`), /--ui-accent/)
 })
@@ -105,6 +107,8 @@ test('the pointer over an opened stop: only its half above the panel is drawn (i
 
 test('the small arrow after "Open" stands 4 px after the word; the source tags are quieter: 10.5 px in --ui-text-quaternary, 4 px apart', () => {
   assert.equal(ruleOf(`.${D.openChev}`), `.${D.openChev}{display:inline-flex;margin-left:4px}`)
+  // the word and its arrow are one piece inside Hermes's Button (whose own gap between children would add to the 4 px)
+  assert.equal(ruleOf(`.${D.openWord}`), `.${D.openWord}{display:inline-flex;align-items:center}`)
   assert.match(ruleOf(`.${D.foot}`), /gap:4px/)
   assert.equal(ruleOf(`.${D.foot} .${D.src}`), `.${D.foot} .${D.src}{font-size:10.5px;color:var(--ui-text-quaternary)}`)
   const dash = read('src/dash.js')

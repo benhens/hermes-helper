@@ -599,7 +599,9 @@ export function makeDashboard(ctx) {
       )
     } else if (ready && here >= 0) {
       const it = items[here]
-      const openArrow = jsx('span', { className: D.openChev, children: jsx(DashIcon, { icon: DASH_ICONS.open, size: 12 }) }, 'c')
+      // the word and its arrow as one piece: Hermes's Button puts its own gap between its children, and the arrow
+      // stands 4 px after the word (seen: about 14 px when they were two children)
+      const openWord = jsx('span', { className: D.openWord, children: [W.setup.open, jsx('span', { className: D.openChev, children: jsx(DashIcon, { icon: DASH_ICONS.open, size: 12 }) }, 'c')] })
       under = jsxs(
         'div',
         {
@@ -625,7 +627,7 @@ export function makeDashboard(ctx) {
               'words'
             ),
             // "Open", then Hermes's small down arrow: the steps open below (hhdesign's review of 65b108b, point 5)
-            jsx(Button, { variant: 'link', size: 'inline', 'data-hh': 'open-next', onClick: () => toggle(it.id), children: [W.setup.open, openArrow] }, 'open')
+            jsx(Button, { variant: 'link', size: 'inline', 'data-hh': 'open-next', onClick: () => toggle(it.id), children: openWord }, 'open')
           ]
         },
         'next'

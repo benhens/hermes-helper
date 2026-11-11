@@ -291,6 +291,7 @@ export const D = {
   allDone: 'hhd-alldone',
   // dash-v2: the small down arrow after "Open"
   openChev: 'hhd-open-chev',
+  openWord: 'hhd-open-word',
   steps: 'hhd-steps',
   caret: 'hhd-caret',
   stepsHead: 'hhd-steps-head',
