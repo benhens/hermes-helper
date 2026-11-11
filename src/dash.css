@@ -77,8 +77,8 @@ html:not(.dark) .hhd-tile{--hhd-rest-y:100%;--hhd-tint:6%}
 .hhd-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;min-width:0;padding:4px 0 0}
 .hhd-title{margin:0;font-size:1.4rem;font-weight:600;letter-spacing:-.025em;color:var(--ui-text-primary)}
 .hhd-cards{display:grid;align-items:stretch;min-width:0}
-.hhd-scard{position:relative;isolation:isolate;overflow:hidden;container-type:inline-size;display:flex;flex-direction:column;gap:10px;min-width:0;width:100%;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid transparent;border-radius:var(--radius-lg);padding:20px;--hhd-sign:96px;--hhd-room:calc(var(--hhd-sign) + 20px);min-height:calc(96px + 26px);--hhd-rest-y:0%;--hhd-tint:11%;background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)}
-.hhd-compact .hhd-scard{padding:12px;--hhd-sign:72px;min-height:calc(72px + 26px)}
+.hhd-scard{position:relative;isolation:isolate;overflow:hidden;container-type:inline-size;display:flex;flex-direction:column;gap:10px;min-width:0;width:100%;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid transparent;border-radius:var(--radius-lg);padding:20px;--hhd-sign:88px;--hhd-room:calc(var(--hhd-sign) + 18px);min-height:calc(88px + 34px);--hhd-rest-y:0%;--hhd-tint:11%;background:radial-gradient(140% 100% at 0% var(--hhd-rest-y),color-mix(in srgb,var(--hhd-accent) var(--hhd-tint),transparent),transparent 70%) var(--ui-chat-bubble-background)}
+.hhd-compact .hhd-scard{padding:12px;--hhd-sign:72px;--hhd-room:calc(var(--hhd-sign) + 26px);min-height:calc(72px + 34px)}
 html:not(.dark) .hhd-scard{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 html:not(.dark) .hhd-scard{--hhd-rest-y:100%;--hhd-tint:6%}
 .hhd-scard:focus-visible{outline:2px solid var(--ui-text-secondary);outline-offset:2px}
@@ -96,10 +96,12 @@ html:not(.dark) .hhd-scard{--hhd-rest-y:100%;--hhd-tint:6%}
 /* his pick (PICK.md, way 3 "Hermes dots"; REVIEW.md 1: the font signs' line thickened by a 5 px outline of their
    own colour, the two drawn signs (Model, Memory) by a 3-unit line, about PICK.md's 3.4 on 24): the card's own sign,
    in dots, at the right, in the card's accent (green only on the icon square and the word Done); a dot grid and a fade
-   from the left as masks. REVIEW.md 2: nothing touches it. The sign is 96 px (72 compact) and sits 13 px inside the
-   card's right edge, centred; the card is at least the sign plus 2 x 13 px tall; the title, the Done line and the
-   why-line keep the sign's width plus 20 px free at the right, so 18 px or more lie between the sign and any word */
-.hhd-scard-sign{position:absolute;right:13px;top:calc(50% - var(--hhd-sign) / 2);z-index:-1;display:flex;align-items:center;justify-content:center;width:var(--hhd-sign);height:var(--hhd-sign);font-size:var(--hhd-sign);line-height:1;opacity:.8;color:var(--hhd-accent);-webkit-text-stroke:5px currentColor;pointer-events:none;mask-image:radial-gradient(circle,var(--ui-base) 1.2px,transparent 1.7px),linear-gradient(to right,transparent 0,var(--ui-base) 25%);mask-size:4px 4px,100% 100%;mask-composite:intersect;-webkit-mask-composite:source-in}
+   from the left as masks. REVIEW.md 2: nothing touches it. The sign is 88 px (72 compact); with its 2.5 px outline it
+   sits 13 px or more inside the card's right edge (16 px + 1 px border - 2.5), centred; the card is at least the sign
+   plus 34 px tall (outline and 2 x 13 px); the title, the Done line and the why-line keep the sign's width plus 18 px
+   (26 px compact, where the padding is 8 px less) free at the right, so 18 px or more lie between the sign and any word.
+   A container query below changes --hhd-sign only: --hhd-room keeps the card's value, the larger room */
+.hhd-scard-sign{position:absolute;right:16px;top:calc(50% - var(--hhd-sign) / 2);z-index:-1;display:flex;align-items:center;justify-content:center;width:var(--hhd-sign);height:var(--hhd-sign);font-size:var(--hhd-sign);line-height:1;opacity:.8;color:var(--hhd-accent);-webkit-text-stroke:5px currentColor;pointer-events:none;mask-image:radial-gradient(circle,var(--ui-base) 1.2px,transparent 1.7px),linear-gradient(to right,transparent 0,var(--ui-base) 25%);mask-size:4px 4px,100% 100%;mask-composite:intersect;-webkit-mask-composite:source-in}
 .hhd-scard-sign svg{width:100%;height:100%;stroke-width:3}
 /* a card narrower than 300 px: the sign 66 px at .5; under 240 px none. A container query measures the content box:
    a card less its 2 x 20 px padding and 2 x 1 px border (the compact card: 2 x 12 px padding) */

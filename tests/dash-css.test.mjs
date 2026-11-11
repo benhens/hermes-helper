@@ -221,12 +221,12 @@ test('look-fix: tiles keep the icon left of the words at every width; the line u
   assert.match(ruleOf(`.${D.tileLine}`), /-webkit-line-clamp:2;overflow:hidden/)
 })
 
-test('look-fix (PICK.md way 3), follow-up 19:55 (REVIEW.md 2): each set-up card draws its sign in dots at its right, 96 px (72 narrow), 13 px inside the edge, centred, behind the words at .8 in the card\'s accent, masked by a 4 px dot grid and a fade from the left; the card is at least the sign + 26 px tall; the words keep the sign + 20 px free', () => {
+test('look-fix (PICK.md way 3), follow-up 19:55 (REVIEW.md 2): each set-up card draws its sign in dots at its right, 88 px (72 narrow), 13 px inside the edge with its outline, centred, behind the words at .8 in the card\'s accent, masked by a 4 px dot grid and a fade from the left; the card is at least the sign + 34 px tall; the words keep the sign + 18 px (26 narrow) free', () => {
   const s = ruleOf(`.${D.scardSign}`)
-  for (const part of ['position:absolute', 'right:13px', 'top:calc(50% - var(--hhd-sign) / 2)', 'z-index:-1', 'width:var(--hhd-sign)', 'height:var(--hhd-sign)', 'font-size:var(--hhd-sign)', 'opacity:.8', 'color:var(--hhd-accent)', 'pointer-events:none', 'mask-size:4px 4px,100% 100%', 'mask-composite:intersect']) assert.ok(s.includes(part), part)
+  for (const part of ['position:absolute', 'right:16px', 'top:calc(50% - var(--hhd-sign) / 2)', 'z-index:-1', 'width:var(--hhd-sign)', 'height:var(--hhd-sign)', 'font-size:var(--hhd-sign)', 'opacity:.8', 'color:var(--hhd-accent)', 'pointer-events:none', 'mask-size:4px 4px,100% 100%', 'mask-composite:intersect']) assert.ok(s.includes(part), part)
   assert.match(ruleOf(`.${D.scard}`), /position:relative;isolation:isolate;overflow:hidden/)
-  assert.match(ruleOf(`.${D.scard}`), /--hhd-sign:96px;--hhd-room:calc\(var\(--hhd-sign\) \+ 20px\);min-height:calc\(96px \+ 26px\)/)
-  assert.match(ruleOf(`.${D.compact} .${D.scard}`), /--hhd-sign:72px;min-height:calc\(72px \+ 26px\)/)
+  assert.match(ruleOf(`.${D.scard}`), /--hhd-sign:88px;--hhd-room:calc\(var\(--hhd-sign\) \+ 18px\);min-height:calc\(88px \+ 34px\)/)
+  assert.match(ruleOf(`.${D.compact} .${D.scard}`), /--hhd-sign:72px;--hhd-room:calc\(var\(--hhd-sign\) \+ 26px\);min-height:calc\(72px \+ 34px\)/)
   assert.match(ruleOf(`.${D.scardWhy}`), /margin-right:var\(--hhd-room\)/)
   assert.match(ruleOf(`.${D.scardTop}`), /margin-right:var\(--hhd-room\)/)
 })
