@@ -227,9 +227,13 @@ export function all(node, pred, out = []) {
   return out
 }
 
+// A name kept whole (src/reveal.js keepNamesWhole) is an inline span inside a line's words: on screen it joins
+// the text around it with no space, so it is joined that way here too.
+const inlineWhole = x => x != null && typeof x === 'object' && !Array.isArray(x) && x.props && x.props['data-hh'] === 'name-whole'
+const joinAll = (nodes, f) => nodes.reduce((out, x, i) => out + (i && !inlineWhole(x) && !inlineWhole(nodes[i - 1]) ? ' ' : '') + f(x), '')
 export function text(node) {
   if (node == null) return ''
-  if (Array.isArray(node)) return node.map(text).join(' ')
+  if (Array.isArray(node)) return joinAll(node, text)
   if (typeof node !== 'object') return String(node)
   return text(node.props.children)
 }
@@ -239,7 +243,7 @@ export function text(node) {
 // which is aria-hidden. So spoken() holds each line once.
 export function spoken(node) {
   if (node == null) return ''
-  if (Array.isArray(node)) return node.map(spoken).join(' ')
+  if (Array.isArray(node)) return joinAll(node, spoken)
   if (typeof node !== 'object') return String(node)
   if (node.props['aria-hidden'] === true) return ''
   return spoken(node.props.children)

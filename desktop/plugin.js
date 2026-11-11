@@ -443,6 +443,10 @@ const TALK_DATA = {
       "text": "I can't do that, but your own Hermes can. Paste this into a new chat with it.",
       "paste_text": "I asked for this: \"{request}\". Please do it for me. Ask me before you change anything."
     },
+    "H2": {
+      "text": "Hermes can read, change and run code on your computer. You can ask it for help with that. I don't build things myself.",
+      "paste_text": "I asked: \"{request}\". Can you help me with that? First tell me your plan, and ask me before you change anything."
+    },
     "K1": {
       "text": "That looks like a secret key. I did not keep it. Keys go in Settings, never in a chat."
     },
@@ -473,6 +477,51 @@ const TALK_DATA = {
     },
     "NAME_NEW": {
       "text": "Thanks, {name}. Ask me anything about Hermes."
+    },
+    "BACK": {
+      "text": "Hi again, {name}. What would you like Hermes to help you with?",
+      "text_no_name": "Hi again. What would you like Hermes to help you with?"
+    },
+    "HELLO": {
+      "text": "Hi, {name}. What would you like Hermes to help you with?",
+      "text_no_name": "Hi. What would you like Hermes to help you with?"
+    },
+    "HELLO_SAME": {
+      "text": "I'm here. Type your question whenever you are ready."
+    },
+    "THANKS": {
+      "text": "You're welcome. Ask me more about Hermes whenever you like."
+    },
+    "OK": {
+      "text": "Good. I'm here if you want to know more."
+    },
+    "HOW": {
+      "text": "I'm good, thanks for asking. I'm here when you have a question about Hermes."
+    },
+    "WHO": {
+      "text": "I'm Helper. I help you learn about Hermes and set it up. Your own Hermes does the work.",
+      "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs)."
+    },
+    "AI": {
+      "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs."
+    },
+    "BYE": {
+      "text": "Bye. Come back any time you have a question about Hermes."
+    },
+    "CUT": {
+      "text": "Sorry, that looks cut off. Tell me a bit more about what you need."
+    },
+    "MEAN_NONE": {
+      "text": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\"."
+    },
+    "WRONG": {
+      "text": "Sorry about that. Please say it another way."
+    },
+    "AGAIN": {
+      "text": "Sorry, I have nothing more on that. Please ask it another way."
+    },
+    "N1_AGAIN": {
+      "text": "Sorry, I don't have checked information on that one either."
     }
   },
   "opening": {
@@ -571,7 +620,30 @@ const TALK_DATA = {
       "that",
       "this",
       "what",
-      "how"
+      "how",
+      "thx",
+      "cheers",
+      "sup",
+      "wassup",
+      "bye",
+      "goodbye",
+      "cya",
+      "later",
+      "why",
+      "who",
+      "when",
+      "where",
+      "which",
+      "whats",
+      "what's",
+      "can",
+      "could",
+      "would",
+      "should",
+      "does",
+      "did",
+      "is",
+      "are"
     ],
     "question_starts": [
       "what",
@@ -617,7 +689,73 @@ const TALK_DATA = {
         "my",
         "we"
       ]
-    }
+    },
+    "name_strong_stop": [
+      "today",
+      "tomorrow",
+      "tonight",
+      "yesterday",
+      "later",
+      "soon",
+      "now",
+      "sometime",
+      "sometimes",
+      "anytime",
+      "whenever",
+      "when",
+      "if",
+      "after",
+      "before",
+      "next",
+      "this",
+      "that",
+      "every",
+      "each",
+      "daily",
+      "weekly",
+      "morning",
+      "mornings",
+      "evening",
+      "evenings",
+      "afternoon",
+      "night",
+      "noon",
+      "weekend",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+      "again",
+      "maybe",
+      "please",
+      "pls",
+      "plz",
+      "whatever",
+      "anything",
+      "something",
+      "by",
+      "out",
+      "up",
+      "any",
+      "asap",
+      "once",
+      "twice",
+      "anyway"
+    ],
+    "name_new_may_follow": [
+      "please",
+      "pls",
+      "plz",
+      "thanks",
+      "thank you",
+      "thx",
+      "now",
+      "instead",
+      "from now on"
+    ]
   },
   "key_patterns": [
     "(?<![A-Za-z0-9])(?:sk-|sk_|rk_|xai-|AIza|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|glpat-|hf_|gsk_|pplx-|r8_|fw_|npm_|xox[abposr]-|xapp-)[A-Za-z0-9_-]{16,}",
@@ -808,6 +946,799 @@ const TALK_DATA = {
         "turn on",
         "switch on"
       ]
+    },
+    "make_words": [
+      "make me",
+      "create me",
+      "build me",
+      "can you make",
+      "could you make",
+      "would you make",
+      "will you make",
+      "please make",
+      "can you create",
+      "could you create",
+      "would you create",
+      "please create",
+      "i want you to make",
+      "i want you to build",
+      "i want you to create",
+      "i need you to make",
+      "i need you to build"
+    ],
+    "make_not_followed_by": [
+      "it",
+      "that",
+      "this",
+      "sure",
+      "sense",
+      "things",
+      "understand",
+      "me understand",
+      "hermes",
+      "my hermes",
+      "my bot",
+      "the bot",
+      "my bots"
+    ],
+    "make_not_when_starts": [
+      "can it",
+      "could it",
+      "will it",
+      "would it",
+      "can hermes",
+      "could hermes",
+      "will hermes",
+      "would hermes",
+      "does hermes",
+      "is hermes able",
+      "is it able"
+    ],
+    "build_question_words": [
+      "build an app",
+      "make an app",
+      "build a website",
+      "make a website",
+      "build a bot",
+      "make a bot",
+      "write the code",
+      "build me",
+      "build it",
+      "make me an app",
+      "make me a website"
+    ],
+    "software_lead_ins": [
+      "please",
+      "pls",
+      "can you",
+      "could you",
+      "would you",
+      "will you",
+      "i want you to",
+      "i need you to",
+      "help me",
+      "just",
+      "now",
+      "ok",
+      "okay",
+      "so"
+    ],
+    "software_verbs": [
+      "write",
+      "code",
+      "create",
+      "program",
+      "develop",
+      "design"
+    ],
+    "software_things": [
+      "script",
+      "scripts",
+      "program",
+      "programs",
+      "programme",
+      "app",
+      "apps",
+      "application",
+      "web app",
+      "game",
+      "games",
+      "bot",
+      "bots",
+      "chatbot",
+      "website",
+      "websites",
+      "site",
+      "web page",
+      "webpage",
+      "landing page",
+      "code",
+      "plugin",
+      "extension",
+      "macro",
+      "software",
+      "api",
+      "tool"
+    ],
+    "software_between_max": 3,
+    "software_between_not": [
+      "my",
+      "your",
+      "our",
+      "his",
+      "her",
+      "their",
+      "second",
+      "another",
+      "other",
+      "extra",
+      "hermes"
+    ]
+  },
+  "small_talk": {
+    "cut_end_words": [
+      "helper",
+      "hermes",
+      "please",
+      "pls",
+      "mate"
+    ],
+    "cut_start_words": [
+      "helper",
+      "hermes"
+    ],
+    "kinds": {
+      "hello": [
+        "hey",
+        "hi",
+        "hello",
+        "hiya",
+        "heya",
+        "hey there",
+        "hi there",
+        "hello there",
+        "yo",
+        "howdy",
+        "hey hey",
+        "hii",
+        "hiii",
+        "heyy",
+        "heyyy",
+        "helo",
+        "hallo",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "morning",
+        "evening",
+        "greetings"
+      ],
+      "thanks": [
+        "thanks",
+        "thank you",
+        "thx",
+        "ty",
+        "thank u",
+        "thanks a lot",
+        "thank you so much",
+        "thanks so much",
+        "many thanks",
+        "cheers",
+        "great thanks",
+        "ok thanks",
+        "okay thanks",
+        "ok thank you",
+        "okay thank you",
+        "much appreciated",
+        "appreciate it",
+        "thanks for that",
+        "nice thanks",
+        "cool thanks"
+      ],
+      "ok": [
+        "ok",
+        "okay",
+        "k",
+        "kk",
+        "okey",
+        "oki",
+        "cool",
+        "nice",
+        "great",
+        "got it",
+        "gotcha",
+        "alright",
+        "all right",
+        "sure",
+        "fine",
+        "good",
+        "perfect",
+        "understood",
+        "i see",
+        "makes sense",
+        "ah ok",
+        "oh ok",
+        "ok cool",
+        "ah",
+        "oh",
+        "hmm",
+        "hm",
+        "interesting",
+        "awesome",
+        "wow",
+        "yes",
+        "yeah",
+        "yep",
+        "yup",
+        "no",
+        "nope",
+        "nah",
+        "lol",
+        "haha",
+        "ha"
+      ],
+      "how": [
+        "how are you",
+        "how are you doing",
+        "how are u",
+        "how r u",
+        "hows it going",
+        "how's it going",
+        "how is it going",
+        "whats up",
+        "what's up",
+        "sup",
+        "wassup",
+        "how do you do",
+        "you ok",
+        "you good",
+        "how are things",
+        "how have you been"
+      ],
+      "who": [
+        "who are you",
+        "what are you",
+        "who is this",
+        "what is this",
+        "whats your name",
+        "what's your name",
+        "what is your name",
+        "your name",
+        "who made you",
+        "what is helper",
+        "who is helper",
+        "what's helper",
+        "whats helper",
+        "what do you do",
+        "tell me about yourself",
+        "introduce yourself"
+      ],
+      "ai": [
+        "are you an ai",
+        "are you ai",
+        "are you a bot",
+        "are you a robot",
+        "are you human",
+        "are you a human",
+        "are you a person",
+        "are you real",
+        "are you a real person",
+        "is this a bot",
+        "is this an ai",
+        "is this a person",
+        "is this a human",
+        "is this a real person",
+        "am i talking to a bot",
+        "am i talking to a person",
+        "am i talking to a human",
+        "am i talking to an ai",
+        "am i talking to ai",
+        "are you chatgpt",
+        "are you claude",
+        "is this chatgpt",
+        "is this claude"
+      ],
+      "bye": [
+        "bye",
+        "goodbye",
+        "good bye",
+        "bye bye",
+        "see you",
+        "see ya",
+        "cya",
+        "later",
+        "see you later",
+        "good night",
+        "goodnight",
+        "gotta go",
+        "got to go",
+        "that's all",
+        "thats all",
+        "that is all",
+        "i'm done",
+        "im done",
+        "that's it",
+        "thats it"
+      ],
+      "mean": [
+        "what do you mean",
+        "what does that mean",
+        "what does it mean",
+        "i don't understand",
+        "i dont understand",
+        "i do not understand",
+        "i don't get it",
+        "i dont get it",
+        "huh",
+        "what",
+        "say that again",
+        "explain that",
+        "can you explain that",
+        "in simple words",
+        "simpler please",
+        "simpler",
+        "say it simpler",
+        "i'm confused",
+        "im confused",
+        "confused",
+        "what?"
+      ],
+      "wrong": [
+        "that's wrong",
+        "thats wrong",
+        "that is wrong",
+        "wrong",
+        "wrong answer",
+        "that's not right",
+        "thats not right",
+        "that is not right",
+        "not right",
+        "incorrect",
+        "that's incorrect",
+        "thats incorrect",
+        "you're wrong",
+        "youre wrong",
+        "not what i meant",
+        "that's not what i meant",
+        "thats not what i meant",
+        "that is not what i meant",
+        "not what i asked",
+        "that's not what i asked",
+        "thats not what i asked",
+        "that's not it",
+        "thats not it",
+        "not that",
+        "no not that",
+        "no, not that",
+        "no that's wrong",
+        "no, that's wrong",
+        "no thats wrong",
+        "no, thats wrong",
+        "no not what i meant",
+        "no, not what i meant",
+        "nope wrong",
+        "nope, wrong",
+        "i meant something else",
+        "not quite"
+      ]
+    },
+    "cut_question_words": [
+      "how",
+      "why",
+      "who",
+      "when",
+      "where",
+      "which"
+    ],
+    "cut_dangling": [
+      "a",
+      "an",
+      "the",
+      "to",
+      "i",
+      "my",
+      "and",
+      "or",
+      "of",
+      "for",
+      "with",
+      "about"
+    ],
+    "cut_small_words": [
+      "you",
+      "u",
+      "it",
+      "i",
+      "we",
+      "they",
+      "this",
+      "that",
+      "me",
+      "hermes",
+      "helper"
+    ],
+    "no_words": [
+      "no",
+      "nope",
+      "nah"
+    ],
+    "no_means_wrong_after": [
+      "row",
+      "plain",
+      "term",
+      "W2",
+      "COST",
+      "WHERE",
+      "N1",
+      "N1a",
+      "N1b",
+      "N1_AGAIN",
+      "H1",
+      "skill by name",
+      "C1",
+      "AGAIN"
+    ],
+    "thanks_tail": [
+      "so much",
+      "so so much",
+      "a lot",
+      "very much",
+      "lots",
+      "loads",
+      "heaps",
+      "a ton",
+      "a bunch",
+      "again",
+      "man",
+      "buddy",
+      "x"
+    ],
+    "ai_line": "AI"
+  },
+  "no_repeat": {
+    "exempt": [
+      "H1",
+      "H2",
+      "K1",
+      "RM1",
+      "RM3",
+      "RM4",
+      "RM5",
+      "RM6",
+      "NAME_NEW",
+      "AI",
+      "AI_PICK",
+      "AI_WRITES",
+      "TP",
+      "F1",
+      "F2",
+      "F3",
+      "OPEN",
+      "BACK",
+      "skill by name"
+    ],
+    "groups": {
+      "talk": [
+        "THANKS",
+        "OK",
+        "HOW",
+        "WHO",
+        "BYE",
+        "CUT",
+        "HELLO",
+        "HELLO_SAME",
+        "WRONG"
+      ],
+      "dont_know": [
+        "N1",
+        "N1a",
+        "N1b",
+        "N1_AGAIN"
+      ]
+    },
+    "in_place": {
+      "talk": [
+        "HELLO_SAME",
+        "OK"
+      ],
+      "dont_know": [
+        "N1_AGAIN",
+        "AGAIN"
+      ],
+      "answer": [
+        "plain",
+        "AGAIN",
+        "MEAN_NONE"
+      ]
+    },
+    "wrong_starts": [
+      "no",
+      "nope",
+      "nah",
+      "wrong",
+      "that's wrong",
+      "thats wrong",
+      "that is wrong",
+      "that's not",
+      "thats not",
+      "that is not",
+      "not what i",
+      "not that",
+      "i meant",
+      "incorrect",
+      "that isn't"
+    ],
+    "wrong_anywhere": [
+      "not what i meant",
+      "not what i asked",
+      "that's wrong",
+      "thats wrong",
+      "that is wrong",
+      "that's not it",
+      "thats not it",
+      "that's not right",
+      "thats not right",
+      "you're wrong",
+      "youre wrong",
+      "i meant",
+      "not what i",
+      "isn't what i",
+      "is not what i",
+      "isn't right",
+      "is not right",
+      "not correct",
+      "isn't correct",
+      "misunderstood",
+      "misunderstand",
+      "got it wrong",
+      "you are wrong"
+    ],
+    "asked_again": [
+      "again",
+      "once more",
+      "repeat",
+      "repeat that",
+      "one more time",
+      "say that again"
+    ]
+  },
+  "lonely_words": {
+    "drive": {
+      "needs_one_of": [
+        "my drive",
+        "the drive",
+        "use drive",
+        "drive folder",
+        "drive folders",
+        "drive file",
+        "drive files",
+        "in drive",
+        "on drive",
+        "from drive",
+        "to drive",
+        "shared drive"
+      ]
+    },
+    "zoom": {
+      "needs_one_of": [
+        "use zoom",
+        "my zoom",
+        "connect zoom",
+        "link zoom",
+        "zoom account",
+        "zoom app",
+        "zoom call",
+        "zoom calls",
+        "zoom meeting",
+        "zoom meetings",
+        "on zoom",
+        "with zoom",
+        "to zoom"
+      ],
+      "not_with": [
+        "listen",
+        "listens",
+        "listening",
+        "record",
+        "records",
+        "recording",
+        "join",
+        "joins",
+        "attend",
+        "attends",
+        "take notes",
+        "takes notes",
+        "transcribe"
+      ]
+    },
+    "phone": {
+      "not_with": [
+        "photo",
+        "photos",
+        "pictures",
+        "files",
+        "contacts",
+        "back up",
+        "backup",
+        "storage"
+      ]
+    },
+    "slow": {
+      "needs_one_of": [
+        "answer",
+        "answers",
+        "reply",
+        "replies",
+        "response",
+        "responses",
+        "it",
+        "it's",
+        "hermes",
+        "bot",
+        "helper",
+        "chat",
+        "chats",
+        "message",
+        "messages",
+        "ai",
+        "model"
+      ],
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "is slow": {
+      "needs_one_of": [
+        "answer",
+        "answers",
+        "reply",
+        "replies",
+        "response",
+        "responses",
+        "it",
+        "it's",
+        "hermes",
+        "bot",
+        "helper",
+        "chat",
+        "chats",
+        "message",
+        "messages",
+        "ai",
+        "model"
+      ],
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "speed up": {
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "speed it up": {
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "bill": {
+      "needs_one_of": [
+        "huge",
+        "high",
+        "big",
+        "too high",
+        "so high",
+        "this month",
+        "last month",
+        "went up",
+        "going up",
+        "expensive",
+        "too much",
+        "so much"
+      ],
+      "not_with": [
+        "pay my",
+        "pay the",
+        "pay a",
+        "pay bills",
+        "split"
+      ]
+    },
+    "too long": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
+    },
+    "fills up": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
+    },
+    "filling up": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
+    },
+    "filled up": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
     }
   },
   "ignore_phrases": [
@@ -899,12 +1830,11 @@ const TALK_DATA = {
       "options",
       "menu",
       "ideas",
-      "examples",
-      "?"
+      "examples"
     ]
   },
   "what_is": {
-    "pattern": "^(?:(?:so|ok|okay|and|hi|hey|helper)[ ,]+)*(?:what is|what's|whats|what are|what exactly is|what does|explain|tell me what)\\s+(?:a |an |the )?(.+?)(?:\\s+(?:is|are|means|mean))?\\s*[?.!]*$",
+    "pattern": "^(?:(?:so|ok|okay|and|hi|hey|helper|please|pls|plz|can you|could you|would you)[ ,]+)*(?:what is|what's|whats|what are|what exactly is|what does|explain|tell me what)\\s+(?:a |an |the )?(.+?)(?:\\s+(?:is|are|means|mean))?(?:[\\s,?.!]+(?:please|pls|plz|thanks|thank you|thx))*\\s*[?.!]*$",
     "words": {
       "mod": [
         "model",
@@ -935,6 +1865,10 @@ const TALK_DATA = {
       "bot": [
         "bot",
         "bots"
+      ],
+      "use": [
+        "token",
+        "tokens"
       ]
     }
   },
@@ -1243,12 +2177,10 @@ const TALK_DATA = {
         "chatgtp"
       ],
       "weak_key_words": [
-        "pay",
         "paying",
         "paid",
         "cost",
         "costs",
-        "money",
         "spend",
         "spending",
         "expensive",
@@ -1258,7 +2190,29 @@ const TALK_DATA = {
         "free",
         "subscription",
         "subscriptions",
-        "budget"
+        "budget",
+        "pay for",
+        "have to pay",
+        "need to pay",
+        "do i pay",
+        "pay anything",
+        "pay to use",
+        "pay monthly",
+        "pay extra",
+        "pay more",
+        "pay less",
+        "should i pay",
+        "will i pay",
+        "how much money",
+        "cost money",
+        "costs money",
+        "cost me money",
+        "spend money",
+        "spending money",
+        "any money",
+        "save money",
+        "waste money",
+        "much money"
       ],
       "pick": {
         "label": "Which AI to use"
@@ -2070,6 +3024,287 @@ const TALK_DATA = {
           }
         }
       ]
+    },
+    {
+      "id": "use",
+      "part": "model",
+      "key_words": [
+        "token",
+        "tokens",
+        "usage",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "costs too much",
+        "cost too much",
+        "costing too much",
+        "costs a lot",
+        "too expensive",
+        "so expensive",
+        "cheaper",
+        "save money",
+        "spend less",
+        "pay less",
+        "lower cost",
+        "lower the cost",
+        "reduce cost",
+        "reduce the cost",
+        "credits",
+        "quota",
+        "rate limit",
+        "usage limit",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached",
+        "so slow",
+        "too slow",
+        "is slow",
+        "slow answers",
+        "answers slowly",
+        "takes forever",
+        "takes so long",
+        "takes too long",
+        "faster answers",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much",
+        "bill",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up",
+        "slow",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation"
+      ],
+      "misspellings": [
+        "tokns",
+        "toknes",
+        "tokenz",
+        "tokkens",
+        "useage",
+        "usuage"
+      ],
+      "weak_key_words": [
+        "limit",
+        "limits"
+      ],
+      "typed_only": true,
+      "pick": {
+        "label": "Using less"
+      },
+      "question": {
+        "id": "use-q",
+        "text": "Is it the cost, a limit that runs out, or slow answers?",
+        "answers": [
+          {
+            "label": "Each message uses a lot",
+            "gives": "use1"
+          },
+          {
+            "label": "It costs too much",
+            "gives": "use2"
+          },
+          {
+            "label": "My limit runs out",
+            "gives": "use3"
+          },
+          {
+            "label": "Answers are slow",
+            "gives": "use4"
+          }
+        ]
+      },
+      "plain": {
+        "id": "use0",
+        "text": "Tokens are small pieces of words. Your AI counts them, and long chats use the most.",
+        "source": "token: Anthropic glossary, https://platform.claude.com/docs/en/about-claude/glossary (\"Tokens are the smallest individual units of a language model, and can correspond to words, subwords, characters\"); counted and paid: getting-started/quickstart.md line 118 (\"API key for pay-per-token\"); long chats: reference/faq.md line 547 (\"Cause: Long conversations, verbose system prompts, or many tool calls accumulating context.\")",
+        "next": {
+          "kind": "line",
+          "label": "What helps",
+          "id": "use-more",
+          "text": "When a chat gets long, start a fresh one. Click \"New session\" at the top left.",
+          "source": "reference/faq.md line 547 (\"Cause: Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)"
+        }
+      },
+      "needs": [
+        {
+          "id": "use1",
+          "key_words": [
+            "token",
+            "tokens",
+            "tokns",
+            "toknes",
+            "use less",
+            "uses less",
+            "using less",
+            "less usage",
+            "uses a lot",
+            "uses so much",
+            "uses too much",
+            "using too much",
+            "using a lot",
+            "uses up",
+            "each message",
+            "every message",
+            "each question",
+            "every question",
+            "per message",
+            "per question",
+            "context window",
+            "context length",
+            "context is full",
+            "too long",
+            "fills up",
+            "filling up",
+            "filled up",
+            "long chat",
+            "long chats",
+            "long conversation"
+          ],
+          "only_if_no_other_need": true,
+          "text": "Long chats use the most tokens, small pieces of words. For a fresh chat, click \"New session\" at the top left.",
+          "source": "token: Anthropic glossary (as use0); reference/faq.md line 547 (\"Cause: Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)",
+          "next": {
+            "kind": "line",
+            "label": "See what uses them",
+            "id": "use1-next",
+            "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+          }
+        },
+        {
+          "id": "use2",
+          "key_words": [
+            "cost",
+            "costs",
+            "costing",
+            "expensive",
+            "cheaper",
+            "cheap",
+            "money",
+            "save money",
+            "spend less",
+            "pay less",
+            "price",
+            "bill",
+            "costs too much",
+            "too expensive",
+            "costing me",
+            "cost me",
+            "costs me",
+            "too much money",
+            "so much money",
+            "a lot of money",
+            "spending too much",
+            "spending so much"
+          ],
+          "text": "Long chats cost the most. For a fresh chat, click \"New session\" at the top left. A cheaper AI also helps.",
+          "source": "reference/faq.md line 547 (\"Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run); integrations/providers.md line 1562 (\"Cost optimization\")",
+          "next": {
+            "kind": "part",
+            "label": "Open Model"
+          }
+        },
+        {
+          "id": "use3",
+          "key_words": [
+            "limit",
+            "limits",
+            "runs out",
+            "run out",
+            "ran out",
+            "running out",
+            "quota",
+            "credits",
+            "rate limit",
+            "usage limit",
+            "hit the limit",
+            "hit a limit",
+            "hit my limit",
+            "reached the limit",
+            "limit reached"
+          ],
+          "text": "Each message uses part of your limit, and long chats use more. For a fresh chat, click \"New session\" at the top left.",
+          "source": "user-guide/features/credential-pools.md line 29 (\"Plan/usage limit reached\"); reference/faq.md line 547 (\"Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)",
+          "next": {
+            "kind": "line",
+            "label": "See what uses them",
+            "id": "use3-next",
+            "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+          }
+        },
+        {
+          "id": "use4",
+          "key_words": [
+            "slow",
+            "slowly",
+            "so slow",
+            "too slow",
+            "takes forever",
+            "takes long",
+            "takes so long",
+            "takes too long",
+            "faster",
+            "speed",
+            "laggy",
+            "lag",
+            "take forever",
+            "taking forever",
+            "took forever",
+            "takes ages",
+            "take ages",
+            "taking ages",
+            "took ages",
+            "slows down",
+            "slowing down",
+            "slowed down",
+            "speed it up",
+            "speed up"
+          ],
+          "text": "Big AIs and long chats can make answers slow. A smaller, faster AI can help.",
+          "source": "reference/faq.md lines 538 to 541 (\"Slow responses ... Cause: Large model, distant API server, or heavy system prompt with many tools ... Try a faster/smaller model\"); guides/troubleshooting-agent-quality.md line 27 (\"responses are slowing down\" in a long session)",
+          "next": {
+            "kind": "part",
+            "label": "Open Model"
+          }
+        }
+      ]
     }
   ],
   "terms": [
@@ -2368,10 +3603,11 @@ const TALK_DATA = {
       "see": {
         "see_line": "This is all I keep about you.",
         "see_line_nothing": "I keep nothing about you yet.",
+        "see_line_deleted": "Everything I kept about you is deleted. I only remember that we have met.",
         "delete_all": {
           "label": "Delete all of it",
           "question": "Delete everything I keep about you?",
-          "after_yes": "Done. I keep nothing about you now. What Hermes itself remembers is not touched.",
+          "after_yes": "Done. I keep nothing about you now. I won't ask your name again.",
           "after_no": "Fine. Nothing is changed.",
           "answers": [
             {
@@ -2927,6 +4163,10 @@ const TALK_DATA = {
       "button_under_see": "Open Helper settings",
       "by_hand": "By hand: open \"Settings\", then \"Plugins\", then \"Helper\"."
     },
+    "met": {
+      "store_key": "met",
+      "value": true
+    },
     "settings_file": {
       "top_line": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
       "box_lines": {
@@ -3015,10 +4255,11 @@ const TALK_DATA = {
       },
       "forget_all": {
         "label": "Forget all of this",
-        "under": "Deletes everything on this page from this computer. What Hermes itself remembers is not touched.",
+        "action": "Forget",
+        "under": "Deletes everything on this page from this computer. Helper still won't ask your name again.",
         "question": "Delete everything Helper keeps about you?",
         "with_question": "What was already sent to your AI cannot be taken back.",
-        "after_yes": "Done. Helper keeps nothing about you now.",
+        "after_yes": "Done. Helper keeps nothing about you now. It won't ask your name again.",
         "answers": [
           {
             "label": "Yes, delete it",
@@ -3772,7 +5013,11 @@ const WANTS_DATA = {
         "find",
         "research",
         "check",
-        "browse"
+        "browse",
+        "look stuff up",
+        "looks stuff up",
+        "look things up",
+        "looks things up"
       ],
       "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
       "sources": [
@@ -4381,12 +5626,22 @@ const WANTS_DATA = {
         "what is in",
         "what's in"
       ],
-      "text": "Hermes can look at a picture you give it. This is built in. The AI you use must be able to read pictures.",
+      "text": "Hermes can look at a picture you give it. This is built in. If your AI reads only text, another AI describes it.",
       "sources": [
         {
           "file": "user-guide/features/vision.md",
           "line": 10,
           "quote": "any vision-capable model can process them"
+        },
+        {
+          "file": "user-guide/features/vision.md",
+          "line": 204,
+          "quote": "an auxiliary vision model describes the image, and the text description is injected into the conversation"
+        },
+        {
+          "file": "user-guide/features/vision.md",
+          "line": 206,
+          "quote": "You don't configure this"
         },
         {
           "file": "user-guide/features/tools.md",
@@ -4570,6 +5825,43 @@ const WANTS_DATA = {
       }
     },
     {
+      "id": "w_meme",
+      "group": "pics",
+      "label": "Make memes",
+      "kind": "optional_skill",
+      "thing": "meme-generation",
+      "key_words": [
+        "meme",
+        "memes"
+      ],
+      "things": [],
+      "actions": [],
+      "text": "There is an optional skill, \"meme-generation\". You add it first. Its written steps teach Hermes to put text on known meme pictures.",
+      "sources": [
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 81,
+          "quote": "Create meme PNGs from templates with Pillow text overlay."
+        },
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 9,
+          "quote": "Install them explicitly"
+        }
+      ],
+      "next": {
+        "kind": "steps",
+        "label": "Show me how to add it",
+        "steps": [
+          "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+          "Click \"Source\", then pick \"Optional\".",
+          "Find the card \"meme-generation\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+          "Click the card, then click \"Install\"."
+        ],
+        "after": "It works from your next new chat, not this one."
+      }
+    },
+    {
       "id": "w_voice",
       "group": "voice",
       "label": "Talk to it out loud",
@@ -4656,6 +5948,61 @@ const WANTS_DATA = {
         "kind": "paste",
         "label": "Show me what to ask",
         "paste_text": "Please read your next answer out loud. If speech is not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_stt",
+      "group": "voice",
+      "label": "Turn voice notes into text",
+      "kind": "built_in",
+      "thing": "voice message transcription (speech-to-text)",
+      "key_words": [
+        "voice note",
+        "voice notes",
+        "voice memo",
+        "voice memos",
+        "transcribe",
+        "transcription",
+        "speech to text",
+        "speech-to-text"
+      ],
+      "things": [
+        "voice note",
+        "voice notes",
+        "voice message",
+        "voice messages",
+        "voice memo",
+        "voice memos",
+        "recording",
+        "recordings",
+        "audio"
+      ],
+      "actions": [
+        "into text",
+        "to text",
+        "transcribe",
+        "transcribes",
+        "write out",
+        "type out",
+        "write down"
+      ],
+      "text": "Hermes turns voice messages from Telegram or WhatsApp into text by itself. This is built in.",
+      "sources": [
+        {
+          "file": "user-guide/features/tts.md",
+          "line": 13,
+          "quote": "supports both text-to-speech output and voice message transcription"
+        },
+        {
+          "file": "user-guide/features/tts.md",
+          "line": 496,
+          "quote": "Voice messages sent on Telegram, Discord, WhatsApp, Slack, or Signal are automatically transcribed and injected as text into the conversation."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "I want to send you voice messages and have them turned into text. Please tell me what that needs here. Ask me before you change anything."
       }
     },
     {
@@ -4916,6 +6263,21 @@ const WANTS_DATA = {
           "quote": "The desktop app's **Connectors** page."
         }
       ]
+    },
+    "CN2": {
+      "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. To see if {service} is there, click \"Capabilities\", then the \"Connectors\" tab.",
+      "sources": [
+        {
+          "file": "user-guide/features/tool-gateway.md",
+          "line": 124,
+          "quote": "Connectors are hosted apps such as Gmail that the agent reaches through the Nous tool gateway"
+        },
+        {
+          "file": "user-guide/features/tool-gateway.md",
+          "line": 139,
+          "quote": "The desktop app's **Connectors** page."
+        }
+      ]
     }
   },
   "service_lines": {
@@ -4923,10 +6285,10 @@ const WANTS_DATA = {
       "line": "CN1"
     },
     "Google Calendar": {
-      "line": "CN1"
+      "line": "CN2"
     },
     "Google Drive": {
-      "line": "CN1"
+      "line": "CN2"
     },
     "GitHub": {
       "line": "S1",
@@ -7774,7 +9136,9 @@ function cleanAnswers(value) {
 const STEP_COUNT = STEPS.length
 // 'remember' is the person's answer to the memory test on Your setup (src/setup-tab.js).
 // 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
-const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept']
+// 'met' (changes-14, keeps.met): true once Helper has said hello, so the name is asked only on the first
+// visit; nothing about the person, and no Forget removes it (src/page.js).
+const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept', 'met']
 
 function readState(get) {
   const pick = (key, allowed, fallback) => {
@@ -7882,7 +9246,17 @@ function wordRe(p, flags = '') {
   return wordRes.get(key)
 }
 const hits = (t, p) => wordRe(p).test(t)
-const whichOf = (t, list) => list.filter(p => hits(t, p))
+// changes-16/17 (JSON lonely_words, route2.py lonely_ok): a listed key word counts only with one of its
+// needs_one_of phrases in the message (when it has that list) and none of its not_with words. Every key-word
+// list goes through it (topics, needs, weak words, the wants rows); the typed answers to Helper's own service
+// question use hits(), as route2.py's hit(), and are not affected.
+const LONELY = TALK_DATA.lonely_words || {}
+function lonelyOk(t, p) {
+  const r = LONELY[p]
+  if (!r) return true
+  return (!r.needs_one_of || r.needs_one_of.some(q => hits(t, q))) && !(r.not_with || []).some(q => hits(t, q))
+}
+const whichOf = (t, list) => list.filter(p => hits(t, p) && lonelyOk(t, p))
 // A start counts when it is the whole message, or the next character is not a to z, 0 to 9 or '.
 const startsWith = (t, list) => list.some(p => t === p || (t.startsWith(p) && /[^a-z0-9']/.test(t[p.length])))
 function cutIgnored(t) {
@@ -7897,14 +9271,60 @@ const capFirst = s => {
   return chars.length ? chars[0].toUpperCase() + chars.slice(1).join('') : s
 }
 
+// The request step: null, the words that make it a request (H1), or { h2: words } for a question whether
+// Hermes can build something (changes-16, H2).
 function buildHit(text) {
   const t = cutIgnored(talkNorm(text)) // the ignore phrases are cut before this step too
   if (startsWith(t, BUILD.skip_starts) || whichOf(t, BUILD.how_phrases).length) return null // a question about how is never a request
+  // changes-16 (build.build_question_rule): "can it build ...?" is a question about Hermes
+  const q = whichOf(t, BUILD.build_question_words)
+  if (startsWith(t, BUILD.make_not_when_starts) && q.length) return { h2: q[0] }
   const w = whichOf(t, BUILD.build_words)
   if (w.length) return w[0]
   const pair = BUILD.build_pair
   const doing = whichOf(t, pair.and_one_of)
   if (hits(t, pair.must_have) && doing.length) return pair.must_have + ' + ' + doing[0]
+  // changes-15 (build.make_words): make me ..., can you make ..., unless the next words are on
+  // make_not_followed_by, or the message starts as a question about Hermes
+  if (!startsWith(t, BUILD.make_not_when_starts)) {
+    for (const m of BUILD.make_words) {
+      const re = wordRe(m, 'g')
+      re.lastIndex = 0
+      let x
+      while ((x = re.exec(t))) {
+        // the match ends after the character that follows the words (as route2.py's m.end())
+        const rest = t.slice(x.index + x[0].length).replace(/^[ ,]+/, '')
+        if (rest && !startsWith(rest, BUILD.make_not_followed_by)) return m
+      }
+    }
+  }
+  return softwareHit(t) // changes-17
+}
+// changes-17 (build.software_rule): lead-ins cut again and again, then a software verb as the first word and a
+// software thing (one or two words) after at most software_between_max words, none of them on software_between_not.
+function softwareHit(t) {
+  const leads = [...BUILD.software_lead_ins].sort((a, b) => b.length - a.length)
+  let again = true
+  while (again) {
+    again = false
+    for (const p of leads) {
+      if (t !== p && startsWith(t, [p])) {
+        t = t.slice(p.length).replace(/^[ ,]+/, '')
+        again = true
+      }
+    }
+  }
+  const ws = t.match(/[a-z0-9'-]+/g) || []
+  const max = BUILD.software_between_max
+  if (!ws.length || !BUILD.software_verbs.includes(ws[0])) return null
+  for (let i = 1; i < Math.min(ws.length, max + 3); i++) {
+    const between = ws.slice(1, i)
+    if (between.length > max || between.some(w => BUILD.software_between_not.includes(w))) return null
+    for (const th of BUILD.software_things) {
+      const n = th.split(' ').length
+      if (ws.slice(i, i + n).join(' ') === th) return ws[0] + ' + ' + th
+    }
+  }
   return null
 }
 const questionForm = t => t.includes('?') || startsWith(t, OPENING.question_starts)
@@ -8064,12 +9484,45 @@ function byCode(text, st) {
 // service: the service last named, for the text to paste. kept: the stored record (keeps.storage).
 // rmText: the message that led to "Do you mean me, or your own Hermes?", for the answer to it.
 // wants: the wants steps are on (row 5); false only for replaying route2.py, which has none.
-function freshVisit(stage = 'open', kept = {}) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true }
+// changes-14/15: met, the mark that Helper has said hello (its own storage key, keeps.met; it outlives the
+// visit and no Forget removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
+// note_last), for ordinary talk and for never saying the same line twice; rejected: the lines the person
+// called wrong in this visit (no_repeat.rejected_rule), never stored.
+function freshVisit(stage = 'open', kept = {}, met = false) {
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [] }
 }
-// A later visit: only the stored record is carried over. A kept name means the opening's two
-// questions are not asked again (content/helper-keeps-v1.md section 4).
-const laterVisit = kept => freshVisit(kept && kept.name ? 'open' : 'name', kept || {})
+// A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
+// earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,
+// so a name never stands without met there), so a record from a build before the mark is not asked the name
+// again. The window's first line, and so the stage, is opening()'s: met, BACK and no question; else OPEN.
+const laterVisit = (kept, met = false) => {
+  const k = kept || {}
+  const was = met === true || !!k.name
+  return freshVisit(was ? 'open' : 'name', k, was)
+}
+// changes-14 (route2.py opening): the window opens.
+function opening(st) {
+  let out
+  if (st.met) {
+    st.stage = 'open'
+    out = { kind: 'BACK', name: st.kept.name || null }
+  } else {
+    st.stage = 'name'
+    out = { kind: 'OPEN' }
+  }
+  noteLast(st, out)
+  return out
+}
+// route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
+// wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
+const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
+function noteLast(st, o) {
+  if (!o) return o
+  st.last = o.kind
+  st.lastKey = lineKey(o)
+  st.lastTopic = ['row', 'question', 'plain'].includes(o.kind) ? o.topic || null : null
+  return o
+}
 
 /* ---------- what Helper keeps (route2.py: keep, keep_typed, kept_need, remember) ---------- */
 // Writes one thing into the visit's record, and notes on the result that the faint kept line must
@@ -8258,8 +9711,22 @@ function codeName(text, strongOnly = false) {
   const name = codeNameRaw(text, strongOnly)
   return name && !refusedName(name) ? name : null
 }
+// helper-builder-qs-v1.md point 1 (route2.py strong_match): the first place name_strong_pattern matches, or
+// null when the word it caught is on opening.not_a_name or name_strong_stop ("call me tomorrow"). No second match.
+function strongMatch(text) {
+  const m = NAME_STRONG.exec(text)
+  if (m && (OPENING.not_a_name.includes(m[1].toLowerCase()) || OPENING.name_strong_stop.includes(m[1].toLowerCase()))) return null
+  return m
+}
+// route2.py tail_ok: after a name typed on a later visit only spaces, . , ! and name_new_may_follow's words
+const MAY_FOLLOW = [...OPENING.name_new_may_follow].sort((a, b) => b.length - a.length).map(w => new RegExp('(^|[^a-z0-9])' + escapeRe(w) + '(?=$|[^a-z0-9])', 'g'))
+function tailOk(rest) {
+  let t = talkNorm(rest)
+  for (const re of MAY_FOLLOW) t = t.replace(re, '$1 ')
+  return /^[\s.,!]*$/.test(t)
+}
 function codeNameRaw(text, strongOnly) {
-  let m = NAME_STRONG.exec(text)
+  let m = strongMatch(text)
   if (m) return capFirst(m[1])
   if (strongOnly) return null
   m = NAME_WEAK.exec(text)
@@ -8273,7 +9740,7 @@ function codeNameRaw(text, strongOnly) {
 // A reply to "What's your name?" that holds a name and a question of its own: [name, the rest], or [null, null].
 function nameWithMore(text) {
   const more = OPENING.name_with_more
-  let m = NAME_STRONG.exec(text)
+  let m = strongMatch(text)
   if (!m) {
     m = NAME_WEAK.exec(text)
     if (m) {
@@ -8307,6 +9774,9 @@ function nameLater(text, st, out) {
   const weak = m ? capFirst(m[1]) : null
   if (kn && [(strong || '').toLowerCase(), (weak || '').toLowerCase()].includes(kn.toLowerCase())) return { kind: 'NAME_AGAIN', name: kn }
   if (!strong) return null
+  // helper-builder-qs-v1.md point 1: NAME_NEW only when the name ends the message (polite words may follow)
+  const sm = strongMatch(text)
+  if (!tailOk(text.slice(sm.index + sm[0].length))) return null
   keep(st, out, 'name', strong)
   st.name = strong
   return { kind: 'NAME_NEW', name: strong }
@@ -8367,8 +9837,132 @@ function serviceIn(text, st, answered) {
   return st.service
 }
 
-// One typed message -> a result. The order of steps is route2.py's turn(), with no model.
+/* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
+const ST = TALK_DATA.small_talk
+const NR = TALK_DATA.no_repeat
+const LETTER = /\p{L}/u
+const ONE_WORD = /^(?:\p{L}|['-]){2,30}$/u
+// changes-17 (opening.one_word_name): at "What's your name?" a one-word reply is the name, unless the word is
+// on not_a_name or is a topic or term key word. An ending . or ! is cut off; a ? makes it a question.
+function oneWordName(text, st) {
+  if (st.stage !== 'name') return false
+  const raw = String(text).trim().replace(/[.!]+$/, '').trim()
+  if (!ONE_WORD.test(raw) || !LETTER.test(raw)) return false
+  const t = cutIgnored(talkNorm(raw))
+  return !OPENING.not_a_name.includes(t) && !strongTopics(t).length && !anyTerm(t)
+}
+// changes-17: the person says Helper was wrong (no_repeat's words; a bare no, nope or nah at the start not counted)
+const saysWrong = t => whichOf(t, NR.wrong_anywhere).length > 0 || startsWith(t, NR.wrong_starts.filter(w => !ST.no_words.includes(w)))
+const WEAK_ALL = TALK_DATA.topics.flatMap(x => x.weak_key_words || [])
+// Step 0 b (JSON small_talk, route2.py small_talk): the kind of an ordinary message, or null. Whole messages only.
+function smallTalk(text, st) {
+  if (oneWordName(text, st)) return null // Ty and Will at What's your name? are names
+  let t = talkNorm(text)
+  let again = true
+  while (again) {
+    again = false
+    let t2 = t.replace(/[ ?!.,]+$/, '')
+    for (const w of ST.cut_end_words) {
+      if (t2.endsWith(' ' + w)) {
+        t2 = t2.slice(0, -w.length).replace(/[ ,]+$/, '')
+        again = true
+      }
+    }
+    for (const w of ST.cut_start_words) {
+      if (t2 !== w && startsWith(t2, [w])) {
+        t2 = t2.slice(w.length).replace(/^[ ,:.]+/, '')
+        again = true
+      }
+    }
+    t = t2
+  }
+  const opening = st.stage === 'name' || st.stage === 'work'
+  let kind = (Object.entries(ST.kinds).find(([, ws]) => ws.includes(t)) || [null])[0]
+  if (kind === null) {
+    // changes-17 thanks_tail: "ty so much", "thx a lot"
+    for (const w of [...ST.kinds.thanks].sort((a, b) => b.length - a.length)) {
+      if (startsWith(t, [w]) && ST.thanks_tail.includes(t.slice(w.length).replace(/^[ ,!.]+|[ ,!.]+$/g, ''))) {
+        kind = 'thanks'
+        break
+      }
+    }
+  }
+  if (kind === null) {
+    const letters = /[a-z0-9]/.test(t)
+    const one = /^[a-z]+$/.test(t)
+    const tc = cutIgnored(t)
+    const known = strongTopics(tc).length > 0 || anyTerm(tc) || whichOf(tc, WEAK_ALL).length > 0
+    const ws = typedWords(t)
+    if (!letters || (one && t.length === 1)) kind = 'cut' // rules a and b
+    else if (!opening && saysWrong(t) && !known) kind = 'wrong' // changes-17 wrong_rule_17
+    else if (!opening && !st.pending && !known) {
+      if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
+      else if (ws.length <= 4 && ST.cut_dangling.includes(ws[ws.length - 1])) kind = 'cut' // rule d
+      else if (ws.length <= 3 && ws.length > 1 && OPENING.question_starts.includes(ws[0]) && ws.slice(1).every(w => ST.cut_small_words.includes(w))) kind = 'cut' // changes-17 rule e
+    }
+  }
+  if (kind === null) return null
+  // changes-15 no_rule: a bare no right after an answer, with nothing open, says the answer was wrong
+  if (kind === 'ok' && ST.no_words.includes(t) && !st.pending && ST.no_means_wrong_after.includes(st.last)) kind = 'wrong'
+  if (opening && !['thanks', 'how', 'who', 'ai', 'bye', 'cut'].includes(kind)) return null // at_opening
+  if (st.pending && (kind === 'ok' || kind === 'mean')) return null // when_pending: the answer to Helper's question
+  return kind
+}
+// The fixed line for a small-talk kind: [line, the name for HELLO or the topic for a plain line].
+function smallLine(kind, st) {
+  const name = st.name || st.kept.name || null
+  if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
+  if (kind === 'ai') return [ST.ai_line, null]
+  if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
+  return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG' }[kind], null]
+}
+// Builder: the plugin's own kinds that route2.py does not have, kept out of no_repeat like the data's exempt
+// ones: a skill named by name (changes-15's own words: "a skill named by name") and what Helper keeps, asked
+// by typing (A1, A2, A4: the person's own record, or a Yes/No question that must be asked each time).
+const EXEMPT_ALSO = ['skill', 'A1', 'A2', 'A4', 'A-none']
+// changes-15 (JSON no_repeat, route2.py no_repeat): never the same line twice in a row in answer to typed
+// messages, and never a line the person just called wrong in this visit. The line in its place drops the open
+// question and keeps any "Kept:" line the original carried. live-v2 (no_repeat.asked_again): a message that
+// asks for it again in so many words gets the same line.
+function noRepeat(out, st, text) {
+  const k = out.kind
+  const t = talkNorm(text)
+  const saidWrong = startsWith(t, NR.wrong_starts) || whichOf(t, NR.wrong_anywhere).length > 0
+  if (saidWrong && st.lastKey) st.rejected.push(st.lastKey)
+  if (!saidWrong && whichOf(t, NR.asked_again).length) {
+    st.rejected = []
+    return out
+  }
+  const avoid = [st.lastKey, ...st.rejected]
+  if (NR.exempt.includes(k) || EXEMPT_ALSO.includes(k) || !avoid.includes(lineKey(out))) {
+    if (!saidWrong) st.rejected = []
+    return out
+  }
+  const group = (Object.entries(NR.groups).find(([, ks]) => ks.includes(k)) || ['answer'])[0]
+  const cands = []
+  for (const c of NR.in_place[group]) {
+    if (c === 'plain') {
+      if (out.topic) cands.push({ kind: 'plain', topic: out.topic })
+    } else cands.push({ kind: c })
+  }
+  const next = cands.find(x => !avoid.includes(lineKey(x))) || cands.find(x => lineKey(x) !== st.lastKey)
+  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) next[x] = out[x]
+  next.repeat_of = k
+  st.pending = null
+  st.lastq = false
+  return next
+}
+
+// One typed message -> a result (route2.py turn, changes-14's wrapper): the steps below, then no_repeat; met
+// is set when the opening ends here, and the line is noted as Helper's last.
 function turn(text, st) {
+  const wasOpening = st.stage === 'name' || st.stage === 'work'
+  const out = noRepeat(turnSteps(text, st), st, text)
+  if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
+  return noteLast(st, out)
+}
+// The order of steps is route2.py's _turn(), with no model.
+function turnSteps(text, st) {
   const out = {}
   const openAtStart = st.stage === 'open'
   const done = (kind, more = {}) => {
@@ -8381,6 +9975,14 @@ function turn(text, st) {
   if (looksLikeKey(text)) {
     out.kind = 'K1'
     return out
+  }
+  // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
+  const sk = smallTalk(text, st)
+  if (sk) {
+    const [line, x] = smallLine(sk, st)
+    st.stage = 'open'
+    if (line === 'plain') return done('plain', { topic: x, why: 'what do you mean' })
+    return line === 'HELLO' ? done(line, { name: x }) : done(line)
   }
   // 1 b. a request to Helper to remember something; then what Helper keeps, asked about by typing
   if (remember(text, st, out)) return out
@@ -8396,6 +9998,10 @@ function turn(text, st) {
   }
   // 2. a request to do it
   const built = buildHit(text)
+  if (built && built.h2) {
+    st.stage = 'open'
+    return done('H2', { why: built.h2 }) // changes-16
+  }
   if (built) {
     st.stage = 'open'
     return done('H1', { why: built })
@@ -8417,8 +10023,10 @@ function turn(text, st) {
         keep(st, out, 'name', taken)
       }
       name = both ? null : codeName(text, true)
-      ordinary = both || (!name && (strongTopics(t).length > 0 || anyTerm(t) || questionForm(t)))
+      // changes-17: a one-word name ("Will") is not a question
+      ordinary = both || (!name && (strongTopics(t).length > 0 || anyTerm(t) || questionForm(t)) && !oneWordName(text, st))
       if (!name && !ordinary) name = codeName(text)
+      if (name && oneWordName(text, st)) name = capFirst(String(text).trim().replace(/[.!]+$/, '').trim()) // "Ty!" is Ty
     } else ordinary = questionForm(t)
     if (!ordinary) {
       let work = null
@@ -8428,11 +10036,16 @@ function turn(text, st) {
       st.work = work
       if (work || st.stage === 'work') {
         st.stage = 'open'
-        // the name is kept now; what the person does is used for this visit only, never kept
-        if (st.name) keep(st, out, 'name', st.name)
+        // changes-15: the name was written at F1 already; only a name new here would be written now. What the
+        // person does is used for this visit only, never kept.
+        if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
         return done('F2', { name: st.name, work })
       }
+      // changes-15: met and the name are written as soon as the name question is answered; the first
+      // "Kept:" line shows under F1
       st.stage = 'work'
+      st.met = true
+      if (st.name) keep(st, out, 'name', st.name)
       return done('F1', { name: st.name })
     }
     st.stage = 'open'
@@ -8448,7 +10061,7 @@ function turn(text, st) {
     // reference checks it first, before "remember that ..." and the other early steps; here it stays at
     // its old place, after them: none of the four labels reaches those steps (tests/talk-wf1.test.mjs).
     const group = openAtStart ? GROUP_BY_LABEL.get(asLabel(cutIgnored(talkNorm(text)))) : null
-    if (group) return done('G1', { group, buttons: pickGroup(group, st).buttons })
+    if (group) return done('G1', { group, buttons: pickGroupSteps(group, st).buttons })
     const sk = skillOf(cutIgnored(talkNorm(text)))
     if (sk.length === 1) {
       const row = rowOfSkill(sk[0])
@@ -8515,7 +10128,7 @@ function turn(text, st) {
 /* ---------- what the person picks or presses ---------- */
 // An answer picked under a topic question: its need's row at once. No key words, no model. A
 // picked answer to one of the three questions is kept (keeps rule 2).
-function pick(topic, i, st) {
+function pickSteps(topic, i, st) {
   const a = TOPICS[topic].question.answers[i]
   st.found[topic] = a.gives
   st.pending = null
@@ -8532,7 +10145,7 @@ function pick(topic, i, st) {
 // topic's question if not asked yet, or its plain line. The held pick "Web, files, pictures and
 // voice" (held_picks.wants, changes-9): the wants question can-q at once, its four groups to pick
 // (route2.py pick_topic).
-function pickTopic(topic, st) {
+function pickTopicSteps(topic, st) {
   if (TALK_DATA.held_picks && TALK_DATA.held_picks.includes(topic)) {
     st.pending = null
     st.lastq = false
@@ -8563,7 +10176,7 @@ function pickTopic(topic, st) {
 
 // The link "Change" beside "From what I keep": the topic's question is asked again. A question
 // still open is dropped for it.
-function change(topic, st) {
+function changeSteps(topic, st) {
   if (!st.asked.includes(topic)) st.asked.push(topic)
   st.pending = topic
   st.lastq = true
@@ -8572,9 +10185,9 @@ function change(topic, st) {
 
 // A button under "Which one do you mean?", with the message that led to it. A row's button: that
 // row.
-function press(choice, text, st) {
+function pressSteps(choice, text, st) {
   st.lastq = false
-  if (WANT_ROWS[choice]) return pickWant(choice, st)
+  if (WANT_ROWS[choice]) return pickWantSteps(choice, st)
   if (TERMS[choice]) return { kind: 'term', term: choice }
   const ns = needsFor(cutIgnored(talkNorm(text)), choice, false)
   if (ns.length !== 1) return { kind: 'plain', topic: choice }
@@ -8585,53 +10198,56 @@ function press(choice, text, st) {
 
 // A group picked under "What do you want Hermes to do?": line G1 with the group's rows to pick.
 // Not a question, so lastq stays false (helper-wants-v1.md 6.3).
-function pickGroup(group, st) {
+function pickGroupSteps(group, st) {
   st.pending = null
   st.lastq = false
   return { kind: 'G1', group, buttons: WROWS.filter(r => r.group === group).map(r => r.id) }
 }
 // A row picked (under G1, N2 or "Which one do you mean?"): its line and its button. No key words.
-function pickWant(id, st) {
+function pickWantSteps(id, st) {
   st.pending = null
   st.lastq = false
   return { kind: 'want', row: id }
 }
 
 // An answer under "Do you mean me, or your own Hermes?" (RM2): 'helper' or 'hermes'.
-function rmPick(who, st) {
+function rmPickSteps(who, st) {
   st.lastq = false
   if (who === 'helper') return { kind: 'RM3' }
-  return press('mem', st.rmText || '', st)
+  return pressSteps('mem', st.rmText || '', st)
 }
 
 // Skip, at "What's your name?" or "What do you do?". A name given before Skip is kept now.
+// changes-14: a pressed Skip is remembered (met). changes-15: a name given before Skip was written at F1.
 function skip(st) {
   if (st.stage !== 'name' && st.stage !== 'work') return null
   st.stage = 'open'
   st.lastq = false
   st.pending = null
+  st.met = true
   const out = { kind: 'F3' }
-  if (st.name) keep(st, out, 'name', st.name)
+  noteLast(st, out)
+  if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
   return out
 }
 
 // A button that makes Helper say one more pre-written line.
-function sayLine(line, st) {
+function sayLineSteps(line, st) {
   st.lastq = false
   st.pending = null
   return { kind: 'extra', line }
 }
 
 // "See what I keep" pressed where Helper's settings page cannot open: the list, as for A1.
-const seeKept = st => aboutKept({ kind: 'A1' }, st)
+const seeKept = st => noteLast(st, aboutKept({ kind: 'A1' }, st))
 // "Delete all of it" under that list: the A4 question.
-const askForgetAll = st => aboutKept({ kind: 'A4' }, st)
+const askForgetAll = st => noteLast(st, aboutKept({ kind: 'A4' }, st))
 
 // Yes or No under "Delete your name?" (what: name, mod, msg, svc, asked) or "Delete everything I
 // keep about you?" (what: 'all'). Yes deletes from the visit's record; the page then writes it.
 // When nothing is left, the whole record goes, told as well (keeps.storage), so the first-time
 // line shows again at the next keep. A forgotten name is not used again in this visit either.
-function forgetAnswer(what, yes, st) {
+function forgetAnswerSteps(what, yes, st) {
   st.lastq = false
   st.pending = null
   if (!yes) return { kind: 'A-no', what }
@@ -8640,6 +10256,19 @@ function forgetAnswer(what, yes, st) {
   if (what === 'all' || what === 'name') st.name = null
   return { kind: 'A-yes', what }
 }
+
+// changes-14/15 (route2.py conv: note_last after a pick or a button): Helper's last line, whatever led to it.
+// Every pick and button below notes its line; st is each one's last argument.
+const noted = fn => (...a) => noteLast(a[a.length - 1], fn(...a))
+const pick = noted(pickSteps)
+const pickTopic = noted(pickTopicSteps)
+const change = noted(changeSteps)
+const press = noted(pressSteps)
+const pickGroup = noted(pickGroupSteps)
+const pickWant = noted(pickWantSteps)
+const rmPick = noted(rmPickSteps)
+const sayLine = noted(sayLineSteps)
+const forgetAnswer = noted(forgetAnswerSteps)
 
 /* ---------- from a result to what Helper says ---------- */
 const fillSlots = (text, slots) => text.replace(/\{(\w+)\}/g, (m, k) => (slots[k] != null ? String(slots[k]) : m))
@@ -8764,24 +10393,18 @@ function noteForgotten(note, kept) {
   return items.length > 0 && !items.some(item => stillKept(kept, item))
 }
 
-// The opening line. On a later visit (stage open: a name is kept, src/talk.js laterVisit) the opening's
-// question is not asked. With the kept name, Helper greets by it with the data's one line for a person it
-// knows, NAME_AGAIN ("Hi again, {name}. Ask me anything about Hermes."; talk v2 look, point 7: hhtech saw no
-// name). changes-14's BACK line, written for exactly this, is not ported here (Lead, 11 Nov 00:35).
-// Without a name: the opening line without its question.
+// The opening line. changes-14 (keeps.met): when the window opens on a visit whose met mark is set, Helper says
+// BACK ("Hi again, {name}. What would you like Hermes to help you with?", or without the name) and asks no
+// opening question; else OPEN with "What's your name?". With no visit: OPEN's line (for the tests).
 function openingLine(st = null) {
-  const said = { line: 'OPEN', text: FIXED.OPEN.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }
-  if (st && st.stage === 'open') {
-    const name = st.kept && st.kept.name
-    if (name) return { ...said, line: 'OPEN-again', text: fillSlots(FIXED.NAME_AGAIN.text, { name }) }
-    return { ...said, line: 'OPEN-again', text: FIXED.OPEN.text.replace(/\s*[^.?]*\?\s*$/, '') }
-  }
-  return said
+  if (!st) return lineFor({ kind: 'OPEN' }, freshVisit('name'))
+  return lineFor(opening(st), st)
 }
 
 // result: what turn, pick, pickTopic, press, skip, sayLine, change, rmPick or forgetAnswer
 // returned. typed: the person's words (for the text to paste under "your own Hermes can").
-// opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it).
+// opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it). opts.keptShown: the
+// conversation already shows a "Kept:" or "From what I keep:" line (A1 with nothing kept then says it was deleted).
 // Returns { line, text, source, answers, next, paste, note, used, hint, rows, docs }:
 //   docs: the box "From the Hermes docs" { head, words, source } (S1, S2), the page's own words;
 //   next may also be { kind: 'steps', label, steps, after } (the clicks to add an optional skill);
@@ -8798,10 +10421,33 @@ function lineFor(result, st, typed = '', opts = {}) {
   switch (result.kind) {
     case 'K1':
       return said('K1', FIXED.K1.text)
-    case 'H1': {
+    case 'H1':
+    case 'H2': {
+      // changes-16: H2 ("can it build ...?") has its own text to paste, filled the same way as H1's
       const request = Array.from(String(typed).trim()).slice(0, TALK_DATA.limits.request_chars_in_paste).join('').replace(/"/g, "'")
-      return said('H1', FIXED.H1.text, { paste: fillSlots(FIXED.H1.paste_text, { request }) })
+      return said(result.kind, FIXED[result.kind].text, { source: FIXED[result.kind].source || null, paste: fillSlots(FIXED[result.kind].paste_text, { request }) })
     }
+    case 'OPEN':
+      return said('OPEN', FIXED.OPEN.text)
+    // changes-14: a later visit (BACK) and a hello greet by the kept name, or without one
+    case 'BACK':
+    case 'HELLO': {
+      const f = FIXED[result.kind]
+      return said(result.kind, result.name ? fillSlots(f.text, { name: result.name }) : f.text_no_name || f.text)
+    }
+    // changes-14/15: ordinary talk and the lines no_repeat puts in place of a repeat: one line, nothing to pick
+    case 'HELLO_SAME':
+    case 'THANKS':
+    case 'OK':
+    case 'HOW':
+    case 'WHO':
+    case 'AI':
+    case 'BYE':
+    case 'CUT':
+    case 'MEAN_NONE':
+    case 'WRONG':
+    case 'AGAIN':
+      return said(result.kind, FIXED[result.kind].text)
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
@@ -8813,6 +10459,7 @@ function lineFor(result, st, typed = '', opts = {}) {
     case 'N1':
     case 'N1a':
     case 'N1b':
+    case 'N1_AGAIN': // changes-15: in place of a second don't-know line, the faint hint under it as under N1
       return dontKnowLine(result.kind)
     case 'skill by name':
       // an official skill asked about by its name that the skill step did not settle (two at once)
@@ -8868,7 +10515,8 @@ function lineFor(result, st, typed = '', opts = {}) {
       if (result.serviceLine && result.serviceLine.line === 'S1') return { ...skillLine(result.serviceLine.skill, said), used }
       if (result.serviceLine) {
         const f = WANTS_DATA.fixed[result.serviceLine.line]
-        return said(result.serviceLine.line, f.text, { source: sourceText(f.sources), used })
+        // changes-16: CN2 names the service it was asked about ({service}: Google Calendar or Google Drive)
+        return said(result.serviceLine.line, fillSlots(f.text, { service: st.service }), { source: sourceText(f.sources), used })
       }
       return said(n.id, n.text, { source: n.source, next: nextFor(n.next, result.topic, st), used })
     }
@@ -8886,7 +10534,9 @@ function lineFor(result, st, typed = '', opts = {}) {
       return said('RM2', RM.RM2.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: RM.RM2.answers.map(a => ({ id: `rm-${a.gives}`, label: a.label, rm: a.gives === 'RM3' ? 'helper' : 'hermes' })) } })
     case 'A1': {
       const rows = keptRows(st.kept)
-      if (!rows.length) return said('A1-none', KEEPS.tell.see.see_line_nothing)
+      // helper-builder-qs-v1.md point 3: nothing kept, and this conversation already shows a "Kept:" or "From
+      // what I keep:" line (opts.keptShown, from the page): it was deleted. Else nothing was kept yet.
+      if (!rows.length) return opts.keptShown ? said('A1-deleted', KEEPS.tell.see.see_line_deleted) : said('A1-none', KEEPS.tell.see.see_line_nothing)
       // with Helper's settings page: its button, and under the list the way there by hand
       const next = opts.settingsPage ? { kind: 'settings', label: KEEPS.after_settings_page_exists.button_under_see } : { kind: 'forget-all', label: ALL.label }
       return said('A1', KEEPS.tell.see.see_line, { rows, next, hint: opts.settingsPage ? KEEPS.after_settings_page_exists.by_hand : null })
@@ -9240,7 +10890,8 @@ const K = {
   // the top right. The setup card's text to paste (cardPaste) stays as it is ----
   bubblePaste: 'flex w-full min-w-0 items-start gap-2 rounded-md border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) py-1.5 pl-2.5 pr-1.5',
   bubblePasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
-  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-[11px] leading-4 text-(--ui-text-secondary)'
+  // builder-qs (Lead, 11 Nov 00:55: the text to paste at least 12 px): the older line's too, as the bubble's
+  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)'
 }
 
 // Joins class names, skipping empty ones. Only K and T values go in.
@@ -9320,7 +10971,7 @@ const ICONS = ['compass', 'chevron-left', 'chevron-right', 'chevron-down', 'arro
 // ---- src/talk-css.js ----
 // Generated by scripts/build.mjs from src/talk.css (the style sheet of Helper's conversation window).
 // Edit the CSS, then build; tests/talk-css.test.mjs checks it.
-const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}"
+const TALK_CSS = ".hh-win{display:flex;flex-direction:column;padding:16px var(--hh-pad,20px) 18px;background:var(--ui-sidebar-surface-background);--hh-char:168px;--hh-k:.84;--hh-pad:20px}\n.hh-win.hh-narrow{--hh-pad:14px}\n.hh-win.hh-small{--hh-char:132px;--hh-k:.66}\n.hh-conv{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}\n.hh-conv>*{flex:none}\n.hh-old{align-self:flex-start;max-width:86%;padding:6px 11px;border-radius:10px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-tertiary);font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old-link{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ui-text-secondary);text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-old-link .codicon{font-size:12px}\n.hh-me{align-self:flex-end;max-width:82%;padding:6px 11px;border-radius:12px;background:var(--ui-chat-bubble-background);border:1px solid var(--dt-user-bubble-border);font-size:13.5px;line-height:19px;color:var(--ui-text-primary)}\n.hh-note{align-self:flex-start;max-width:100%;margin-top:-4px;font-size:12px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-note .hh-link{margin-left:10px;white-space:nowrap}\n.hh-link{color:inherit;text-decoration:underline;text-decoration-color:var(--ui-text-quaternary);text-underline-offset:3px;cursor:pointer}\n.hh-link:hover{text-decoration-color:currentColor}\n.hh-bubble{position:relative;align-self:flex-start;max-width:100%;margin-top:5px;padding:11px 15px 12px;border-radius:12px;background:var(--ui-bg-elevated);border:1px solid var(--ui-stroke-primary)}\n.hh-line{font-size:16px;line-height:23px;font-weight:500;text-wrap:pretty;color:var(--ui-text-primary)}\n.hh-in{margin-top:10px;padding-top:10px;border-top:1px solid var(--ui-stroke-tertiary);display:flex}\n.hh-bubble.hh-dots{display:flex;gap:5px;padding:12px 14px;margin-left:calc(var(--hh-char)*.5 - 8px)}\n.hh-dots i{width:6px;height:6px;border-radius:50%;background:var(--ui-text-quaternary)}\n.hh-dots i.hh-on{background:var(--ui-text-secondary)}\n.hh-btn{height:28px;padding:0 10px 0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;flex:none;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;background:var(--ui-bg-tertiary);color:var(--ui-text-primary);border:1px solid var(--ui-stroke-secondary)}\n.hh-btn .codicon{font-size:13px;color:var(--ui-text-secondary)}\n.hh-btn:hover{background:var(--ui-control-hover-background);border-color:var(--ui-stroke-primary)}\n.hh-btn:active{background:var(--ui-control-active-background);border-color:var(--ui-stroke-primary);filter:brightness(.8)}\n.hh-under{position:relative;flex:none;display:flex;min-height:calc(108px*var(--hh-k) + 16px)}\n.hh-charspace{flex:none;width:calc(var(--hh-char) + 12px)}\n.hh-small .hh-charspace{width:calc(var(--hh-char) + 8px)}\n.hh-tail-fill{fill:var(--ui-bg-elevated)}\n.hh-tail-edge{fill:none;stroke:var(--ui-stroke-primary);stroke-width:1px;stroke-linejoin:round;stroke-linecap:round}\n.hh-answers{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-end;padding:8px 0 9px}\n.hh-answer{min-height:29px;max-width:100%;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;flex:none;font-size:13.5px;line-height:19px;text-align:left;cursor:pointer;color:var(--ui-text-primary);background:var(--ui-chat-bubble-background);border:1px solid var(--ui-stroke-primary)}\n.hh-answer:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary)}\n.hh-answer:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);filter:brightness(.8)}\n.hh-answer:focus-visible,.hh-btn:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-picks{overflow:hidden}\n.hh-win{position:relative;flex:none;box-sizing:border-box;height:100%;min-height:0;--hh-inset:0px}\n.hh-win.hh-over{position:absolute;top:0;bottom:0;height:auto;z-index:20;border-left:1px solid var(--ui-stroke-tertiary)}\n.hh-conv{flex-direction:column-reverse;justify-content:flex-start;overflow:hidden auto;overscroll-behavior:contain;overflow-anchor:none}\n.hh-conv[data-fade=top]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=bottom]{mask-image:linear-gradient(to top,transparent 0,var(--ui-base) 20px)}\n.hh-conv[data-fade=both]{mask-image:linear-gradient(to bottom,transparent 0,var(--ui-base) 20px,var(--ui-base) calc(100% - 20px),transparent 100%)}\n.hh-conv-in{display:flex;flex-direction:column;gap:9px}\n.hh-conv-in>*{flex:none}\n.hh-me{overflow-wrap:anywhere}\n.hh-note .hh-link{padding:0;border:0;background:none;font:inherit}\n.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-note{text-wrap:pretty}\n.hh-rows{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:19px;color:var(--ui-text-secondary)}\n.hh-old .hh-rows{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-bubble{flex:none;margin-top:14px;min-width:calc(var(--hh-inset) + var(--hh-char)*.5 + 32px)}\n.hh-bubble.hh-dots{min-width:0;margin-left:calc(var(--hh-inset) + var(--hh-char)*.5 - 8px)}\n.hh-wait{visibility:hidden}\n.hh-in.hh-col{flex-direction:column;align-items:flex-start;gap:10px}\n.hh-where{font-size:13px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-old .hh-where{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary);text-wrap:pretty}\n.hh-linkcell{position:absolute;z-index:2;left:calc(var(--hh-inset) + var(--hh-char)*.5 - 2px);top:-1px;width:22px;height:24px;overflow:visible;pointer-events:none}\n.hh-tail-short{display:block;width:22px;height:24px;overflow:visible}\n.hh-char{position:absolute;left:var(--hh-inset);bottom:calc(-8px*var(--hh-k));z-index:1;pointer-events:none}\n.hh-picks{transition:height .3s ease-in-out}\n.hh-picks .hh-answers{display:grid;grid-template-columns:repeat(var(--hh-cols,2),minmax(0,1fr));gap:6px;padding:10px 10px 0}\n.hh-picks .hh-answer{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;justify-content:flex-start;border-radius:12px}\n.hh-skip{flex:none;align-self:center;padding:0 2px;font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}\n.hh-grip{position:absolute;top:0;bottom:0;left:-7px;width:14px;display:flex;align-items:center;justify-content:center;cursor:col-resize;z-index:3;touch-action:none}\n.hh-grip::before{content:\"\";position:absolute;top:0;bottom:0;left:7px;width:1px;background:var(--ui-stroke-tertiary)}\n.hh-grip-pill{position:relative;width:5px;height:48px;border-radius:3px;background:var(--ui-text-quaternary)}\n.hh-old-link:focus-visible,.hh-link:focus-visible,.hh-grip:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px}\n.hh-docs{margin:8px 0 0;padding:1px 0 1px 12px;border-left:2px solid var(--ui-text-tertiary)}\n.hh-docs-head{margin:0;font-size:12px;line-height:17px;font-weight:500;color:var(--ui-text-tertiary)}\n.hh-docs-words{margin:2px 0 0;font-size:13.5px;line-height:19px;font-style:italic;text-wrap:pretty;overflow-wrap:anywhere;color:var(--ui-text-secondary)}\n.hh-old .hh-docs{margin-top:4px}\n.hh-old .hh-docs-words{font-size:12.5px;line-height:17px}\n.hh-steps{margin:0;padding-left:20px;list-style:decimal;font-size:13.5px;line-height:19px;text-wrap:pretty;color:var(--ui-text-secondary)}\n.hh-steps li::marker{color:var(--ui-text-tertiary);font-variant-numeric:tabular-nums}\n.hh-steps li+li{margin-top:6px}\n.hh-old .hh-steps{margin-top:3px;font-size:12.5px;line-height:17px}\n.hh-old .hh-steps li+li{margin-top:4px}\n.hh-after{font-size:12.5px;line-height:17px;text-wrap:pretty;color:var(--ui-text-tertiary)}\n.hh-btn[aria-expanded=true] .codicon,.hh-old-link[aria-expanded=true] .codicon{transform:rotate(180deg)}\n.hh-picks .hh-answer.hh-more{background:transparent;color:var(--ui-text-secondary);border-color:var(--ui-stroke-tertiary)}\n.hh-picks .hh-answer.hh-more:hover{background:linear-gradient(var(--ui-control-hover-background),var(--ui-control-hover-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-quaternary);color:var(--ui-text-primary)}\n.hh-picks .hh-answer.hh-more:active{background:linear-gradient(var(--ui-control-active-background),var(--ui-control-active-background)),var(--ui-chat-bubble-background);border-color:var(--ui-text-tertiary);color:var(--ui-text-primary)}\n.hh-gone{text-decoration:line-through}"
 
 // ---- src/layout.js ----
 // How the page fits its window (talk v1: rows 4 and 5 of docs/build/talk-v1-plan.md).
@@ -9967,9 +11618,18 @@ const SPOKEN_ONCE = { userSelect: 'none' }
 // Words not yet shown hold their place unseen, so the text has its final size from the first word
 // and nothing jumps as words arrive.
 const UNSEEN = { visibility: 'hidden' }
+// A name in curly marks with no space in it is kept on one line with its marks (src/quotes.js namesWhole;
+// hhdesign's review of d1ceddc, 3.1). text is already drawn by curlyQuotes.
+const NAME_WHOLE = { whiteSpace: 'nowrap' }
+function keepNamesWhole(text) {
+  const parts = namesWhole(text)
+  if (!parts) return text
+  return parts.map((p, i) => (typeof p === 'string' ? p : jsx('span', { style: NAME_WHOLE, 'data-hh': 'name-whole', children: p.whole }, `n${i}`)))
+}
 
 // One line Helper says. A screen reader gets the whole line once (Hermes's own sr-only class);
-// the copy the eye sees, growing word by word, is hidden from it.
+// the copy the eye sees, growing word by word, is hidden from it. A name kept whole is one word, so it is
+// always wholly in the seen part or wholly in the rest.
 function Said({ clock, id, text, className, fresh = false }) {
   const words = wordsOf(text)
   const [, redraw] = useState(0)
@@ -9988,7 +11648,7 @@ function Said({ clock, id, text, className, fresh = false }) {
         {
           'aria-hidden': true,
           'data-hh': 'said-seen',
-          children: [words.slice(0, n).join(' '), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: (n ? ' ' : '') + rest }, 'rest') : null]
+          children: [keepNamesWhole(words.slice(0, n).join(' ')), rest ? jsx('span', { style: UNSEEN, 'data-hh': 'said-rest', children: keepNamesWhole((n ? ' ' : '') + rest) }, 'rest') : null]
         },
         'seen'
       )
@@ -10683,10 +12343,36 @@ function BubbleLink() {
 // page shows as words to read, a pair of straight double quotes is drawn as curly ones (“Bots”). Done where the
 // line is drawn, never in the data. Never used on text to paste, the settings text box, anything the person
 // typed (their messages, a kept thing in the list or a faint "Kept: ..." line, the line quoted back on the
-// settings page), or anything that is matched or stored; tests/quotes.test.mjs checks those four.
+// settings page), or anything that is matched or stored; tests/talk-look.test.mjs checks those four.
 // A quote mark with no partner stays straight.
+// Apostrophes (hhdesign's review of d1ceddc, section 3 point 3): in the same step, a straight ' between two
+// letters is drawn as ’ (I’m, What’s, Helper’s), with the same four exceptions.
 function curlyQuotes(text) {
-  return typeof text === 'string' ? text.replace(/"([^"\n]*)"/g, '\u201c$1\u201d') : text
+  return typeof text === 'string' ? text.replace(/"([^"\n]*)"/g, '\u201c$1\u201d').replace(/(\p{L})'(?=\p{L})/gu, '$1\u2019') : text
+}
+
+// A name in curly marks with no space in it (a skill such as “email-inbox-triage”) is kept on one line with its
+// marks (hhdesign's review of d1ceddc, section 3 point 1: it broke at its hyphen and read as two words), unless
+// it is longer than NAME_WHOLE_MAX characters: then it may be wider than the bubble's text width at 360 px, and
+// it breaks as before. The longest of the 186 skill names has 31 characters; its width in the app: see
+// docs/build/talk-v2-c18-report.md. src/talk-view.js draws each { whole } part in a span with white-space:nowrap.
+const NAME_WHOLE_MAX = 31
+const QUOTED_NAME = /\u201c([^\u201c\u201d\s]+)\u201d/g
+// text already drawn by curlyQuotes -> null when no name in it is kept whole, else its parts in order: strings,
+// and { whole: '“name”' } for each name kept whole
+function namesWhole(text) {
+  if (typeof text !== 'string' || !text.includes('\u201c')) return null
+  const parts = []
+  let at = 0
+  for (const m of text.matchAll(QUOTED_NAME)) {
+    if (Array.from(m[1]).length > NAME_WHOLE_MAX) continue
+    if (m.index > at) parts.push(text.slice(at, m.index))
+    parts.push({ whole: m[0] })
+    at = m.index + m[0].length
+  }
+  if (!parts.length) return null
+  if (at < text.length) parts.push(text.slice(at))
+  return parts
 }
 
 // ---- src/talk-view.js ----
@@ -10710,6 +12396,8 @@ function curlyQuotes(text) {
 //     used:    null | { text, link, topic }   the faint "From what I keep: ..." line, the same place
 //     opened:  true once a 'paste' button was pressed }
 // Classes come from the T table (src/talk.css); the text to paste wears Hermes's own classes.
+// A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js)
+const drawn = text => keepNamesWhole(curlyQuotes(text))
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
 // (talk v2 look: once its part is open, the style sheet turns the down arrow up.)
@@ -10730,14 +12418,14 @@ const DocsBox = ({ docs, wait }) =>
     'aria-hidden': wait ? true : undefined,
     'data-hh': 'docs',
     children: [
-      jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: curlyQuotes(docs.head) }, 'h'),
-      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: curlyQuotes(docs.words) }, 'w')
+      jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: drawn(docs.head) }, 'h'),
+      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: drawn(docs.words) }, 'w')
     ]
   })
 // The clicks to add an optional skill: Hermes's own numbered list (rule B), and the faint line after them.
 const Steps = ({ next }) => [
-  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: curlyQuotes(s) }, i)) }, 'steps'),
-  next.after ? jsx('p', { className: T.after, 'data-hh': 'steps-after', children: curlyQuotes(next.after) }, 'after') : null
+  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: drawn(s) }, i)) }, 'steps'),
+  next.after ? jsx('p', { className: T.after, 'data-hh': 'steps-after', children: drawn(next.after) }, 'after') : null
 ]
 // Text to paste inside a Helper line (notes-wants.md item 4): Hermes's own small code card with Copy at its
 // top right; smaller in an older line. Drawn exactly as it will be pasted.
@@ -10803,11 +12491,11 @@ function OldLine({ entry, onNext }) {
     'data-line': entry.line,
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
-      curlyQuotes(entry.text),
+      drawn(entry.text),
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
-      entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: curlyQuotes(entry.hint) }, 'hint') : null,
-      next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: curlyQuotes(next.text) }, 'where') : null,
+      entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
+      next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: drawn(next.text) }, 'where') : null,
       next && next.kind !== 'where'
         ? jsxs(
             'button',
@@ -10888,8 +12576,8 @@ function Bubble({ entry, clock, fresh, said, onNext }) {
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
   if (entry.rows) inside.push(jsx(Rows, { rows: entry.rows }, 'rows'))
-  if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: curlyQuotes(entry.hint) }, 'hint'))
-  if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: curlyQuotes(next.text) }, 'where'))
+  if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint'))
+  if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: drawn(next.text) }, 'where'))
   else if (next)
     inside.push(
       jsxs(
@@ -11121,6 +12809,14 @@ function makePage(ctx, opts = {}) {
   // back cleaned. The settings page writes the same record, so it is read again every time the
   // page is put on screen.
   const readKept = () => cleanKept(ctx.storage.get('kept', null))
+  // changes-14: the met mark, true or nothing
+  const readMet = () => {
+    try {
+      return ctx.storage.get('met', false) === true
+    } catch {
+      return false
+    }
+  }
   // The conversation, kept while the plugin is loaded (leaving the page and coming back keeps
   // it). Nothing of it is written anywhere: it is gone when Hermes restarts. visit = what Helper
   // knows in this visit (src/talk.js), its `kept` the stored record; log = what was said, each
@@ -11130,9 +12826,13 @@ function makePage(ctx, opts = {}) {
   const remembered = () => {
     if (!memory) {
       const kept = readKept()
-      // a later visit: a kept name means the opening's two questions are not asked again
-      memory = { visit: laterVisit(kept), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)) }
+      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (no Forget removes
+      // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
+      // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
+      const metStored = readMet()
+      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
       memory.log = [helperEntry(openingLine(memory.visit))]
+      writeKept()
     }
     return memory
   }
@@ -11147,6 +12847,13 @@ function makePage(ctx, opts = {}) {
   // After everything the person does: the record is written when it changed, and removed whole
   // when nothing is left in it (told with it). A storage that fails is not kept from answering.
   const writeKept = () => {
+    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); never removed
+    if (memory.visit.met && !memory.metStored) {
+      try {
+        ctx.storage.set('met', true)
+        memory.metStored = true
+      } catch {}
+    }
     const next = keptToStore(memory.visit.kept)
     const text = JSON.stringify(next)
     if (text === memory.stored) return
@@ -11398,7 +13105,9 @@ function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     function answer(result, shown, typed = '') {
       if (!result) return
-      const said = lineFor(result, visit, typed, { settingsPage })
+      // helper-builder-qs-v1.md point 3: the conversation already shows a "Kept:" or "From what I keep:" line
+      const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
+      const said = lineFor(result, visit, typed, { settingsPage, keptShown })
       writeKept()
       addToLog([shown ? youEntry(shown) : null, helperEntry(said)].filter(Boolean))
       setFocusAsk(true)
@@ -12057,9 +13766,6 @@ const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')
-// The action word of the Forget row: Lead's job and hhdesign's review name it "Forget"; it is not in the
-// talk data (Questions for Lead). The row's title is the data's label.
-const FORGET_ACTION = 'Forget'
 
 function makeSettingsPage(ctx) {
   const read = () => cleanKept(ctx.storage.get('kept', null))
@@ -12203,7 +13909,7 @@ function makeSettingsPage(ctx) {
             jsx(ListRow, {
               title: curlyQuotes(FA.label),
               description: curlyQuotes(FA.under),
-              action: jsx(Button, { size: 'sm', variant: 'textStrong', onClick: () => setForget('ask'), 'aria-label': FA.label, 'data-hh': 'settings-forget-all', children: FORGET_ACTION }, 'f')
+              action: jsx(Button, { size: 'sm', variant: 'textStrong', onClick: () => setForget('ask'), 'aria-label': FA.label, 'data-hh': 'settings-forget-all', children: FA.action }, 'f')
             }, 'row'),
             forget === 'ask'
               ? jsxs('div', {

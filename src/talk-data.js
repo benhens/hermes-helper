@@ -53,6 +53,10 @@ export const TALK_DATA = {
       "text": "I can't do that, but your own Hermes can. Paste this into a new chat with it.",
       "paste_text": "I asked for this: \"{request}\". Please do it for me. Ask me before you change anything."
     },
+    "H2": {
+      "text": "Hermes can read, change and run code on your computer. You can ask it for help with that. I don't build things myself.",
+      "paste_text": "I asked: \"{request}\". Can you help me with that? First tell me your plan, and ask me before you change anything."
+    },
     "K1": {
       "text": "That looks like a secret key. I did not keep it. Keys go in Settings, never in a chat."
     },
@@ -83,6 +87,51 @@ export const TALK_DATA = {
     },
     "NAME_NEW": {
       "text": "Thanks, {name}. Ask me anything about Hermes."
+    },
+    "BACK": {
+      "text": "Hi again, {name}. What would you like Hermes to help you with?",
+      "text_no_name": "Hi again. What would you like Hermes to help you with?"
+    },
+    "HELLO": {
+      "text": "Hi, {name}. What would you like Hermes to help you with?",
+      "text_no_name": "Hi. What would you like Hermes to help you with?"
+    },
+    "HELLO_SAME": {
+      "text": "I'm here. Type your question whenever you are ready."
+    },
+    "THANKS": {
+      "text": "You're welcome. Ask me more about Hermes whenever you like."
+    },
+    "OK": {
+      "text": "Good. I'm here if you want to know more."
+    },
+    "HOW": {
+      "text": "I'm good, thanks for asking. I'm here when you have a question about Hermes."
+    },
+    "WHO": {
+      "text": "I'm Helper. I help you learn about Hermes and set it up. Your own Hermes does the work.",
+      "source": "His opening of 10 Nov (I can help you learn about Hermes and set it up); BRIEF value 4 (it never builds or installs)."
+    },
+    "AI": {
+      "text": "I'm a small program inside Hermes, not a person. No AI writes my words. I use lines checked against the Hermes docs."
+    },
+    "BYE": {
+      "text": "Bye. Come back any time you have a question about Hermes."
+    },
+    "CUT": {
+      "text": "Sorry, that looks cut off. Tell me a bit more about what you need."
+    },
+    "MEAN_NONE": {
+      "text": "Sorry, that was not clear. Type the word you want explained, like \"what is a skill\"."
+    },
+    "WRONG": {
+      "text": "Sorry about that. Please say it another way."
+    },
+    "AGAIN": {
+      "text": "Sorry, I have nothing more on that. Please ask it another way."
+    },
+    "N1_AGAIN": {
+      "text": "Sorry, I don't have checked information on that one either."
     }
   },
   "opening": {
@@ -181,7 +230,30 @@ export const TALK_DATA = {
       "that",
       "this",
       "what",
-      "how"
+      "how",
+      "thx",
+      "cheers",
+      "sup",
+      "wassup",
+      "bye",
+      "goodbye",
+      "cya",
+      "later",
+      "why",
+      "who",
+      "when",
+      "where",
+      "which",
+      "whats",
+      "what's",
+      "can",
+      "could",
+      "would",
+      "should",
+      "does",
+      "did",
+      "is",
+      "are"
     ],
     "question_starts": [
       "what",
@@ -227,7 +299,73 @@ export const TALK_DATA = {
         "my",
         "we"
       ]
-    }
+    },
+    "name_strong_stop": [
+      "today",
+      "tomorrow",
+      "tonight",
+      "yesterday",
+      "later",
+      "soon",
+      "now",
+      "sometime",
+      "sometimes",
+      "anytime",
+      "whenever",
+      "when",
+      "if",
+      "after",
+      "before",
+      "next",
+      "this",
+      "that",
+      "every",
+      "each",
+      "daily",
+      "weekly",
+      "morning",
+      "mornings",
+      "evening",
+      "evenings",
+      "afternoon",
+      "night",
+      "noon",
+      "weekend",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+      "again",
+      "maybe",
+      "please",
+      "pls",
+      "plz",
+      "whatever",
+      "anything",
+      "something",
+      "by",
+      "out",
+      "up",
+      "any",
+      "asap",
+      "once",
+      "twice",
+      "anyway"
+    ],
+    "name_new_may_follow": [
+      "please",
+      "pls",
+      "plz",
+      "thanks",
+      "thank you",
+      "thx",
+      "now",
+      "instead",
+      "from now on"
+    ]
   },
   "key_patterns": [
     "(?<![A-Za-z0-9])(?:sk-|sk_|rk_|xai-|AIza|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|glpat-|hf_|gsk_|pplx-|r8_|fw_|npm_|xox[abposr]-|xapp-)[A-Za-z0-9_-]{16,}",
@@ -418,6 +556,799 @@ export const TALK_DATA = {
         "turn on",
         "switch on"
       ]
+    },
+    "make_words": [
+      "make me",
+      "create me",
+      "build me",
+      "can you make",
+      "could you make",
+      "would you make",
+      "will you make",
+      "please make",
+      "can you create",
+      "could you create",
+      "would you create",
+      "please create",
+      "i want you to make",
+      "i want you to build",
+      "i want you to create",
+      "i need you to make",
+      "i need you to build"
+    ],
+    "make_not_followed_by": [
+      "it",
+      "that",
+      "this",
+      "sure",
+      "sense",
+      "things",
+      "understand",
+      "me understand",
+      "hermes",
+      "my hermes",
+      "my bot",
+      "the bot",
+      "my bots"
+    ],
+    "make_not_when_starts": [
+      "can it",
+      "could it",
+      "will it",
+      "would it",
+      "can hermes",
+      "could hermes",
+      "will hermes",
+      "would hermes",
+      "does hermes",
+      "is hermes able",
+      "is it able"
+    ],
+    "build_question_words": [
+      "build an app",
+      "make an app",
+      "build a website",
+      "make a website",
+      "build a bot",
+      "make a bot",
+      "write the code",
+      "build me",
+      "build it",
+      "make me an app",
+      "make me a website"
+    ],
+    "software_lead_ins": [
+      "please",
+      "pls",
+      "can you",
+      "could you",
+      "would you",
+      "will you",
+      "i want you to",
+      "i need you to",
+      "help me",
+      "just",
+      "now",
+      "ok",
+      "okay",
+      "so"
+    ],
+    "software_verbs": [
+      "write",
+      "code",
+      "create",
+      "program",
+      "develop",
+      "design"
+    ],
+    "software_things": [
+      "script",
+      "scripts",
+      "program",
+      "programs",
+      "programme",
+      "app",
+      "apps",
+      "application",
+      "web app",
+      "game",
+      "games",
+      "bot",
+      "bots",
+      "chatbot",
+      "website",
+      "websites",
+      "site",
+      "web page",
+      "webpage",
+      "landing page",
+      "code",
+      "plugin",
+      "extension",
+      "macro",
+      "software",
+      "api",
+      "tool"
+    ],
+    "software_between_max": 3,
+    "software_between_not": [
+      "my",
+      "your",
+      "our",
+      "his",
+      "her",
+      "their",
+      "second",
+      "another",
+      "other",
+      "extra",
+      "hermes"
+    ]
+  },
+  "small_talk": {
+    "cut_end_words": [
+      "helper",
+      "hermes",
+      "please",
+      "pls",
+      "mate"
+    ],
+    "cut_start_words": [
+      "helper",
+      "hermes"
+    ],
+    "kinds": {
+      "hello": [
+        "hey",
+        "hi",
+        "hello",
+        "hiya",
+        "heya",
+        "hey there",
+        "hi there",
+        "hello there",
+        "yo",
+        "howdy",
+        "hey hey",
+        "hii",
+        "hiii",
+        "heyy",
+        "heyyy",
+        "helo",
+        "hallo",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "morning",
+        "evening",
+        "greetings"
+      ],
+      "thanks": [
+        "thanks",
+        "thank you",
+        "thx",
+        "ty",
+        "thank u",
+        "thanks a lot",
+        "thank you so much",
+        "thanks so much",
+        "many thanks",
+        "cheers",
+        "great thanks",
+        "ok thanks",
+        "okay thanks",
+        "ok thank you",
+        "okay thank you",
+        "much appreciated",
+        "appreciate it",
+        "thanks for that",
+        "nice thanks",
+        "cool thanks"
+      ],
+      "ok": [
+        "ok",
+        "okay",
+        "k",
+        "kk",
+        "okey",
+        "oki",
+        "cool",
+        "nice",
+        "great",
+        "got it",
+        "gotcha",
+        "alright",
+        "all right",
+        "sure",
+        "fine",
+        "good",
+        "perfect",
+        "understood",
+        "i see",
+        "makes sense",
+        "ah ok",
+        "oh ok",
+        "ok cool",
+        "ah",
+        "oh",
+        "hmm",
+        "hm",
+        "interesting",
+        "awesome",
+        "wow",
+        "yes",
+        "yeah",
+        "yep",
+        "yup",
+        "no",
+        "nope",
+        "nah",
+        "lol",
+        "haha",
+        "ha"
+      ],
+      "how": [
+        "how are you",
+        "how are you doing",
+        "how are u",
+        "how r u",
+        "hows it going",
+        "how's it going",
+        "how is it going",
+        "whats up",
+        "what's up",
+        "sup",
+        "wassup",
+        "how do you do",
+        "you ok",
+        "you good",
+        "how are things",
+        "how have you been"
+      ],
+      "who": [
+        "who are you",
+        "what are you",
+        "who is this",
+        "what is this",
+        "whats your name",
+        "what's your name",
+        "what is your name",
+        "your name",
+        "who made you",
+        "what is helper",
+        "who is helper",
+        "what's helper",
+        "whats helper",
+        "what do you do",
+        "tell me about yourself",
+        "introduce yourself"
+      ],
+      "ai": [
+        "are you an ai",
+        "are you ai",
+        "are you a bot",
+        "are you a robot",
+        "are you human",
+        "are you a human",
+        "are you a person",
+        "are you real",
+        "are you a real person",
+        "is this a bot",
+        "is this an ai",
+        "is this a person",
+        "is this a human",
+        "is this a real person",
+        "am i talking to a bot",
+        "am i talking to a person",
+        "am i talking to a human",
+        "am i talking to an ai",
+        "am i talking to ai",
+        "are you chatgpt",
+        "are you claude",
+        "is this chatgpt",
+        "is this claude"
+      ],
+      "bye": [
+        "bye",
+        "goodbye",
+        "good bye",
+        "bye bye",
+        "see you",
+        "see ya",
+        "cya",
+        "later",
+        "see you later",
+        "good night",
+        "goodnight",
+        "gotta go",
+        "got to go",
+        "that's all",
+        "thats all",
+        "that is all",
+        "i'm done",
+        "im done",
+        "that's it",
+        "thats it"
+      ],
+      "mean": [
+        "what do you mean",
+        "what does that mean",
+        "what does it mean",
+        "i don't understand",
+        "i dont understand",
+        "i do not understand",
+        "i don't get it",
+        "i dont get it",
+        "huh",
+        "what",
+        "say that again",
+        "explain that",
+        "can you explain that",
+        "in simple words",
+        "simpler please",
+        "simpler",
+        "say it simpler",
+        "i'm confused",
+        "im confused",
+        "confused",
+        "what?"
+      ],
+      "wrong": [
+        "that's wrong",
+        "thats wrong",
+        "that is wrong",
+        "wrong",
+        "wrong answer",
+        "that's not right",
+        "thats not right",
+        "that is not right",
+        "not right",
+        "incorrect",
+        "that's incorrect",
+        "thats incorrect",
+        "you're wrong",
+        "youre wrong",
+        "not what i meant",
+        "that's not what i meant",
+        "thats not what i meant",
+        "that is not what i meant",
+        "not what i asked",
+        "that's not what i asked",
+        "thats not what i asked",
+        "that's not it",
+        "thats not it",
+        "not that",
+        "no not that",
+        "no, not that",
+        "no that's wrong",
+        "no, that's wrong",
+        "no thats wrong",
+        "no, thats wrong",
+        "no not what i meant",
+        "no, not what i meant",
+        "nope wrong",
+        "nope, wrong",
+        "i meant something else",
+        "not quite"
+      ]
+    },
+    "cut_question_words": [
+      "how",
+      "why",
+      "who",
+      "when",
+      "where",
+      "which"
+    ],
+    "cut_dangling": [
+      "a",
+      "an",
+      "the",
+      "to",
+      "i",
+      "my",
+      "and",
+      "or",
+      "of",
+      "for",
+      "with",
+      "about"
+    ],
+    "cut_small_words": [
+      "you",
+      "u",
+      "it",
+      "i",
+      "we",
+      "they",
+      "this",
+      "that",
+      "me",
+      "hermes",
+      "helper"
+    ],
+    "no_words": [
+      "no",
+      "nope",
+      "nah"
+    ],
+    "no_means_wrong_after": [
+      "row",
+      "plain",
+      "term",
+      "W2",
+      "COST",
+      "WHERE",
+      "N1",
+      "N1a",
+      "N1b",
+      "N1_AGAIN",
+      "H1",
+      "skill by name",
+      "C1",
+      "AGAIN"
+    ],
+    "thanks_tail": [
+      "so much",
+      "so so much",
+      "a lot",
+      "very much",
+      "lots",
+      "loads",
+      "heaps",
+      "a ton",
+      "a bunch",
+      "again",
+      "man",
+      "buddy",
+      "x"
+    ],
+    "ai_line": "AI"
+  },
+  "no_repeat": {
+    "exempt": [
+      "H1",
+      "H2",
+      "K1",
+      "RM1",
+      "RM3",
+      "RM4",
+      "RM5",
+      "RM6",
+      "NAME_NEW",
+      "AI",
+      "AI_PICK",
+      "AI_WRITES",
+      "TP",
+      "F1",
+      "F2",
+      "F3",
+      "OPEN",
+      "BACK",
+      "skill by name"
+    ],
+    "groups": {
+      "talk": [
+        "THANKS",
+        "OK",
+        "HOW",
+        "WHO",
+        "BYE",
+        "CUT",
+        "HELLO",
+        "HELLO_SAME",
+        "WRONG"
+      ],
+      "dont_know": [
+        "N1",
+        "N1a",
+        "N1b",
+        "N1_AGAIN"
+      ]
+    },
+    "in_place": {
+      "talk": [
+        "HELLO_SAME",
+        "OK"
+      ],
+      "dont_know": [
+        "N1_AGAIN",
+        "AGAIN"
+      ],
+      "answer": [
+        "plain",
+        "AGAIN",
+        "MEAN_NONE"
+      ]
+    },
+    "wrong_starts": [
+      "no",
+      "nope",
+      "nah",
+      "wrong",
+      "that's wrong",
+      "thats wrong",
+      "that is wrong",
+      "that's not",
+      "thats not",
+      "that is not",
+      "not what i",
+      "not that",
+      "i meant",
+      "incorrect",
+      "that isn't"
+    ],
+    "wrong_anywhere": [
+      "not what i meant",
+      "not what i asked",
+      "that's wrong",
+      "thats wrong",
+      "that is wrong",
+      "that's not it",
+      "thats not it",
+      "that's not right",
+      "thats not right",
+      "you're wrong",
+      "youre wrong",
+      "i meant",
+      "not what i",
+      "isn't what i",
+      "is not what i",
+      "isn't right",
+      "is not right",
+      "not correct",
+      "isn't correct",
+      "misunderstood",
+      "misunderstand",
+      "got it wrong",
+      "you are wrong"
+    ],
+    "asked_again": [
+      "again",
+      "once more",
+      "repeat",
+      "repeat that",
+      "one more time",
+      "say that again"
+    ]
+  },
+  "lonely_words": {
+    "drive": {
+      "needs_one_of": [
+        "my drive",
+        "the drive",
+        "use drive",
+        "drive folder",
+        "drive folders",
+        "drive file",
+        "drive files",
+        "in drive",
+        "on drive",
+        "from drive",
+        "to drive",
+        "shared drive"
+      ]
+    },
+    "zoom": {
+      "needs_one_of": [
+        "use zoom",
+        "my zoom",
+        "connect zoom",
+        "link zoom",
+        "zoom account",
+        "zoom app",
+        "zoom call",
+        "zoom calls",
+        "zoom meeting",
+        "zoom meetings",
+        "on zoom",
+        "with zoom",
+        "to zoom"
+      ],
+      "not_with": [
+        "listen",
+        "listens",
+        "listening",
+        "record",
+        "records",
+        "recording",
+        "join",
+        "joins",
+        "attend",
+        "attends",
+        "take notes",
+        "takes notes",
+        "transcribe"
+      ]
+    },
+    "phone": {
+      "not_with": [
+        "photo",
+        "photos",
+        "pictures",
+        "files",
+        "contacts",
+        "back up",
+        "backup",
+        "storage"
+      ]
+    },
+    "slow": {
+      "needs_one_of": [
+        "answer",
+        "answers",
+        "reply",
+        "replies",
+        "response",
+        "responses",
+        "it",
+        "it's",
+        "hermes",
+        "bot",
+        "helper",
+        "chat",
+        "chats",
+        "message",
+        "messages",
+        "ai",
+        "model"
+      ],
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "is slow": {
+      "needs_one_of": [
+        "answer",
+        "answers",
+        "reply",
+        "replies",
+        "response",
+        "responses",
+        "it",
+        "it's",
+        "hermes",
+        "bot",
+        "helper",
+        "chat",
+        "chats",
+        "message",
+        "messages",
+        "ai",
+        "model"
+      ],
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "speed up": {
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "speed it up": {
+      "not_with": [
+        "internet",
+        "wifi",
+        "wi-fi",
+        "computer",
+        "laptop",
+        "pc",
+        "mac",
+        "phone",
+        "service",
+        "website",
+        "connection",
+        "network",
+        "printer"
+      ]
+    },
+    "bill": {
+      "needs_one_of": [
+        "huge",
+        "high",
+        "big",
+        "too high",
+        "so high",
+        "this month",
+        "last month",
+        "went up",
+        "going up",
+        "expensive",
+        "too much",
+        "so much"
+      ],
+      "not_with": [
+        "pay my",
+        "pay the",
+        "pay a",
+        "pay bills",
+        "split"
+      ]
+    },
+    "too long": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
+    },
+    "fills up": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
+    },
+    "filling up": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
+    },
+    "filled up": {
+      "needs_one_of": [
+        "context",
+        "chat",
+        "chats",
+        "conversation",
+        "conversations",
+        "session",
+        "sessions",
+        "window"
+      ]
     }
   },
   "ignore_phrases": [
@@ -509,12 +1440,11 @@ export const TALK_DATA = {
       "options",
       "menu",
       "ideas",
-      "examples",
-      "?"
+      "examples"
     ]
   },
   "what_is": {
-    "pattern": "^(?:(?:so|ok|okay|and|hi|hey|helper)[ ,]+)*(?:what is|what's|whats|what are|what exactly is|what does|explain|tell me what)\\s+(?:a |an |the )?(.+?)(?:\\s+(?:is|are|means|mean))?\\s*[?.!]*$",
+    "pattern": "^(?:(?:so|ok|okay|and|hi|hey|helper|please|pls|plz|can you|could you|would you)[ ,]+)*(?:what is|what's|whats|what are|what exactly is|what does|explain|tell me what)\\s+(?:a |an |the )?(.+?)(?:\\s+(?:is|are|means|mean))?(?:[\\s,?.!]+(?:please|pls|plz|thanks|thank you|thx))*\\s*[?.!]*$",
     "words": {
       "mod": [
         "model",
@@ -545,6 +1475,10 @@ export const TALK_DATA = {
       "bot": [
         "bot",
         "bots"
+      ],
+      "use": [
+        "token",
+        "tokens"
       ]
     }
   },
@@ -853,12 +1787,10 @@ export const TALK_DATA = {
         "chatgtp"
       ],
       "weak_key_words": [
-        "pay",
         "paying",
         "paid",
         "cost",
         "costs",
-        "money",
         "spend",
         "spending",
         "expensive",
@@ -868,7 +1800,29 @@ export const TALK_DATA = {
         "free",
         "subscription",
         "subscriptions",
-        "budget"
+        "budget",
+        "pay for",
+        "have to pay",
+        "need to pay",
+        "do i pay",
+        "pay anything",
+        "pay to use",
+        "pay monthly",
+        "pay extra",
+        "pay more",
+        "pay less",
+        "should i pay",
+        "will i pay",
+        "how much money",
+        "cost money",
+        "costs money",
+        "cost me money",
+        "spend money",
+        "spending money",
+        "any money",
+        "save money",
+        "waste money",
+        "much money"
       ],
       "pick": {
         "label": "Which AI to use"
@@ -1680,6 +2634,287 @@ export const TALK_DATA = {
           }
         }
       ]
+    },
+    {
+      "id": "use",
+      "part": "model",
+      "key_words": [
+        "token",
+        "tokens",
+        "usage",
+        "use less",
+        "uses less",
+        "using less",
+        "less usage",
+        "uses a lot",
+        "uses so much",
+        "uses too much",
+        "using too much",
+        "using a lot",
+        "uses up",
+        "costs too much",
+        "cost too much",
+        "costing too much",
+        "costs a lot",
+        "too expensive",
+        "so expensive",
+        "cheaper",
+        "save money",
+        "spend less",
+        "pay less",
+        "lower cost",
+        "lower the cost",
+        "reduce cost",
+        "reduce the cost",
+        "credits",
+        "quota",
+        "rate limit",
+        "usage limit",
+        "runs out",
+        "run out",
+        "ran out",
+        "running out",
+        "hit the limit",
+        "hit a limit",
+        "hit my limit",
+        "reached the limit",
+        "limit reached",
+        "so slow",
+        "too slow",
+        "is slow",
+        "slow answers",
+        "answers slowly",
+        "takes forever",
+        "takes so long",
+        "takes too long",
+        "faster answers",
+        "costing me",
+        "cost me",
+        "costs me",
+        "too much money",
+        "so much money",
+        "a lot of money",
+        "spending too much",
+        "spending so much",
+        "bill",
+        "take forever",
+        "taking forever",
+        "took forever",
+        "takes ages",
+        "take ages",
+        "taking ages",
+        "took ages",
+        "slows down",
+        "slowing down",
+        "slowed down",
+        "speed it up",
+        "speed up",
+        "slow",
+        "context window",
+        "context length",
+        "context is full",
+        "too long",
+        "fills up",
+        "filling up",
+        "filled up",
+        "long chat",
+        "long chats",
+        "long conversation"
+      ],
+      "misspellings": [
+        "tokns",
+        "toknes",
+        "tokenz",
+        "tokkens",
+        "useage",
+        "usuage"
+      ],
+      "weak_key_words": [
+        "limit",
+        "limits"
+      ],
+      "typed_only": true,
+      "pick": {
+        "label": "Using less"
+      },
+      "question": {
+        "id": "use-q",
+        "text": "Is it the cost, a limit that runs out, or slow answers?",
+        "answers": [
+          {
+            "label": "Each message uses a lot",
+            "gives": "use1"
+          },
+          {
+            "label": "It costs too much",
+            "gives": "use2"
+          },
+          {
+            "label": "My limit runs out",
+            "gives": "use3"
+          },
+          {
+            "label": "Answers are slow",
+            "gives": "use4"
+          }
+        ]
+      },
+      "plain": {
+        "id": "use0",
+        "text": "Tokens are small pieces of words. Your AI counts them, and long chats use the most.",
+        "source": "token: Anthropic glossary, https://platform.claude.com/docs/en/about-claude/glossary (\"Tokens are the smallest individual units of a language model, and can correspond to words, subwords, characters\"); counted and paid: getting-started/quickstart.md line 118 (\"API key for pay-per-token\"); long chats: reference/faq.md line 547 (\"Cause: Long conversations, verbose system prompts, or many tool calls accumulating context.\")",
+        "next": {
+          "kind": "line",
+          "label": "What helps",
+          "id": "use-more",
+          "text": "When a chat gets long, start a fresh one. Click \"New session\" at the top left.",
+          "source": "reference/faq.md line 547 (\"Cause: Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)"
+        }
+      },
+      "needs": [
+        {
+          "id": "use1",
+          "key_words": [
+            "token",
+            "tokens",
+            "tokns",
+            "toknes",
+            "use less",
+            "uses less",
+            "using less",
+            "less usage",
+            "uses a lot",
+            "uses so much",
+            "uses too much",
+            "using too much",
+            "using a lot",
+            "uses up",
+            "each message",
+            "every message",
+            "each question",
+            "every question",
+            "per message",
+            "per question",
+            "context window",
+            "context length",
+            "context is full",
+            "too long",
+            "fills up",
+            "filling up",
+            "filled up",
+            "long chat",
+            "long chats",
+            "long conversation"
+          ],
+          "only_if_no_other_need": true,
+          "text": "Long chats use the most tokens, small pieces of words. For a fresh chat, click \"New session\" at the top left.",
+          "source": "token: Anthropic glossary (as use0); reference/faq.md line 547 (\"Cause: Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)",
+          "next": {
+            "kind": "line",
+            "label": "See what uses them",
+            "id": "use1-next",
+            "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+          }
+        },
+        {
+          "id": "use2",
+          "key_words": [
+            "cost",
+            "costs",
+            "costing",
+            "expensive",
+            "cheaper",
+            "cheap",
+            "money",
+            "save money",
+            "spend less",
+            "pay less",
+            "price",
+            "bill",
+            "costs too much",
+            "too expensive",
+            "costing me",
+            "cost me",
+            "costs me",
+            "too much money",
+            "so much money",
+            "a lot of money",
+            "spending too much",
+            "spending so much"
+          ],
+          "text": "Long chats cost the most. For a fresh chat, click \"New session\" at the top left. A cheaper AI also helps.",
+          "source": "reference/faq.md line 547 (\"Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run); integrations/providers.md line 1562 (\"Cost optimization\")",
+          "next": {
+            "kind": "part",
+            "label": "Open Model"
+          }
+        },
+        {
+          "id": "use3",
+          "key_words": [
+            "limit",
+            "limits",
+            "runs out",
+            "run out",
+            "ran out",
+            "running out",
+            "quota",
+            "credits",
+            "rate limit",
+            "usage limit",
+            "hit the limit",
+            "hit a limit",
+            "hit my limit",
+            "reached the limit",
+            "limit reached"
+          ],
+          "text": "Each message uses part of your limit, and long chats use more. For a fresh chat, click \"New session\" at the top left.",
+          "source": "user-guide/features/credential-pools.md line 29 (\"Plan/usage limit reached\"); reference/faq.md line 547 (\"Long conversations\"); sessions.md line 97 (\"`/new` for a fresh thread\"); seen: the left list's top item \"New session\", dev/checks/hhtech-desk-usage/shots-2b-r2/01-new-chat.png (hhtech-desk-usage.md section 2; Lead opened two other shots of the same run)",
+          "next": {
+            "kind": "line",
+            "label": "See what uses them",
+            "id": "use3-next",
+            "text": "In a Hermes chat, not here, type /usage and send it. It shows what each message carries, like the list of actions Hermes can take.",
+            "source": "reference/faq.md lines 558 to 559 (\"# Check session token usage\" / \"/usage\"), line 562 (\"the system prompt plus tool schemas sent on every call\"); user-guide/tui.md line 133 (\"Rich token / cost / context panel\"); seen: /usage typed in a Desktop chat prints \"Context breakdown (estimated)\" with \"System prompt\", \"Tool definitions\", \"Subagent definitions\", \"Conversation\", dev/checks/hhtech-desk-usage/shots-2b-r2/09-usage-sent.png (opened by Lead). \"actions Hermes can take\" is the tool term's own wording (terms.tool). \"send it\": hhtech saw /compress need Enter twice (the first picks it from a list); the line does not say how many."
+          }
+        },
+        {
+          "id": "use4",
+          "key_words": [
+            "slow",
+            "slowly",
+            "so slow",
+            "too slow",
+            "takes forever",
+            "takes long",
+            "takes so long",
+            "takes too long",
+            "faster",
+            "speed",
+            "laggy",
+            "lag",
+            "take forever",
+            "taking forever",
+            "took forever",
+            "takes ages",
+            "take ages",
+            "taking ages",
+            "took ages",
+            "slows down",
+            "slowing down",
+            "slowed down",
+            "speed it up",
+            "speed up"
+          ],
+          "text": "Big AIs and long chats can make answers slow. A smaller, faster AI can help.",
+          "source": "reference/faq.md lines 538 to 541 (\"Slow responses ... Cause: Large model, distant API server, or heavy system prompt with many tools ... Try a faster/smaller model\"); guides/troubleshooting-agent-quality.md line 27 (\"responses are slowing down\" in a long session)",
+          "next": {
+            "kind": "part",
+            "label": "Open Model"
+          }
+        }
+      ]
     }
   ],
   "terms": [
@@ -1978,10 +3213,11 @@ export const TALK_DATA = {
       "see": {
         "see_line": "This is all I keep about you.",
         "see_line_nothing": "I keep nothing about you yet.",
+        "see_line_deleted": "Everything I kept about you is deleted. I only remember that we have met.",
         "delete_all": {
           "label": "Delete all of it",
           "question": "Delete everything I keep about you?",
-          "after_yes": "Done. I keep nothing about you now. What Hermes itself remembers is not touched.",
+          "after_yes": "Done. I keep nothing about you now. I won't ask your name again.",
           "after_no": "Fine. Nothing is changed.",
           "answers": [
             {
@@ -2537,6 +3773,10 @@ export const TALK_DATA = {
       "button_under_see": "Open Helper settings",
       "by_hand": "By hand: open \"Settings\", then \"Plugins\", then \"Helper\"."
     },
+    "met": {
+      "store_key": "met",
+      "value": true
+    },
     "settings_file": {
       "top_line": "This is what Helper keeps about you. Your Hermes does not read it or act on it.",
       "box_lines": {
@@ -2625,10 +3865,11 @@ export const TALK_DATA = {
       },
       "forget_all": {
         "label": "Forget all of this",
-        "under": "Deletes everything on this page from this computer. What Hermes itself remembers is not touched.",
+        "action": "Forget",
+        "under": "Deletes everything on this page from this computer. Helper still won't ask your name again.",
         "question": "Delete everything Helper keeps about you?",
         "with_question": "What was already sent to your AI cannot be taken back.",
-        "after_yes": "Done. Helper keeps nothing about you now.",
+        "after_yes": "Done. Helper keeps nothing about you now. It won't ask your name again.",
         "answers": [
           {
             "label": "Yes, delete it",

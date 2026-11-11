@@ -11,7 +11,9 @@ import { clampHelperWidth, HELPER_PX } from './layout.js'
 export const STEP_COUNT = STEPS.length
 // 'remember' is the person's answer to the memory test on Your setup (src/setup-tab.js).
 // 'kept' is the one record of what Helper keeps about the person, by fixed rules (src/kept.js).
-export const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept']
+// 'met' (changes-14, keeps.met): true once Helper has said hello, so the name is asked only on the first
+// visit; nothing about the person, and no Forget removes it (src/page.js).
+export const STORED_KEYS = ['tab', 'step', 'answers', 'helperWidth', 'remember', 'kept', 'met']
 
 export function readState(get) {
   const pick = (key, allowed, fallback) => {

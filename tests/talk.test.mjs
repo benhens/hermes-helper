@@ -11,9 +11,9 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import * as TALK from '../src/talk.js'
 import { TALK_DATA } from '../src/talk-data.js'
-import { pinned } from './lib/team-pins.mjs'
+import { pinned, PINS } from './lib/team-pins.mjs'
 
-const { freshVisit, laterVisit, turn, pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, typedAboutKept, lineFor, openingLine, hintFor, buildHit, talkNorm, keptRows, PARTS, EXTRA_LINES, REPLY_HINT } = TALK
+const { freshVisit, laterVisit, opening, turn, pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, typedAboutKept, lineFor, openingLine, hintFor, buildHit, talkNorm, keptRows, PARTS, EXTRA_LINES, REPLY_HINT } = TALK
 const ROOT = path.resolve(import.meta.dirname, '..')
 const TEAM = path.resolve(ROOT, '..')
 const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')
@@ -26,12 +26,16 @@ function show(o) {
   if (o.name_taken) return show({ ...o, name_taken: null }) + ' +name=' + o.name_taken
   if (o.kept && o.kept.length) return show({ ...o, kept: null, first: null }) + ' +kept=' + o.kept.join(',') + (o.first ? ' +first' : '')
   if (o.used) return show({ ...o, used: null }) + ' +from-kept'
+  if (o.repeat_of) return show({ ...o, repeat_of: null }) + ' +norepeat' // changes-15
   const py = v => (v === null || v === undefined ? 'None' : v)
   const by = {
     row: () => 'line ' + o.need,
     question: () => 'question ' + o.topic,
     plain: () => 'plain line ' + o.topic + '0',
     H1: () => `H1 (${o.why})`,
+    H2: () => `H2 (${o.why})`, // changes-16
+    BACK: () => `BACK name=${py(o.name)}`, // changes-14
+    HELLO: () => `HELLO name=${py(o.name)}`,
     term: () => 'term line ' + o.term,
     W1: () => 'W1 buttons ' + o.buttons.join('+'),
     // changes-11
@@ -46,8 +50,9 @@ function show(o) {
   }
   return (by[o.kind] || (() => o.kind))()
 }
-const stateOf = st => ({ stage: st.stage, pending: st.pending, found: { ...st.found }, asked: [...st.asked].sort(), lastq: st.lastq, name: st.name, work: st.work, kept: JSON.parse(JSON.stringify(st.kept)) })
-const expectedState = s => ({ stage: s.stage, pending: s.pending, found: s.found, asked: s.asked, lastq: s.lastq, name: s.name, work: s.work, kept: s.kept })
+// builder-qs: met (changes-14) is part of the visit route2.py records
+const stateOf = st => ({ stage: st.stage, pending: st.pending, found: { ...st.found }, asked: [...st.asked].sort(), lastq: st.lastq, name: st.name, work: st.work, kept: JSON.parse(JSON.stringify(st.kept)), met: st.met })
+const expectedState = s => ({ stage: s.stage, pending: s.pending, found: s.found, asked: s.asked, lastq: s.lastq, name: s.name, work: s.work, kept: s.kept, met: s.met })
 const usesModel = c => c.steps.some(s => s.has_model)
 const usesWants = c => c.steps.some(s => s.do === 'topic' && s.topic === 'wants')
 // A visit as route2.py has it: the wants steps (rows, skills by name, the near miss, the service
@@ -61,12 +66,19 @@ function replay(conv) {
   for (const step of conv.steps) {
     let o
     if (step.do === 'visit') {
-      // a later visit: only the stored record is carried over (route2.py starts it at stage open)
-      st = asRoute2(freshVisit('open', st.kept))
+      // a later visit: only the stored record and met are carried over (route2.py starts it at stage open)
+      st = asRoute2(freshVisit('open', st.kept, st.met))
       got.push(null)
       continue
     }
-    if (step.do === 'say') o = turn(step.text, st)
+    if (step.do === 'forget_all') {
+      // changes-14: Forget all removes the record, never met
+      for (const k of Object.keys(st.kept)) delete st.kept[k]
+      got.push({ shown: null, state: stateOf(st) })
+      continue
+    }
+    if (step.do === 'open') o = opening(st) // changes-14: the window opens
+    else if (step.do === 'say') o = turn(step.text, st)
     else if (step.do === 'pick') o = pick(step.topic, step.i, st)
     else if (step.do === 'topic') o = pickTopic(step.topic, st)
     else if (step.do === 'press') o = press(step.choice, step.text, st)
@@ -102,7 +114,7 @@ test('the test files were made from the talk data this plugin holds, by one rout
     assert.equal(f.json_sha256, ours, 'run bash dev/checks/talk-v2-look/recopy-look.sh again')
     assert.equal(f.route2_sha256, ON.route2_sha256)
   }
-  assert.equal(ON.route2_sha256, '46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368', 'the team\'s route2.py at the pin, not a changed copy')
+  assert.equal(ON.route2_sha256, PINS['dev/checks/hhcontent-talk-v2/route2.py'][0], 'the team\'s route2.py at the pin, not a changed copy')
   assert.equal(ON.keeps_off, false)
   assert.equal(ON.no_wants, false)
   const missed = ON.conversations.filter(c => !c.failed && c.steps.length && c.steps[c.steps.length - 1].shown !== c.expect).map(c => c.name)
@@ -133,7 +145,7 @@ test('every conversation route2.py ran, keeping on, the wants steps off as route
     const got = replay(conv)
     conv.steps.forEach((step, i) => {
       if (step.do === 'visit') return
-      assert.equal(got[i].shown, step.shown, `${conv.name}, turn ${i + 1} (${step.text || step.do})`)
+      if (step.do !== 'forget_all') assert.equal(got[i].shown, step.shown, `${conv.name}, turn ${i + 1} (${step.text || step.do})`)
       assert.deepEqual(got[i].state, expectedState(step.state), `${conv.name}, turn ${i + 1}: the visit after it`)
       turns++
     })
@@ -216,17 +228,20 @@ test('a how-question is never a request to do it; a request gets the hand-over l
   assert.equal(cut.length, 'I asked for this: "". Please do it for me. Ask me before you change anything.'.length + 300)
 })
 
-test('the opening: greeting, name, what the person does, then a line with nothing to pick, the name kept and told once', () => {
+test('the opening: greeting, name, what the person does, then a line with nothing to pick, the name kept and told at F1 (changes-15)', () => {
   const st = freshVisit('name')
   assert.equal(openingLine().text, "Hi, I'm Helper. I can help you learn about Hermes and set it up. What's your name?")
   const f1 = lineFor(turn('Peter', st), st)
   assert.equal(f1.text, 'Nice to meet you, Peter. What do you do?')
   assert.equal(f1.answers, null)
-  assert.equal(f1.note, null, 'nothing is kept while the opening is still open')
+  // changes-15 (For builder 3 and 5): the name and met are written as soon as the name is given, with the faint
+  // "Kept:" line and the first-time line under F1
+  assert.deepEqual(f1.note, { text: 'Kept: Peter.', link: 'See what I keep', first: 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.', items: [['name', 'Peter']] })
+  assert.equal(st.met, true)
   const f2 = lineFor(turn('I run a tennis club', st), st)
   assert.equal(f2.text, 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(f2.answers, null, 'no topics after the greeting')
-  assert.deepEqual(f2.note, { text: 'Kept: Peter.', link: 'See what I keep', first: 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.', items: [['name', 'Peter']] })
+  assert.equal(f2.note, null, 'told once, under F1')
   assert.deepEqual(st.kept, { name: 'Peter', told: true })
   assert.equal(st.work, 'I run a tennis club', 'what the person does is used for this visit')
   assert.equal(st.kept.work, undefined, 'and never kept')
@@ -247,7 +262,7 @@ test('no name given: the lines without a name and nothing kept; Skip: the "that\
 })
 
 test('the topics show only when the person asks what they can ask (TP): four of them, "Or type your question"', () => {
-  for (const ask of ['what can I ask you?', 'help', 'Hey Helper, what do you know?', 'i don\'t know what to ask', '?']) {
+  for (const ask of ['what can I ask you?', 'help', 'Hey Helper, what do you know?', 'i don\'t know what to ask']) {
     const st = freshVisit('name')
     const said = lineFor(turn(ask, st), st)
     assert.equal(said.line, 'TP', ask)
@@ -258,6 +273,9 @@ test('the topics show only when the person asks what they can ask (TP): four of 
   }
   assert.equal(turn('what can you tell me about memory', freshVisit()).kind, 'question', 'a topic word wins')
   assert.equal(turn('what do you know about me', freshVisit()).kind, 'A1', 'the kept-things list first')
+  // changes-14 (For builder 4): "?" alone is no longer a way to ask for the topics; it looks cut off
+  assert.equal(TALK_DATA.asks_for_topics.whole_message.includes('?'), false)
+  assert.equal(turn('?', freshVisit()).kind, 'CUT')
 })
 
 test('the don\'t-know lines show no topics, and the small grey line under each tells how to see them', () => {
@@ -302,6 +320,9 @@ test('never more than four things to pick: the topics, every answer list, C1, an
 
 test('answers to pick only under the questions that carry them (answers.when_shown): which AI, which chat app, which service', () => {
   const carries = Object.fromEntries(Object.entries(DATA.answers.when_shown.questions).map(([k, v]) => [k.split(' ')[0], v]))
+  // changes-14 (For builder 5): the topic use (reached by typing only) is not in that table; its four answers sit
+  // under use-q like the other picked answers
+  carries['use-q'] = true
   for (const t of TALK_DATA.topics) {
     const st = freshVisit()
     const q = lineFor(pickTopic(t.id, st), st)
@@ -309,7 +330,10 @@ test('answers to pick only under the questions that carry them (answers.when_sho
     assert.equal(!!q.answers, carries[t.question.id], t.question.id)
     assert.equal(hintFor(q), q.answers ? 'Or type your own answer' : REPLY_HINT)
   }
-  assert.deepEqual(TALK_DATA.topics.filter(t => t.question.answers.length).map(t => t.id).sort(), ['mod', 'msg', 'svc'])
+  assert.deepEqual(TALK_DATA.topics.filter(t => t.question.answers.length).map(t => t.id).sort(), ['mod', 'msg', 'svc', 'use'])
+  // and no pick reaches use: it is on no topic pick
+  assert.deepEqual(TALK_DATA.topics.filter(t => t.typed_only).map(t => t.id), ['use'])
+  assert.ok(!JSON.stringify(TALK_DATA.topic_picks || []).includes('"use"'))
 })
 
 test('a pick goes by its id to its row, never through key words', () => {
@@ -435,16 +459,28 @@ test('the first-time line is the one for a build with no AI step: nothing about 
   assert.doesNotMatch(JSON.stringify(TALK_DATA), /Only your name goes to your AI/)
 })
 
-test('a later visit: a kept name skips the opening and greets by the name (NAME_AGAIN\'s words); with no kept name, the opening is asked again', () => {
+test('a later visit (changes-14): met, or a kept name, opens with BACK and no question; else the opening is asked', () => {
   const st = laterVisit({ name: 'Peter', told: true })
   assert.equal(st.stage, 'open')
   const said = openingLine(st)
-  assert.equal(said.line, 'OPEN-again')
-  assert.equal(said.text, 'Hi again, Peter. Ask me anything about Hermes.')
-  assert.equal(said.text, TALK_DATA.fixed.NAME_AGAIN.text.replace('{name}', 'Peter'))
-  assert.equal(laterVisit({ mod: 'mod1', told: true }).stage, 'name', 'no kept name: the name is asked again')
+  assert.equal(said.line, 'BACK')
+  assert.equal(said.text, 'Hi again, Peter. What would you like Hermes to help you with?')
+  assert.equal(said.text, TALK_DATA.fixed.BACK.text.replace('{name}', 'Peter'))
+  assert.equal(said.answers, null)
+  // Skip pressed on the first visit: met, no name: BACK without the name
+  const skipped = laterVisit({}, true)
+  assert.equal(skipped.stage, 'open')
+  assert.equal(openingLine(skipped).text, 'Hi again. What would you like Hermes to help you with?')
+  assert.equal(openingLine(laterVisit(null, true)).line, 'BACK')
+  // never met: the opening, with the name question
+  assert.equal(laterVisit({ mod: 'mod1', told: true }).stage, 'name', 'no kept name, never met: the name is asked')
   assert.equal(openingLine(laterVisit({ mod: 'mod1', told: true })).line, 'OPEN')
   assert.equal(laterVisit(null).stage, 'name')
+  // Forget all removes the record, never met: the next visit still opens with BACK
+  const v = laterVisit({ name: 'Peter', told: true })
+  forgetAnswer('all', true, v)
+  assert.deepEqual(v.kept, {})
+  assert.equal(openingLine(laterVisit(v.kept, v.met)).text, 'Hi again. What would you like Hermes to help you with?')
 })
 
 test('a kept answer is used where its question would be asked: "From what I keep" and Change, which asks again', () => {
@@ -509,7 +545,9 @@ test('"forget everything" (A4): the delete-all question; Yes removes the whole r
   const st = laterVisit({ name: 'Peter', asked: ['a b'], told: true })
   const said = lineFor(turn('forget everything', st), st)
   assert.equal(said.text, 'Delete everything I keep about you?')
-  assert.equal(lineFor(forgetAnswer('all', true, st), st).text, 'Done. I keep nothing about you now. What Hermes itself remembers is not touched.')
+  // changes-14 (section 1): the line after Yes says the name is not asked again (met stays)
+  assert.equal(lineFor(forgetAnswer('all', true, st), st).text, "Done. I keep nothing about you now. I won't ask your name again.")
+  assert.equal(st.met, true)
   assert.deepEqual(st.kept, {})
   const nw = DATA.keeps.typed.not_when
   for (const m of nw.examples_taken) assert.ok(['A2', 'A4'].includes(typedAboutKept(m) && typedAboutKept(m).kind), m)

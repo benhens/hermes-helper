@@ -188,7 +188,8 @@ export const K = {
   // the top right. The setup card's text to paste (cardPaste) stays as it is ----
   bubblePaste: 'flex w-full min-w-0 items-start gap-2 rounded-md border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) py-1.5 pl-2.5 pr-1.5',
   bubblePasteText: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)',
-  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-[11px] leading-4 text-(--ui-text-secondary)'
+  // builder-qs (Lead, 11 Nov 00:55: the text to paste at least 12 px): the older line's too, as the bubble's
+  bubblePasteTextOld: 'wrap-anywhere min-w-0 flex-1 font-mono text-xs leading-4.5 text-(--ui-text-secondary)'
 }
 
 // Joins class names, skipping empty ones. Only K and T values go in.

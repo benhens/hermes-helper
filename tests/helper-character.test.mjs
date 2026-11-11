@@ -9,6 +9,7 @@ import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData } from './lib/render.mjs'
 import { openingLine } from '../src/talk.js'
+import { curlyQuotes } from '../src/quotes.js'
 import { T } from '../src/look.js'
 import { TALK_CSS } from '../src/talk-css.js'
 import { CHARACTER_PX, CHARACTER_SMALL_PX } from '../src/layout.js'
@@ -55,7 +56,8 @@ async function open({ storage = fakeStorage(), host = {}, settleFirst = true, me
 }
 
 const WORDS = n => n.trim().split(/\s+/).length
-const OPENING = openingLine().text
+// as drawn: curly apostrophes (d1ceddc review 3.3, src/quotes.js)
+const OPENING = curlyQuotes(openingLine().text)
 const OPENING_WORDS = WORDS(OPENING)
 const helper = view => byData(view.tree, 'helper')
 const root = view => byData(view.tree, 'page')
@@ -225,7 +227,8 @@ test('the person\'s own words appear at once; Helper\'s reply appears word by wo
   for (let i = 0; i < RISE_TICKS + OPENING_WORDS; i++) timers.tick()
   send(view, 'Peter')
   const conv = byData(helper(view), 'conversation-lines').props.children
-  assert.deepEqual(conv.map(c => c.props['data-hh']), ['old', 'me'])
+  // changes-15: the faint "Kept: Peter." line comes with the name (under the person's message)
+  assert.deepEqual(conv.map(c => c.props['data-hh']), ['old', 'me', 'kept-note'])
   // the older line and the person's message: plain text, whole, not word by word
   assert.equal(all(conv, n => n.props['data-hh'] === 'said').length, 0)
   // (each starts with the words only a screen reader hears: who said it)

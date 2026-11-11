@@ -72,9 +72,11 @@
 .hh-conv-in>*{flex:none}
 .hh-me{overflow-wrap:anywhere}
 /* The faint lines (what was kept, what is used) hold a link that is a real button: it looks like
-   the text around it. The first-time line goes on a line of its own under "Kept: ...". */
+   the text around it. The first-time line goes on a line of its own under "Kept: ...". hhdesign's review
+   of d1ceddc, 3.2: that line is about privacy and must be readable, so it takes the secondary text colour
+   in both themes (the faint colour measured 3.5:1 in light); "Kept: ... See what I keep" stays faint. */
 .hh-note .hh-link{padding:0;border:0;background:none;font:inherit}
-.hh-note-first{display:block;text-wrap:pretty}
+.hh-note-first{display:block;text-wrap:pretty;color:var(--ui-text-secondary)}
 /* talk v2 look (hhdesign's review of e86b410, point 3): no word alone on the last line of a faint line */
 .hh-note{text-wrap:pretty}
 /* The list of what Helper keeps, inside the bubble (and small in an older line). */

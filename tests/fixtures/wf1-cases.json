@@ -1,7 +1,7 @@
 {
  "about": "Written by dev/checks/talk-v2-wf1/dump_wf1.py from hhcontent's run_wf1.py. Do not edit: make it again.",
  "run_wf1_sha256": "221f20d29716dd39c677fe8024489b36e36f07d92811a3005f58c3c7142eb40a",
- "summary": "53 of 53 as expected",
+ "summary": "50 of 53 as expected; FAIL: [\"service of 'can it use my google drive'\", \"service of 'can it use my google calendar'\", \"service of 'can it use my drive'\"]",
  "random_keys": "random 40-character AWS-style secrets: old pattern 5 catches 196684 of 196902, new 196684 (lost 0)",
  "cases": [
   {
@@ -9,13 +9,13 @@
    "name": "service of 'can it use my google drive'",
    "got": [
     "Google Drive",
-    "CN1"
+    "S1"
    ],
    "want": [
     "Google Drive",
     "CN1"
    ],
-   "ok": true,
+   "ok": false,
    "text": "can it use my google drive",
    "typed": null,
    "s": null
@@ -73,13 +73,13 @@
    "name": "service of 'can it use my google calendar'",
    "got": [
     "Google Calendar",
-    "CN1"
+    "S1"
    ],
    "want": [
     "Google Calendar",
     "CN1"
    ],
-   "ok": true,
+   "ok": false,
    "text": "can it use my google calendar",
    "typed": null,
    "s": null
@@ -89,13 +89,13 @@
    "name": "service of 'can it use my drive'",
    "got": [
     "Google Drive",
-    "CN1"
+    "S1"
    ],
    "want": [
     "Google Drive",
     "CN1"
    ],
-   "ok": true,
+   "ok": false,
    "text": "can it use my drive",
    "typed": null,
    "s": null

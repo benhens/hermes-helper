@@ -160,7 +160,8 @@ test('a later visit (the name question skipped), then a name typed: the kept nam
   assert.deepEqual(st.kept, { ...ANNA(), name: 'Bea' })
   assert.equal(st.name, 'Bea')
   const bare = laterVisit(ANNA())
-  assert.equal(say(bare, 'Bea').line, 'N1')
+  // changes-14 (small_talk rule c): one word of two or three letters, nothing open, looks cut off
+  assert.equal(say(bare, 'Bea').line, 'CUT')
   assert.deepEqual(bare.kept, ANNA())
   // a name the conversation never keeps (changes-10 name_refused) is no new name
   const refused = laterVisit(ANNA())
@@ -179,8 +180,9 @@ test('a later visit (the name question skipped), then a name typed: the kept nam
 
 test('the faint "Kept:" line carries what it kept, and is forgotten exactly when none of that is kept any more', () => {
   const st = freshVisit('name')
-  say(st, 'Anna')
-  const f2 = say(st, 'I run a bakery')
+  // changes-15: the name is kept, and told, under F1
+  const f2 = say(st, 'Anna')
+  assert.equal(say(st, 'I run a bakery').note, null)
   assert.deepEqual(f2.note.items, [['name', 'Anna']])
   const rm = say(st, 'remember that my club has six courts')
   assert.deepEqual(rm.note.items, [['asked', 'my club has six courts']])

@@ -26,9 +26,11 @@ const GLOSS = [
   [/\bbots?\b/i, /separate Hermes|\b(?:its|their) own\b/i],
   [/\bkeys?\b/i, /\bsecret\b/i],
   [/\bsubscriptions?\b/i, /\bplan\b/i],
-  [/SOUL\.md/i, /\bfile\b/i]
+  [/SOUL\.md/i, /\bfile\b/i],
+  // changes-14 (check.py): token is a term now, explained in the line that uses it (it was banned)
+  [/\btokens?\b/i, /pieces of words|word pieces/i]
 ]
-const BANNED = /\b(?:profiles?|providers?|gateways?|toolsets?|cron|sessions?|tokens?|agents?|API|config\w*|yaml|CLI|terminal|command line|OAuth|LLMs?|servers?|VPS|context|prompts?|webhooks?|endpoints?|backend|daemon|runtime)\b/i
+const BANNED = /\b(?:profiles?|providers?|gateways?|toolsets?|cron|sessions?|agents?|API|config\w*|yaml|CLI|terminal|command line|OAuth|LLMs?|servers?|VPS|context|prompts?|webhooks?|endpoints?|backend|daemon|runtime)\b/i
 const PRODUCT = /\b(?:course|tutor|teacher|academy|chatbot|assistant|wizard|guide|lesson|quiz)\b/i
 const PROMISE = /\bI(?:'ll| will| can)?\s+(?:set up|install|connect|build|create)\b/i
 
@@ -67,7 +69,10 @@ export function checkLine(line, kind = 'reply') {
 const NEXT_KINDS = ['part', 'paste', 'line', 'none']
 // The fixed lines the code says, and which of them show things to pick. changes-11: COST, WHERE,
 // W2 (skill and plugin compared), NAME_AGAIN and NAME_NEW (a name typed on a later visit).
-export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'K1', 'COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW']
+// builder-qs (changes-14 to 16): BACK (a later visit), the ordinary-talk lines, the "are you an AI" line of this
+// build with no AI step (AI; the lines for builds that call a model stay out), WRONG, AGAIN and N1_AGAIN (no_repeat), H2.
+export const FIXED_USED = ['OPEN', 'F1', 'F2', 'F3', 'N1', 'N1a', 'N1b', 'N_HINT', 'TP', 'W1', 'C1', 'H1', 'H2', 'K1', 'COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW',
+  'BACK', 'HELLO', 'HELLO_SAME', 'THANKS', 'OK', 'HOW', 'WHO', 'AI', 'BYE', 'CUT', 'MEAN_NONE', 'WRONG', 'AGAIN', 'N1_AGAIN']
 // changes-11 (check_json.py): W2 compares the two terms the person typed, so for W2 alone the
 // two-terms rule is lifted; each term must still be explained in the line.
 const LIFTED = { W2: ['2 Hermes terms in one line'] }
@@ -99,6 +104,7 @@ function keepLines(d) {
   const see = tell.see || {}
   add('A1', see.see_line)
   add('A1-none', see.see_line_nothing)
+  add('A1-deleted', see.see_line_deleted) // helper-builder-qs-v1.md point 3
   const all = see.delete_all || {}
   add('A4', all.question, 'question')
   add('A4-after-yes', all.after_yes)
@@ -192,7 +198,11 @@ export function talkProblems(d) {
   const carries = Object.fromEntries(Object.entries(shown).map(([k, v]) => [k.split(' ')[0], v]))
   for (const t of d.topics || []) {
     const n = (t.question.answers || []).length
-    if (!(t.question.id in carries)) problems.push(`${t.question.id}: not in answers.when_shown`)
+    // builder-qs: a typed_only topic (use, changes-14) is reached by typing only; its question carries its answers
+    // (changes-14, For builder 5) though when_shown does not list it
+    if (!(t.question.id in carries)) {
+      if (!(t.typed_only && n)) problems.push(`${t.question.id}: not in answers.when_shown`)
+    }
     else if (carries[t.question.id] && !n) problems.push(`${t.question.id}: no answers to pick, but when_shown says it carries them`)
     else if (!carries[t.question.id] && n) problems.push(`${t.question.id}: answers to pick, but when_shown says it carries none`)
   }
@@ -202,11 +212,15 @@ export function talkProblems(d) {
     ids.add(l.id)
     if (!l.source) problems.push(`${l.id}: no source`)
     let found = checkLine(l.text, l.kind === 'question' ? 'question' : 'reply')
-    if (l.kind === 'opening') found = found.filter(x => x !== 'an answer line ends with a question')
+    // changes-14 (check_json.py): BACK and HELLO (kind greeting) greet and then ask, as the opening does
+    if (l.kind === 'opening' || l.kind === 'greeting') found = found.filter(x => x !== 'an answer line ends with a question')
     if (LIFTED[l.id]) found = found.filter(x => !LIFTED[l.id].includes(x))
     for (const x of found) problems.push(`${l.id}: ${x}`)
   }
   for (const id of FIXED_USED) if (!(d.fixed_lines || []).some(f => f.id === id)) problems.push(`fixed line ${id} is missing`)
+  // changes-18: the Forget row's action word on the settings page is the data's (the page has no word of its own)
+  const fa = ((d.keeps || {}).settings_file || {}).forget_all || {}
+  if (!(typeof fa.action === 'string' && fa.action.trim())) problems.push('keeps.settings_file.forget_all.action is missing')
   // changes-11: a fixed line's own button (COST, WHERE: "Open Model", "Open Messaging")
   for (const f of d.fixed_lines || []) {
     if (!FIXED_USED.includes(f.id) || !f.next) continue
@@ -243,6 +257,25 @@ export function talkProblems(d) {
       problems.push(`key pattern is not a JavaScript pattern: ${p} (${e.message})`)
     }
   }
+  // builder-qs: the lists the new steps read. Missing or empty, a step would quietly do nothing.
+  const st = d.small_talk || {}
+  for (const k of ['hello', 'thanks', 'ok', 'how', 'who', 'ai', 'bye', 'mean', 'wrong']) if (!((st.kinds || {})[k] || []).length) problems.push(`small_talk.kinds.${k} is empty`)
+  for (const k of ['cut_question_words', 'cut_dangling', 'cut_small_words', 'no_words', 'no_means_wrong_after', 'thanks_tail']) if (!(st[k] || []).length) problems.push(`small_talk.${k} is empty`)
+  const ab = st.ai_line_by_build || {}
+  if (!(ab.use_now in ab) || !(d.fixed_lines || []).some(f => f.id === ab[ab.use_now])) problems.push(`small_talk.ai_line_by_build.use_now names no line: ${ab.use_now}`)
+  if (ab.use_now !== 'no_ai_step') problems.push(`small_talk.ai_line_by_build.use_now is ${ab.use_now}: this build has no AI step`)
+  const nr = d.no_repeat || {}
+  for (const k of ['exempt', 'wrong_starts', 'wrong_anywhere']) if (!(nr[k] || []).length) problems.push(`no_repeat.${k} is empty`)
+  for (const k of ['talk', 'dont_know', 'answer']) if ((((nr.in_place || {})[k]) || []).length < 2) problems.push(`no_repeat.in_place.${k} needs two lines`)
+  for (const [g, ids] of Object.entries(nr.in_place || {})) for (const id of ids) if (id !== 'plain' && !FIXED_USED.includes(id)) problems.push(`no_repeat.in_place.${g} names a line the plugin does not say: ${id}`)
+  if (!((nr.asked_again || {}).words || []).length) problems.push('no_repeat.asked_again.words is empty')
+  for (const k of ['make_words', 'make_not_followed_by', 'make_not_when_starts', 'build_question_words', 'software_lead_ins', 'software_verbs', 'software_things', 'software_between_not']) if (!((d.build || {})[k] || []).length) problems.push(`build.${k} is empty`)
+  if (!Number.isInteger((d.build || {}).software_between_max)) problems.push('build.software_between_max is not a whole number')
+  if (!Object.keys((d.lonely_words || {}).words || {}).length) problems.push('lonely_words.words is empty')
+  for (const k of ['name_strong_stop', 'name_new_may_follow']) if (!(((d.opening || {})[k] || {}).words || []).length) problems.push(`opening.${k}.words is empty`)
+  const met = (d.keeps || {}).met || {}
+  if (!met.store_key || met.value !== true) problems.push('keeps.met has no store_key or its value is not true')
+  if (!((((d.keeps || {}).tell || {}).see || {}).see_line_deleted)) problems.push('keeps.tell.see.see_line_deleted is missing')
   for (const [name, count] of pickLists(d)) if (count > MAX_TO_PICK) problems.push(`over four to pick at once: ${name} has ${count}`)
   const topicIds = (d.topics || []).map(t => t.id)
   for (const t of d.topics || []) {
@@ -259,7 +292,9 @@ export function talkProblems(d) {
   for (const t of d.terms || []) if (!NEXT_KINDS.includes(t.next && t.next.kind)) problems.push(`term ${t.id}: button of an unknown kind`)
   // the held picks that are not topics (the wants) are checked by scripts/wants-data.mjs
   const reach = (d.topic_picks || []).flatMap(p => (p.holds ? heldOf(d, p) : [p.gives])).filter(x => !(d.held_picks || {})[x]).sort()
-  if (reach.join() !== [...topicIds].sort().join()) problems.push(`the topic picks do not reach every topic exactly once: ${reach.join(' ')}`)
+  // changes-14: a typed_only topic (use) is reached by no pick
+  const pickable = (d.topics || []).filter(t => !t.typed_only).map(t => t.id)
+  if (reach.join() !== [...pickable].sort().join()) problems.push(`the topic picks do not reach every topic exactly once: ${reach.join(' ')}`)
   for (const p of d.topic_picks || []) {
     for (const x of p.holds || []) if (!topicIds.includes(x) && !(d.held_picks || {})[x]) problems.push(`the pick "${p.label}" holds ${x}, which is not a topic`)
     if (p.holds && !(d.fixed_lines || []).some(f => f.id === p.line)) problems.push(`the pick "${p.label}" names a line that is missing: ${p.line}`)
@@ -293,7 +328,7 @@ function slimKeeps(K) {
       first_time_if_no_model_call: K.tell.first_time_if_no_model_call,
       link: { words: K.tell.link.words },
       see: {
-        ...pickKeys(K.tell.see, ['see_line', 'see_line_nothing']),
+        ...pickKeys(K.tell.see, ['see_line', 'see_line_nothing', 'see_line_deleted']),
         delete_all: { ...pickKeys(K.tell.see.delete_all, ['label', 'question', 'after_yes', 'after_no']), answers: slimAnswers(K.tell.see.delete_all.answers) },
         rows: pickKeys(K.tell.see.rows, ['name', 'mod', 'msg', 'svc', 'asked'])
       }
@@ -312,10 +347,12 @@ function slimKeeps(K) {
       forget_all: { key_words: K.typed.forget_all.key_words }
     },
     after_settings_page_exists: pickKeys(K.after_settings_page_exists, ['button_under_see', 'by_hand']),
+    // changes-14/15: the mark that Helper has said hello (its own storage key, never in the record)
+    met: pickKeys(K.met, ['store_key', 'value']),
     settings_file: {
       ...pickKeys(S, ['top_line', 'box_lines', 'order', 'under_box', 'empty', 'buttons', 'cannot_read', 'why', 'saved', 'also_tell', 'facts']),
       would_delete: { ...pickKeys(S.would_delete, ['question', 'question_one']), answers: slimAnswers(S.would_delete.answers) },
-      forget_all: { ...pickKeys(S.forget_all, ['label', 'under', 'question', 'with_question', 'after_yes']), answers: slimAnswers(S.forget_all.answers) },
+      forget_all: { ...pickKeys(S.forget_all, ['label', 'action', 'under', 'question', 'with_question', 'after_yes']), answers: slimAnswers(S.forget_all.answers) },
       read: { ...pickKeys(S.read, ['labels', 'max_box_chars', 'quote_max_chars']), messages: pickKeys(S.read.messages, ['saved', 'cannot_read', 'quote', 'secret_line', 'too_much']) }
     }
   }
@@ -332,12 +369,23 @@ export function slimTalkData(d, skills = { skills: [] }) {
     fixed,
     opening: {
       ...pickKeys(d.opening, ['name_strong_pattern', 'name_weak_pattern', 'pattern_flags', 'short_answer_max_words', 'name_max_chars', 'not_a_name', 'question_starts', 'work_max_words', 'work_max_chars', 'name_refused_words_also']),
-      name_with_more: pickKeys(d.opening.name_with_more, ['after_name', 'self_starts'])
+      name_with_more: pickKeys(d.opening.name_with_more, ['after_name', 'self_starts']),
+      // helper-builder-qs-v1.md point 1: ordinary words caught after "call me" are no name; what may follow a later name
+      name_strong_stop: d.opening.name_strong_stop.words,
+      name_new_may_follow: d.opening.name_new_may_follow.words
     },
     // changes-10: the K1 key shapes, one list for the message box, "remember that ..." and the
     // settings page (src/key-check.js)
     key_patterns: d.key_patterns.patterns,
-    build: pickKeys(d.build, ['skip_starts', 'how_phrases', 'build_words', 'build_pair']),
+    // changes-15 (make me ...), changes-16 (H2: can it build ...?), changes-17 (write/code a script ...)
+    build: pickKeys(d.build, ['skip_starts', 'how_phrases', 'build_words', 'build_pair', 'make_words', 'make_not_followed_by', 'make_not_when_starts', 'build_question_words',
+      'software_lead_ins', 'software_verbs', 'software_things', 'software_between_max', 'software_between_not']),
+    // changes-14 (ordinary talk, with changes-15 and -17), changes-15 (never the same line twice), changes-16/17 (a word that needs a second word)
+    // small_talk.ai_line: the one line this build says to "are you an AI" (ai_line_by_build[use_now]; the build
+    // stops unless use_now is the no-AI one), so neither the other builds' lines nor the note go public
+    small_talk: { ...pickKeys(d.small_talk, ['cut_end_words', 'cut_start_words', 'kinds', 'cut_question_words', 'cut_dangling', 'cut_small_words', 'no_words', 'no_means_wrong_after', 'thanks_tail']), ai_line: d.small_talk.ai_line_by_build[d.small_talk.ai_line_by_build.use_now] },
+    no_repeat: { ...pickKeys(d.no_repeat, ['exempt', 'groups', 'in_place', 'wrong_starts', 'wrong_anywhere']), asked_again: d.no_repeat.asked_again.words },
+    lonely_words: Object.fromEntries(Object.entries(d.lonely_words.words).map(([w, r]) => [w, pickKeys(r, ['needs_one_of', 'not_with'])])),
     ignore_phrases: d.ignore_phrases,
     unsure_words: d.unsure_words,
     chat_apps: d.chat_apps,
@@ -353,7 +401,7 @@ export function slimTalkData(d, skills = { skills: [] }) {
     held_picks: Object.keys(d.held_picks || {}).filter(k => k !== 'note' && WANTS_BUILT),
     held_labels: Object.fromEntries(Object.entries(d.held_picks || {}).filter(([k]) => k !== 'note' && WANTS_BUILT).map(([k, v]) => [k, v.label])),
     topics: d.topics.map(t => ({
-      ...pickKeys(t, ['id', 'part', 'part_if_no_memory_part', 'key_words', 'misspellings', 'weak_key_words', 'weak_only_in_question_about_hermes']),
+      ...pickKeys(t, ['id', 'part', 'part_if_no_memory_part', 'key_words', 'misspellings', 'weak_key_words', 'weak_only_in_question_about_hermes', 'typed_only']),
       pick: pickKeys(t.pick, ['label']),
       question: { id: t.question.id, text: t.question.text, answers: (t.question.answers || []).map(a => pickKeys(a, ['label', 'gives', 'service'])) },
       plain: { ...pickKeys(t.plain, ['id', 'text', 'source']), next: slimNext(t.plain.next) },

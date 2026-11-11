@@ -22,11 +22,13 @@ import { Codicon, CopyButton } from '@hermes/plugin-sdk'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, T, cx } from './look.js'
-import { Said } from './reveal.js'
+import { Said, keepNamesWhole } from './reveal.js'
 import { BubbleLink } from './bubble-link.js'
 import { columnsFor, linesAllowed } from './layout.js'
 import { noteForgotten } from './talk.js'
 import { curlyQuotes } from './quotes.js'
+// A Helper line drawn as words to read: curly marks and apostrophes, names in marks kept whole (src/quotes.js)
+const drawn = text => keepNamesWhole(curlyQuotes(text))
 
 // The small arrow on a button: down when it opens something under itself, right when it leads on.
 // (talk v2 look: once its part is open, the style sheet turns the down arrow up.)
@@ -47,14 +49,14 @@ const DocsBox = ({ docs, wait }) =>
     'aria-hidden': wait ? true : undefined,
     'data-hh': 'docs',
     children: [
-      jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: curlyQuotes(docs.head) }, 'h'),
-      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: curlyQuotes(docs.words) }, 'w')
+      jsx('p', { className: T.docsHead, 'data-hh': 'docs-head', children: drawn(docs.head) }, 'h'),
+      jsx('p', { className: T.docsWords, 'data-hh': 'docs-words', children: drawn(docs.words) }, 'w')
     ]
   })
 // The clicks to add an optional skill: Hermes's own numbered list (rule B), and the faint line after them.
 const Steps = ({ next }) => [
-  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: curlyQuotes(s) }, i)) }, 'steps'),
-  next.after ? jsx('p', { className: T.after, 'data-hh': 'steps-after', children: curlyQuotes(next.after) }, 'after') : null
+  jsx('ol', { className: T.steps, 'data-hh': 'steps', children: next.steps.map((s, i) => jsx('li', { children: drawn(s) }, i)) }, 'steps'),
+  next.after ? jsx('p', { className: T.after, 'data-hh': 'steps-after', children: drawn(next.after) }, 'after') : null
 ]
 // Text to paste inside a Helper line (notes-wants.md item 4): Hermes's own small code card with Copy at its
 // top right; smaller in an older line. Drawn exactly as it will be pasted.
@@ -120,11 +122,11 @@ function OldLine({ entry, onNext }) {
     'data-line': entry.line,
     children: [
       jsx('span', { className: K.srOnly, children: 'Helper said: ' }, 'who'),
-      curlyQuotes(entry.text),
+      drawn(entry.text),
       entry.docs ? jsx(DocsBox, { docs: entry.docs }, 'docs') : null,
       entry.rows ? jsx(Rows, { rows: entry.rows }, 'rows') : null,
-      entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: curlyQuotes(entry.hint) }, 'hint') : null,
-      next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: curlyQuotes(next.text) }, 'where') : null,
+      entry.hint ? jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint') : null,
+      next && next.kind === 'where' ? jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: drawn(next.text) }, 'where') : null,
       next && next.kind !== 'where'
         ? jsxs(
             'button',
@@ -205,8 +207,8 @@ export function Bubble({ entry, clock, fresh, said, onNext }) {
   const pasteText = entry.paste || (next && next.kind === 'paste' && entry.opened ? next.text : null)
   const inside = []
   if (entry.rows) inside.push(jsx(Rows, { rows: entry.rows }, 'rows'))
-  if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: curlyQuotes(entry.hint) }, 'hint'))
-  if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: curlyQuotes(next.text) }, 'where'))
+  if (entry.hint) inside.push(jsx('p', { className: T.where, 'data-hh': 'hint', children: drawn(entry.hint) }, 'hint'))
+  if (next && next.kind === 'where') inside.push(jsx('p', { className: T.where, 'data-hh': 'where', 'data-line': next.line, children: drawn(next.text) }, 'where'))
   else if (next)
     inside.push(
       jsxs(

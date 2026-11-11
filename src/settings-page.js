@@ -21,9 +21,6 @@ const SETTINGS_WORDS = TALK_DATA.keeps.settings_file
 const SETTINGS_BOX_ROWS = 7
 // The quote around a line that cannot be read ("{line}"): the line is shown in its own chip without it.
 const SETTINGS_QUOTE = SETTINGS_WORDS.read.messages.quote.split('{line}')
-// The action word of the Forget row: Lead's job and hhdesign's review name it "Forget"; it is not in the
-// talk data (Questions for Lead). The row's title is the data's label.
-const FORGET_ACTION = 'Forget'
 
 export function makeSettingsPage(ctx) {
   const read = () => cleanKept(ctx.storage.get('kept', null))
@@ -167,7 +164,7 @@ export function makeSettingsPage(ctx) {
             jsx(ListRow, {
               title: curlyQuotes(FA.label),
               description: curlyQuotes(FA.under),
-              action: jsx(Button, { size: 'sm', variant: 'textStrong', onClick: () => setForget('ask'), 'aria-label': FA.label, 'data-hh': 'settings-forget-all', children: FORGET_ACTION }, 'f')
+              action: jsx(Button, { size: 'sm', variant: 'textStrong', onClick: () => setForget('ask'), 'aria-label': FA.label, 'data-hh': 'settings-forget-all', children: FA.action }, 'f')
             }, 'row'),
             forget === 'ask'
               ? jsxs('div', {

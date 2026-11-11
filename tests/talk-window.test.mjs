@@ -42,7 +42,8 @@ async function open({ storage = fakeStorage(), host = {}, extra = {} } = {}) {
   return { view, timers, storage, Page }
 }
 
-const OPEN = "Hi, I'm Helper. I can help you learn about Hermes and set it up. What's your name?"
+// as drawn: curly apostrophes (d1ceddc review 3.3, src/quotes.js)
+const OPEN = 'Hi, I’m Helper. I can help you learn about Hermes and set it up. What’s your name?'
 const helper = view => byData(view.tree, 'helper')
 const root = view => byData(view.tree, 'page')
 const bubble = view => byData(helper(view), 'bubble')
@@ -130,18 +131,31 @@ test('the opening: the greeting in the bubble, nothing above it, nothing to pick
   assert.equal(skipLink(view).props.className, T.skip)
 })
 
-test('the opening, played: the name, what the person does, then "Ask me anything" with nothing to pick; the faint "Kept: Peter." line with its first-time line', async () => {
+test('the opening, played: the name, with the faint "Kept: Peter." line and its first-time line under it (changes-15), what the person does, then "Ask me anything" with nothing to pick', async () => {
   const { view } = await open()
   finish(view)
   send(view, 'Peter')
   assert.equal(said(view), 'Nice to meet you, Peter. What do you do?')
   assert.equal(group(view), null, 'still nothing to pick')
   assert.ok(skipLink(view), 'Skip stays at the second question')
+  // changes-15: the name is kept as soon as it is given: last above the bubble, the faint line about what was
+  // kept, with its link and, this once, where it is kept (the no-model wording: there is no AI step)
+  const note = conversation(view).at(-1)
+  assert.equal(note.props['data-hh'], 'kept-note')
+  assert.equal(note.props.className, T.note)
+  assert.equal(text(note.props.children[0]), 'Kept: Peter.')
+  const link = byData(note, 'kept-link')
+  assert.equal(link.type, 'button')
+  assert.equal(link.props.className, T.link)
+  assert.equal(text(link), 'See what I keep')
+  assert.equal(text(byData(note, 'kept-first')), TALK_DATA.keeps.tell.first_time_if_no_model_call)
+  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
   finish(view)
   send(view, 'I run a tennis club')
   assert.equal(line(view), 'F2')
   assert.equal(said(view), 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(skipLink(view), null)
+  assert.equal(conversation(view).at(-1).props['data-hh'], 'me', 'the name was told once, under F1')
   finish(view)
   // talk v2 (changes-7): no topics after the greeting
   assert.equal(picks(view), null)
@@ -153,18 +167,7 @@ test('the opening, played: the name, what the person does, then "Ask me anything
     ['old', T.old, 'Nice to meet you, Peter. What do you do?'],
     ['me', T.me, 'I run a tennis club']
   ])
-  // last above the bubble: the faint line about what was kept, with its link and, this once,
-  // where it is kept (the no-model wording: there is no AI step)
-  const note = conversation(view).at(-1)
-  assert.equal(note.props['data-hh'], 'kept-note')
-  assert.equal(note.props.className, T.note)
-  assert.equal(text(note.props.children[0]), 'Kept: Peter.')
-  const link = byData(note, 'kept-link')
-  assert.equal(link.type, 'button')
-  assert.equal(link.props.className, T.link)
-  assert.equal(text(link), 'See what I keep')
-  assert.equal(text(byData(note, 'kept-first')), TALK_DATA.keeps.tell.first_time_if_no_model_call)
-  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
+  assert.equal(notes(view).length, 1)
   // the first-time line comes once only
   send(view, 'remember that my club has six courts')
   assert.equal(line(view), 'RM1')
@@ -176,7 +179,7 @@ test('"Skip" at the name question: it becomes the person\'s message, Helper says
   const { view } = await open()
   click(skipLink(view))
   assert.equal(line(view), 'F3')
-  assert.equal(said(view), "That's fine. Ask me anything about Hermes.")
+  assert.equal(said(view), 'That’s fine. Ask me anything about Hermes.')
   assert.equal(skipLink(view), null)
   assert.deepEqual(lines(view).map(c => words(c)), [OPEN, 'Skip'])
   finish(view)
@@ -311,12 +314,15 @@ test('answers to pick only under the questions that carry them: an open question
     const { view } = await atTopics()
     const held = TALK_DATA.topic_picks.find(p => p.holds && p.holds.includes(topic.id))
     if (held) pickNow(view, held.label)
-    pickNow(view, topic.pick.label)
+    // changes-14: the topic use is reached by typing only ("usage" alone asks use-q)
+    if (topic.typed_only) send(view, 'usage')
+    else pickNow(view, topic.pick.label)
     assert.equal(line(view), topic.question.id)
     finish(view)
     assert.equal(labels(view).length, topic.question.answers.length, topic.id)
     const key = Object.keys(carry).find(q => q.startsWith(topic.question.id + ' '))
-    assert.equal(labels(view).length > 0, carry[key], `${topic.id}: ${key}`)
+    // use-q is not in that list: changes-14 says its four answers sit under it like the other picked answers
+    assert.equal(labels(view).length > 0, topic.typed_only ? true : carry[key], `${topic.id}: ${key}`)
   }
 })
 
@@ -331,18 +337,21 @@ test('a pick goes by its own id, never through the key words: every answer of ev
         pickNow(view, held.label)
         assert.equal(line(view), held.line)
       }
-      pickNow(view, topic.pick.label)
+      // changes-14: the topic use is reached by typing only ("usage" alone asks use-q)
+      if (topic.typed_only) send(view, 'usage')
+      else pickNow(view, topic.pick.label)
       assert.equal(line(view), topic.question.id)
       finish(view)
       assert.equal(text(answers(view)[i]).trim(), a.label)
       click(answers(view)[i])
-      // changes-6 fix 6: Gmail and Google Calendar have their own line, CN1 (tests/talk-wants.test.mjs)
+      // changes-6 fix 6: Gmail has its own line, CN1; changes-16: Google Calendar CN2 (tests/talk-wants.test.mjs)
       const own = a.service && WANTS_DATA.service_lines[a.service]
       assert.equal(line(view), own ? own.line : a.gives, `${topic.id}: "${a.label}"`)
       checked++
     }
   }
-  assert.equal(checked, 12)
+  // changes-14: use-q's four answers join the twelve
+  assert.equal(checked, 16)
 })
 
 test('the pick that holds four: "What Hermes can do" gives its own line with the wants first; "Web, files, pictures and voice" asks what you want Hermes to do, with the four groups', async () => {
@@ -523,7 +532,7 @@ test('a request to do it: "your own Hermes can", with the person\'s own words to
   const { view } = await pastOpening()
   send(view, 'please install a skill for writing emails')
   assert.equal(line(view), 'H1')
-  assert.equal(said(view), "I can't do that, but your own Hermes can. Paste this into a new chat with it.")
+  assert.equal(said(view), 'I can’t do that, but your own Hermes can. Paste this into a new chat with it.')
   assert.equal(button(view), null)
   const copy = all(bubble(view), n => n.type === 'sdk:CopyButton')
   assert.equal(copy.length, 1)
@@ -605,7 +614,8 @@ test('what is kept about the person: one stored record ("kept") by fixed rules, 
   send(view, 'remember that my club has six courts')
   send(view, 'please install a skill')
   send(view, 'what is a skill')
-  assert.deepEqual([...storage.data.keys()], ['kept'], 'one key was written')
+  assert.deepEqual([...storage.data.keys()].sort(), ['kept', 'met'], 'the record and the met mark (changes-14), nothing else')
+  assert.equal(storage.data.get('met'), true)
   assert.deepEqual(storage.data.get('kept'), { name: 'Peter', msg: 'WhatsApp', asked: ['my club has six courts'], told: true })
   assert.doesNotMatch(JSON.stringify([...storage.data]), /tennis|install|skill/)
   assert.deepEqual(globalThis.__hhHost.calls.filter(m => m !== 'setup.runtime_check' && m !== 'setup.status'), [], 'and nothing was sent to Hermes')
@@ -623,7 +633,7 @@ test('no AI step: the conversation\'s code reaches no model and no request; the 
   assert.doesNotMatch(built, /turnWithModel|talk\.model|model_hint/)
 })
 
-test('the conversation lives while the plugin is loaded; when Hermes starts again it is gone, but the kept name is not: a later visit skips the opening\'s questions', async () => {
+test('the conversation lives while the plugin is loaded; when Hermes starts again it is gone, but the kept name is not: a later visit opens with BACK and asks no name (changes-14/15)', async () => {
   useHost()
   const storage = fakeStorage()
   const first = await registerPlugin(storage, fakeTimers())
@@ -635,9 +645,11 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   const back = mount(first.Page)
   await settle()
   assert.equal(spoken(byData(byData(back.tree, 'bubble'), 'said')).trim(), 'Nice to meet you, Peter. What do you do?')
-  assert.equal(byData(back.tree, 'conversation-lines').props.children.length, 2)
-  // not answered yet: nothing kept (the name is kept with "What do you do?" answered)
-  assert.deepEqual([...storage.data.keys()], [])
+  // the opening line, the name and the faint "Kept: Peter." line
+  assert.equal(byData(back.tree, 'conversation-lines').props.children.length, 3)
+  // changes-15: the name and met are written as soon as the name is given
+  assert.deepEqual(storage.data.get('kept'), { name: 'Peter', told: true })
+  assert.equal(storage.data.get('met'), true)
   finish(back)
   send(back, 'I run a tennis club')
   assert.deepEqual(storage.data.get('kept'), { name: 'Peter', told: true })
@@ -645,21 +657,56 @@ test('the conversation lives while the plugin is loaded; when Hermes starts agai
   const second = await registerPlugin(storage, fakeTimers())
   const fresh = mount(second.Page)
   await settle()
-  assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'OPEN-again')
-  // talk v2 look, point 7 (hhtech: no name after a full restart): it greets by the kept name
+  assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'BACK')
   finish(fresh)
-  assert.equal(spoken(byData(byData(fresh.tree, 'bubble'), 'said')).trim(), 'Hi again, Peter. Ask me anything about Hermes.')
+  assert.equal(spoken(byData(byData(fresh.tree, 'bubble'), 'said')).trim(), 'Hi again, Peter. What would you like Hermes to help you with?')
   assert.deepEqual(byData(fresh.tree, 'conversation-lines').props.children, [])
   assert.equal(byData(fresh.tree, 'skip'), null, 'no question to skip')
-  assert.doesNotMatch(text(fresh.tree), /tennis/)
+  assert.doesNotMatch(text(fresh.tree), /tennis|your name/)
   send(fresh, 'what do you know about me')
   assert.equal(byData(fresh.tree, 'bubble').props['data-line'], 'A1')
   assert.deepEqual(all(byData(fresh.tree, 'kept-rows'), n => n.type === 'li').map(n => text(n)), ['Your name: Peter'])
 })
 
+test('his complaint (changes-14): Skip on the first visit is remembered; after Hermes starts again Helper asks no name, then "hey" and "he" get their own lines', async () => {
+  useHost()
+  const storage = fakeStorage()
+  const first = await registerPlugin(storage, fakeTimers())
+  const view = mount(first.Page)
+  await settle()
+  assert.equal(byData(view.tree, 'bubble').props['data-line'], 'OPEN')
+  finish(view)
+  click(skipLink(view))
+  assert.equal(line(view), 'F3')
+  assert.equal(storage.data.get('met'), true, 'Skip writes the met mark')
+  assert.equal(storage.data.has('kept'), false, 'and nothing about the person')
+  // Hermes starts again, twice: never the name question
+  for (let i = 0; i < 2; i++) {
+    const again = await registerPlugin(storage, fakeTimers())
+    const v = mount(again.Page)
+    await settle()
+    assert.equal(byData(v.tree, 'bubble').props['data-line'], 'BACK')
+    finish(v)
+    assert.equal(said(v), 'Hi again. What would you like Hermes to help you with?')
+    assert.equal(skipLink(v), null)
+    send(v, 'hey')
+    assert.equal(line(v), 'HELLO_SAME', 'a hello right after BACK: the same-greeting line')
+    send(v, 'he')
+    assert.equal(line(v), 'CUT')
+    assert.equal(said(v), TALK_DATA.fixed.CUT.text)
+    v.unmount()
+  }
+  // Forget all on the settings page side (the record removed): met stays, still no name question
+  storage.data.delete('kept')
+  const third = await registerPlugin(storage, fakeTimers())
+  const v3 = mount(third.Page)
+  await settle()
+  assert.equal(byData(v3.tree, 'bubble').props['data-line'], 'BACK')
+})
+
 test('"See what I keep" opens Helper\'s settings page; "what do you know about me" lists what is kept with "Open Helper settings" and the way there by hand', async () => {
   const { view } = await pastOpening()
-  click(byData(conversation(view).at(-1), 'kept-link'))
+  click(byData(notes(view).at(-1), 'kept-link'))
   assert.deepEqual(globalThis.__hhHost.navigated, [SETTINGS_HREF])
   assert.equal(line(view), 'F2', 'Helper says nothing for it')
   send(view, 'what do you know about me')
@@ -675,7 +722,7 @@ test('"See what I keep" opens Helper\'s settings page; "what do you know about m
 
 test('on a Hermes without plugin settings pages: "See what I keep" shows the list in the conversation, with "Delete all of it" that asks first', async () => {
   const { view, storage } = await pastOpening({ extra: { registerSettingsPage: undefined } })
-  click(byData(conversation(view).at(-1), 'kept-link'))
+  click(byData(notes(view).at(-1), 'kept-link'))
   assert.equal(globalThis.__hhHost.navigated, undefined)
   assert.equal(line(view), 'A1')
   assert.equal(words(lines(view).at(-1)), 'See what I keep')
@@ -836,11 +883,11 @@ test('a group: "Here is what I have checked for that", its rows to pick; over fo
   click(answer(view, 'More'))
   assert.deepEqual(labels(view), ['Check stock prices', 'Watch a price for me'])
   assert.equal(group(view).props['data-columns'], 2)
-  // a group of three: one row of three
+  // a group of four (changes-16 added "Turn voice notes into text" to voice): two by two, no More
   const second = await atWants()
   pickNow(second.view, 'Voice and sound')
   finish(second.view)
-  assert.deepEqual(labels(second.view), ['Talk to it out loud', 'Read answers out loud', 'Write a song'])
+  assert.deepEqual(labels(second.view), ['Talk to it out loud', 'Read answers out loud', 'Turn voice notes into text', 'Write a song'])
 })
 
 test('a row picked: the person\'s message is its label, Helper says the row\'s own line, and "Show me what to ask" opens the text to paste', async () => {
@@ -924,7 +971,7 @@ test('the near miss: "can it edit my videos" gets "I don\'t know that one. These
   const { view } = await pastOpening()
   send(view, 'can it edit my videos')
   assert.equal(line(view), 'N2')
-  assert.equal(said(view), 'I don\'t know that one. These are the nearest things I have checked.')
+  assert.equal(said(view), 'I don’t know that one. These are the nearest things I have checked.')
   finish(view)
   assert.deepEqual(labels(view), ['Make pictures', 'Look at my pictures', 'Make a video from text', 'More'])
   pickNow(view, 'Make a video from text')
@@ -977,7 +1024,9 @@ test('after "Forget all", the older "Kept: ..." lines above are marked as forgot
   click(answer(view, TALK_DATA.keeps.tell.see.delete_all.answers.find(a => a.gives === 'yes').label))
   assert.equal(storage.data.has('kept'), false)
   send(view, 'what do you know about me')
-  assert.equal(said(view), 'I keep nothing about you yet.')
+  // helper-builder-qs-v1.md point 3: the conversation shows "Kept:" lines, so it says they were deleted
+  assert.equal(said(view), TALK_DATA.keeps.tell.see.see_line_deleted)
+  assert.equal(said(view), 'Everything I kept about you is deleted. I only remember that we have met.')
   const old = keptNotes(view)
   assert.deepEqual(old.map(forgotten), [true, true])
   // the words are still there to read, struck through; the link still works
@@ -1046,10 +1095,10 @@ test('a "From what I keep: ..." line whose answer was forgotten is marked the sa
 
 test('a later visit (the name question skipped), then the name typed anyway: "Hi again, Anna."; "my name is Bea" is kept in its place; nothing about the old name is said', async () => {
   const { view, storage } = await open({ storage: fakeStorage({ kept: ANNA() }) })
-  assert.equal(line(view), 'OPEN-again')
+  // changes-14: the window opens with BACK, by the kept name, and asks nothing
+  assert.equal(line(view), 'BACK')
   finish(view)
-  // talk v2 look, point 7: the window starts from the stored record alone and greets by its name
-  assert.equal(said(view), 'Hi again, Anna. Ask me anything about Hermes.')
+  assert.equal(said(view), 'Hi again, Anna. What would you like Hermes to help you with?')
   send(view, 'Anna')
   assert.equal(line(view), 'NAME_AGAIN')
   assert.equal(said(view), 'Hi again, Anna. Ask me anything about Hermes.')

@@ -12,7 +12,7 @@ import crypto from 'node:crypto'
 import { freshVisit, laterVisit, turn, pick, pickTopic, pickGroup, pickWant, press, lineFor, skillOf, wantsOf, pageOf, SKILL_NEXT_PATTERNS, WANT_ROWS } from '../src/talk.js'
 import { WANTS_DATA } from '../src/wants-data.js'
 import { skillSentence } from '../scripts/wants-data.mjs'
-import { pinned } from './lib/team-pins.mjs'
+import { pinned, PINS } from './lib/team-pins.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const TEAM = path.resolve(ROOT, '..')
@@ -31,6 +31,10 @@ function show(o) {
     question: () => 'question ' + o.topic,
     plain: () => 'plain line ' + o.topic + '0',
     H1: () => `H1 (${o.why})`,
+    // builder-qs (route2.py show): H2, BACK and HELLO with the name
+    H2: () => `H2 (${o.why})`,
+    BACK: () => `BACK name=${py(o.name)}`,
+    HELLO: () => `HELLO name=${py(o.name)}`,
     term: () => 'term line ' + o.term,
     W1: () => 'W1 buttons ' + o.buttons.slice(0, 4).join('+'),
     // changes-11 (route2.py show)
@@ -86,7 +90,7 @@ test('the reference file was made from the team\'s scripts (when the team\'s fol
 })
 
 test('wants fixes v1: the reference ran hhcontent\'s third layer after fixes6_step.py, and on the 296 messages it changes only "is there a skill for knitting", to N1', () => {
-  assert.equal(O.wants_fixes_step_sha256, '9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a')
+  assert.equal(O.wants_fixes_step_sha256, PINS['dev/checks/hhcontent-wants-fixes/wants_fixes_step.py'][0])
   // talk v2 look: route2.py run as the team has it (changes-12's secret rule is ported)
   assert.equal(O.route2_run, 'route2.py')
   assert.equal(O.route2_run_sha256, O.route2_sha256)
@@ -158,12 +162,12 @@ test('skills by name, hhtech\'s twenty sentences (Q4): all ten that name a skill
   assert.deepEqual([found, quiet], [10, 10])
 })
 
-test('hhcontent\'s forty messages (test_wants.py): 38 as hhcontent expected; the two hhcontent named differ ("a skill for knitting" is N1 now, wants fixes v1)', () => {
+test('hhcontent\'s forty messages (test_wants.py): 39 as hhcontent expected; the one hhcontent named still differs ("a skill for knitting" is N1 now, wants fixes v1)', () => {
   const as = e => (e.startsWith('S:') ? 'skill:' + e.slice(2) : e.startsWith('topic:') ? e.slice(6) : e)
   const off = set('test_wants40').filter(m => landed(ours(m).o) !== as(m.hhcontent_expects)).map(m => [m.text, landed(ours(m).o)])
   assert.deepEqual(off, [
-    // hhcontent's own two (helper-wants-v1.md 6, "Ran"): no row's words match; youtube is svc's word
-    ['can hermes look things up online', 'N2:web'],
+    // hhcontent's own two (helper-wants-v1.md 6, "Ran"): youtube is svc's word. The other one, "can hermes
+    // look things up online", now lands as hhcontent expected: changes-16 gave w_web "look stuff up" words
     ['can it download youtube videos', 'svc']
   ])
   assert.equal(landed(ours(set('test_wants40').find(m => m.text === 'is there a skill for knitting')).o), 'N1')
@@ -256,22 +260,25 @@ test('S1 and S2 for every skill on the two pages: Helper\'s fixed line with the 
       assert.equal(said.next, null)
     }
   }
-  // 186 skills: 5 left out, 14 with a row of their own, the rest by S1 or S2
-  assert.equal(s1 + s2, 186 - 5 - 14)
+  // 186 skills: 5 left out, 15 with a row of their own (changes-16 added w_meme for meme-generation), the rest by S1 or S2
+  const withRow = WANTS_DATA.rows.filter(r => WANTS_DATA.skills.some(s => s.name === r.thing)).length
+  assert.equal(withRow, 15)
+  assert.equal(s1 + s2, 186 - 5 - withRow)
   assert.ok(s1 > 25 && s2 > 120, `${s1} built in, ${s2} optional`)
   // skill lines v1 section 3: 174 of 186 skills have a plain line, 12 keep the fixed sentence
   assert.deepEqual([WANTS_DATA.skills.filter(s => s.say != null).length, WANTS_DATA.skills.filter(s => s.say == null).length], [174, 12])
   assert.ok(!/\{say\}/.test(JSON.stringify(WANTS_DATA.fixed.S1.text_fixed + WANTS_DATA.fixed.S2.text_fixed)))
 })
 
-test('the service lines: Gmail, Google Calendar and Google Drive get the Connectors line; GitHub gets the github skill with its docs box; typed, picked and kept alike; Notion is as before', () => {
+test('the service lines: Gmail gets the Connectors line CN1, Google Calendar and Google Drive CN2 with their name (changes-16); GitHub gets the github skill with its docs box; typed, picked and kept alike; Notion is as before', () => {
   const CN1 = WANTS_DATA.fixed.CN1.text
+  const CN2 = svc => WANTS_DATA.fixed.CN2.text.replace('{service}', svc)
   let st = freshVisit()
   assert.equal(lineFor(turn('can it read my gmail', st), st).text, CN1)
   st = freshVisit()
-  assert.equal(lineFor(turn('can it add events to google calendar', st), st).text, CN1)
+  assert.equal(lineFor(turn('can it add events to google calendar', st), st).text, CN2('Google Calendar'))
   st = freshVisit()
-  assert.equal(lineFor(turn('can it use my drive', st), st).text, CN1)
+  assert.equal(lineFor(turn('can it use my drive', st), st).text, CN2('Google Drive'))
   st = freshVisit()
   const gh = lineFor(turn('can it connect to github', st), st)
   assert.equal(gh.line, 'S1')
@@ -321,7 +328,9 @@ test('the wants pick and the groups: can-q with the four groups, G1 with a group
   assert.deepEqual(q.answers.items.map(a => a.group), ['web', 'files', 'pics', 'voice'])
   assert.equal(st.lastq, false)
   const g = pickGroup('voice', st)
-  assert.deepEqual(g.buttons, ['w_voice', 'w_aloud', 'w_music'])
+  // changes-16: w_stt (voice notes into text) joined the voice group, now four rows, still no More
+  assert.deepEqual(g.buttons, ['w_voice', 'w_aloud', 'w_stt', 'w_music'])
+  assert.equal(lineFor(g, st).answers.items.some(a => a.more), false)
   assert.equal(lineFor(g, st).text, 'Here is what I have checked for that. Pick one, or type your own.')
   // a topic question may follow it (lastq false)
   assert.equal(pickTopic('mem', st).kind, 'question')

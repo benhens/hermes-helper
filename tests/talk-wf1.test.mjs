@@ -6,7 +6,8 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
-import { freshVisit, turn, serviceIn } from '../src/talk.js'
+import { freshVisit, turn, serviceIn, lineFor as talkLineFor } from '../src/talk.js'
+import { PINS } from './lib/team-pins.mjs'
 import { WANTS_DATA } from '../src/wants-data.js'
 import { looksLikeKey, KEY_PATTERNS } from '../src/key-check.js'
 
@@ -42,12 +43,17 @@ function run(text, stage = 'open', pending = null) {
   }
   return [show(turn(text, st)), st]
 }
-// run_wf1.py's line_for(): the line a named service gets
+// run_wf1.py's line_for(): the line a named service gets. run_wf1.py's own helper predates changes-16's CN2 and
+// calls every other line S1; the plugin's names CN1 and CN2 as they are (see STALE below).
 const lineFor = svc => {
   if (!svc) return null
   const v = WANTS_DATA.service_lines[svc]
-  return v ? (v.line === 'CN1' ? 'CN1' : 'S1') : 'svc1'
+  return v ? (['CN1', 'CN2'].includes(v.line) ? v.line : 'S1') : 'svc1'
 }
+// changes-16 (For builder 4): Google Calendar and Google Drive now show CN2. run_wf1.py (unchanged since the
+// wants fixes) still expects CN1 for them, and its line_for() turns CN2 into "S1", so the Python itself reports
+// these three as FAIL. For them the plugin must find the same service, and show CN2.
+const STALE = ["service of 'can it use my google drive'", "service of 'can it use my google calendar'", "service of 'can it use my drive'"]
 
 function ours(c) {
   if (c.name.startsWith('service of ')) {
@@ -65,10 +71,11 @@ function ours(c) {
   return got
 }
 
-test('the cases file is hhcontent\'s run_wf1.py, 53 cases, all as hhcontent expected in Python', t => {
+test('the cases file is hhcontent\'s run_wf1.py, 53 cases, all as hhcontent expected in Python except the three changes-16 moved to CN2', t => {
   assert.equal(F.cases.length, 53)
-  assert.equal(F.summary, '53 of 53 as expected')
-  assert.ok(F.cases.every(c => c.ok))
+  assert.equal(F.summary, `50 of 53 as expected; FAIL: [${STALE.map(s => JSON.stringify(s)).join(", ")}]`)
+  assert.deepEqual(F.cases.filter(c => !c.ok).map(c => c.name), STALE)
+  for (const c of F.cases.filter(c => !c.ok)) assert.deepEqual([c.want[1], c.got[1], c.got[0]], ['CN1', 'S1', c.want[0]], c.name)
   assert.deepEqual([1, 2, 3, 4, 5].map(s => F.cases.filter(c => c.section === s).length), [15, 11, 11, 9, 7])
   const run = path.join(ROOT, '..', 'dev/checks/hhcontent-wants-fixes/run_wf1.py')
   if (!fs.existsSync(run)) return t.skip('no team folder beside the plugin')
@@ -77,10 +84,21 @@ test('the cases file is hhcontent\'s run_wf1.py, 53 cases, all as hhcontent expe
 
 for (const s of [1, 2, 3, 4, 5]) {
   test(`run_wf1.py section ${s}: every case gives in the plugin what it gives in hhcontent's Python`, () => {
-    const off = F.cases.filter(c => c.section === s).map(c => [c.name, ours(c), c.want]).filter(([, got, want]) => JSON.stringify(got) !== JSON.stringify(want))
+    const want = c => (STALE.includes(c.name) ? [c.want[0], 'CN2'] : c.want)
+    const off = F.cases.filter(c => c.section === s).map(c => [c.name, ours(c), want(c)]).filter(([, got, w]) => JSON.stringify(got) !== JSON.stringify(w))
     assert.deepEqual(off, [])
   })
 }
+
+test('changes-16: "can it use my google drive" and "... calendar" show CN2 naming the service; Gmail keeps CN1', () => {
+  for (const [text, svc, line] of [['can it use my google drive', 'Google Drive', 'CN2'], ['can it use my drive', 'Google Drive', 'CN2'], ['can it use my google calendar', 'Google Calendar', 'CN2'], ['can it read my gmail', 'Gmail', 'CN1']]) {
+    const st = freshVisit('open')
+    const said = talkLineFor(turn(text, st), st, text)
+    assert.equal(said.line, line, text)
+    assert.equal(said.text, WANTS_DATA.fixed[line].text.replace('{service}', svc), text)
+    assert.doesNotMatch(said.text, /\{/)
+  }
+})
 
 // Pattern 5 as it was before wants fixes v1 (the plugin's src/talk-data.js at 827d19d)
 const OLD_P5 = new RegExp('(?<![A-Za-z0-9/+.:_-])(?=[A-Za-z0-9/+]*[A-Z])(?=[A-Za-z0-9/+]*[a-z])(?=[A-Za-z0-9/+]*[0-9])[A-Za-z0-9+][A-Za-z0-9/+]{39}(?![A-Za-z0-9/+=.:_-])')
@@ -112,8 +130,8 @@ test('key pattern 5: 200,000 random AWS-style 40-character secrets, the new patt
 // dev/checks/talk-v2-wf1/stage_label.py from the pinned scripts.
 const X = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/wf1-extra.json'), 'utf8'))
 test('the extra cases were made from the pinned scripts: route2.py and wants_fixes_step.py at the job\'s checksums', () => {
-  assert.equal(X.sha256['hhcontent-talk-v2/route2.py'], '46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368')
-  assert.equal(X.sha256['hhcontent-wants-fixes/wants_fixes_step.py'], '9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a')
+  assert.equal(X.sha256['hhcontent-talk-v2/route2.py'], PINS['dev/checks/hhcontent-talk-v2/route2.py'][0])
+  assert.equal(X.sha256['hhcontent-wants-fixes/wants_fixes_step.py'], PINS['dev/checks/hhcontent-wants-fixes/wants_fixes_step.py'][0])
   assert.deepEqual([X.group_label_by_stage.length, X.typed_change.length], [12, 6])
 })
 
@@ -132,5 +150,8 @@ test('keeps.typed_change with a service kept: the longer typed name wins, as rou
     })
     assert.deepEqual(off, [])
   }
-  assert.equal(X.typed_change.find(c => c.text === 'I use one drive now').kept_after, 'OneDrive')
+  // the inner "drive" never wins over "one drive": since changes-16 (a lone service word needs a second word,
+  // lonely_words) the reference no longer takes "I use one drive now" as a service at all, so the kept one stays
+  for (const text of ['I use one drive now', 'my files are on one drive']) assert.notEqual(X.typed_change.find(c => c.text === text).kept_after, 'Google Drive', text)
+  assert.equal(X.typed_change.find(c => c.text === 'I use one drive now').kept_after, 'Gmail')
 })

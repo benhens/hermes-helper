@@ -272,13 +272,16 @@
    "sha256": "cfe0c18e3e2e06a4bb51fc43f631190a2b81f33d5b4208f7385949f3da52a3ed",
    "lines": {
     "13": "Hermes Agent supports both text-to-speech output and voice message transcription across all messaging platforms.",
-    "25": "| **Edge TTS** (default) | Good | Free | None needed |"
+    "25": "| **Edge TTS** (default) | Good | Free | None needed |",
+    "496": "Voice messages sent on Telegram, Discord, WhatsApp, Slack, or Signal are automatically transcribed and injected as text into the conversation. The agent sees the transcript as normal text."
    }
   },
   "user-guide/features/vision.md": {
    "sha256": "4fff6ebc1722206f4d297af2c0294deae58647b5ef17c734cdbd6b029f60beef",
    "lines": {
-    "10": "Hermes Agent supports **multimodal vision** — you can paste images from your clipboard directly into the CLI and ask the agent to analyze, describe, or work with them. Images are sent to the model as base64-encoded content blocks, so any vision-capable model can process them."
+    "10": "Hermes Agent supports **multimodal vision** — you can paste images from your clipboard directly into the CLI and ask the agent to analyze, describe, or work with them. Images are sent to the model as base64-encoded content blocks, so any vision-capable model can process them.",
+    "204": "| **Text-only** (DeepSeek V4 Pro, DeepSeek V3, smaller open-source models, older chat-only endpoints) | Routed through the `vision_analyze` auxiliary tool — an auxiliary vision model describes the image, and the text description is injected into the conversation. |",
+    "206": "You don't configure this — Hermes looks up your current model's capability in the provider metadata and picks the right path automatically. The practical effect: you can switch between vision and non-vision models mid-session and image handling \"just works\" without changing your workflow. Text-only models get coherent context about the image rather than a broken multimodal payload they'd have to reject."
    }
   },
   "user-guide/features/voice-mode.md": {

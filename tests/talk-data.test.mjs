@@ -25,6 +25,8 @@ test('the data as copied has no problem, and the built data file is what the bui
   assert.deepEqual(talkProblems(read()), [])
   assert.equal(fs.readFileSync(path.join(ROOT, 'src/talk-data.js'), 'utf8'), talkDataSource())
   assert.deepEqual(TALK_DATA, slimTalkData(read(), JSON.parse(fs.readFileSync(path.join(ROOT, 'content/skills-list-v1.json'), 'utf8'))))
+  // changes-18: without the Forget row's word the build stops
+  assert.ok(talkProblems(broken(d => delete d.keeps.settings_file.forget_all.action)).includes('keeps.settings_file.forget_all.action is missing'))
 })
 
 test('the line rules are hhcontent\'s check.py: the same findings for every line of the data and for lines broken on purpose', () => {

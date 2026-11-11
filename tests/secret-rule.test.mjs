@@ -11,7 +11,7 @@ import { looksSecret, pyRegExp } from '../src/secret-rule.js'
 import { turn, freshVisit } from '../src/talk.js'
 import { readBox } from '../src/settings-file.js'
 import { TALK_DATA } from '../src/talk-data.js'
-import { pinned } from './lib/team-pins.mjs'
+import { pinned, PINS } from './lib/team-pins.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const X = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'fixtures', 'secret-cases.json'), 'utf8'))
@@ -37,7 +37,7 @@ test('the cases were made from the talk data this plugin holds and the secret ru
   assert.equal(X.sha256['hhcontent-talk-v2/secret_rule.py'], 'd7f5f5512d319eae03e909a0a71edcd2d26935e3667d823b8f9c53dbb391a9b3')
   assert.equal(X.sha256['hhcontent-settings-edit/settings_read.py'], '23b0ea4ea4ffba0ec22e335ad251c987da2b7137172b88056239f44387eb9bee')
   assert.equal(X.sha256['hhcontent-changes-10/refuse_tests.py'], '3a56eda6e6262bfce020018795af6da5b8057dcc36ab86f41a8dc58a25f55afc')
-  assert.equal(X.sha256['hhcontent-talk-v2/route2.py'], '46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368')
+  assert.equal(X.sha256['hhcontent-talk-v2/route2.py'], PINS['dev/checks/hhcontent-talk-v2/route2.py'][0])
 })
 
 test('the team names those checksums (when the team\'s folder is there)', t => {

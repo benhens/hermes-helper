@@ -53,7 +53,17 @@ function wordRe(p, flags = '') {
   return wordRes.get(key)
 }
 const hits = (t, p) => wordRe(p).test(t)
-const whichOf = (t, list) => list.filter(p => hits(t, p))
+// changes-16/17 (JSON lonely_words, route2.py lonely_ok): a listed key word counts only with one of its
+// needs_one_of phrases in the message (when it has that list) and none of its not_with words. Every key-word
+// list goes through it (topics, needs, weak words, the wants rows); the typed answers to Helper's own service
+// question use hits(), as route2.py's hit(), and are not affected.
+const LONELY = TALK_DATA.lonely_words || {}
+function lonelyOk(t, p) {
+  const r = LONELY[p]
+  if (!r) return true
+  return (!r.needs_one_of || r.needs_one_of.some(q => hits(t, q))) && !(r.not_with || []).some(q => hits(t, q))
+}
+const whichOf = (t, list) => list.filter(p => hits(t, p) && lonelyOk(t, p))
 // A start counts when it is the whole message, or the next character is not a to z, 0 to 9 or '.
 const startsWith = (t, list) => list.some(p => t === p || (t.startsWith(p) && /[^a-z0-9']/.test(t[p.length])))
 function cutIgnored(t) {
@@ -68,14 +78,60 @@ const capFirst = s => {
   return chars.length ? chars[0].toUpperCase() + chars.slice(1).join('') : s
 }
 
+// The request step: null, the words that make it a request (H1), or { h2: words } for a question whether
+// Hermes can build something (changes-16, H2).
 export function buildHit(text) {
   const t = cutIgnored(talkNorm(text)) // the ignore phrases are cut before this step too
   if (startsWith(t, BUILD.skip_starts) || whichOf(t, BUILD.how_phrases).length) return null // a question about how is never a request
+  // changes-16 (build.build_question_rule): "can it build ...?" is a question about Hermes
+  const q = whichOf(t, BUILD.build_question_words)
+  if (startsWith(t, BUILD.make_not_when_starts) && q.length) return { h2: q[0] }
   const w = whichOf(t, BUILD.build_words)
   if (w.length) return w[0]
   const pair = BUILD.build_pair
   const doing = whichOf(t, pair.and_one_of)
   if (hits(t, pair.must_have) && doing.length) return pair.must_have + ' + ' + doing[0]
+  // changes-15 (build.make_words): make me ..., can you make ..., unless the next words are on
+  // make_not_followed_by, or the message starts as a question about Hermes
+  if (!startsWith(t, BUILD.make_not_when_starts)) {
+    for (const m of BUILD.make_words) {
+      const re = wordRe(m, 'g')
+      re.lastIndex = 0
+      let x
+      while ((x = re.exec(t))) {
+        // the match ends after the character that follows the words (as route2.py's m.end())
+        const rest = t.slice(x.index + x[0].length).replace(/^[ ,]+/, '')
+        if (rest && !startsWith(rest, BUILD.make_not_followed_by)) return m
+      }
+    }
+  }
+  return softwareHit(t) // changes-17
+}
+// changes-17 (build.software_rule): lead-ins cut again and again, then a software verb as the first word and a
+// software thing (one or two words) after at most software_between_max words, none of them on software_between_not.
+function softwareHit(t) {
+  const leads = [...BUILD.software_lead_ins].sort((a, b) => b.length - a.length)
+  let again = true
+  while (again) {
+    again = false
+    for (const p of leads) {
+      if (t !== p && startsWith(t, [p])) {
+        t = t.slice(p.length).replace(/^[ ,]+/, '')
+        again = true
+      }
+    }
+  }
+  const ws = t.match(/[a-z0-9'-]+/g) || []
+  const max = BUILD.software_between_max
+  if (!ws.length || !BUILD.software_verbs.includes(ws[0])) return null
+  for (let i = 1; i < Math.min(ws.length, max + 3); i++) {
+    const between = ws.slice(1, i)
+    if (between.length > max || between.some(w => BUILD.software_between_not.includes(w))) return null
+    for (const th of BUILD.software_things) {
+      const n = th.split(' ').length
+      if (ws.slice(i, i + n).join(' ') === th) return ws[0] + ' + ' + th
+    }
+  }
   return null
 }
 const questionForm = t => t.includes('?') || startsWith(t, OPENING.question_starts)
@@ -235,12 +291,45 @@ function byCode(text, st) {
 // service: the service last named, for the text to paste. kept: the stored record (keeps.storage).
 // rmText: the message that led to "Do you mean me, or your own Hermes?", for the answer to it.
 // wants: the wants steps are on (row 5); false only for replaying route2.py, which has none.
-export function freshVisit(stage = 'open', kept = {}) {
-  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true }
+// changes-14/15: met, the mark that Helper has said hello (its own storage key, keeps.met; it outlives the
+// visit and no Forget removes it); last, lastKey, lastTopic: Helper's last line in this visit (route2.py
+// note_last), for ordinary talk and for never saying the same line twice; rejected: the lines the person
+// called wrong in this visit (no_repeat.rejected_rule), never stored.
+export function freshVisit(stage = 'open', kept = {}, met = false) {
+  return { stage, pending: null, found: {}, asked: [], lastq: false, name: null, work: null, service: null, kept, rmText: null, wants: true, met, last: null, lastKey: null, lastTopic: null, rejected: [] }
 }
-// A later visit: only the stored record is carried over. A kept name means the opening's two
-// questions are not asked again (content/helper-keeps-v1.md section 4).
-export const laterVisit = kept => freshVisit(kept && kept.name ? 'open' : 'name', kept || {})
+// A later visit: only the stored record and the met mark are carried over. met: Helper has said hello on an
+// earlier visit (changes-14, keeps.met). Builder: a kept name counts as met too (route2.py writes both at F1,
+// so a name never stands without met there), so a record from a build before the mark is not asked the name
+// again. The window's first line, and so the stage, is opening()'s: met, BACK and no question; else OPEN.
+export const laterVisit = (kept, met = false) => {
+  const k = kept || {}
+  const was = met === true || !!k.name
+  return freshVisit(was ? 'open' : 'name', k, was)
+}
+// changes-14 (route2.py opening): the window opens.
+export function opening(st) {
+  let out
+  if (st.met) {
+    st.stage = 'open'
+    out = { kind: 'BACK', name: st.kept.name || null }
+  } else {
+    st.stage = 'name'
+    out = { kind: 'OPEN' }
+  }
+  noteLast(st, out)
+  return out
+}
+// route2.py line_key: "the same line" is the same kind, topic, need, term and buttons. Builder: also the same
+// wants row, skill or group (the plugin's own lines; route2.py has none), so two different rows are two lines.
+const lineKey = o => JSON.stringify([o.kind, o.topic || null, o.need || null, o.term || null, o.buttons || [], o.row || null, o.skill || null, o.group || null])
+function noteLast(st, o) {
+  if (!o) return o
+  st.last = o.kind
+  st.lastKey = lineKey(o)
+  st.lastTopic = ['row', 'question', 'plain'].includes(o.kind) ? o.topic || null : null
+  return o
+}
 
 /* ---------- what Helper keeps (route2.py: keep, keep_typed, kept_need, remember) ---------- */
 // Writes one thing into the visit's record, and notes on the result that the faint kept line must
@@ -429,8 +518,22 @@ function codeName(text, strongOnly = false) {
   const name = codeNameRaw(text, strongOnly)
   return name && !refusedName(name) ? name : null
 }
+// helper-builder-qs-v1.md point 1 (route2.py strong_match): the first place name_strong_pattern matches, or
+// null when the word it caught is on opening.not_a_name or name_strong_stop ("call me tomorrow"). No second match.
+function strongMatch(text) {
+  const m = NAME_STRONG.exec(text)
+  if (m && (OPENING.not_a_name.includes(m[1].toLowerCase()) || OPENING.name_strong_stop.includes(m[1].toLowerCase()))) return null
+  return m
+}
+// route2.py tail_ok: after a name typed on a later visit only spaces, . , ! and name_new_may_follow's words
+const MAY_FOLLOW = [...OPENING.name_new_may_follow].sort((a, b) => b.length - a.length).map(w => new RegExp('(^|[^a-z0-9])' + escapeRe(w) + '(?=$|[^a-z0-9])', 'g'))
+function tailOk(rest) {
+  let t = talkNorm(rest)
+  for (const re of MAY_FOLLOW) t = t.replace(re, '$1 ')
+  return /^[\s.,!]*$/.test(t)
+}
 function codeNameRaw(text, strongOnly) {
-  let m = NAME_STRONG.exec(text)
+  let m = strongMatch(text)
   if (m) return capFirst(m[1])
   if (strongOnly) return null
   m = NAME_WEAK.exec(text)
@@ -444,7 +547,7 @@ function codeNameRaw(text, strongOnly) {
 // A reply to "What's your name?" that holds a name and a question of its own: [name, the rest], or [null, null].
 function nameWithMore(text) {
   const more = OPENING.name_with_more
-  let m = NAME_STRONG.exec(text)
+  let m = strongMatch(text)
   if (!m) {
     m = NAME_WEAK.exec(text)
     if (m) {
@@ -478,6 +581,9 @@ function nameLater(text, st, out) {
   const weak = m ? capFirst(m[1]) : null
   if (kn && [(strong || '').toLowerCase(), (weak || '').toLowerCase()].includes(kn.toLowerCase())) return { kind: 'NAME_AGAIN', name: kn }
   if (!strong) return null
+  // helper-builder-qs-v1.md point 1: NAME_NEW only when the name ends the message (polite words may follow)
+  const sm = strongMatch(text)
+  if (!tailOk(text.slice(sm.index + sm[0].length))) return null
   keep(st, out, 'name', strong)
   st.name = strong
   return { kind: 'NAME_NEW', name: strong }
@@ -538,8 +644,132 @@ export function serviceIn(text, st, answered) {
   return st.service
 }
 
-// One typed message -> a result. The order of steps is route2.py's turn(), with no model.
+/* ---------- changes-14, -15, -17: ordinary talk, and never the same line twice ---------- */
+const ST = TALK_DATA.small_talk
+const NR = TALK_DATA.no_repeat
+const LETTER = /\p{L}/u
+const ONE_WORD = /^(?:\p{L}|['-]){2,30}$/u
+// changes-17 (opening.one_word_name): at "What's your name?" a one-word reply is the name, unless the word is
+// on not_a_name or is a topic or term key word. An ending . or ! is cut off; a ? makes it a question.
+function oneWordName(text, st) {
+  if (st.stage !== 'name') return false
+  const raw = String(text).trim().replace(/[.!]+$/, '').trim()
+  if (!ONE_WORD.test(raw) || !LETTER.test(raw)) return false
+  const t = cutIgnored(talkNorm(raw))
+  return !OPENING.not_a_name.includes(t) && !strongTopics(t).length && !anyTerm(t)
+}
+// changes-17: the person says Helper was wrong (no_repeat's words; a bare no, nope or nah at the start not counted)
+const saysWrong = t => whichOf(t, NR.wrong_anywhere).length > 0 || startsWith(t, NR.wrong_starts.filter(w => !ST.no_words.includes(w)))
+const WEAK_ALL = TALK_DATA.topics.flatMap(x => x.weak_key_words || [])
+// Step 0 b (JSON small_talk, route2.py small_talk): the kind of an ordinary message, or null. Whole messages only.
+export function smallTalk(text, st) {
+  if (oneWordName(text, st)) return null // Ty and Will at What's your name? are names
+  let t = talkNorm(text)
+  let again = true
+  while (again) {
+    again = false
+    let t2 = t.replace(/[ ?!.,]+$/, '')
+    for (const w of ST.cut_end_words) {
+      if (t2.endsWith(' ' + w)) {
+        t2 = t2.slice(0, -w.length).replace(/[ ,]+$/, '')
+        again = true
+      }
+    }
+    for (const w of ST.cut_start_words) {
+      if (t2 !== w && startsWith(t2, [w])) {
+        t2 = t2.slice(w.length).replace(/^[ ,:.]+/, '')
+        again = true
+      }
+    }
+    t = t2
+  }
+  const opening = st.stage === 'name' || st.stage === 'work'
+  let kind = (Object.entries(ST.kinds).find(([, ws]) => ws.includes(t)) || [null])[0]
+  if (kind === null) {
+    // changes-17 thanks_tail: "ty so much", "thx a lot"
+    for (const w of [...ST.kinds.thanks].sort((a, b) => b.length - a.length)) {
+      if (startsWith(t, [w]) && ST.thanks_tail.includes(t.slice(w.length).replace(/^[ ,!.]+|[ ,!.]+$/g, ''))) {
+        kind = 'thanks'
+        break
+      }
+    }
+  }
+  if (kind === null) {
+    const letters = /[a-z0-9]/.test(t)
+    const one = /^[a-z]+$/.test(t)
+    const tc = cutIgnored(t)
+    const known = strongTopics(tc).length > 0 || anyTerm(tc) || whichOf(tc, WEAK_ALL).length > 0
+    const ws = typedWords(t)
+    if (!letters || (one && t.length === 1)) kind = 'cut' // rules a and b
+    else if (!opening && saysWrong(t) && !known) kind = 'wrong' // changes-17 wrong_rule_17
+    else if (!opening && !st.pending && !known) {
+      if (one && ((t.length >= 2 && t.length <= 3) || ST.cut_question_words.includes(t))) kind = 'cut' // rule c
+      else if (ws.length <= 4 && ST.cut_dangling.includes(ws[ws.length - 1])) kind = 'cut' // rule d
+      else if (ws.length <= 3 && ws.length > 1 && OPENING.question_starts.includes(ws[0]) && ws.slice(1).every(w => ST.cut_small_words.includes(w))) kind = 'cut' // changes-17 rule e
+    }
+  }
+  if (kind === null) return null
+  // changes-15 no_rule: a bare no right after an answer, with nothing open, says the answer was wrong
+  if (kind === 'ok' && ST.no_words.includes(t) && !st.pending && ST.no_means_wrong_after.includes(st.last)) kind = 'wrong'
+  if (opening && !['thanks', 'how', 'who', 'ai', 'bye', 'cut'].includes(kind)) return null // at_opening
+  if (st.pending && (kind === 'ok' || kind === 'mean')) return null // when_pending: the answer to Helper's question
+  return kind
+}
+// The fixed line for a small-talk kind: [line, the name for HELLO or the topic for a plain line].
+function smallLine(kind, st) {
+  const name = st.name || st.kept.name || null
+  if (kind === 'hello') return [st.lastq || ['BACK', 'HELLO', 'HELLO_SAME'].includes(st.last) ? 'HELLO_SAME' : 'HELLO', name]
+  if (kind === 'ai') return [ST.ai_line, null]
+  if (kind === 'mean') return st.lastTopic && st.last !== 'plain' ? ['plain', st.lastTopic] : ['MEAN_NONE', null]
+  return [{ thanks: 'THANKS', ok: 'OK', how: 'HOW', who: 'WHO', bye: 'BYE', cut: 'CUT', wrong: 'WRONG' }[kind], null]
+}
+// Builder: the plugin's own kinds that route2.py does not have, kept out of no_repeat like the data's exempt
+// ones: a skill named by name (changes-15's own words: "a skill named by name") and what Helper keeps, asked
+// by typing (A1, A2, A4: the person's own record, or a Yes/No question that must be asked each time).
+const EXEMPT_ALSO = ['skill', 'A1', 'A2', 'A4', 'A-none']
+// changes-15 (JSON no_repeat, route2.py no_repeat): never the same line twice in a row in answer to typed
+// messages, and never a line the person just called wrong in this visit. The line in its place drops the open
+// question and keeps any "Kept:" line the original carried. live-v2 (no_repeat.asked_again): a message that
+// asks for it again in so many words gets the same line.
+function noRepeat(out, st, text) {
+  const k = out.kind
+  const t = talkNorm(text)
+  const saidWrong = startsWith(t, NR.wrong_starts) || whichOf(t, NR.wrong_anywhere).length > 0
+  if (saidWrong && st.lastKey) st.rejected.push(st.lastKey)
+  if (!saidWrong && whichOf(t, NR.asked_again).length) {
+    st.rejected = []
+    return out
+  }
+  const avoid = [st.lastKey, ...st.rejected]
+  if (NR.exempt.includes(k) || EXEMPT_ALSO.includes(k) || !avoid.includes(lineKey(out))) {
+    if (!saidWrong) st.rejected = []
+    return out
+  }
+  const group = (Object.entries(NR.groups).find(([, ks]) => ks.includes(k)) || ['answer'])[0]
+  const cands = []
+  for (const c of NR.in_place[group]) {
+    if (c === 'plain') {
+      if (out.topic) cands.push({ kind: 'plain', topic: out.topic })
+    } else cands.push({ kind: c })
+  }
+  const next = cands.find(x => !avoid.includes(lineKey(x))) || cands.find(x => lineKey(x) !== st.lastKey)
+  for (const x of ['kept', 'first', 'name_taken', 'thing']) if (x in out) next[x] = out[x]
+  next.repeat_of = k
+  st.pending = null
+  st.lastq = false
+  return next
+}
+
+// One typed message -> a result (route2.py turn, changes-14's wrapper): the steps below, then no_repeat; met
+// is set when the opening ends here, and the line is noted as Helper's last.
 export function turn(text, st) {
+  const wasOpening = st.stage === 'name' || st.stage === 'work'
+  const out = noRepeat(turnSteps(text, st), st, text)
+  if (wasOpening && st.stage === 'open') st.met = true // keeps.met.written_when: the opening ended, by any route
+  return noteLast(st, out)
+}
+// The order of steps is route2.py's _turn(), with no model.
+function turnSteps(text, st) {
   const out = {}
   const openAtStart = st.stage === 'open'
   const done = (kind, more = {}) => {
@@ -552,6 +782,14 @@ export function turn(text, st) {
   if (looksLikeKey(text)) {
     out.kind = 'K1'
     return out
+  }
+  // 0 b. ordinary talk (changes-14): hello, thanks, ok, cut off, "what do you mean", "that's wrong" ...
+  const sk = smallTalk(text, st)
+  if (sk) {
+    const [line, x] = smallLine(sk, st)
+    st.stage = 'open'
+    if (line === 'plain') return done('plain', { topic: x, why: 'what do you mean' })
+    return line === 'HELLO' ? done(line, { name: x }) : done(line)
   }
   // 1 b. a request to Helper to remember something; then what Helper keeps, asked about by typing
   if (remember(text, st, out)) return out
@@ -567,6 +805,10 @@ export function turn(text, st) {
   }
   // 2. a request to do it
   const built = buildHit(text)
+  if (built && built.h2) {
+    st.stage = 'open'
+    return done('H2', { why: built.h2 }) // changes-16
+  }
   if (built) {
     st.stage = 'open'
     return done('H1', { why: built })
@@ -588,8 +830,10 @@ export function turn(text, st) {
         keep(st, out, 'name', taken)
       }
       name = both ? null : codeName(text, true)
-      ordinary = both || (!name && (strongTopics(t).length > 0 || anyTerm(t) || questionForm(t)))
+      // changes-17: a one-word name ("Will") is not a question
+      ordinary = both || (!name && (strongTopics(t).length > 0 || anyTerm(t) || questionForm(t)) && !oneWordName(text, st))
       if (!name && !ordinary) name = codeName(text)
+      if (name && oneWordName(text, st)) name = capFirst(String(text).trim().replace(/[.!]+$/, '').trim()) // "Ty!" is Ty
     } else ordinary = questionForm(t)
     if (!ordinary) {
       let work = null
@@ -599,11 +843,16 @@ export function turn(text, st) {
       st.work = work
       if (work || st.stage === 'work') {
         st.stage = 'open'
-        // the name is kept now; what the person does is used for this visit only, never kept
-        if (st.name) keep(st, out, 'name', st.name)
+        // changes-15: the name was written at F1 already; only a name new here would be written now. What the
+        // person does is used for this visit only, never kept.
+        if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
         return done('F2', { name: st.name, work })
       }
+      // changes-15: met and the name are written as soon as the name question is answered; the first
+      // "Kept:" line shows under F1
       st.stage = 'work'
+      st.met = true
+      if (st.name) keep(st, out, 'name', st.name)
       return done('F1', { name: st.name })
     }
     st.stage = 'open'
@@ -619,7 +868,7 @@ export function turn(text, st) {
     // reference checks it first, before "remember that ..." and the other early steps; here it stays at
     // its old place, after them: none of the four labels reaches those steps (tests/talk-wf1.test.mjs).
     const group = openAtStart ? GROUP_BY_LABEL.get(asLabel(cutIgnored(talkNorm(text)))) : null
-    if (group) return done('G1', { group, buttons: pickGroup(group, st).buttons })
+    if (group) return done('G1', { group, buttons: pickGroupSteps(group, st).buttons })
     const sk = skillOf(cutIgnored(talkNorm(text)))
     if (sk.length === 1) {
       const row = rowOfSkill(sk[0])
@@ -686,7 +935,7 @@ export function turn(text, st) {
 /* ---------- what the person picks or presses ---------- */
 // An answer picked under a topic question: its need's row at once. No key words, no model. A
 // picked answer to one of the three questions is kept (keeps rule 2).
-export function pick(topic, i, st) {
+function pickSteps(topic, i, st) {
   const a = TOPICS[topic].question.answers[i]
   st.found[topic] = a.gives
   st.pending = null
@@ -703,7 +952,7 @@ export function pick(topic, i, st) {
 // topic's question if not asked yet, or its plain line. The held pick "Web, files, pictures and
 // voice" (held_picks.wants, changes-9): the wants question can-q at once, its four groups to pick
 // (route2.py pick_topic).
-export function pickTopic(topic, st) {
+function pickTopicSteps(topic, st) {
   if (TALK_DATA.held_picks && TALK_DATA.held_picks.includes(topic)) {
     st.pending = null
     st.lastq = false
@@ -734,7 +983,7 @@ export function pickTopic(topic, st) {
 
 // The link "Change" beside "From what I keep": the topic's question is asked again. A question
 // still open is dropped for it.
-export function change(topic, st) {
+function changeSteps(topic, st) {
   if (!st.asked.includes(topic)) st.asked.push(topic)
   st.pending = topic
   st.lastq = true
@@ -743,9 +992,9 @@ export function change(topic, st) {
 
 // A button under "Which one do you mean?", with the message that led to it. A row's button: that
 // row.
-export function press(choice, text, st) {
+function pressSteps(choice, text, st) {
   st.lastq = false
-  if (WANT_ROWS[choice]) return pickWant(choice, st)
+  if (WANT_ROWS[choice]) return pickWantSteps(choice, st)
   if (TERMS[choice]) return { kind: 'term', term: choice }
   const ns = needsFor(cutIgnored(talkNorm(text)), choice, false)
   if (ns.length !== 1) return { kind: 'plain', topic: choice }
@@ -756,53 +1005,56 @@ export function press(choice, text, st) {
 
 // A group picked under "What do you want Hermes to do?": line G1 with the group's rows to pick.
 // Not a question, so lastq stays false (helper-wants-v1.md 6.3).
-export function pickGroup(group, st) {
+function pickGroupSteps(group, st) {
   st.pending = null
   st.lastq = false
   return { kind: 'G1', group, buttons: WROWS.filter(r => r.group === group).map(r => r.id) }
 }
 // A row picked (under G1, N2 or "Which one do you mean?"): its line and its button. No key words.
-export function pickWant(id, st) {
+function pickWantSteps(id, st) {
   st.pending = null
   st.lastq = false
   return { kind: 'want', row: id }
 }
 
 // An answer under "Do you mean me, or your own Hermes?" (RM2): 'helper' or 'hermes'.
-export function rmPick(who, st) {
+function rmPickSteps(who, st) {
   st.lastq = false
   if (who === 'helper') return { kind: 'RM3' }
-  return press('mem', st.rmText || '', st)
+  return pressSteps('mem', st.rmText || '', st)
 }
 
 // Skip, at "What's your name?" or "What do you do?". A name given before Skip is kept now.
+// changes-14: a pressed Skip is remembered (met). changes-15: a name given before Skip was written at F1.
 export function skip(st) {
   if (st.stage !== 'name' && st.stage !== 'work') return null
   st.stage = 'open'
   st.lastq = false
   st.pending = null
+  st.met = true
   const out = { kind: 'F3' }
-  if (st.name) keep(st, out, 'name', st.name)
+  noteLast(st, out)
+  if (st.name && st.kept.name !== st.name) keep(st, out, 'name', st.name)
   return out
 }
 
 // A button that makes Helper say one more pre-written line.
-export function sayLine(line, st) {
+function sayLineSteps(line, st) {
   st.lastq = false
   st.pending = null
   return { kind: 'extra', line }
 }
 
 // "See what I keep" pressed where Helper's settings page cannot open: the list, as for A1.
-export const seeKept = st => aboutKept({ kind: 'A1' }, st)
+export const seeKept = st => noteLast(st, aboutKept({ kind: 'A1' }, st))
 // "Delete all of it" under that list: the A4 question.
-export const askForgetAll = st => aboutKept({ kind: 'A4' }, st)
+export const askForgetAll = st => noteLast(st, aboutKept({ kind: 'A4' }, st))
 
 // Yes or No under "Delete your name?" (what: name, mod, msg, svc, asked) or "Delete everything I
 // keep about you?" (what: 'all'). Yes deletes from the visit's record; the page then writes it.
 // When nothing is left, the whole record goes, told as well (keeps.storage), so the first-time
 // line shows again at the next keep. A forgotten name is not used again in this visit either.
-export function forgetAnswer(what, yes, st) {
+function forgetAnswerSteps(what, yes, st) {
   st.lastq = false
   st.pending = null
   if (!yes) return { kind: 'A-no', what }
@@ -811,6 +1063,19 @@ export function forgetAnswer(what, yes, st) {
   if (what === 'all' || what === 'name') st.name = null
   return { kind: 'A-yes', what }
 }
+
+// changes-14/15 (route2.py conv: note_last after a pick or a button): Helper's last line, whatever led to it.
+// Every pick and button below notes its line; st is each one's last argument.
+const noted = fn => (...a) => noteLast(a[a.length - 1], fn(...a))
+export const pick = noted(pickSteps)
+export const pickTopic = noted(pickTopicSteps)
+export const change = noted(changeSteps)
+export const press = noted(pressSteps)
+export const pickGroup = noted(pickGroupSteps)
+export const pickWant = noted(pickWantSteps)
+export const rmPick = noted(rmPickSteps)
+export const sayLine = noted(sayLineSteps)
+export const forgetAnswer = noted(forgetAnswerSteps)
 
 /* ---------- from a result to what Helper says ---------- */
 const fillSlots = (text, slots) => text.replace(/\{(\w+)\}/g, (m, k) => (slots[k] != null ? String(slots[k]) : m))
@@ -935,24 +1200,18 @@ export function noteForgotten(note, kept) {
   return items.length > 0 && !items.some(item => stillKept(kept, item))
 }
 
-// The opening line. On a later visit (stage open: a name is kept, src/talk.js laterVisit) the opening's
-// question is not asked. With the kept name, Helper greets by it with the data's one line for a person it
-// knows, NAME_AGAIN ("Hi again, {name}. Ask me anything about Hermes."; talk v2 look, point 7: hhtech saw no
-// name). changes-14's BACK line, written for exactly this, is not ported here (Lead, 11 Nov 00:35).
-// Without a name: the opening line without its question.
+// The opening line. changes-14 (keeps.met): when the window opens on a visit whose met mark is set, Helper says
+// BACK ("Hi again, {name}. What would you like Hermes to help you with?", or without the name) and asks no
+// opening question; else OPEN with "What's your name?". With no visit: OPEN's line (for the tests).
 export function openingLine(st = null) {
-  const said = { line: 'OPEN', text: FIXED.OPEN.text, source: null, answers: null, next: null, paste: null, note: null, used: null, hint: null, rows: null, docs: null }
-  if (st && st.stage === 'open') {
-    const name = st.kept && st.kept.name
-    if (name) return { ...said, line: 'OPEN-again', text: fillSlots(FIXED.NAME_AGAIN.text, { name }) }
-    return { ...said, line: 'OPEN-again', text: FIXED.OPEN.text.replace(/\s*[^.?]*\?\s*$/, '') }
-  }
-  return said
+  if (!st) return lineFor({ kind: 'OPEN' }, freshVisit('name'))
+  return lineFor(opening(st), st)
 }
 
 // result: what turn, pick, pickTopic, press, skip, sayLine, change, rmPick or forgetAnswer
 // returned. typed: the person's words (for the text to paste under "your own Hermes can").
-// opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it).
+// opts.settingsPage: Helper's page in Hermes's Settings exists (A1 then offers it). opts.keptShown: the
+// conversation already shows a "Kept:" or "From what I keep:" line (A1 with nothing kept then says it was deleted).
 // Returns { line, text, source, answers, next, paste, note, used, hint, rows, docs }:
 //   docs: the box "From the Hermes docs" { head, words, source } (S1, S2), the page's own words;
 //   next may also be { kind: 'steps', label, steps, after } (the clicks to add an optional skill);
@@ -969,10 +1228,33 @@ export function lineFor(result, st, typed = '', opts = {}) {
   switch (result.kind) {
     case 'K1':
       return said('K1', FIXED.K1.text)
-    case 'H1': {
+    case 'H1':
+    case 'H2': {
+      // changes-16: H2 ("can it build ...?") has its own text to paste, filled the same way as H1's
       const request = Array.from(String(typed).trim()).slice(0, TALK_DATA.limits.request_chars_in_paste).join('').replace(/"/g, "'")
-      return said('H1', FIXED.H1.text, { paste: fillSlots(FIXED.H1.paste_text, { request }) })
+      return said(result.kind, FIXED[result.kind].text, { source: FIXED[result.kind].source || null, paste: fillSlots(FIXED[result.kind].paste_text, { request }) })
     }
+    case 'OPEN':
+      return said('OPEN', FIXED.OPEN.text)
+    // changes-14: a later visit (BACK) and a hello greet by the kept name, or without one
+    case 'BACK':
+    case 'HELLO': {
+      const f = FIXED[result.kind]
+      return said(result.kind, result.name ? fillSlots(f.text, { name: result.name }) : f.text_no_name || f.text)
+    }
+    // changes-14/15: ordinary talk and the lines no_repeat puts in place of a repeat: one line, nothing to pick
+    case 'HELLO_SAME':
+    case 'THANKS':
+    case 'OK':
+    case 'HOW':
+    case 'WHO':
+    case 'AI':
+    case 'BYE':
+    case 'CUT':
+    case 'MEAN_NONE':
+    case 'WRONG':
+    case 'AGAIN':
+      return said(result.kind, FIXED[result.kind].text)
     case 'F1':
       return said('F1', named(FIXED.F1))
     case 'F2':
@@ -984,6 +1266,7 @@ export function lineFor(result, st, typed = '', opts = {}) {
     case 'N1':
     case 'N1a':
     case 'N1b':
+    case 'N1_AGAIN': // changes-15: in place of a second don't-know line, the faint hint under it as under N1
       return dontKnowLine(result.kind)
     case 'skill by name':
       // an official skill asked about by its name that the skill step did not settle (two at once)
@@ -1039,7 +1322,8 @@ export function lineFor(result, st, typed = '', opts = {}) {
       if (result.serviceLine && result.serviceLine.line === 'S1') return { ...skillLine(result.serviceLine.skill, said), used }
       if (result.serviceLine) {
         const f = WANTS_DATA.fixed[result.serviceLine.line]
-        return said(result.serviceLine.line, f.text, { source: sourceText(f.sources), used })
+        // changes-16: CN2 names the service it was asked about ({service}: Google Calendar or Google Drive)
+        return said(result.serviceLine.line, fillSlots(f.text, { service: st.service }), { source: sourceText(f.sources), used })
       }
       return said(n.id, n.text, { source: n.source, next: nextFor(n.next, result.topic, st), used })
     }
@@ -1057,7 +1341,9 @@ export function lineFor(result, st, typed = '', opts = {}) {
       return said('RM2', RM.RM2.text, { answers: { kind: 'question', hint: TALK_DATA.answers.hint_under_question, items: RM.RM2.answers.map(a => ({ id: `rm-${a.gives}`, label: a.label, rm: a.gives === 'RM3' ? 'helper' : 'hermes' })) } })
     case 'A1': {
       const rows = keptRows(st.kept)
-      if (!rows.length) return said('A1-none', KEEPS.tell.see.see_line_nothing)
+      // helper-builder-qs-v1.md point 3: nothing kept, and this conversation already shows a "Kept:" or "From
+      // what I keep:" line (opts.keptShown, from the page): it was deleted. Else nothing was kept yet.
+      if (!rows.length) return opts.keptShown ? said('A1-deleted', KEEPS.tell.see.see_line_deleted) : said('A1-none', KEEPS.tell.see.see_line_nothing)
       // with Helper's settings page: its button, and under the list the way there by hand
       const next = opts.settingsPage ? { kind: 'settings', label: KEEPS.after_settings_page_exists.button_under_see } : { kind: 'forget-all', label: ALL.label }
       return said('A1', KEEPS.tell.see.see_line, { rows, next, hint: opts.settingsPage ? KEEPS.after_settings_page_exists.by_hand : null })

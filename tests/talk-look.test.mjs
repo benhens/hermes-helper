@@ -7,7 +7,8 @@ import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, spoken, byData } from './lib/render.mjs'
 import { TALK_DATA } from '../src/talk-data.js'
 import { T, K } from '../src/look.js'
-import { curlyQuotes } from '../src/quotes.js'
+import { curlyQuotes, namesWhole, NAME_WHOLE_MAX } from '../src/quotes.js'
+import { WANTS_DATA } from '../src/wants-data.js'
 import { columnsFor, linesAllowed, FOUR_TWO_LINES_PX } from '../src/layout.js'
 import { turn, freshVisit, lineFor } from '../src/talk.js'
 import { renderKept } from '../src/settings-file.js'
@@ -53,25 +54,79 @@ beforeEach(() => {
 
 /* ---------- point 4: quote marks ---------- */
 
-test('curlyQuotes: a pair of straight double quotes becomes curly; a lone one stays; nothing else changes', () => {
+test('curlyQuotes: a pair of straight double quotes becomes curly; a lone one stays; an apostrophe between letters becomes ’ (d1ceddc review, 3.3); nothing else changes', () => {
   assert.equal(curlyQuotes('open "Bots", then "New bot".'), 'open “Bots”, then “New bot”.')
   assert.equal(curlyQuotes('a "lone one'), 'a "lone one')
-  assert.equal(curlyQuotes('it\'s 5" tall and "x"'), 'it\'s 5“ tall and ”x"')
+  assert.equal(curlyQuotes('it\'s 5" tall and "x"'), 'it’s 5“ tall and ”x"')
   assert.equal(curlyQuotes('no quotes'), 'no quotes')
   assert.equal(curlyQuotes(null), null)
+  // apostrophes: only between two letters (any alphabet); at a word's edge or by a digit it stays straight
+  assert.equal(curlyQuotes("That's fine. I'm Helper. Helper's page. Don't."), 'That’s fine. I’m Helper. Helper’s page. Don’t.')
+  assert.equal(curlyQuotes("the '90s, 5' tall, rock 'n' roll, 'quoted', Zoë's"), "the '90s, 5' tall, rock 'n' roll, 'quoted', Zoë’s")
 })
 
-test('every Helper line drawn in the bubble and the older lines has no straight pair left, while the data keeps its own', async () => {
+test('a name in curly marks with no space in it stays on one line with its marks (d1ceddc review, 3.1); a name with a space, or longer than the limit, wraps as before', () => {
+  const parts = namesWhole(curlyQuotes('It teaches Hermes to sort mail. Its name is "email-inbox-triage", built in.'))
+  assert.deepEqual(parts, ['It teaches Hermes to sort mail. Its name is ', { whole: '“email-inbox-triage”' }, ', built in.'])
+  assert.deepEqual(namesWhole('click “+”, then save'), ['click ', { whole: '“+”' }, ', then save'])
+  assert.equal(namesWhole('click “New bot”'), null, 'a name with a space is left alone')
+  assert.equal(namesWhole('plain words'), null)
+  const long = 'x'.repeat(NAME_WHOLE_MAX + 1)
+  assert.equal(namesWhole(`“${long}”`), null, 'longer than the limit: wraps as before')
+  // every one of the 186 skill names is within the limit (the longest has 31 characters)
+  assert.equal(Math.max(...WANTS_DATA.skills.map(s => s.name.length)), 31)
+  assert.ok(WANTS_DATA.skills.every(s => Array.from(s.name).length <= NAME_WHOLE_MAX))
+})
+
+test('in the window: a skill named by name keeps its name whole in the bubble and in the older line; the person\'s own words are left as typed', async () => {
+  const { view } = await pastOpening()
+  send(view, 'what\'s the "email-inbox-triage" skill')
+  const whole = n => all(n, x => x.props && x.props['data-hh'] === 'name-whole').map(x => [x.props.style.whiteSpace, text(x)])
+  assert.deepEqual(whole(bubble(view)), [['nowrap', '“email-inbox-triage”']])
+  const me = conversation(view).filter(c => c.props['data-hh'] === 'me').at(-1)
+  assert.match(text(me), /what's the "email-inbox-triage" skill/)
+  assert.deepEqual(whole(me), [])
+  send(view, 'thanks')
+  const old = conversation(view).filter(c => c.props['data-hh'] === 'old').at(-1)
+  assert.deepEqual(whole(old), [['nowrap', '“email-inbox-triage”']])
+})
+
+test('apostrophes: drawn curly in Helper\'s lines; straight in the text to paste, the person\'s words, the "Kept:" line, the settings box and what is stored', async () => {
+  const { view, storage } = await pastOpening()
+  send(view, 'remember that my club\'s courts are clay')
+  const me = conversation(view).filter(c => c.props['data-hh'] === 'me').at(-1)
+  assert.match(text(me), /my club's courts/)
+  const note = conversation(view).filter(c => c.props['data-hh'] === 'kept-note').at(-1)
+  assert.match(text(note), /club's/)
+  assert.deepEqual(storage.data.get('kept').asked, ["my club's courts are clay"])
+  send(view, 'please make me a website for my club\'s members')
+  const paste = byData(bubble(view), 'paste')
+  assert.ok(paste)
+  assert.match(text(byData(paste, 'paste-text')), /my club's members/)
+  assert.doesNotMatch(text(byData(paste, 'paste-text')), /’/)
+  // the settings box
+  const reg = await registerPlugin(fakeStorage({ kept: storage.data.get('kept') }), fakeTimers())
+  const page = mount(reg.settingsPages[0].render().type)
+  const tb = byData(all(page.tree, n => n.type === 'sdk:ListRow')[0].props.below, 'settings-box')
+  assert.match(tb.props.value, /club's/)
+  // and Helper's own lines draw what the data keeps straight
+  const st = freshVisit('name')
+  for (const s of [lineFor({ kind: 'F3' }, st).text, TALK_DATA.fixed.H1.text]) assert.match(s, /\p{L}'\p{L}/u, 'the data keeps its straight ones')
+})
+
+test('every Helper line drawn in the bubble and the older lines has no straight pair left, and no straight apostrophe between letters, while the data keeps its own', async () => {
   const { view } = await pastOpening()
   const seen = []
-  for (const w of ['second bot for work', 'what can I ask', 'is there a github skill', 'what does the dspy skill do', 'tell me a joke', 'can it read my gmail', 'what do you know about me']) {
+  for (const w of ['second bot for work', 'what can I ask', 'is there a github skill', 'what does the dspy skill do', 'tell me a joke', 'can it read my gmail', 'what do you know about me', 'he', 'how do i']) {
     send(view, w)
     if (button(view) && button(view).props['data-kind'] === 'steps') click(button(view))
     seen.push(said(view), text(bubble(view)))
   }
   for (const c of conversation(view).filter(c => c.props['data-hh'] === 'old')) seen.push(text(c))
   assert.ok(seen.some(s => /“/.test(s)), 'some line had quote marks to curl')
+  assert.ok(seen.some(s => /\p{L}’\p{L}/u.test(s)), 'some line had an apostrophe to curl')
   for (const s of seen) assert.doesNotMatch(s, STRAIGHT_PAIR, s)
+  for (const s of seen) assert.doesNotMatch(s, /\p{L}'\p{L}/u, s)
   assert.match(TALK_DATA.parts.bots.where_line.text, STRAIGHT_PAIR, 'the data is not changed')
 })
 
@@ -202,7 +257,8 @@ test('rule A, B, C and items 3 and 7 in the style sheet, with hhdesign\'s values
 test('the text to paste inside the bubble wears its own classes; the setup card\'s stays as it was', () => {
   assert.equal(K.bubblePaste, 'flex w-full min-w-0 items-start gap-2 rounded-md border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) py-1.5 pl-2.5 pr-1.5')
   assert.match(K.bubblePasteText, /font-mono text-xs leading-4\.5 text-\(--ui-text-secondary\)/)
-  assert.match(K.bubblePasteTextOld, /font-mono text-\[11px\] leading-4/)
+  // builder-qs (Lead, 11 Nov 00:55): text to paste at least 12 px, in an older line too
+  assert.match(K.bubblePasteTextOld, /font-mono text-xs leading-4\.5 text-\(--ui-text-secondary\)/)
   assert.equal(K.cardPaste, 'flex min-w-0 items-center gap-1.5 rounded-md bg-(--ui-bg-quinary) px-1.5 py-0.5')
   assert.equal(K.cardPasteText, 'wrap-anywhere min-w-0 flex-1 font-mono text-[0.65rem] text-(--ui-text-tertiary)')
 })

@@ -175,8 +175,8 @@ export function wantsProblems(W, talk, skillsList, docs) {
     if (v.line === 'S1') {
       const s = byName.get(v.skill)
       if (!s || s.kind !== 'built_in') fail(`service line ${service}: ${v.skill} is not a built-in skill on the page`)
-    } else if (v.line !== 'CN1') fail(`service line ${service}: ${v.line} is not CN1 or S1 (the code shows only these two)`)
-    else if (!fixed.some(f => f.id === 'CN1')) fail(`service line ${service}: the fixed line CN1 is missing`)
+    } else if (!['CN1', 'CN2'].includes(v.line)) fail(`service line ${service}: ${v.line} is not CN1, CN2 or S1 (the code shows only these)`)
+    else if (!fixed.some(f => f.id === v.line)) fail(`service line ${service}: the fixed line ${v.line} is missing`)
   }
   // Builder: no {slot} shown unfilled. Helper fills only {name} and {say}, only in S1 and S2 (their line,
   // clicks and after; {say} from the skill's own say, checked in skillLineProblems); the docs box's words
@@ -185,7 +185,8 @@ export function wantsProblems(W, talk, skillsList, docs) {
   const said = []
   for (const w of rows) said.push([w.id, w.text], [w.id, w.label], ...Object.values(pickKeysShallow(w.next || {})).flat().map(x => [w.id, x]))
   for (const f of fixed) {
-    const filled = ['S1', 'S2'].includes(f.id) ? s => String(s).replace(/\{name\}/g, '').replace(/\{say\}/g, '') : s => s
+    // changes-16: CN2's {service} is the service code that led to it (service_lines), filled by Helper
+    const filled = ['S1', 'S2'].includes(f.id) ? s => String(s).replace(/\{name\}/g, '').replace(/\{say\}/g, '') : f.id === 'CN2' ? s => String(s).replace(/\{service\}/g, '') : s => s
     said.push([f.id, filled(f.text)], ...Object.values(pickKeysShallow(f.next || {})).flat().map(x => [f.id, filled(x)]))
     // skill lines v1: the old sentence, said when a skill's say is null; it has only {name}
     if (f.text_fixed !== undefined) said.push([f.id + ' text_fixed', String(f.text_fixed).replace(/\{name\}/g, '')])
@@ -270,7 +271,7 @@ export function slimWantsData(W, skillsList) {
   const left = new Set(((skillsList && skillsList.skills) || []).filter(s => s.left_out).map(s => s.name))
   const fixed = Object.fromEntries(
     W.fixed_lines
-      .filter(f => ['N2', 'G1', 'S1', 'S2', 'box-head', 'CN1'].includes(f.id))
+      .filter(f => ['N2', 'G1', 'S1', 'S2', 'box-head', 'CN1', 'CN2'].includes(f.id))
       .map(f => [f.id, { ...pickKeys(f, ['text', 'text_fixed', 'sources']), ...(f.next ? { next: pickKeys(f.next, ['kind', 'label', 'steps', 'after']) } : {}) }])
   )
   const wf1 = W.skill_name_rule_wf1 || {}

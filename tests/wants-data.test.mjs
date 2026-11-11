@@ -23,13 +23,13 @@ const copy = o => JSON.parse(JSON.stringify(o))
 const problems = (w = W, t = TALK, s = SKILLS, d = DOCS) => wantsProblems(w, t, s, d)
 const row = (w, id) => w.wants.find(r => r.id === id)
 
-test('the team\'s wants data passes every check: 24 rows in four groups, 186 skills, five of them left out', () => {
+test('the team\'s wants data passes every check: 26 rows in four groups (changes-16: w_stt, w_meme), 186 skills, five of them left out', () => {
   assert.deepEqual(problems(), [])
-  assert.equal(W.wants.length, 24)
-  assert.deepEqual(W.groups.map(g => [g.id, W.wants.filter(r => r.group === g.id).length]), [['web', 8], ['files', 7], ['pics', 6], ['voice', 3]])
+  assert.equal(W.wants.length, 26)
+  assert.deepEqual(W.groups.map(g => [g.id, W.wants.filter(r => r.group === g.id).length]), [['web', 8], ['files', 7], ['pics', 7], ['voice', 4]])
   assert.equal(W.skills.length, 186)
   assert.deepEqual(WANTS_DATA.skills.filter(s => s.left_out).map(s => s.name).sort(), ['godmode', 'obliteratus', 'scrapling', 'sherlock', 'web-pentest'])
-  assert.equal(WANTS_DATA.rows.length, 24)
+  assert.equal(WANTS_DATA.rows.length, 26)
 })
 
 // Each breakage must stop the build with a reason that names it.
@@ -48,7 +48,7 @@ const BREAKS = [
   ['a built-in row for an optional skill', w => (row(w, 'w_pdf').kind = 'optional_skill'), /w_pdf: built in \/ optional differs from the page/],
   ['a row for a skill on neither page', w => ((row(w, 'w_pdf').thing = 'pdf-maker'), (row(w, 'w_pdf').text = row(w, 'w_pdf').text.replace('"pdf"', '"pdf-maker"'))), /w_pdf: names a skill that is on neither page/],
   ['a skill row whose line does not name it as the page does', w => (row(w, 'w_pdf').text = row(w, 'w_pdf').text.replace('"pdf"', '"PDF"')), /w_pdf: line does not name the skill/],
-  ['a group of nine rows', w => { for (const id of ['w_docs', 'w_pdf']) row(w, id).group = 'voice'; for (const id of ['w_office', 'w_notes', 'w_meeting', 'w_code']) row(w, id).group = 'voice' }, /group voice has 9 rows, over 8/],
+  ['a group of nine rows', w => { for (const id of ['w_docs', 'w_pdf']) row(w, id).group = 'voice'; for (const id of ['w_office', 'w_notes', 'w_meeting']) row(w, id).group = 'voice' }, /group voice has 9 rows, over 8/],
   ['five groups', w => w.groups.push({ id: 'look', label: 'Look something up', subject_words: [] }), new RegExp(`5 groups: more than ${MAX_GROUPS}|group look has no rows`)],
   ['two rows with the same key word', w => row(w, 'w_aloud').key_words.push('voice mode'), /key word 'voice mode' in w_voice and w_aloud/],
   ['two rows with the same thing and action', w => row(w, 'w_pdf').actions.push('read'), /collision w_docs \/ w_pdf: things pdf,pdfs with actions read/],
@@ -61,7 +61,7 @@ const BREAKS = [
   ['a group answer missing under can-q', w => w.topic.question.answers.pop(), /can-q's answers are not the groups/],
   ['a fixed line the code says is missing', w => (w.fixed_lines = w.fixed_lines.filter(f => f.id !== 'G1')), /fixed line G1 is missing/],
   ['GitHub\'s line names a skill that is not built in', w => (w.service_lines.GitHub = 'S1 with the built-in skill stocks'), /service line GitHub: stocks is not a built-in skill/],
-  ['a service line the code does not show', w => (w.service_lines.Gmail = 'N2'), /service line Gmail: N2 is not CN1 or S1/],
+  ['a service line the code does not show', w => (w.service_lines.Gmail = 'N2'), /service line Gmail: N2 is not CN1, CN2 or S1/],
   ['a {slot} in a row\'s text to paste', w => (row(w, 'w_web').next.paste_text = 'Search the web for {topic}.'), /w_web: a \{slot\} Helper does not fill/],
   ['a {slot} other than {name} in S2\'s after line', w => (w.fixed_lines.find(f => f.id === 'S2').next.after = 'It works from your next {when}.'), /S2: a \{slot\} Helper does not fill/],
   ['an optional row with no clicks', w => (row(w, 'w_reddit').next.steps = []), /w_reddit: clicks with no steps or no after line/],
@@ -132,6 +132,6 @@ test('the plugin\'s copy of the wants data is the team\'s at the checksum this j
 test('the code gets only what it reads: no notes, no hints for a model, no screenshots\' paths; the service lines as data', () => {
   const text = JSON.stringify(slimWantsData(W, SKILLS))
   for (const k of ['model_hint', '"seen"', '"shot"', 'card_says', '"why"', '"status"', '"under"', 'hhtech', 'hhcontent', 'Builder']) assert.ok(!text.includes(k), k)
-  assert.deepEqual(serviceLines(W), { Gmail: { line: 'CN1' }, 'Google Calendar': { line: 'CN1' }, 'Google Drive': { line: 'CN1' }, GitHub: { line: 'S1', skill: 'github' } })
+  assert.deepEqual(serviceLines(W), { Gmail: { line: 'CN1' }, 'Google Calendar': { line: 'CN2' }, 'Google Drive': { line: 'CN2' }, GitHub: { line: 'S1', skill: 'github' } })
   assert.deepEqual(WANTS_DATA, slimWantsData(W, SKILLS))
 })

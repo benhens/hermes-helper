@@ -134,7 +134,11 @@ export const WANTS_DATA = {
         "find",
         "research",
         "check",
-        "browse"
+        "browse",
+        "look stuff up",
+        "looks stuff up",
+        "look things up",
+        "looks things up"
       ],
       "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
       "sources": [
@@ -743,12 +747,22 @@ export const WANTS_DATA = {
         "what is in",
         "what's in"
       ],
-      "text": "Hermes can look at a picture you give it. This is built in. The AI you use must be able to read pictures.",
+      "text": "Hermes can look at a picture you give it. This is built in. If your AI reads only text, another AI describes it.",
       "sources": [
         {
           "file": "user-guide/features/vision.md",
           "line": 10,
           "quote": "any vision-capable model can process them"
+        },
+        {
+          "file": "user-guide/features/vision.md",
+          "line": 204,
+          "quote": "an auxiliary vision model describes the image, and the text description is injected into the conversation"
+        },
+        {
+          "file": "user-guide/features/vision.md",
+          "line": 206,
+          "quote": "You don't configure this"
         },
         {
           "file": "user-guide/features/tools.md",
@@ -932,6 +946,43 @@ export const WANTS_DATA = {
       }
     },
     {
+      "id": "w_meme",
+      "group": "pics",
+      "label": "Make memes",
+      "kind": "optional_skill",
+      "thing": "meme-generation",
+      "key_words": [
+        "meme",
+        "memes"
+      ],
+      "things": [],
+      "actions": [],
+      "text": "There is an optional skill, \"meme-generation\". You add it first. Its written steps teach Hermes to put text on known meme pictures.",
+      "sources": [
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 81,
+          "quote": "Create meme PNGs from templates with Pillow text overlay."
+        },
+        {
+          "file": "reference/optional-skills-catalog.md",
+          "line": 9,
+          "quote": "Install them explicitly"
+        }
+      ],
+      "next": {
+        "kind": "steps",
+        "label": "Show me how to add it",
+        "steps": [
+          "In the Hermes app, click \"Capabilities\", then the \"Skills\" tab.",
+          "Click \"Source\", then pick \"Optional\".",
+          "Find the card \"meme-generation\". If it is not there, scroll down and click \"Show more\". Do it again until you see it.",
+          "Click the card, then click \"Install\"."
+        ],
+        "after": "It works from your next new chat, not this one."
+      }
+    },
+    {
       "id": "w_voice",
       "group": "voice",
       "label": "Talk to it out loud",
@@ -1018,6 +1069,61 @@ export const WANTS_DATA = {
         "kind": "paste",
         "label": "Show me what to ask",
         "paste_text": "Please read your next answer out loud. If speech is not ready, tell me what it needs."
+      }
+    },
+    {
+      "id": "w_stt",
+      "group": "voice",
+      "label": "Turn voice notes into text",
+      "kind": "built_in",
+      "thing": "voice message transcription (speech-to-text)",
+      "key_words": [
+        "voice note",
+        "voice notes",
+        "voice memo",
+        "voice memos",
+        "transcribe",
+        "transcription",
+        "speech to text",
+        "speech-to-text"
+      ],
+      "things": [
+        "voice note",
+        "voice notes",
+        "voice message",
+        "voice messages",
+        "voice memo",
+        "voice memos",
+        "recording",
+        "recordings",
+        "audio"
+      ],
+      "actions": [
+        "into text",
+        "to text",
+        "transcribe",
+        "transcribes",
+        "write out",
+        "type out",
+        "write down"
+      ],
+      "text": "Hermes turns voice messages from Telegram or WhatsApp into text by itself. This is built in.",
+      "sources": [
+        {
+          "file": "user-guide/features/tts.md",
+          "line": 13,
+          "quote": "supports both text-to-speech output and voice message transcription"
+        },
+        {
+          "file": "user-guide/features/tts.md",
+          "line": 496,
+          "quote": "Voice messages sent on Telegram, Discord, WhatsApp, Slack, or Signal are automatically transcribed and injected as text into the conversation."
+        }
+      ],
+      "next": {
+        "kind": "paste",
+        "label": "Show me what to ask",
+        "paste_text": "I want to send you voice messages and have them turned into text. Please tell me what that needs here. Ask me before you change anything."
       }
     },
     {
@@ -1278,6 +1384,21 @@ export const WANTS_DATA = {
           "quote": "The desktop app's **Connectors** page."
         }
       ]
+    },
+    "CN2": {
+      "text": "The Hermes app links apps such as Gmail through its \"Connectors\" page. To see if {service} is there, click \"Capabilities\", then the \"Connectors\" tab.",
+      "sources": [
+        {
+          "file": "user-guide/features/tool-gateway.md",
+          "line": 124,
+          "quote": "Connectors are hosted apps such as Gmail that the agent reaches through the Nous tool gateway"
+        },
+        {
+          "file": "user-guide/features/tool-gateway.md",
+          "line": 139,
+          "quote": "The desktop app's **Connectors** page."
+        }
+      ]
     }
   },
   "service_lines": {
@@ -1285,10 +1406,10 @@ export const WANTS_DATA = {
       "line": "CN1"
     },
     "Google Calendar": {
-      "line": "CN1"
+      "line": "CN2"
     },
     "Google Drive": {
-      "line": "CN1"
+      "line": "CN2"
     },
     "GitHub": {
       "line": "S1",

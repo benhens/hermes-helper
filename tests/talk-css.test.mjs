@@ -135,3 +135,14 @@ test('the piece between bubble and character is placed by rules alone: its cell 
   assert.equal(168 / 200, 0.84)
   assert.equal(132 / 200, 0.66)
 })
+
+// hhdesign's review of d1ceddc, 3.2: the first-time line under "Kept:" is about privacy, so it takes the secondary
+// text colour in both themes (the faint tertiary measured 3.5:1 in light); "Kept: ... See what I keep" stays faint.
+test('the first-time line under "Kept:" in Helper\'s window is in --ui-text-secondary; the "Kept:" line itself stays in --ui-text-tertiary', () => {
+  const rules = sel => TALK_CSS.split('\n').filter(r => r.startsWith(sel + '{'))
+  const colours = sel => rules(sel).flatMap(r => [...r.matchAll(/(?:^|[;{])color:([^;}]+)/g)].map(m => m[1]))
+  assert.deepEqual(colours('.hh-note-first'), ['var(--ui-text-secondary)'])
+  assert.deepEqual(colours('.hh-note'), ['var(--ui-text-tertiary)'])
+  // no rule for a theme of its own: the same variable serves dark and light
+  assert.doesNotMatch(TALK_CSS, /\.dark[^{\n]*\.hh-note-first/)
+})

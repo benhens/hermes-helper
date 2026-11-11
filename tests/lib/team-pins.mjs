@@ -1,10 +1,9 @@
-// The team's files this build was made from, pinned at the checksums the job names (Lead, talk v2 wants
+// The team's files this build was made from, pinned at the checksums the team named (Lead, talk v2 wants
 // fixes: "if the files on disk no longer match the checksums this job names, take them at the checksums
-// this job names"). hhcontent changed helper-talk-v2.json and route2.py again after the wants fixes
-// (content/helper-builder-qs-v1.md, 23:45 UTC), and the changes-14 job will change them once more; those
-// are ported in a later job. So a test compares the plugin's copy with the pin, checks that the pin is a
-// checksum the team named (in its note, or its own "before" copy), and only reports when the team's file
-// on disk has moved on since.
+// this job names"). builder-qs + changes-14 to -18 (11 Nov 2026): each file at the newest checksum the team
+// named for it; the talk data at changes-18's. A test compares the plugin's copy with the pin, checks that
+// the pin is a checksum the team named (in its note, or its own "before" copy), and only reports when the
+// team's file on disk has moved on since.
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
@@ -14,16 +13,14 @@ const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).di
 
 // file (in the team's folder) -> [the pinned sha256, where the team names it]
 export const PINS = {
-  'content/helper-talk-v2.json': ['e3c4666a33109960cb6304337530b4cf859eda170f97a1738ddce76e5098589b', 'content/helper-wants-fixes-v1.md'],
-  'content/helper-wants-v1.json': ['6cc374ef4d754e8b1e59d3206be946169e2413b887d04755565c2c83c0b82b4a', 'content/helper-skill-lines-v1.md'],
+  'content/helper-talk-v2.json': ['4899a0ae3643d9efc67308e5dde65c77c0be04506ef067344597650107e45f57', 'content/helper-talk-v2-changes-18.md'],
+  'content/helper-wants-v1.json': ['bb195263a1d70d2f468ed2de691ec872f39deac841e3c948eca13b84f8277956', 'content/helper-talk-v2-changes-16.md'],
   'content/skills-list-v1.json': ['b4102198861acf29e663a6afbc63fd4a473d876d616ada84891dcbf05a6b53d0', 'content/helper-skill-lines-v1.md'],
-  'dev/checks/hhcontent-talk-v2/route2.py': ['46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368', 'content/helper-wants-fixes-v1.md'],
-  'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a', 'content/helper-wants-fixes-v1.md'],
-  // hhcontent's changes-14 job (started 00:30 UTC) changes check.py too: kept as it was, hhcontent's own
-  // "before" copy of that job
-  'dev/checks/hhcontent-talk-v2/check.py': ['83c807fdac78a1579386e03a8006f2d3c3afcd87dd536b6f323b4d04dce2de2f', 'dev/checks/hhcontent-changes-14/before/check.py'],
-  // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs): changes-14 changes it
-  'content/helper-keeps-v1.md': ['80ebe181341055d633fc469ce44495bf2130e15166f8ce765ebfeff40bb6140a', 'dev/checks/hhcontent-changes-14/before/helper-keeps-v1.md'],
+  'dev/checks/hhcontent-talk-v2/route2.py': ['3af440269b7f405d1e56136bd8b76597451b19955f41d52956cb14cf153af95c', 'content/helper-talk-v2-changes-17.md'],
+  'dev/checks/hhcontent-wants-fixes/wants_fixes_step.py': ['87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e', 'content/helper-talk-v2-changes-16.md'],
+  'dev/checks/hhcontent-talk-v2/check.py': ['73aabccdeb8f7540e3699ef377ccfb74cf0366c5541f38dcf01f06beab146623', 'content/helper-talk-v2-changes-14.md'],
+  // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs)
+  'content/helper-keeps-v1.md': ['0b2563a8e2772d5b918af6bef73cb53af74ce0840b359151a3689c5168a311f4', 'content/helper-talk-live-v2.md'],
   // changes-12 and -13 (the secret rule), ported in the look job: settings_read.py and tests.json at
   // changes-12's checksums, secret_rule.py and refuse_tests.py at changes-13's
   'dev/checks/hhcontent-settings-edit/settings_read.py': ['23b0ea4ea4ffba0ec22e335ad251c987da2b7137172b88056239f44387eb9bee', 'content/helper-talk-v2-changes-12.md'],

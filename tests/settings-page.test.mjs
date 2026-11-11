@@ -6,9 +6,11 @@
 // Builder, 10 Nov 2026.
 import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, byData } from './lib/render.mjs'
 import { TALK_DATA } from '../src/talk-data.js'
 import { renderKept } from '../src/settings-file.js'
+import { curlyQuotes } from '../src/quotes.js'
 
 const SF = TALK_DATA.keeps.settings_file
 
@@ -60,12 +62,12 @@ test('the page: hhcontent\'s top line, the box drawn from the stored record with
   assert.match(box(view).props.value, /^Name: Peter \(Helper greets you with it\)$/m)
   assert.equal(box(view).props.placeholder, SF.empty)
   assert.equal(box(view).props.spellCheck, false)
-  for (const l of SF.under_box) assert.ok(text(inside(view)).includes(l), l)
+  for (const l of SF.under_box) assert.ok(text(inside(view)).includes(curlyQuotes(l)), l)
   assert.equal(shown(view, 'save'), 'Save')
   assert.equal(shown(view, 'undo'), 'Undo changes')
   assert.equal(find(view, 'save').type, 'sdk:Button')
-  assert.ok(shown(view, 'facts').includes(SF.also_tell))
-  for (const f of SF.facts) assert.ok(shown(view, 'facts').includes(f), f)
+  assert.ok(shown(view, 'facts').includes(curlyQuotes(SF.also_tell)))
+  for (const f of SF.facts) assert.ok(shown(view, 'facts').includes(curlyQuotes(f)), f)
   // no AI step: neither "Only your name goes to your AI" nor "already sent to your AI"
   assert.doesNotMatch(text(inside(view)), /your AI/)
   // an empty record: the empty line as the box's hint, and no "Forget all of this"
@@ -96,7 +98,7 @@ test('a line that cannot be read: nothing saved, the box stays as typed, Helper 
   type(view, 'Name: Peter\nPaying for an AI: maybe')
   press(view, 'save')
   assert.match(shown(view, 'refused'), /^Nothing was saved\. Helper could not read line 2:/)
-  assert.ok(shown(view, 'refused').includes(SF.why.mod_value))
+  assert.ok(shown(view, 'refused').includes(curlyQuotes(SF.why.mod_value)))
   assert.deepEqual(storage.data.get('kept'), PETER)
   assert.equal(find(view, 'refused').props.role, 'status')
 })
@@ -134,7 +136,7 @@ test('Undo changes puts the box back as stored; Save and Undo wait for a change,
   press(view, 'forget-all')
   type(view, 'Name: Pete')
   press(view, 'undo')
-  assert.ok(!shownAll(view, 'forget').includes(SF.forget_all.question))
+  assert.ok(!shownAll(view, 'forget').includes(curlyQuotes(SF.forget_all.question)))
 })
 
 test('the questions are read out when they come, and the keyboard goes to No, the answer that changes nothing', async () => {
@@ -153,16 +155,16 @@ test('the questions are read out when they come, and the keyboard goes to No, th
 
 test('"Forget all of this" asks first; Yes removes the record whole and says so; No keeps it', async () => {
   const { view, storage } = await openSettings({ kept: PETER })
-  assert.ok(shownAll(view, 'forget').includes(SF.forget_all.label))
-  assert.ok(shownAll(view, 'forget').includes(SF.forget_all.under))
+  assert.ok(shownAll(view, 'forget').includes(curlyQuotes(SF.forget_all.label)))
+  assert.ok(shownAll(view, 'forget').includes(curlyQuotes(SF.forget_all.under)))
   press(view, 'forget-all')
-  assert.ok(shownAll(view, 'forget').includes(SF.forget_all.question))
+  assert.ok(shownAll(view, 'forget').includes(curlyQuotes(SF.forget_all.question)))
   press(view, 'forget-no')
   assert.deepEqual(storage.data.get('kept'), PETER)
   press(view, 'forget-all')
   press(view, 'forget-yes')
   assert.equal(storage.data.has('kept'), false)
-  assert.equal(shown(view, 'forgot'), SF.forget_all.after_yes)
+  assert.equal(shown(view, 'forgot'), curlyQuotes(SF.forget_all.after_yes))
   assert.equal(box(view).props.value, '')
 })
 
@@ -175,11 +177,14 @@ test('the bottom of the page: a thin divider, then "Forget all of this" as one o
   assert.equal(rows.length, 1, 'one row: Hermes\'s own memory row stays out (its address is not in the plugin docs)')
   const row = rows[0].props
   assert.equal(row.title, SF.forget_all.label)
-  assert.equal(row.description, SF.forget_all.under)
+  assert.equal(row.description, curlyQuotes(SF.forget_all.under))
   assert.equal(row.wide, undefined, 'Hermes\'s ordinary row: the action beside the words on a wide page, under them on a narrow one')
   assert.equal(row.action.type, 'sdk:Button')
   assert.equal(row.action.props.variant, 'textStrong')
-  assert.equal(text(row.action), 'Forget')
+  // changes-18 (For builder 2): the action word comes from the data, not from a constant in the code
+  assert.equal(text(row.action), SF.forget_all.action)
+  assert.equal(SF.forget_all.action, 'Forget')
+  assert.doesNotMatch(fs.readFileSync(new URL('../src/settings-page.js', import.meta.url), 'utf8'), /FORGET_ACTION|'Forget'/)
   assert.equal(row.action.props['aria-label'], SF.forget_all.label)
   // no filled button for Forget any more
   assert.equal(all(part, n => n.type === 'sdk:Button' && n.props.variant === 'secondary').length, 0)

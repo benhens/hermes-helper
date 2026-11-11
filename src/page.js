@@ -92,6 +92,14 @@ export function makePage(ctx, opts = {}) {
   // back cleaned. The settings page writes the same record, so it is read again every time the
   // page is put on screen.
   const readKept = () => cleanKept(ctx.storage.get('kept', null))
+  // changes-14: the met mark, true or nothing
+  const readMet = () => {
+    try {
+      return ctx.storage.get('met', false) === true
+    } catch {
+      return false
+    }
+  }
   // The conversation, kept while the plugin is loaded (leaving the page and coming back keeps
   // it). Nothing of it is written anywhere: it is gone when Hermes restarts. visit = what Helper
   // knows in this visit (src/talk.js), its `kept` the stored record; log = what was said, each
@@ -101,9 +109,13 @@ export function makePage(ctx, opts = {}) {
   const remembered = () => {
     if (!memory) {
       const kept = readKept()
-      // a later visit: a kept name means the opening's two questions are not asked again
-      memory = { visit: laterVisit(kept), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)) }
+      // changes-14 (keeps.met): Helper has said hello before, stored under its own key 'met' (no Forget removes
+      // it). Set: the window opens with BACK and asks nothing; else OPEN with "What's your name?". A kept name
+      // counts as met too (src/talk.js laterVisit); met is then written, so it outlives a Forget all.
+      const metStored = readMet()
+      memory = { visit: laterVisit(kept, metStored), log: [], nextId: 1, typed: '', stored: JSON.stringify(keptToStore(kept)), metStored }
       memory.log = [helperEntry(openingLine(memory.visit))]
+      writeKept()
     }
     return memory
   }
@@ -118,6 +130,13 @@ export function makePage(ctx, opts = {}) {
   // After everything the person does: the record is written when it changed, and removed whole
   // when nothing is left in it (told with it). A storage that fails is not kept from answering.
   const writeKept = () => {
+    // changes-14: the met mark, written once when the visit has it (the opening ended, or Skip); never removed
+    if (memory.visit.met && !memory.metStored) {
+      try {
+        ctx.storage.set('met', true)
+        memory.metStored = true
+      } catch {}
+    }
     const next = keptToStore(memory.visit.kept)
     const text = JSON.stringify(next)
     if (text === memory.stored) return
@@ -369,7 +388,9 @@ export function makePage(ctx, opts = {}) {
     // What Helper keeps is written straight after (src/kept.js), so storage never lags the lines.
     function answer(result, shown, typed = '') {
       if (!result) return
-      const said = lineFor(result, visit, typed, { settingsPage })
+      // helper-builder-qs-v1.md point 3: the conversation already shows a "Kept:" or "From what I keep:" line
+      const keptShown = memory.log.some(e => e.who === 'helper' && (e.note || e.used))
+      const said = lineFor(result, visit, typed, { settingsPage, keptShown })
       writeKept()
       addToLog([shown ? youEntry(shown) : null, helperEntry(said)].filter(Boolean))
       setFocusAsk(true)

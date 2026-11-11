@@ -1,0 +1,3916 @@
+{
+ "about": "Written by dev/checks/builder-qs/dump_qs_sets.py. Do not edit: make it again.",
+ "route2_sha256": "3af440269b7f405d1e56136bd8b76597451b19955f41d52956cb14cf153af95c",
+ "json_sha256": "4899a0ae3643d9efc67308e5dde65c77c0be04506ef067344597650107e45f57",
+ "wants_json_sha256": "bb195263a1d70d2f468ed2de691ec872f39deac841e3c948eca13b84f8277956",
+ "wants_fixes_step_sha256": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e",
+ "cases": [
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "web search: built in (web tools)",
+   "start": "open-sam",
+   "texts": [
+    "can hermes look stuff up on the internet for me"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_web",
+    "kind": "want",
+    "all": [
+     "ROW w_web"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 1
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "image generation: built in tool",
+   "start": "open-sam",
+   "texts": [
+    "i want it to make pictures for my instagram posts"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_image",
+    "kind": "want",
+    "all": [
+     "ROW w_image"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 2
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "voice / text-to-speech: built in",
+   "start": "open-sam",
+   "texts": [
+    "can it talk out loud to me like siri"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_voice",
+    "kind": "want",
+    "all": [
+     "ROW w_voice"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 3
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "browser tool: built in",
+   "start": "open-sam",
+   "texts": [
+    "can it go on websites and fill in forms for me"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_browser",
+    "kind": "want",
+    "all": [
+     "ROW w_browser"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 4
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "youtube-content skill",
+   "start": "open-sam",
+   "texts": [
+    "summarise youtube vids i send it"
+   ],
+   "route2": {
+    "shown": "line svc1",
+    "kind": "row",
+    "all": [
+     "line svc1"
+    ],
+    "name": null,
+    "topic": "svc",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_youtube",
+    "kind": "want",
+    "all": [
+     "ROW w_youtube"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 5
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "speech-to-text / voice message transcription: built in",
+   "start": "open-sam",
+   "texts": [
+    "turn my voice notes into text pls"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_stt",
+    "kind": "want",
+    "all": [
+     "ROW w_stt"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 6
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "powerpoint / office skill",
+   "start": "open-sam",
+   "texts": [
+    "can it make powerpoint slides"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_office",
+    "kind": "want",
+    "all": [
+     "ROW w_office"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 7
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "files on my computer: file + terminal tools, built in",
+   "start": "open-sam",
+   "texts": [
+    "help me clean up the messy downloads folder on my computer"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N2 group files",
+    "kind": "N2",
+    "all": [
+     "N2 group files"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 8
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "manim-video skill (animated explainer videos)",
+   "start": "open-sam",
+   "texts": [
+    "can it make a little animated video explaning fractions"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "W1 buttons w_video+w_anim",
+    "kind": "W1",
+    "all": [
+     "W1 buttons w_video+w_anim"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 9
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "songwriting skill (if official)",
+   "start": "open-sam",
+   "texts": [
+    "can it help me write songs"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_music",
+    "kind": "want",
+    "all": [
+     "ROW w_music"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 10
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "Gmail / email: Connectors line or an email skill",
+   "start": "open-sam",
+   "texts": [
+    "can it read my emails and tell me whats important"
+   ],
+   "route2": {
+    "shown": "question svc",
+    "kind": "question",
+    "all": [
+     "question svc"
+    ],
+    "name": null,
+    "topic": "svc",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "question svc",
+    "kind": "question",
+    "all": [
+     "question svc"
+    ],
+    "name": null,
+    "topic": "svc",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 11
+  },
+  {
+   "set": "hhtech30",
+   "group": "covered",
+   "want": "vision (image understanding): built in",
+   "start": "open-sam",
+   "texts": [
+    "can it look at a photo and tell me whats in it"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_see",
+    "kind": "want",
+    "all": [
+     "ROW w_see"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 12
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it file my taxes for me"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 13
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can hermes order me a pizza"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 14
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it drive my car"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 15
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it edit my wedding video in premiere pro"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N2 group pics",
+    "kind": "N2",
+    "all": [
+     "N2 group pics"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 16
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it teach my dog tricks"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 17
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it fix my wifi router"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 18
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it print things on my 3d printer"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 19
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it water my plants"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 20
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it make me money on the stock market"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N2 group web",
+    "kind": "N2",
+    "all": [
+     "N2 group web"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 21
+  },
+  {
+   "set": "hhtech30",
+   "group": "none",
+   "want": "don't-know line",
+   "start": "open-sam",
+   "texts": [
+    "can it pay my bills from my bank acount"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 22
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "don't-know, nearby picks (pictures and video)",
+   "start": "open-sam",
+   "texts": [
+    "can it make a video of me dancing"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_video",
+    "kind": "want",
+    "all": [
+     "ROW w_video"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 23
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "don't-know with picks, or the pictures row",
+   "start": "open-sam",
+   "texts": [
+    "can it make memes"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_meme",
+    "kind": "want",
+    "all": [
+     "ROW w_meme"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 24
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "don't-know, nearby picks (voice to text)",
+   "start": "open-sam",
+   "texts": [
+    "can it listen to my zoom meetings and take notes"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 25
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "don't-know, nearby picks (look at a photo / files)",
+   "start": "open-sam",
+   "texts": [
+    "can it read my handwritten notes"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 26
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "don't-know, nearby picks (web)",
+   "start": "open-sam",
+   "texts": [
+    "can it watch tiktok and tell me whats trending"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 27
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "don't-know, nearby picks (voice)",
+   "start": "open-sam",
+   "texts": [
+    "can it copy my voice"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N2 group voice",
+    "kind": "N2",
+    "all": [
+     "N2 group voice"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 28
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "don't-know, nearby picks (files)",
+   "start": "open-sam",
+   "texts": [
+    "can it back up the photos on my phone"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N2 group pics",
+    "kind": "N2",
+    "all": [
+     "N2 group pics"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 29
+  },
+  {
+   "set": "hhtech30",
+   "group": "near",
+   "want": "a question or nearby picks; never a promise that Helper builds it",
+   "start": "open-sam",
+   "texts": [
+    "can it make a website for my bakery"
+   ],
+   "route2": {
+    "shown": "H2 (make a website)",
+    "kind": "H2",
+    "all": [
+     "H2 (make a website)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H2 (make a website)",
+    "kind": "H2",
+    "all": [
+     "H2 (make a website)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "id": 30
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "hello",
+   "start": "open",
+   "texts": [
+    "hiya"
+   ],
+   "route2": {
+    "shown": "HELLO name=None",
+    "kind": "HELLO",
+    "all": [
+     "HELLO name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "hello",
+   "start": "open",
+   "texts": [
+    "helo"
+   ],
+   "route2": {
+    "shown": "HELLO name=None",
+    "kind": "HELLO",
+    "all": [
+     "HELLO name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "hello",
+   "start": "open",
+   "texts": [
+    "good morning!"
+   ],
+   "route2": {
+    "shown": "HELLO name=None",
+    "kind": "HELLO",
+    "all": [
+     "HELLO name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "hello",
+   "start": "open",
+   "texts": [
+    "yo"
+   ],
+   "route2": {
+    "shown": "HELLO name=None",
+    "kind": "HELLO",
+    "all": [
+     "HELLO name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "thanks",
+   "start": "open",
+   "texts": [
+    "thx"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "thanks",
+   "start": "open",
+   "texts": [
+    "cheers mate"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "thanks",
+   "start": "open",
+   "texts": [
+    "ty so much"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "cut",
+   "start": "open",
+   "texts": [
+    "how do i"
+   ],
+   "route2": {
+    "shown": "CUT",
+    "kind": "CUT",
+    "all": [
+     "CUT"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "cut",
+   "start": "open",
+   "texts": [
+    "can you"
+   ],
+   "route2": {
+    "shown": "CUT",
+    "kind": "CUT",
+    "all": [
+     "CUT"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "cut",
+   "start": "open",
+   "texts": [
+    "what is a"
+   ],
+   "route2": {
+    "shown": "CUT",
+    "kind": "CUT",
+    "all": [
+     "CUT"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "what's a skill?"
+   ],
+   "route2": {
+    "shown": "term line skill",
+    "kind": "term",
+    "all": [
+     "term line skill"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "term line skill",
+    "kind": "term",
+    "all": [
+     "term line skill"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "is it free?"
+   ],
+   "route2": {
+    "shown": "COST",
+    "kind": "COST",
+    "all": [
+     "COST"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line mod3",
+    "kind": "row",
+    "all": [
+     "line mod3"
+    ],
+    "name": null,
+    "topic": "mod",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "why so slow"
+   ],
+   "route2": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "how do I use fewer tokens"
+   ],
+   "route2": {
+    "shown": "line use1",
+    "kind": "row",
+    "all": [
+     "line use1"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use1",
+    "kind": "row",
+    "all": [
+     "line use1"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "it's costing me too much money"
+   ],
+   "route2": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "I keep hitting the rate limit"
+   ],
+   "route2": {
+    "shown": "line use3",
+    "kind": "row",
+    "all": [
+     "line use3"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use3",
+    "kind": "row",
+    "all": [
+     "line use3"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "answers take forever to come back"
+   ],
+   "route2": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "my bill is huge this month"
+   ],
+   "route2": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "how can I make it cheaper to run"
+   ],
+   "route2": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "the context window keeps filling up"
+   ],
+   "route2": {
+    "shown": "line use1",
+    "kind": "row",
+    "all": [
+     "line use1"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use1",
+    "kind": "row",
+    "all": [
+     "line use1"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "it says I ran out of credits"
+   ],
+   "route2": {
+    "shown": "line use3",
+    "kind": "row",
+    "all": [
+     "line use3"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use3",
+    "kind": "row",
+    "all": [
+     "line use3"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "each reply is really slow, can I speed it up"
+   ],
+   "route2": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "how do I save on usage"
+   ],
+   "route2": {
+    "shown": "question use",
+    "kind": "question",
+    "all": [
+     "question use"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "question use",
+    "kind": "question",
+    "all": [
+     "question use"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "make me an app that tracks my runs"
+   ],
+   "route2": {
+    "shown": "H1 (make me)",
+    "kind": "H1",
+    "all": [
+     "H1 (make me)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (make me)",
+    "kind": "H1",
+    "all": [
+     "H1 (make me)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "can you build me a website"
+   ],
+   "route2": {
+    "shown": "H1 (can you build)",
+    "kind": "H1",
+    "all": [
+     "H1 (can you build)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (can you build)",
+    "kind": "H1",
+    "all": [
+     "H1 (can you build)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "write me a script that renames my photos"
+   ],
+   "route2": {
+    "shown": "H1 (write + script)",
+    "kind": "H1",
+    "all": [
+     "H1 (write + script)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (write + script)",
+    "kind": "H1",
+    "all": [
+     "H1 (write + script)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "create a discord bot for my server"
+   ],
+   "route2": {
+    "shown": "H1 (create + bot)",
+    "kind": "H1",
+    "all": [
+     "H1 (create + bot)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (create + bot)",
+    "kind": "H1",
+    "all": [
+     "H1 (create + bot)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "build a plugin that reads my email"
+   ],
+   "route2": {
+    "shown": "H1 (build a plugin)",
+    "kind": "H1",
+    "all": [
+     "H1 (build a plugin)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (build a plugin)",
+    "kind": "H1",
+    "all": [
+     "H1 (build a plugin)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "install the weather plugin for me"
+   ],
+   "route2": {
+    "shown": "H1 (for me + install)",
+    "kind": "H1",
+    "all": [
+     "H1 (for me + install)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (for me + install)",
+    "kind": "H1",
+    "all": [
+     "H1 (for me + install)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "connect my google calendar"
+   ],
+   "route2": {
+    "shown": "H1 (connect my)",
+    "kind": "H1",
+    "all": [
+     "H1 (connect my)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (connect my)",
+    "kind": "H1",
+    "all": [
+     "H1 (connect my)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "set up telegram for me"
+   ],
+   "route2": {
+    "shown": "H1 (for me + set up)",
+    "kind": "H1",
+    "all": [
+     "H1 (for me + set up)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (for me + set up)",
+    "kind": "H1",
+    "all": [
+     "H1 (for me + set up)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "code a game for my kid"
+   ],
+   "route2": {
+    "shown": "H1 (code + game)",
+    "kind": "H1",
+    "all": [
+     "H1 (code + game)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (code + game)",
+    "kind": "H1",
+    "all": [
+     "H1 (code + game)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "please make a todo list app"
+   ],
+   "route2": {
+    "shown": "H1 (please make)",
+    "kind": "H1",
+    "all": [
+     "H1 (please make)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (please make)",
+    "kind": "H1",
+    "all": [
+     "H1 (please make)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "that's wrong"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "no that's not right"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "you're wrong"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "that isn't what I asked"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "incorrect"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Pēteris",
+   "start": "name",
+   "texts": [
+    "Pēteris"
+   ],
+   "route2": {
+    "shown": "F1 name=Pēteris +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Pēteris +kept=name +first"
+    ],
+    "name": "Pēteris",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Pēteris",
+    "kind": "F1",
+    "all": [
+     "F1 name=Pēteris"
+    ],
+    "name": "Pēteris",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Anna",
+   "start": "name",
+   "texts": [
+    "Anna"
+   ],
+   "route2": {
+    "shown": "F1 name=Anna +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Anna +kept=name +first"
+    ],
+    "name": "Anna",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Anna",
+    "kind": "F1",
+    "all": [
+     "F1 name=Anna"
+    ],
+    "name": "Anna",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Tom",
+   "start": "name",
+   "texts": [
+    "Hi, I'm Tom"
+   ],
+   "route2": {
+    "shown": "F1 name=Tom +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Tom +kept=name +first"
+    ],
+    "name": "Tom",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Tom",
+    "kind": "F1",
+    "all": [
+     "F1 name=Tom"
+    ],
+    "name": "Tom",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Jo",
+   "start": "name",
+   "texts": [
+    "my name is Jo"
+   ],
+   "route2": {
+    "shown": "F1 name=Jo +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Jo +kept=name +first"
+    ],
+    "name": "Jo",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Jo",
+    "kind": "F1",
+    "all": [
+     "F1 name=Jo"
+    ],
+    "name": "Jo",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Mo",
+   "start": "name",
+   "texts": [
+    "Mo"
+   ],
+   "route2": {
+    "shown": "F1 name=Mo +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Mo +kept=name +first"
+    ],
+    "name": "Mo",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Mo",
+    "kind": "F1",
+    "all": [
+     "F1 name=Mo"
+    ],
+    "name": "Mo",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Sunny",
+   "start": "name",
+   "texts": [
+    "Sunny"
+   ],
+   "route2": {
+    "shown": "F1 name=Sunny +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Sunny +kept=name +first"
+    ],
+    "name": "Sunny",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Sunny",
+    "kind": "F1",
+    "all": [
+     "F1 name=Sunny"
+    ],
+    "name": "Sunny",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Yo-Yo",
+   "start": "name",
+   "texts": [
+    "Yo-Yo"
+   ],
+   "route2": {
+    "shown": "F1 name=Yo-Yo +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Yo-Yo +kept=name +first"
+    ],
+    "name": "Yo-Yo",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Yo-Yo",
+    "kind": "F1",
+    "all": [
+     "F1 name=Yo-Yo"
+    ],
+    "name": "Yo-Yo",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Ty",
+   "start": "name",
+   "texts": [
+    "Ty"
+   ],
+   "route2": {
+    "shown": "F1 name=Ty +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ty +kept=name +first"
+    ],
+    "name": "Ty",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Ty",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ty"
+    ],
+    "name": "Ty",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Cash",
+   "start": "name",
+   "texts": [
+    "Cash"
+   ],
+   "route2": {
+    "shown": "F1 name=Cash +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Cash +kept=name +first"
+    ],
+    "name": "Cash",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Cash",
+    "kind": "F1",
+    "all": [
+     "F1 name=Cash"
+    ],
+    "name": "Cash",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "hhtech48",
+   "group": "names",
+   "want": "Will",
+   "start": "name",
+   "texts": [
+    "Will"
+   ],
+   "route2": {
+    "shown": "F1 name=Will +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Will +kept=name +first"
+    ],
+    "name": "Will",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "thanks",
+   "start": "open",
+   "texts": [
+    "thx a lot"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "thanks",
+   "start": "open",
+   "texts": [
+    "ty!"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "cut",
+   "start": "open",
+   "texts": [
+    "can you"
+   ],
+   "route2": {
+    "shown": "CUT",
+    "kind": "CUT",
+    "all": [
+     "CUT"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "cut",
+   "start": "open",
+   "texts": [
+    "what about"
+   ],
+   "route2": {
+    "shown": "CUT",
+    "kind": "CUT",
+    "all": [
+     "CUT"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "why is this so expensive"
+   ],
+   "route2": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "it takes ages to answer"
+   ],
+   "route2": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "how do I spend less on this"
+   ],
+   "route2": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use2",
+    "kind": "row",
+    "all": [
+     "line use2"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "use",
+   "start": "open",
+   "texts": [
+    "my chats get too long and it slows down"
+   ],
+   "route2": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line use4",
+    "kind": "row",
+    "all": [
+     "line use4"
+    ],
+    "name": null,
+    "topic": "use",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "write me an app for tracking my workouts"
+   ],
+   "route2": {
+    "shown": "H1 (write + app)",
+    "kind": "H1",
+    "all": [
+     "H1 (write + app)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (write + app)",
+    "kind": "H1",
+    "all": [
+     "H1 (write + app)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "code me a website for my band"
+   ],
+   "route2": {
+    "shown": "H1 (code + website)",
+    "kind": "H1",
+    "all": [
+     "H1 (code + website)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (code + website)",
+    "kind": "H1",
+    "all": [
+     "H1 (code + website)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "create a telegram bot that posts news"
+   ],
+   "route2": {
+    "shown": "H1 (create + bot)",
+    "kind": "H1",
+    "all": [
+     "H1 (create + bot)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (create + bot)",
+    "kind": "H1",
+    "all": [
+     "H1 (create + bot)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "open",
+   "want": "build",
+   "start": "open",
+   "texts": [
+    "write a program that sorts my emails"
+   ],
+   "route2": {
+    "shown": "H1 (write + program)",
+    "kind": "H1",
+    "all": [
+     "H1 (write + program)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "H1 (write + program)",
+    "kind": "H1",
+    "all": [
+     "H1 (write + program)"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "can you write me a poem"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "write me a short story"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "the service was slow yesterday"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "how do I connect discord"
+   ],
+   "route2": {
+    "shown": "line msg2",
+    "kind": "row",
+    "all": [
+     "line msg2"
+    ],
+    "name": null,
+    "topic": "msg",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line msg2",
+    "kind": "row",
+    "all": [
+     "line msg2"
+    ],
+    "name": null,
+    "topic": "msg",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_open",
+   "want": "thanks",
+   "start": "open",
+   "texts": [
+    "ty"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_open",
+   "want": "real",
+   "start": "open",
+   "texts": [
+    "can it write code for me?"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "ROW w_code",
+    "kind": "want",
+    "all": [
+     "ROW w_code"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "that's not it"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "no, that is not what I meant at all"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "you misunderstood me"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "wrong",
+   "want": "wrong",
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "wrong answer"
+   ],
+   "route2": {
+    "shown": "WRONG",
+    "kind": "WRONG",
+    "all": [
+     "term line skill",
+     "WRONG"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": true
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "names",
+   "want": "Pat",
+   "start": "name",
+   "texts": [
+    "Pat"
+   ],
+   "route2": {
+    "shown": "F1 name=Pat +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Pat +kept=name +first"
+    ],
+    "name": "Pat",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Pat",
+    "kind": "F1",
+    "all": [
+     "F1 name=Pat"
+    ],
+    "name": "Pat",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "names",
+   "want": "Joy",
+   "start": "name",
+   "texts": [
+    "Joy"
+   ],
+   "route2": {
+    "shown": "F1 name=Joy +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Joy +kept=name +first"
+    ],
+    "name": "Joy",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Joy",
+    "kind": "F1",
+    "all": [
+     "F1 name=Joy"
+    ],
+    "name": "Joy",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "names",
+   "want": "Sky",
+   "start": "name",
+   "texts": [
+    "Sky"
+   ],
+   "route2": {
+    "shown": "F1 name=Sky +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Sky +kept=name +first"
+    ],
+    "name": "Sky",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Sky",
+    "kind": "F1",
+    "all": [
+     "F1 name=Sky"
+    ],
+    "name": "Sky",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "names",
+   "want": "Ray",
+   "start": "name",
+   "texts": [
+    "Ray"
+   ],
+   "route2": {
+    "shown": "F1 name=Ray +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ray +kept=name +first"
+    ],
+    "name": "Ray",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Ray",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ray"
+    ],
+    "name": "Ray",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_names",
+   "want": "noname",
+   "start": "name",
+   "texts": [
+    "will it remember my name?"
+   ],
+   "route2": {
+    "shown": "line mem1",
+    "kind": "row",
+    "all": [
+     "line mem1"
+    ],
+    "name": null,
+    "topic": "mem",
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "line mem1",
+    "kind": "row",
+    "all": [
+     "line mem1"
+    ],
+    "name": null,
+    "topic": "mem",
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "own20",
+   "group": "controls_names",
+   "want": "noname",
+   "start": "name",
+   "texts": [
+    "thanks"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=None",
+    "kind": "F1",
+    "all": [
+     "F1 name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Ty"
+   ],
+   "route2": {
+    "shown": "F1 name=Ty +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ty +kept=name +first"
+    ],
+    "name": "Ty",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Ty",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ty"
+    ],
+    "name": "Ty",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Will"
+   ],
+   "route2": {
+    "shown": "F1 name=Will +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Will +kept=name +first"
+    ],
+    "name": "Will",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "May"
+   ],
+   "route2": {
+    "shown": "F1 name=May +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=May +kept=name +first"
+    ],
+    "name": "May",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=May",
+    "kind": "F1",
+    "all": [
+     "F1 name=May"
+    ],
+    "name": "May",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Hope"
+   ],
+   "route2": {
+    "shown": "F1 name=Hope +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Hope +kept=name +first"
+    ],
+    "name": "Hope",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Hope",
+    "kind": "F1",
+    "all": [
+     "F1 name=Hope"
+    ],
+    "name": "Hope",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Art"
+   ],
+   "route2": {
+    "shown": "F1 name=Art +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Art +kept=name +first"
+    ],
+    "name": "Art",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Art",
+    "kind": "F1",
+    "all": [
+     "F1 name=Art"
+    ],
+    "name": "Art",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Bill"
+   ],
+   "route2": {
+    "shown": "F1 name=Bill +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Bill +kept=name +first"
+    ],
+    "name": "Bill",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Bill",
+    "kind": "F1",
+    "all": [
+     "F1 name=Bill"
+    ],
+    "name": "Bill",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Mark"
+   ],
+   "route2": {
+    "shown": "F1 name=Mark +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Mark +kept=name +first"
+    ],
+    "name": "Mark",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Mark",
+    "kind": "F1",
+    "all": [
+     "F1 name=Mark"
+    ],
+    "name": "Mark",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Sue"
+   ],
+   "route2": {
+    "shown": "F1 name=Sue +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Sue +kept=name +first"
+    ],
+    "name": "Sue",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Sue",
+    "kind": "F1",
+    "all": [
+     "F1 name=Sue"
+    ],
+    "name": "Sue",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Rob"
+   ],
+   "route2": {
+    "shown": "F1 name=Rob +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Rob +kept=name +first"
+    ],
+    "name": "Rob",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Rob",
+    "kind": "F1",
+    "all": [
+     "F1 name=Rob"
+    ],
+    "name": "Rob",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "ty"
+   ],
+   "route2": {
+    "shown": "F1 name=Ty +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ty +kept=name +first"
+    ],
+    "name": "Ty",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=Ty",
+    "kind": "F1",
+    "all": [
+     "F1 name=Ty"
+    ],
+    "name": "Ty",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "will"
+   ],
+   "route2": {
+    "shown": "F1 name=Will +kept=name +first",
+    "kind": "F1",
+    "all": [
+     "F1 name=Will +kept=name +first"
+    ],
+    "name": "Will",
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "hope so"
+   ],
+   "route2": {
+    "shown": "F1 name=None",
+    "kind": "F1",
+    "all": [
+     "F1 name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=None",
+    "kind": "F1",
+    "all": [
+     "F1 name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Will?"
+   ],
+   "route2": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "lead-names",
+   "group": "names",
+   "want": null,
+   "start": "name",
+   "texts": [
+    "Bill me"
+   ],
+   "route2": {
+    "shown": "F1 name=None",
+    "kind": "F1",
+    "all": [
+     "F1 name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "F1 name=None",
+    "kind": "F1",
+    "all": [
+     "F1 name=None"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "ty-later",
+   "group": "open",
+   "want": null,
+   "start": "open",
+   "texts": [
+    "ty"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "ty-later",
+   "group": "open",
+   "want": null,
+   "start": "open",
+   "texts": [
+    "what's a skill?",
+    "ty"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "term line skill",
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "term line skill",
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "ty-later",
+   "group": "open",
+   "want": null,
+   "start": "open",
+   "texts": [
+    "ty so much"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "N1",
+    "kind": "N1",
+    "all": [
+     "N1"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   }
+  },
+  {
+   "set": "ty-later",
+   "group": "open",
+   "want": null,
+   "start": "open",
+   "texts": [
+    "which model?",
+    "ty"
+   ],
+   "route2": {
+    "shown": "THANKS",
+    "kind": "THANKS",
+    "all": [
+     "question mod",
+     "THANKS"
+    ],
+    "name": null,
+    "topic": null,
+    "repeat_of": null,
+    "rejected": false
+   },
+   "oracle": {
+    "shown": "plain line mod0",
+    "kind": "plain",
+    "all": [
+     "question mod",
+     "plain line mod0"
+    ],
+    "name": null,
+    "topic": "mod",
+    "repeat_of": null,
+    "rejected": false
+   }
+  }
+ ]
+}

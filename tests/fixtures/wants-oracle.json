@@ -1,11 +1,11 @@
 {
  "about": "Written by dev/checks/talk-v2-wants/dump_oracle.py. Do not edit: make it again.",
- "route2_sha256": "46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368",
+ "route2_sha256": "3af440269b7f405d1e56136bd8b76597451b19955f41d52956cb14cf153af95c",
  "route2_run": "route2.py",
- "route2_run_sha256": "46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368",
+ "route2_run_sha256": "3af440269b7f405d1e56136bd8b76597451b19955f41d52956cb14cf153af95c",
  "wants_step_sha256": "491b7f75865c4d61219476632e5d56270081ef6146f77c5fbd5323fed420a23f",
  "fixes6_step_sha256": "cd6d53f51b1bcac27fc2436c1ac0431199a650d6cb6c5a120c47e02d02ba9142",
- "wants_fixes_step_sha256": "9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a",
+ "wants_fixes_step_sha256": "87c60114d9284a78ea2ae2a3401dea349c9864154da307e11b8d93e569dbdd1e",
  "skill_next_patterns": [
   "(?:the|a|an|this|that) {n} skills?",
   "skills? (?:called|named) \\\"?{n}\\\"?",
@@ -1977,8 +1977,8 @@
      "after": "",
      "text": "hi",
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "HELLO name=None",
+      "kind": "HELLO",
       "row": null,
       "skill": null,
       "group": null,
@@ -4435,7 +4435,7 @@
       "name"
      ],
      "route2": {
-      "shown": "F1 name=Anna",
+      "shown": "F1 name=Anna +kept=name +first",
       "kind": "F1",
       "row": null,
       "skill": null,
@@ -4476,7 +4476,7 @@
       "name"
      ],
      "route2": {
-      "shown": "F1 name=Jānis",
+      "shown": "F1 name=Jānis +kept=name +first",
       "kind": "F1",
       "row": null,
       "skill": null,
@@ -5394,37 +5394,37 @@
       "build"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "H1 (write + website)",
+      "kind": "H1",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
-      "why": null
+      "why": "write + website"
      },
      "oracle": {
-      "shown": "N2 group web",
-      "kind": "N2",
+      "shown": "H1 (write + website)",
+      "kind": "H1",
       "row": null,
       "skill": null,
-      "group": "web",
+      "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
-      "why": null
+      "why": "write + website"
      },
      "oracle_f6": {
-      "shown": "N2 group web",
-      "kind": "N2",
+      "shown": "H1 (write + website)",
+      "kind": "H1",
       "row": null,
       "skill": null,
-      "group": "web",
+      "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
-      "why": null
+      "why": "write + website"
      }
     },
     {
@@ -6137,37 +6137,37 @@
       "build"
      ],
      "route2": {
-      "shown": "N1",
-      "kind": "N1",
+      "shown": "H1 (make me)",
+      "kind": "H1",
       "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
-      "why": null
+      "why": "make me"
      },
      "oracle": {
-      "shown": "ROW w_image",
-      "kind": "want",
-      "row": "w_image",
+      "shown": "H1 (make me)",
+      "kind": "H1",
+      "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
-      "why": null
+      "why": "make me"
      },
      "oracle_f6": {
-      "shown": "ROW w_image",
-      "kind": "want",
-      "row": "w_image",
+      "shown": "H1 (make me)",
+      "kind": "H1",
+      "row": null,
       "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
-      "why": null
+      "why": "make me"
      }
     },
     {
@@ -8779,10 +8779,10 @@
       "why": null
      },
      "oracle": {
-      "shown": "SKILL meme-generation",
-      "kind": "skillS",
-      "row": null,
-      "skill": "meme-generation",
+      "shown": "ROW w_meme",
+      "kind": "want",
+      "row": "w_meme",
+      "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
@@ -8790,10 +8790,10 @@
       "why": null
      },
      "oracle_f6": {
-      "shown": "SKILL meme-generation",
-      "kind": "skillS",
-      "row": null,
-      "skill": "meme-generation",
+      "shown": "ROW w_meme",
+      "kind": "want",
+      "row": "w_meme",
+      "skill": null,
       "group": null,
       "buttons": null,
       "topic": null,
@@ -10634,22 +10634,22 @@
       "why": null
      },
      "oracle": {
-      "shown": "N2 group web",
-      "kind": "N2",
-      "row": null,
+      "shown": "ROW w_web",
+      "kind": "want",
+      "row": "w_web",
       "skill": null,
-      "group": "web",
+      "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
       "why": null
      },
      "oracle_f6": {
-      "shown": "N2 group web",
-      "kind": "N2",
-      "row": null,
+      "shown": "ROW w_web",
+      "kind": "want",
+      "row": "w_web",
       "skill": null,
-      "group": "web",
+      "group": null,
       "buttons": null,
       "topic": null,
       "need": null,
