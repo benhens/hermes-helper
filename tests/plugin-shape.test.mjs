@@ -5,9 +5,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { buildSource } from '../scripts/build.mjs'
-import { K, ICONS } from '../src/look.js'
-import { STEP_COUNT } from '../src/state.js'
+import { K, D, ICONS, TABLER_ICONS } from '../src/look.js'
 import { STEPS } from '../src/steps.js'
+import { DASH_DATA } from '../src/dash-data.js'
 import { looksLikeKey } from '../src/key-check.js'
 import { selectorFor, missingClasses } from '../scripts/check-hermes-classes.mjs'
 
@@ -15,6 +15,13 @@ const ROOT = path.resolve(import.meta.dirname, '..')
 const plugin = fs.readFileSync(path.join(ROOT, 'desktop/plugin.js'), 'utf8')
 // Code without comments, so a rule can't pass or fail because of a comment.
 const code = plugin.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"\w])\/\/[^\n]*/g, '$1')
+// The program without hhcontent's Dashboard text: that text is prose for the person, so the code rules below read
+// the code only, and the text gets the pasted-key check instead. (dash-v1: the first build's step text, which this
+// set aside before, left the built file with the step list.)
+const DASH_BLOCK = /\nconst DASH_DATA = \{[\s\S]*?\n\}\n/
+// dash-v2 (the two branches joined): the set-up conversation's data (the list's step texts again) is prose too
+const SETUP_BLOCK = /\nconst SETUP_DATA = \{[\s\S]*?\n\}\n/
+const codeOnly = code.replace(DASH_BLOCK, '\n').replace(SETUP_BLOCK, '\n')
 
 test('desktop/plugin.js is the current build of src/ (nobody edited it by hand or forgot to build)', () => {
   assert.equal(plugin, buildSource())
@@ -40,8 +47,8 @@ test('every SDK name used is imported (a missing one is a ReferenceError at rend
     'Select', 'SelectContent', 'SelectItem', 'SelectTrigger', 'SelectValue',
     'Textarea', 'Tip', 'EmptyState', 'GlyphSpinner', 'RowButton', 'PRIMARY_ICON_BTN', 'composerInputBacking',
     'composerSurfaceRing', 'jsx', 'jsxs', 'useState', 'useEffect', 'useRef', 'useId']) {
-    // setup-chat: the set-up list's step texts are prose for the person ("Switch one off only if ..."), not code
-    if (new RegExp(`\\b${name}\\b`).test(code.replace(/^import.*$/gm, '').replace(/\nconst SETUP_DATA = \{[\s\S]*?\n\}\n/, '\n'))) assert.ok(imported.has(name), `${name} used but not imported`)
+    // (in the code, not in the Dashboard's words or the set-up list's step texts: a step there says "Switch one off")
+    if (new RegExp(`\\b${name}\\b`).test(codeOnly.replace(/^import.*$/gm, ''))) assert.ok(imported.has(name), `${name} used but not imported`)
   }
 })
 
@@ -109,13 +116,18 @@ test('the model name never comes from host.state.model or config.get', () => {
   assert.doesNotMatch(code, /config\.get/)
 })
 
-test('Your setup reads only through read-only calls (no set, configure, write, newChat or send)', () => {
+test('the page reads only through read-only calls (no set, configure, write or send); the one newChat is the Dashboard\'s "New session" button', () => {
+  // dash-v1: the Dashboard adds cron.manage and plugins.manage, each only with action 'list' (and Your setup's
+  // reads left the built file with it)
   const methods = [...code.matchAll(/request\('([a-z_.]+)'/g)].map(m => m[1])
-  // setup-chat: the look reads the main bot's scheduled jobs too: cron.manage, only ever with action 'list'
-  assert.deepEqual([...new Set(methods)].sort(), ['cron.manage', 'free_tier.status', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
-  const cron = [...code.matchAll(/request\('cron\.manage', \{([^}]*)\}/g)].map(m => m[1])
-  assert.ok(cron.length >= 1 && cron.every(c => /action: 'list'/.test(c)), 'cron.manage is only asked for its list')
-  assert.doesNotMatch(code, /setEnabled|profiles\.configure|set_asset|config\.set|newChat|composer\.setDraft|\.write\(/)
+  assert.deepEqual([...new Set(methods)].sort(), ['cron.manage', 'free_tier.status', 'llm.oneshot', 'plugins.manage', 'profiles.describe', 'setup.runtime_check', 'setup.status'])
+  for (const m of code.matchAll(/request\('(cron|plugins)\.manage', \{([^}]*)\}/g)) assert.match(m[2], /^\s*action: 'list',/, m[0])
+  // three: the Dashboard's scheduled jobs and plugins, and the set-up conversation's look at the scheduled jobs
+  assert.equal([...code.matchAll(/request\('(cron|plugins)\.manage'/g)].length, 3)
+  assert.doesNotMatch(code, /setEnabled|profiles\.configure|set_asset|config\.set|composer\.setDraft|\.write\(/)
+  // host.newChat only in the Dashboard's route button, and only when the person presses it (goTo)
+  assert.deepEqual([...code.matchAll(/\bnewChat\(/g)].length, 1)
+  assert.match(code, /if \(to === 'new-chat'\) host\.newChat\(\)/)
 })
 
 test('no raw globals the host cannot clean up, no reach into Hermes markup, no network', () => {
@@ -127,18 +139,16 @@ test('no raw globals the host cannot clean up, no reach into Hermes markup, no n
   assert.doesNotMatch(code, /createElement\(\s*['"]script/)
 })
 
-// The program without hhcontent's step text: that text is prose for the person ("Keep it secret:
-// it goes in Settings …"), so the code rules below read the code only, and the text gets the
-// pasted-key check instead.
-const STEPS_BLOCK = /\nconst STEPS_DATA = \{[\s\S]*?\n\}\n/
-const codeOnly = code.replace(STEPS_BLOCK, '\n')
 
 test('no keys or credentials, never reads the full config', () => {
-  assert.ok(STEPS_BLOCK.test(code), 'the step data block is where the build puts it')
-  assert.ok(codeOnly.length < code.length - 20000, 'only the step data was set aside')
+  assert.ok(DASH_BLOCK.test(code), 'the Dashboard data block is where the build puts it')
+  assert.ok(SETUP_BLOCK.test(code), 'the set-up conversation\'s data block is where the build puts it')
+  // exactly those two blocks were set aside (each leaves one line break behind)
+  assert.equal(codeOnly.length, code.length - code.match(DASH_BLOCK)[0].length - code.match(SETUP_BLOCK)[0].length + 2)
+  assert.ok(code.match(DASH_BLOCK)[0].length < 30000 && code.match(SETUP_BLOCK)[0].length < 30000, 'a block that swallowed code would be far longer')
   assert.doesNotMatch(codeOnly, /(api[_-]?key|secret|password|bearer)\s*[:=]/i)
   assert.doesNotMatch(code, /config\.get/)
-  for (const s of STEPS) assert.equal(looksLikeKey(JSON.stringify(s)), false, s.id)
+  for (const it of DASH_DATA.items) assert.equal(looksLikeKey(JSON.stringify(it)), false, it.id)
 })
 
 test('the old helper header is gone from the built file: no Move, Close, "Show helper" or Chat log; the strip can still hide and show Helper', () => {
@@ -160,7 +170,8 @@ test('model names, counts and source tags in normal letters: mono is only for te
   // review of e86b410, section 3 point 3), and text to paste inside Helper's bubble, Hermes's own
   // small code card (notes-wants.md item 4), large and small; talk-live-3 (Lead's call on question 5 of the c18 report):
   // text to type inside a Helper line (/usage), in the paste box's code style
-  assert.deepEqual(mono, ['cardPasteText', 'settingsBox', 'settingsRefusedLine', 'bubblePasteText', 'bubblePasteTextOld', 'typed'])
+  // (dash-v1: mono, Hermes's font-mono for the Dashboard's commands to paste)
+  assert.deepEqual(mono, ['cardPasteText', 'settingsBox', 'settingsRefusedLine', 'bubblePasteText', 'bubblePasteTextOld', 'typed', 'mono'])
 })
 
 test('header clears Hermes\'s title-bar band, where its window buttons float (top-right corner stays empty)', () => {
@@ -211,20 +222,25 @@ test('every class comes from the two class tables (K: Hermes\'s own classes; T: 
   }
 })
 
-test('two text tabs, Setup and Your setup, in Capabilities\' TextTab look (not the SegmentedControl pill)', () => {
+test('three text tabs, Dashboard, Learn and My setup (dash-v1), in Capabilities\' TextTab look (not the SegmentedControl pill)', () => {
   assert.doesNotMatch(src('page.js'), /SegmentedControl/)
-  assert.match(src('page.js'), /\{ id: 'setup', label: 'Setup' \}/)
-  assert.match(src('page.js'), /\{ id: 'yours', label: 'Your setup' \}/)
+  assert.match(src('page.js'), /export const TABS = TAB_IDS\.map\(id => \(\{ id, label: DASH_DATA\.words\.tabs\[id\] \}\)\)/)
+  assert.doesNotMatch(src('page.js'), /'Your setup'|label: 'Setup'/)
   assert.match(src('page.js'), /role: 'tablist'/)
   assert.match(src('page.js'), /role: 'tab',/)
 })
 
 test('buttons are Hermes Button components; bare <button>s only where Hermes uses them too', () => {
-  // On the page: the choice cards (Hermes Chip markup), the text tabs (TextTab is a plain <button>),
-  // Helper's strip (PaneTab vertical / kanban rail are plain buttons) and "Skip" in the message box.
+  // On the page: the text tabs (TextTab is a plain <button>), Helper's strip (PaneTab vertical / kanban rail are
+  // plain buttons) and "Skip" in the message box. (dash-v1: the step's choice cards left with the step.)
   const bare = [...src('page.js').matchAll(/jsxs?\(\s*'button',\s*\{\s*type: 'button',\s*(['\w-]+)/g)].map(m => m[1])
-  assert.deepEqual(bare.sort(), ["'aria-pressed'", 'className', 'className', 'role'])
-  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 4)
+  assert.deepEqual(bare.sort(), ['className', 'className', 'role'])
+  assert.equal([...src('page.js').matchAll(/jsxs?\(\s*'button'/g)].length, 3)
+  // dash-v1: on the Dashboard the 11 stops of the path are our own shape from hhdesign's drawing (round marks with
+  // their names), one real <button type="button"> wearing D classes; every other button there is Hermes's
+  const stops = [...src('dash.js').matchAll(/'button',\s*\{\s*type: 'button',\s*className: (cx\(D\.stop,[^\n]*\)),/g)].map(m => m[1])
+  assert.equal(stops.length, 1)
+  assert.equal([...src('dash.js').matchAll(/jsxs?\(\s*'button'/g)].length, 1)
   assert.match(src('page.js'), /jsx\('button', \{ type: 'button', className: T\.skip,/)
   assert.doesNotMatch(src('setup-tab.js'), /jsxs?\(\s*'button'/)
   // In Helper's window (src/talk-view.js): the answers to pick, a button inside the bubble and an
@@ -242,7 +258,8 @@ test('buttons are Hermes Button components; bare <button>s only where Hermes use
 test('every codicon named in the code is in the ICONS list (which hermes-checks.sh checks against Hermes)', () => {
   // A name written straight (name: 'x'), picked between two (name: a ? 'x' : 'y'), or handed out
   // by talk-view.js's nextIcon().
-  const files = ['page.js', 'setup-tab.js', 'main.js', 'talk-view.js', 'bubble-link.js']
+  // dash-v1: and the Dashboard's table of Hermes's own icons (codicon: 'x' in DASH_ICONS); setup-tab.js is parked
+  const files = ['page.js', 'main.js', 'talk-view.js', 'bubble-link.js', 'dash.js']
   const named = files.flatMap(f => [
     ...[...src(f).matchAll(/(?:name|icon|codicon):\s*'([a-z-]+)'/g)].map(m => m[1]),
     ...[...src(f).matchAll(/(?:name|icon|codicon):\s*[^,'{}]+\?\s*'([a-z-]+)'\s*:\s*'([a-z-]+)'/g)].flatMap(m => [m[1], m[2]]),
@@ -252,19 +269,25 @@ test('every codicon named in the code is in the ICONS list (which hermes-checks.
   // and the list holds no name the code has stopped using
   assert.deepEqual([...new Set(named)].sort(), [...ICONS].sort())
   // every Codicon in these files takes its name in one of those three ways
-  for (const f of files) for (const m of src(f).matchAll(/jsx\(Codicon, \{ name: ([^,}]+)/g)) assert.match(m[1].trim(), /^'[a-z-]+'$|\?\s*'[a-z-]+'\s*:\s*'[a-z-]+'$|^nextIcon\(\w+(\.\w+)?\)$/, `${f}: ${m[0]}`)
+  for (const f of files) for (const m of src(f).matchAll(/jsx\(Codicon, \{ name: ([^,}]+)/g)) assert.match(m[1].trim(), /^'[a-z-]+'$|\?\s*'[a-z-]+'\s*:\s*'[a-z-]+'$|^nextIcon\(\w+(\.\w+)?\)$|^icon\.codicon$/, `${f}: ${m[0]}`)
+  // the Tabler ones: only the three Hermes shows for Model, Memory and Safety, taken from the SDK's icons
+  const tabler = [...src('dash.js').matchAll(/tabler: '(\w+)'/g)].map(m => m[1])
+  assert.deepEqual([...new Set(tabler)].sort(), [...TABLER_ICONS].sort())
+  assert.doesNotMatch(plugin, /@tabler\/icons-react|@\/lib\/icons/)
 })
 
-test('the step count matches the step list (a mismatch would crash the open step)', () => {
-  assert.equal(STEPS.length, STEP_COUNT)
+test('the step list left the built file with the step (dash-v1: parked in src/, not joined)', () => {
   STEPS.forEach((s, i) => assert.equal(s.number, i + 1))
+  assert.doesNotMatch(plugin, /---- src\/(steps|steps-data|setup-tab|setup-cards)\.js ----/)
+  assert.doesNotMatch(code, /I understand, next step|Ask about this step/)
 })
 
 test('Hermes Buttons get no size, padding or radius overrides beyond Hermes\'s own patterns', () => {
   // Allowed: the composer's own send class. Anything else would restyle Hermes's button.
   const allowed = new Set()
-  const buttons = [...propsOf(src('page.js'), 'Button'), ...propsOf(src('setup-tab.js'), 'Button')]
-  assert.ok(buttons.length >= 8, `found ${buttons.length} Button calls`)
+  // dash-v1: the Dashboard's Buttons instead of the parked Your setup's
+  const buttons = [...propsOf(src('page.js'), 'Button'), ...propsOf(src('dash.js'), 'Button')]
+  assert.ok(buttons.length >= 3, `found ${buttons.length} Button calls`)
   for (const props of buttons) {
     const cls = props.match(/className:\s*(cx\([^)]*\)|[^,\n]+)/)
     if (!cls) continue

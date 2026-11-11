@@ -8,6 +8,7 @@ import assert from 'node:assert/strict'
 import { registerPlugin, fakeStorage, fakeTimers, mount, settle, all, text, byData, spoken } from '../lib/render.mjs'
 import { aiModeSource, setupBuiltSource } from '../lib/mode-loader.mjs'
 import { SETUP_BUILT } from '../../src/setup-built.js'
+import { LOOK_READ_MS } from '../../src/setup-look.js'
 
 const opt = { skip: !SETUP_BUILT && 'the set-up conversation is switched off in this run' }
 // Hermes as the page sees it. hermes: { model, soul, jobs, bots } can be changed while the test runs.
@@ -17,8 +18,8 @@ function useHost(hermes = {}) {
     hermes: h,
     asks: [],
     calls: [],
-    request: async (method, params) => {
-      host.calls.push([method, params])
+    request: async (method, params, ms) => {
+      host.calls.push([method, params, ms])
       if (h.fail.includes(method)) throw new Error('read failed: ' + method)
       if (method === 'llm.oneshot') {
         host.asks.push(params)
@@ -71,7 +72,10 @@ async function press(view, label) {
   finish(view)
 }
 const READS = ['cron.manage', 'profiles.describe', 'setup.runtime_check']
-const lookCalls = host => host.calls.filter(([m, p]) => (m === 'setup.runtime_check' && p && p.profile) || m === 'profiles.describe' || m === 'cron.manage')
+// dash-v2 (the page now opens on the Dashboard, which makes read-only reads of its own when it opens): the look's
+// reads are the ones made with the look's own time limit (LOOK_READ_MS; the Dashboard's wait 30 s). The counts
+// below are unchanged.
+const lookCalls = host => host.calls.filter(([m, p, ms]) => ms === LOOK_READ_MS && ((m === 'setup.runtime_check' && p && p.profile) || m === 'profiles.describe' || m === 'cron.manage'))
 const REC4 = ['Show me the steps', "I've done this already", 'Something else', 'Not now']
 
 test('conversation (a) on the page: the two questions, the look by itself, First chat\'s steps, It worked, the next thing, Not now; Hermes started again: the returning line', opt, async () => {
@@ -122,7 +126,9 @@ test('conversation (a) on the page: the two questions, the look by itself, First
   // the questions, the look, the choice and the steps used no AI, and nothing was written to Hermes
   assert.equal(host.asks.length, 2, 'one call for each recommendation, none for anything else')
   for (const p of host.asks) assert.match(p.instructions, /^You are Helper, inside the Hermes app\. Write one short message that recommends the next thing to set up\./)
-  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'llm.oneshot', 'profiles.describe', 'setup.runtime_check'])
+  // (dash-v2: plugins.manage is the Dashboard's read of the plugins list when the page opened, only ever action 'list')
+  assert.deepEqual([...new Set(host.calls.map(([m]) => m))].sort(), ['cron.manage', 'llm.oneshot', 'plugins.manage', 'profiles.describe', 'setup.runtime_check'])
+  for (const [m, p] of host.calls) if (m === 'plugins.manage' || m === 'cron.manage') assert.equal(p.action, 'list', m)
   // kept between visits
   const kept = storage.data.get('kept')
   assert.deepEqual([kept.name, kept.work, kept.setup_new, kept.setup_goal, kept.setup_goal_id, kept.setup_done_said, kept.setup_current], ['Peter', 'I run a tennis club', 'new', 'send reminders to my members about training', 'schedule', ['first_chat'], 'scheduled_job'])

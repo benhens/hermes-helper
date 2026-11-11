@@ -1,0 +1,90 @@
+// dash-v1: the Dashboard's style sheet (src/dash.css), as tests/talk-css.test.mjs checks Helper's: built as it is,
+// our own hhd- classes only, every colour a Hermes variable, no fonts, no shadows, no warning colours; and his rule
+// for the path: the line is one neutral line, never coloured, in no state.
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
+import { DASH_CSS } from '../src/dash-css.js'
+import { talkCssText } from '../scripts/build.mjs'
+import { D, K } from '../src/look.js'
+import { colourFindings, styleFindings } from './lib/colour-lint.mjs'
+
+const ROOT = path.resolve(import.meta.dirname, '..')
+const read = p => fs.readFileSync(path.join(ROOT, p), 'utf8')
+const sheet = read('src/dash.css')
+const rules = DASH_CSS.split('\n')
+const selectorsOf = rule => rule.slice(0, rule.indexOf('{')).split(',').map(s => s.trim())
+const classesIn = text => [...new Set([...text.matchAll(/\.([a-zA-Z][\w-]*)/g)].map(m => m[1]))]
+
+test('the built string is the sheet with its comments and line breaks dropped, nothing else changed', () => {
+  assert.equal(DASH_CSS, talkCssText(sheet))
+})
+
+test('every selector is one of our own hhd- classes (in the light theme, under Hermes\'s html:not(.dark))', () => {
+  for (const rule of rules) for (const sel of selectorsOf(rule)) assert.match(sel, /^(html:not\(\.dark\) )?\.hhd-[\w.:\s-]*(\.hhd-[\w-]+|::?[\w-]+(\([^)]*\))?)*$/, sel)
+  for (const c of classesIn(rules.map(r => r.slice(0, r.indexOf('{'))).join('\n'))) assert.ok(c.startsWith('hhd-') || c === 'dark', c)
+})
+
+test('every colour is a Hermes variable; no fonts, no shadows (the light card edge is Hermes\'s own inset hairline), no pictures', () => {
+  assert.deepEqual(colourFindings(DASH_CSS), [])
+  assert.deepEqual(styleFindings(DASH_CSS), [])
+  assert.doesNotMatch(DASH_CSS, /font-family|url\(|@import|@font-face/)
+})
+
+test('the lint on the sheet bites: a colour, a font or a ring drawn as a shadow is found', () => {
+  assert.ok(colourFindings(DASH_CSS + '\n.hhd-x{color:#4a84fe}').length)
+  assert.ok(styleFindings(DASH_CSS + '\n.hhd-x{font-family:Inter}').length)
+  assert.ok(styleFindings(DASH_CSS + '\n.hhd-x{box-shadow:0 0 0 7px var(--ui-accent)}').length)
+})
+
+test('no warning colours anywhere on the tab: no red, yellow, orange or green, in the sheet or in the classes the tab wears', () => {
+  const warn = /--ui-(red|yellow|orange|green)|destructive|warning/
+  assert.doesNotMatch(DASH_CSS, warn)
+  assert.doesNotMatch(Object.values(D).join(' '), warn)
+  const dash = read('src/dash.js')
+  for (const [key] of [...dash.matchAll(/\bK\.(\w+)/g)].map(m => [m[1]])) assert.doesNotMatch(K[key], warn, key)
+})
+
+test('every class the code names has a rule in the sheet, and the sheet has no class the code does not name; hhd- classes are written in the D table only', () => {
+  const named = [...new Set(Object.values(D))]
+  const inSheet = classesIn(rules.map(r => r.slice(0, r.indexOf('{'))).join('\n')).filter(c => c !== 'dark')
+  for (const name of named) assert.ok(inSheet.includes(name), `no rule for ${name}`)
+  for (const name of inSheet) assert.ok(named.includes(name), `a rule for ${name}, which nothing names`)
+  for (const f of fs.readdirSync(path.join(ROOT, 'src')).filter(x => x.endsWith('.js') && !['look.js', 'dash-css.js'].includes(x))) {
+    const code = read('src/' + f).split('\n').filter(line => !line.trim().startsWith('//')).join('\n')
+    assert.doesNotMatch(code, /['"`\s]hhd-[a-z]/, `${f} writes an hhd- class outside the D table`)
+  }
+})
+
+test('the path\'s line: one thin neutral line (Hermes\'s --ui-stroke-tertiary, 1.5 px) through all 11 stops; no rule colours it, in any state', () => {
+  const lineRules = rules.filter(r => selectorsOf(r).some(s => /\.hhd-line(?![\w-])/.test(s)))
+  assert.deepEqual(lineRules, [`.${D.line}{fill:none;stroke:var(--ui-stroke-tertiary);stroke-width:1.5;stroke-linecap:round}`])
+  // nothing else in the sheet draws a stroke, and nothing reaches the line through a state (done, here, ...)
+  assert.equal(rules.filter(r => /[{;]stroke(-[a-z]+)?:/.test(r)).length, 1)
+  for (const r of rules) for (const s of selectorsOf(r)) if (/hhd-line(?![\w-])/.test(s)) assert.equal(s, `.${D.line}`)
+  // in the code: every segment wears the line's class and nothing else, with no colour of its own
+  const dash = read('src/dash.js')
+  assert.match(dash, /jsx\('path', \{ d, className: D\.line, 'data-hh': 'line' \}, i\)/)
+  assert.doesNotMatch(dash, /stroke/)
+})
+
+test('the stops show the state: filled accent = done, ringed and larger = You are here, small thin ring = not counted; the halo is an outline, not a shadow', () => {
+  const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
+  assert.match(rule(`.${D.done} .${D.dot}`), /background:var\(--ui-accent\)/)
+  assert.match(rule(`.${D.here} .${D.dot}`), /width:50px;height:50px;.*border:2px solid var\(--ui-accent\);outline:5px solid color-mix\(in srgb,var\(--ui-accent\) 14%,transparent\)/)
+  assert.match(rule(`.${D.quiet} .${D.dot}`), /width:30px;height:30px;background:var\(--ui-bg-elevated\);border:1\.5px solid var\(--ui-stroke-tertiary\)/)
+  assert.match(rule(`.${D.todo} .${D.dot}`), /background:var\(--ui-bg-tertiary\)/)
+  assert.doesNotMatch(rule(`.${D.quiet} .${D.dot}`), /--ui-accent/)
+})
+
+test('hhdesign\'s r7 sizes: tiles 3 across, icon square 40 px at 13% accent; Activity squares 8 px, 2 px apart; stops 40 px (32 narrow)', () => {
+  const rule = sel => rules.find(r => r.startsWith(sel + '{')) || ''
+  assert.match(rule(`.${D.stats}`), /grid-template-columns:repeat\(3,minmax\(0,1fr\)\);gap:10px/)
+  assert.match(rule(`.${D.tileIcon}`), /width:40px;height:40px;border-radius:10px;background:color-mix\(in srgb,var\(--ui-accent\) 13%,transparent\)/)
+  assert.match(rule(`.${D.tileNum}`), /font-size:28px;line-height:32px;font-weight:600/)
+  assert.match(rule(`.${D.sq}`), /width:8px;height:8px;border-radius:2px/)
+  assert.match(rule(`.${D.grid}`), /grid-template-rows:repeat\(7,8px\);grid-auto-columns:8px;gap:2px/)
+  assert.match(rule(`.${D.dot}`), /width:40px;height:40px/)
+  assert.match(rule(`.${D.compact} .${D.dot}`), /width:32px;height:32px/)
+})

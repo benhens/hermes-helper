@@ -26,6 +26,8 @@ export const PINS = {
   // setup-chat: the set-up conversation (named at changes-8, unchanged at changes-10) and the set-up list
   'content/helper-setup-chat-v1.json': ['c2e2e9d77ca05a43f570191e791ca954e81ccc04e1dbe635fb7d02e501cc313b', 'content/helper-talk-live-v2-changes-8.md'],
   'content/dash-setup-list-v2.json': ['e47f30e49d14485e351b382d577f857762ec55dad95653dafef501dcfa29cc80', 'content/result-hhcontent-dash-words.md'],
+  // dash-v2: every other word on the Dashboard tab
+  'content/dash-words-v1.json': ['c7b22d5f2805797ccadb2d0dae47e4df5b606b9c11656b99ab56eaef5a7992b5', 'content/result-hhcontent-dash-words.md'],
   // the disclosure the README copies word for word (tests/readme-disclosure.test.mjs)
   'content/helper-keeps-v1.md': ['0b2563a8e2772d5b918af6bef73cb53af74ce0840b359151a3689c5168a311f4', 'content/helper-talk-live-v2.md'],
   // changes-12 and -13 (the secret rule), ported in the look job: settings_read.py and tests.json at

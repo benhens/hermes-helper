@@ -1,0 +1,108 @@
+{
+  "id": "dash-words-v1",
+  "written": "2026-11-11 hhcontent (job hhcontent-dash-words-lk)",
+  "for": "The Dashboard tab's words. page_words below replaces the stand-in page_words block in plugin/content/dash-setup-list-v2.json (same keys, stand_in gone, new keys listed in new_keys). The 11 stops, their sentences and steps stay in content/dash-setup-list-v2.json.",
+  "goes_with": "content/dash-setup-list-v2.json, sha256 in content/dash-words-v1.md",
+  "not_seen_on_screen": "None of these words has been seen on the page. Widths are not checked: see fit_risks.",
+  "new_keys": [
+    "stats.bots_one, stats.skills_one, stats.plugins_one: the word when the number is 1. stats.bots, stats.skills, stats.plugins stay the word for every other number.",
+    "stats.not_known: screen readers only, for a tile whose read failed (the tile shows no number).",
+    "stats.waiting: screen readers only, while a tile's number is still being read.",
+    "activity.no_chats: optional line where 'Last used' would stand when the open bot has no counted chat. Lead's say whether it is shown (hhdesign's review, fault 6).",
+    "setup.copied: the Copy button's word after a press (the build already shows it; it was not in the data)."
+  ],
+  "page_words": {
+    "tabs": {"dashboard": "Dashboard", "learn": "Learn", "my_setup": "My setup"},
+    "tab_list_label": "Helper tabs",
+    "not_built": "Nothing here yet. What is ready is on Dashboard.",
+    "stats": {
+      "bots_one": "bot",
+      "bots": "bots",
+      "skills_one": "skill",
+      "skills": "skills",
+      "plugins_one": "plugin on in this bot",
+      "plugins": "plugins on in this bot",
+      "not_known": "Helper could not read this number just now.",
+      "waiting": "Counting"
+    },
+    "activity": {
+      "title": "This bot's activity",
+      "last_used_today": "Last used today",
+      "last_used_one": "Last used yesterday",
+      "last_used_n": "Last used {n} days ago",
+      "no_chats": "No chats with this bot yet",
+      "less": "Less",
+      "more": "More",
+      "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "days": ["", "Mon", "", "Wed", "", "Fri", ""]
+    },
+    "setup": {
+      "title": "Set up",
+      "count": "{n} of {total}",
+      "you_are_here": "You are here",
+      "next": "Next",
+      "open": "Open",
+      "all_done": "All 6 are set up.",
+      "not_counted": "Helper can't see this one, so it isn't counted.",
+      "close": "Close",
+      "copy": "Copy",
+      "copied": "Copied",
+      "source": "{file}, line {line}",
+      "state_done": "done",
+      "state_not_done": "to do",
+      "state_not_counted": "not counted",
+      "state_not_known": "Helper could not check this one just now"
+    },
+    "marks": {
+      "install": "Install",
+      "model": "Model",
+      "first_chat": "First chat",
+      "personality": "Personality",
+      "chat_apps": "Chat apps",
+      "tools_apps": "Tools and apps",
+      "skills": "Skills",
+      "memory": "Memory",
+      "scheduled_job": "Scheduled jobs",
+      "second_bot": "Second bot",
+      "safety": "Safety"
+    },
+    "routes": [
+      {"item": "model", "step": 3, "label": "Open Model settings", "to": "/settings?tab=config:model"},
+      {"item": "first_chat", "step": 1, "label": "New session", "to": "new-chat"},
+      {"item": "chat_apps", "step": 1, "label": "Open Messaging", "to": "/messaging"},
+      {"item": "scheduled_job", "step": 3, "label": "Open Scheduled jobs", "to": "/cron"}
+    ]
+  },
+  "rules": {
+    "tile": "Number, then the word: bots_one when the number is 1, else bots. Same for skills and plugins. So: 1 bot, 2 bots, 1 skill, 39 skills, 1 plugin on in this bot, 2 plugins on in this bot.",
+    "plugins_number": "Plugins switched on for the bot the app has open, plus 1 for Helper. A plugin that is installed but switched off is not counted (Lead, 11 Nov; his words: \"We have active plugins\").",
+    "last_used": "0 days: last_used_today. 1 day: last_used_one. 2 or more: last_used_n with the number. Never '1 days ago'.",
+    "all_done": "Shown only when all six counted stops are done. The 6 is written in the sentence: if the number of counted stops changes, this sentence changes with it.",
+    "count": "{n} of {total} gives '2 of 6'. It stands beside the title 'Set up', so it needs no more words."
+  },
+  "variants": {
+    "plugins_label": [
+      {"n": 1, "one": "plugin on in this bot", "many": "plugins on in this bot", "note": "Recommended. Says switched on, and says it is this bot's. 22 letters."},
+      {"n": 2, "one": "active plugin in this bot", "many": "active plugins in this bot", "note": "His word 'active'. 26 letters, the longest."},
+      {"n": 3, "one": "plugin, this bot", "many": "plugins, this bot", "note": "Shortest, 17 letters, for a narrow tile. Does not say switched on."}
+    ],
+    "activity_title": [
+      {"n": 1, "text": "This bot's activity", "note": "Recommended. Same two words, 'this bot', as the plugins tile."},
+      {"n": 2, "text": "Activity in this bot", "note": "Keeps 'Activity' first."},
+      {"n": 3, "text": "Activity, this bot", "note": "Shortest."}
+    ],
+    "not_used": "The bot's own name in the label ('plugins on in work'). Not offered: Hermes showed the main bot's row as 'Hermes' (hhtech-dash-reads2.md line 70), so the label would read 'plugins on in Hermes', which says the whole Hermes."
+  },
+  "fit_risks": [
+    "The plugins label is 22 letters where the stand-in had 7. At a 480 px left side a tile is about 150 px wide: it may wrap to two lines. For hhdesign and the Builder: let it wrap, or use variant 3 at the narrow size.",
+    "'This bot's activity' is drawn in Hermes's small capitals: THIS BOT'S ACTIVITY. Not seen.",
+    "state_not_known is long for a screen reader after a stop's name: 'Model, Helper could not check this one just now'. Read aloud it is one clear sentence; not tried in a screen reader."
+  ],
+  "word_reasons": {
+    "not_built": "Was 'Not built yet.', which speaks about us, not about the person. The new line promises nothing and says where to look.",
+    "state_not_done": "Was 'not done yet'. 'to do' says the same without a 'not'. Screen readers only.",
+    "all_done": "Was 'Everything Helper can see is set up.' Shorter, and matches '6 of 6' beside it. The five small stops still say 'Helper can't see this one, so it isn't counted.' when opened.",
+    "tabs": "His picks (BRIEF, 10 Nov second chat: 'Dashboard', 'Learn', 'My setup'). Not changed.",
+    "no_heading_about_missing": "No word on the tab says something is not set up. The only 'not' on screen is inside an opened small stop: 'so it isn't counted'."
+  }
+}

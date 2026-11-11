@@ -1,10 +1,8 @@
 // The reads of the set-up list (content/dash-setup-list-v2.json items[].read), as fixed rules. Pure code, no React, no
 // Hermes, no AI: src/setup-look.js reads Hermes and hands the answers here.
 //
-// setup-chat (Lead, 11 Nov: "If the Dashboard job built these reads already, use that code, do not write them twice"):
-// everything between the two marks below is src/dash-rules.js of the branch job/dash-v1 (commit 65b108b), line for
-// line, unchanged. It is a copy only because that branch is not on main yet, and its copy of the list is older than the
-// team's. When job/dash-v1 is merged, src/dash-rules.js should import these from here, so there is one copy.
+// One copy (dash-v2, the two branches joined): the Dashboard (src/dash.js, src/dash-rules.js) and Helper's set-up
+// conversation (src/setup-look.js) both use these. They began as src/dash-rules.js of job/dash-v1 (65b108b).
 //   install        always done: this page runs only inside an installed Hermes
 //   model          setup.runtime_check { profile: main bot } says ok: true (Hermes's own free plan counts)
 //   personality    profiles.describe { name: main bot }: soul is not empty and not one of Hermes's starter texts
@@ -13,7 +11,6 @@
 //   second_bot     profiles.list: two or more bots
 // A read that failed or has not come back is "not known" (null): never shown as done.
 
-/* ===== from job/dash-v1 src/dash-rules.js, unchanged ===== */
 /* ---------- Hermes's starter personality texts (hermes_cli/default_soul.py, Hermes v0.23.0) ---------- */
 // DEFAULT_SOUL_MD and the four _LEGACY_TEMPLATE_SOULS, copied as hhtech copied them into its test page
 // (hhtech-dash-reads.md 1.5); tests/dash-rules.test.mjs compares them with tests/fixtures/hermes-default-souls.json.
@@ -74,4 +71,26 @@ export function doneFlags(reads) {
   }
 }
 
-/* ===== end of the copy ===== */
+
+/* ---------- a read that always ends ---------- */
+// A read that gives up after `ms` (the host's own timer, cleaned up with the plugin). A host door that throws
+// instead of rejecting counts as a failed read. Every read ends as { ok: true, value } or { ok: false }.
+export function makeReader(ctx) {
+  return (fn, ms) =>
+    new Promise(resolve => {
+      let done = false
+      const end = r => {
+        if (done) return
+        done = true
+        stop()
+        resolve(r)
+      }
+      const stop = ctx.setTimeout(() => end({ ok: false }), ms)
+      Promise.resolve()
+        .then(fn)
+        .then(
+          value => end({ ok: true, value }),
+          () => end({ ok: false })
+        )
+    })
+}

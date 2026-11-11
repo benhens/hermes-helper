@@ -7,32 +7,12 @@
 //   cron.manage { action: 'list', profile: main, include_disabled }  its scheduled jobs (always with profile)
 // Every read ends as { ok: true, value } or { ok: false } (failed, threw, or gave no answer in LOOK_READ_MS); a failed
 // read is "couldn't check" (null, or model 'unread'), never a guess. The rules that turn the answers into done or not
-// done are src/setup-reads.js (the Dashboard job's). makeReader below is src/dash.js's of job/dash-v1, unchanged.
-import { botRows, mainBotName, doneFlags } from './setup-reads.js'
+// done are src/setup-reads.js (the Dashboard job's), and so is makeReader (one copy, shared with src/dash.js).
+import { botRows, mainBotName, doneFlags, makeReader } from './setup-reads.js'
 
 export const LOOK_READ_MS = 8000
 // What Helper has seen when nothing could be read (also before the first look comes back)
 export const LOOK_UNSEEN = { model: 'unread', soul: null, jobs: null, bots: null }
-
-function makeReader(ctx) {
-  return (fn, ms) =>
-    new Promise(resolve => {
-      let done = false
-      const end = r => {
-        if (done) return
-        done = true
-        stop()
-        resolve(r)
-      }
-      const stop = ctx.setTimeout(() => end({ ok: false }), ms)
-      Promise.resolve()
-        .then(fn)
-        .then(
-          value => end({ ok: true, value }),
-          () => end({ ok: false })
-        )
-    })
-}
 
 // The reads' answers as what the set-up conversation uses (src/setup-chat.js `seen`)
 export function seenFrom(reads) {

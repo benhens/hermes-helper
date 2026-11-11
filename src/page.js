@@ -10,7 +10,7 @@
 // Look: the left side wears Hermes's own UI kit components and the class strings its own screens
 // use (K in src/look.js). Helper's window has the one style sheet of our own (src/talk.css, the T
 // table), put into a <style> element inside our own page.
-import { host, Button, Codicon, RowButton, Textarea, Tip, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
+import { host, Button, Codicon, Textarea, PRIMARY_ICON_BTN, composerInputBacking, composerSurfaceRing } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, T, cx } from './look.js'
@@ -20,10 +20,9 @@ import { RISE, expressionFor, asksQuestion, makeBusy } from './expressions.js'
 import { makeEyes } from './eyes.js'
 import { makeRevealClock, wordsOf } from './reveal.js'
 import { prefersReducedMotion, watchReducedMotion } from './motion.js'
-import { readState } from './state.js'
+import { readState, TAB_IDS } from './state.js'
 import { checkModel, RECHECK_AFTER_MS } from './model-status.js'
 import { MAX_INPUT_CHARS } from './key-check.js'
-import { STEPS, LATER_STEPS, VERSION_LINE, LINES, stepByNumber, railLines, docsUrl, isDocsUrl, chipLabel, nextAfter, fitsGoal } from './steps.js'
 import { laterVisit, turnParts, keptWords, keptWasShown, nameWithMore, pick, pickTopic, pickGroup, pickWant, pageOf, press, pressOffer, offerSaid, offerIsSetup, hasTopicWord, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, lineFor, openingLine, hintFor } from './talk.js'
 import { cleanKept, keptToStore } from './kept.js'
 import { SETUP_BUILT, SETUP_AI_BUILT } from './setup-built.js'
@@ -34,12 +33,10 @@ import { makeLook, LOOK_UNSEEN } from './setup-look.js'
 import { liveWhyNot, askLive, liveApply, LIVE_SECONDS, SLOW_LINE, slowFollows } from './live-turn.js'
 import { lastLines, sendable } from './live-request.js'
 import { Conversation, Bubble, BusyDots, Picks, Under, Grip } from './talk-view.js'
-import { makeSetupCards, renderYourSetup } from './setup-tab.js'
-import { layoutFor, clampHelperWidth, RAIL_PX, RAIL_NUMBERS_PX, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
+import { makeDashboard, DASH_COMPACT_UNDER_PX, openHermesDocs } from './dash.js'
+import { DASH_DATA } from './dash-data.js'
+import { layoutFor, clampHelperWidth, STRIP_PX, HELPER_MIN_PX, HELPER_MAX_PX } from './layout.js'
 
-// Column widths (layout only; every colour, font and line comes from Hermes's classes).
-const RAIL_WIDTH = `${RAIL_PX}px`
-const RAIL_NUMBERS_WIDTH = `${RAIL_NUMBERS_PX}px`
 // One press of an arrow key on the edge to drag moves it this far.
 const GRIP_KEY_PX = 16
 // Keys that are not typing by themselves: pressing one alone does not end the word-by-word reveal.
@@ -47,10 +44,9 @@ const LONE_KEYS = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']
 // The longest conversation kept in page memory.
 const LOG_MAX = 200
 
-export const TABS = [
-  { id: 'setup', label: 'Setup' },
-  { id: 'yours', label: 'Your setup' }
-]
+// dash-v1: three tabs, Dashboard, Learn, My setup (Pēteris's pick, 11 Nov 2026); their names from the Dashboard's
+// data (content/dash-setup-list-v2.json page_words). Only Dashboard is built: Learn and My setup show one quiet line.
+export const TABS = TAB_IDS.map(id => ({ id, label: DASH_DATA.words.tabs[id] }))
 
 // Our own page's size, from a ResizeObserver on our own element (never Hermes's markup). The ref
 // function is made once, so React doesn't detach and re-attach it on every render; React calls it
@@ -90,7 +86,7 @@ export function makePage(ctx, opts = {}) {
   // clock = which words of Helper's lines are visible (a line is revealed once, then stays whole).
   const busy = makeBusy()
   const clock = makeRevealClock({ setInterval: (fn, ms) => ctx.setInterval(fn, ms) })
-  const useSetupCards = makeSetupCards(ctx, { busy })
+  const { useDashboard, renderDashboard } = makeDashboard(ctx)
   const sleep = ms => new Promise(resolve => ctx.setTimeout(resolve, ms))
   // Last successful model check (ok or none), shared by every mount of the page while the plugin
   // is loaded. A failed check is not kept, so the next open asks again.
@@ -277,15 +273,6 @@ export function makePage(ctx, opts = {}) {
     if (memory && memory.lookWait) memory.lookWait()
     if (memory && memory.recWait) memory.recWait(null)
   }
-  // Opens a docs page in the person's browser (the SDK's OS door; false when unavailable).
-  const openDocs = url => {
-    if (!isDocsUrl(url)) return
-    try {
-      const done = ctx.os && typeof ctx.os.openExternal === 'function' ? ctx.os.openExternal(url) : null
-      if (done && typeof done.catch === 'function') done.catch(() => {})
-    } catch {}
-  }
-
   function useModelStatus() {
     const fresh = lastCheck && Date.now() - lastCheck.at < RECHECK_AFTER_MS
     const [status, setStatus] = useState(() => (fresh ? lastCheck.result : { state: 'checking' }))
@@ -322,8 +309,6 @@ export function makePage(ctx, opts = {}) {
   return function HelperPage() {
     const [initial] = useState(() => readState((k, d) => ctx.storage.get(k, d)))
     const [tab, setTab] = useState(initial.tab)
-    const [step, setStep] = useState(initial.step)
-    const [answers, setAnswers] = useState(initial.answers)
     // The width the person dragged Helper's window to (remembered), and whether Helper is folded
     // away to its strip (not remembered: it starts open, so the greeting is seen first).
     const [helperWidth, setHelperWidth] = useState(initial.helperWidth)
@@ -366,7 +351,9 @@ export function makePage(ctx, opts = {}) {
     const [focusStrip, setFocusStrip] = useState(false)
     const [size, measureRef] = useOwnSize()
     const width = size.width
-    const [modelStatus, recheck] = useModelStatus()
+    const [modelStatus] = useModelStatus()
+    // dash-v1: the Dashboard's state, read again each time its tab is opened (src/dash.js)
+    const dashboard = useDashboard({ active: tab === 'dashboard' })
     // talk-live: the AI step reads the model status this page checked, and ends a waiting turn on this page
     live.status = modelStatus
     // (review) the page drawn last holds the view; a page that leaves lets go only of its own
@@ -379,7 +366,6 @@ export function makePage(ctx, opts = {}) {
       },
       []
     )
-    const setup = useSetupCards({ active: tab === 'yours', launchModel: modelStatus, recheckLaunch: recheck })
     const askBox = useRef(null)
     // The conversation's scrolling area: kept at the bottom, where the newest words are.
     const helperScroll = useRef(null)
@@ -400,9 +386,8 @@ export function makePage(ctx, opts = {}) {
       ctx.storage.set(key, value)
     }
     const saveTab = keep('tab', setTab)
-    const saveStep = keep('step', setStep)
 
-    // The message box takes the keyboard when asked to (a pick, "Ask about this step", Helper
+    // The message box takes the keyboard when asked to (a pick, Helper
     // opened from its strip); a request that finds no box is dropped, so it can't steal focus later.
     useEffect(() => {
       if (!focusAsk) return
@@ -435,11 +420,10 @@ export function makePage(ctx, opts = {}) {
       if (folded && !fit.narrow) setFolded(false)
     }, [width])
 
-    const currentStep = stepByNumber(step) || STEPS[0]
     const helperShown = fit.helper !== 'strip'
 
     // Puts Helper away or brings it back, with the keyboard following (to the strip, or to the
-    // message box). The strip, Escape and "Ask about this step" all go through it; only the
+    // message box). The strip and Escape go through it; only the
     // unfolding by a wider window (the effect above) sets the state itself, and moves no focus.
     function foldHelper(away) {
       setFolded(away)
@@ -804,7 +788,7 @@ export function makePage(ctx, opts = {}) {
         setLog(old => (memory.log = old.map(e => (e.id === entry.id ? { ...e, pressed: true } : e))))
         return runSetup(mv, next.label)
       }
-      if (next.kind === 'docs') return openDocs(next.url)
+      if (next.kind === 'docs') return openHermesDocs(ctx, next.url)
       if (next.kind === 'part') go(next.to)
     }
 
@@ -825,27 +809,6 @@ export function makePage(ctx, opts = {}) {
     function skipOpening() {
       liveClose()
       answer(skip(visit), 'Skip', '', true)
-    }
-
-    // Picking an answer on a step: saved. Helper stays silent: its lines come from the conversation only.
-    function choose(option) {
-      if (answers[currentStep.id] === option.id) return
-      const next = { ...answers, [currentStep.id]: option.id }
-      setAnswers(next)
-      ctx.storage.set('answers', next)
-    }
-
-    // "I understand, next step": the step's next_rule picks the next step (code, not the model).
-    // After the last step it opens Your setup.
-    function finishStep() {
-      const to = nextAfter(currentStep, answers[currentStep.id])
-      if (to !== 'done') return saveStep(to)
-      saveTab('yours')
-    }
-
-    // "Ask about this step": the keyboard goes to the message box; a folded Helper opens first.
-    function askAboutStep() {
-      foldHelper(false)
     }
 
     /* ---------- Helper's edge to drag: between 360 and 600 px, remembered ---------- */
@@ -912,7 +875,7 @@ export function makePage(ctx, opts = {}) {
     const tabRow = jsx('div', {
       className: K.tabs,
       role: 'tablist',
-      'aria-label': 'Helper',
+      'aria-label': DASH_DATA.words.tabListLabel,
       'data-hh': 'tabs',
       children: TABS.map((t, i) => {
         const on = tab === t.id
@@ -939,255 +902,11 @@ export function makePage(ctx, opts = {}) {
 
     const header = jsx('div', { className: K.head, 'data-hh': 'header', children: tabRow })
 
-    /* ---------- step list (numbers only when the window is narrow) ---------- */
-    const numbersOnly = fit.rail === 'numbers'
-    const stepRow = s => {
-      const on = s.number === step
-      const rail = railLines(s)
-      const number = jsx('span', { className: on ? K.rowNumberOn : K.rowNumber, children: s.number }, 'n')
-      const button = jsxs(RowButton, {
-        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
-        'aria-current': on ? 'step' : undefined,
-        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}` : undefined,
-        onClick: () => saveStep(s.number),
-        children: numbersOnly
-          ? [number]
-          : [
-              number,
-              jsxs(
-                'span',
-                {
-                  className: K.rowText,
-                  children: [
-                    jsx('span', { className: K.rowTitle, children: rail.title }),
-                    rail.sub ? jsx('span', { className: K.rowSub, children: jsx('span', { className: K.truncate, children: rail.sub }) }) : null
-                  ]
-                },
-                't'
-              )
-            ]
-      })
-      return jsx(
-        'div',
-        {
-          className: cx(K.row, on ? K.rowActive : K.rowIdle),
-          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}`, children: button }) : button
-        },
-        s.number
-      )
-    }
-
-    // Steps that come later: not buttons. With numbers only, the number carries its title for
-    // screen readers (role img + label) and as a tip on hover.
-    const laterRow = s => {
-      const inner = jsxs('div', {
-        className: numbersOnly ? K.rowButtonNumbers : K.rowButton,
-        role: numbersOnly ? 'img' : undefined,
-        'aria-label': numbersOnly ? `Step ${s.number}: ${s.title}, comes later` : undefined,
-        children: [
-          jsx('span', { className: K.rowNumber, children: s.number }, 'n'),
-          numbersOnly ? null : jsx('span', { className: K.rowText, children: jsx('span', { className: K.rowTitleOff, children: s.title }) }, 't')
-        ]
-      })
-      return jsx(
-        'div',
-        {
-          className: cx(K.row, K.rowIdle),
-          'aria-disabled': true,
-          children: numbersOnly ? jsx(Tip, { label: `Step ${s.number}: ${s.title}, comes later`, children: inner }) : inner
-        },
-        s.number
-      )
-    }
-
-    const rail = jsxs(
-      'nav',
-      {
-        className: K.rail,
-        style: { width: numbersOnly ? RAIL_NUMBERS_WIDTH : RAIL_WIDTH },
-        'aria-label': 'Steps',
-        'data-hh': 'steps',
-        'data-numbers-only': numbersOnly,
-        children: [
-          jsxs('div', {
-            className: K.railScroll,
-            children: [
-              numbersOnly ? null : jsx('div', { className: cx(K.sectionLabel, K.sectionLabelPad), children: 'Steps' }),
-              jsx('div', { className: K.rowList, children: STEPS.map(stepRow) }),
-              jsx('div', { className: cx(K.sectionLabel, numbersOnly ? K.sectionLabelPad : K.sectionLabelGap), children: numbersOnly ? null : 'After these' }),
-              jsx('div', { className: K.rowList, children: LATER_STEPS.map(laterRow) })
-            ]
-          }),
-          numbersOnly ? null : jsx('div', { className: K.railFoot, children: VERSION_LINE })
-        ]
-      },
-      'rail'
-    )
-
-    /* ---------- open step ---------- */
-    // One primary button per screen (hhdesign fix 6): "I understand, next step"; the rest are secondary.
-    const stepActions = jsxs(
-      'div',
-      {
-        className: K.actions,
-        children: [
-          jsx(Button, { size: 'sm', onClick: finishStep, children: 'I understand, next step' }),
-          jsx(Button, { variant: 'secondary', size: 'sm', onClick: askAboutStep, children: 'Ask about this step' })
-        ]
-      },
-      'actions'
-    )
-
-    // A source tag that opens its docs page: "Hermes docs › {section}" (v1-strings part 5).
-    const sourceLink = (url, label, key) =>
-      jsx(
-        'a',
-        {
-          className: K.chipLink,
-          href: url,
-          target: '_blank',
-          rel: 'noreferrer',
-          title: url,
-          'data-hh': 'source',
-          onClick: e => {
-            e.preventDefault()
-            openDocs(url)
-          },
-          onAuxClick: e => {
-            e.preventDefault()
-            openDocs(url)
-          },
-          children: label
-        },
-        key
-      )
-    const factSource = f => sourceLink(f.url || docsUrl(f.source), chipLabel(f.section), f.id || f.source + f.section)
-
-    // The open step is wide enough for two columns (the comparison, and the answer cards).
-    const wideStep = fit.columns === 2
-    const here = currentStep
-    const picked = answers[here.id]
-    const fits = fitsGoal(answers, here.id)
-    const introSources = []
-    for (const src of here.intro_sources || []) {
-      const key = `${src.source}#${src.section}`
-      if (!introSources.some(x => x.key === key)) introSources.push({ key, url: docsUrl(src.source), label: chipLabel(src.section) })
-    }
-
-    const stepView = [
-      jsxs(
-        'header',
-        {
-          children: [
-            jsx('div', { className: K.sectionLabel, children: `Step ${here.number} of ${STEPS.length}` }),
-            jsx('h3', { className: K.stepTitle, children: here.title }),
-            jsx('p', { className: K.prose, 'data-hh': 'intro', children: here.intro })
-          ]
-        },
-        'head'
-      ),
-      introSources.length
-        ? jsxs(
-            'div',
-            {
-              className: K.chips,
-              'data-hh': 'intro-sources',
-              children: [jsx('span', { className: K.chipsLabel, children: 'Source' }, 'l'), ...introSources.map(x => sourceLink(x.url, x.label, x.key))]
-            },
-            'intro-sources'
-          )
-        : null,
-      here.compare
-        ? jsx(
-            'dl',
-            {
-              className: cx(K.pairGrid, wideStep && K.twoColumns),
-              'data-hh': 'compare',
-              'data-columns': fit.columns,
-              children: ['left', 'right'].map(side => {
-                const c = here.compare[side]
-                return jsxs(
-                  'div',
-                  {
-                    className: K.pairSide,
-                    children: [jsx('dt', { className: K.pairTitle, children: c.title }), jsx('dd', { className: K.caption, children: c.text }), factSource(c)]
-                  },
-                  side
-                )
-              })
-            },
-            'compare'
-          )
-        : null,
-      jsx(
-        'ul',
-        {
-          className: K.factList,
-          'data-hh': 'facts',
-          children: here.facts.map(f =>
-            jsxs('li', { className: K.fact, 'data-fact': f.id, children: [jsx('p', { className: K.factText, children: f.text }), factSource(f)] }, f.id)
-          )
-        },
-        'facts'
-      ),
-      jsxs(
-        'div',
-        {
-          className: K.scaffold,
-          'data-hh': 'video',
-          children: [
-            jsx('span', { className: K.scaffoldGlyph, children: jsx(Codicon, { name: 'play-circle', size: '0.875rem' }) }),
-            jsx('span', { children: LINES.videoLater })
-          ]
-        },
-        'video'
-      ),
-      jsxs(
-        'section',
-        {
-          children: [
-            jsx('div', { className: K.question, children: here.question }),
-            jsx('div', {
-              className: cx(K.choices, wideStep && K.twoColumns),
-              role: 'group',
-              'aria-label': here.question,
-              'data-hh': 'choices',
-              'data-columns': fit.columns,
-              children: here.options.map(o =>
-                jsxs(
-                  'button',
-                  {
-                    type: 'button',
-                    'aria-pressed': picked === o.id,
-                    className: cx(K.choice, picked === o.id ? K.choiceOn : K.choiceOff),
-                    'data-option': o.id,
-                    onClick: () => choose(o),
-                    children: [
-                      jsxs('span', {
-                        className: K.choiceText,
-                        children: [jsx('span', { className: K.choiceLabel, children: o.label }), o.hint ? jsx('span', { className: K.choiceSub, children: o.hint }) : null]
-                      }, 't'),
-                      fits === o.id ? jsx('span', { className: K.fitTag, 'data-hh': 'fits-goal', children: LINES.fitsGoal }, 'fit') : null
-                    ]
-                  },
-                  o.id
-                )
-              )
-            })
-          ]
-        },
-        'question'
-      ),
-      stepActions
-    ]
-
-    const yoursView = renderYourSetup(setup, {
-      openStep: n => {
-        saveStep(n)
-        saveTab('setup')
-      },
-      cardColumns: fit.cardColumns
-    })
+    /* ---------- the tab's panel: the Dashboard, or one quiet line for a tab not built yet ---------- */
+    const panel =
+      tab === 'dashboard'
+        ? renderDashboard(dashboard, { compact: fit.main < DASH_COMPACT_UNDER_PX })
+        : jsx('p', { className: K.notBuilt, 'data-hh': 'not-built', children: DASH_DATA.words.notBuilt }, 'not-built')
 
     const main = jsx(
       'main',
@@ -1198,7 +917,7 @@ export function makePage(ctx, opts = {}) {
         role: 'tabpanel',
         id: 'hh-tabpanel',
         'aria-labelledby': `hh-tab-${tab}`,
-        children: jsx('div', { className: K.detailScroll, children: jsxs('div', { className: tab === 'setup' ? K.detailInner : K.detailInnerWide, children: tab === 'setup' ? stepView : yoursView }) })
+        children: jsx('div', { className: K.detailScroll, 'data-hh': 'scroll', children: panel })
       },
       'main'
     )
@@ -1354,13 +1073,13 @@ export function makePage(ctx, opts = {}) {
           )
         : null
 
-    // The left side: the tabs, and under them the step list and the open step (or Your setup).
+    // The left side: the tabs, and under them the open tab.
     const left = jsxs(
       'div',
       {
         className: K.left,
         'data-hh': 'left',
-        children: [header, jsx('div', { className: K.body, 'data-hh': 'body', children: tab === 'setup' ? [rail, main] : [main] }, 'body')]
+        children: [header, jsx('div', { className: K.body, 'data-hh': 'body', children: [main] }, 'body')]
       },
       'left'
     )
