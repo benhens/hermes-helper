@@ -328,6 +328,11 @@ export const DASH_DATA = {
       "plugins": "plugins on in this bot",
       "not_known": "Helper could not read this number just now.",
       "waiting": "Counting",
+      "lines": {
+        "bots": "Each bot is a separate Hermes.",
+        "skills": "Each skill teaches Hermes one task.",
+        "plugins": "Each plugin is an add-on for Hermes."
+      },
       "plugins_short_one": "plugin, this bot",
       "plugins_short": "plugins, this bot",
       "plugins_title": "Plugins",

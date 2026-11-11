@@ -214,6 +214,8 @@ export const D = {
   // loom-fixes: a tile that opens Hermes's own screen, and the plugins tile's name in place of a number
   tileBtn: 'hhd-tile-btn',
   tileName: 'hhd-tile-name',
+  // loom2: the one plain line under each tile
+  tileLine: 'hhd-tile-line',
   wait: 'hhd-wait',
   // Set up (loom2): the heading and count over a grid of cards; a card wears a tile's surface, edge, corners and icon
   head: 'hhd-head',

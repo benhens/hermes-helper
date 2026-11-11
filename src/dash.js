@@ -210,9 +210,11 @@ export function makeDashboard(ctx) {
     }
     // loom-fixes (Lead's points 14 and 15, hhtech-loom-n1 1 and 2): a tile with a screen of Hermes's own that lists the
     // same things is a button to that screen; the bots tile stays plain. The plugins tile has no number.
+    // loom2 point 4: one plain line under each tile, what the thing is
+    const tileLine = key => jsx('span', { className: D.tileLine, 'data-hh': 'tile-line', children: W.stats.lines[key] }, 'line')
     const tileWords = key =>
       key === 'plugins'
-        ? [jsx('b', { className: D.tileName, 'data-hh': 'tile-name', children: W.stats.plugins_title }, 'n'), jsx('span', { className: D.tileLabel, children: W.stats.plugins_line }, 'l')]
+        ? [jsx('b', { className: D.tileName, 'data-hh': 'tile-name', children: W.stats.plugins_title }, 'n'), jsx('span', { className: D.tileLabel, children: W.stats.plugins_line }, 'l'), tileLine(key)]
         : [
             numbers[key] === undefined
               ? jsx('i', { className: D.wait, 'data-hh': 'wait', 'aria-hidden': true }, 'n')
@@ -227,7 +229,8 @@ export function makeDashboard(ctx) {
                 ? jsx('span', { className: K.srOnly, children: W.stats.not_known }, 'sr')
                 : null,
             // a tile that opens Hermes's screen says where it goes (the plugins tile says it on screen)
-            TILE_GO[key] ? jsx('span', { className: K.srOnly, children: '. ' + W.stats.plugins_line }, 'go') : null
+            TILE_GO[key] ? jsx('span', { className: K.srOnly, children: '. ' + W.stats.plugins_line }, 'go') : null,
+            tileLine(key)
           ]
     const tile = key => {
       const inner = [jsx('span', { className: D.tileIcon, children: jsx(DashIcon, { icon: DASH_ICONS[key], size: 20 }) }, 'i'), jsxs('span', { className: D.tileWords, children: tileWords(key) }, 'w')]

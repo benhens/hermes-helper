@@ -106,6 +106,22 @@ test('the top box: three tiles, bots and skills with their numbers, plugins with
   assert.equal(log.filter(e => e.method === 'plugins.manage').length, 0)
 })
 
+test('loom2: one plain line under each tile says what the thing is (his Loom, 0:20 "why is it just saying Plugins, Skills, Bots?"); the plugins tile keeps "See them in Capabilities"', async () => {
+  for (const who of ['just_installed', 'all']) {
+    const { view } = await open(who)
+    const line = k => said(byData(byData(dash(view), `tile-${k}`), 'tile-line'))
+    assert.deepEqual(['bots', 'skills', 'plugins'].map(line), ['Each bot is a separate Hermes.', 'Each skill teaches Hermes one task.', 'Each plugin is an add-on for Hermes.'])
+    assert.ok(all(byData(dash(view), 'stats'), n => n.props && n.props['data-hh'] === 'tile-line').every(n => n.props.className === D.tileLine))
+    assert.match(text(byData(dash(view), 'tile-plugins')), /See them in Capabilities/)
+  }
+  // while a number is still read, the line is there already
+  useHost('half')
+  globalThis.__hhHost.skills = () => new Promise(() => {})
+  const reg = await registerPlugin(fakeStorage(), fakeTimers())
+  const view = mount(reg.Page)
+  assert.equal(said(byData(byData(dash(view), 'tile-skills'), 'tile-line')), 'Each skill teaches Hermes one task.')
+})
+
 test('the skills and plugins tiles are buttons to Hermes\'s own screens (Capabilities, Skills / Plugins); the bots tile stays plain; keyboard and screen reader as a route button', async () => {
   const { view } = await open('half')
   const tile = k => byData(dash(view), `tile-${k}`)

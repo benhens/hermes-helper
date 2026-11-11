@@ -139,6 +139,10 @@ export const CARDS_OUT = ['scheduled_job']
 // the word on a card the person marked; the button that marks it (his words, 17:10 UTC: "only if the person clicks
 // Done"), in place of "I've done this". Once the team's file has them, these are the same words and change nothing.
 export const LOOM2_WORDS = { start_here: 'Start here', state_done: 'Done', mark_done: 'Done' }
+// loom2 point 4 (his Loom, 0:20 "why is it just saying Plugins, Skills, Bots? Why?"): one plain line under each tile, as
+// Lead wrote them: bots from the second-bot card's sentence, skills from the skills card's, plugins from
+// content/helper-talk-v2.json fixed_lines 63 ("A plugin is an add-on.")
+export const TILE_LINES = { bots: 'Each bot is a separate Hermes.', skills: 'Each skill teaches Hermes one task.', plugins: 'Each plugin is an add-on for Hermes.' }
 
 // What src/dash.js reads: the cards (no done rules or reads: since loom2 nothing is read for them) and the page words.
 export function slimDashData(data) {
@@ -163,7 +167,7 @@ export function slimDashData(data) {
     path: data.items.filter(i => i.on_path === true).map(i => i.id),
     words: {
       // loom2: no tabs (Learn is out, his Loom of 11 Nov, 1:51): the tab names and Learn's line are not built in
-      stats: { ...w.stats, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
+      stats: { ...w.stats, lines: TILE_LINES, plugins_short_one: shortPlugins(data).one, plugins_short: shortPlugins(data).many, plugins_title: PLUGINS_TILE.title, plugins_line: PLUGINS_TILE.line },
       helperWindow: pickWords(w.helper_window, ['hide', 'show', 'clear', 'clear_ask', 'clear_yes', 'clear_no']),
       // loom2: Activity is out (his Loom of 11 Nov, 0:05 "just take it out"): its words are not built in
       // loom2: no path, so no "You are here", Next, Open, all done line or seen states; no "Helper can't see this one"
