@@ -266,7 +266,7 @@ test('the new build checks stop the build on broken data (each broken on purpose
 
 test('the build: the new lines are in the plugin\'s data, and W2 alone may hold two Hermes terms (each still explained); a W2 that breaks another rule still stops the build', () => {
   for (const id of ['COST', 'WHERE', 'W2', 'NAME_AGAIN', 'NAME_NEW']) assert.ok(TALK_DATA.fixed[id] && TALK_DATA.fixed[id].text, id)
-  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.')
+  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
   assert.deepEqual(talkProblems(DATA), [])
   const broken = (id, change) => {
     const d = JSON.parse(JSON.stringify(DATA))

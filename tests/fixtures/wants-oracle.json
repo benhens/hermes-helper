@@ -1,8 +1,11 @@
 {
  "about": "Written by dev/checks/talk-v2-wants/dump_oracle.py. Do not edit: make it again.",
- "route2_sha256": "c7edb97ac41e007b5c4a7df277475143866fd49612b0a98f7c2956b9b196b48e",
+ "route2_sha256": "46f1b2acd6f35c272f25e53507c7cb6a30a3d10c4e5dfdb911c90fb6625f1368",
+ "route2_run": "route2_secret11.py",
+ "route2_run_sha256": "eb2d3ec5490712d6a88c30562e798e0619ce65028ab93b821051b5e8deddbc4c",
  "wants_step_sha256": "491b7f75865c4d61219476632e5d56270081ef6146f77c5fbd5323fed420a23f",
  "fixes6_step_sha256": "cd6d53f51b1bcac27fc2436c1ac0431199a650d6cb6c5a120c47e02d02ba9142",
+ "wants_fixes_step_sha256": "9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a",
  "skill_next_patterns": [
   "(?:the|a|an|this|that) {n} skills?",
   "skills? (?:called|named) \\\"?{n}\\\"?",
@@ -29,6 +32,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -65,6 +79,17 @@
       "topic": "mem",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -83,6 +108,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -119,6 +155,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -137,6 +184,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -173,6 +231,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -191,6 +260,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -227,6 +307,17 @@
       "topic": "mem",
       "need": "mem2",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem2",
+      "why": null
      }
     },
     {
@@ -245,6 +336,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mem3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem3",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mem3",
       "kind": "row",
       "row": null,
@@ -281,6 +383,17 @@
       "topic": "mem",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -299,6 +412,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mod",
       "kind": "question",
       "row": null,
@@ -335,6 +459,17 @@
       "topic": "mod",
       "need": "mod1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1",
+      "why": null
      }
     },
     {
@@ -353,6 +488,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mod2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mod2",
       "kind": "row",
       "row": null,
@@ -389,6 +535,17 @@
       "topic": "mod",
       "need": "mod3",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3",
+      "why": null
      }
     },
     {
@@ -407,6 +564,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mod",
       "kind": "question",
       "row": null,
@@ -443,6 +611,17 @@
       "topic": "mod",
       "need": "mod3",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3",
+      "why": null
      }
     },
     {
@@ -461,6 +640,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mod",
       "kind": "question",
       "row": null,
@@ -497,6 +687,17 @@
       "topic": "mod",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -515,6 +716,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question msg",
       "kind": "question",
       "row": null,
@@ -551,6 +763,17 @@
       "topic": "msg",
       "need": "msg2",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2",
+      "why": null
      }
     },
     {
@@ -569,6 +792,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line msg1",
       "kind": "row",
       "row": null,
@@ -605,6 +839,17 @@
       "topic": "msg",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -623,6 +868,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question msg",
       "kind": "question",
       "row": null,
@@ -659,6 +915,17 @@
       "topic": "msg",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -677,6 +944,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line msg2",
       "kind": "row",
       "row": null,
@@ -713,6 +991,17 @@
       "topic": "sch",
       "need": "sch1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1",
+      "why": null
      }
     },
     {
@@ -731,6 +1020,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line sch2",
       "kind": "row",
       "row": null,
@@ -767,6 +1067,17 @@
       "topic": "sch",
       "need": "sch3",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line sch3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch3",
+      "why": null
      }
     },
     {
@@ -785,6 +1096,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question sch",
       "kind": "question",
       "row": null,
@@ -821,6 +1143,17 @@
       "topic": "sch",
       "need": "sch4",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line sch4",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch4",
+      "why": null
      }
     },
     {
@@ -839,6 +1172,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line svc1",
       "kind": "row",
       "row": null,
@@ -875,6 +1219,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -893,6 +1248,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line svc2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line svc2",
       "kind": "row",
       "row": null,
@@ -929,6 +1295,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -947,6 +1324,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question bot",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question bot",
       "kind": "question",
       "row": null,
@@ -983,6 +1371,17 @@
       "topic": "bot",
       "need": "bot1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1",
+      "why": null
      }
     },
     {
@@ -1001,6 +1400,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line bot2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line bot2",
       "kind": "row",
       "row": null,
@@ -1037,6 +1447,17 @@
       "topic": "bot",
       "need": "bot1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1",
+      "why": null
      }
     },
     {
@@ -1055,6 +1476,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mod",
       "kind": "question",
       "row": null,
@@ -1085,6 +1517,20 @@
       "why": null
      },
      "oracle": {
+      "shown": "W1 buttons mem+msg",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "msg"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "W1 buttons mem+msg",
       "kind": "W1",
       "row": null,
@@ -1130,6 +1576,20 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "W1 buttons msg+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "sch"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1148,6 +1608,17 @@
       "why": "can you connect"
      },
      "oracle": {
+      "shown": "H1 (can you connect)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "can you connect"
+     },
+     "oracle_f6": {
       "shown": "H1 (can you connect)",
       "kind": "H1",
       "row": null,
@@ -1184,6 +1655,17 @@
       "topic": null,
       "need": null,
       "why": "connect my"
+     },
+     "oracle_f6": {
+      "shown": "H1 (connect my)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "connect my"
      }
     },
     {
@@ -1202,6 +1684,17 @@
       "why": "please install"
      },
      "oracle": {
+      "shown": "H1 (please install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "please install"
+     },
+     "oracle_f6": {
       "shown": "H1 (please install)",
       "kind": "H1",
       "row": null,
@@ -1238,6 +1731,17 @@
       "topic": null,
       "need": null,
       "why": "for me + set up"
+     },
+     "oracle_f6": {
+      "shown": "H1 (for me + set up)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "for me + set up"
      }
     },
     {
@@ -1256,6 +1760,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "K1",
+      "kind": "K1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "K1",
       "kind": "K1",
       "row": null,
@@ -1292,6 +1807,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1310,6 +1836,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line skill",
       "kind": "term",
       "row": null,
@@ -1346,6 +1883,17 @@
       "topic": "mod",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1364,6 +1912,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -1400,6 +1959,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1418,6 +1988,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -1454,6 +2035,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1472,6 +2064,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line sch1",
       "kind": "row",
       "row": null,
@@ -1508,6 +2111,17 @@
       "topic": "sch",
       "need": "sch3",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line sch3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch3",
+      "why": null
      }
     },
     {
@@ -1526,6 +2140,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -1570,6 +2195,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -1591,6 +2227,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -1630,6 +2277,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -1651,6 +2309,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mem2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mem2",
       "kind": "row",
       "row": null,
@@ -1690,6 +2359,17 @@
       "topic": "mem",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1711,6 +2391,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mod",
       "kind": "question",
       "row": null,
@@ -1750,6 +2441,17 @@
       "topic": "mod",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1771,6 +2473,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mod1",
       "kind": "row",
       "row": null,
@@ -1816,6 +2529,20 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "W1 buttons msg+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "sch"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1837,6 +2564,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mod3",
       "kind": "row",
       "row": null,
@@ -1876,6 +2614,17 @@
       "topic": "mod",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1897,6 +2646,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mod3",
       "kind": "row",
       "row": null,
@@ -1936,6 +2696,17 @@
       "topic": "msg",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -1957,6 +2728,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line msg1",
       "kind": "row",
       "row": null,
@@ -1996,6 +2778,17 @@
       "topic": "msg",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2017,6 +2810,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question msg",
       "kind": "question",
       "row": null,
@@ -2056,6 +2860,17 @@
       "topic": "sch",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2077,6 +2892,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line sch1",
       "kind": "row",
       "row": null,
@@ -2116,6 +2942,17 @@
       "topic": "sch",
       "need": "sch2",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2",
+      "why": null
      }
     },
     {
@@ -2137,6 +2974,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question sch",
       "kind": "question",
       "row": null,
@@ -2176,6 +3024,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -2197,6 +3056,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question svc",
       "kind": "question",
       "row": null,
@@ -2236,6 +3106,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -2257,6 +3138,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question svc",
       "kind": "question",
       "row": null,
@@ -2297,6 +3189,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line mcp",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2318,6 +3221,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question bot",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question bot",
       "kind": "question",
       "row": null,
@@ -2357,6 +3271,17 @@
       "topic": "bot",
       "need": "bot1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1",
+      "why": null
      }
     },
     {
@@ -2378,6 +3303,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line profile",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line profile",
       "kind": "term",
       "row": null,
@@ -2411,6 +3347,20 @@
       "why": null
      },
      "oracle": {
+      "shown": "W1 buttons mem+sch",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "sch"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "W1 buttons mem+sch",
       "kind": "W1",
       "row": null,
@@ -2459,6 +3409,20 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "W1 buttons mod+msg",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mod",
+       "msg"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2495,6 +3459,20 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "W1 buttons msg+bot",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "msg",
+       "bot"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2516,6 +3494,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line sch5",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch5",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line sch5",
       "kind": "row",
       "row": null,
@@ -2561,6 +3550,20 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "W1 buttons mem+bot",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "mem",
+       "bot"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2582,6 +3585,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question msg",
       "kind": "question",
       "row": null,
@@ -2621,6 +3635,17 @@
       "topic": "mod",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2642,6 +3667,17 @@
       "why": "for me + install"
      },
      "oracle": {
+      "shown": "H1 (for me + install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "for me + install"
+     },
+     "oracle_f6": {
       "shown": "H1 (for me + install)",
       "kind": "H1",
       "row": null,
@@ -2681,6 +3717,17 @@
       "topic": null,
       "need": null,
       "why": "can you set up"
+     },
+     "oracle_f6": {
+      "shown": "H1 (can you set up)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "can you set up"
      }
     },
     {
@@ -2702,6 +3749,17 @@
       "why": "please connect"
      },
      "oracle": {
+      "shown": "H1 (please connect)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "please connect"
+     },
+     "oracle_f6": {
       "shown": "H1 (please connect)",
       "kind": "H1",
       "row": null,
@@ -2741,6 +3799,17 @@
       "topic": null,
       "need": null,
       "why": "link my"
+     },
+     "oracle_f6": {
+      "shown": "H1 (link my)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "link my"
      }
     },
     {
@@ -2762,6 +3831,17 @@
       "why": "for me + create"
      },
      "oracle": {
+      "shown": "H1 (for me + create)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "for me + create"
+     },
+     "oracle_f6": {
       "shown": "H1 (for me + create)",
       "kind": "H1",
       "row": null,
@@ -2801,6 +3881,17 @@
       "topic": "msg",
       "need": "msg1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1",
+      "why": null
      }
     },
     {
@@ -2822,6 +3913,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line msg2",
       "kind": "row",
       "row": null,
@@ -2861,6 +3963,17 @@
       "topic": "bot",
       "need": "bot1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1",
+      "why": null
      }
     },
     {
@@ -2882,6 +3995,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -2921,6 +4045,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -2942,6 +4077,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -2981,6 +4127,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3002,6 +4159,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_image",
+      "kind": "want",
+      "row": "w_image",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_image",
       "kind": "want",
       "row": "w_image",
@@ -3041,6 +4209,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3062,6 +4241,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group files",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "files",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group files",
       "kind": "N2",
       "row": null,
@@ -3101,6 +4291,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3122,6 +4323,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -3161,6 +4373,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3182,6 +4405,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line plugin",
       "kind": "term",
       "row": null,
@@ -3221,6 +4455,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "F1 name=Anna",
+      "kind": "F1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3242,6 +4487,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "F1 name=Jānis",
+      "kind": "F1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "F1 name=Jānis",
       "kind": "F1",
       "row": null,
@@ -3281,6 +4537,17 @@
       "topic": "mem",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mem +kept=name +first +name=Tom",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3302,6 +4569,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "F2 name=Sam work=I'm a nurse +kept=name,work +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "F2 name=Sam work=I'm a nurse +kept=name,work +first",
       "kind": "F2",
       "row": null,
@@ -3341,6 +4619,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "F2 name=Sam work=I teach piano every day after school +kept=name,work +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3362,6 +4651,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "F2 name=Sam work=I write emails and connect clients with suppliers +kept=name,work +first",
+      "kind": "F2",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "F2 name=Sam work=I write emails and connect clients with suppliers +kept=name,work +first",
       "kind": "F2",
       "row": null,
@@ -3406,6 +4706,17 @@
       "topic": "mod",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mod",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3427,6 +4738,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mod1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mod1",
       "kind": "row",
       "row": null,
@@ -3466,6 +4788,17 @@
       "topic": "msg",
       "need": "msg2",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2",
+      "why": null
      }
     },
     {
@@ -3487,6 +4820,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question msg",
       "kind": "question",
       "row": null,
@@ -3526,6 +4870,17 @@
       "topic": "mem",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3547,6 +4902,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -3586,6 +4952,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3607,6 +4984,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -3646,6 +5034,17 @@
       "topic": "bot",
       "need": "bot1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1",
+      "why": null
      }
     },
     {
@@ -3667,6 +5066,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -3714,6 +5124,20 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "W1 buttons skill+plugin",
+      "kind": "W1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": [
+       "skill",
+       "plugin"
+      ],
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3735,6 +5159,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_web",
+      "kind": "want",
+      "row": "w_web",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_web",
       "kind": "want",
       "row": "w_web",
@@ -3774,6 +5209,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3795,6 +5241,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question svc",
       "kind": "question",
       "row": null,
@@ -3834,6 +5291,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -3855,6 +5323,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line mcp",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line mcp",
       "kind": "term",
       "row": null,
@@ -3894,6 +5373,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3915,6 +5405,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group web",
       "kind": "N2",
       "row": null,
@@ -3954,6 +5455,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -3975,6 +5487,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line msg2",
       "kind": "row",
       "row": null,
@@ -4019,6 +5542,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4040,6 +5574,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4079,6 +5624,17 @@
       "topic": "sch",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question sch",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4100,6 +5656,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4139,6 +5706,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4160,6 +5738,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line msg1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line msg1",
       "kind": "row",
       "row": null,
@@ -4199,6 +5788,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4220,6 +5820,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line sch1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line sch1",
       "kind": "row",
       "row": null,
@@ -4259,6 +5870,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -4280,6 +5902,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4319,6 +5952,17 @@
       "topic": "bot",
       "need": "bot1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1",
+      "why": null
      }
     },
     {
@@ -4340,6 +5984,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4379,6 +6034,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4400,6 +6066,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line soul",
       "kind": "term",
       "row": null,
@@ -4439,6 +6116,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4460,6 +6148,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_image",
+      "kind": "want",
+      "row": "w_image",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_image",
       "kind": "want",
       "row": "w_image",
@@ -4499,6 +6198,17 @@
       "topic": null,
       "need": null,
       "why": "for me + install"
+     },
+     "oracle_f6": {
+      "shown": "H1 (for me + install)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "for me + install"
      }
     },
     {
@@ -4520,6 +6230,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4559,6 +6280,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4580,6 +6312,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4624,6 +6367,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4645,6 +6399,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4684,6 +6449,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4705,6 +6481,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mod3",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mod",
+      "need": "mod3",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mod3",
       "kind": "row",
       "row": null,
@@ -4744,6 +6531,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -4765,6 +6563,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question msg",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question msg",
       "kind": "question",
       "row": null,
@@ -4804,6 +6613,17 @@
       "topic": "msg",
       "need": "msg2",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line msg2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "msg",
+      "need": "msg2",
+      "why": null
      }
     },
     {
@@ -4825,6 +6645,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4864,6 +6695,17 @@
       "topic": "sch",
       "need": "sch5",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line sch5",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch5",
+      "why": null
      }
     },
     {
@@ -4885,6 +6727,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4924,6 +6777,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -4945,6 +6809,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -4984,6 +6859,17 @@
       "topic": "bot",
       "need": "bot1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line bot1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "bot",
+      "need": "bot1",
+      "why": null
      }
     },
     {
@@ -5014,6 +6900,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5035,6 +6932,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line plugin",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line plugin",
       "kind": "term",
       "row": null,
@@ -5075,6 +6983,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -5096,6 +7015,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -5135,6 +7065,17 @@
       "topic": "svc",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question svc",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5165,6 +7106,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line soul",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5186,6 +7138,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question sch +kept=name +first +name=Maria",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question sch +kept=name +first +name=Maria",
       "kind": "question",
       "row": null,
@@ -5230,6 +7193,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -5251,6 +7225,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_browser",
+      "kind": "want",
+      "row": "w_browser",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_browser",
       "kind": "want",
       "row": "w_browser",
@@ -5290,6 +7275,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_xpost",
+      "kind": "want",
+      "row": "w_xpost",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5311,6 +7307,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_docs",
       "kind": "want",
       "row": "w_docs",
@@ -5351,6 +7358,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group files",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "files",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5372,6 +7390,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_code",
+      "kind": "want",
+      "row": "w_code",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_code",
       "kind": "want",
       "row": "w_code",
@@ -5412,6 +7441,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5433,6 +7473,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_see",
+      "kind": "want",
+      "row": "w_see",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_see",
       "kind": "want",
       "row": "w_see",
@@ -5472,6 +7523,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5493,6 +7555,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group voice",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "voice",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group voice",
       "kind": "N2",
       "row": null,
@@ -5532,6 +7605,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5562,6 +7646,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_youtube",
+      "kind": "want",
+      "row": "w_youtube",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5583,6 +7678,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_papers",
+      "kind": "want",
+      "row": "w_papers",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_papers",
       "kind": "want",
       "row": "w_papers",
@@ -5623,6 +7729,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5644,6 +7761,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_prices",
+      "kind": "want",
+      "row": "w_prices",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_prices",
       "kind": "want",
       "row": "w_prices",
@@ -5684,6 +7812,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5706,6 +7845,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group pics",
       "kind": "N2",
       "row": null,
@@ -5747,6 +7897,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group voice",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "voice",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5769,6 +7930,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -5809,6 +7981,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5830,6 +8013,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -5869,6 +8063,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5899,6 +8104,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5920,6 +8136,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -5960,6 +8187,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group voice",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "voice",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -5981,6 +8219,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -6021,6 +8270,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6042,6 +8302,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -6081,6 +8352,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6102,6 +8384,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -6144,6 +8437,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL himalaya",
+      "kind": "skillS",
+      "row": null,
+      "skill": "himalaya",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6163,6 +8467,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "SKILL github",
+      "kind": "skillS",
+      "row": null,
+      "skill": "github",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "SKILL github",
       "kind": "skillS",
       "row": null,
@@ -6200,6 +8515,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL excalidraw",
+      "kind": "skillS",
+      "row": null,
+      "skill": "excalidraw",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6219,6 +8545,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "SKILL google-workspace",
+      "kind": "skillS",
+      "row": null,
+      "skill": "google-workspace",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "SKILL google-workspace",
       "kind": "skillS",
       "row": null,
@@ -6256,6 +8593,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL solana",
+      "kind": "skillS",
+      "row": null,
+      "skill": "solana",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6275,6 +8623,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "SKILL docker-management",
+      "kind": "skillS",
+      "row": null,
+      "skill": "docker-management",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "SKILL docker-management",
       "kind": "skillS",
       "row": null,
@@ -6312,6 +8671,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL rss-feeds",
+      "kind": "skillS",
+      "row": null,
+      "skill": "rss-feeds",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6331,6 +8701,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "SKILL openhue",
+      "kind": "skillS",
+      "row": null,
+      "skill": "openhue",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "SKILL openhue",
       "kind": "skillS",
       "row": null,
@@ -6368,6 +8749,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL 1password",
+      "kind": "skillS",
+      "row": null,
+      "skill": "1password",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6387,6 +8779,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "SKILL meme-generation",
+      "kind": "skillS",
+      "row": null,
+      "skill": "meme-generation",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "SKILL meme-generation",
       "kind": "skillS",
       "row": null,
@@ -6424,6 +8827,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6443,6 +8857,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N1",
       "kind": "N1",
       "row": null,
@@ -6480,6 +8905,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6499,6 +8935,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line skill",
       "kind": "term",
       "row": null,
@@ -6536,6 +8983,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6555,6 +9013,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group web",
       "kind": "N2",
       "row": null,
@@ -6592,6 +9061,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_code",
+      "kind": "want",
+      "row": "w_code",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6611,6 +9091,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line skill",
       "kind": "term",
       "row": null,
@@ -6648,6 +9139,17 @@
       "topic": null,
       "need": null,
       "why": "build a website"
+     },
+     "oracle_f6": {
+      "shown": "H1 (build a website)",
+      "kind": "H1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": "build a website"
      }
     },
     {
@@ -6667,6 +9169,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group files",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "files",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group files",
       "kind": "N2",
       "row": null,
@@ -6712,6 +9225,17 @@
       "topic": "mem",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -6734,6 +9258,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -6774,6 +9309,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -6796,6 +9342,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -6836,6 +9393,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -6858,6 +9426,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line mem1",
       "kind": "row",
       "row": null,
@@ -6898,6 +9477,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -6920,6 +9510,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -6960,6 +9561,17 @@
       "topic": "mem",
       "need": "mem1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line mem1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": "mem1",
+      "why": null
      }
     },
     {
@@ -6982,6 +9594,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -7022,6 +9645,17 @@
       "topic": "mem",
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7044,6 +9678,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line svc1",
       "kind": "row",
       "row": null,
@@ -7084,6 +9729,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -7106,6 +9762,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_youtube",
+      "kind": "want",
+      "row": "w_youtube",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_youtube",
       "kind": "want",
       "row": "w_youtube",
@@ -7146,6 +9813,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_notes",
+      "kind": "want",
+      "row": "w_notes",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7168,6 +9846,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line svc1",
       "kind": "row",
       "row": null,
@@ -7208,6 +9897,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -7230,6 +9930,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line svc1",
       "kind": "row",
       "row": null,
@@ -7270,6 +9981,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL github",
+      "kind": "skillS",
+      "row": null,
+      "skill": "github",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7292,6 +10014,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "SKILL google-workspace",
+      "kind": "skillS",
+      "row": null,
+      "skill": "google-workspace",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "SKILL google-workspace",
       "kind": "skillS",
       "row": null,
@@ -7332,6 +10065,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_pdf",
+      "kind": "want",
+      "row": "w_pdf",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7354,6 +10098,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line skill",
       "kind": "term",
       "row": null,
@@ -7394,6 +10149,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7416,6 +10182,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line skill",
       "kind": "term",
       "row": null,
@@ -7456,6 +10233,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_maps",
+      "kind": "want",
+      "row": "w_maps",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7478,6 +10266,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line skill",
       "kind": "term",
       "row": null,
@@ -7518,6 +10317,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "term line skill",
+      "kind": "term",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7540,6 +10350,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_stocks",
+      "kind": "want",
+      "row": "w_stocks",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_stocks",
       "kind": "want",
       "row": "w_stocks",
@@ -7580,6 +10401,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -7602,6 +10434,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "question mem",
+      "kind": "question",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "mem",
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "question mem",
       "kind": "question",
       "row": null,
@@ -7644,6 +10487,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_video",
+      "kind": "want",
+      "row": "w_video",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7663,6 +10517,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_docs",
       "kind": "want",
       "row": "w_docs",
@@ -7700,6 +10565,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7719,6 +10595,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_web",
+      "kind": "want",
+      "row": "w_web",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_web",
       "kind": "want",
       "row": "w_web",
@@ -7756,6 +10643,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7775,6 +10673,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group pics",
       "kind": "N2",
       "row": null,
@@ -7812,6 +10721,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7831,6 +10751,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_browser",
+      "kind": "want",
+      "row": "w_browser",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_browser",
       "kind": "want",
       "row": "w_browser",
@@ -7868,6 +10799,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_xpost",
+      "kind": "want",
+      "row": "w_xpost",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7887,6 +10829,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_reddit",
+      "kind": "want",
+      "row": "w_reddit",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_reddit",
       "kind": "want",
       "row": "w_reddit",
@@ -7924,6 +10877,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_docs",
+      "kind": "want",
+      "row": "w_docs",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7943,6 +10907,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_pdf",
+      "kind": "want",
+      "row": "w_pdf",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_pdf",
       "kind": "want",
       "row": "w_pdf",
@@ -7980,6 +10955,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_office",
+      "kind": "want",
+      "row": "w_office",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -7999,6 +10985,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_notes",
+      "kind": "want",
+      "row": "w_notes",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_notes",
       "kind": "want",
       "row": "w_notes",
@@ -8036,6 +11033,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_meeting",
+      "kind": "want",
+      "row": "w_meeting",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8055,6 +11063,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_code",
+      "kind": "want",
+      "row": "w_code",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_code",
       "kind": "want",
       "row": "w_code",
@@ -8092,6 +11111,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_computer",
+      "kind": "want",
+      "row": "w_computer",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8111,6 +11141,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_image",
+      "kind": "want",
+      "row": "w_image",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_image",
       "kind": "want",
       "row": "w_image",
@@ -8148,6 +11189,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_see",
+      "kind": "want",
+      "row": "w_see",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8167,6 +11219,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_anim",
+      "kind": "want",
+      "row": "w_anim",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_anim",
       "kind": "want",
       "row": "w_anim",
@@ -8204,6 +11267,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_youtube",
+      "kind": "want",
+      "row": "w_youtube",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8223,6 +11297,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_voice",
+      "kind": "want",
+      "row": "w_voice",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_voice",
       "kind": "want",
       "row": "w_voice",
@@ -8260,6 +11345,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_aloud",
+      "kind": "want",
+      "row": "w_aloud",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8279,6 +11375,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_music",
+      "kind": "want",
+      "row": "w_music",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_music",
       "kind": "want",
       "row": "w_music",
@@ -8316,6 +11423,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_papers",
+      "kind": "want",
+      "row": "w_papers",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8335,6 +11453,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_maps",
+      "kind": "want",
+      "row": "w_maps",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_maps",
       "kind": "want",
       "row": "w_maps",
@@ -8372,6 +11501,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_stocks",
+      "kind": "want",
+      "row": "w_stocks",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8391,6 +11531,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_prices",
+      "kind": "want",
+      "row": "w_prices",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_prices",
       "kind": "want",
       "row": "w_prices",
@@ -8428,6 +11579,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL docker-management",
+      "kind": "skillS",
+      "row": null,
+      "skill": "docker-management",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8456,6 +11618,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "SKILL humanizer",
+      "kind": "skillS",
+      "row": null,
+      "skill": "humanizer",
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8475,6 +11648,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "term line skill",
       "kind": "term",
       "row": null,
@@ -8512,6 +11696,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8531,6 +11726,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group web",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "web",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group web",
       "kind": "N2",
       "row": null,
@@ -8568,6 +11774,17 @@
       "topic": "svc",
       "need": "svc1",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
      }
     },
     {
@@ -8587,6 +11804,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "ROW w_video",
+      "kind": "want",
+      "row": "w_video",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "ROW w_video",
       "kind": "want",
       "row": "w_video",
@@ -8624,6 +11852,17 @@
       "topic": "sch",
       "need": "sch2",
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "line sch2",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "sch",
+      "need": "sch2",
+      "why": null
      }
     },
     {
@@ -8643,6 +11882,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "line svc1",
+      "kind": "row",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": "svc",
+      "need": "svc1",
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "line svc1",
       "kind": "row",
       "row": null,
@@ -8680,6 +11930,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "N1",
+      "kind": "N1",
+      "row": null,
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8708,6 +11969,17 @@
       "topic": null,
       "need": null,
       "why": null
+     },
+     "oracle_f6": {
+      "shown": "ROW w_music",
+      "kind": "want",
+      "row": "w_music",
+      "skill": null,
+      "group": null,
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
      }
     },
     {
@@ -8727,6 +11999,17 @@
       "why": null
      },
      "oracle": {
+      "shown": "N2 group pics",
+      "kind": "N2",
+      "row": null,
+      "skill": null,
+      "group": "pics",
+      "buttons": null,
+      "topic": null,
+      "need": null,
+      "why": null
+     },
+     "oracle_f6": {
       "shown": "N2 group pics",
       "kind": "N2",
       "row": null,

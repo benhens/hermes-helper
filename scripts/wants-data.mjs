@@ -83,12 +83,33 @@ export function wantsProblems(W, talk, skillsList, docs) {
   }
   const fixed = W.fixed_lines || []
   for (const f of fixed) {
-    line(f.id, (f.text || '').replace(/\{name\}/g, LONG_NAME), f.kind)
+    // skill lines v1: S1 and S2 say {say}, a skill's own plain words; each skill's whole line is checked below
+    if (!(['S1', 'S2'].includes(f.id) && /\{say\}/.test(f.text || ''))) line(f.id, (f.text || '').replace(/\{name\}/g, LONG_NAME), f.kind)
+    if (f.text_fixed !== undefined) line(f.id + ' text_fixed', f.text_fixed.replace(/\{name\}/g, LONG_NAME), f.kind)
     for (const s of f.sources || []) source(f.id, s)
     if (f.next && f.next.kind === 'steps') {
       if (!(f.next.steps || []).length || !f.next.after) fail(f.id + ': clicks with no steps or no after line')
       ;[...(f.next.steps || []), f.next.after].forEach((x, j) => line(`${f.id}-step${j}`, (x || '').replace(/\{name\}/g, LONG_NAME)))
     }
+  }
+  for (const p of skillLineProblems(W)) fail(p)
+  // Builder: wants fixes v1's data is there and fits the code (ordinary names are skill names; the
+  // "skill for ..." pattern compiles here as in Python and catches the word after it)
+  const wf1 = W.skill_name_rule_wf1
+  if (!wf1) fail('skill_name_rule_wf1 is missing')
+  else {
+    for (const n of wf1.ordinary_names || []) if (!byName.has(n)) fail(`skill_name_rule_wf1: ordinary name ${n} is no skill`)
+    let re = null
+    try {
+      re = new RegExp('(^|[^a-z0-9])' + wf1.skill_for_pattern)
+    } catch (e) {
+      fail('skill_name_rule_wf1.skill_for_pattern does not compile: ' + e.message)
+    }
+    if (re) {
+      const m = re.exec('is there a skill for knitting')
+      if (!m || m[2] !== 'knitting') fail('skill_name_rule_wf1.skill_for_pattern does not catch the word after "skill for"')
+    }
+    if (!Array.isArray(wf1.skill_for_not_after)) fail('skill_name_rule_wf1.skill_for_not_after is not a list')
   }
   const cn1 = fixed.find(f => f.id === 'CN1')
   if (cn1 && /cost|free/i.test(cn1.text)) fail('CN1 says something about cost')
@@ -156,14 +177,17 @@ export function wantsProblems(W, talk, skillsList, docs) {
     } else if (v.line !== 'CN1') fail(`service line ${service}: ${v.line} is not CN1 or S1 (the code shows only these two)`)
     else if (!fixed.some(f => f.id === 'CN1')) fail(`service line ${service}: the fixed line CN1 is missing`)
   }
-  // Builder: no {slot} shown unfilled. Helper fills only {name}, only in S1 and S2 (their line, clicks
-  // and after); the docs box's words are the docs' own and may hold braces ("{slug}").
+  // Builder: no {slot} shown unfilled. Helper fills only {name} and {say}, only in S1 and S2 (their line,
+  // clicks and after; {say} from the skill's own say, checked in skillLineProblems); the docs box's words
+  // are the docs' own and may hold braces ("{slug}").
   const slot = /\{\w+\}/
   const said = []
   for (const w of rows) said.push([w.id, w.text], [w.id, w.label], ...Object.values(pickKeysShallow(w.next || {})).flat().map(x => [w.id, x]))
   for (const f of fixed) {
-    const filled = ['S1', 'S2'].includes(f.id) ? s => String(s).replace(/\{name\}/g, '') : s => s
+    const filled = ['S1', 'S2'].includes(f.id) ? s => String(s).replace(/\{name\}/g, '').replace(/\{say\}/g, '') : s => s
     said.push([f.id, filled(f.text)], ...Object.values(pickKeysShallow(f.next || {})).flat().map(x => [f.id, filled(x)]))
+    // skill lines v1: the old sentence, said when a skill's say is null; it has only {name}
+    if (f.text_fixed !== undefined) said.push([f.id + ' text_fixed', String(f.text_fixed).replace(/\{name\}/g, '')])
   }
   said.push(['can-q', (T.question || {}).text || ''], ...qa.map(a => ['can-q', a.label]), ...groups.map(g => ['group ' + g.id, g.label]))
   for (const [id, s] of said) if (typeof s === 'string' && slot.test(s)) fail(`${id}: a {slot} Helper does not fill: ${s.slice(0, 60)}`)
@@ -191,6 +215,51 @@ const pickKeys = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undef
 // The words of a button: its label, text to paste, clicks and after line.
 const pickKeysShallow = n => pickKeys(n, ['label', 'paste_text', 'steps', 'after'])
 
+// Skill lines v1 (content/helper-skill-lines-v1.md): S1 and S2 say "It teaches Hermes to {say}", where
+// {say} is the skill's own say; a skill whose say is null gets the old sentence, kept as text_fixed.
+// skillSentence gives the line as src/talk.js says it ({name} filled with name; tests compare the two).
+export const SAY_SENTENCE_MAX = 18
+export function skillSentence(W, s, name = s.name) {
+  const f = (W.fixed_lines || []).find(x => x.id === (s.kind === 'optional' ? 'S2' : 'S1'))
+  if (!f) return null
+  if (s.say != null && /\{say\}/.test(f.text)) return f.text.replace(/\{name\}/g, name).replace(/\{say\}/g, s.say)
+  return (f.text_fixed !== undefined ? f.text_fixed : f.text).replace(/\{name\}/g, name)
+}
+// hhcontent's own check of these lines (dev/checks/hhcontent-skill-lines/apply_sl1.py), ported: the whole
+// line with {name} left in (one word, as check.py always counted it) passes every R rule, except that the
+// sentence "It teaches Hermes to ..." may have up to 18 words (4 fixed words and the plain part); the
+// plain part alone, with a capital first letter, passes every rule (so at most 14 words). Builder's own:
+// a say ends with a full stop (the template has none after {say}) and holds no {slot}; a skill with no say
+// needs its line's text_fixed; text_fixed holds no slot but {name}.
+export function skillLineProblems(W) {
+  const out = []
+  for (const s of W.skills || []) {
+    const id = s.kind === 'optional' ? 'S2' : 'S1'
+    const f = (W.fixed_lines || []).find(x => x.id === id)
+    if (!f) continue // "fixed line S1 is missing" says it
+    const usesSay = /\{say\}/.test(f.text || '')
+    if (s.say == null) {
+      if (usesSay && f.text_fixed === undefined) out.push(`skill ${s.name}: no say, and ${id} has no text_fixed to say instead`)
+      continue
+    }
+    if (typeof s.say !== 'string' || !s.say.trim()) {
+      out.push(`skill ${s.name}: say is not words`)
+      continue
+    }
+    if (!usesSay) continue // the data's S line does not say it
+    if (/\{\w+\}/.test(s.say)) out.push(`skill ${s.name}: say holds a {slot}: ${s.say}`)
+    if (!/\.$/.test(s.say)) out.push(`skill ${s.name}: say does not end with a full stop: ${s.say}`)
+    const whole = skillSentence(W, s, '{name}')
+    const teach = whole.slice(whole.indexOf('It teaches Hermes to'))
+    const teachWords = teach.split(/\s+/).filter(w => /[A-Za-z0-9{]/.test(w)).length
+    const bent = `sentence of ${teachWords} words > 14`
+    const f1 = checkLine(whole).filter(x => !(whole.includes('It teaches Hermes to') && teachWords <= SAY_SENTENCE_MAX && x === bent))
+    const f2 = checkLine(s.say[0].toUpperCase() + s.say.slice(1)).map(x => 'plain part: ' + x)
+    if (f1.length || f2.length) out.push(`skill ${s.name}: ${id} line fails: ${[...f1, ...f2].join('; ')} :: ${whole}`)
+  }
+  return out
+}
+
 // What src/talk.js reads. Each skill carries left_out from the skills list (the five marked left
 // out get N1b, as before); a skill's own words are shown only in the box "From the Hermes docs".
 export function slimWantsData(W, skillsList) {
@@ -198,8 +267,9 @@ export function slimWantsData(W, skillsList) {
   const fixed = Object.fromEntries(
     W.fixed_lines
       .filter(f => ['N2', 'G1', 'S1', 'S2', 'box-head', 'CN1'].includes(f.id))
-      .map(f => [f.id, { ...pickKeys(f, ['text', 'sources']), ...(f.next ? { next: pickKeys(f.next, ['kind', 'label', 'steps', 'after']) } : {}) }])
+      .map(f => [f.id, { ...pickKeys(f, ['text', 'text_fixed', 'sources']), ...(f.next ? { next: pickKeys(f.next, ['kind', 'label', 'steps', 'after']) } : {}) }])
   )
+  const wf1 = W.skill_name_rule_wf1 || {}
   return {
     docs_version: W.docs_version,
     pick: { label: W.topic.pick.label },
@@ -211,6 +281,13 @@ export function slimWantsData(W, skillsList) {
     })),
     fixed,
     service_lines: serviceLines(W),
-    skills: W.skills.map(s => ({ ...pickKeys(s, ['name', 'kind', 'docs_words', 'page', 'line']), ...(left.has(s.name) ? { left_out: true } : {}) }))
+    // wants fixes v1 (content/helper-wants-fixes-v1.md): ordinary-word skill names count after "skill(s) for"
+    // only as the last word; "a skill for <a word Helper has nothing for>" in a question is not the term line
+    skill_name_rule_wf1: {
+      ordinary_names: wf1.ordinary_names || [],
+      skill_for_pattern: wf1.skill_for_pattern || null,
+      skill_for_not_after: wf1.skill_for_not_after || []
+    },
+    skills: W.skills.map(s => ({ ...pickKeys(s, ['name', 'kind', 'say', 'docs_words', 'page', 'line']), ...(left.has(s.name) ? { left_out: true } : {}) }))
   }
 }

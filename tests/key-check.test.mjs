@@ -10,7 +10,10 @@ import { turn, freshVisit } from '../src/talk.js'
 
 test('the patterns are hhcontent\'s key_patterns, exactly, with no flags (changes-10: one list for route2.py, settings_read.py and the plugin)', () => {
   const data = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'content', 'helper-talk-v2.json'), 'utf8'))
-  assert.deepEqual(KEY_PATTERNS.map(r => r.source), data.key_patterns.patterns)
+  // RegExp.source writes a slash as \/ (pattern 5 has one since wants fixes v1): compare with the same
+  // strings put through RegExp, which changes nothing else
+  assert.deepEqual(KEY_PATTERNS.map(r => r.source), data.key_patterns.patterns.map(p => new RegExp(p).source))
+  assert.ok(data.key_patterns.patterns.every(p => !/\\\//.test(p)), 'the data writes no \\/ of its own')
   assert.equal(KEY_PATTERNS.length, 7)
   assert.ok(KEY_PATTERNS.every(r => r.flags === ''))
 })

@@ -172,15 +172,18 @@
   {
    "id": "S1",
    "kind": "reply",
-   "status": "new: a skill on the docs pages with no hand-written row, built in",
-   "text": "Hermes comes with a skill called \"{name}\". Skills are written steps that teach Hermes one task. The docs say this.",
-   "under": "a box with the page's description word for word, headed: From the Hermes docs"
+   "status": "new: a skill on the docs pages with no hand-written row, built in. Skill lines v1 (10 Nov 23:10): {say} is the skill's say field; when say is null use text_fixed",
+   "text": "Hermes comes with a skill called \"{name}\". It teaches Hermes to {say}",
+   "under": "a box with the page's description word for word, headed: From the Hermes docs",
+   "text_fixed": "Hermes comes with a skill called \"{name}\". Skills are written steps that teach Hermes one task. The docs say this.",
+   "sources": [],
+   "say_rule": "{say} comes from skills[].say, written by hand from the docs line, checked by dev/checks/hhcontent-skill-lines/apply_sl1.py. The box under it keeps the docs' own words."
   },
   {
    "id": "S2",
    "kind": "reply",
-   "status": "new: the same, optional",
-   "text": "The optional skill \"{name}\" must be added first. Skills are written steps that teach Hermes one task. The docs say this.",
+   "status": "new: the same, optional. Skill lines v1 (10 Nov 23:10): {say} is the skill's say field; when say is null use text_fixed",
+   "text": "The skill \"{name}\" must be added first. It teaches Hermes to {say}",
    "under": "the same box, then the button Show me how to add it with the steps of add_steps (changes-6, fix 5)",
    "next": {
     "kind": "steps",
@@ -204,7 +207,9 @@
      "line": 9,
      "quote": "Install them explicitly"
     }
-   ]
+   ],
+   "text_fixed": "The optional skill \"{name}\" must be added first. Skills are written steps that teach Hermes one task. The docs say this.",
+   "say_rule": "{say} comes from skills[].say, written by hand from the docs line, checked by dev/checks/hhcontent-skill-lines/apply_sl1.py. The box under it keeps the docs' own words."
   },
   {
    "id": "box-head",
@@ -263,7 +268,9 @@
     "search engine",
     "google things",
     "google something",
-    "google it"
+    "google it",
+    "webpages",
+    "webpage"
    ],
    "text": "Hermes can search the web and read web pages. That is a built-in tool, an action it can take.",
    "sources": [
@@ -1433,7 +1440,7 @@
   }
  ],
  "skill_name_rule": "Changes-6, fix 3. A skill from the list below is reached by its name only when the name and the word skill or skills sit next to each other: the/a/an/this/that {name} skill(s) (changes-8: the word before the name is needed, so my sketch skills or I have no canvas skills name no skill), skill(s) called {name}, skill(s) named {name}, skill(s) for {name}, \"{name}\" skill. {name} may have spaces in place of its hyphens. Whole words. Code: dev/checks/hhcontent-changes-6/skill_next.py (PATTERNS). This step runs after the key check and the build words and BEFORE the six topics, so is there a github skill gets the github skill, not the svc question. A hand-written row for that skill wins. Otherwise line S1 or S2 with the page's own words in a box.",
- "skill_name_example": "is there a github skill -> S1: Hermes comes with a skill called \"github\". Skills are written steps that teach Hermes one task. The docs say this. Under it the box From the Hermes docs: GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
+ "skill_name_example": "is there a github skill -> S1: Hermes comes with a skill called \"github\". It teaches Hermes to work with GitHub: issues, pull requests, reviews and code folders. Under it the box From the Hermes docs: GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
  "skills_counts": {
   "built_in": 44,
   "optional": 142,
@@ -1447,7 +1454,8 @@
    "docs_words": "Manage Apple Notes via memo CLI: create, search, edit.",
    "page": "reference/skills-catalog.md",
    "line": 19,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "write, find and change notes in Apple Notes."
   },
   {
    "name": "apple-reminders",
@@ -1456,7 +1464,8 @@
    "docs_words": "Apple Reminders via remindctl: add, list, complete.",
    "page": "reference/skills-catalog.md",
    "line": 20,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "add, list and tick off items in Apple Reminders."
   },
   {
    "name": "findmy",
@@ -1465,7 +1474,8 @@
    "docs_words": "Track Apple devices/AirTags via FindMy.app on macOS.",
    "page": "reference/skills-catalog.md",
    "line": 21,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "see where your Apple devices and AirTags are, using the Find My app."
   },
   {
    "name": "imessage",
@@ -1474,7 +1484,8 @@
    "docs_words": "Send and receive iMessages/SMS via the imsg CLI on macOS.",
    "page": "reference/skills-catalog.md",
    "line": 22,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "send and read iMessages and texts from the Messages app on a Mac."
   },
   {
    "name": "claude-code",
@@ -1483,7 +1494,8 @@
    "docs_words": "Delegate coding to Claude Code CLI (features, PRs).",
    "page": "reference/skills-catalog.md",
    "line": 28,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "hand a coding job to Claude Code, a separate coding app."
   },
   {
    "name": "codex",
@@ -1492,7 +1504,8 @@
    "docs_words": "Delegate coding to OpenAI Codex CLI (features, PRs).",
    "page": "reference/skills-catalog.md",
    "line": 29,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "hand a coding job to Codex, a separate coding app by OpenAI."
   },
   {
    "name": "computer-use",
@@ -1501,7 +1514,8 @@
    "docs_words": "Drive the desktop background-first; escalate on signal.",
    "page": "reference/skills-catalog.md",
    "line": 30,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "use your desktop, doing things in the background first."
   },
   {
    "name": "hermes-agent",
@@ -1510,7 +1524,8 @@
    "docs_words": "Use, configure, theme, extend, and orchestrate Hermes Agent.",
    "page": "reference/skills-catalog.md",
    "line": 31,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "use and change its own settings and look, and add to itself."
   },
   {
    "name": "architecture-diagram",
@@ -1519,7 +1534,8 @@
    "docs_words": "Dark-themed SVG architecture/cloud/infra diagrams as HTML.",
    "page": "reference/skills-catalog.md",
    "line": 37,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "draw a dark-themed picture of how a software system fits together."
   },
   {
    "name": "ascii-video",
@@ -1528,7 +1544,8 @@
    "docs_words": "ASCII video: convert video/audio to colored ASCII MP4/GIF.",
    "page": "reference/skills-catalog.md",
    "line": 38,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "turn a video or sound into a moving picture made of letters."
   },
   {
    "name": "baoyu-infographic",
@@ -1537,7 +1554,8 @@
    "docs_words": "Infographics: 21 layouts x 21 styles (信息图, 可视化).",
    "page": "reference/skills-catalog.md",
    "line": 39,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make an infographic: one picture that sums up facts, in many layouts."
   },
   {
    "name": "claude-design",
@@ -1546,7 +1564,8 @@
    "docs_words": "Design one-off HTML artifacts (landing, deck, prototype).",
    "page": "reference/skills-catalog.md",
    "line": 40,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "design a one-off web page, slide deck or clickable mockup."
   },
   {
    "name": "humanizer",
@@ -1555,7 +1574,8 @@
    "docs_words": "Humanize text: strip AI-isms and add real voice.",
    "page": "reference/skills-catalog.md",
    "line": 41,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "rewrite text so it sounds less like an AI wrote it."
   },
   {
    "name": "manim-video",
@@ -1564,7 +1584,8 @@
    "docs_words": "Manim CE animations: 3Blue1Brown math/algo videos.",
    "page": "reference/skills-catalog.md",
    "line": 42,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make animated videos that explain maths."
   },
   {
    "name": "p5js",
@@ -1573,7 +1594,8 @@
    "docs_words": "p5.js sketches: gen art, shaders, interactive, 3D.",
    "page": "reference/skills-catalog.md",
    "line": 43,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make art with code, also moving and 3D art."
   },
   {
    "name": "popular-web-designs",
@@ -1582,7 +1604,8 @@
    "docs_words": "54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.",
    "page": "reference/skills-catalog.md",
    "line": 44,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make web pages in the style of 54 well-known sites, such as Stripe."
   },
   {
    "name": "songwriting-and-ai-music",
@@ -1591,7 +1614,8 @@
    "docs_words": "Songwriting craft and Suno AI music prompts.",
    "page": "reference/skills-catalog.md",
    "line": 45,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "help write songs, and write the text you give Suno, a music AI."
   },
   {
    "name": "sdlc-review",
@@ -1600,7 +1624,8 @@
    "docs_words": "Review Kanban handoffs and route verified outcomes.",
    "page": "reference/skills-catalog.md",
    "line": 51,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": null
   },
   {
    "name": "email-inbox-triage",
@@ -1609,7 +1634,8 @@
    "docs_words": "Triage an inbox: prioritize threads, draft replies safely.",
    "page": "reference/skills-catalog.md",
    "line": 57,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "sort your inbox by what matters most, and draft replies for you to check."
   },
   {
    "name": "himalaya",
@@ -1618,7 +1644,8 @@
    "docs_words": "Himalaya CLI: IMAP/SMTP email from terminal.",
    "page": "reference/skills-catalog.md",
    "line": 58,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "read and send email from your own mailbox."
   },
   {
    "name": "youtube-content",
@@ -1627,7 +1654,8 @@
    "docs_words": "YouTube transcripts to summaries, threads, blogs.",
    "page": "reference/skills-catalog.md",
    "line": 64,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "turn a YouTube video's spoken words into a summary, thread or blog post."
   },
   {
    "name": "obsidian",
@@ -1636,7 +1664,8 @@
    "docs_words": "Read, search, create, and edit notes in the Obsidian vault.",
    "page": "reference/skills-catalog.md",
    "line": 70,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "read, search, write and change notes in your Obsidian notes folder."
   },
   {
    "name": "document-to-action-items",
@@ -1645,7 +1674,8 @@
    "docs_words": "Extract cited obligations, deadlines, tasks from documents.",
    "page": "reference/skills-catalog.md",
    "line": 76,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "pull deadlines, duties and tasks out of a document, with where each was found."
   },
   {
    "name": "google-workspace",
@@ -1654,7 +1684,8 @@
    "docs_words": "Gmail, Calendar, Drive, Docs, Sheets via gws CLI or Python.",
    "page": "reference/skills-catalog.md",
    "line": 77,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "use your Gmail, Google Calendar, Drive, Docs and Sheets."
   },
   {
    "name": "maps",
@@ -1663,7 +1694,8 @@
    "docs_words": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.",
    "page": "reference/skills-catalog.md",
    "line": 78,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "find places, addresses, routes and time zones from open map data."
   },
   {
    "name": "meeting-action-items",
@@ -1672,7 +1704,8 @@
    "docs_words": "Turn meeting notes into cited decisions, owners, tickets.",
    "page": "reference/skills-catalog.md",
    "line": 79,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "turn meeting notes into decisions, who does what, and follow-up tasks."
   },
   {
    "name": "microsoft-office",
@@ -1681,7 +1714,8 @@
    "docs_words": "Create, read, and edit Word, PowerPoint, and Excel files.",
    "page": "reference/skills-catalog.md",
    "line": 80,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make, read and change Word, PowerPoint and Excel files."
   },
   {
    "name": "pdf",
@@ -1690,7 +1724,8 @@
    "docs_words": "PDF files: create, read, merge, fill, OCR, edit text.",
    "page": "reference/skills-catalog.md",
    "line": 81,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make, read, merge and fill in PDF files, also scanned ones."
   },
   {
    "name": "product-price-monitor",
@@ -1699,7 +1734,8 @@
    "docs_words": "Watch product, flight, or listing prices; alert on target.",
    "page": "reference/skills-catalog.md",
    "line": 82,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "watch a product, flight or listing price and tell you at your target."
   },
   {
    "name": "teams-meeting-pipeline",
@@ -1708,7 +1744,8 @@
    "docs_words": "Teams meeting summaries, job replay, Graph subscriptions.",
    "page": "reference/skills-catalog.md",
    "line": 83,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "get summaries of Teams meetings."
   },
   {
    "name": "weekly-review-planning",
@@ -1717,7 +1754,8 @@
    "docs_words": "Weekly reset: commitments, stalled work, next-week plan.",
    "page": "reference/skills-catalog.md",
    "line": 84,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "look back at your week, see what got stuck, and plan the next."
   },
   {
    "name": "arxiv",
@@ -1726,7 +1764,8 @@
    "docs_words": "Search arXiv papers by keyword, author, category, or ID.",
    "page": "reference/skills-catalog.md",
    "line": 90,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "search and read science papers on arXiv."
   },
   {
    "name": "competitor-news-monitor",
@@ -1735,7 +1774,8 @@
    "docs_words": "Watch named companies for material news; cited digests.",
    "page": "reference/skills-catalog.md",
    "line": 91,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "watch companies you name and report only important news about them."
   },
   {
    "name": "grounded-citations",
@@ -1744,7 +1784,8 @@
    "docs_words": "Ground answers and documents in cited, verifiable sources.",
    "page": "reference/skills-catalog.md",
    "line": 92,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "give answers where every fact shows where it came from."
   },
   {
    "name": "xurl",
@@ -1753,7 +1794,8 @@
    "docs_words": "X/Twitter via xurl CLI: raw post search, posting, DM, media.",
    "page": "reference/skills-catalog.md",
    "line": 98,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "post, search and send messages on X, the site that was Twitter."
   },
   {
    "name": "codebase-inspection",
@@ -1762,7 +1804,8 @@
    "docs_words": "Inspect codebases w/ pygount: LOC, languages, ratios.",
    "page": "reference/skills-catalog.md",
    "line": 104,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "count how much code a project has, and in which languages."
   },
   {
    "name": "dogfood",
@@ -1771,7 +1814,8 @@
    "docs_words": "Exploratory QA of web apps: find bugs, evidence, reports.",
    "page": "reference/skills-catalog.md",
    "line": 105,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "test a web app like a user would, and write up the bugs found."
   },
   {
    "name": "github",
@@ -1780,7 +1824,8 @@
    "docs_words": "GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
    "page": "reference/skills-catalog.md",
    "line": 106,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "work with GitHub: issues, pull requests, reviews and code folders."
   },
   {
    "name": "requesting-code-review",
@@ -1789,7 +1834,8 @@
    "docs_words": "Pre-commit review: security scan, quality gates, auto-fix.",
    "page": "reference/skills-catalog.md",
    "line": 107,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "check new code for safety and quality before it is saved for good."
   },
   {
    "name": "simplify-code",
@@ -1798,7 +1844,8 @@
    "docs_words": "Parallel 4-agent cleanup of recent code changes.",
    "page": "reference/skills-catalog.md",
    "line": 108,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "tidy up code you changed lately."
   },
   {
    "name": "spike",
@@ -1807,7 +1854,8 @@
    "docs_words": "Throwaway experiments to validate an idea before build.",
    "page": "reference/skills-catalog.md",
    "line": 109,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "try out an idea with quick throwaway code before building it for real."
   },
   {
    "name": "systematic-debugging",
@@ -1816,7 +1864,8 @@
    "docs_words": "4-phase root cause debugging: understand bugs before fixing.",
    "page": "reference/skills-catalog.md",
    "line": 110,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "find the real cause of a bug before trying to fix it."
   },
   {
    "name": "test-driven-development",
@@ -1825,7 +1874,8 @@
    "docs_words": "TDD: enforce RED-GREEN-REFACTOR, tests before code.",
    "page": "reference/skills-catalog.md",
    "line": 111,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "write code by writing a test first, then the code that passes it."
   },
   {
    "name": "blocked-page-recovery",
@@ -1834,7 +1884,8 @@
    "docs_words": "Use when a fetch fails: 403/429, paywall, WAF, bot wall.",
    "page": "reference/skills-catalog.md",
    "line": 117,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "get a web page that will not open, such as one behind a paywall."
   },
   {
    "name": "agent-merge-conflict-arbiter",
@@ -1845,7 +1896,8 @@
    "line": 34,
    "add_id": "official/autonomous-ai-agents/agent-merge-conflict-arbiter",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "settle a clash when two AI helpers changed the same code."
   },
   {
    "name": "antigravity-cli",
@@ -1856,7 +1908,8 @@
    "line": 35,
    "add_id": "official/autonomous-ai-agents/antigravity-cli",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "use the separate Antigravity app."
   },
   {
    "name": "blackbox",
@@ -1867,7 +1920,8 @@
    "line": 36,
    "add_id": "official/autonomous-ai-agents/blackbox",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "hand a coding job to Blackbox AI, a separate coding app."
   },
   {
    "name": "dynamic-workflow",
@@ -1878,7 +1932,8 @@
    "line": 37,
    "add_id": "official/autonomous-ai-agents/dynamic-workflow",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": null
   },
   {
    "name": "grok",
@@ -1889,7 +1944,8 @@
    "line": 38,
    "add_id": "official/autonomous-ai-agents/grok",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "hand a coding job to Grok Build, a separate coding app by xAI."
   },
   {
    "name": "opencode",
@@ -1900,7 +1956,8 @@
    "line": 39,
    "add_id": "official/autonomous-ai-agents/opencode",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "hand a coding job to OpenCode, a separate coding app."
   },
   {
    "name": "openhands",
@@ -1911,7 +1968,8 @@
    "line": 40,
    "add_id": "official/autonomous-ai-agents/openhands",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "hand a coding job to OpenHands, a coding app that works with many AIs."
   },
   {
    "name": "evm",
@@ -1922,7 +1980,8 @@
    "line": 46,
    "add_id": "official/blockchain/evm",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "look up wallets, coins and fees on eight blockchains. Read only."
   },
   {
    "name": "hyperliquid",
@@ -1933,7 +1992,8 @@
    "line": 47,
    "add_id": "official/blockchain/hyperliquid",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "look up prices and your past trades on Hyperliquid."
   },
   {
    "name": "solana",
@@ -1944,7 +2004,8 @@
    "line": 48,
    "add_id": "official/blockchain/solana",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "look up Solana wallets, coins and NFTs, with prices in dollars."
   },
   {
    "name": "one-three-one-rule",
@@ -1955,7 +2016,8 @@
    "line": 54,
    "add_id": "official/communication/one-three-one-rule",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "answer a hard choice as one problem, three options and one pick."
   },
   {
    "name": "ai-presenter-video",
@@ -1966,7 +2028,8 @@
    "line": 60,
    "add_id": "official/creative/ai-presenter-video",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make a video of a talking presenter from a script and one photo."
   },
   {
    "name": "anatomy",
@@ -1977,7 +2040,8 @@
    "line": 61,
    "add_id": "official/creative/anatomy",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "explain an idea with a machine drawing you can click on."
   },
   {
    "name": "archify",
@@ -1988,7 +2052,8 @@
    "line": 62,
    "add_id": "official/creative/archify",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make clickable diagrams as web pages."
   },
   {
    "name": "ascii-art",
@@ -1999,7 +2064,8 @@
    "line": 63,
    "add_id": "official/creative/ascii-art",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make pictures and big banner text out of letters."
   },
   {
    "name": "auteur",
@@ -2010,7 +2076,8 @@
    "line": 64,
    "add_id": "official/creative/auteur",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "design and build web pages with a film-like, cinematic feel."
   },
   {
    "name": "baoyu-article-illustrator",
@@ -2021,7 +2088,8 @@
    "line": 65,
    "add_id": "official/creative/baoyu-article-illustrator",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make matching pictures to illustrate an article you wrote."
   },
   {
    "name": "baoyu-comic",
@@ -2032,7 +2100,8 @@
    "line": 66,
    "add_id": "official/creative/baoyu-comic",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make comics that teach a topic or tell someone's life story."
   },
   {
    "name": "brag",
@@ -2043,7 +2112,8 @@
    "line": 67,
    "add_id": "official/creative/brag",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make a launch video for a project you built."
   },
   {
    "name": "brag-slim",
@@ -2054,7 +2124,8 @@
    "line": 68,
    "add_id": "official/creative/brag-slim",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make a launch video for a project or web address."
   },
   {
    "name": "comfyui",
@@ -2065,7 +2136,8 @@
    "line": 69,
    "add_id": "official/creative/comfyui",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make pictures, video and sound with AI."
   },
   {
    "name": "concept-diagrams",
@@ -2076,7 +2148,8 @@
    "line": 70,
    "add_id": "official/creative/concept-diagrams",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make simple, flat diagrams for teaching."
   },
   {
    "name": "creative-ideation",
@@ -2087,7 +2160,8 @@
    "line": 71,
    "add_id": "official/creative/creative-ideation",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "come up with ideas, using named methods from creative work."
   },
   {
    "name": "design-md",
@@ -2098,7 +2172,8 @@
    "line": 72,
    "add_id": "official/creative/design-md",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "write and check a DESIGN.md file that describes how a design looks."
   },
   {
    "name": "draw-your-font",
@@ -2109,7 +2184,8 @@
    "line": 73,
    "add_id": "official/creative/draw-your-font",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "turn a photo of your handwriting into a font you can install."
   },
   {
    "name": "dream-loop",
@@ -2120,7 +2196,8 @@
    "line": 74,
    "add_id": "official/creative/dream-loop",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "build 3D scenes, checking each against a drawing of the goal."
   },
   {
    "name": "excalidraw",
@@ -2131,7 +2208,8 @@
    "line": 75,
    "add_id": "official/creative/excalidraw",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make hand-drawn style diagrams for Excalidraw."
   },
   {
    "name": "heartmula",
@@ -2142,7 +2220,8 @@
    "line": 76,
    "add_id": "official/creative/heartmula",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make whole songs from lyrics, like Suno does."
   },
   {
    "name": "hyperframes",
@@ -2153,7 +2232,8 @@
    "line": 77,
    "add_id": "official/creative/hyperframes",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make MP4 videos from web pages."
   },
   {
    "name": "impeccable",
@@ -2164,7 +2244,8 @@
    "line": 78,
    "add_id": "official/creative/impeccable",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "design the look of web pages well."
   },
   {
    "name": "ip-as-logo",
@@ -2175,7 +2256,8 @@
    "line": 79,
    "add_id": "official/creative/ip-as-logo",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "design a tiny, cute mascot logo that still reads when very small."
   },
   {
    "name": "kanban-video-orchestrator",
@@ -2186,7 +2268,8 @@
    "line": 80,
    "add_id": "official/creative/kanban-video-orchestrator",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "split a big video job among several Hermes helpers and run it."
   },
   {
    "name": "meme-generation",
@@ -2197,7 +2280,8 @@
    "line": 81,
    "add_id": "official/creative/meme-generation",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make meme pictures from a topic, with text on a known template."
   },
   {
    "name": "mono-color",
@@ -2208,7 +2292,8 @@
    "line": 82,
    "add_id": "official/creative/mono-color",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make poster pictures in one or two ink colours, like printed art."
   },
   {
    "name": "pixel-art",
@@ -2219,7 +2304,8 @@
    "line": 83,
    "add_id": "official/creative/pixel-art",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make pixel art in the colours of old game consoles."
   },
   {
    "name": "pretext",
@@ -2230,7 +2316,8 @@
    "line": 84,
    "add_id": "official/creative/pretext",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "build playful web demos where text flows around moving things."
   },
   {
    "name": "simple-english",
@@ -2241,7 +2328,8 @@
    "line": 85,
    "add_id": "official/creative/simple-english",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "rewrite text in very simple, strict English."
   },
   {
    "name": "sketch",
@@ -2252,7 +2340,8 @@
    "line": 86,
    "add_id": "official/creative/sketch",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make two or three quick throwaway designs of a screen to compare."
   },
   {
    "name": "social-media-content-calendar",
@@ -2263,7 +2352,8 @@
    "line": 87,
    "add_id": "official/creative/social-media-content-calendar",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "plan posts for several social media sites, from first idea to posting."
   },
   {
    "name": "system-atlas",
@@ -2274,7 +2364,8 @@
    "line": 88,
    "add_id": "official/creative/system-atlas",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "build a clickable map of how a software system works."
   },
   {
    "name": "tldraw-offline",
@@ -2285,7 +2376,8 @@
    "line": 89,
    "add_id": "official/creative/tldraw-offline",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "read and change drawings in the tldraw offline app."
   },
   {
    "name": "unreal-mcp",
@@ -2296,7 +2388,8 @@
    "line": 90,
    "add_id": "official/creative/unreal-mcp",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "control scenes and objects in Unreal Engine, a game-making app."
   },
   {
    "name": "jupyter-notebook",
@@ -2307,7 +2400,8 @@
    "line": 96,
    "add_id": "official/data-science/jupyter-notebook",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "run Python step by step in a Jupyter notebook that keeps its results."
   },
   {
    "name": "actual-setup",
@@ -2318,7 +2412,8 @@
    "line": 102,
    "add_id": "official/devops/actual-setup",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "set up Actual Computer to run AI for Hermes."
   },
   {
    "name": "docker-management",
@@ -2329,7 +2424,8 @@
    "line": 103,
    "add_id": "official/devops/docker-management",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "start, stop and tidy Docker containers, a way to run apps boxed in."
   },
   {
    "name": "hermes-s6-container-supervision",
@@ -2340,7 +2436,8 @@
    "line": 104,
    "add_id": "official/devops/hermes-s6-container-supervision",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": null
   },
   {
    "name": "inference-sh-cli",
@@ -2351,7 +2448,8 @@
    "line": 105,
    "add_id": "official/devops/inference-sh-cli",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make pictures and video with over 150 AI apps run on inference.sh."
   },
   {
    "name": "pinggy-tunnel",
@@ -2362,7 +2460,8 @@
    "line": 106,
    "add_id": "official/devops/pinggy-tunnel",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "give something running on your computer a public web address for a while."
   },
   {
    "name": "setup-wizard-generator",
@@ -2373,7 +2472,8 @@
    "line": 107,
    "add_id": "official/devops/setup-wizard-generator",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "make a step-by-step script that walks a person through a manual setup."
   },
   {
    "name": "watchers",
@@ -2384,7 +2484,8 @@
    "line": 108,
    "add_id": "official/devops/watchers",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "check news feeds, GitHub or data links on a timer and report new items."
   },
   {
    "name": "adversarial-ux-test",
@@ -2395,7 +2496,8 @@
    "line": 114,
    "add_id": "official/dogfood/adversarial-ux-test",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "play an angry, impatient user to find what is confusing in your app."
   },
   {
    "name": "agentmail",
@@ -2406,7 +2508,8 @@
    "line": 120,
    "add_id": "official/email/agentmail",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "use its own email inbox, through AgentMail."
   },
   {
    "name": "3-statement-model",
@@ -2417,7 +2520,8 @@
    "line": 126,
    "add_id": "official/finance/3-statement-model",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "fill in a company's linked money statements in an Excel file."
   },
   {
    "name": "comps-analysis",
@@ -2428,7 +2532,8 @@
    "line": 127,
    "add_id": "official/finance/comps-analysis",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "value a company against similar companies, in an Excel file."
   },
   {
    "name": "dcf-model",
@@ -2439,7 +2544,8 @@
    "line": 128,
    "add_id": "official/finance/dcf-model",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "value a company from its future cash, in an Excel file."
   },
   {
    "name": "excel-author",
@@ -2450,7 +2556,8 @@
    "line": 129,
    "add_id": "official/finance/excel-author",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "build careful financial Excel files that others can check."
   },
   {
    "name": "lbo-model",
@@ -2461,7 +2568,8 @@
    "line": 130,
    "add_id": "official/finance/lbo-model",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "plan the numbers for buying a company with borrowed money, in Excel."
   },
   {
    "name": "merger-model",
@@ -2472,7 +2580,8 @@
    "line": 131,
    "add_id": "official/finance/merger-model",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "work out what a merger does to earnings per share, in Excel."
   },
   {
    "name": "polymarket",
@@ -2483,7 +2592,8 @@
    "line": 132,
    "add_id": "official/finance/polymarket",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "look up prediction market odds and prices on Polymarket."
   },
   {
    "name": "pptx-author",
@@ -2494,7 +2604,8 @@
    "line": 133,
    "add_id": "official/finance/pptx-author",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make PowerPoint files."
   },
   {
    "name": "stocks",
@@ -2505,7 +2616,8 @@
    "line": 134,
    "add_id": "official/finance/stocks",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "look up stock and crypto prices, history and comparisons, from Yahoo."
   },
   {
    "name": "minecraft-modpack-server",
@@ -2516,7 +2628,8 @@
    "line": 140,
    "add_id": "official/gaming/minecraft-modpack-server",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "set up and run a Minecraft game world with mods."
   },
   {
    "name": "pokemon-player",
@@ -2527,7 +2640,8 @@
    "line": 141,
    "add_id": "official/gaming/pokemon-player",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "play Pokemon games."
   },
   {
    "name": "fitness-nutrition",
@@ -2538,7 +2652,8 @@
    "line": 147,
    "add_id": "official/health/fitness-nutrition",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "plan workouts and look up food values and exercises."
   },
   {
    "name": "neuroskill-bci",
@@ -2549,7 +2664,8 @@
    "line": 148,
    "add_id": "official/health/neuroskill-bci",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "read your mood and focus from a NeuroSkill brain sensor."
   },
   {
    "name": "fastmcp",
@@ -2560,7 +2676,8 @@
    "line": 154,
    "add_id": "official/mcp/fastmcp",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   },
   {
    "name": "mcp-oauth-remote-gateway",
@@ -2571,7 +2688,8 @@
    "line": 155,
    "add_id": "official/mcp/mcp-oauth-remote-gateway",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   },
   {
    "name": "mcporter",
@@ -2582,7 +2700,8 @@
    "line": 156,
    "add_id": "official/mcp/mcporter",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   },
   {
    "name": "gif-search",
@@ -2593,7 +2712,8 @@
    "line": 162,
    "add_id": "official/media/gif-search",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "find and save GIFs from Tenor."
   },
   {
    "name": "songsee",
@@ -2604,7 +2724,8 @@
    "line": 163,
    "add_id": "official/media/songsee",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "draw pictures of a sound file, such as its pitch over time."
   },
   {
    "name": "accelerate",
@@ -2615,7 +2736,8 @@
    "line": 169,
    "add_id": "official/mlops/accelerate",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "train AIs on several graphics cards with few code changes."
   },
   {
    "name": "axolotl",
@@ -2627,7 +2749,8 @@
    "add_id": "official/mlops/training/axolotl",
    "add_id_certain": true,
    "add_id_seen": "seen in the app after Install by hhtech, Desktop v0.23.0: docs/answers/hhtech-fixes-6.md section 2",
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "train your own version of an AI from a settings file."
   },
   {
    "name": "chroma",
@@ -2638,7 +2761,8 @@
    "line": 171,
    "add_id": "official/mlops/chroma",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "keep text in a search store so an AI can find it by meaning."
   },
   {
    "name": "dspy",
@@ -2649,7 +2773,8 @@
    "line": 172,
    "add_id": "official/mlops/dspy",
    "add_id_certain": false,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "build AI programs that improve their own instructions by themselves."
   },
   {
    "name": "evaluating-llms-harness",
@@ -2660,7 +2785,8 @@
    "line": 173,
    "add_id": "official/mlops/evaluating-llms-harness",
    "add_id_certain": false,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "test AIs on standard exams to compare how good they are."
   },
   {
    "name": "faiss",
@@ -2671,7 +2797,8 @@
    "line": 174,
    "add_id": "official/mlops/faiss",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "search huge collections of numbers for the closest matches, very fast."
   },
   {
    "name": "flash-attention",
@@ -2682,7 +2809,8 @@
    "line": 175,
    "add_id": "official/mlops/flash-attention",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "make training and running AIs faster."
   },
   {
    "name": "lambda-labs",
@@ -2693,7 +2821,8 @@
    "line": 176,
    "add_id": "official/mlops/lambda-labs",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "rent strong graphics cards from Lambda Labs to train AIs."
   },
   {
    "name": "llama-cpp",
@@ -2704,7 +2833,8 @@
    "line": 177,
    "add_id": "official/mlops/llama-cpp",
    "add_id_certain": false,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "run an AI on your own computer with llama.cpp."
   },
   {
    "name": "modal",
@@ -2715,7 +2845,8 @@
    "line": 178,
    "add_id": "official/mlops/modal",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "run AI jobs on Modal's rented graphics cards."
   },
   {
    "name": "nemo-curator",
@@ -2726,7 +2857,8 @@
    "line": 179,
    "add_id": "official/mlops/nemo-curator",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "clean up large piles of text before training an AI on it."
   },
   {
    "name": "obliteratus",
@@ -2737,7 +2869,8 @@
    "line": 180,
    "add_id": "official/mlops/obliteratus",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "remove the safety refusals built into open AIs."
   },
   {
    "name": "peft",
@@ -2748,7 +2881,8 @@
    "line": 181,
    "add_id": "official/mlops/peft",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "train your own version of a big AI on a small graphics card."
   },
   {
    "name": "pytorch-fsdp",
@@ -2759,7 +2893,8 @@
    "line": 182,
    "add_id": "official/mlops/pytorch-fsdp",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   },
   {
    "name": "pytorch-lightning",
@@ -2770,7 +2905,8 @@
    "line": 183,
    "add_id": "official/mlops/pytorch-lightning",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": null
   },
   {
    "name": "saelens",
@@ -2781,7 +2917,8 @@
    "line": 184,
    "add_id": "official/mlops/saelens",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   },
   {
    "name": "segment-anything-model",
@@ -2792,7 +2929,8 @@
    "line": 185,
    "add_id": "official/mlops/segment-anything-model",
    "add_id_certain": false,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "cut out any object in a picture, by pointing at it."
   },
   {
    "name": "serving-llms-vllm",
@@ -2803,7 +2941,8 @@
    "line": 186,
    "add_id": "official/mlops/serving-llms-vllm",
    "add_id_certain": false,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "run an AI fast for many users at once, with vLLM."
   },
   {
    "name": "simpo",
@@ -2814,7 +2953,8 @@
    "line": 187,
    "add_id": "official/mlops/simpo",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   },
   {
    "name": "slime",
@@ -2825,7 +2965,8 @@
    "line": 188,
    "add_id": "official/mlops/slime",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   },
   {
    "name": "tensorrt-llm",
@@ -2836,7 +2977,8 @@
    "line": 189,
    "add_id": "official/mlops/tensorrt-llm",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "run AIs as fast as possible on NVIDIA graphics cards."
   },
   {
    "name": "torchtitan",
@@ -2847,7 +2989,8 @@
    "line": 190,
    "add_id": "official/mlops/torchtitan",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "train a new AI from scratch on many graphics cards."
   },
   {
    "name": "unsloth",
@@ -2858,7 +3001,8 @@
    "line": 191,
    "add_id": "official/mlops/unsloth",
    "add_id_certain": false,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "train your own version of an AI faster, on a smaller graphics card."
   },
   {
    "name": "stripe-link-cli",
@@ -2869,7 +3013,8 @@
    "line": 197,
    "add_id": "official/payments/stripe-link-cli",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "buy things for you, with each payment approved in Link."
   },
   {
    "name": "stripe-projects",
@@ -2880,7 +3025,8 @@
    "line": 198,
    "add_id": "official/payments/stripe-projects",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "sign you up for web services and keep their logins in one place."
   },
   {
    "name": "box",
@@ -2891,7 +3037,8 @@
    "line": 204,
    "add_id": "official/productivity/box",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "organise, share and search your files on Box, a cloud file store."
   },
   {
    "name": "canvas",
@@ -2902,7 +3049,8 @@
    "line": 205,
    "add_id": "official/productivity/canvas",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "see your courses and assignments in Canvas, a school website."
   },
   {
    "name": "decision-questionnaire",
@@ -2913,7 +3061,8 @@
    "line": 206,
    "add_id": "official/productivity/decision-questionnaire",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "turn a decision you cannot make alone into questions for someone else."
   },
   {
    "name": "here-now",
@@ -2924,7 +3073,8 @@
    "line": 207,
    "add_id": "official/productivity/here-now",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "put a web page online at here.now and keep files there."
   },
   {
    "name": "live-dashboard",
@@ -2935,7 +3085,8 @@
    "line": 208,
    "add_id": "official/productivity/live-dashboard",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "build a page that shows live facts and refreshes itself."
   },
   {
    "name": "memento-flashcards",
@@ -2946,7 +3097,8 @@
    "line": 209,
    "add_id": "official/productivity/memento-flashcards",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "help you learn facts with flashcards that come back at the right time."
   },
   {
    "name": "property-listings",
@@ -2957,7 +3109,8 @@
    "line": 210,
    "add_id": "official/productivity/property-listings",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "show homes or rentals you found as cards to compare, in the Hermes app."
   },
   {
    "name": "shop",
@@ -2968,7 +3121,8 @@
    "line": 211,
    "add_id": "official/productivity/shop",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "search shops, buy, and track orders and returns."
   },
   {
    "name": "siyuan",
@@ -2979,7 +3133,8 @@
    "line": 212,
    "add_id": "official/productivity/siyuan",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "search and change notes in SiYuan, a notes app."
   },
   {
    "name": "telephony",
@@ -2990,7 +3145,8 @@
    "line": 213,
    "add_id": "official/productivity/telephony",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "get a phone number, send texts and make AI phone calls, through Twilio."
   },
   {
    "name": "bioinformatics",
@@ -3001,7 +3157,8 @@
    "line": 219,
    "add_id": "official/research/bioinformatics",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "find the right method for gene and biology data work."
   },
   {
    "name": "blogwatcher",
@@ -3012,7 +3169,8 @@
    "line": 220,
    "add_id": "official/research/blogwatcher",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "follow blogs and news feeds and see what is new."
   },
   {
    "name": "darwinian-evolver",
@@ -3023,7 +3181,8 @@
    "line": 221,
    "add_id": "official/research/darwinian-evolver",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "improve a short text or code by trying many versions and keeping the best."
   },
   {
    "name": "domain-intel",
@@ -3034,7 +3193,8 @@
    "line": 222,
    "add_id": "official/research/domain-intel",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "look up public facts about a website's address: owner, certificates, subdomains."
   },
   {
    "name": "drug-discovery",
@@ -3045,7 +3205,8 @@
    "line": 223,
    "add_id": "official/research/drug-discovery",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "look up medicines and how they act, for drug research."
   },
   {
    "name": "gitnexus-explorer",
@@ -3056,7 +3217,8 @@
    "line": 224,
    "add_id": "official/research/gitnexus-explorer",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "show a code project as a clickable map of its parts."
   },
   {
    "name": "llm-wiki",
@@ -3067,7 +3229,8 @@
    "line": 225,
    "add_id": "official/research/llm-wiki",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "build a growing set of linked notes that an AI keeps up to date."
   },
   {
    "name": "osint-investigation",
@@ -3078,7 +3241,8 @@
    "line": 226,
    "add_id": "official/research/osint-investigation",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "dig through public records to trace money, companies and links between them."
   },
   {
    "name": "parallel-cli",
@@ -3089,7 +3253,8 @@
    "line": 227,
    "add_id": "official/research/parallel-cli",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "search the web and do deep research with Parallel."
   },
   {
    "name": "qmd",
@@ -3100,7 +3265,8 @@
    "line": 228,
    "add_id": "official/research/qmd",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "search your own notes and documents on your computer, by words and meaning."
   },
   {
    "name": "research-paper-writing",
@@ -3111,7 +3277,8 @@
    "line": 229,
    "add_id": "official/research/research-paper-writing",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "plan, run and write up AI research for big science meetings."
   },
   {
    "name": "rss-feeds",
@@ -3122,7 +3289,8 @@
    "line": 230,
    "add_id": "official/research/rss-feeds",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "read news feeds from a website and list the newest entries."
   },
   {
    "name": "scrapling",
@@ -3133,7 +3301,8 @@
    "line": 231,
    "add_id": "official/research/scrapling",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "copy data from websites, also ones that try to block robots."
   },
   {
    "name": "1password",
@@ -3144,7 +3313,8 @@
    "line": 237,
    "add_id": "official/security/1password",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "read your secrets from 1Password and use them."
   },
   {
    "name": "godmode",
@@ -3155,7 +3325,8 @@
    "line": 238,
    "add_id": "official/security/godmode",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "get around the safety rules of AIs."
   },
   {
    "name": "oss-forensics",
@@ -3166,7 +3337,8 @@
    "line": 239,
    "add_id": "official/security/oss-forensics",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "investigate an attack on open-source code on GitHub and write a report."
   },
   {
    "name": "sherlock",
@@ -3177,7 +3349,8 @@
    "line": 240,
    "add_id": "official/security/sherlock",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "find which websites have an account with a given username."
   },
   {
    "name": "unbroker",
@@ -3188,7 +3361,8 @@
    "line": 241,
    "add_id": "official/security/unbroker",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "find and remove your personal details from people-search websites."
   },
   {
    "name": "web-pentest",
@@ -3199,7 +3373,8 @@
    "line": 242,
    "add_id": "official/security/web-pentest",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "attack a website you are allowed to test, to find its security holes."
   },
   {
    "name": "openhue",
@@ -3210,7 +3385,8 @@
    "line": 248,
    "add_id": "official/smart-home/openhue",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "turn Philips Hue lights and scenes on and off."
   },
   {
    "name": "reddit-reading",
@@ -3221,7 +3397,8 @@
    "line": 254,
    "add_id": "official/social-media/reddit-reading",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "read and search Reddit posts and comments."
   },
   {
    "name": "ast-grep",
@@ -3232,7 +3409,8 @@
    "line": 260,
    "add_id": "official/software-development/ast-grep",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "search and change code by its structure, not only its letters."
   },
   {
    "name": "code-wiki",
@@ -3243,7 +3421,8 @@
    "line": 261,
    "add_id": "official/software-development/code-wiki",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "write a wiki with diagrams that explains a code project."
   },
   {
    "name": "grill-me",
@@ -3254,7 +3433,8 @@
    "line": 262,
    "add_id": "official/software-development/grill-me",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "question your plan hard, step by step, before you build it."
   },
   {
    "name": "hermes-agent-skill-authoring",
@@ -3265,7 +3445,8 @@
    "line": 263,
    "add_id": "official/software-development/hermes-agent-skill-authoring",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "write new skills, the steps that teach Hermes a task, for the Hermes project."
   },
   {
    "name": "inspecting-hermes-desktop-dom",
@@ -3276,7 +3457,8 @@
    "line": 264,
    "add_id": "official/software-development/inspecting-hermes-desktop-dom",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "look inside the running Hermes app's page, for people changing the app."
   },
   {
    "name": "node-inspect-debugger",
@@ -3287,7 +3469,8 @@
    "line": 265,
    "add_id": "official/software-development/node-inspect-debugger",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "find bugs in Node.js programs by pausing them step by step."
   },
   {
    "name": "pr-lens",
@@ -3298,7 +3481,8 @@
    "line": 266,
    "add_id": "official/software-development/pr-lens",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "draw a code change as a moving diagram that shows how it works."
   },
   {
    "name": "python-debugpy",
@@ -3309,7 +3493,8 @@
    "line": 267,
    "add_id": "official/software-development/python-debugpy",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "find bugs in Python programs by pausing them step by step."
   },
   {
    "name": "rest-graphql-debug",
@@ -3320,7 +3505,8 @@
    "line": 268,
    "add_id": "official/software-development/rest-graphql-debug",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "find out why a web service answers with an error."
   },
   {
    "name": "subagent-driven-development",
@@ -3331,7 +3517,8 @@
    "line": 269,
    "add_id": "official/software-development/subagent-driven-development",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "carry out a coding plan by handing each task to a fresh AI helper."
   },
   {
    "name": "cloudflare-temporary-deploy",
@@ -3342,7 +3529,8 @@
    "line": 275,
    "add_id": "official/web-development/cloudflare-temporary-deploy",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "put a small web app online for an hour, with no account."
   },
   {
    "name": "har-derived-api-client",
@@ -3353,7 +3541,8 @@
    "line": 276,
    "add_id": "official/web-development/har-derived-api-client",
    "add_id_certain": true,
-   "passes_r_rules": true
+   "passes_r_rules": true,
+   "say": "record what a website sends, then make a program that fetches the same data."
   },
   {
    "name": "page-agent",
@@ -3364,7 +3553,8 @@
    "line": 277,
    "add_id": "official/web-development/page-agent",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "add an AI helper inside your own web app that clicks for its users."
   },
   {
    "name": "publish-site",
@@ -3375,7 +3565,8 @@
    "line": 278,
    "add_id": "official/web-development/publish-site",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "put a website you built online on GitHub, Cloudflare or Netlify Pages."
   },
   {
    "name": "scrollcraft",
@@ -3386,7 +3577,8 @@
    "line": 279,
    "add_id": "official/web-development/scrollcraft",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": "build landing pages where scrolling plays like a film."
   },
   {
    "name": "yuanbao",
@@ -3397,7 +3589,53 @@
    "line": 285,
    "add_id": "official/yuanbao/yuanbao",
    "add_id_certain": true,
-   "passes_r_rules": false
+   "passes_r_rules": false,
+   "say": null
   }
- ]
+ ],
+ "skill_name_rule_wf1": {
+  "about": "wants-fixes-v1 (content/helper-wants-fixes-v1.md). Four rules on top of skill_name_rule. Reference: dev/checks/hhcontent-wants-fixes/wants_fixes_step.py.",
+  "no_name_before_hyphen": "A skill name never ends right before a hyphen: in a skill called \"brag-slim\" only brag-slim is named, not brag. (Builder's change in 9434be1, kept by Lead.)",
+  "longer_name_wins": "When one skill name's match lies inside another's, only the longer counts: a skill called brag slim names brag-slim only. (Builder's change in 9434be1, kept by Lead.)",
+  "group_label_typed": "A group's own label typed exactly (letters and digits only, any case: pictures and video) opens that group, as if picked. Only once the conversation is open (after the name and work questions). (Builder's change in 9434be1, kept by Lead.)",
+  "ordinary_names_rule": "These skill names are ordinary words. After skill(s) for, such a name counts only when it is the last word of the message (is there a skill for maps). Followed by more words (skills for shop owners) it names no skill. The other patterns (the shop skill, a skill called shop) still count.",
+  "ordinary_names": [
+   "accelerate",
+   "anatomy",
+   "auteur",
+   "blackbox",
+   "box",
+   "brag",
+   "canvas",
+   "chroma",
+   "dogfood",
+   "impeccable",
+   "maps",
+   "modal",
+   "pretext",
+   "shop",
+   "sketch",
+   "slime",
+   "spike",
+   "stocks",
+   "watchers"
+  ],
+  "ordinary_names_judgement": "hhcontent's judgement of which names a person would use as a plain word. Read from the 186 names: every name with no hyphen that is a common English word.",
+  "skill_for_unknown": "Only in a question (route2 question_form). When the term step would explain the word skill, but the message asks for a skill for something (skill(s) for, or skill(s) that can / which can, then a word not in skill_for_not_after), and no row, skill or topic matched, the term line is not shown: the nearest group's N2 if one matches (I don't know that one, then its rows), else N1. is there a skill for knitting -> N1; is there a skill for editing photos -> N2 pics; what is a skill, what are skills for, is there a skill for me -> the term line. His words: if Helper doesn't know, it says so and doesn't make it up.",
+  "skill_for_pattern": "skills? (?:for|that can|which can) (?:a |an |the |my )?([a-z][a-z0-9'-]*)",
+  "skill_for_not_after": [
+   "me",
+   "it",
+   "hermes",
+   "bot",
+   "bots",
+   "beginners",
+   "beginner",
+   "newcomers",
+   "newcomer",
+   "starters",
+   "agents",
+   "agent"
+  ]
+ }
 }

@@ -10,6 +10,7 @@ import crypto from 'node:crypto'
 import { wantsProblems, slimWantsData, serviceLines, MAX_GROUPS } from '../scripts/wants-data.mjs'
 import { WANTS_DATA } from '../src/wants-data.js'
 import { wantsDataSource } from '../scripts/build.mjs'
+import { pinned } from './lib/team-pins.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const TEAM = path.resolve(ROOT, '..')
@@ -65,7 +66,19 @@ const BREAKS = [
   ['a {slot} other than {name} in S2\'s after line', w => (w.fixed_lines.find(f => f.id === 'S2').next.after = 'It works from your next {when}.'), /S2: a \{slot\} Helper does not fill/],
   ['an optional row with no clicks', w => (row(w, 'w_reddit').next.steps = []), /w_reddit: clicks with no steps or no after line/],
   ['a row with no kind (no crash, a reason)', w => delete row(w, 'w_web').kind, /w_web: kind undefined is not one the wants data uses/],
-  ['a row id that is a topic id', w => (row(w, 'w_web').id = 'mem'), /mem: the same id as a topic, term or pick/]
+  ['a row id that is a topic id', w => (row(w, 'w_web').id = 'mem'), /mem: the same id as a topic, term or pick/],
+  // wants fixes v1: skill_name_rule_wf1
+  ['no skill_name_rule_wf1', w => delete w.skill_name_rule_wf1, /skill_name_rule_wf1 is missing/],
+  ['an ordinary name that is no skill', w => w.skill_name_rule_wf1.ordinary_names.push('knitting'), /ordinary name knitting is no skill/],
+  ['a "skill for" pattern that does not catch the word after it', w => (w.skill_name_rule_wf1.skill_for_pattern = 'skills? for (?:a )?'), /skill_for_pattern does not catch the word/],
+  ['a "skill for" pattern that does not compile', w => (w.skill_name_rule_wf1.skill_for_pattern = 'skills? for ([a-z]'), /skill_for_pattern does not compile/],
+  // skill lines v1: S1 and S2 say {say}, or text_fixed when a skill has none
+  ['a skill with no say and S1 with no text_fixed', w => delete w.fixed_lines.find(f => f.id === 'S1').text_fixed, /skill sdlc-review: no say, and S1 has no text_fixed/],
+  ['a say with a {slot}', w => (w.skills.find(s => s.name === 'github').say = 'work with {thing} on GitHub.'), /skill github: say holds a \{slot\}/],
+  ['a say with no full stop', w => (w.skills.find(s => s.name === 'github').say = 'work with GitHub'), /skill github: say does not end with a full stop/],
+  ['a say over the word limit', w => (w.skills.find(s => s.name === 'github').say = 'work with GitHub and all of its many issues, pull requests, reviews, code folders and other things too.'), /skill github: S1 line fails/],
+  ['a {slot} other than {name} and {say} in S1', w => (w.fixed_lines.find(f => f.id === 'S1').text += ' {when}'), /S1: a \{slot\} Helper does not fill/],
+  ['a {say} in S2\'s text_fixed', w => (w.fixed_lines.find(f => f.id === 'S2').text_fixed += ' {say}'), /S2 text_fixed: a \{slot\} Helper does not fill/]
 ]
 for (const [what, breakIt, reason] of BREAKS) {
   test(`the build stops on ${what}`, () => {
@@ -106,11 +119,11 @@ test('the docs lines are the v0.23.0 docs\' own, line for line (when the Hermes 
   assert.ok(lines >= 200, `only ${lines} lines`)
 })
 
-test('the plugin\'s copy of the wants data is the team\'s (when the team\'s folder is there)', t => {
+test('the plugin\'s copy of the wants data is the team\'s at the checksum this job names (when the team\'s folder is there)', t => {
   const team = path.join(TEAM, 'content', 'helper-wants-v1.json')
   if (!fs.existsSync(team)) return t.skip('no team content folder beside the plugin')
   const sha = p => crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')
-  assert.equal(sha(path.join(ROOT, 'content', 'helper-wants-v1.json')), sha(team), 'run bash dev/checks/talk-v2/recopy.sh')
+  assert.equal(sha(path.join(ROOT, 'content', 'helper-wants-v1.json')), pinned(t, 'content/helper-wants-v1.json'), 'run bash dev/checks/talk-v2-wf1/recopy-wf1.sh')
 })
 
 test('the code gets only what it reads: no notes, no hints for a model, no screenshots\' paths; the service lines as data', () => {

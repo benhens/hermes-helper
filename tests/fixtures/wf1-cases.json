@@ -1,0 +1,592 @@
+{
+ "about": "Written by dev/checks/talk-v2-wf1/dump_wf1.py from hhcontent's run_wf1.py. Do not edit: make it again.",
+ "run_wf1_sha256": "221f20d29716dd39c677fe8024489b36e36f07d92811a3005f58c3c7142eb40a",
+ "summary": "53 of 53 as expected",
+ "random_keys": "random 40-character AWS-style secrets: old pattern 5 catches 196684 of 196902, new 196684 (lost 0)",
+ "cases": [
+  {
+   "section": 1,
+   "name": "service of 'can it use my google drive'",
+   "got": [
+    "Google Drive",
+    "CN1"
+   ],
+   "want": [
+    "Google Drive",
+    "CN1"
+   ],
+   "ok": true,
+   "text": "can it use my google drive",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it read my google sheets'",
+   "got": [
+    "Google Sheets",
+    "svc1"
+   ],
+   "want": [
+    "Google Sheets",
+    "svc1"
+   ],
+   "ok": true,
+   "text": "can it read my google sheets",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it check my google mail'",
+   "got": [
+    "Gmail",
+    "CN1"
+   ],
+   "want": [
+    "Gmail",
+    "CN1"
+   ],
+   "ok": true,
+   "text": "can it check my google mail",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it use one drive'",
+   "got": [
+    "OneDrive",
+    "svc1"
+   ],
+   "want": [
+    "OneDrive",
+    "svc1"
+   ],
+   "ok": true,
+   "text": "can it use one drive",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it use my google calendar'",
+   "got": [
+    "Google Calendar",
+    "CN1"
+   ],
+   "want": [
+    "Google Calendar",
+    "CN1"
+   ],
+   "ok": true,
+   "text": "can it use my google calendar",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it use my drive'",
+   "got": [
+    "Google Drive",
+    "CN1"
+   ],
+   "want": [
+    "Google Drive",
+    "CN1"
+   ],
+   "ok": true,
+   "text": "can it use my drive",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it use google'",
+   "got": [
+    "Google",
+    "svc1"
+   ],
+   "want": [
+    "Google",
+    "svc1"
+   ],
+   "ok": true,
+   "text": "can it use google",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it read my gmail'",
+   "got": [
+    "Gmail",
+    "CN1"
+   ],
+   "want": [
+    "Gmail",
+    "CN1"
+   ],
+   "ok": true,
+   "text": "can it read my gmail",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "service of 'can it use onedrive'",
+   "got": [
+    "OneDrive",
+    "svc1"
+   ],
+   "want": [
+    "OneDrive",
+    "svc1"
+   ],
+   "ok": true,
+   "text": "can it use onedrive",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "turn: can it use my google drive",
+   "got": "line svc1",
+   "want": "line svc1",
+   "ok": true,
+   "text": "can it use onedrive",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "typed 'google drive' under the svc question: kept",
+   "got": "Google Drive",
+   "want": "Google Drive",
+   "ok": true,
+   "text": null,
+   "typed": "google drive",
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "typed 'one drive' under the svc question: kept",
+   "got": "OneDrive",
+   "want": "OneDrive",
+   "ok": true,
+   "text": null,
+   "typed": "one drive",
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "typed 'drive' under the svc question: kept",
+   "got": "Google Drive",
+   "want": "Google Drive",
+   "ok": true,
+   "text": null,
+   "typed": "drive",
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "typed 'google mail' under the svc question: kept",
+   "got": "Gmail",
+   "want": "Gmail",
+   "ok": true,
+   "text": null,
+   "typed": "google mail",
+   "s": null
+  },
+  {
+   "section": 1,
+   "name": "typed 'google calendar' under the svc question: kept",
+   "got": "Google Calendar",
+   "want": "Google Calendar",
+   "ok": true,
+   "text": null,
+   "typed": "google calendar",
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "is there a skill called \"brag-slim\"",
+   "got": "SKILL brag-slim",
+   "want": "SKILL brag-slim",
+   "ok": true,
+   "text": "is there a skill called \"brag-slim\"",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "is there a skill called brag slim",
+   "got": "SKILL brag-slim",
+   "want": "SKILL brag-slim",
+   "ok": true,
+   "text": "is there a skill called brag slim",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "what does the brag skill do",
+   "got": "SKILL brag",
+   "want": "SKILL brag",
+   "ok": true,
+   "text": "what does the brag skill do",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "the \"brag\" skill",
+   "got": "SKILL brag",
+   "want": "SKILL brag",
+   "ok": true,
+   "text": "the \"brag\" skill",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "pictures and video",
+   "got": "G1 group pics",
+   "want": "G1 group pics",
+   "ok": true,
+   "text": "pictures and video",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "Pictures and Video.",
+   "got": "G1 group pics",
+   "want": "G1 group pics",
+   "ok": true,
+   "text": "Pictures and Video.",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "search and use the web",
+   "got": "G1 group web",
+   "want": "G1 group web",
+   "ok": true,
+   "text": "search and use the web",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "voice and sound",
+   "got": "G1 group voice",
+   "want": "G1 group voice",
+   "ok": true,
+   "text": "voice and sound",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "files and my computer",
+   "got": "G1 group files",
+   "want": "G1 group files",
+   "ok": true,
+   "text": "files and my computer",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "label at the name question is not a group",
+   "got": false,
+   "want": false,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 2,
+   "name": "label plus more words is not a group",
+   "got": false,
+   "want": false,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "is there a skill for knitting",
+   "got": "N1",
+   "want": "N1",
+   "ok": true,
+   "text": "is there a skill for knitting",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "is there a skill for knitting?",
+   "got": "N1",
+   "want": "N1",
+   "ok": true,
+   "text": "is there a skill for knitting?",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "are there skills that can knit",
+   "got": "N1",
+   "want": "N1",
+   "ok": true,
+   "text": "are there skills that can knit",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "is there a skill for my taxes",
+   "got": "N1",
+   "want": "N1",
+   "ok": true,
+   "text": "is there a skill for my taxes",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "what is a skill  (the term line)",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": "what is a skill",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "what are skills for?  (the term line)",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": "what are skills for?",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "is there a skill for me  (the term line)",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": "is there a skill for me",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "which skill for hermes  (the term line)",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": "which skill for hermes",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "I am working on my anatomy skills for drawing  (the term line)",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": "I am working on my anatomy skills for drawing",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "is there a skill for docker management",
+   "got": "SKILL docker-management",
+   "want": "SKILL docker-management",
+   "ok": true,
+   "text": "is there a skill for docker management",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 3,
+   "name": "is there a skill for editing photos",
+   "got": "N2 group pics",
+   "want": "N2 group pics",
+   "ok": true,
+   "text": "is there a skill for editing photos",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "are there skills for shop owners",
+   "got": "N1",
+   "want": "N1",
+   "ok": true,
+   "text": "are there skills for shop owners",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "is there a skill for sketch artists",
+   "got": "N1",
+   "want": "N1",
+   "ok": true,
+   "text": "is there a skill for sketch artists",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "any skills for box office numbers?",
+   "got": "N1",
+   "want": "N1",
+   "ok": true,
+   "text": "any skills for box office numbers?",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "is there a shop skill",
+   "got": "SKILL shop",
+   "want": "SKILL shop",
+   "ok": true,
+   "text": "is there a shop skill",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "a skill called shop",
+   "got": "SKILL shop",
+   "want": "SKILL shop",
+   "ok": true,
+   "text": "a skill called shop",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "is there a skill for shop",
+   "got": "SKILL shop",
+   "want": "SKILL shop",
+   "ok": true,
+   "text": "is there a skill for shop",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "is there a skill for maps?  (maps: its skill or its row)",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": "is there a skill for maps?",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "is there a skill for canvas",
+   "got": "SKILL canvas",
+   "want": "SKILL canvas",
+   "ok": true,
+   "text": "is there a skill for canvas",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 4,
+   "name": "the sketch skill",
+   "got": "SKILL sketch",
+   "want": "SKILL sketch",
+   "ok": true,
+   "text": "the sketch skill",
+   "typed": null,
+   "s": null
+  },
+  {
+   "section": 5,
+   "name": "is a key: Projects/Club2026/AutumnSchedule/Week123",
+   "got": false,
+   "want": false,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": "Projects/Club2026/AutumnSchedule/Week123"
+  },
+  {
+   "section": 5,
+   "name": "is a key: remember that my files are in Projects/Club2026/AutumnSc",
+   "got": false,
+   "want": false,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": "remember that my files are in Projects/Club2026/AutumnSchedule/Week123"
+  },
+  {
+   "section": 5,
+   "name": "is a key: Documents/Tennis2026/MembersList/Summer12",
+   "got": false,
+   "want": false,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": "Documents/Tennis2026/MembersList/Summer12"
+  },
+  {
+   "section": 5,
+   "name": "is a key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  },
+  {
+   "section": 5,
+   "name": "is a key: my aws secret is wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKE",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": "my aws secret is wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  },
+  {
+   "section": 5,
+   "name": "is a key: Abc/Def/Ghi9jklmnopqrstuvwxyzABCDEFGHIJK+",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": "Abc/Def/Ghi9jklmnopqrstuvwxyzABCDEFGHIJK+"
+  },
+  {
+   "section": 5,
+   "name": "is a key: je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY",
+   "got": true,
+   "want": true,
+   "ok": true,
+   "text": null,
+   "typed": null,
+   "s": "je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY"
+  }
+ ]
+}

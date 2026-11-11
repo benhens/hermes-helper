@@ -54,7 +54,7 @@ export const TALK_DATA = {
       "paste_text": "I asked for this: \"{request}\". Please do it for me. Ask me before you change anything."
     },
     "K1": {
-      "text": "That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat."
+      "text": "That looks like a secret key. I did not keep it. Keys go in Settings, never in a chat."
     },
     "COST": {
       "text": "Hermes itself is free. The AI it uses can cost money, depending on which one you choose.",
@@ -234,7 +234,7 @@ export const TALK_DATA = {
     "(?<![A-Za-z0-9])eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
     "(?<![A-Za-z0-9])(?=[A-Za-z]*[0-9])(?=[0-9]*[A-Za-z])[A-Za-z0-9]{32,}(?![A-Za-z0-9])",
     "(?<![A-Za-z0-9])(?:AKIA|ASIA)[A-Z0-9]{16}(?![A-Za-z0-9])",
-    "(?<![A-Za-z0-9/+.:_-])(?=[A-Za-z0-9/+]*[A-Z])(?=[A-Za-z0-9/+]*[a-z])(?=[A-Za-z0-9/+]*[0-9])[A-Za-z0-9+][A-Za-z0-9/+]{39}(?![A-Za-z0-9/+=.:_-])",
+    "(?<![A-Za-z0-9/+.:_-])(?!(?:[A-Za-z][a-z]*(?:[A-Z][a-z]+)*[0-9]*/){2,}[A-Za-z][a-z]*(?:[A-Z][a-z]+)*[0-9]*(?![A-Za-z0-9/+]))(?=[A-Za-z0-9/+]*[A-Z])(?=[A-Za-z0-9/+]*[a-z])(?=[A-Za-z0-9/+]*[0-9])[A-Za-z0-9+][A-Za-z0-9/+]{39}(?![A-Za-z0-9/+=.:_-])",
     "(?<![0-9])[0-9]{6,12}:[A-Za-z0-9_-]{30,}",
     "-----BEGIN [A-Z ]*PRIVATE KEY-----"
   ],
@@ -1463,11 +1463,15 @@ export const TALK_DATA = {
           "key_words": [
             "google calendar",
             "gmail",
+            "google drive",
+            "google sheets",
+            "google mail",
             "google",
             "calendar",
             "github",
             "notion",
             "linear",
+            "one drive",
             "drive",
             "jira",
             "spotify",
@@ -1491,12 +1495,16 @@ export const TALK_DATA = {
             "google calendar": "Google Calendar",
             "gmail": "Gmail",
             "gmial": "Gmail",
+            "google drive": "Google Drive",
+            "google sheets": "Google Sheets",
+            "google mail": "Gmail",
             "google": "Google",
             "calendar": "my calendar",
             "calender": "my calendar",
             "github": "GitHub",
             "notion": "Notion",
             "linear": "Linear",
+            "one drive": "OneDrive",
             "drive": "Google Drive",
             "jira": "Jira",
             "spotify": "Spotify",
@@ -1888,7 +1896,11 @@ export const TALK_DATA = {
           "zoom": "Zoom",
           "shopify": "Shopify",
           "airtable": "Airtable",
-          "youtube": "YouTube"
+          "youtube": "YouTube",
+          "google drive": "Google Drive",
+          "google sheets": "Google Sheets",
+          "google mail": "Gmail",
+          "one drive": "OneDrive"
         }
       }
     },
@@ -1959,7 +1971,7 @@ export const TALK_DATA = {
     },
     "tell": {
       "kept_line": "Kept: {kept_words}.",
-      "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.",
+      "first_time_if_no_model_call": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.",
       "link": {
         "words": "See what I keep"
       },
@@ -2329,7 +2341,8 @@ export const TALK_DATA = {
       "facts": [
         "Kept as plain text in the Hermes app on this computer.",
         "Shared by all your bots, each a separate Hermes.",
-        "Removing Helper does not delete it."
+        "Removing Helper does not delete it.",
+        "Do not type passwords here."
       ],
       "would_delete": {
         "question": "Save, and forget {n} things?",

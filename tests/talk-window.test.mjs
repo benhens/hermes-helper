@@ -163,7 +163,7 @@ test('the opening, played: the name, what the person does, then "Ask me anything
   assert.equal(link.props.className, T.link)
   assert.equal(text(link), 'See what I keep')
   assert.equal(text(byData(note, 'kept-first')), TALK_DATA.keeps.tell.first_time_if_no_model_call)
-  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.')
+  assert.equal(TALK_DATA.keeps.tell.first_time_if_no_model_call, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
   // the first-time line comes once only
   send(view, 'remember that my club has six courts')
   assert.equal(line(view), 'RM1')
@@ -523,7 +523,7 @@ test('a pasted key: Helper\'s fixed line, the box empties, and the key is nowher
   send(view, `my key is ${key}`)
   assert.equal(box(view).props.value, '')
   assert.equal(line(view), 'K1')
-  assert.equal(said(view), 'That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat.')
+  assert.equal(said(view), 'That looks like a secret key. I did not keep it. Keys go in Settings, never in a chat.')
   assert.ok(!JSON.stringify(view.tree).includes(key))
   assert.ok(!JSON.stringify([...storage.data]).includes(key))
   assert.equal(lines(view).at(-1).props['data-hh'], 'old')
@@ -727,9 +727,13 @@ test('Helper\'s lines hold no link out of the page and no model\'s words: every 
     ...W.rows.map(r => r.text),
     ...Object.values(W.fixed).map(f => f.text),
     W.question.text,
-    ...W.skills.map(s => (s.kind === 'optional' ? W.fixed.S2 : W.fixed.S1).text.replace('{name}', s.name))
+    // skill lines v1: "It teaches Hermes to {say}", or the old sentence (text_fixed) when a skill has no say
+    ...W.skills.map(s => {
+      const f = s.kind === 'optional' ? W.fixed.S2 : W.fixed.S1
+      return s.say != null ? f.text.replace('{name}', s.name).replace('{say}', s.say) : f.text_fixed.replace('{name}', s.name)
+    })
   ])
-  for (const w of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work', 'what can I ask', 'can it read pdfs', 'can it edit my videos', 'is there a github skill', 'what does the dspy skill do']) {
+  for (const w of ['what is a skill', 'how does memory work?', 'can it read my gmail', 'tell me a joke', 'second bot for work', 'what can I ask', 'can it read pdfs', 'can it edit my videos', 'is there a github skill', 'what does the dspy skill do', 'is there a skill called sdlc-review']) {
     send(view, w)
     const now = said(view).replace('Thanks, Peter.', 'Thanks, {name}.')
     assert.ok(pre.has(now), `${w} → ${now}`)
@@ -867,16 +871,23 @@ test('a skill by its name: Helper\'s fixed line, and under it a box headed "From
   const { view } = await pastOpening()
   send(view, 'is there a github skill')
   assert.equal(line(view), 'S1')
-  assert.equal(said(view), 'Hermes comes with a skill called "github". Skills are written steps that teach Hermes one task. The docs say this.')
+  // skill lines v1 (content/helper-skill-lines-v1.md section 2, its own examples, word for word)
+  assert.equal(said(view), 'Hermes comes with a skill called "github". It teaches Hermes to work with GitHub: issues, pull requests, reviews and code folders.')
   finish(view)
   const box1 = docsBox(view)
   assert.equal(box1.props.className, T.docs)
   assert.equal(text(byData(box1, 'docs-head')).trim(), 'From the Hermes docs')
   assert.equal(text(byData(box1, 'docs-words')).trim(), 'GitHub via gh CLI: PRs, issues, reviews, repos, auth.')
   assert.equal(button(view), null, 'a built-in skill has no button')
+  // a skill with no plain words (say is null) keeps the old sentence, text_fixed
+  send(view, 'is there a skill called sdlc-review')
+  assert.equal(line(view), 'S1')
+  assert.equal(said(view), 'Hermes comes with a skill called "sdlc-review". Skills are written steps that teach Hermes one task. The docs say this.')
+  finish(view)
+  assert.equal(text(byData(docsBox(view), 'docs-words')).trim(), 'Review Kanban handoffs and route verified outcomes.')
   send(view, 'what does the dspy skill do')
   assert.equal(line(view), 'S2')
-  assert.equal(said(view), 'The optional skill "dspy" must be added first. Skills are written steps that teach Hermes one task. The docs say this.')
+  assert.equal(said(view), 'The skill "dspy" must be added first. It teaches Hermes to build AI programs that improve their own instructions by themselves.')
   finish(view)
   assert.ok(docsBox(view))
   click(button(view))

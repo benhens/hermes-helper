@@ -117,16 +117,28 @@ export const nearOf = t => WANTS_DATA.groups.filter(g => whichOf(t, g.subject_wo
 // changes-8): hhcontent's skill_next.py PATTERNS, word for word; {n} is the name, or the name with
 // spaces for its hyphens. tests/talk-wants.test.mjs compares these with skill_next.py's own.
 export const SKILL_NEXT_PATTERNS = ['(?:the|a|an|this|that) {n} skills?', 'skills? (?:called|named) \\"?{n}\\"?', 'skills? for {n}', '\\"{n}\\" skills?']
+// Wants fixes v1 (helper-wants-v1.json skill_name_rule_wf1, hhcontent's wants_fixes_step.py): a name that
+// is an ordinary word counts after "skill(s) for" only as the last word of the message ("is there a skill
+// for shop" names shop; "skills for shop owners" names nothing). "the shop skill" still counts.
+const WF1 = WANTS_DATA.skill_name_rule_wf1
+const ORDINARY_NAMES = new Set(WF1.ordinary_names)
+// skill_for_unknown: "skill(s) for <word>" (or "that can", "which can") where the word is not on
+// skill_for_not_after ("is there a skill for me" stays the line about what a skill is)
+const SKILL_FOR = new RegExp('(^|[^a-z0-9])' + WF1.skill_for_pattern)
+function skillForUnknown(t) {
+  const m = SKILL_FOR.exec(t)
+  return !!m && !WF1.skill_for_not_after.includes(m[2])
+}
 const SKILL_RES = WANTS_DATA.skills.map(s => {
   const names = [...new Set([s.name, s.name.replace(/-/g, ' ')])]
-  const alts = names.flatMap(n => SKILL_NEXT_PATTERNS.map(p => p.replace(/\\"/g, '"').replace('{n}', escapeRe(n))))
-  // Builder (not in skill_next.py, changed after the first test run, please check): a name never
-  // ends right before a hyphen, so 'a skill called "brag-slim"' names brag-slim only, not brag too
-  // (skill_next.py finds both, and two names fall through to the skill line about what a skill is).
+  const lastOnly = p => (ORDINARY_NAMES.has(s.name) && p.startsWith('skills? for') ? '\\s*[?.!]*$' : '')
+  const alts = names.flatMap(n => SKILL_NEXT_PATTERNS.map(p => p.replace(/\\"/g, '"').replace('{n}', escapeRe(n)) + lastOnly(p)))
+  // A name never ends right before a hyphen, so 'a skill called "brag-slim"' names brag-slim only, not
+  // brag too (the Builder's rule, in the reference since wants fixes v1: wants_fixes_step.py a).
   return [s.name, new RegExp('(^|[^a-z0-9])(?:' + alts.join('|') + ')($|[^a-z0-9-])')]
 })
-// The skills a message names. Builder (not in skill_next.py, please check): where one name's match
-// lies inside another's ('a skill called brag slim' is brag and brag-slim), only the longer counts.
+// The skills a message names. Where one name's match lies inside another's ('a skill called brag
+// slim' is brag and brag-slim), only the longer counts (the Builder's rule, now wants_fixes_step.py b).
 export function skillOf(t) {
   const found = SKILL_RES.map(([n, re]) => [n, re.exec(t)]).filter(([, m]) => m).map(([n, m]) => [n, m.index, m.index + m[0].length])
   const inside = (a, b) => a !== b && b[1] <= a[1] && a[2] <= b[2] && b[2] - b[1] > a[2] - a[1]
@@ -181,6 +193,9 @@ function byCode(text, st) {
     if (!st.pending || questionForm(t)) {
       const terms = TERM_IDS.filter(k => whichOf(t, TERMS[k].key_words).length)
       if (terms.length === 1) {
+        // wants fixes v1 (skill_for_unknown): in a question, "skill(s) for / that can ..." and a word that is
+        // not on skill_for_not_after is not the line about what a skill is: turn() goes on to N2 or N1
+        if (st.wants !== false && TERMS[terms[0]].key_words.includes('skill') && questionForm(t) && skillForUnknown(t)) return r
         r.term = terms[0]
         return r
       }
@@ -239,6 +254,14 @@ function keep(st, out, key, value) {
   }
 }
 
+// The names a typed answer gives (keeps.answers.<topic>.names: typed word -> name). Wants fixes v1
+// (route2.py keep_typed and typed_change): a matched word inside a longer matched word does not count,
+// so "one drive" is OneDrive only, not Google Drive too ("drive").
+function typedNames(t, names) {
+  let ws = Object.keys(names).filter(w => hits(t, w))
+  ws = ws.filter(w => !ws.some(v => v !== w && hits(v, w)))
+  return new Set(ws.map(w => names[w]))
+}
 // Rule 2: an answer typed to Helper's own open question, found by code's words.
 function keepTyped(t, topic, need, st, out) {
   const A = KEEPS.answers
@@ -248,7 +271,7 @@ function keepTyped(t, topic, need, st, out) {
     const v = A.mod.values.find(x => x.need === need)
     if (v && whichOf(t, v.typed_words).length && !(unsure && v.typed_not_with_unsure_words)) keep(st, out, 'mod', need)
   } else if (!unsure && !(topic === 'svc' && need !== 'svc1') && !(topic === 'msg' && need === 'msg3')) {
-    const names = new Set(Object.entries(A[topic].names).filter(([w]) => hits(t, w)).map(([, n]) => n))
+    const names = typedNames(t, A[topic].names)
     if (names.has('Google Calendar')) names.delete('Google')
     if (names.size === 1) keep(st, out, topic, [...names][0])
   }
@@ -492,7 +515,7 @@ function typedChange(t, topic, st, out) {
   let vs
   if (topic === 'mod') vs = KEEPS.answers.mod.values.filter(v => (v.need === 'mod1' || v.need === 'mod2') && whichOf(t, v.typed_words).length).map(v => v.need)
   else {
-    const names = new Set(Object.entries(KEEPS.answers[topic].names).filter(([w]) => hits(t, w)).map(([, n]) => n))
+    const names = typedNames(t, KEEPS.answers[topic].names)
     if (names.has('Google Calendar')) names.delete('Google')
     vs = [...names]
   }
@@ -504,7 +527,7 @@ const samePair = (a, b) => a.length === b.length && [...a].sort().join('\u0000')
 // name of the first of the need's key words that is in the message (the list has the longest
 // first), the message itself when it was the answer to "Which service?", or the one named earlier
 // in this visit.
-function serviceIn(text, st, answered) {
+export function serviceIn(text, st, answered) {
   const need = TOPICS.svc && TOPICS.svc.needs.find(n => n.id === 'svc1')
   if (!need) return st.service
   const t = cutIgnored(talkNorm(text))
@@ -517,6 +540,7 @@ function serviceIn(text, st, answered) {
 // One typed message -> a result. The order of steps is route2.py's turn(), with no model.
 export function turn(text, st) {
   const out = {}
+  const openAtStart = st.stage === 'open'
   const done = (kind, more = {}) => {
     Object.assign(out, { kind }, more)
     st.lastq = kind === 'question' || kind === 'W1'
@@ -588,9 +612,10 @@ export function turn(text, st) {
   // github skill" gets the skill, not the service question. A row for that skill wins; a skill
   // marked left out gets N1b; else S1 (built in) or S2 (optional, with the clicks to add it).
   if (st.wants !== false) {
-    // Builder (not in the reference, please check): a group's own label typed as it is on its
+    // The Builder's rule, in the reference since wants fixes v1 (wants_fixes_step.py c): a group's own label typed as it is on its
     // button ("pictures and video") is that group, as if picked; else "I don't know that one" (N2).
-    const group = GROUP_BY_LABEL.get(asLabel(cutIgnored(talkNorm(text))))
+    // Only when the conversation was already open as the message came, as the reference has it.
+    const group = openAtStart ? GROUP_BY_LABEL.get(asLabel(cutIgnored(talkNorm(text)))) : null
     if (group) return done('G1', { group, buttons: pickGroup(group, st).buttons })
     const sk = skillOf(cutIgnored(talkNorm(text)))
     if (sk.length === 1) {
@@ -847,11 +872,14 @@ function wantNext(n, name) {
 const sourceText = sources => (sources || []).map(s => `${s.file} line ${s.line}`).join('; ') || null
 // S1 or S2 for a skill with no row of its own: Helper's fixed line, the box "From the Hermes docs"
 // with the page's own words (not Helper's voice), and for an optional skill the clicks to add it.
+// Skill lines v1 (content/helper-skill-lines-v1.md): the line says "It teaches Hermes to {say}", the
+// skill's own plain words; a skill whose say is null gets the old sentence, kept as text_fixed.
 function skillLine(name, said) {
   const s = WSKILLS.get(name)
   const f = WANTS_DATA.fixed[s.kind === 'optional' ? 'S2' : 'S1']
+  const text = s.say != null ? fillSlots(f.text, { name, say: s.say }) : fillSlots(f.text_fixed !== undefined ? f.text_fixed : f.text, { name })
   const docs = { head: WANTS_DATA.fixed['box-head'].text, words: s.docs_words, source: `${s.page} line ${s.line}` }
-  return said(s.kind === 'optional' ? 'S2' : 'S1', fillSlots(f.text, { name }), { source: docs.source, docs, next: f.next ? wantNext(f.next, name) : null })
+  return said(s.kind === 'optional' ? 'S2' : 'S1', text, { source: docs.source, docs, next: f.next ? wantNext(f.next, name) : null })
 }
 
 // The words for one kept thing (keeps.things[].kept_words): "Peter", "you pay for ChatGPT",

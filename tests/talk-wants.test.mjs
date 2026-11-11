@@ -11,10 +11,13 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import { freshVisit, laterVisit, turn, pick, pickTopic, pickGroup, pickWant, press, lineFor, skillOf, wantsOf, pageOf, SKILL_NEXT_PATTERNS, WANT_ROWS } from '../src/talk.js'
 import { WANTS_DATA } from '../src/wants-data.js'
+import { skillSentence } from '../scripts/wants-data.mjs'
+import { pinned } from './lib/team-pins.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const TEAM = path.resolve(ROOT, '..')
 const O = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/wants-oracle.json'), 'utf8'))
+const WANTS_JSON = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/helper-wants-v1.json'), 'utf8'))
 const sha = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')
 
 // route2.py's show() and the oracle's own additions (wants_step.py show)
@@ -50,7 +53,10 @@ const isWants = o => ['want', 'skillS', 'N2'].includes(o.kind) || (o.kind === 'W
 // The cost and where lines give way to a row in the plugin (the Builder's rule, tests/talk-fixes):
 // there the reference's row stays the result.
 const route2FirstSteps = r => ['NAME_AGAIN', 'NAME_NEW'].includes(r.kind) || (r.kind === 'plain' && r.why === 'what is')
-const expected = m => (route2FirstSteps(m.route2) ? m.route2.shown : isWants(m.oracle) ? m.oracle.shown : m.route2.shown)
+// wants fixes v1: where hhcontent's third layer (wants_fixes_step.py) changes the reference's result, that
+// result stands ("is there a skill for knitting": N1, not the term line)
+const wf1Changed = m => m.oracle_f6 && m.oracle_f6.shown !== m.oracle.shown
+const expected = m => (route2FirstSteps(m.route2) ? m.route2.shown : isWants(m.oracle) || wf1Changed(m) ? m.oracle.shown : m.route2.shown)
 function ours(m) {
   const st = freshVisit({ '': 'open', name: 'name', work: 'work' }[m.after || ''])
   if (m.after === 'work') st.name = 'Sam'
@@ -70,12 +76,23 @@ const KNOWN = {
   'forget everything, it was a mistake': ['A-none', TYPED_ABOUT_KEPT]
 }
 
-test('the reference file was made from the team\'s scripts as they are now (when the team\'s folder is there)', t => {
+test('the reference file was made from the team\'s scripts (when the team\'s folder is there): route2.py at the pin, the three wants layers as they are now', t => {
   const ck = path.join(TEAM, 'dev', 'checks')
   if (!fs.existsSync(path.join(ck, 'hhtech-fixes-6', 'fixes6_step.py'))) return t.skip('no team folder beside the plugin')
-  assert.equal(O.route2_sha256, sha(path.join(ck, 'hhcontent-talk-v2', 'route2.py')), 'route2.py changed: bash dev/checks/talk-v2/recopy.sh')
+  assert.equal(O.route2_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/route2.py'), 'route2.py is not the pinned one: bash dev/checks/talk-v2-wf1/recopy-wf1.sh')
   assert.equal(O.wants_step_sha256, sha(path.join(ck, 'hhtech-wants-check', 'wants_step.py')))
   assert.equal(O.fixes6_step_sha256, sha(path.join(ck, 'hhtech-fixes-6', 'fixes6_step.py')))
+  assert.equal(O.wants_fixes_step_sha256, sha(path.join(ck, 'hhcontent-wants-fixes', 'wants_fixes_step.py')))
+})
+
+test('wants fixes v1: the reference ran hhcontent\'s third layer after fixes6_step.py, and on the 296 messages it changes only "is there a skill for knitting", to N1', () => {
+  assert.equal(O.wants_fixes_step_sha256, '9e49d87fffc2fa8ab62d7c38c6863dbfc9f223286d324cafbaf137329285d75a')
+  // the replay ran route2.py with changes-12's one remember line put back (tests/talk.test.mjs SECRET_12)
+  assert.equal(O.route2_run, 'route2_secret11.py')
+  const changed = O.sets.flatMap(s => s.messages.filter(wf1Changed).map(m => [s.name, m.text, m.oracle_f6.shown, m.oracle.shown]))
+  assert.deepEqual(changed, [['test_wants40', 'is there a skill for knitting', 'term line skill', 'N1']])
+  const knit = O.sets.flatMap(s => s.messages).find(m => m.text === 'is there a skill for knitting')
+  assert.equal(ours(knit).shown, 'N1')
 })
 
 test('the skill-name patterns are hhcontent\'s skill_next.py PATTERNS, word for word (the article before "NAME skill" of changes-8)', () => {
@@ -140,17 +157,15 @@ test('skills by name, hhtech\'s twenty sentences (Q4): all ten that name a skill
   assert.deepEqual([found, quiet], [10, 10])
 })
 
-test('hhcontent\'s forty messages (test_wants.py): 37 as hhcontent expected; the two hhcontent named differ, and "a skill for knitting" gets the skill line as in route2.py', () => {
+test('hhcontent\'s forty messages (test_wants.py): 38 as hhcontent expected; the two hhcontent named differ ("a skill for knitting" is N1 now, wants fixes v1)', () => {
   const as = e => (e.startsWith('S:') ? 'skill:' + e.slice(2) : e.startsWith('topic:') ? e.slice(6) : e)
   const off = set('test_wants40').filter(m => landed(ours(m).o) !== as(m.hhcontent_expects)).map(m => [m.text, landed(ours(m).o)])
   assert.deepEqual(off, [
     // hhcontent's own two (helper-wants-v1.md 6, "Ran"): no row's words match; youtube is svc's word
     ['can hermes look things up online', 'N2:web'],
-    // test_wants.py has no terms step; route2.py and the reference give the term "skill" its line
-    // ("A skill is a set of written steps ..."), as for "what is a skill" (Questions for Lead)
-    ['is there a skill for knitting', 'word:skill'],
     ['can it download youtube videos', 'svc']
   ])
+  assert.equal(landed(ours(set('test_wants40').find(m => m.text === 'is there a skill for knitting')).o), 'N1')
 })
 
 test('the order of steps: a skill by name before the topics; a row takes svc off only for its own word; rows count only in a question while a topic question is open', () => {
@@ -228,7 +243,8 @@ test('S1 and S2 for every skill on the two pages: Helper\'s fixed line with the 
     }
     assert.deepEqual([o.kind, o.skill], ['skill', s.name], s.name)
     const said = lineFor(o, st)
-    assert.equal(said.text, (s.kind === 'optional' ? WANTS_DATA.fixed.S2 : WANTS_DATA.fixed.S1).text.replace('{name}', s.name))
+    // skill lines v1: "It teaches Hermes to {say}", or the old sentence (text_fixed) when say is null
+    assert.equal(said.text, skillSentence(WANTS_JSON, WANTS_JSON.skills.find(x => x.name === s.name)), s.name)
     assert.deepEqual(said.docs, { head: 'From the Hermes docs', words: s.docs_words, source: `${s.page} line ${s.line}` })
     if (s.kind === 'optional') {
       s2++
@@ -242,6 +258,9 @@ test('S1 and S2 for every skill on the two pages: Helper\'s fixed line with the 
   // 186 skills: 5 left out, 14 with a row of their own, the rest by S1 or S2
   assert.equal(s1 + s2, 186 - 5 - 14)
   assert.ok(s1 > 25 && s2 > 120, `${s1} built in, ${s2} optional`)
+  // skill lines v1 section 3: 174 of 186 skills have a plain line, 12 keep the fixed sentence
+  assert.deepEqual([WANTS_DATA.skills.filter(s => s.say != null).length, WANTS_DATA.skills.filter(s => s.say == null).length], [174, 12])
+  assert.ok(!/\{say\}/.test(JSON.stringify(WANTS_DATA.fixed.S1.text_fixed + WANTS_DATA.fixed.S2.text_fixed)))
 })
 
 test('the service lines: Gmail, Google Calendar and Google Drive get the Connectors line; GitHub gets the github skill with its docs box; typed, picked and kept alike; Notion is as before', () => {

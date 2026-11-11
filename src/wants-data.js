@@ -114,7 +114,9 @@ export const WANTS_DATA = {
         "search engine",
         "google things",
         "google something",
-        "google it"
+        "google it",
+        "webpages",
+        "webpage"
       ],
       "things": [
         "web",
@@ -1233,10 +1235,13 @@ export const WANTS_DATA = {
       "text": "Here is what I have checked for that. Pick one, or type your own."
     },
     "S1": {
-      "text": "Hermes comes with a skill called \"{name}\". Skills are written steps that teach Hermes one task. The docs say this."
+      "text": "Hermes comes with a skill called \"{name}\". It teaches Hermes to {say}",
+      "text_fixed": "Hermes comes with a skill called \"{name}\". Skills are written steps that teach Hermes one task. The docs say this.",
+      "sources": []
     },
     "S2": {
-      "text": "The optional skill \"{name}\" must be added first. Skills are written steps that teach Hermes one task. The docs say this.",
+      "text": "The skill \"{name}\" must be added first. It teaches Hermes to {say}",
+      "text_fixed": "The optional skill \"{name}\" must be added first. Skills are written steps that teach Hermes one task. The docs say this.",
       "sources": [
         {
           "file": "reference/optional-skills-catalog.md",
@@ -1290,10 +1295,49 @@ export const WANTS_DATA = {
       "skill": "github"
     }
   },
+  "skill_name_rule_wf1": {
+    "ordinary_names": [
+      "accelerate",
+      "anatomy",
+      "auteur",
+      "blackbox",
+      "box",
+      "brag",
+      "canvas",
+      "chroma",
+      "dogfood",
+      "impeccable",
+      "maps",
+      "modal",
+      "pretext",
+      "shop",
+      "sketch",
+      "slime",
+      "spike",
+      "stocks",
+      "watchers"
+    ],
+    "skill_for_pattern": "skills? (?:for|that can|which can) (?:a |an |the |my )?([a-z][a-z0-9'-]*)",
+    "skill_for_not_after": [
+      "me",
+      "it",
+      "hermes",
+      "bot",
+      "bots",
+      "beginners",
+      "beginner",
+      "newcomers",
+      "newcomer",
+      "starters",
+      "agents",
+      "agent"
+    ]
+  },
   "skills": [
     {
       "name": "apple-notes",
       "kind": "built_in",
+      "say": "write, find and change notes in Apple Notes.",
       "docs_words": "Manage Apple Notes via memo CLI: create, search, edit.",
       "page": "reference/skills-catalog.md",
       "line": 19
@@ -1301,6 +1345,7 @@ export const WANTS_DATA = {
     {
       "name": "apple-reminders",
       "kind": "built_in",
+      "say": "add, list and tick off items in Apple Reminders.",
       "docs_words": "Apple Reminders via remindctl: add, list, complete.",
       "page": "reference/skills-catalog.md",
       "line": 20
@@ -1308,6 +1353,7 @@ export const WANTS_DATA = {
     {
       "name": "findmy",
       "kind": "built_in",
+      "say": "see where your Apple devices and AirTags are, using the Find My app.",
       "docs_words": "Track Apple devices/AirTags via FindMy.app on macOS.",
       "page": "reference/skills-catalog.md",
       "line": 21
@@ -1315,6 +1361,7 @@ export const WANTS_DATA = {
     {
       "name": "imessage",
       "kind": "built_in",
+      "say": "send and read iMessages and texts from the Messages app on a Mac.",
       "docs_words": "Send and receive iMessages/SMS via the imsg CLI on macOS.",
       "page": "reference/skills-catalog.md",
       "line": 22
@@ -1322,6 +1369,7 @@ export const WANTS_DATA = {
     {
       "name": "claude-code",
       "kind": "built_in",
+      "say": "hand a coding job to Claude Code, a separate coding app.",
       "docs_words": "Delegate coding to Claude Code CLI (features, PRs).",
       "page": "reference/skills-catalog.md",
       "line": 28
@@ -1329,6 +1377,7 @@ export const WANTS_DATA = {
     {
       "name": "codex",
       "kind": "built_in",
+      "say": "hand a coding job to Codex, a separate coding app by OpenAI.",
       "docs_words": "Delegate coding to OpenAI Codex CLI (features, PRs).",
       "page": "reference/skills-catalog.md",
       "line": 29
@@ -1336,6 +1385,7 @@ export const WANTS_DATA = {
     {
       "name": "computer-use",
       "kind": "built_in",
+      "say": "use your desktop, doing things in the background first.",
       "docs_words": "Drive the desktop background-first; escalate on signal.",
       "page": "reference/skills-catalog.md",
       "line": 30
@@ -1343,6 +1393,7 @@ export const WANTS_DATA = {
     {
       "name": "hermes-agent",
       "kind": "built_in",
+      "say": "use and change its own settings and look, and add to itself.",
       "docs_words": "Use, configure, theme, extend, and orchestrate Hermes Agent.",
       "page": "reference/skills-catalog.md",
       "line": 31
@@ -1350,6 +1401,7 @@ export const WANTS_DATA = {
     {
       "name": "architecture-diagram",
       "kind": "built_in",
+      "say": "draw a dark-themed picture of how a software system fits together.",
       "docs_words": "Dark-themed SVG architecture/cloud/infra diagrams as HTML.",
       "page": "reference/skills-catalog.md",
       "line": 37
@@ -1357,6 +1409,7 @@ export const WANTS_DATA = {
     {
       "name": "ascii-video",
       "kind": "built_in",
+      "say": "turn a video or sound into a moving picture made of letters.",
       "docs_words": "ASCII video: convert video/audio to colored ASCII MP4/GIF.",
       "page": "reference/skills-catalog.md",
       "line": 38
@@ -1364,6 +1417,7 @@ export const WANTS_DATA = {
     {
       "name": "baoyu-infographic",
       "kind": "built_in",
+      "say": "make an infographic: one picture that sums up facts, in many layouts.",
       "docs_words": "Infographics: 21 layouts x 21 styles (信息图, 可视化).",
       "page": "reference/skills-catalog.md",
       "line": 39
@@ -1371,6 +1425,7 @@ export const WANTS_DATA = {
     {
       "name": "claude-design",
       "kind": "built_in",
+      "say": "design a one-off web page, slide deck or clickable mockup.",
       "docs_words": "Design one-off HTML artifacts (landing, deck, prototype).",
       "page": "reference/skills-catalog.md",
       "line": 40
@@ -1378,6 +1433,7 @@ export const WANTS_DATA = {
     {
       "name": "humanizer",
       "kind": "built_in",
+      "say": "rewrite text so it sounds less like an AI wrote it.",
       "docs_words": "Humanize text: strip AI-isms and add real voice.",
       "page": "reference/skills-catalog.md",
       "line": 41
@@ -1385,6 +1441,7 @@ export const WANTS_DATA = {
     {
       "name": "manim-video",
       "kind": "built_in",
+      "say": "make animated videos that explain maths.",
       "docs_words": "Manim CE animations: 3Blue1Brown math/algo videos.",
       "page": "reference/skills-catalog.md",
       "line": 42
@@ -1392,6 +1449,7 @@ export const WANTS_DATA = {
     {
       "name": "p5js",
       "kind": "built_in",
+      "say": "make art with code, also moving and 3D art.",
       "docs_words": "p5.js sketches: gen art, shaders, interactive, 3D.",
       "page": "reference/skills-catalog.md",
       "line": 43
@@ -1399,6 +1457,7 @@ export const WANTS_DATA = {
     {
       "name": "popular-web-designs",
       "kind": "built_in",
+      "say": "make web pages in the style of 54 well-known sites, such as Stripe.",
       "docs_words": "54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.",
       "page": "reference/skills-catalog.md",
       "line": 44
@@ -1406,6 +1465,7 @@ export const WANTS_DATA = {
     {
       "name": "songwriting-and-ai-music",
       "kind": "built_in",
+      "say": "help write songs, and write the text you give Suno, a music AI.",
       "docs_words": "Songwriting craft and Suno AI music prompts.",
       "page": "reference/skills-catalog.md",
       "line": 45
@@ -1413,6 +1473,7 @@ export const WANTS_DATA = {
     {
       "name": "sdlc-review",
       "kind": "built_in",
+      "say": null,
       "docs_words": "Review Kanban handoffs and route verified outcomes.",
       "page": "reference/skills-catalog.md",
       "line": 51
@@ -1420,6 +1481,7 @@ export const WANTS_DATA = {
     {
       "name": "email-inbox-triage",
       "kind": "built_in",
+      "say": "sort your inbox by what matters most, and draft replies for you to check.",
       "docs_words": "Triage an inbox: prioritize threads, draft replies safely.",
       "page": "reference/skills-catalog.md",
       "line": 57
@@ -1427,6 +1489,7 @@ export const WANTS_DATA = {
     {
       "name": "himalaya",
       "kind": "built_in",
+      "say": "read and send email from your own mailbox.",
       "docs_words": "Himalaya CLI: IMAP/SMTP email from terminal.",
       "page": "reference/skills-catalog.md",
       "line": 58
@@ -1434,6 +1497,7 @@ export const WANTS_DATA = {
     {
       "name": "youtube-content",
       "kind": "built_in",
+      "say": "turn a YouTube video's spoken words into a summary, thread or blog post.",
       "docs_words": "YouTube transcripts to summaries, threads, blogs.",
       "page": "reference/skills-catalog.md",
       "line": 64
@@ -1441,6 +1505,7 @@ export const WANTS_DATA = {
     {
       "name": "obsidian",
       "kind": "built_in",
+      "say": "read, search, write and change notes in your Obsidian notes folder.",
       "docs_words": "Read, search, create, and edit notes in the Obsidian vault.",
       "page": "reference/skills-catalog.md",
       "line": 70
@@ -1448,6 +1513,7 @@ export const WANTS_DATA = {
     {
       "name": "document-to-action-items",
       "kind": "built_in",
+      "say": "pull deadlines, duties and tasks out of a document, with where each was found.",
       "docs_words": "Extract cited obligations, deadlines, tasks from documents.",
       "page": "reference/skills-catalog.md",
       "line": 76
@@ -1455,6 +1521,7 @@ export const WANTS_DATA = {
     {
       "name": "google-workspace",
       "kind": "built_in",
+      "say": "use your Gmail, Google Calendar, Drive, Docs and Sheets.",
       "docs_words": "Gmail, Calendar, Drive, Docs, Sheets via gws CLI or Python.",
       "page": "reference/skills-catalog.md",
       "line": 77
@@ -1462,6 +1529,7 @@ export const WANTS_DATA = {
     {
       "name": "maps",
       "kind": "built_in",
+      "say": "find places, addresses, routes and time zones from open map data.",
       "docs_words": "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.",
       "page": "reference/skills-catalog.md",
       "line": 78
@@ -1469,6 +1537,7 @@ export const WANTS_DATA = {
     {
       "name": "meeting-action-items",
       "kind": "built_in",
+      "say": "turn meeting notes into decisions, who does what, and follow-up tasks.",
       "docs_words": "Turn meeting notes into cited decisions, owners, tickets.",
       "page": "reference/skills-catalog.md",
       "line": 79
@@ -1476,6 +1545,7 @@ export const WANTS_DATA = {
     {
       "name": "microsoft-office",
       "kind": "built_in",
+      "say": "make, read and change Word, PowerPoint and Excel files.",
       "docs_words": "Create, read, and edit Word, PowerPoint, and Excel files.",
       "page": "reference/skills-catalog.md",
       "line": 80
@@ -1483,6 +1553,7 @@ export const WANTS_DATA = {
     {
       "name": "pdf",
       "kind": "built_in",
+      "say": "make, read, merge and fill in PDF files, also scanned ones.",
       "docs_words": "PDF files: create, read, merge, fill, OCR, edit text.",
       "page": "reference/skills-catalog.md",
       "line": 81
@@ -1490,6 +1561,7 @@ export const WANTS_DATA = {
     {
       "name": "product-price-monitor",
       "kind": "built_in",
+      "say": "watch a product, flight or listing price and tell you at your target.",
       "docs_words": "Watch product, flight, or listing prices; alert on target.",
       "page": "reference/skills-catalog.md",
       "line": 82
@@ -1497,6 +1569,7 @@ export const WANTS_DATA = {
     {
       "name": "teams-meeting-pipeline",
       "kind": "built_in",
+      "say": "get summaries of Teams meetings.",
       "docs_words": "Teams meeting summaries, job replay, Graph subscriptions.",
       "page": "reference/skills-catalog.md",
       "line": 83
@@ -1504,6 +1577,7 @@ export const WANTS_DATA = {
     {
       "name": "weekly-review-planning",
       "kind": "built_in",
+      "say": "look back at your week, see what got stuck, and plan the next.",
       "docs_words": "Weekly reset: commitments, stalled work, next-week plan.",
       "page": "reference/skills-catalog.md",
       "line": 84
@@ -1511,6 +1585,7 @@ export const WANTS_DATA = {
     {
       "name": "arxiv",
       "kind": "built_in",
+      "say": "search and read science papers on arXiv.",
       "docs_words": "Search arXiv papers by keyword, author, category, or ID.",
       "page": "reference/skills-catalog.md",
       "line": 90
@@ -1518,6 +1593,7 @@ export const WANTS_DATA = {
     {
       "name": "competitor-news-monitor",
       "kind": "built_in",
+      "say": "watch companies you name and report only important news about them.",
       "docs_words": "Watch named companies for material news; cited digests.",
       "page": "reference/skills-catalog.md",
       "line": 91
@@ -1525,6 +1601,7 @@ export const WANTS_DATA = {
     {
       "name": "grounded-citations",
       "kind": "built_in",
+      "say": "give answers where every fact shows where it came from.",
       "docs_words": "Ground answers and documents in cited, verifiable sources.",
       "page": "reference/skills-catalog.md",
       "line": 92
@@ -1532,6 +1609,7 @@ export const WANTS_DATA = {
     {
       "name": "xurl",
       "kind": "built_in",
+      "say": "post, search and send messages on X, the site that was Twitter.",
       "docs_words": "X/Twitter via xurl CLI: raw post search, posting, DM, media.",
       "page": "reference/skills-catalog.md",
       "line": 98
@@ -1539,6 +1617,7 @@ export const WANTS_DATA = {
     {
       "name": "codebase-inspection",
       "kind": "built_in",
+      "say": "count how much code a project has, and in which languages.",
       "docs_words": "Inspect codebases w/ pygount: LOC, languages, ratios.",
       "page": "reference/skills-catalog.md",
       "line": 104
@@ -1546,6 +1625,7 @@ export const WANTS_DATA = {
     {
       "name": "dogfood",
       "kind": "built_in",
+      "say": "test a web app like a user would, and write up the bugs found.",
       "docs_words": "Exploratory QA of web apps: find bugs, evidence, reports.",
       "page": "reference/skills-catalog.md",
       "line": 105
@@ -1553,6 +1633,7 @@ export const WANTS_DATA = {
     {
       "name": "github",
       "kind": "built_in",
+      "say": "work with GitHub: issues, pull requests, reviews and code folders.",
       "docs_words": "GitHub via gh CLI: PRs, issues, reviews, repos, auth.",
       "page": "reference/skills-catalog.md",
       "line": 106
@@ -1560,6 +1641,7 @@ export const WANTS_DATA = {
     {
       "name": "requesting-code-review",
       "kind": "built_in",
+      "say": "check new code for safety and quality before it is saved for good.",
       "docs_words": "Pre-commit review: security scan, quality gates, auto-fix.",
       "page": "reference/skills-catalog.md",
       "line": 107
@@ -1567,6 +1649,7 @@ export const WANTS_DATA = {
     {
       "name": "simplify-code",
       "kind": "built_in",
+      "say": "tidy up code you changed lately.",
       "docs_words": "Parallel 4-agent cleanup of recent code changes.",
       "page": "reference/skills-catalog.md",
       "line": 108
@@ -1574,6 +1657,7 @@ export const WANTS_DATA = {
     {
       "name": "spike",
       "kind": "built_in",
+      "say": "try out an idea with quick throwaway code before building it for real.",
       "docs_words": "Throwaway experiments to validate an idea before build.",
       "page": "reference/skills-catalog.md",
       "line": 109
@@ -1581,6 +1665,7 @@ export const WANTS_DATA = {
     {
       "name": "systematic-debugging",
       "kind": "built_in",
+      "say": "find the real cause of a bug before trying to fix it.",
       "docs_words": "4-phase root cause debugging: understand bugs before fixing.",
       "page": "reference/skills-catalog.md",
       "line": 110
@@ -1588,6 +1673,7 @@ export const WANTS_DATA = {
     {
       "name": "test-driven-development",
       "kind": "built_in",
+      "say": "write code by writing a test first, then the code that passes it.",
       "docs_words": "TDD: enforce RED-GREEN-REFACTOR, tests before code.",
       "page": "reference/skills-catalog.md",
       "line": 111
@@ -1595,6 +1681,7 @@ export const WANTS_DATA = {
     {
       "name": "blocked-page-recovery",
       "kind": "built_in",
+      "say": "get a web page that will not open, such as one behind a paywall.",
       "docs_words": "Use when a fetch fails: 403/429, paywall, WAF, bot wall.",
       "page": "reference/skills-catalog.md",
       "line": 117
@@ -1602,6 +1689,7 @@ export const WANTS_DATA = {
     {
       "name": "agent-merge-conflict-arbiter",
       "kind": "optional",
+      "say": "settle a clash when two AI helpers changed the same code.",
       "docs_words": "Neutral arbiter for merge conflicts between two agents.",
       "page": "reference/optional-skills-catalog.md",
       "line": 34
@@ -1609,6 +1697,7 @@ export const WANTS_DATA = {
     {
       "name": "antigravity-cli",
       "kind": "optional",
+      "say": "use the separate Antigravity app.",
       "docs_words": "Operate the Antigravity CLI (agy): plugins, auth, sandbox.",
       "page": "reference/optional-skills-catalog.md",
       "line": 35
@@ -1616,6 +1705,7 @@ export const WANTS_DATA = {
     {
       "name": "blackbox",
       "kind": "optional",
+      "say": "hand a coding job to Blackbox AI, a separate coding app.",
       "docs_words": "Delegate coding tasks to the Blackbox AI multi-model CLI.",
       "page": "reference/optional-skills-catalog.md",
       "line": 36
@@ -1623,6 +1713,7 @@ export const WANTS_DATA = {
     {
       "name": "dynamic-workflow",
       "kind": "optional",
+      "say": null,
       "docs_words": "Plan-in-code fan-outs, adversarial verification, waves.",
       "page": "reference/optional-skills-catalog.md",
       "line": 37
@@ -1630,6 +1721,7 @@ export const WANTS_DATA = {
     {
       "name": "grok",
       "kind": "optional",
+      "say": "hand a coding job to Grok Build, a separate coding app by xAI.",
       "docs_words": "Delegate coding to xAI Grok Build CLI (features, PRs).",
       "page": "reference/optional-skills-catalog.md",
       "line": 38
@@ -1637,6 +1729,7 @@ export const WANTS_DATA = {
     {
       "name": "opencode",
       "kind": "optional",
+      "say": "hand a coding job to OpenCode, a separate coding app.",
       "docs_words": "Delegate coding to OpenCode CLI (features, PR review).",
       "page": "reference/optional-skills-catalog.md",
       "line": 39
@@ -1644,6 +1737,7 @@ export const WANTS_DATA = {
     {
       "name": "openhands",
       "kind": "optional",
+      "say": "hand a coding job to OpenHands, a coding app that works with many AIs.",
       "docs_words": "Delegate coding to OpenHands CLI (model-agnostic, LiteLLM).",
       "page": "reference/optional-skills-catalog.md",
       "line": 40
@@ -1651,6 +1745,7 @@ export const WANTS_DATA = {
     {
       "name": "evm",
       "kind": "optional",
+      "say": "look up wallets, coins and fees on eight blockchains. Read only.",
       "docs_words": "Read-only EVM client: wallets, tokens, gas across 8 chains.",
       "page": "reference/optional-skills-catalog.md",
       "line": 46
@@ -1658,6 +1753,7 @@ export const WANTS_DATA = {
     {
       "name": "hyperliquid",
       "kind": "optional",
+      "say": "look up prices and your past trades on Hyperliquid.",
       "docs_words": "Hyperliquid market data, account history, trade review.",
       "page": "reference/optional-skills-catalog.md",
       "line": 47
@@ -1665,6 +1761,7 @@ export const WANTS_DATA = {
     {
       "name": "solana",
       "kind": "optional",
+      "say": "look up Solana wallets, coins and NFTs, with prices in dollars.",
       "docs_words": "Query Solana wallets, tokens, txs, and NFTs in USD.",
       "page": "reference/optional-skills-catalog.md",
       "line": 48
@@ -1672,6 +1769,7 @@ export const WANTS_DATA = {
     {
       "name": "one-three-one-rule",
       "kind": "optional",
+      "say": "answer a hard choice as one problem, three options and one pick.",
       "docs_words": "1-3-1 decision briefs: problem, three options, one pick.",
       "page": "reference/optional-skills-catalog.md",
       "line": 54
@@ -1679,6 +1777,7 @@ export const WANTS_DATA = {
     {
       "name": "ai-presenter-video",
       "kind": "optional",
+      "say": "make a video of a talking presenter from a script and one photo.",
       "docs_words": "Make a verified AI presenter video from script + image.",
       "page": "reference/optional-skills-catalog.md",
       "line": 60
@@ -1686,6 +1785,7 @@ export const WANTS_DATA = {
     {
       "name": "anatomy",
       "kind": "optional",
+      "say": "explain an idea with a machine drawing you can click on.",
       "docs_words": "Explain an idea as an interactive isometric machine figure.",
       "page": "reference/optional-skills-catalog.md",
       "line": 61
@@ -1693,6 +1793,7 @@ export const WANTS_DATA = {
     {
       "name": "archify",
       "kind": "optional",
+      "say": "make clickable diagrams as web pages.",
       "docs_words": "Validated interactive HTML diagrams, upstream-maintained.",
       "page": "reference/optional-skills-catalog.md",
       "line": 62
@@ -1700,6 +1801,7 @@ export const WANTS_DATA = {
     {
       "name": "ascii-art",
       "kind": "optional",
+      "say": "make pictures and big banner text out of letters.",
       "docs_words": "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.",
       "page": "reference/optional-skills-catalog.md",
       "line": 63
@@ -1707,6 +1809,7 @@ export const WANTS_DATA = {
     {
       "name": "auteur",
       "kind": "optional",
+      "say": "design and build web pages with a film-like, cinematic feel.",
       "docs_words": "Design and build cinematic, award-level web pages.",
       "page": "reference/optional-skills-catalog.md",
       "line": 64
@@ -1714,6 +1817,7 @@ export const WANTS_DATA = {
     {
       "name": "baoyu-article-illustrator",
       "kind": "optional",
+      "say": "make matching pictures to illustrate an article you wrote.",
       "docs_words": "Article illustrations: type × style × palette consistency.",
       "page": "reference/optional-skills-catalog.md",
       "line": 65
@@ -1721,6 +1825,7 @@ export const WANTS_DATA = {
     {
       "name": "baoyu-comic",
       "kind": "optional",
+      "say": "make comics that teach a topic or tell someone's life story.",
       "docs_words": "Knowledge comics (知识漫画): educational, biography, tutorial.",
       "page": "reference/optional-skills-catalog.md",
       "line": 66
@@ -1728,6 +1833,7 @@ export const WANTS_DATA = {
     {
       "name": "brag",
       "kind": "optional",
+      "say": "make a launch video for a project you built.",
       "docs_words": "Project launch video via Hyperframes, upstream-maintained.",
       "page": "reference/optional-skills-catalog.md",
       "line": 67
@@ -1735,6 +1841,7 @@ export const WANTS_DATA = {
     {
       "name": "brag-slim",
       "kind": "optional",
+      "say": "make a launch video for a project or web address.",
       "docs_words": "Launch video from a project or URL, upstream-maintained.",
       "page": "reference/optional-skills-catalog.md",
       "line": 68
@@ -1742,6 +1849,7 @@ export const WANTS_DATA = {
     {
       "name": "comfyui",
       "kind": "optional",
+      "say": "make pictures, video and sound with AI.",
       "docs_words": "Generate images, video, and audio via diffusion workflows.",
       "page": "reference/optional-skills-catalog.md",
       "line": 69
@@ -1749,6 +1857,7 @@ export const WANTS_DATA = {
     {
       "name": "concept-diagrams",
       "kind": "optional",
+      "say": "make simple, flat diagrams for teaching.",
       "docs_words": "Generate flat, minimal educational SVG visuals as HTML.",
       "page": "reference/optional-skills-catalog.md",
       "line": 70
@@ -1756,6 +1865,7 @@ export const WANTS_DATA = {
     {
       "name": "creative-ideation",
       "kind": "optional",
+      "say": "come up with ideas, using named methods from creative work.",
       "docs_words": "Generate ideas via named methods from creative practice.",
       "page": "reference/optional-skills-catalog.md",
       "line": 71
@@ -1763,6 +1873,7 @@ export const WANTS_DATA = {
     {
       "name": "design-md",
       "kind": "optional",
+      "say": "write and check a DESIGN.md file that describes how a design looks.",
       "docs_words": "Author/validate/export Google's DESIGN.md token spec files.",
       "page": "reference/optional-skills-catalog.md",
       "line": 72
@@ -1770,6 +1881,7 @@ export const WANTS_DATA = {
     {
       "name": "draw-your-font",
       "kind": "optional",
+      "say": "turn a photo of your handwriting into a font you can install.",
       "docs_words": "Turn a handwriting photo into an installable TTF font.",
       "page": "reference/optional-skills-catalog.md",
       "line": 73
@@ -1777,6 +1889,7 @@ export const WANTS_DATA = {
     {
       "name": "dream-loop",
       "kind": "optional",
+      "say": "build 3D scenes, checking each against a drawing of the goal.",
       "docs_words": "Build stunning 3D scenes via a concept-art fidelity loop.",
       "page": "reference/optional-skills-catalog.md",
       "line": 74
@@ -1784,6 +1897,7 @@ export const WANTS_DATA = {
     {
       "name": "excalidraw",
       "kind": "optional",
+      "say": "make hand-drawn style diagrams for Excalidraw.",
       "docs_words": "Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).",
       "page": "reference/optional-skills-catalog.md",
       "line": 75
@@ -1791,6 +1905,7 @@ export const WANTS_DATA = {
     {
       "name": "heartmula",
       "kind": "optional",
+      "say": "make whole songs from lyrics, like Suno does.",
       "docs_words": "HeartMuLa: Suno-like song generation from lyrics + tags.",
       "page": "reference/optional-skills-catalog.md",
       "line": 76
@@ -1798,6 +1913,7 @@ export const WANTS_DATA = {
     {
       "name": "hyperframes",
       "kind": "optional",
+      "say": "make MP4 videos from web pages.",
       "docs_words": "Render MP4/WebM videos from HTML compositions.",
       "page": "reference/optional-skills-catalog.md",
       "line": 77
@@ -1805,6 +1921,7 @@ export const WANTS_DATA = {
     {
       "name": "impeccable",
       "kind": "optional",
+      "say": "design the look of web pages well.",
       "docs_words": "Frontend design guidance, upstream-maintained (impeccable).",
       "page": "reference/optional-skills-catalog.md",
       "line": 78
@@ -1812,6 +1929,7 @@ export const WANTS_DATA = {
     {
       "name": "ip-as-logo",
       "kind": "optional",
+      "say": "design a tiny, cute mascot logo that still reads when very small.",
       "docs_words": "Design minimal cute IP mascot marks readable at 32px.",
       "page": "reference/optional-skills-catalog.md",
       "line": 79
@@ -1819,6 +1937,7 @@ export const WANTS_DATA = {
     {
       "name": "kanban-video-orchestrator",
       "kind": "optional",
+      "say": "split a big video job among several Hermes helpers and run it.",
       "docs_words": "Plan and run multi-agent video production pipelines.",
       "page": "reference/optional-skills-catalog.md",
       "line": 80
@@ -1826,6 +1945,7 @@ export const WANTS_DATA = {
     {
       "name": "meme-generation",
       "kind": "optional",
+      "say": "make meme pictures from a topic, with text on a known template.",
       "docs_words": "Create meme PNGs from templates with Pillow text overlay.",
       "page": "reference/optional-skills-catalog.md",
       "line": 81
@@ -1833,6 +1953,7 @@ export const WANTS_DATA = {
     {
       "name": "mono-color",
       "kind": "optional",
+      "say": "make poster pictures in one or two ink colours, like printed art.",
       "docs_words": "Generate one- or two-ink editorial print poster images.",
       "page": "reference/optional-skills-catalog.md",
       "line": 82
@@ -1840,6 +1961,7 @@ export const WANTS_DATA = {
     {
       "name": "pixel-art",
       "kind": "optional",
+      "say": "make pixel art in the colours of old game consoles.",
       "docs_words": "Pixel art w/ era palettes (NES, Game Boy, PICO-8).",
       "page": "reference/optional-skills-catalog.md",
       "line": 83
@@ -1847,6 +1969,7 @@ export const WANTS_DATA = {
     {
       "name": "pretext",
       "kind": "optional",
+      "say": "build playful web demos where text flows around moving things.",
       "docs_words": "Build creative browser demos with DOM-free text layout.",
       "page": "reference/optional-skills-catalog.md",
       "line": 84
@@ -1854,6 +1977,7 @@ export const WANTS_DATA = {
     {
       "name": "simple-english",
       "kind": "optional",
+      "say": "rewrite text in very simple, strict English.",
       "docs_words": "Rewrite text to ASD-STE100 Simplified Technical English.",
       "page": "reference/optional-skills-catalog.md",
       "line": 85
@@ -1861,6 +1985,7 @@ export const WANTS_DATA = {
     {
       "name": "sketch",
       "kind": "optional",
+      "say": "make two or three quick throwaway designs of a screen to compare.",
       "docs_words": "Throwaway HTML mockups: 2-3 design variants to compare.",
       "page": "reference/optional-skills-catalog.md",
       "line": 86
@@ -1868,6 +1993,7 @@ export const WANTS_DATA = {
     {
       "name": "social-media-content-calendar",
       "kind": "optional",
+      "say": "plan posts for several social media sites, from first idea to posting.",
       "docs_words": "Plan multi-platform social campaigns: briefs to posting.",
       "page": "reference/optional-skills-catalog.md",
       "line": 87
@@ -1875,6 +2001,7 @@ export const WANTS_DATA = {
     {
       "name": "system-atlas",
       "kind": "optional",
+      "say": "build a clickable map of how a software system works.",
       "docs_words": "Build explorable isometric architecture atlases as HTML.",
       "page": "reference/optional-skills-catalog.md",
       "line": 88
@@ -1882,6 +2009,7 @@ export const WANTS_DATA = {
     {
       "name": "tldraw-offline",
       "kind": "optional",
+      "say": "read and change drawings in the tldraw offline app.",
       "docs_words": "Drive and script tldraw offline canvases with an agent.",
       "page": "reference/optional-skills-catalog.md",
       "line": 89
@@ -1889,6 +2017,7 @@ export const WANTS_DATA = {
     {
       "name": "unreal-mcp",
       "kind": "optional",
+      "say": "control scenes and objects in Unreal Engine, a game-making app.",
       "docs_words": "Automate Unreal Engine editor scenes, actors, and renders.",
       "page": "reference/optional-skills-catalog.md",
       "line": 90
@@ -1896,6 +2025,7 @@ export const WANTS_DATA = {
     {
       "name": "jupyter-notebook",
       "kind": "optional",
+      "say": "run Python step by step in a Jupyter notebook that keeps its results.",
       "docs_words": "Iterative Python via live Jupyter kernel (hamelnb).",
       "page": "reference/optional-skills-catalog.md",
       "line": 96
@@ -1903,6 +2033,7 @@ export const WANTS_DATA = {
     {
       "name": "actual-setup",
       "kind": "optional",
+      "say": "set up Actual Computer to run AI for Hermes.",
       "docs_words": "Set up Actual Computer (actual.inc) inference in Hermes.",
       "page": "reference/optional-skills-catalog.md",
       "line": 102
@@ -1910,6 +2041,7 @@ export const WANTS_DATA = {
     {
       "name": "docker-management",
       "kind": "optional",
+      "say": "start, stop and tidy Docker containers, a way to run apps boxed in.",
       "docs_words": "Manage Docker containers, images, volumes, and Compose.",
       "page": "reference/optional-skills-catalog.md",
       "line": 103
@@ -1917,6 +2049,7 @@ export const WANTS_DATA = {
     {
       "name": "hermes-s6-container-supervision",
       "kind": "optional",
+      "say": null,
       "docs_words": "Modify or debug s6 services in the Hermes Docker image.",
       "page": "reference/optional-skills-catalog.md",
       "line": 104
@@ -1924,6 +2057,7 @@ export const WANTS_DATA = {
     {
       "name": "inference-sh-cli",
       "kind": "optional",
+      "say": "make pictures and video with over 150 AI apps run on inference.sh.",
       "docs_words": "Run 150+ AI apps (image, video, LLM) via inference.sh CLI.",
       "page": "reference/optional-skills-catalog.md",
       "line": 105
@@ -1931,6 +2065,7 @@ export const WANTS_DATA = {
     {
       "name": "pinggy-tunnel",
       "kind": "optional",
+      "say": "give something running on your computer a public web address for a while.",
       "docs_words": "Zero-install localhost tunnels over SSH via Pinggy.",
       "page": "reference/optional-skills-catalog.md",
       "line": 106
@@ -1938,6 +2073,7 @@ export const WANTS_DATA = {
     {
       "name": "setup-wizard-generator",
       "kind": "optional",
+      "say": "make a step-by-step script that walks a person through a manual setup.",
       "docs_words": "Generate a bash wizard guiding a human through manual setup.",
       "page": "reference/optional-skills-catalog.md",
       "line": 107
@@ -1945,6 +2081,7 @@ export const WANTS_DATA = {
     {
       "name": "watchers",
       "kind": "optional",
+      "say": "check news feeds, GitHub or data links on a timer and report new items.",
       "docs_words": "Poll RSS, JSON APIs, and GitHub with watermark dedup.",
       "page": "reference/optional-skills-catalog.md",
       "line": 108
@@ -1952,6 +2089,7 @@ export const WANTS_DATA = {
     {
       "name": "adversarial-ux-test",
       "kind": "optional",
+      "say": "play an angry, impatient user to find what is confusing in your app.",
       "docs_words": "Roleplay a hostile user to find and triage UX pain points.",
       "page": "reference/optional-skills-catalog.md",
       "line": 114
@@ -1959,6 +2097,7 @@ export const WANTS_DATA = {
     {
       "name": "agentmail",
       "kind": "optional",
+      "say": "use its own email inbox, through AgentMail.",
       "docs_words": "Use when an agent needs AgentMail CLI email inboxes.",
       "page": "reference/optional-skills-catalog.md",
       "line": 120
@@ -1966,6 +2105,7 @@ export const WANTS_DATA = {
     {
       "name": "3-statement-model",
       "kind": "optional",
+      "say": "fill in a company's linked money statements in an Excel file.",
       "docs_words": "Build integrated IS/BS/CF financial workbooks in Excel.",
       "page": "reference/optional-skills-catalog.md",
       "line": 126
@@ -1973,6 +2113,7 @@ export const WANTS_DATA = {
     {
       "name": "comps-analysis",
       "kind": "optional",
+      "say": "value a company against similar companies, in an Excel file.",
       "docs_words": "Build comparable-company valuation workbooks in Excel.",
       "page": "reference/optional-skills-catalog.md",
       "line": 127
@@ -1980,6 +2121,7 @@ export const WANTS_DATA = {
     {
       "name": "dcf-model",
       "kind": "optional",
+      "say": "value a company from its future cash, in an Excel file.",
       "docs_words": "Build discounted cash flow valuation workbooks in Excel.",
       "page": "reference/optional-skills-catalog.md",
       "line": 128
@@ -1987,6 +2129,7 @@ export const WANTS_DATA = {
     {
       "name": "excel-author",
       "kind": "optional",
+      "say": "build careful financial Excel files that others can check.",
       "docs_words": "Build auditable financial workbooks headless via openpyxl.",
       "page": "reference/optional-skills-catalog.md",
       "line": 129
@@ -1994,6 +2137,7 @@ export const WANTS_DATA = {
     {
       "name": "lbo-model",
       "kind": "optional",
+      "say": "plan the numbers for buying a company with borrowed money, in Excel.",
       "docs_words": "Build leveraged buyout workbooks with IRR/MOIC in Excel.",
       "page": "reference/optional-skills-catalog.md",
       "line": 130
@@ -2001,6 +2145,7 @@ export const WANTS_DATA = {
     {
       "name": "merger-model",
       "kind": "optional",
+      "say": "work out what a merger does to earnings per share, in Excel.",
       "docs_words": "Build M&A accretion/dilution workbooks in Excel.",
       "page": "reference/optional-skills-catalog.md",
       "line": 131
@@ -2008,6 +2153,7 @@ export const WANTS_DATA = {
     {
       "name": "polymarket",
       "kind": "optional",
+      "say": "look up prediction market odds and prices on Polymarket.",
       "docs_words": "Query Polymarket: markets, prices, orderbooks, history.",
       "page": "reference/optional-skills-catalog.md",
       "line": 132
@@ -2015,6 +2161,7 @@ export const WANTS_DATA = {
     {
       "name": "pptx-author",
       "kind": "optional",
+      "say": "make PowerPoint files.",
       "docs_words": "Build PowerPoint decks headless with python-pptx.",
       "page": "reference/optional-skills-catalog.md",
       "line": 133
@@ -2022,6 +2169,7 @@ export const WANTS_DATA = {
     {
       "name": "stocks",
       "kind": "optional",
+      "say": "look up stock and crypto prices, history and comparisons, from Yahoo.",
       "docs_words": "Stock quotes, history, search, compare, crypto via Yahoo.",
       "page": "reference/optional-skills-catalog.md",
       "line": 134
@@ -2029,6 +2177,7 @@ export const WANTS_DATA = {
     {
       "name": "minecraft-modpack-server",
       "kind": "optional",
+      "say": "set up and run a Minecraft game world with mods.",
       "docs_words": "Host modded Minecraft servers (CurseForge, Modrinth).",
       "page": "reference/optional-skills-catalog.md",
       "line": 140
@@ -2036,6 +2185,7 @@ export const WANTS_DATA = {
     {
       "name": "pokemon-player",
       "kind": "optional",
+      "say": "play Pokemon games.",
       "docs_words": "Play Pokemon via headless emulator + RAM reads.",
       "page": "reference/optional-skills-catalog.md",
       "line": 141
@@ -2043,6 +2193,7 @@ export const WANTS_DATA = {
     {
       "name": "fitness-nutrition",
       "kind": "optional",
+      "say": "plan workouts and look up food values and exercises.",
       "docs_words": "Workout planning, macros, and body metrics via wger/USDA.",
       "page": "reference/optional-skills-catalog.md",
       "line": 147
@@ -2050,6 +2201,7 @@ export const WANTS_DATA = {
     {
       "name": "neuroskill-bci",
       "kind": "optional",
+      "say": "read your mood and focus from a NeuroSkill brain sensor.",
       "docs_words": "Use live BCI cognitive and mood state from NeuroSkill.",
       "page": "reference/optional-skills-catalog.md",
       "line": 148
@@ -2057,6 +2209,7 @@ export const WANTS_DATA = {
     {
       "name": "fastmcp",
       "kind": "optional",
+      "say": null,
       "docs_words": "Build, test, and deploy Python MCP servers.",
       "page": "reference/optional-skills-catalog.md",
       "line": 154
@@ -2064,6 +2217,7 @@ export const WANTS_DATA = {
     {
       "name": "mcp-oauth-remote-gateway",
       "kind": "optional",
+      "say": null,
       "docs_words": "Manual OAuth for remote MCP servers on headless gateways.",
       "page": "reference/optional-skills-catalog.md",
       "line": 155
@@ -2071,6 +2225,7 @@ export const WANTS_DATA = {
     {
       "name": "mcporter",
       "kind": "optional",
+      "say": null,
       "docs_words": "List, auth, and call MCP servers/tools from the terminal.",
       "page": "reference/optional-skills-catalog.md",
       "line": 156
@@ -2078,6 +2233,7 @@ export const WANTS_DATA = {
     {
       "name": "gif-search",
       "kind": "optional",
+      "say": "find and save GIFs from Tenor.",
       "docs_words": "Search/download GIFs from Tenor via curl + jq.",
       "page": "reference/optional-skills-catalog.md",
       "line": 162
@@ -2085,6 +2241,7 @@ export const WANTS_DATA = {
     {
       "name": "songsee",
       "kind": "optional",
+      "say": "draw pictures of a sound file, such as its pitch over time.",
       "docs_words": "Audio spectrograms/features (mel, chroma, MFCC) via CLI.",
       "page": "reference/optional-skills-catalog.md",
       "line": 163
@@ -2092,6 +2249,7 @@ export const WANTS_DATA = {
     {
       "name": "accelerate",
       "kind": "optional",
+      "say": "train AIs on several graphics cards with few code changes.",
       "docs_words": "Run PyTorch training across GPUs with minimal changes.",
       "page": "reference/optional-skills-catalog.md",
       "line": 169
@@ -2099,6 +2257,7 @@ export const WANTS_DATA = {
     {
       "name": "axolotl",
       "kind": "optional",
+      "say": "train your own version of an AI from a settings file.",
       "docs_words": "Axolotl: YAML LLM fine-tuning (LoRA, DPO, GRPO).",
       "page": "reference/optional-skills-catalog.md",
       "line": 170
@@ -2106,6 +2265,7 @@ export const WANTS_DATA = {
     {
       "name": "chroma",
       "kind": "optional",
+      "say": "keep text in a search store so an AI can find it by meaning.",
       "docs_words": "Embedding database for RAG and semantic search.",
       "page": "reference/optional-skills-catalog.md",
       "line": 171
@@ -2113,6 +2273,7 @@ export const WANTS_DATA = {
     {
       "name": "dspy",
       "kind": "optional",
+      "say": "build AI programs that improve their own instructions by themselves.",
       "docs_words": "DSPy: declarative LM programs, auto-optimize prompts, RAG.",
       "page": "reference/optional-skills-catalog.md",
       "line": 172
@@ -2120,6 +2281,7 @@ export const WANTS_DATA = {
     {
       "name": "evaluating-llms-harness",
       "kind": "optional",
+      "say": "test AIs on standard exams to compare how good they are.",
       "docs_words": "lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).",
       "page": "reference/optional-skills-catalog.md",
       "line": 173
@@ -2127,6 +2289,7 @@ export const WANTS_DATA = {
     {
       "name": "faiss",
       "kind": "optional",
+      "say": "search huge collections of numbers for the closest matches, very fast.",
       "docs_words": "Fast vector similarity search at billion scale.",
       "page": "reference/optional-skills-catalog.md",
       "line": 174
@@ -2134,6 +2297,7 @@ export const WANTS_DATA = {
     {
       "name": "flash-attention",
       "kind": "optional",
+      "say": "make training and running AIs faster.",
       "docs_words": "Speed up long-sequence transformer training and inference.",
       "page": "reference/optional-skills-catalog.md",
       "line": 175
@@ -2141,6 +2305,7 @@ export const WANTS_DATA = {
     {
       "name": "lambda-labs",
       "kind": "optional",
+      "say": "rent strong graphics cards from Lambda Labs to train AIs.",
       "docs_words": "On-demand GPU cloud instances for ML training.",
       "page": "reference/optional-skills-catalog.md",
       "line": 176
@@ -2148,6 +2313,7 @@ export const WANTS_DATA = {
     {
       "name": "llama-cpp",
       "kind": "optional",
+      "say": "run an AI on your own computer with llama.cpp.",
       "docs_words": "llama.cpp local GGUF inference + HF Hub model discovery.",
       "page": "reference/optional-skills-catalog.md",
       "line": 177
@@ -2155,6 +2321,7 @@ export const WANTS_DATA = {
     {
       "name": "modal",
       "kind": "optional",
+      "say": "run AI jobs on Modal's rented graphics cards.",
       "docs_words": "Serverless GPU cloud for ML jobs and model APIs.",
       "page": "reference/optional-skills-catalog.md",
       "line": 178
@@ -2162,6 +2329,7 @@ export const WANTS_DATA = {
     {
       "name": "nemo-curator",
       "kind": "optional",
+      "say": "clean up large piles of text before training an AI on it.",
       "docs_words": "Curate LLM training data: dedupe, filter, PII redaction.",
       "page": "reference/optional-skills-catalog.md",
       "line": 179
@@ -2169,6 +2337,7 @@ export const WANTS_DATA = {
     {
       "name": "obliteratus",
       "kind": "optional",
+      "say": "remove the safety refusals built into open AIs.",
       "docs_words": "OBLITERATUS: abliterate LLM refusals (diff-in-means).",
       "page": "reference/optional-skills-catalog.md",
       "line": 180,
@@ -2177,6 +2346,7 @@ export const WANTS_DATA = {
     {
       "name": "peft",
       "kind": "optional",
+      "say": "train your own version of a big AI on a small graphics card.",
       "docs_words": "Fine-tune large LLMs with LoRA on limited GPU memory.",
       "page": "reference/optional-skills-catalog.md",
       "line": 181
@@ -2184,6 +2354,7 @@ export const WANTS_DATA = {
     {
       "name": "pytorch-fsdp",
       "kind": "optional",
+      "say": null,
       "docs_words": "Fully sharded data-parallel training for large models.",
       "page": "reference/optional-skills-catalog.md",
       "line": 182
@@ -2191,6 +2362,7 @@ export const WANTS_DATA = {
     {
       "name": "pytorch-lightning",
       "kind": "optional",
+      "say": null,
       "docs_words": "Clean training loops with built-in distributed support.",
       "page": "reference/optional-skills-catalog.md",
       "line": 183
@@ -2198,6 +2370,7 @@ export const WANTS_DATA = {
     {
       "name": "saelens",
       "kind": "optional",
+      "say": null,
       "docs_words": "Train sparse autoencoders to interpret model features.",
       "page": "reference/optional-skills-catalog.md",
       "line": 184
@@ -2205,6 +2378,7 @@ export const WANTS_DATA = {
     {
       "name": "segment-anything-model",
       "kind": "optional",
+      "say": "cut out any object in a picture, by pointing at it.",
       "docs_words": "SAM: zero-shot image segmentation via points, boxes, masks.",
       "page": "reference/optional-skills-catalog.md",
       "line": 185
@@ -2212,6 +2386,7 @@ export const WANTS_DATA = {
     {
       "name": "serving-llms-vllm",
       "kind": "optional",
+      "say": "run an AI fast for many users at once, with vLLM.",
       "docs_words": "vLLM: high-throughput LLM serving, OpenAI API, quantization.",
       "page": "reference/optional-skills-catalog.md",
       "line": 186
@@ -2219,6 +2394,7 @@ export const WANTS_DATA = {
     {
       "name": "simpo",
       "kind": "optional",
+      "say": null,
       "docs_words": "Reference-free preference alignment, simpler than DPO.",
       "page": "reference/optional-skills-catalog.md",
       "line": 187
@@ -2226,6 +2402,7 @@ export const WANTS_DATA = {
     {
       "name": "slime",
       "kind": "optional",
+      "say": null,
       "docs_words": "RL post-training for LLMs with Megatron and SGLang.",
       "page": "reference/optional-skills-catalog.md",
       "line": 188
@@ -2233,6 +2410,7 @@ export const WANTS_DATA = {
     {
       "name": "tensorrt-llm",
       "kind": "optional",
+      "say": "run AIs as fast as possible on NVIDIA graphics cards.",
       "docs_words": "High-throughput LLM inference on NVIDIA GPUs.",
       "page": "reference/optional-skills-catalog.md",
       "line": 189
@@ -2240,6 +2418,7 @@ export const WANTS_DATA = {
     {
       "name": "torchtitan",
       "kind": "optional",
+      "say": "train a new AI from scratch on many graphics cards.",
       "docs_words": "Pretrain LLMs at scale with PyTorch 4D parallelism.",
       "page": "reference/optional-skills-catalog.md",
       "line": 190
@@ -2247,6 +2426,7 @@ export const WANTS_DATA = {
     {
       "name": "unsloth",
       "kind": "optional",
+      "say": "train your own version of an AI faster, on a smaller graphics card.",
       "docs_words": "Unsloth: 2-5x faster LoRA/QLoRA fine-tuning, less VRAM.",
       "page": "reference/optional-skills-catalog.md",
       "line": 191
@@ -2254,6 +2434,7 @@ export const WANTS_DATA = {
     {
       "name": "stripe-link-cli",
       "kind": "optional",
+      "say": "buy things for you, with each payment approved in Link.",
       "docs_words": "Agent payments via Stripe Link — cards, SPT, approvals.",
       "page": "reference/optional-skills-catalog.md",
       "line": 197
@@ -2261,6 +2442,7 @@ export const WANTS_DATA = {
     {
       "name": "stripe-projects",
       "kind": "optional",
+      "say": "sign you up for web services and keep their logins in one place.",
       "docs_words": "Provision SaaS services + sync creds via Stripe Projects.",
       "page": "reference/optional-skills-catalog.md",
       "line": 198
@@ -2268,6 +2450,7 @@ export const WANTS_DATA = {
     {
       "name": "box",
       "kind": "optional",
+      "say": "organise, share and search your files on Box, a cloud file store.",
       "docs_words": "Box manages cloud files, sharing, search, and metadata.",
       "page": "reference/optional-skills-catalog.md",
       "line": 204
@@ -2275,6 +2458,7 @@ export const WANTS_DATA = {
     {
       "name": "canvas",
       "kind": "optional",
+      "say": "see your courses and assignments in Canvas, a school website.",
       "docs_words": "Fetch Canvas LMS courses and assignments via API token.",
       "page": "reference/optional-skills-catalog.md",
       "line": 205
@@ -2282,6 +2466,7 @@ export const WANTS_DATA = {
     {
       "name": "decision-questionnaire",
       "kind": "optional",
+      "say": "turn a decision you cannot make alone into questions for someone else.",
       "docs_words": "Turn an unanswerable decision into a questionnaire doc.",
       "page": "reference/optional-skills-catalog.md",
       "line": 206
@@ -2289,6 +2474,7 @@ export const WANTS_DATA = {
     {
       "name": "here-now",
       "kind": "optional",
+      "say": "put a web page online at here.now and keep files there.",
       "docs_words": "Publish sites to {slug}.here.now and store files in Drives.",
       "page": "reference/optional-skills-catalog.md",
       "line": 207
@@ -2296,6 +2482,7 @@ export const WANTS_DATA = {
     {
       "name": "live-dashboard",
       "kind": "optional",
+      "say": "build a page that shows live facts and refreshes itself.",
       "docs_words": "Build self-updating dashboards from live sources.",
       "page": "reference/optional-skills-catalog.md",
       "line": 208
@@ -2303,6 +2490,7 @@ export const WANTS_DATA = {
     {
       "name": "memento-flashcards",
       "kind": "optional",
+      "say": "help you learn facts with flashcards that come back at the right time.",
       "docs_words": "Spaced-repetition flashcards: create, review, quiz, export.",
       "page": "reference/optional-skills-catalog.md",
       "line": 209
@@ -2310,6 +2498,7 @@ export const WANTS_DATA = {
     {
       "name": "property-listings",
       "kind": "optional",
+      "say": "show homes or rentals you found as cards to compare, in the Hermes app.",
       "docs_words": "Present property and rental listings as desktop cards.",
       "page": "reference/optional-skills-catalog.md",
       "line": 210
@@ -2317,6 +2506,7 @@ export const WANTS_DATA = {
     {
       "name": "shop",
       "kind": "optional",
+      "say": "search shops, buy, and track orders and returns.",
       "docs_words": "Shop catalog search, checkout, order tracking, returns.",
       "page": "reference/optional-skills-catalog.md",
       "line": 211
@@ -2324,6 +2514,7 @@ export const WANTS_DATA = {
     {
       "name": "siyuan",
       "kind": "optional",
+      "say": "search and change notes in SiYuan, a notes app.",
       "docs_words": "Query and edit a SiYuan knowledge base via its API.",
       "page": "reference/optional-skills-catalog.md",
       "line": 212
@@ -2331,6 +2522,7 @@ export const WANTS_DATA = {
     {
       "name": "telephony",
       "kind": "optional",
+      "say": "get a phone number, send texts and make AI phone calls, through Twilio.",
       "docs_words": "Provision Twilio numbers, SMS/MMS, and AI outbound calls.",
       "page": "reference/optional-skills-catalog.md",
       "line": 213
@@ -2338,6 +2530,7 @@ export const WANTS_DATA = {
     {
       "name": "bioinformatics",
       "kind": "optional",
+      "say": "find the right method for gene and biology data work.",
       "docs_words": "Gateway to 400+ genomics and computational biology skills.",
       "page": "reference/optional-skills-catalog.md",
       "line": 219
@@ -2345,6 +2538,7 @@ export const WANTS_DATA = {
     {
       "name": "blogwatcher",
       "kind": "optional",
+      "say": "follow blogs and news feeds and see what is new.",
       "docs_words": "Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.",
       "page": "reference/optional-skills-catalog.md",
       "line": 220
@@ -2352,6 +2546,7 @@ export const WANTS_DATA = {
     {
       "name": "darwinian-evolver",
       "kind": "optional",
+      "say": "improve a short text or code by trying many versions and keeping the best.",
       "docs_words": "Evolve prompts/regex/SQL/code with Imbue's evolution loop.",
       "page": "reference/optional-skills-catalog.md",
       "line": 221
@@ -2359,6 +2554,7 @@ export const WANTS_DATA = {
     {
       "name": "domain-intel",
       "kind": "optional",
+      "say": "look up public facts about a website's address: owner, certificates, subdomains.",
       "docs_words": "Passive recon of subdomains, SSL certs, WHOIS, and DNS.",
       "page": "reference/optional-skills-catalog.md",
       "line": 222
@@ -2366,6 +2562,7 @@ export const WANTS_DATA = {
     {
       "name": "drug-discovery",
       "kind": "optional",
+      "say": "look up medicines and how they act, for drug research.",
       "docs_words": "Drug discovery: ChEMBL search, drug-likeness, interactions.",
       "page": "reference/optional-skills-catalog.md",
       "line": 223
@@ -2373,6 +2570,7 @@ export const WANTS_DATA = {
     {
       "name": "gitnexus-explorer",
       "kind": "optional",
+      "say": "show a code project as a clickable map of its parts.",
       "docs_words": "Serve an interactive codebase knowledge graph web UI.",
       "page": "reference/optional-skills-catalog.md",
       "line": 224
@@ -2380,6 +2578,7 @@ export const WANTS_DATA = {
     {
       "name": "llm-wiki",
       "kind": "optional",
+      "say": "build a growing set of linked notes that an AI keeps up to date.",
       "docs_words": "Karpathy's LLM Wiki: build/query interlinked markdown KB.",
       "page": "reference/optional-skills-catalog.md",
       "line": 225
@@ -2387,6 +2586,7 @@ export const WANTS_DATA = {
     {
       "name": "osint-investigation",
       "kind": "optional",
+      "say": "dig through public records to trace money, companies and links between them.",
       "docs_words": "Follow the money via public records and sanctions data.",
       "page": "reference/optional-skills-catalog.md",
       "line": 226
@@ -2394,6 +2594,7 @@ export const WANTS_DATA = {
     {
       "name": "parallel-cli",
       "kind": "optional",
+      "say": "search the web and do deep research with Parallel.",
       "docs_words": "Agent-native web search, deep research, and enrichment.",
       "page": "reference/optional-skills-catalog.md",
       "line": 227
@@ -2401,6 +2602,7 @@ export const WANTS_DATA = {
     {
       "name": "qmd",
       "kind": "optional",
+      "say": "search your own notes and documents on your computer, by words and meaning.",
       "docs_words": "Hybrid local search over notes, docs, and transcripts.",
       "page": "reference/optional-skills-catalog.md",
       "line": 228
@@ -2408,6 +2610,7 @@ export const WANTS_DATA = {
     {
       "name": "research-paper-writing",
       "kind": "optional",
+      "say": "plan, run and write up AI research for big science meetings.",
       "docs_words": "Write ML papers for NeurIPS/ICML/ICLR: design→submit.",
       "page": "reference/optional-skills-catalog.md",
       "line": 229
@@ -2415,6 +2618,7 @@ export const WANTS_DATA = {
     {
       "name": "rss-feeds",
       "kind": "optional",
+      "say": "read news feeds from a website and list the newest entries.",
       "docs_words": "Read RSS, Atom, JSON feeds; discover feeds behind a page.",
       "page": "reference/optional-skills-catalog.md",
       "line": 230
@@ -2422,6 +2626,7 @@ export const WANTS_DATA = {
     {
       "name": "scrapling",
       "kind": "optional",
+      "say": "copy data from websites, also ones that try to block robots.",
       "docs_words": "Scrape sites with stealth browsing and Cloudflare bypass.",
       "page": "reference/optional-skills-catalog.md",
       "line": 231,
@@ -2430,6 +2635,7 @@ export const WANTS_DATA = {
     {
       "name": "1password",
       "kind": "optional",
+      "say": "read your secrets from 1Password and use them.",
       "docs_words": "Set up op CLI, sign in, and read or inject secrets.",
       "page": "reference/optional-skills-catalog.md",
       "line": 237
@@ -2437,6 +2643,7 @@ export const WANTS_DATA = {
     {
       "name": "godmode",
       "kind": "optional",
+      "say": "get around the safety rules of AIs.",
       "docs_words": "Jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN.",
       "page": "reference/optional-skills-catalog.md",
       "line": 238,
@@ -2445,6 +2652,7 @@ export const WANTS_DATA = {
     {
       "name": "oss-forensics",
       "kind": "optional",
+      "say": "investigate an attack on open-source code on GitHub and write a report.",
       "docs_words": "GitHub supply-chain forensics: recovery, IOCs, reporting.",
       "page": "reference/optional-skills-catalog.md",
       "line": 239
@@ -2452,6 +2660,7 @@ export const WANTS_DATA = {
     {
       "name": "sherlock",
       "kind": "optional",
+      "say": "find which websites have an account with a given username.",
       "docs_words": "Find accounts for a username across 400+ platforms.",
       "page": "reference/optional-skills-catalog.md",
       "line": 240,
@@ -2460,6 +2669,7 @@ export const WANTS_DATA = {
     {
       "name": "unbroker",
       "kind": "optional",
+      "say": "find and remove your personal details from people-search websites.",
       "docs_words": "Remove your info from data-broker sites, by name or phone.",
       "page": "reference/optional-skills-catalog.md",
       "line": 241
@@ -2467,6 +2677,7 @@ export const WANTS_DATA = {
     {
       "name": "web-pentest",
       "kind": "optional",
+      "say": "attack a website you are allowed to test, to find its security holes.",
       "docs_words": "Authorized web pentest: recon, proof-based exploits, report.",
       "page": "reference/optional-skills-catalog.md",
       "line": 242,
@@ -2475,6 +2686,7 @@ export const WANTS_DATA = {
     {
       "name": "openhue",
       "kind": "optional",
+      "say": "turn Philips Hue lights and scenes on and off.",
       "docs_words": "Control Philips Hue lights, scenes, rooms via OpenHue CLI.",
       "page": "reference/optional-skills-catalog.md",
       "line": 248
@@ -2482,6 +2694,7 @@ export const WANTS_DATA = {
     {
       "name": "reddit-reading",
       "kind": "optional",
+      "say": "read and search Reddit posts and comments.",
       "docs_words": "Read Reddit: subreddits, search, threads, users. No browser.",
       "page": "reference/optional-skills-catalog.md",
       "line": 254
@@ -2489,6 +2702,7 @@ export const WANTS_DATA = {
     {
       "name": "ast-grep",
       "kind": "optional",
+      "say": "search and change code by its structure, not only its letters.",
       "docs_words": "AST-aware structural code search and rewrite via ast-grep.",
       "page": "reference/optional-skills-catalog.md",
       "line": 260
@@ -2496,6 +2710,7 @@ export const WANTS_DATA = {
     {
       "name": "code-wiki",
       "kind": "optional",
+      "say": "write a wiki with diagrams that explains a code project.",
       "docs_words": "Generate wiki docs + Mermaid diagrams for any codebase.",
       "page": "reference/optional-skills-catalog.md",
       "line": 261
@@ -2503,6 +2718,7 @@ export const WANTS_DATA = {
     {
       "name": "grill-me",
       "kind": "optional",
+      "say": "question your plan hard, step by step, before you build it.",
       "docs_words": "Adversarial plan interview before implementation.",
       "page": "reference/optional-skills-catalog.md",
       "line": 262
@@ -2510,6 +2726,7 @@ export const WANTS_DATA = {
     {
       "name": "hermes-agent-skill-authoring",
       "kind": "optional",
+      "say": "write new skills, the steps that teach Hermes a task, for the Hermes project.",
       "docs_words": "Author in-repo SKILL.md files: frontmatter and structure.",
       "page": "reference/optional-skills-catalog.md",
       "line": 263
@@ -2517,6 +2734,7 @@ export const WANTS_DATA = {
     {
       "name": "inspecting-hermes-desktop-dom",
       "kind": "optional",
+      "say": "look inside the running Hermes app's page, for people changing the app.",
       "docs_words": "Read the live Hermes desktop DOM/CSS over CDP.",
       "page": "reference/optional-skills-catalog.md",
       "line": 264
@@ -2524,6 +2742,7 @@ export const WANTS_DATA = {
     {
       "name": "node-inspect-debugger",
       "kind": "optional",
+      "say": "find bugs in Node.js programs by pausing them step by step.",
       "docs_words": "Debug Node.js via --inspect + Chrome DevTools Protocol CLI.",
       "page": "reference/optional-skills-catalog.md",
       "line": 265
@@ -2531,6 +2750,7 @@ export const WANTS_DATA = {
     {
       "name": "pr-lens",
       "kind": "optional",
+      "say": "draw a code change as a moving diagram that shows how it works.",
       "docs_words": "Draw code changes as animated architecture/data-flow SVGs.",
       "page": "reference/optional-skills-catalog.md",
       "line": 266
@@ -2538,6 +2758,7 @@ export const WANTS_DATA = {
     {
       "name": "python-debugpy",
       "kind": "optional",
+      "say": "find bugs in Python programs by pausing them step by step.",
       "docs_words": "Debug Python: pdb REPL + debugpy remote (DAP).",
       "page": "reference/optional-skills-catalog.md",
       "line": 267
@@ -2545,6 +2766,7 @@ export const WANTS_DATA = {
     {
       "name": "rest-graphql-debug",
       "kind": "optional",
+      "say": "find out why a web service answers with an error.",
       "docs_words": "Debug REST/GraphQL APIs: status codes, auth, schemas, repro.",
       "page": "reference/optional-skills-catalog.md",
       "line": 268
@@ -2552,6 +2774,7 @@ export const WANTS_DATA = {
     {
       "name": "subagent-driven-development",
       "kind": "optional",
+      "say": "carry out a coding plan by handing each task to a fresh AI helper.",
       "docs_words": "Execute plans via delegate_task subagents (2-stage review).",
       "page": "reference/optional-skills-catalog.md",
       "line": 269
@@ -2559,6 +2782,7 @@ export const WANTS_DATA = {
     {
       "name": "cloudflare-temporary-deploy",
       "kind": "optional",
+      "say": "put a small web app online for an hour, with no account.",
       "docs_words": "Deploy a Worker live, no account, via wrangler --temporary.",
       "page": "reference/optional-skills-catalog.md",
       "line": 275
@@ -2566,6 +2790,7 @@ export const WANTS_DATA = {
     {
       "name": "har-derived-api-client",
       "kind": "optional",
+      "say": "record what a website sends, then make a program that fetches the same data.",
       "docs_words": "Record a site's XHR into a HAR, derive an HTTP client.",
       "page": "reference/optional-skills-catalog.md",
       "line": 276
@@ -2573,6 +2798,7 @@ export const WANTS_DATA = {
     {
       "name": "page-agent",
       "kind": "optional",
+      "say": "add an AI helper inside your own web app that clicks for its users.",
       "docs_words": "Embed an in-page natural-language GUI copilot in web apps.",
       "page": "reference/optional-skills-catalog.md",
       "line": 277
@@ -2580,6 +2806,7 @@ export const WANTS_DATA = {
     {
       "name": "publish-site",
       "kind": "optional",
+      "say": "put a website you built online on GitHub, Cloudflare or Netlify Pages.",
       "docs_words": "Versioned site deploys to GitHub/Cloudflare/Netlify Pages.",
       "page": "reference/optional-skills-catalog.md",
       "line": 278
@@ -2587,6 +2814,7 @@ export const WANTS_DATA = {
     {
       "name": "scrollcraft",
       "kind": "optional",
+      "say": "build landing pages where scrolling plays like a film.",
       "docs_words": "Premium scroll-driven landing pages; scroll = timeline.",
       "page": "reference/optional-skills-catalog.md",
       "line": 279
@@ -2594,6 +2822,7 @@ export const WANTS_DATA = {
     {
       "name": "yuanbao",
       "kind": "optional",
+      "say": null,
       "docs_words": "Yuanbao (元宝) groups: @mention users, query info/members.",
       "page": "reference/optional-skills-catalog.md",
       "line": 285

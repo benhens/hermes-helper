@@ -11,6 +11,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import * as TALK from '../src/talk.js'
 import { TALK_DATA } from '../src/talk-data.js'
+import { pinned } from './lib/team-pins.mjs'
 
 const { freshVisit, laterVisit, turn, pick, pickTopic, press, skip, sayLine, change, rmPick, forgetAnswer, seeKept, askForgetAll, typedAboutKept, lineFor, openingLine, hintFor, buildHit, talkNorm, keptRows, PARTS, EXTRA_LINES, REPLY_HINT } = TALK
 const ROOT = path.resolve(import.meta.dirname, '..')
@@ -78,31 +79,72 @@ function replay(conv) {
   return got
 }
 
+// talk v2 wants fixes: changes-12's secret rule (looks_secret) is not in this build (Lead: point 8 of the
+// look job). The replay uses route2_secret11.py, the team's route2.py with its one changes-12 line put back
+// (dev/checks/talk-v2-wf1/make_secret11.py); the team's own route2.py was run too (TEAM_RUN). These are the
+// conversations where the two differ, each only at a "remember that ..." turn: the plugin does here what
+// route2.py did before changes-12.
+const TEAM_RUN = fixture('route2-conversations-team.json')
+const SECRET_12 = [
+  'changes-12: where the passwords are is not a password, kept',
+  'changes-12: where the logins are is kept',
+  'changes-12: pw and a colon',
+  'changes-12: a short label, is, one value',
+  'changes-12: another language, same shape',
+  'changes-12: a typo of password',
+  'changes-12: 12 plain words in a row',
+  'changes-12: 24 plain words get RM6, not too long',
+  'changes-12: talking about passwords is kept',
+  'changes-12: talking about API keys is kept',
+  'changes-12: a password manager is kept'
+]
+
 test('the test files were made from the talk data this plugin holds, by one route2.py, and route2.py met every one of its own expectations (the wants under C1 included)', () => {
   const ours = sha(path.join(ROOT, 'content/helper-talk-v2.json'))
-  for (const f of [ON, fixture('route2-set2.json'), fixture('route2-extra.json')]) {
-    assert.equal(f.json_sha256, ours, 'run bash dev/checks/talk-v2/recopy.sh again')
-    assert.equal(f.route2_sha256, ON.route2_sha256)
+  for (const f of [ON, TEAM_RUN, fixture('route2-set2.json'), fixture('route2-extra.json')]) {
+    assert.equal(f.json_sha256, ours, 'run bash dev/checks/talk-v2-wf1/recopy-wf1.sh again')
+    if (f !== TEAM_RUN) assert.equal(f.route2_sha256, ON.route2_sha256)
   }
-  assert.equal(ON.keeps_off, false)
-  assert.equal(ON.no_wants, false)
-  const off = ON.conversations.filter(c => !c.failed && c.steps.length && c.steps[c.steps.length - 1].shown !== c.expect)
-  assert.deepEqual(off.map(c => c.expect), [])
+  for (const f of [ON, TEAM_RUN]) {
+    assert.equal(f.keeps_off, false)
+    assert.equal(f.no_wants, false)
+  }
+  // the team's route2.py met all its expectations; the one with changes-12's line put back, all but those
+  const missed = f => f.conversations.filter(c => !c.failed && c.steps.length && c.steps[c.steps.length - 1].shown !== c.expect).map(c => c.name)
+  assert.deepEqual(missed(TEAM_RUN), [])
+  assert.deepEqual(missed(ON), SECRET_12)
 })
 
-test('the plugin\'s copies are the team\'s files (when the team\'s folder is there): the talk data, the skills list and the wants', t => {
+test('changes-12 not ported: the team\'s route2.py and the replayed one differ only in the listed conversations, and there only at a "remember that ..." turn', () => {
+  assert.deepEqual(TEAM_RUN.conversations.map(c => c.name), ON.conversations.map(c => c.name))
+  const differ = []
+  ON.conversations.forEach((c, i) => {
+    const t = TEAM_RUN.conversations[i]
+    if (JSON.stringify(c.steps) === JSON.stringify(t.steps)) return
+    differ.push(c.name)
+    c.steps.forEach((s, j) => {
+      if (JSON.stringify(s) === JSON.stringify(t.steps[j])) return
+      assert.match(s.text || '', /^remember that /, `${c.name}: a turn that is not "remember that ..." differs`)
+      assert.ok(/^RM/.test(s.shown) && /^RM/.test(t.steps[j].shown), `${c.name}: ${s.shown} / ${t.steps[j].shown}`)
+    })
+  })
+  assert.deepEqual(differ, SECRET_12)
+  assert.deepEqual(TEAM_RUN.singles, ON.singles)
+})
+
+test('the plugin\'s copies are the team\'s files at the checksums this job names (when the team\'s folder is there): the talk data, the skills list and the wants', t => {
   if (!fs.existsSync(path.join(TEAM, 'content'))) return t.skip('no team content folder beside the plugin')
-  for (const f of ['helper-talk-v2.json', 'skills-list-v1.json', 'helper-wants-v1.json']) assert.equal(sha(path.join(ROOT, 'content', f)), sha(path.join(TEAM, 'content', f)), `content/${f} differs from the team's: bash dev/checks/talk-v2/recopy.sh`)
+  for (const f of ['helper-talk-v2.json', 'skills-list-v1.json', 'helper-wants-v1.json']) assert.equal(sha(path.join(ROOT, 'content', f)), pinned(t, 'content/' + f), `content/${f} is not the team's at the pin: bash dev/checks/talk-v2-wf1/recopy-wf1.sh`)
 })
 
-test('the reference scripts the test files were made from are still the team\'s (when the team\'s folder is there): route2.py, check.py, settings_read.py and its cases', t => {
+test('the reference scripts the test files were made from are the team\'s (when the team\'s folder is there): route2.py and settings_read.py with its cases at the pins, check.py as it is now', t => {
   const checks = path.join(TEAM, 'dev', 'checks')
   if (!fs.existsSync(path.join(checks, 'hhcontent-talk-v2', 'route2.py'))) return t.skip('no team folder beside the plugin')
-  assert.equal(ON.route2_sha256, sha(path.join(checks, 'hhcontent-talk-v2', 'route2.py')), 'route2.py changed since the copy: bash dev/checks/talk-v2/recopy.sh')
+  assert.equal(TEAM_RUN.route2_sha256, pinned(t, 'dev/checks/hhcontent-talk-v2/route2.py'), 'route2.py is not the pinned one: bash dev/checks/talk-v2-wf1/recopy-wf1.sh')
   assert.equal(fixture('check-py-lines.json').check_py_sha256, sha(path.join(checks, 'hhcontent-talk-v2', 'check.py')), 'check.py changed since the copy')
   const s = fixture('settings-read.json')
-  assert.equal(s.settings_read_sha256, sha(path.join(checks, 'hhcontent-settings-edit', 'settings_read.py')), 'settings_read.py changed since the copy')
-  assert.equal(s.tests_sha256, sha(path.join(checks, 'hhcontent-settings-edit', 'tests.json')), 'tests.json changed since the copy')
+  assert.equal(s.settings_read_sha256, pinned(t, 'dev/checks/hhcontent-settings-edit/settings_read.py'), 'settings_read.py is not the pinned one')
+  assert.equal(s.tests_sha256, pinned(t, 'dev/checks/hhcontent-settings-edit/tests.json'), 'tests.json is not the pinned one')
 })
 
 test('every conversation route2.py ran, keeping on, the wants steps off as route2.py has none: the same result and the same visit (stored record included) at every turn', () => {
@@ -205,7 +247,7 @@ test('the opening: greeting, name, what the person does, then a line with nothin
   const f2 = lineFor(turn('I run a tennis club', st), st)
   assert.equal(f2.text, 'Thanks, Peter. Ask me anything about Hermes.')
   assert.equal(f2.answers, null, 'no topics after the greeting')
-  assert.deepEqual(f2.note, { text: 'Kept: Peter.', link: 'See what I keep', first: 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.', items: [['name', 'Peter']] })
+  assert.deepEqual(f2.note, { text: 'Kept: Peter.', link: 'See what I keep', first: 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.', items: [['name', 'Peter']] })
   assert.deepEqual(st.kept, { name: 'Peter', told: true })
   assert.equal(st.work, 'I run a tennis club', 'what the person does is used for this visit')
   assert.equal(st.kept.work, undefined, 'and never kept')
@@ -410,7 +452,7 @@ test('the grey kept line: the values as kept, one line for one moment, the first
 
 test('the first-time line is the one for a build with no AI step: nothing about sending to an AI', () => {
   const first = TALK_DATA.keeps.tell.first_time_if_no_model_call
-  assert.equal(first, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.')
+  assert.equal(first, 'I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.')
   assert.doesNotMatch(JSON.stringify(TALK_DATA), /Only your name goes to your AI/)
 })
 

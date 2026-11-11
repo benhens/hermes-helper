@@ -9,7 +9,10 @@
   "needs": "what the first lines of its own page say it needs, plus the Platforms row of that page",
   "left_out": "true: Helper answers a question about it with its don't-know line (his words, 10 Nov 19:30). Approved by him: not yet",
   "alike_groups": "ids of groups in alike_groups",
-  "found_by": "built-in only: want_row id, or things and actions, or none with the reason"
+  "found_by": "built-in only: want_row id, or things and actions, or none with the reason",
+  "say": "Said by Helper after 'It teaches Hermes to' in S1/S2 (content/helper-skill-lines-v1.md). Says no more than docs_words. null = Helper keeps the fixed sentence",
+  "say_from": "for = the 'for' with a small first letter; rewritten = changed so it says no more than docs_words or fits the line; fixed: reason",
+  "say_judged": "where the plain words were checked against docs_words by reading, not by rule: what was judged"
  },
  "left_out_criterion": "A skill is left out when its purpose is to get around safety or security, or when it can do real harm to the person or to others in a beginner's hands.",
  "left_out_status": "proposal, waiting for his approval",
@@ -28,7 +31,9 @@
   "builtin_with_want_row": 11,
   "builtin_not_found": 10,
   "built_in_done": 44,
-  "optional_done": 142
+  "optional_done": 142,
+  "say_plain": 174,
+  "say_fixed": 12
  },
  "alike_groups": [
   {
@@ -379,7 +384,10 @@
      "make",
      "change"
     ]
-   }
+   },
+   "say": "write, find and change notes in Apple Notes.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "apple-reminders",
@@ -412,7 +420,10 @@
      "make",
      "complete"
     ]
-   }
+   },
+   "say": "add, list and tick off items in Apple Reminders.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "findmy",
@@ -448,7 +459,10 @@
      "where is",
      "where's"
     ]
-   }
+   },
+   "say": "see where your Apple devices and AirTags are, using the Find My app.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "imessage",
@@ -483,7 +497,10 @@
      "write",
      "answer"
     ]
-   }
+   },
+   "say": "send and read iMessages and texts from the Messages app on a Mac.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "claude-code",
@@ -519,7 +536,10 @@
      "fix",
      "write"
     ]
-   }
+   },
+   "say": "hand a coding job to Claude Code, a separate coding app.",
+   "say_from": "rewritten",
+   "say_judged": "\"a separate coding app\" explains CLI"
   },
   {
    "name": "codex",
@@ -556,7 +576,10 @@
      "fix",
      "write"
     ]
-   }
+   },
+   "say": "hand a coding job to Codex, a separate coding app by OpenAI.",
+   "say_from": "for",
+   "say_judged": "\"a separate coding app\" explains CLI"
   },
   {
    "name": "computer-use",
@@ -581,7 +604,10 @@
    ],
    "found_by": {
     "none": "the built-in tool row w_computer answers it"
-   }
+   },
+   "say": "use your desktop, doing things in the background first.",
+   "say_from": "rewritten",
+   "say_judged": "\"background first\" from background-first; escalate left out"
   },
   {
    "name": "hermes-agent",
@@ -606,7 +632,10 @@
    ],
    "found_by": {
     "none": "Helper's own topics answer questions about Hermes"
-   }
+   },
+   "say": "use and change its own settings and look, and add to itself.",
+   "say_from": "rewritten",
+   "say_judged": "configure, theme, extend said as settings, look, add to itself"
   },
   {
    "name": "architecture-diagram",
@@ -642,7 +671,10 @@
      "create",
      "design"
     ]
-   }
+   },
+   "say": "draw a dark-themed picture of how a software system fits together.",
+   "say_from": "for",
+   "say_judged": "\"how a software system fits together\" for architecture diagrams"
   },
   {
    "name": "ascii-video",
@@ -676,7 +708,10 @@
      "turn",
      "convert"
     ]
-   }
+   },
+   "say": "turn a video or sound into a moving picture made of letters.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "baoyu-infographic",
@@ -710,7 +745,10 @@
      "design",
      "draw"
     ]
-   }
+   },
+   "say": "make an infographic: one picture that sums up facts, in many layouts.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "claude-design",
@@ -745,7 +783,10 @@
      "make",
      "create"
     ]
-   }
+   },
+   "say": "design a one-off web page, slide deck or clickable mockup.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "humanizer",
@@ -783,7 +824,10 @@
      "sound natural",
      "less robotic"
     ]
-   }
+   },
+   "say": "rewrite text so it sounds less like an AI wrote it.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "manim-video",
@@ -808,7 +852,10 @@
    ],
    "found_by": {
     "want_row": "w_anim"
-   }
+   },
+   "say": "make animated videos that explain maths.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "p5js",
@@ -842,7 +889,10 @@
      "draw",
      "build"
     ]
-   }
+   },
+   "say": "make art with code, also moving and 3D art.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "popular-web-designs",
@@ -867,7 +917,10 @@
    ],
    "found_by": {
     "none": "no plain pair: the want is 'look like Stripe', a name, not a thing and action"
-   }
+   },
+   "say": "make web pages in the style of 54 well-known sites, such as Stripe.",
+   "say_from": "for",
+   "say_judged": "\"well-known sites\" for real design systems"
   },
   {
    "name": "songwriting-and-ai-music",
@@ -892,7 +945,10 @@
    ],
    "found_by": {
     "want_row": "w_music"
-   }
+   },
+   "say": "help write songs, and write the text you give Suno, a music AI.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "sdlc-review",
@@ -915,7 +971,9 @@
    "alike_groups": [],
    "found_by": {
     "none": "not clear from the docs"
-   }
+   },
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "email-inbox-triage",
@@ -954,7 +1012,10 @@
      "clean up",
      "what needs"
     ]
-   }
+   },
+   "say": "sort your inbox by what matters most, and draft replies for you to check.",
+   "say_from": "for",
+   "say_judged": "\"for you to check\" for safely"
   },
   {
    "name": "himalaya",
@@ -989,7 +1050,10 @@
      "check",
      "reply"
     ]
-   }
+   },
+   "say": "read and send email from your own mailbox.",
+   "say_from": "rewritten",
+   "say_judged": "IMAP/SMTP said as read and send"
   },
   {
    "name": "youtube-content",
@@ -1014,7 +1078,10 @@
    ],
    "found_by": {
     "want_row": "w_youtube"
-   }
+   },
+   "say": "turn a YouTube video's spoken words into a summary, thread or blog post.",
+   "say_from": "for",
+   "say_judged": "transcripts said as spoken words"
   },
   {
    "name": "obsidian",
@@ -1040,7 +1107,10 @@
    ],
    "found_by": {
     "want_row": "w_notes"
-   }
+   },
+   "say": "read, search, write and change notes in your Obsidian notes folder.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "document-to-action-items",
@@ -1082,7 +1152,10 @@
      "todos",
      "tasks from"
     ]
-   }
+   },
+   "say": "pull deadlines, duties and tasks out of a document, with where each was found.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "google-workspace",
@@ -1108,7 +1181,10 @@
    ],
    "found_by": {
     "none": "topic svc catches gmail, calendar, drive first"
-   }
+   },
+   "say": "use your Gmail, Google Calendar, Drive, Docs and Sheets.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "maps",
@@ -1131,7 +1207,10 @@
    "alike_groups": [],
    "found_by": {
     "want_row": "w_maps"
-   }
+   },
+   "say": "find places, addresses, routes and time zones from open map data.",
+   "say_from": "rewritten",
+   "say_judged": "OpenStreetMap/OSRM said as open map data"
   },
   {
    "name": "meeting-action-items",
@@ -1156,7 +1235,10 @@
    ],
    "found_by": {
     "want_row": "w_meeting"
-   }
+   },
+   "say": "turn meeting notes into decisions, who does what, and follow-up tasks.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "microsoft-office",
@@ -1181,7 +1263,10 @@
    ],
    "found_by": {
     "want_row": "w_office"
-   }
+   },
+   "say": "make, read and change Word, PowerPoint and Excel files.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "pdf",
@@ -1204,7 +1289,10 @@
    "alike_groups": [],
    "found_by": {
     "want_row": "w_pdf"
-   }
+   },
+   "say": "make, read, merge and fill in PDF files, also scanned ones.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "product-price-monitor",
@@ -1227,7 +1315,10 @@
    "alike_groups": [],
    "found_by": {
     "want_row": "w_prices"
-   }
+   },
+   "say": "watch a product, flight or listing price and tell you at your target.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "teams-meeting-pipeline",
@@ -1264,7 +1355,10 @@
      "notes",
      "recording"
     ]
-   }
+   },
+   "say": "get summaries of Teams meetings.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "weekly-review-planning",
@@ -1298,7 +1392,10 @@
      "look back",
      "reset"
     ]
-   }
+   },
+   "say": "look back at your week, see what got stuck, and plan the next.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "arxiv",
@@ -1321,7 +1418,10 @@
    "alike_groups": [],
    "found_by": {
     "want_row": "w_papers"
-   }
+   },
+   "say": "search and read science papers on arXiv.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "competitor-news-monitor",
@@ -1356,7 +1456,10 @@
      "follow",
      "news"
     ]
-   }
+   },
+   "say": "watch companies you name and report only important news about them.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "grounded-citations",
@@ -1389,7 +1492,10 @@
      "include",
      "show"
     ]
-   }
+   },
+   "say": "give answers where every fact shows where it came from.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "xurl",
@@ -1412,7 +1518,10 @@
    "alike_groups": [],
    "found_by": {
     "want_row": "w_xpost"
-   }
+   },
+   "say": "post, search and send messages on X, the site that was Twitter.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "codebase-inspection",
@@ -1447,7 +1556,10 @@
      "which languages",
      "size"
     ]
-   }
+   },
+   "say": "count how much code a project has, and in which languages.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "dogfood",
@@ -1480,7 +1592,10 @@
      "qa",
      "try out"
     ]
-   }
+   },
+   "say": "test a web app like a user would, and write up the bugs found.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "github",
@@ -1505,7 +1620,10 @@
    ],
    "found_by": {
     "none": "topic svc catches github first"
-   }
+   },
+   "say": "work with GitHub: issues, pull requests, reviews and code folders.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "requesting-code-review",
@@ -1530,7 +1648,10 @@
    ],
    "found_by": {
     "none": "its pair (code, review) is want row w_code's"
-   }
+   },
+   "say": "check new code for safety and quality before it is saved for good.",
+   "say_from": "for",
+   "say_judged": "pre-commit said as before it is saved for good"
   },
   {
    "name": "simplify-code",
@@ -1564,7 +1685,10 @@
      "tidy",
      "cleaner"
     ]
-   }
+   },
+   "say": "tidy up code you changed lately.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "spike",
@@ -1587,7 +1711,10 @@
    "alike_groups": [],
    "found_by": {
     "none": "no plain pair: 'try an idea' fits too many wants"
-   }
+   },
+   "say": "try out an idea with quick throwaway code before building it for real.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "systematic-debugging",
@@ -1623,7 +1750,10 @@
      "track down",
      "why"
     ]
-   }
+   },
+   "say": "find the real cause of a bug before trying to fix it.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "test-driven-development",
@@ -1646,7 +1776,10 @@
    "alike_groups": [],
    "found_by": {
     "none": "no plain pair: found by its name only"
-   }
+   },
+   "say": "write code by writing a test first, then the code that passes it.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "blocked-page-recovery",
@@ -1669,7 +1802,10 @@
    "alike_groups": [],
    "found_by": {
     "none": "on the borderline list for him; no pair until he decides"
-   }
+   },
+   "say": "get a web page that will not open, such as one behind a paywall.",
+   "say_from": "rewritten",
+   "say_judged": "fetch fails said as will not open; paywall is in the line"
   },
   {
    "name": "agent-merge-conflict-arbiter",
@@ -1689,7 +1825,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "settle a clash when two AI helpers changed the same code.",
+   "say_from": "for",
+   "say_judged": "agents said as AI helpers"
   },
   {
    "name": "antigravity-cli",
@@ -1711,7 +1850,10 @@
    "left_out": false,
    "alike_groups": [
     "g_coding"
-   ]
+   ],
+   "say": "use the separate Antigravity app.",
+   "say_from": "rewritten",
+   "say_judged": "\"separate app\" explains CLI"
   },
   {
    "name": "blackbox",
@@ -1733,7 +1875,10 @@
    "left_out": false,
    "alike_groups": [
     "g_coding"
-   ]
+   ],
+   "say": "hand a coding job to Blackbox AI, a separate coding app.",
+   "say_from": "for",
+   "say_judged": "\"a separate coding app\" explains CLI"
   },
   {
    "name": "dynamic-workflow",
@@ -1753,7 +1898,9 @@
    "for_from": "unclear",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "grok",
@@ -1775,7 +1922,10 @@
    "left_out": false,
    "alike_groups": [
     "g_coding"
-   ]
+   ],
+   "say": "hand a coding job to Grok Build, a separate coding app by xAI.",
+   "say_from": "for",
+   "say_judged": "\"a separate coding app\" explains CLI"
   },
   {
    "name": "opencode",
@@ -1797,7 +1947,10 @@
    "left_out": false,
    "alike_groups": [
     "g_coding"
-   ]
+   ],
+   "say": "hand a coding job to OpenCode, a separate coding app.",
+   "say_from": "rewritten",
+   "say_judged": "\"a separate coding app\" explains CLI"
   },
   {
    "name": "openhands",
@@ -1819,7 +1972,10 @@
    "left_out": false,
    "alike_groups": [
     "g_coding"
-   ]
+   ],
+   "say": "hand a coding job to OpenHands, a coding app that works with many AIs.",
+   "say_from": "for",
+   "say_judged": "\"a coding app that works with many AIs\" = model-agnostic CLI"
   },
   {
    "name": "evm",
@@ -1839,7 +1995,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look up wallets, coins and fees on eight blockchains. Read only.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "hyperliquid",
@@ -1859,7 +2018,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look up prices and your past trades on Hyperliquid.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "solana",
@@ -1879,7 +2041,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look up Solana wallets, coins and NFTs, with prices in dollars.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "one-three-one-rule",
@@ -1899,7 +2064,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "answer a hard choice as one problem, three options and one pick.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "ai-presenter-video",
@@ -1921,7 +2089,10 @@
    "left_out": false,
    "alike_groups": [
     "g_video"
-   ]
+   ],
+   "say": "make a video of a talking presenter from a script and one photo.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "anatomy",
@@ -1941,7 +2112,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "explain an idea with a machine drawing you can click on.",
+   "say_from": "rewritten",
+   "say_judged": "interactive isometric machine figure said as machine drawing you can click on"
   },
   {
    "name": "archify",
@@ -1963,7 +2137,10 @@
    "left_out": false,
    "alike_groups": [
     "g_diagram"
-   ]
+   ],
+   "say": "make clickable diagrams as web pages.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "ascii-art",
@@ -1983,7 +2160,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "make pictures and big banner text out of letters.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "auteur",
@@ -2005,7 +2185,10 @@
    "left_out": false,
    "alike_groups": [
     "g_webdesign"
-   ]
+   ],
+   "say": "design and build web pages with a film-like, cinematic feel.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "baoyu-article-illustrator",
@@ -2027,7 +2210,10 @@
    "left_out": false,
    "alike_groups": [
     "g_pictures"
-   ]
+   ],
+   "say": "make matching pictures to illustrate an article you wrote.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "baoyu-comic",
@@ -2047,7 +2233,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "make comics that teach a topic or tell someone's life story.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "brag",
@@ -2070,7 +2259,10 @@
    "alike_groups": [
     "g_brag",
     "g_video"
-   ]
+   ],
+   "say": "make a launch video for a project you built.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "brag-slim",
@@ -2092,7 +2284,10 @@
    "left_out": false,
    "alike_groups": [
     "g_brag"
-   ]
+   ],
+   "say": "make a launch video for a project or web address.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "comfyui",
@@ -2115,7 +2310,10 @@
    "alike_groups": [
     "g_pictures",
     "g_video"
-   ]
+   ],
+   "say": "make pictures, video and sound with AI.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "concept-diagrams",
@@ -2137,7 +2335,10 @@
    "left_out": false,
    "alike_groups": [
     "g_diagram"
-   ]
+   ],
+   "say": "make simple, flat diagrams for teaching.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "creative-ideation",
@@ -2157,7 +2358,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "come up with ideas, using named methods from creative work.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "design-md",
@@ -2179,7 +2383,10 @@
    "left_out": false,
    "alike_groups": [
     "g_webdesign"
-   ]
+   ],
+   "say": "write and check a DESIGN.md file that describes how a design looks.",
+   "say_from": "rewritten",
+   "say_judged": "token spec said as describes how a design looks"
   },
   {
    "name": "draw-your-font",
@@ -2199,7 +2406,10 @@
    "for_from": "page",
    "needs": "Node.js 18 or newer",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "turn a photo of your handwriting into a font you can install.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "dream-loop",
@@ -2219,7 +2429,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "build 3D scenes, checking each against a drawing of the goal.",
+   "say_from": "rewritten",
+   "say_judged": "concept-art fidelity loop said as checking against a drawing of the goal"
   },
   {
    "name": "excalidraw",
@@ -2241,7 +2454,10 @@
    "left_out": false,
    "alike_groups": [
     "g_diagram"
-   ]
+   ],
+   "say": "make hand-drawn style diagrams for Excalidraw.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "heartmula",
@@ -2263,7 +2479,10 @@
    "left_out": false,
    "alike_groups": [
     "g_music"
-   ]
+   ],
+   "say": "make whole songs from lyrics, like Suno does.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "hyperframes",
@@ -2285,7 +2504,10 @@
    "left_out": false,
    "alike_groups": [
     "g_video"
-   ]
+   ],
+   "say": "make MP4 videos from web pages.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "impeccable",
@@ -2307,7 +2529,10 @@
    "left_out": false,
    "alike_groups": [
     "g_webdesign"
-   ]
+   ],
+   "say": "design the look of web pages well.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "ip-as-logo",
@@ -2329,7 +2554,10 @@
    "left_out": false,
    "alike_groups": [
     "g_pictures"
-   ]
+   ],
+   "say": "design a tiny, cute mascot logo that still reads when very small.",
+   "say_from": "for",
+   "say_judged": "readable at 32px said as reads when very small"
   },
   {
    "name": "kanban-video-orchestrator",
@@ -2351,7 +2579,10 @@
    "left_out": false,
    "alike_groups": [
     "g_video"
-   ]
+   ],
+   "say": "split a big video job among several Hermes helpers and run it.",
+   "say_from": "for",
+   "say_judged": "multi-agent said as several Hermes helpers"
   },
   {
    "name": "meme-generation",
@@ -2373,7 +2604,10 @@
    "left_out": false,
    "alike_groups": [
     "g_pictures"
-   ]
+   ],
+   "say": "make meme pictures from a topic, with text on a known template.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "mono-color",
@@ -2395,7 +2629,10 @@
    "left_out": false,
    "alike_groups": [
     "g_pictures"
-   ]
+   ],
+   "say": "make poster pictures in one or two ink colours, like printed art.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "pixel-art",
@@ -2417,7 +2654,10 @@
    "left_out": false,
    "alike_groups": [
     "g_pictures"
-   ]
+   ],
+   "say": "make pixel art in the colours of old game consoles.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "pretext",
@@ -2437,7 +2677,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "build playful web demos where text flows around moving things.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "simple-english",
@@ -2459,7 +2702,10 @@
    "left_out": false,
    "alike_groups": [
     "g_rewrite"
-   ]
+   ],
+   "say": "rewrite text in very simple, strict English.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "sketch",
@@ -2481,7 +2727,10 @@
    "left_out": false,
    "alike_groups": [
     "g_webdesign"
-   ]
+   ],
+   "say": "make two or three quick throwaway designs of a screen to compare.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "social-media-content-calendar",
@@ -2501,7 +2750,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "plan posts for several social media sites, from first idea to posting.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "system-atlas",
@@ -2523,7 +2775,10 @@
    "left_out": false,
    "alike_groups": [
     "g_diagram"
-   ]
+   ],
+   "say": "build a clickable map of how a software system works.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "tldraw-offline",
@@ -2543,7 +2798,10 @@
    "for_from": "page",
    "needs": "the tldraw offline app",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "read and change drawings in the tldraw offline app.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "unreal-mcp",
@@ -2563,7 +2821,10 @@
    "for_from": "page",
    "needs": "Unreal Engine with its MCP add-on",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "control scenes and objects in Unreal Engine, a game-making app.",
+   "say_from": "for",
+   "say_judged": "\"a game-making app\" explains Unreal Engine"
   },
   {
    "name": "jupyter-notebook",
@@ -2583,7 +2844,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "run Python step by step in a Jupyter notebook that keeps its results.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "actual-setup",
@@ -2603,7 +2867,10 @@
    "for_from": "page",
    "needs": "an Actual Computer account",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "set up Actual Computer to run AI for Hermes.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "docker-management",
@@ -2623,7 +2890,10 @@
    "for_from": "page",
    "needs": "Docker",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "start, stop and tidy Docker containers, a way to run apps boxed in.",
+   "say_from": "for",
+   "say_judged": "\"a way to run apps boxed in\" explains containers"
   },
   {
    "name": "hermes-s6-container-supervision",
@@ -2642,7 +2912,9 @@
    "for_from": "unclear",
    "needs": "Linux only",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "inference-sh-cli",
@@ -2665,7 +2937,10 @@
    "alike_groups": [
     "g_pictures",
     "g_video"
-   ]
+   ],
+   "say": "make pictures and video with over 150 AI apps run on inference.sh.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "pinggy-tunnel",
@@ -2685,7 +2960,10 @@
    "for_from": "page",
    "needs": "free for 60 minutes, paid plan for more",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "give something running on your computer a public web address for a while.",
+   "say_from": "for",
+   "say_judged": "localhost tunnel said as public web address for a while"
   },
   {
    "name": "setup-wizard-generator",
@@ -2705,7 +2983,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "make a step-by-step script that walks a person through a manual setup.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "watchers",
@@ -2727,7 +3008,10 @@
    "left_out": false,
    "alike_groups": [
     "g_feeds"
-   ]
+   ],
+   "say": "check news feeds, GitHub or data links on a timer and report new items.",
+   "say_from": "for",
+   "say_judged": "poll said as check on a timer; JSON APIs said as data links"
   },
   {
    "name": "adversarial-ux-test",
@@ -2747,7 +3031,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "play an angry, impatient user to find what is confusing in your app.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "agentmail",
@@ -2769,7 +3056,10 @@
    "left_out": false,
    "alike_groups": [
     "g_email"
-   ]
+   ],
+   "say": "use its own email inbox, through AgentMail.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "3-statement-model",
@@ -2789,7 +3079,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "fill in a company's linked money statements in an Excel file.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "comps-analysis",
@@ -2809,7 +3102,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "value a company against similar companies, in an Excel file.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "dcf-model",
@@ -2829,7 +3125,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "value a company from its future cash, in an Excel file.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "excel-author",
@@ -2849,7 +3148,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "build careful financial Excel files that others can check.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "lbo-model",
@@ -2869,7 +3171,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "plan the numbers for buying a company with borrowed money, in Excel.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "merger-model",
@@ -2889,7 +3194,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "work out what a merger does to earnings per share, in Excel.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "polymarket",
@@ -2909,7 +3217,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look up prediction market odds and prices on Polymarket.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "pptx-author",
@@ -2931,7 +3242,10 @@
    "left_out": false,
    "alike_groups": [
     "g_pptx"
-   ]
+   ],
+   "say": "make PowerPoint files.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "stocks",
@@ -2951,7 +3265,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look up stock and crypto prices, history and comparisons, from Yahoo.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "minecraft-modpack-server",
@@ -2971,7 +3288,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "set up and run a Minecraft game world with mods.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "pokemon-player",
@@ -2991,7 +3311,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "play Pokemon games.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "fitness-nutrition",
@@ -3011,7 +3334,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "plan workouts and look up food values and exercises.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "neuroskill-bci",
@@ -3031,7 +3357,10 @@
    "for_from": "page",
    "needs": "NeuroSkill and a brain-sensing headband",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "read your mood and focus from a NeuroSkill brain sensor.",
+   "say_from": "rewritten",
+   "say_judged": "BCI said as brain sensor"
   },
   {
    "name": "fastmcp",
@@ -3051,7 +3380,9 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": null,
+   "say_from": "fixed: needs MCP explained, which the docs line does not do"
   },
   {
    "name": "mcp-oauth-remote-gateway",
@@ -3071,7 +3402,9 @@
    "for_from": "unclear",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "mcporter",
@@ -3091,7 +3424,9 @@
    "for_from": "page",
    "needs": "Node.js",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": null,
+   "say_from": "fixed: needs MCP explained, which the docs line does not do"
   },
   {
    "name": "gif-search",
@@ -3111,7 +3446,10 @@
    "for_from": "page",
    "needs": "a Tenor secret key",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "find and save GIFs from Tenor.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "songsee",
@@ -3131,7 +3469,10 @@
    "for_from": "page",
    "needs": "Go, and ffmpeg for some files",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "draw pictures of a sound file, such as its pitch over time.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "accelerate",
@@ -3153,7 +3494,10 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": "train AIs on several graphics cards with few code changes.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "axolotl",
@@ -3175,7 +3519,10 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": "train your own version of an AI from a settings file.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "chroma",
@@ -3195,7 +3542,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "keep text in a search store so an AI can find it by meaning.",
+   "say_from": "for",
+   "say_judged": "embedding database said as search store by meaning"
   },
   {
    "name": "dspy",
@@ -3215,7 +3565,10 @@
    "for_from": "unclear",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "build AI programs that improve their own instructions by themselves.",
+   "say_from": "rewritten",
+   "say_judged": "auto-optimize prompts said as improve their own instructions; RAG left out"
   },
   {
    "name": "evaluating-llms-harness",
@@ -3235,7 +3588,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "test AIs on standard exams to compare how good they are.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "faiss",
@@ -3255,7 +3611,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "search huge collections of numbers for the closest matches, very fast.",
+   "say_from": "for",
+   "say_judged": "vector similarity said as closest matches in numbers"
   },
   {
    "name": "flash-attention",
@@ -3275,7 +3634,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows, and a graphics card",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "make training and running AIs faster.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "lambda-labs",
@@ -3295,7 +3657,10 @@
    "for_from": "page",
    "needs": "a Lambda Labs account, paid",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "rent strong graphics cards from Lambda Labs to train AIs.",
+   "say_from": "rewritten",
+   "say_judged": "\"strong\" for GPU, said once"
   },
   {
    "name": "llama-cpp",
@@ -3317,7 +3682,10 @@
    "left_out": false,
    "alike_groups": [
     "g_localai"
-   ]
+   ],
+   "say": "run an AI on your own computer with llama.cpp.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "modal",
@@ -3337,7 +3705,10 @@
    "for_from": "page",
    "needs": "a Modal account, paid",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "run AI jobs on Modal's rented graphics cards.",
+   "say_from": "rewritten",
+   "say_judged": "serverless GPU cloud said as rented graphics cards"
   },
   {
    "name": "nemo-curator",
@@ -3357,7 +3728,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows, and an NVIDIA graphics card",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "clean up large piles of text before training an AI on it.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "obliteratus",
@@ -3378,7 +3752,10 @@
    "needs": "a Mac or Linux, not Windows, and a graphics card",
    "left_out": true,
    "left_out_why": "Its purpose is to remove the safety refusals from AI models.",
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "remove the safety refusals built into open AIs.",
+   "say_from": "rewritten",
+   "say_judged": "abliterate refusals said as remove safety refusals"
   },
   {
    "name": "peft",
@@ -3400,7 +3777,10 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": "train your own version of a big AI on a small graphics card.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "pytorch-fsdp",
@@ -3422,7 +3802,9 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "pytorch-lightning",
@@ -3444,7 +3826,9 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "saelens",
@@ -3464,7 +3848,9 @@
    "for_from": "unclear",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "segment-anything-model",
@@ -3484,7 +3870,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "cut out any object in a picture, by pointing at it.",
+   "say_from": "for",
+   "say_judged": "points said as pointing at it"
   },
   {
    "name": "serving-llms-vllm",
@@ -3506,7 +3895,10 @@
    "left_out": false,
    "alike_groups": [
     "g_localai"
-   ]
+   ],
+   "say": "run an AI fast for many users at once, with vLLM.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "simpo",
@@ -3528,7 +3920,9 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "slime",
@@ -3550,7 +3944,9 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   },
   {
    "name": "tensorrt-llm",
@@ -3571,7 +3967,10 @@
    "left_out": false,
    "alike_groups": [
     "g_localai"
-   ]
+   ],
+   "say": "run AIs as fast as possible on NVIDIA graphics cards.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "torchtitan",
@@ -3593,7 +3992,10 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": "train a new AI from scratch on many graphics cards.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "unsloth",
@@ -3615,7 +4017,10 @@
    "left_out": false,
    "alike_groups": [
     "g_finetune"
-   ]
+   ],
+   "say": "train your own version of an AI faster, on a smaller graphics card.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "stripe-link-cli",
@@ -3635,7 +4040,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows, and a Stripe Link account, in the US only",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "buy things for you, with each payment approved in Link.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "stripe-projects",
@@ -3655,7 +4063,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows, and a Stripe account",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "sign you up for web services and keep their logins in one place.",
+   "say_from": "rewritten",
+   "say_judged": "provision said as sign up; creds said as logins"
   },
   {
    "name": "box",
@@ -3675,7 +4086,10 @@
    "for_from": "page",
    "needs": "a Box account and the Box app",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "organise, share and search your files on Box, a cloud file store.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "canvas",
@@ -3695,7 +4109,10 @@
    "for_from": "page",
    "needs": "a Canvas login",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "see your courses and assignments in Canvas, a school website.",
+   "say_from": "rewritten",
+   "say_judged": "Canvas LMS said as a school website"
   },
   {
    "name": "decision-questionnaire",
@@ -3715,7 +4132,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "turn a decision you cannot make alone into questions for someone else.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "here-now",
@@ -3737,7 +4157,10 @@
    "left_out": false,
    "alike_groups": [
     "g_publish"
-   ]
+   ],
+   "say": "put a web page online at here.now and keep files there.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "live-dashboard",
@@ -3757,7 +4180,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "build a page that shows live facts and refreshes itself.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "memento-flashcards",
@@ -3777,7 +4203,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "help you learn facts with flashcards that come back at the right time.",
+   "say_from": "rewritten",
+   "say_judged": "spaced repetition said as come back at the right time"
   },
   {
    "name": "property-listings",
@@ -3797,7 +4226,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "show homes or rentals you found as cards to compare, in the Hermes app.",
+   "say_from": "for",
+   "say_judged": "desktop cards said as cards in the Hermes app"
   },
   {
    "name": "shop",
@@ -3817,7 +4249,10 @@
    "for_from": "page",
    "needs": "the shop app",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "search shops, buy, and track orders and returns.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "siyuan",
@@ -3839,7 +4274,10 @@
    "left_out": false,
    "alike_groups": [
     "g_notes"
-   ]
+   ],
+   "say": "search and change notes in SiYuan, a notes app.",
+   "say_from": "rewritten",
+   "say_judged": "knowledge base said as notes app"
   },
   {
    "name": "telephony",
@@ -3859,7 +4297,10 @@
    "for_from": "page",
    "needs": "a Twilio account, paid",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "get a phone number, send texts and make AI phone calls, through Twilio.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "bioinformatics",
@@ -3879,7 +4320,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "find the right method for gene and biology data work.",
+   "say_from": "for",
+   "say_judged": "gateway to 400+ skills said as find the right method"
   },
   {
    "name": "blogwatcher",
@@ -3901,7 +4345,10 @@
    "left_out": false,
    "alike_groups": [
     "g_feeds"
-   ]
+   ],
+   "say": "follow blogs and news feeds and see what is new.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "darwinian-evolver",
@@ -3921,7 +4368,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "improve a short text or code by trying many versions and keeping the best.",
+   "say_from": "for",
+   "say_judged": "evolve said as trying many versions and keeping the best"
   },
   {
    "name": "domain-intel",
@@ -3941,7 +4391,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look up public facts about a website's address: owner, certificates, subdomains.",
+   "say_from": "for",
+   "say_judged": "passive recon said as public facts"
   },
   {
    "name": "drug-discovery",
@@ -3961,7 +4414,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look up medicines and how they act, for drug research.",
+   "say_from": "for",
+   "say_judged": "ChEMBL search, interactions said as how they act"
   },
   {
    "name": "gitnexus-explorer",
@@ -3981,7 +4437,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "show a code project as a clickable map of its parts.",
+   "say_from": "for",
+   "say_judged": "knowledge graph web UI said as clickable map"
   },
   {
    "name": "llm-wiki",
@@ -4003,7 +4462,10 @@
    "left_out": false,
    "alike_groups": [
     "g_notes"
-   ]
+   ],
+   "say": "build a growing set of linked notes that an AI keeps up to date.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "osint-investigation",
@@ -4023,7 +4485,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "dig through public records to trace money, companies and links between them.",
+   "say_from": "for",
+   "say_judged": "follow the money via public records"
   },
   {
    "name": "parallel-cli",
@@ -4045,7 +4510,10 @@
    "left_out": false,
    "alike_groups": [
     "g_websearch"
-   ]
+   ],
+   "say": "search the web and do deep research with Parallel.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "qmd",
@@ -4067,7 +4535,10 @@
    "left_out": false,
    "alike_groups": [
     "g_notes"
-   ]
+   ],
+   "say": "search your own notes and documents on your computer, by words and meaning.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "research-paper-writing",
@@ -4087,7 +4558,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "plan, run and write up AI research for big science meetings.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "rss-feeds",
@@ -4109,7 +4583,10 @@
    "left_out": false,
    "alike_groups": [
     "g_feeds"
-   ]
+   ],
+   "say": "read news feeds from a website and list the newest entries.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "scrapling",
@@ -4130,7 +4607,10 @@
    "needs": "",
    "left_out": true,
    "left_out_why": "Its page sells getting past sites that block robots, Cloudflare bypass in the docs' words.",
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "copy data from websites, also ones that try to block robots.",
+   "say_from": "for",
+   "say_judged": "stealth, Cloudflare bypass said as sites that try to block robots"
   },
   {
    "name": "1password",
@@ -4150,7 +4630,10 @@
    "for_from": "page",
    "needs": "a 1Password account and its op app",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "read your secrets from 1Password and use them.",
+   "say_from": "rewritten",
+   "say_judged": "read or inject secrets said as read and use"
   },
   {
    "name": "godmode",
@@ -4171,7 +4654,10 @@
    "needs": "",
    "left_out": true,
    "left_out_why": "Its purpose is to get around the safety rules of AI models. The page calls it jailbreaking.",
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "get around the safety rules of AIs.",
+   "say_from": "rewritten",
+   "say_judged": "jailbreak said as get around the safety rules"
   },
   {
    "name": "oss-forensics",
@@ -4191,7 +4677,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "investigate an attack on open-source code on GitHub and write a report.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "sherlock",
@@ -4212,7 +4701,10 @@
    "needs": "",
    "left_out": true,
    "left_out_why": "It finds a person's accounts across 400 sites from one username. Easy to misuse on others.",
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "find which websites have an account with a given username.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "unbroker",
@@ -4232,7 +4724,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "find and remove your personal details from people-search websites.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "web-pentest",
@@ -4253,7 +4748,10 @@
    "needs": "a Mac or Linux, not Windows",
    "left_out": true,
    "left_out_why": "It attacks websites. Pointed at a site you may not test, it breaks the law.",
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "attack a website you are allowed to test, to find its security holes.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "openhue",
@@ -4273,7 +4771,10 @@
    "for_from": "page",
    "needs": "a Hue Bridge and the openhue app",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "turn Philips Hue lights and scenes on and off.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "reddit-reading",
@@ -4293,7 +4794,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "read and search Reddit posts and comments.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "ast-grep",
@@ -4313,7 +4817,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "search and change code by its structure, not only its letters.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "code-wiki",
@@ -4333,7 +4840,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "write a wiki with diagrams that explains a code project.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "grill-me",
@@ -4353,7 +4863,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "question your plan hard, step by step, before you build it.",
+   "say_from": "rewritten",
+   "say_judged": null
   },
   {
    "name": "hermes-agent-skill-authoring",
@@ -4373,7 +4886,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "write new skills, the steps that teach Hermes a task, for the Hermes project.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "inspecting-hermes-desktop-dom",
@@ -4393,7 +4909,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "look inside the running Hermes app's page, for people changing the app.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "node-inspect-debugger",
@@ -4413,7 +4932,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "find bugs in Node.js programs by pausing them step by step.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "pr-lens",
@@ -4433,7 +4955,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "draw a code change as a moving diagram that shows how it works.",
+   "say_from": "for",
+   "say_judged": "animated said as moving"
   },
   {
    "name": "python-debugpy",
@@ -4453,7 +4978,10 @@
    "for_from": "page",
    "needs": "a Mac or Linux, not Windows",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "find bugs in Python programs by pausing them step by step.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "rest-graphql-debug",
@@ -4473,7 +5001,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "find out why a web service answers with an error.",
+   "say_from": "for",
+   "say_judged": "REST/GraphQL APIs said as web service"
   },
   {
    "name": "subagent-driven-development",
@@ -4493,7 +5024,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "carry out a coding plan by handing each task to a fresh AI helper.",
+   "say_from": "for",
+   "say_judged": "subagents said as fresh AI helper"
   },
   {
    "name": "cloudflare-temporary-deploy",
@@ -4515,7 +5049,10 @@
    "left_out": false,
    "alike_groups": [
     "g_publish"
-   ]
+   ],
+   "say": "put a small web app online for an hour, with no account.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "har-derived-api-client",
@@ -4535,7 +5072,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "record what a website sends, then make a program that fetches the same data.",
+   "say_from": "rewritten",
+   "say_judged": "derive an HTTP client said as make a program that fetches the same data"
   },
   {
    "name": "page-agent",
@@ -4555,7 +5095,10 @@
    "for_from": "page",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": "add an AI helper inside your own web app that clicks for its users.",
+   "say_from": "for",
+   "say_judged": "GUI copilot said as AI helper that clicks"
   },
   {
    "name": "publish-site",
@@ -4577,7 +5120,10 @@
    "left_out": false,
    "alike_groups": [
     "g_publish"
-   ]
+   ],
+   "say": "put a website you built online on GitHub, Cloudflare or Netlify Pages.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "scrollcraft",
@@ -4599,7 +5145,10 @@
    "left_out": false,
    "alike_groups": [
     "g_webdesign"
-   ]
+   ],
+   "say": "build landing pages where scrolling plays like a film.",
+   "say_from": "for",
+   "say_judged": null
   },
   {
    "name": "yuanbao",
@@ -4619,7 +5168,9 @@
    "for_from": "unclear",
    "needs": "",
    "left_out": false,
-   "alike_groups": []
+   "alike_groups": [],
+   "say": null,
+   "say_from": "fixed: what it is for is not clear from the docs"
   }
  ]
 }

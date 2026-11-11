@@ -7386,11 +7386,15 @@
   },
   {
    "about_keeping": true,
-   "expect": "RM6",
+   "expect": "RM1 +kept=asked +first",
    "failed": null,
    "kept": null,
-   "kept_after": {},
-   "name": "plural: passwords are refused",
+   "kept_after": {
+    "asked": [
+     "my passwords are in the blue notebook"
+    ]
+   },
+   "name": "changes-12: where the passwords are is not a password, kept",
    "stage": "open",
    "steps": [
     {
@@ -7482,11 +7486,11 @@
   },
   {
    "about_keeping": true,
-   "expect": "RM6",
+   "expect": "RM1 +kept=asked +first",
    "failed": null,
    "kept": null,
-   "kept_after": {},
-   "name": "logins are refused",
+   "kept_after": null,
+   "name": "changes-12: where the logins are is kept",
    "stage": "open",
    "steps": [
     {
@@ -7509,6 +7513,450 @@
       "work": null
      },
      "text": "remember that the logins are on the fridge"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: pw and a colon",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "pw: hunter-7-blue"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "pw: hunter-7-blue"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that pw: hunter-7-blue"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: a short label, is, one value",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "the wifi key is GreenHouse2026"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "the wifi key is GreenHouse2026"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that the wifi key is GreenHouse2026"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: another language, same shape",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "mana parole ir Riga2026"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "mana parole ir Riga2026"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that mana parole ir Riga2026"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: a typo of password",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "my pasword is sunflower12"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "my pasword is sunflower12"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my pasword is sunflower12"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: a secret word, is, plain words",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my passphrase is correct horse battery staple"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: 12 plain words in a row",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "tiger lamp forest mango quiet river salt opera blanket cherry jump vivid"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "tiger lamp forest mango quiet river salt opera blanket cherry jump vivid"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that tiger lamp forest mango quiet river salt opera blanket cherry jump vivid"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM6",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: 24 plain words get RM6, not too long",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM5"
+     },
+     "shown": "RM5",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that tiger lamp forest mango quiet river salt opera blanket cherry jump vivid tiger lamp forest mango quiet river salt opera blanket cherry jump vivid "
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM1 +kept=asked +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "changes-12: talking about passwords is kept",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that I use Bitwarden for passwords"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM1 +kept=asked +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "changes-12: talking about API keys is kept",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that I want to learn about API keys"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM1 +kept=asked +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "changes-12: a password manager is kept",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM6"
+     },
+     "shown": "RM6",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my password manager is 1Password"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM1 +kept=asked +first",
+   "failed": null,
+   "kept": null,
+   "kept_after": null,
+   "name": "changes-12: an AI name after is, kept",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "first": true,
+      "kept": [
+       "asked"
+      ],
+      "kind": "RM1",
+      "thing": "my favourite model is gpt-4o"
+     },
+     "shown": "RM1 +kept=asked +first",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {
+       "asked": [
+        "my favourite model is gpt-4o"
+       ],
+       "told": true
+      },
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that my favourite model is gpt-4o"
+    }
+   ]
+  },
+  {
+   "about_keeping": true,
+   "expect": "RM5",
+   "failed": null,
+   "kept": null,
+   "kept_after": {},
+   "name": "changes-12: a long ordinary sentence is still too long",
+   "stage": "open",
+   "steps": [
+    {
+     "do": "say",
+     "has_model": false,
+     "model": null,
+     "out": {
+      "calls": 0,
+      "kind": "RM5"
+     },
+     "shown": "RM5",
+     "state": {
+      "asked": [],
+      "found": {},
+      "kept": {},
+      "lastq": false,
+      "name": null,
+      "pending": null,
+      "stage": "open",
+      "work": null
+     },
+     "text": "remember that well that is a long story because I do a little bit of everything these days and more"
     }
    ]
   },
@@ -9994,15 +10442,15 @@
    ]
   }
  ],
- "json_sha256": "471deff0ce066d61153c2e43ca0547472fd77189b986b5f203d4c5ba008ce6fe",
+ "json_sha256": "e3c4666a33109960cb6304337530b4cf859eda170f97a1738ddce76e5098589b",
  "keeps_off": false,
  "last_printed_lines": [
   "ok    mail on schedule: gmail every morning: line sch5",
   "",
-  "conversations: 201 of 201 as expected"
+  "conversations: 202 of 213 as expected"
  ],
  "no_wants": false,
- "route2_sha256": "c7edb97ac41e007b5c4a7df277475143866fd49612b0a98f7c2956b9b196b48e",
+ "route2_sha256": "eb2d3ec5490712d6a88c30562e798e0619ce65028ab93b821051b5e8deddbc4c",
  "singles": [
   {
    "landed": "mem",

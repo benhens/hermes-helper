@@ -108,9 +108,9 @@
   },
   {
    "id": "K1",
-   "text": "That looks like a secret key, so I did not send it. Keys go in Settings, never in a chat.",
+   "text": "That looks like a secret key. I did not keep it. Keys go in Settings, never in a chat.",
    "kind": "reply",
-   "words": 20,
+   "words": 19,
    "found": []
   },
   {
@@ -292,9 +292,9 @@
   },
   {
    "id": "kept-first",
-   "text": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone.",
+   "text": "I keep this in the Hermes app on this computer. Nothing you type to me goes to any AI or anyone. Never tell me passwords.",
    "kind": "reply",
-   "words": 21,
+   "words": 25,
    "found": []
   },
   {
@@ -505,6 +505,13 @@
    "text": "Removing Helper does not delete it.",
    "kind": "reply",
    "words": 6,
+   "found": []
+  },
+  {
+   "id": "settings-fact-4",
+   "text": "Do not type passwords here.",
+   "kind": "reply",
+   "words": 5,
    "found": []
   },
   {
