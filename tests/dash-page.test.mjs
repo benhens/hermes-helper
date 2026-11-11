@@ -1,4 +1,4 @@
-// dash-v1: the Dashboard tab rendered from the built desktop/plugin.js with stand-ins for React and Hermes
+// The Dashboard tab (dash-v1, fixes of dash-v2) rendered from the built desktop/plugin.js with stand-ins for React and Hermes
 // (tests/lib/render.mjs), for the three made-up people of tests/dash-rules.test.mjs: the three tiles and their
 // waiting blocks, the order of the reads (always naming the bot), Activity shown only when its read works, the path
 // (filled, "You are here", the quiet five, one neutral line), a click on a stop, the route buttons, and the rules:
@@ -23,7 +23,11 @@ const skillsOf = { just_installed: 39, half: 39, all: 44 }
 
 let log
 // A made-up person's Hermes. opts: listPersisted false = a Hermes without that read; failing: names of reads that fail
-function useHost(who, { listPersisted = true, failing = [], userCount = 1, openBot = 'default' } = {}) {
+// plugins: the rows of plugins.manage list (Hermes's own parts are source bundled); byBot: { name: person } gives a bot
+// other than the main one its own answers
+const ONE_ON = [{ name: 'advanced-delegation', source: 'user', status: 'enabled' }]
+const BUNDLED = Array.from({ length: 64 }, (_, i) => ({ name: `own-${i}`, source: 'bundled', status: i < 59 ? 'enabled' : 'not enabled' }))
+function useHost(who, { listPersisted = true, failing = [], plugins = ONE_ON, openBot = 'default', byBot = {}, sessions = null } = {}) {
   log = []
   const p = PEOPLE[who]
   const answer = (name, value) => {
@@ -36,17 +40,22 @@ function useHost(who, { listPersisted = true, failing = [], userCount = 1, openB
     request: async (method, params) => {
       log.push({ method, params })
       if (failing.includes(method)) throw new Error(`${method} failed`)
-      if (method === 'setup.runtime_check' && params && params.profile) return p.model.value
+      const bot = PEOPLE[byBot[params && (params.profile || params.name)]] || p
+      if (method === 'setup.runtime_check' && params && params.profile) return bot.model.value
       if (method === 'setup.runtime_check') return { ok: true, model: 'mock-small' }
-      if (method === 'profiles.describe') return p.soul.value
-      if (method === 'cron.manage') return p.cron.value
-      if (method === 'plugins.manage') return { user_count: userCount, bundled_count: 64, plugins: [] }
+      if (method === 'profiles.describe') return bot.soul.value
+      if (method === 'cron.manage') return bot.cron.value
+      if (method === 'plugins.manage') {
+        const rows = Array.isArray(plugins) ? plugins : plugins[params.profile] || []
+        return { user_count: rows.length, bundled_count: 64, plugins: [...BUNDLED, ...rows] }
+      }
       throw new Error('unexpected ' + method)
     },
     profiles: () => answer('profiles.list', p.bots.value),
     skills: name => answer('skills.list', Array.from({ length: name === 'default' ? skillsOf[who] : 3 }, (_, i) => ({ name: name === 'default' ? `s${i}` : `own-${name}-${i}` }))),
-    status: () => answer('status', p.status.value),
-    ...(listPersisted ? { listPersisted: o => answer('listPersisted', { sessions: sessionsOf[who], total: sessionsOf[who].length, asked: o }) } : {})
+    // host.status() answers for the bot the app has open
+    status: () => answer('status', (PEOPLE[byBot[globalThis.__hhHost.profile]] || p).status.value),
+    ...(listPersisted ? { listPersisted: o => answer('listPersisted', { sessions: sessions || sessionsOf[who], total: (sessions || sessionsOf[who]).length, asked: o }) } : {})
   }
 }
 
@@ -56,6 +65,11 @@ async function open(who, opts, storage = fakeStorage()) {
   const view = mount(reg.Page)
   await settle(12)
   return { view, storage: reg.storage, Page: reg.Page }
+}
+// the words of a tile as they read on screen, without what only a screen reader gets
+const tileSaid = (view, key) => {
+  const t = byData(dash(view), `tile-${key}`)
+  return all(t, n => [D.tileNum, D.tileLabel].includes(n.props.className)).map(n => text(n).trim()).join(' ')
 }
 const dash = view => byData(view.tree, 'dashboard')
 // the words as they read on screen (the stand-in renderer joins an element's parts with spaces)
@@ -75,14 +89,41 @@ beforeEach(() => {
   delete globalThis.ResizeObserver
 })
 
-test('the top box: three tiles, bots, skills (different names across all bots) and plugins (installed + 1 for Helper), each with Hermes\'s own icon', async () => {
-  const { view } = await open('half', { userCount: 1 })
+test('the top box: three tiles, bots, skills (different names across all bots) and plugins (switched on for the open bot + 1 for Helper), each with Hermes\'s own icon', async () => {
+  const { view } = await open('half')
   assert.deepEqual(all(byData(dash(view), 'stats'), n => /^tile-/.test(n.props['data-hh'] || '')).map(n => n.props['data-hh']), ['tile-bots', 'tile-skills', 'tile-plugins'])
   // half: 3 bots; skills: the main bot's 39 plus 3 of each other bot's own
   assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileNumber(view, k)), ['3', '45', '2'])
-  assert.deepEqual(['bots', 'skills', 'plugins'].map(k => text(byData(dash(view), `tile-${k}`)).replace(/\d+/g, '').trim()), [W.stats.bots, W.stats.skills, W.stats.plugins])
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileSaid(view, k)), ['3 bots', '45 skills', '2 plugins on in this bot'])
   assert.deepEqual(all(byData(dash(view), 'stats'), n => n.type === 'sdk:Codicon').map(n => [n.props.name, n.props.size]), [['hubot', 20], ['zap', 20], ['extensions', 20]])
   assert.doesNotMatch(text(dash(view)), /30 days|chats in|streak|days with a chat/i)
+})
+
+test('a tile\'s word follows its number: "1 bot", "1 plugin on in this bot" for a newcomer; a plugin that is installed but switched off is not counted', async () => {
+  const off = [{ name: 'advanced-delegation', source: 'user', status: 'not enabled' }]
+  const { view } = await open('just_installed', { plugins: off })
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileSaid(view, k)), ['1 bot', '39 skills', '1 plugin on in this bot'])
+  const two = await open('just_installed', { plugins: [...ONE_ON, ...off, { name: 'x', source: 'user', status: 'disabled' }] })
+  assert.equal(tileSaid(two.view, 'plugins'), '2 plugins on in this bot')
+  // one skill: the singular too (a made-up Hermes whose only bot has one skill)
+  useHost('just_installed')
+  globalThis.__hhHost.skills = () => [{ name: 'only-one' }]
+  const reg = await registerPlugin(fakeStorage(), fakeTimers())
+  const one = mount(reg.Page)
+  await settle(12)
+  assert.equal(tileSaid(one, 'skills'), '1 skill')
+})
+
+test('a screen reader hears "Counting" while a number is still being read, and that it could not be read when its read failed; neither is drawn for the eye', async () => {
+  useHost('half', { failing: ['plugins.manage'] })
+  const reg = await registerPlugin(fakeStorage(), fakeTimers())
+  const view = mount(reg.Page)
+  const heard = key => all(byData(dash(view), `tile-${key}`), n => n.props.className === K.srOnly).map(n => text(n).trim())
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(heard), [[W.stats.waiting], [W.stats.waiting], [W.stats.waiting]])
+  await settle(12)
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(heard), [[], [], [W.stats.not_known]])
+  assert.equal(W.stats.not_known, 'Helper could not read this number just now.')
+  assert.equal(tileSaid(view, 'plugins'), 'plugins on in this bot', 'for the eye: the word, no number')
 })
 
 test('each number has its own waiting block until its read is back; a failed read shows no number at all (never a bare 1 for plugins)', async () => {
@@ -131,13 +172,47 @@ test('the reads: the bots first, then the path\'s own reads, then the skills, th
   assert.deepEqual(sdk.arg, { route: null, profile: 'default', limit: 500 })
 })
 
-test('another bot open in the app: Activity and plugins read that bot; the six rules read the main bot', async () => {
-  await open('half', { openBot: 'bot1' })
-  const req = m => log.find(e => e.method === m && e.params && (e.params.profile || e.params.name))
-  assert.equal(req('setup.runtime_check').params.profile, 'default')
-  assert.equal(req('cron.manage').params.profile, 'default')
-  assert.equal(req('plugins.manage').params.profile, 'bot1')
+test('another bot open in the app (Lead, 11 Nov: the count must not mix two bots): A model, Its personality, Chat apps and Scheduled jobs read that bot, as Activity and the plugins tile do', async () => {
+  // the main bot is the half person's (a model, a paused job, no personality); the open bot "bot1" has all of it
+  const { view } = await open('half', { openBot: 'bot1', byBot: { bot1: 'all' }, plugins: { default: ONE_ON, bot1: [] } })
+  const req = m => log.filter(e => e.method === m && e.params && (e.params.profile || e.params.name))
+  for (const m of ['setup.runtime_check', 'cron.manage', 'plugins.manage']) assert.deepEqual(req(m).map(e => e.params.profile), ['bot1'], m)
+  assert.deepEqual(req('profiles.describe').map(e => e.params.name), ['bot1'])
   assert.equal(globalThis.__hhHost.sdkCalls.find(c => c.name === 'listPersisted').arg.profile, 'bot1')
+  // nothing at all is asked about the main bot
+  assert.deepEqual(log.filter(e => e.params && (e.params.profile === 'default' || e.params.name === 'default')), [])
+  // so the path shows the open bot: its own personality and its chat app are seen done (the main bot has neither)
+  assert.equal(stop(view, 'personality').props['data-state'], 'done')
+  assert.equal(stop(view, 'chat_apps').props['data-state'], 'done')
+  assert.equal(said(byData(dash(view), 'count')), '6 of 6')
+  assert.equal(tileSaid(view, 'plugins'), '1 plugin on in this bot', 'the open bot has no plugin of its own: Helper only')
+  // Install and A second bot are for the whole Hermes
+  assert.equal(stop(view, 'second_bot').props['data-state'], 'done')
+  const main = await open('half', { openBot: 'default', byBot: { bot1: 'all' }, plugins: { default: ONE_ON, bot1: [] } })
+  assert.equal(said(byData(dash(main.view), 'count')), '4 of 6')
+  assert.equal(tileSaid(main.view, 'plugins'), '2 plugins on in this bot')
+})
+
+test('the open bot changes while the tab is on screen: what was read goes, and everything is read again for the new bot', async () => {
+  const { view } = await open('half', { openBot: 'default', byBot: { bot1: 'all' }, plugins: { default: ONE_ON, bot1: [] } })
+  assert.equal(said(byData(dash(view), 'count')), '4 of 6')
+  assert.equal(tileSaid(view, 'plugins'), '2 plugins on in this bot')
+  const before = log.length
+  // the app opens another bot (host.state.profile); the page is drawn again
+  globalThis.__hhHost.profile = 'bot1'
+  click(stop(view, 'memory'))
+  // at once: the old bot's numbers and count are gone
+  assert.deepEqual(['bots', 'skills', 'plugins'].map(k => tileNumber(view, k)), ['waiting', 'waiting', 'waiting'])
+  assert.equal(byData(dash(view), 'count'), null)
+  await settle(12)
+  const again = log.slice(before)
+  assert.equal(again.filter(e => e === 'profiles.list').length, 1, 'the bots are read again')
+  assert.deepEqual(again.filter(e => e.method === 'plugins.manage').map(e => e.params.profile), ['bot1'])
+  assert.deepEqual(again.filter(e => e.params && e.params.profile === 'default'), [])
+  assert.equal(said(byData(dash(view), 'count')), '6 of 6')
+  assert.equal(tileSaid(view, 'plugins'), '1 plugin on in this bot')
+  // the stop that was open stays open through it
+  assert.equal(byData(dash(view), 'steps').props['data-stop'], 'memory')
 })
 
 test('Activity: GitHub\'s grid and "Last used ..."; Hermes\'s own work is not a day; a newcomer\'s first-run chat is not a day either', async () => {
@@ -158,7 +233,27 @@ test('Activity: GitHub\'s grid and "Last used ..."; Hermes\'s own work is not a 
   assert.ok(a2)
   assert.equal(byData(a2, 'last-used'), null)
   assert.equal(byData(a2, 'grid').props.children.filter(c => c.props['data-level'] > 0).length, 0)
+  // hhcontent's optional line for an empty Activity is not shown (Lead, 11 Nov), and is not in the built data
+  assert.doesNotMatch(text(dash(n.view)), /No chats/)
+  assert.equal(W.activity.no_chats, undefined)
+  assert.equal(text(all(a2, x => x.props.className === D.title)[0]), "This bot's activity")
 })
+
+test('a brand-new install whose first-run chat Hermes is still writing (stored as gui, 1 to 3 messages, titled Getting started) shows no "Last used today" and no lit day', async () => {
+  // as read in three brand-new homes on the first opening (dev/checks/dash-v2/fresh-probe-65b108b.out): 2 of 3 showed
+  // "Last used today" with these rows
+  for (const n of [1, 3, 4]) {
+    const { view } = await open('just_installed', { sessions: [{ source: 'gui', title: 'Getting started', started_at: NOW - 15, last_active: NOW - 2, message_count: n }] })
+    const act = byData(dash(view), 'activity')
+    assert.ok(act, 'the box is drawn')
+    assert.equal(byData(act, 'last-used'), null, `${n} messages`)
+    assert.equal(byData(act, 'grid').props.children.filter(c => c.props['data-level'] > 0).length, 0)
+  }
+  // the person's own first chat right after it is a day of use
+  const { view } = await open('just_installed', { sessions: [{ source: 'local', title: 'Getting started', started_at: NOW - 600, last_active: NOW - 500, message_count: 4 }, { source: 'gui', title: 'Plan my week', started_at: NOW - 60, last_active: NOW - 30, message_count: 2 }] })
+  assert.equal(text(byData(byData(dash(view), 'activity'), 'last-used')), 'Last used today')
+})
+
 
 test('Activity is not shown at all when the read is missing (not in the plugin docs) or fails: no error, no made-up squares', async () => {
   for (const opts of [{ listPersisted: false }, { failing: ['listPersisted'] }]) {
@@ -180,11 +275,16 @@ test('person 1, just installed: "2 of 6", Install and Model filled, You are here
   assert.equal(text(byData(stop(view, 'personality'), 'you-are-here')), W.setup.you_are_here)
   const next = byData(dash(view), 'next')
   assert.match(text(next), new RegExp(`${W.setup.next}.*Its personality.*${W.setup.open}`))
+  // hhdesign's review 5: "Open" is followed by Hermes's small down arrow (the steps open below, they do not lead away)
+  const openNext = byData(next, 'open-next')
+  assert.equal(text(openNext).trim(), 'Open')
+  assert.deepEqual(all(openNext, x => x.type === 'sdk:Codicon').map(x => [x.props.name, x.props.size, x.props['aria-hidden']]), [['chevron-down', 12, true]])
+  assert.equal(all(openNext, x => x.props.className === D.openChev).length, 1)
   // the names under the stops are the data's short names
   assert.deepEqual(stops(view).map(s => text(all(s, n => n.props.className === D.name)[0])), DASH_DATA.items.map(i => i.mark))
 })
 
-test('person 2, half: "4 of 6"; person 3, all: "6 of 6", "Everything Helper can see is set up.", nobody is here', async () => {
+test('person 2, half: "4 of 6"; person 3, all: "6 of 6", "All 6 are set up.", nobody is here', async () => {
   const half = await open('half')
   assert.equal(said(byData(dash(half.view), 'count')), '4 of 6')
   assert.equal(stop(half.view, 'scheduled_job').props['data-state'], 'done', 'a paused job counts')
@@ -193,7 +293,7 @@ test('person 2, half: "4 of 6"; person 3, all: "6 of 6", "Everything Helper can 
   assert.equal(said(byData(dash(allSet.view), 'count')), '6 of 6')
   assert.equal(all(dash(allSet.view), n => n.props['data-hh'] === 'you-are-here').length, 0)
   assert.equal(byData(dash(allSet.view), 'next'), null)
-  assert.match(text(byData(dash(allSet.view), 'all-done')), new RegExp(W.setup.all_done.replace('.', '\\.')))
+  assert.equal(text(byData(dash(allSet.view), 'all-done')).trim(), 'All 6 are set up.')
   assert.deepEqual(stops(allSet.view).filter(s => s.props['data-state'] !== 'done').map(s => s.props['data-stop']), ['first_chat', 'tools_apps', 'skills', 'memory', 'safety'])
 })
 
@@ -258,6 +358,65 @@ test('a click on a stop opens it under the path: its sentence, its numbered step
   // "Open" on the Next line opens the stop it names
   click(byData(dash(view), 'open-next'))
   assert.equal(byData(dash(view), 'steps').props['data-stop'], 'personality')
+})
+
+test('hhcontent\'s corrected steps are what an opened stop shows: Its personality as hhtech clicked it, with the way back; the model stop is "A model"', async () => {
+  const { view } = await open('just_installed')
+  click(stop(view, 'personality'))
+  const box = byData(dash(view), 'steps')
+  assert.equal(text(all(box, n => n.type === 'h3')[0]), 'Its personality')
+  assert.deepEqual(all(box, n => n.type === 'ol')[0].props.children.map(li => text(li).trim()), [
+    'Click Bots at the top of the left list.',
+    'Right-click your main bot, then click "Edit…".',
+    'Click the button "Advanced — model, skills, toolsets, SOUL.md".',
+    'The big box under the skills list is SOUL.md. Write who your bot is and how it talks.',
+    'Click Save. To come back: click Sessions at the top of the left list, then Helper.'
+  ])
+  assert.doesNotMatch(text(box), /Edit Profile/)
+  click(stop(view, 'model'))
+  const model = byData(dash(view), 'steps')
+  assert.equal(text(all(model, n => n.type === 'h3')[0]), 'A model')
+  assert.match(text(model), /The AI that does the thinking\. Your app may already have a free one\./)
+  assert.doesNotMatch(text(dash(view)), /Pick a model/)
+  // the team's marks on a step (seen / not seen) are for the team: never on the page, never in the built data
+  assert.doesNotMatch(text(model), /not seen|docs words/i)
+  assert.equal(JSON.stringify(DASH_DATA).includes('not_seen'), false)
+  assert.equal(JSON.stringify(DASH_DATA).includes('docs words'), false)
+})
+
+test('a stop that was open is still open when the person comes back: after a route button took them to Hermes\'s own screen, and after another tab; a closed one stays closed; nothing is stored for it', async () => {
+  const { view, Page, storage } = await open('half')
+  click(stop(view, 'model'))
+  const route = all(byData(dash(view), 'steps'), n => n.props['data-hh'] === 'route')[0]
+  assert.equal(text(route), 'Open Model settings')
+  route.props.onClick()
+  assert.deepEqual(globalThis.__hhHost.navigated, ['/settings?tab=config:model'])
+  // Hermes shows its Settings: our page is taken down, and built again when the person comes back
+  view.unmount()
+  const back = mount(Page)
+  await settle(12)
+  const box = byData(dash(back), 'steps')
+  assert.ok(box, 'the steps are there again')
+  assert.equal(box.props['data-stop'], 'model')
+  assert.equal(stop(back, 'model').props['aria-expanded'], true)
+  assert.equal(all(box, n => n.type === 'ol')[0].props.children.length, 5)
+  assert.equal(byData(dash(back), 'next'), null, 'the Next row gives way to the opened stop, as before')
+  // another tab and back
+  click(all(byData(back.tree, 'tabs'), n => n.props.role === 'tab')[1])
+  await settle(4)
+  click(all(byData(back.tree, 'tabs'), n => n.props.role === 'tab')[0])
+  await settle(12)
+  assert.equal(byData(dash(back), 'steps').props['data-stop'], 'model')
+  // closed by the person: closed when they come back
+  click(byData(dash(back), 'close'))
+  back.unmount()
+  const third = mount(Page)
+  await settle(12)
+  assert.equal(byData(dash(third), 'steps'), null)
+  assert.ok(byData(dash(third), 'next'))
+  // kept for the visit only, in the page's own memory: nothing written but the tab the person chose (as before)
+  assert.deepEqual([...storage.data.keys()], ['tab'])
+  assert.equal(storage.data.get('tab'), 'dashboard')
 })
 
 test('a source tag opens its docs page in the browser (ctx.os), never inside Hermes, and only the official docs', async () => {
@@ -378,19 +537,21 @@ test('the narrow sizes: under 640 px of left side the tab takes hhdesign\'s narr
   for (const st of stops(view)) assert.deepEqual(all(st, n => n.props.className === D.label)[0].props.style, { width: `${room}px` }, st.props['data-stop'])
 })
 
-test('the bots read failed: the main bot is not known, so its three reads are not made and those stops stay unknown (never another bot\'s answer)', async () => {
-  const { view } = await open('half', { failing: ['profiles.list'], openBot: 'bot1' })
-  // (Helper's own model check on the page names no bot: only the reads that name one are the Dashboard's)
-  const methods = log.filter(e => typeof e === 'object' && e.params && (e.params.profile || e.params.name)).map(e => e.method)
-  assert.ok(methods.includes('plugins.manage'), 'the open bot is still read')
-  for (const m of ['setup.runtime_check', 'profiles.describe', 'cron.manage']) assert.ok(!methods.includes(m), m)
-  for (const id of ['model', 'personality', 'scheduled_job', 'second_bot']) {
-    assert.equal(stop(view, id).props['data-state'], 'unknown', id)
-    assert.match(stop(view, id).props['aria-label'], new RegExp(`: ${W.setup.state_not_known}$`), id)
-  }
-  assert.equal(stop(view, 'install').props['data-state'], 'done')
-  // nobody is placed "here" on a stop that was not read
-  assert.deepEqual(all(dash(view), n => n.props['data-hh'] === 'you-are-here').map(n => n), [])
+test('the bots read failed: the open bot is still read by its own name (the app says which bot is open); only A second bot is unknown, and nobody is placed after it', async () => {
+  const { view } = await open('all', { failing: ['profiles.list'], openBot: 'bot1' })
+  const named = log.filter(e => typeof e === 'object' && e.params && (e.params.profile || e.params.name))
+  assert.deepEqual([...new Set(named.map(e => e.params.profile || e.params.name))], ['bot1'], 'never another bot')
+  for (const id of ['model', 'personality', 'chat_apps', 'scheduled_job']) assert.equal(stop(view, id).props['data-state'], 'done', id)
+  assert.equal(stop(view, 'second_bot').props['data-state'], 'unknown')
+  assert.match(stop(view, 'second_bot').props['aria-label'], new RegExp(`: ${W.setup.state_not_known}$`))
+  assert.equal(W.setup.state_not_known, 'Helper could not check this one just now')
+  assert.equal(said(byData(dash(view), 'count')), '5 of 6')
+  assert.equal(byData(dash(view), 'all-done'), null, 'not "All 6 are set up." while one could not be read')
+  assert.deepEqual(all(dash(view), n => n.props['data-hh'] === 'you-are-here'), [])
+  // a stop before the first one not done could not be read: nobody is placed "here"
+  const half = await open('half', { failing: ['setup.runtime_check'] })
+  assert.equal(stop(half.view, 'model').props['data-state'], 'unknown')
+  assert.deepEqual(all(dash(half.view), n => n.props['data-hh'] === 'you-are-here'), [])
 })
 
 test('leaving the tab drops what was read; opening it again reads everything again from the start', async () => {

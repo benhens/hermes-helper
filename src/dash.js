@@ -1,12 +1,16 @@
 // The Dashboard tab (dash-v1, as Pēteris picked it: design/dash-r5 way (ii), r6 Activity, r7 tiles, icons and line).
-// Three parts, top to bottom: the top box (three numbers for the whole Hermes), Activity (the open bot's days with a
-// chat, GitHub's grid), Set up (the path of 11 stops). Every word comes from content/dash-setup-list-v2.json
-// (src/dash-data.js); every rule from src/dash-rules.js; every class from the K and D tables (src/look.js).
+// Three parts, top to bottom: the top box (three numbers: bots and skills for the whole Hermes, plugins for the open
+// bot), Activity (the open bot's days with a chat, GitHub's grid), Set up (the path of 11 stops). Every word comes
+// from the team's content/dash-setup-list-v2.json and content/dash-words-v1.json (src/dash-data.js); every rule from
+// src/dash-rules.js and src/setup-reads.js; every class from the K and D tables (src/look.js).
 // No AI call, no warning colours, nothing stored: the reads run each time the tab is put on screen.
 // Reads, all read-only, always naming the bot (hhtech-dash-reads.md and -reads2.md, "For builder:"):
-//   first   profiles.list (the bots; the main bot is the one Hermes marks as default)
-//   then    setup.runtime_check, profiles.describe, cron.manage list for the main bot; host.status();
-//           host.listPersistedSessions for the bot the app has open (not in the SDK docs: feature-checked)
+//   first   profiles.list (the bots: the bots number, and A second bot)
+//   then    setup.runtime_check, profiles.describe, cron.manage list, host.status() and host.listPersistedSessions
+//           (not in the SDK docs: feature-checked), all for the bot the app has open
+//           (dash-v2; Lead, 11 Nov: "The count must not mix two bots. Every per-bot rule on the path (A model, Its
+//           personality, Chat apps, Scheduled jobs) reads the bot the app has open, the same bot as the plugins tile
+//           and Activity; it rereads when the open bot changes. Install and A second bot are for the whole Hermes.")
 //   then    host.skills.list for each bot (the skills number)
 //   last    plugins.manage list for the open bot (slow: up to a second)
 import { host, useValue, icons, Button, Codicon, CopyButton } from '@hermes/plugin-sdk'
@@ -15,8 +19,8 @@ import { jsx, jsxs } from 'react/jsx-runtime'
 import { K, D, cx } from './look.js'
 import { DASH_DATA } from './dash-data.js'
 import { DASH_CSS } from './dash-css.js'
-import { botRows, mainBotName, openBotName, doneFlags, makeReader } from './setup-reads.js'
-import { pathStates, chatDays, activityGrid, daysSinceUsed, lastUsedLine, weeksThatFit, distinctSkills, pluginCount } from './dash-rules.js'
+import { botRows, openBotName, doneFlags, makeReader } from './setup-reads.js'
+import { pathStates, chatDays, activityGrid, daysSinceUsed, lastUsedLine, weeksThatFit, distinctSkills, pluginCount, tileWord } from './dash-rules.js'
 
 // Every icon on the tab is Hermes's own (design/dash-r7/notes.md, the table; docs/answers/hhtech-dash-icons.md).
 // codicon: Hermes's Codicon component; tabler: Hermes's Tabler set through the SDK's `icons`. hermes: where Hermes
@@ -38,7 +42,9 @@ export const DASH_ICONS = {
   safety: { tabler: 'Lock', hermes: 'app/settings/constants.ts:756' },
   // the page's own small controls: the close mark on an opened stop, the tick of "everything is set up"
   close: { codicon: 'close', hermes: 'components/ui/sheet.tsx:76' },
-  check: { codicon: 'check', hermes: 'components/ui/select.tsx:113' }
+  check: { codicon: 'check', hermes: 'components/ui/select.tsx:113' },
+  // the small down arrow after "Open" on the Next row: the steps open below (hhdesign's review of 65b108b, point 5)
+  open: { codicon: 'chevron-down', hermes: 'components/ui/select.tsx:38' }
 }
 const stopIcon = id => DASH_ICONS[id === 'skills' ? 'skills_stop' : id]
 
@@ -146,9 +152,14 @@ export function makeDashboard(ctx) {
     } catch {}
   }
 
+  // The stop the person left open (dash-v2; hhtech's run: a route button takes them to Hermes's own screen, the page
+  // is built again when they come back, and the steps they were following were gone). Kept here, in the page's own
+  // memory, until Hermes starts again; nothing is written anywhere. Closing the stop forgets it.
+  const kept = { open: null }
+
   // The tab's state. The page holds it (src/page.js calls useDashboard on every draw, as it held the first build's
   // tabs), so it lives while the page is on screen. active: the Dashboard is the open tab. Each time it is opened
-  // (and when the app opens another bot), everything is read again from the start: nothing is kept between visits.
+  // (and when the app opens another bot), everything is read again from the start: nothing that was read is kept.
   function useDashboard({ active }) {
     const openBot = openBotName(useValue(host.state.profile))
     const [reads, setReads] = useState({})
@@ -170,19 +181,17 @@ export function makeDashboard(ctx) {
         const bots = await read(() => host.profiles.list(), DASH_READ_MS)
         if (!alive) return
         const rows = bots.ok ? botRows(bots.value) : null
-        // the main bot's three reads need its name; when the bots read failed they are not made (those stops stay
-        // unknown, never another bot's answer)
-        const main = mainBotName(rows)
-        const notRead = Promise.resolve({ ok: false })
         put({ bots: rows ? bots : { ok: false } })
         const listSessions = door(() => host.listPersistedSessions)
         const getStatus = door(() => host.status)
         const sessions = listSessions ? read(() => listSessions(null, { profile: openBot, limit: 500 }), DASH_READ_MS) : Promise.resolve({ ok: false })
         const status = getStatus ? read(() => getStatus(), DASH_READ_MS) : Promise.resolve({ ok: false })
         const [model, soul, cron, st, ses] = await Promise.all([
-          main ? request('setup.runtime_check', { profile: main }) : notRead,
-          main ? request('profiles.describe', { name: main }) : notRead,
-          main ? request('cron.manage', { action: 'list', profile: main, include_disabled: true }) : notRead,
+          // the open bot, by the name the app itself gives (never a guessed bot): so these are read also when the
+          // bots read failed
+          request('setup.runtime_check', { profile: openBot }),
+          request('profiles.describe', { name: openBot }),
+          request('cron.manage', { action: 'list', profile: openBot, include_disabled: true }),
           status,
           sessions
         ])
@@ -200,12 +209,19 @@ export function makeDashboard(ctx) {
         setReads({})
       }
     }, [active, openBot])
-    const [open, setOpen] = useState(null)
+    const [open, setOpenNow] = useState(() => kept.open)
+    const setOpen = to =>
+      setOpenNow(old => {
+        const next = typeof to === 'function' ? to(old) : to
+        kept.open = next
+        return next
+      })
     const [roadWidth, roadRef] = useDashWidth()
     const [gridWidth, gridRef] = useDashWidth()
     const stepsBox = useRef(null)
     // a stop just opened: its steps are brought into view (at the narrow size the page scrolls to them)
-    const [reveal, setReveal] = useState(false)
+    // (a stop found open on coming back is brought into view the same way)
+    const [reveal, setReveal] = useState(() => kept.open !== null)
     useEffect(() => {
       if (!reveal) return
       setReveal(false)
@@ -250,7 +266,13 @@ export function makeDashboard(ctx) {
                     : numbers[key] === null
                       ? null
                       : jsx('b', { className: D.tileNum, 'data-hh': 'number', children: String(numbers[key]) }, 'n'),
-                  jsx('span', { className: D.tileLabel, children: W.stats[key] }, 'l')
+                  jsx('span', { className: D.tileLabel, children: tileWord(key, numbers[key]) }, 'l'),
+                  // for a screen reader only: the number is still being read, or could not be read
+                  numbers[key] === undefined
+                    ? jsx('span', { className: K.srOnly, children: W.stats.waiting }, 'sr')
+                    : numbers[key] === null
+                      ? jsx('span', { className: K.srOnly, children: W.stats.not_known }, 'sr')
+                      : null
                 ]
               },
               'w'
@@ -522,7 +544,7 @@ export function makeDashboard(ctx) {
                   return jsx(
                     'a',
                     {
-                      className: K.chipLink,
+                      className: `${K.chipLink} ${D.src}`,
                       href: url,
                       target: '_blank',
                       rel: 'noreferrer',
@@ -559,6 +581,7 @@ export function makeDashboard(ctx) {
       )
     } else if (ready && here >= 0) {
       const it = items[here]
+      const openArrow = jsx('span', { className: D.openChev, children: jsx(DashIcon, { icon: DASH_ICONS.open, size: 12 }) }, 'c')
       under = jsxs(
         'div',
         {
@@ -583,7 +606,8 @@ export function makeDashboard(ctx) {
               },
               'words'
             ),
-            jsx(Button, { variant: 'link', size: 'inline', 'data-hh': 'open-next', onClick: () => toggle(it.id), children: W.setup.open }, 'open')
+            // "Open", then Hermes's small down arrow: the steps open below (hhdesign's review of 65b108b, point 5)
+            jsx(Button, { variant: 'link', size: 'inline', 'data-hh': 'open-next', onClick: () => toggle(it.id), children: [W.setup.open, openArrow] }, 'open')
           ]
         },
         'next'

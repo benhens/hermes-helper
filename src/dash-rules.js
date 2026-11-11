@@ -37,6 +37,15 @@ export function pathStates(flags, items = DASH_DATA.items) {
 // (kanban), tool and helper-agent runs, and 'local', the source Hermes's own first-run chat ("Getting started") came
 // back with (hhtech-dash-reads2.md section 3). Chats with no message are left out too.
 export const NOT_THE_PERSON = ['cron', 'kanban', 'tool', 'subagent', 'local']
+// dash-v2: while Hermes is still writing that first-run chat it is not 'local' yet. Read in three brand-new homes on
+// the first opening (dev/checks/dash-v2/fresh-probe-65b108b.out): source 'gui', 1 to 3 messages, title "Getting
+// started"; some seconds later 'local' with 4 messages. So a fresh install showed "Last used today" (hhtech-dash-run,
+// 2 of 3 homes). The field that tells it apart at once is its title (Hermes's CHAT_TITLE, agent/onboarding_text.py;
+// a repeated run is "Getting started #2"): a chat with that title and no more than Hermes's own four messages is
+// left out. With more messages the person has gone on in it, and it is a chat of theirs.
+export const FIRST_RUN_TITLE = /^Getting started( #\d+)?$/
+export const FIRST_RUN_MAX_MESSAGES = 4
+const isFirstRunChat = s => typeof s.title === 'string' && FIRST_RUN_TITLE.test(s.title.trim()) && s.message_count <= FIRST_RUN_MAX_MESSAGES
 // A time from a row as a Date: seconds (Hermes writes seconds); a number above 1e11 is read as milliseconds.
 const dashTime = v => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? new Date(v > 1e11 ? v : v * 1000) : null)
 // The person's own calendar day of a Date (their computer's clock), as 'YYYY-MM-DD'.
@@ -50,6 +59,7 @@ export function chatDays(sessions) {
     if (!s || typeof s !== 'object') continue
     if (NOT_THE_PERSON.includes(String(s.source || '').toLowerCase())) continue
     if (!(typeof s.message_count === 'number' && s.message_count > 0)) continue
+    if (isFirstRunChat(s)) continue
     const first = dashTime(s.started_at)
     const last = dashTime(s.last_active) || dashTime(s.last_activity_at) || first
     const keys = new Set([first, last].filter(Boolean).map(dayKey))
@@ -114,11 +124,17 @@ export function distinctSkills(perBot) {
   }
   return names.size
 }
-// Plugins: what plugins.manage list gives as installed by the person (user_count) for the open bot, plus 1 for
-// Helper itself (Helper is never in that list: hhtech-dash-icons.md point 2). A failed read: not shown, never a
-// bare 1.
+// Plugins (dash-v2; Lead, 11 Nov, his words "active plugins"): the plugins switched on for the open bot, plus 1 for
+// Helper itself (Helper is never in that list: hhtech-dash-icons.md point 2). A row of plugins.manage list is the
+// person's when its source is not 'bundled' (Hermes's own parts; tui_gateway/methods_tools.py counts user_count the
+// same way), and switched on when its status is 'enabled' ('not enabled' and 'disabled' are not: hermes_cli/
+// plugins_cmd.py _plugin_status). A failed read, or an answer with no rows: not shown, never a bare 1.
 export function pluginCount(read) {
   if (!read || !read.ok || !read.value || typeof read.value !== 'object') return null
-  const n = read.value.user_count
-  return Number.isInteger(n) && n >= 0 ? n + 1 : null
+  const rows = read.value.plugins
+  if (!Array.isArray(rows)) return null
+  return rows.filter(r => r && typeof r === 'object' && r.source !== 'bundled' && r.status === 'enabled').length + 1
 }
+// A tile's word under its number (hhcontent): the number 1 takes the _one word, every other number, and a tile with
+// no number yet, the plain one.
+export const tileWord = (key, n, words = DASH_DATA.words.stats) => (n === 1 ? words[`${key}_one`] : words[key])

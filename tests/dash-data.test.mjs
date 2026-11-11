@@ -128,3 +128,40 @@ test('what teammates saw in the app ("seen" sources in team files) is in that fi
     if (!(all[s.line - 1] || '').includes(s.quote)) t.diagnostic(`note: ${where}: ${s.file} line ${s.line} is now line ${at}`)
   }
 })
+
+/* ---------- dash-v2: hhcontent's words (content/result-hhcontent-dash-words.md, "For builder") ---------- */
+test('the words for one (bot, skill, plugin on in this bot), for a screen reader (Counting, could not read) and Copied are needed: one missing stops the build', () => {
+  for (const [part, key] of [['stats', 'bots_one'], ['stats', 'skills_one'], ['stats', 'plugins_one'], ['stats', 'not_known'], ['stats', 'waiting'], ['setup', 'copied']]) {
+    const a = copy()
+    delete a.page_words[part][key]
+    assert.match(dashProblems(a, DOCS).join('\n'), new RegExp(`page_words\\.${part}\\.${key} missing`))
+  }
+  assert.deepEqual([DATA.page_words.stats.bots_one, DATA.page_words.stats.skills_one, DATA.page_words.stats.plugins_one, DATA.page_words.stats.plugins], ['bot', 'skill', 'plugin on in this bot', 'plugins on in this bot'])
+})
+
+test('"All 6 are set up." has the number written in it: when the number of counted stops is not the one in the sentence, the build stops', () => {
+  assert.equal(DATA.page_words.setup.all_done, 'All 6 are set up.')
+  const a = copy()
+  a.page_words.setup.all_done = 'All 5 are set up.'
+  assert.match(dashProblems(a, DOCS).join('\n'), /all_done says 5; 6 stops are counted/)
+  const b = copy()
+  b.page_words.setup.all_done = 'Everything is set up.'
+  assert.match(dashProblems(b, DOCS).join('\n'), /all_done does not say how many/)
+})
+
+test('the built data: "No chats with this bot yet" is not in it (Lead: not shown); the team\'s step marks (seen, not seen, notes) are not in it; a step without a docs line (src null) is still a step', () => {
+  assert.equal(DATA.page_words.activity.no_chats, 'No chats with this bot yet', 'the team\'s file has the line')
+  const built = JSON.stringify(DASH_DATA)
+  assert.doesNotMatch(built, /No chats with this bot yet|not_seen|docs words, not seen|seen_note|"note"/)
+  assert.equal(DASH_DATA.words.activity.title, "This bot's activity")
+  const personality = DATA.items.find(i => i.id === 'personality')
+  assert.deepEqual(personality.steps.map(s => s.src === null), [false, false, true, false, true])
+  assert.deepEqual(DASH_DATA.items.find(i => i.id === 'personality').steps.map(s => Object.keys(s)), [['text'], ['text'], ['text'], ['text'], ['text']])
+  assert.equal(DATA.items.filter(i => i.steps.some(s => s.src === null)).length >= 3, true)
+  // every step carries one of the team's two marks (seen in the app, or docs words not seen)
+  for (const it of DATA.items) for (const s of it.steps) assert.equal(Boolean(s.seen) !== Boolean(s.not_seen), true, `${it.id}: ${s.text}`)
+  // the stop's names as hhcontent has them now
+  assert.deepEqual(DASH_DATA.items.map(i => i.name), ['Install Hermes', 'A model', 'First chat', 'Its personality', 'Chat apps', 'Tools and apps', 'Skills', 'Memory', 'Scheduled jobs', 'A second bot', 'Safety'])
+  // the route buttons stay on the steps hhcontent names: model 3, first_chat 1, chat_apps 1, scheduled_job 3
+  assert.deepEqual(DASH_DATA.items.flatMap(i => i.steps.map((s, k) => (s.route ? `${i.id} ${k + 1}` : null)).filter(Boolean)), ['model 3', 'first_chat 1', 'chat_apps 1', 'scheduled_job 3'])
+})

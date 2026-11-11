@@ -5,10 +5,14 @@
    theme's card edge is Hermes's inset hairline; sizes for a narrow left side sit under .hhd-compact.
    Every class starts with hhd-; every colour is a Hermes variable (or a color-mix of one with transparent). */
 
-/* the tab's column: the cards one under the other */
-.hhd-main{display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}
+/* the tab's column: the cards one under the other.
+   --hhd-round: the ONE value behind every corner of a card, tile, panel, icon square and waiting block (dash-v2).
+   1 = the round look he picked in dash-r3 (12 px cards and tiles, 10 px icon squares, 7 px waiting block).
+   Hermes's own corners are one fifth of that (its --radius-scalar is 0.2): to bring the tab down to them, change
+   this one number to 0.2 (2.4 px cards, 2 px icon squares) or 0.25 (3 px cards). Not his decision yet. */
+.hhd-main{--hhd-round:1;display:flex;flex-direction:column;gap:14px;padding:6px 32px 20px;min-width:0}
 .hhd-compact.hhd-main{gap:12px;padding:4px 24px 16px}
-.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:12px;padding:18px 22px}
+.hhd-card{display:flex;flex-direction:column;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:18px 22px}
 .hhd-compact .hhd-card{padding:14px 16px}
 html:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-title{font-size:11px;line-height:16px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--ui-accent);white-space:nowrap}
@@ -16,16 +20,16 @@ html:not(.dark) .hhd-card{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 /* the top box: three tiles, each its own card; the icon on a tinted square at the left (at the narrow size, above) */
 .hhd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .hhd-compact .hhd-stats{gap:8px}
-.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:12px;padding:14px 16px}
+.hhd-tile{display:flex;align-items:center;gap:12px;min-width:0;background:var(--ui-bg-elevated);border-radius:calc(12px*var(--hhd-round));padding:14px 16px}
 .hhd-compact .hhd-tile{flex-direction:column;align-items:flex-start;gap:10px;padding:12px}
 html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
-.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}
+.hhd-tile-icon{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:calc(10px*var(--hhd-round));background:color-mix(in srgb,var(--ui-accent) 13%,transparent);color:var(--ui-accent)}
 .hhd-compact .hhd-tile-icon{width:32px;height:32px}
 .hhd-tile-words{display:flex;flex-direction:column;min-width:0}
 .hhd-tile-num{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--ui-text-primary)}
 .hhd-compact .hhd-tile-num{font-size:24px;line-height:28px}
 .hhd-tile-label{font-size:12px;line-height:17px;color:var(--ui-text-tertiary);white-space:nowrap}
-.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:7px;background:var(--ui-bg-tertiary)}
+.hhd-wait{display:block;width:30px;height:20px;margin:6px 0;border-radius:calc(7px*var(--hhd-round));background:var(--ui-bg-tertiary)}
 .hhd-compact .hhd-wait{margin:4px 0}
 
 /* Activity: one low strip; words and the key on the left, GitHub's grid on the right */
@@ -57,8 +61,11 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-road{position:relative;margin:4px 0 0;width:100%}
 .hhd-compact .hhd-road{margin-top:2px}
 .hhd-lines{position:absolute;inset:0;overflow:visible;pointer-events:none}
-/* the line: one thin neutral line through all 11 stops, the same in every state; never the accent */
-.hhd-line{fill:none;stroke:var(--ui-stroke-tertiary);stroke-width:1.5;stroke-linecap:round}
+/* the line: one thin neutral line through all 11 stops, the same in every state; never the accent. Its colour is
+   Hermes's own neutral edge line, --sidebar-edge-border (the text colour at 7.5% in light, 12% in dark), because
+   Hermes's hairline --ui-stroke-tertiary is 10% accent and read as a pale blue thread (hhdesign's review of 65b108b).
+   Where a Hermes has no such variable: the grey of the quiet stops' pictures and names. */
+.hhd-line{fill:none;stroke:var(--sidebar-edge-border,var(--ui-text-quaternary));stroke-width:1.5;stroke-linecap:round}
 /* a stop: a button centred on its point; its name above (up) or below (down) */
 .hhd-stop{position:absolute;transform:translate(-50%,-50%);display:block;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}
 .hhd-stop:focus-visible{outline:none}
@@ -70,7 +77,7 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-here .hhd-dot{width:50px;height:50px;background:color-mix(in srgb,var(--ui-accent) 18%,var(--ui-bg-elevated));color:var(--ui-accent);border:2px solid var(--ui-accent);outline:5px solid color-mix(in srgb,var(--ui-accent) 14%,transparent);outline-offset:0}
 .hhd-compact .hhd-here .hhd-dot{width:42px;height:42px}
 /* (ii) the quieter mark for what Helper cannot see: smaller, the card's own colour, a thin ring of the line's colour */
-.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--ui-stroke-tertiary);color:var(--ui-text-quaternary)}
+.hhd-quiet .hhd-dot{width:30px;height:30px;background:var(--ui-bg-elevated);border:1.5px solid var(--sidebar-edge-border,var(--ui-text-quaternary));color:var(--ui-text-quaternary)}
 .hhd-compact .hhd-quiet .hhd-dot{width:26px;height:26px}
 .hhd-sel .hhd-dot,.hhd-stop:focus-visible .hhd-dot{outline:2px solid var(--ui-text-secondary);outline-offset:4px}
 .hhd-label{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -94,9 +101,14 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-next-name{font-size:13px;font-weight:600;color:var(--ui-text-primary)}
 .hhd-next-why{font-size:12.5px;line-height:17px;color:var(--ui-text-tertiary)}
 .hhd-alldone{color:var(--ui-accent)}
-.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:12px;background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}
+/* the small down arrow after "Open": the steps open below, they do not lead away */
+.hhd-open-chev{display:inline-flex;margin-left:4px}
+.hhd-steps{position:relative;display:flex;flex-direction:column;gap:10px;margin-top:14px;border-radius:calc(12px*var(--hhd-round));background:var(--ui-bg-tertiary);padding:16px 40px 14px 18px}
 .hhd-compact .hhd-steps{gap:8px;margin-top:12px;padding:12px 34px 12px 14px}
-.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px}
+/* the pointer to the opened stop: only its half above the panel is drawn (--ui-bg-tertiary is see-through, so the
+   half over the panel showed lighter); at the narrow size the page scrolls to the steps and it would point at nothing */
+.hhd-caret{position:absolute;top:-7px;width:14px;height:14px;background:var(--ui-bg-tertiary);transform:rotate(45deg);border-radius:2px;clip-path:polygon(0 0,100% 0,0 100%)}
+.hhd-compact .hhd-caret{display:none}
 .hhd-steps-head{display:flex;align-items:center;gap:10px;min-width:0}
 .hhd-steps-icon{flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--ui-accent) 18%,transparent);color:var(--ui-accent)}
 .hhd-steps-name{font-size:14px;font-weight:600;color:var(--ui-text-primary)}
@@ -114,5 +126,7 @@ html:not(.dark) .hhd-tile{box-shadow:inset 0 0 0 1px var(--ui-stroke-tertiary)}
 .hhd-word{white-space:nowrap}
 .hhd-paste-for{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}
 .hhd-quietline{font-size:11.5px;line-height:16px;color:var(--ui-text-tertiary)}
-.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}
+.hhd-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}
+/* the source tags stay (each claim traceable), quieter than the steps */
+.hhd-foot .hhd-src{font-size:10.5px;color:var(--ui-text-quaternary)}
 .hhd-close{position:absolute;right:10px;top:10px}

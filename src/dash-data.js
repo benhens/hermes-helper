@@ -430,7 +430,6 @@ export const DASH_DATA = {
       "last_used_today": "Last used today",
       "last_used_one": "Last used yesterday",
       "last_used_n": "Last used {n} days ago",
-      "no_chats": "No chats with this bot yet",
       "less": "Less",
       "more": "More",
       "months": [

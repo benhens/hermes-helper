@@ -267,6 +267,8 @@ export const D = {
   nextName: 'hhd-next-name',
   nextWhy: 'hhd-next-why',
   allDone: 'hhd-alldone',
+  // dash-v2: the small down arrow after "Open"
+  openChev: 'hhd-open-chev',
   steps: 'hhd-steps',
   caret: 'hhd-caret',
   stepsHead: 'hhd-steps-head',
@@ -285,6 +287,8 @@ export const D = {
   pasteFor: 'hhd-paste-for',
   quietLine: 'hhd-quietline',
   foot: 'hhd-foot',
+  // dash-v2: a source tag (worn with Hermes's chip classes), quieter than the steps
+  src: 'hhd-src',
   close: 'hhd-close'
 }
 

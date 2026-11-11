@@ -198,6 +198,28 @@ test('no model that answers: the model first (R1), whatever the answers', opt, a
   assert.equal(bubbleSaid(view), 'Hermes needs a model before anything else. Next: A model. The AI that does the thinking. Your app may already have a free one. Want the steps?')
 })
 
+// dash-v2 (the two branches joined): the docs door is one for the whole page now (src/dash.js openHermesDocs)
+test('no model, "I\'m stuck": the button "Open the Quickstart" hands that docs page to the person\'s browser, never anything inside Hermes', opt, async () => {
+  const opened = []
+  const host = useHost({ model: false })
+  const { Page } = await registerPlugin(fakeStorage(), fakeTimers({ hold: [12000] }), { os: { openExternal: u => opened.push(u) } }, src => aiModeSource(src, 'ai_writes'))
+  const view = mount(Page)
+  await settle()
+  finish(view)
+  byData(view.tree, 'skip').props.onClick({ preventDefault() {} })
+  finish(view)
+  await press(view, 'I know it well')
+  await press(view, 'Several bots, one per job')
+  await press(view, 'Show me the steps')
+  await press(view, labels(view).find(l => /stuck/.test(l)))
+  assert.equal(bubbleLine(view), 'STUCK_MODEL')
+  const button = byData(bubble(view), 'bubble-button')
+  assert.equal(text(button).trim(), 'Open the Quickstart')
+  button.props.onClick({ preventDefault() {} })
+  assert.deepEqual(opened, ['https://hermes-agent.nousresearch.com/docs/getting-started/quickstart'])
+  assert.equal(host.navigated, undefined)
+})
+
 test('the pick "Set up Hermes" under an offer, and "where do I start" typed, bring the recommendation back', opt, async () => {
   const { view, host } = await open()
   finish(view)

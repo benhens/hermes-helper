@@ -1,5 +1,6 @@
-// The Dashboard tab's data (dash-v1): the plugin's copy of the team's content/dash-setup-list-v2.json, with the
-// changes its own "builder" block lists and the tab's other words in "page_words". The build checks it here
+// The Dashboard tab's data: the plugin's copies of the team's content/dash-setup-list-v2.json (the 11 stops) and
+// content/dash-words-v1.json (every other word, "page_words"), each as the team wrote it (dash-v2; scripts/build.mjs
+// dashJoined puts the words beside the list). The build checks it here
 // (with any problem the build stops and writes nothing), then cuts it down to what src/dash.js reads.
 // Checks: every quote from the Hermes docs is on its named line of content/dash-docs-lines-v0.23.0.json (the same
 // rule as the wants: scripts/wants-data.mjs quoteProblem); the 11 things in order; the counted ones are exactly
@@ -76,9 +77,10 @@ export function dashProblems(data, docs) {
   const need = (obj, keys, where) => keys.forEach(k => isText(obj && obj[k]) || fails.push(`page_words.${where}${k} missing`))
   need(w, ['tab_list_label', 'not_built'], '')
   need(w.tabs, ['dashboard', 'learn', 'my_setup'], 'tabs.')
-  need(w.stats, ['bots', 'skills', 'plugins'], 'stats.')
+  // dash-v2: the word for one (bots_one ...), and what a screen reader hears while a number waits or could not be read
+  need(w.stats, ['bots', 'bots_one', 'skills', 'skills_one', 'plugins', 'plugins_one', 'not_known', 'waiting'], 'stats.')
   need(w.activity, ['title', 'last_used_today', 'last_used_one', 'last_used_n', 'less', 'more'], 'activity.')
-  need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'not_counted', 'close', 'copy', 'source', 'state_done', 'state_not_done', 'state_not_counted', 'state_not_known'], 'setup.')
+  need(w.setup, ['title', 'count', 'you_are_here', 'next', 'open', 'all_done', 'not_counted', 'close', 'copy', 'copied', 'source', 'state_done', 'state_not_done', 'state_not_counted', 'state_not_known'], 'setup.')
   if (w.activity) {
     if (!Array.isArray(w.activity.months) || w.activity.months.length !== 12 || !w.activity.months.every(isText)) fails.push('page_words.activity.months: not 12 names')
     if (!Array.isArray(w.activity.days) || w.activity.days.length !== 7 || !w.activity.days.every(d => typeof d === 'string')) fails.push('page_words.activity.days: not 7 (Sunday first; empty for no label)')
@@ -87,6 +89,13 @@ export function dashProblems(data, docs) {
   if (w.setup) {
     if (isText(w.setup.count) && !(w.setup.count.includes('{n}') && w.setup.count.includes('{total}'))) fails.push('page_words.setup.count needs {n} and {total}')
     if (isText(w.setup.source) && !(w.setup.source.includes('{file}') && w.setup.source.includes('{line}'))) fails.push('page_words.setup.source needs {file} and {line}')
+    // "All 6 are set up." has the number written in it (hhcontent): it must be the number of counted stops
+    if (isText(w.setup.all_done)) {
+      const said = w.setup.all_done.match(/\d+/)
+      const counted = items.filter(i => i.counts === true).length
+      if (!said) fails.push('page_words.setup.all_done does not say how many')
+      else if (Number(said[0]) !== counted) fails.push(`page_words.setup.all_done says ${said[0]}; ${counted} stops are counted`)
+    }
     if (isText(w.setup.not_counted) && !(data.cannot_tell_words || []).includes(w.setup.not_counted)) fails.push('page_words.setup.not_counted is not one of cannot_tell_words')
   }
   for (const id of ids) {
@@ -128,7 +137,8 @@ export function slimDashData(data) {
       tabListLabel: w.tab_list_label,
       notBuilt: w.not_built,
       stats: w.stats,
-      activity: w.activity,
+      // activity.no_chats (hhcontent's optional line for an empty Activity) is not shown (Lead, 11 Nov): left out
+      activity: Object.fromEntries(Object.entries(w.activity).filter(([k]) => k !== 'no_chats')),
       setup: w.setup
     }
   }

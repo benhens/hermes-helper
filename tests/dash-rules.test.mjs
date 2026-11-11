@@ -9,7 +9,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import { pathStates, chatDays, activityGrid, daysSinceUsed, lastUsedLine, dayKey, distinctSkills, pluginCount, weeksThatFit, NOT_THE_PERSON } from '../src/dash-rules.js'
+import { pathStates, chatDays, activityGrid, daysSinceUsed, lastUsedLine, dayKey, distinctSkills, pluginCount, tileWord, weeksThatFit, NOT_THE_PERSON, FIRST_RUN_TITLE, FIRST_RUN_MAX_MESSAGES } from '../src/dash-rules.js'
 import { STARTER_SOULS, isStarterSoul, soulNormal, botRows, mainBotName, openBotName, doneFlags } from '../src/setup-reads.js'
 import { DASH_DATA } from '../src/dash-data.js'
 import { PEOPLE } from './lib/dash-people.mjs'
@@ -47,7 +47,7 @@ test('the main bot is the one Hermes marks as default; the open bot is the app\'
   assert.equal(openBotName(' work '), 'work')
 })
 
-test('person 1, just installed on Hermes\'s own free plan: 2 of 6 (Install, Pick a model); You are here on Its personality', () => {
+test('person 1, just installed on Hermes\'s own free plan: 2 of 6 (Install, A model); You are here on Its personality', () => {
   const f = doneFlags(PEOPLE.just_installed)
   assert.deepEqual(f, { install: true, model: true, personality: false, chat_apps: false, scheduled_job: false, second_bot: false })
   const p = pathStates(f)
@@ -138,6 +138,21 @@ test('Hermes\'s own first-run chat ("Getting started", source local) is not a da
   assert.ok(g.cells.every(c => c.level === 0))
 })
 
+test('the first-run chat while Hermes is still writing it (dash-v2; seen in brand-new homes: source gui, 1 to 3 messages, then local with 4): left out by its title, so a fresh install has no day of use', () => {
+  const first = (source, n, title = 'Getting started') => ({ source, title, started_at: at(0), last_active: at(0), message_count: n })
+  for (const n of [1, 2, 3, 4]) assert.equal(chatDays([first('gui', n)]).size, 0, `gui, ${n} messages`)
+  assert.equal(chatDays([first('desktop', 2)]).size, 0)
+  // a later run of the first-run chat is "Getting started #2" (Hermes numbers a repeated title)
+  assert.equal(chatDays([first('gui', 3, 'Getting started #2')]).size, 0)
+  assert.deepEqual([FIRST_RUN_TITLE.test('Getting started'), FIRST_RUN_TITLE.test('Getting started #12'), FIRST_RUN_TITLE.test('Getting started with Telegram'), FIRST_RUN_TITLE.test('getting started')], [true, true, false, false])
+  assert.equal(FIRST_RUN_MAX_MESSAGES, 4)
+  // the person went on in that chat (more than Hermes's own four messages), or has a chat of their own: a day of use
+  assert.equal(chatDays([first('gui', 5)]).size, 1)
+  assert.equal(chatDays([first('gui', 2, 'Getting started with Telegram')]).size, 1)
+  assert.equal(chatDays([first('gui', 2, null)]).size, 1)
+  assert.equal(lastUsedLine(daysSinceUsed(chatDays([first('gui', 3), first('gui', 2, 'Plan my week')]), TODAY)), 'Last used today')
+})
+
 test('Hermes\'s own work is left out (scheduled jobs, the task board, tools, helper agents), and chats with no message', () => {
   assert.deepEqual(NOT_THE_PERSON, ['cron', 'kanban', 'tool', 'subagent', 'local'])
   const days = chatDays([row('cron', 1), row('kanban', 2), row('tool', 3), row('subagent', 4), row('local', 5), row('gui', 6, 6, 0)])
@@ -198,11 +213,28 @@ test('skills: the different skill names across all bots; one bot\'s read failed:
   assert.equal(distinctSkills([]), null)
 })
 
-test('plugins: what the person installed for the open bot (user_count) plus 1 for Helper; a failed read: no number, never a bare 1', () => {
-  assert.equal(pluginCount(ok({ user_count: 0, bundled_count: 64, plugins: [] })), 1)
-  assert.equal(pluginCount(ok({ user_count: 2 })), 3)
+test('plugins: only the plugins switched on for the open bot, plus 1 for Helper; installed but switched off is not counted; a failed read: no number, never a bare 1', () => {
+  const row = (source, status) => ({ name: 'x', source, status })
+  // Hermes's own parts (source bundled) are never the person's plugins
+  assert.equal(pluginCount(ok({ user_count: 0, bundled_count: 64, plugins: [row('bundled', 'enabled'), row('bundled', 'not enabled')] })), 1)
+  // hhtech's home 3: one catalog plugin "installed but not enabled" was counted before; now only Helper
+  assert.equal(pluginCount(ok({ user_count: 1, plugins: [row('bundled', 'enabled'), row('user', 'not enabled')] })), 1)
+  assert.equal(pluginCount(ok({ user_count: 1, plugins: [row('user', 'disabled')] })), 1)
+  assert.equal(pluginCount(ok({ user_count: 1, plugins: [row('user', 'enabled')] })), 2)
+  assert.equal(pluginCount(ok({ user_count: 3, plugins: [row('user', 'enabled'), row('git', 'enabled'), row('user', 'not enabled'), row('bundled', 'enabled')] })), 3)
   assert.equal(pluginCount(FAIL), null)
-  assert.equal(pluginCount(ok({ plugins: [] })), null, 'no user_count: not shown')
-  assert.equal(pluginCount(ok({ user_count: -1 })), null)
+  assert.equal(pluginCount(ok({ user_count: 2 })), null, 'no rows to read the switches from: not shown')
+  assert.equal(pluginCount(ok({ plugins: 'x' })), null)
   assert.equal(pluginCount(undefined), null)
+})
+
+test('a tile\'s word follows its number: 1 takes the _one word, every other number the plain one (hhcontent\'s rule)', () => {
+  const W = DASH_DATA.words.stats
+  assert.deepEqual([1, 2, 0, 39].map(n => tileWord('bots', n)), ['bot', 'bots', 'bots', 'bots'])
+  assert.deepEqual([1, 39].map(n => tileWord('skills', n)), ['skill', 'skills'])
+  assert.deepEqual([1, 2].map(n => tileWord('plugins', n)), [W.plugins_one, W.plugins])
+  assert.deepEqual([W.plugins_one, W.plugins], ['plugin on in this bot', 'plugins on in this bot'])
+  // while the number is not there (waiting, or its read failed) the plain word stands
+  assert.equal(tileWord('bots', undefined), 'bots')
+  assert.equal(tileWord('bots', null), 'bots')
 })
